@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
@@ -16,10 +17,29 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final syncStatus = ref.watch(syncStatusProvider);
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final lastPrayersSync = HiveService.getLastSync('prayers');
 
-    return ListView(
+    return Stack(
+      children: [
+        IgnorePointer(
+          child: Container(
+            height: 160,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        ListView(
       padding: const EdgeInsets.all(16),
       children: [
         // Theme
@@ -206,6 +226,8 @@ class SettingsScreen extends ConsumerWidget {
         const Text('Mybrev — беларускі каталіцкі малітоўнік'),
         const Text('Версія 1.0.0'),
         const SizedBox(height: 32),
+      ],
+    ),
       ],
     );
   }

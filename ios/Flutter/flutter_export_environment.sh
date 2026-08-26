@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=/Users/gleb/Development/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/gleb/Documents/GitHub/senddownrain/mybrev/mybrev_flutter"
+export "FLUTTER_APPLICATION_PATH=/Users/gleb/Documents/GitHub/senddownrain/mybrev/ibreviarybyapp"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"
@@ -11,4 +11,4 @@ export "DART_DEFINES=RkxVVFRFUl9WRVJTSU9OPTMuMzguOQ==,RkxVVFRFUl9DSEFOTkVMPXN0YW
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=false"
 export "TREE_SHAKE_ICONS=false"
-export "PACKAGE_CONFIG=/Users/gleb/Documents/GitHub/senddownrain/mybrev/mybrev_flutter/.dart_tool/package_config.json"
+export "PACKAGE_CONFIG=/Users/gleb/Documents/GitHub/senddownrain/mybrev/ibreviarybyapp/.dart_tool/package_config.json"

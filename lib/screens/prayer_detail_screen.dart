@@ -6,9 +6,12 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:share_plus/share_plus.dart';
 
 String _stripHtmlForCopy(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -127,6 +130,8 @@ class PrayerDetailScreen extends ConsumerWidget {
     final prayers = ref.watch(allPrayersProvider);
     final localPrayers = ref.watch(localPrayersProvider);
     final settings = ref.watch(settingsProvider);
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final Prayer? prayer;
     try {
@@ -153,8 +158,10 @@ class PrayerDetailScreen extends ConsumerWidget {
 
     return ReadingScaffold(
       builder: (context, textStyle) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Малітвы'),
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar(
+          title: Text(p.displayTitle.isNotEmpty ? p.displayTitle : 'Малітва',
+              overflow: TextOverflow.ellipsis),
           actions: [
             if (isLocal)
               IconButton(
@@ -168,27 +175,19 @@ class PrayerDetailScreen extends ConsumerWidget {
                 size: 22,
                 color: isFav ? Colors.red : null,
               ),
-              onPressed: () =>
-                  ref.read(settingsProvider.notifier).toggleFavorite(p.id),
-            ),
-            IconButton(
-              icon: const PhosphorIcon(PhosphorIconsRegular.copy, size: 22),
-              tooltip: 'Скапіяваць',
               onPressed: () {
-                final text = _stripHtmlForCopy(p.displayText);
-                Clipboard.setData(ClipboardData(text: text));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Скапіявана'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
+                HapticFeedback.selectionClick();
+                ref.read(settingsProvider.notifier).toggleFavorite(p.id);
               },
             ),
             IconButton(
-              icon: const PhosphorIcon(PhosphorIconsRegular.bookmarks, size: 22),
-              tooltip: 'У катэгорыі',
-              onPressed: () => _showAssignCategorySheet(context, ref, p),
+              icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork, size: 22),
+              tooltip: 'Падзяліцца',
+              onPressed: () {
+                final text = '${p.displayTitle.isNotEmpty ? '${p.displayTitle}\n\n' : ''}'
+                    '${_stripHtmlForCopy(p.displayText)}';
+                Share.share(text);
+              },
             ),
             PopupMenuButton<double>(
               icon: const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
@@ -212,21 +211,38 @@ class PrayerDetailScreen extends ConsumerWidget {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                p.displayTitle.isNotEmpty ? p.displayTitle : 'Малітва',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                MediaQuery.paddingOf(context).top + kToolbarHeight + 12,
+                16,
+                40,
               ),
-              const SizedBox(height: 14),
-              _buildContent(p, textStyle),
-            ],
-          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildContent(p, textStyle),
+                ],
+              ),
+            ),
+            IgnorePointer(
+              child: Container(
+                height: kToolbarHeight + 120,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

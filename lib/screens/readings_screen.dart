@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReadingsScreen extends ConsumerStatefulWidget {
   /// Calendar date string, e.g. "2026-03-21" (date-based loading).
@@ -220,11 +223,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   @override
   Widget build(BuildContext context) {
     final title = _title;
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Loading
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar.text(title),
         body: const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -241,7 +247,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     // Error
     if (_error != null) {
       return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar.text(title),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -275,7 +282,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     // No readings
     if (_readings.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar.text(title),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -295,18 +303,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       );
     }
 
-    // Multiple year variants — tabs (always for Sunday, conditional for weekdays)
+    // Multiple year variants — tabs
     if (_tabs.length > 1 && _tabController != null) {
       return Scaffold(
-        appBar: AppBar(
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar(
           title: Text(title),
-          actions: [
-            _FontSizeButton(ref: ref),
-          ],
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: _tabs.map((y) => Tab(text: 'Год $y')).toList(),
-          ),
+          actions: [_FontSizeButton(ref: ref)],
         ),
         body: TabBarView(
           controller: _tabController,
@@ -330,7 +333,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                 ),
               );
             }
-            return _ReadingBody(reading: reading, dateStr: widget.dateStr);
+            return _ReadingBody(
+              reading: reading,
+              dateStr: widget.dateStr,
+              seasonColor: seasonColor,
+              isDark: isDark,
+            );
           }).toList(),
         ),
       );
@@ -338,13 +346,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
 
     // Single reading
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: IosGlassAppBar(
         title: Text(title),
-        actions: [
-          _FontSizeButton(ref: ref),
-        ],
+        actions: [_FontSizeButton(ref: ref)],
       ),
-      body: _ReadingBody(reading: _readings.first, dateStr: widget.dateStr),
+      body: _ReadingBody(
+        reading: _readings.first,
+        dateStr: widget.dateStr,
+        seasonColor: seasonColor,
+        isDark: isDark,
+      ),
     );
   }
 }
@@ -354,7 +366,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
 class _ReadingBody extends ConsumerWidget {
   final ParsedReading reading;
   final String? dateStr;
-  const _ReadingBody({required this.reading, this.dateStr});
+  final Color seasonColor;
+  final bool isDark;
+  const _ReadingBody({
+    required this.reading,
+    this.dateStr,
+    required this.seasonColor,
+    required this.isDark,
+  });
 
   static const _weekdays = {
     1: 'Нядзеля',
@@ -388,8 +407,15 @@ class _ReadingBody extends ConsumerWidget {
     final formattedDate = _formattedDate();
 
     return ReadingScaffold(
-      builder: (context, scaffoldStyle) => SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      builder: (context, scaffoldStyle) => Stack(
+        children: [
+          SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          MediaQuery.paddingOf(context).top + kToolbarHeight + 12,
+          16,
+          40,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -467,6 +493,23 @@ class _ReadingBody extends ConsumerWidget {
             const SizedBox(height: 32),
           ],
         ),
+          ),
+          IgnorePointer(
+            child: Container(
+              height: kToolbarHeight + 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -515,15 +558,15 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = textStyle?.fontSize ?? 16.0;
     return Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 6),
+      padding: const EdgeInsets.only(top: 24, bottom: 8),
       child: Text(
-        text,
+        text.toUpperCase(),
         style: TextStyle(
-          fontSize: base * 1.1,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.2,
+          fontSize: base * 0.80,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.5,
           fontFamily: textStyle?.fontFamily,
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
         ),
       ),
     );
@@ -565,18 +608,45 @@ class _ReadingSection extends StatefulWidget {
   State<_ReadingSection> createState() => _ReadingSectionState();
 }
 
+// Closing phrase pattern: "Гэта слова Пана/Бога" variants
+final _closingPhraseRe = RegExp(
+  r'(Гэта\s+слова\s+(Пана|Бога|Божае|Пана\s+Бога)[^.]*\.?)$',
+  caseSensitive: false,
+);
+
 class _ReadingSectionState extends State<_ReadingSection> {
   bool _expanded = false;
   static const _threshold = 600;
 
+  // Strip leading bible reference duplicate from text
+  String _cleanText(String text, String? bible) {
+    if (bible == null || bible.isEmpty) return text;
+    final trimmed = text.trimLeft();
+    if (trimmed.startsWith(bible)) {
+      return trimmed.substring(bible.length).trimLeft();
+    }
+    return text;
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = widget.section;
-    final text = s.text ?? '';
-    final truncated = text.length > _threshold && !_expanded;
-    final display = truncated ? '${text.substring(0, _threshold)}…' : text;
-
+    final rawText = s.text ?? '';
+    final text = _cleanText(rawText, s.bible);
     final base = widget.textStyle.fontSize ?? 16.0;
+
+    // Split off closing phrase if found
+    String bodyText = text;
+    String? closingPhrase;
+    final match = _closingPhraseRe.firstMatch(text);
+    if (match != null) {
+      closingPhrase = match.group(0)!.trim();
+      bodyText = text.substring(0, match.start).trimRight();
+    }
+
+    final truncated = bodyText.length > _threshold && !_expanded;
+    final display = truncated ? '${bodyText.substring(0, _threshold)}…' : bodyText;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -601,10 +671,10 @@ class _ReadingSectionState extends State<_ReadingSection> {
               style: widget.textStyle.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-        if (text.isNotEmpty) ...[
+        if (display.isNotEmpty) ...[
           const SizedBox(height: 6),
           SelectableText(display, style: widget.textStyle),
-          if (text.length > _threshold)
+          if (bodyText.length > _threshold)
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: TextStyle(fontSize: base * 0.9),
@@ -613,12 +683,28 @@ class _ReadingSectionState extends State<_ReadingSection> {
               child: Text(_expanded ? 'Згарнуць' : 'Паказаць поўны тэкст'),
             ),
         ],
+        // Closing phrase bold + separated
+        if (closingPhrase != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            closingPhrase,
+            style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
       ],
     );
   }
 }
 
 // ---------------------------------------------------------------------------
+
+// Strip "Рэфрэн:" prefix from chorus string — UI adds its own label
+String _cleanChorus(String s) {
+  final t = s.trim();
+  const prefix = 'рэфрэн:';
+  if (t.toLowerCase().startsWith(prefix)) return t.substring(prefix.length).trim();
+  return t;
+}
 
 class _PsalmSection extends StatelessWidget {
   final ParsedSection psalm;
@@ -627,30 +713,59 @@ class _PsalmSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final cs = Theme.of(context).colorScheme;
+    final rawChorus = psalm.chorus ?? '';
+    final chorus = rawChorus.isNotEmpty ? _cleanChorus(rawChorus) : '';
+    final hasChorus = chorus.isNotEmpty;
+    final hasVerses = psalm.verses.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionLabel('РЭСПАНСАРЫЙНЫ ПСАЛЬМ', textStyle: textStyle),
         if (psalm.bible != null) _BibleRef(psalm.bible!, textStyle: textStyle),
-        if (psalm.chorus?.isNotEmpty == true) ...[
-          const SizedBox(height: 8),
-          _ChorusBox(
-            prefix: 'Рэфрэн: ',
-            text: psalm.chorus!,
-            altChorus: psalm.altChorus,
-            color: colorScheme.primaryContainer,
-            textStyle: textStyle,
-          ),
+
+        // No structured verses — fallback to raw text block
+        if (!hasVerses) ...[
+          if (hasChorus) ...[
+            const SizedBox(height: 8),
+            _ChorusBox(label: 'Рэфрэн', chorus: chorus, cs: cs, textStyle: textStyle),
+          ],
+          if (psalm.text?.isNotEmpty == true) ...[
+            const SizedBox(height: 8),
+            SelectableText(psalm.text!, style: textStyle),
+          ],
         ],
-        const SizedBox(height: 4),
-        for (final verse in psalm.verses) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: SelectableText(verse, style: textStyle),
-          ),
-          Divider(height: 1, color: colorScheme.outlineVariant),
+
+        // Structured verses: chorus → verse → chorus → verse → … → chorus/altChorus
+        if (hasVerses) ...[
+          for (var i = 0; i < psalm.verses.length; i++) ...[
+            // Chorus before each verse
+            if (hasChorus) ...[
+              const SizedBox(height: 8),
+              _ChorusBox(label: 'Рэфрэн', chorus: chorus, cs: cs, textStyle: textStyle),
+            ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SelectableText(psalm.verses[i], style: textStyle),
+            ),
+            if (i < psalm.verses.length - 1)
+              Divider(height: 1, color: cs.outlineVariant),
+          ],
+          // After last verse: altChorus or chorus again
+          if (hasChorus) ...[
+            Divider(height: 1, color: cs.outlineVariant),
+            const SizedBox(height: 8),
+            if (psalm.altChorus?.isNotEmpty == true)
+              _ChorusBox(
+                label: 'Або',
+                chorus: psalm.altChorus!,
+                cs: cs,
+                textStyle: textStyle,
+              )
+            else
+              _ChorusBox(label: 'Рэфрэн', chorus: chorus, cs: cs, textStyle: textStyle),
+          ],
         ],
       ],
     );
@@ -658,57 +773,47 @@ class _PsalmSection extends StatelessWidget {
 }
 
 class _ChorusBox extends StatelessWidget {
-  final String prefix;
-  final String text;
-  final String? altChorus;
-  final Color color;
+  final String label;
+  final String chorus;
+  final ColorScheme cs;
   final TextStyle textStyle;
-  const _ChorusBox(
-      {required this.prefix,
-      required this.text,
-      this.altChorus,
-      required this.color,
-      required this.textStyle});
+
+  const _ChorusBox({
+    required this.label,
+    required this.chorus,
+    required this.cs,
+    required this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
+        color: cs.primaryContainer.withValues(alpha: 0.30),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(4),
+          bottomRight: Radius.circular(4),
+        ),
+        border: Border(
+          left: BorderSide(color: cs.primary.withValues(alpha: 0.45), width: 3),
+        ),
       ),
       child: SelectableText.rich(
         TextSpan(children: [
           TextSpan(
-            text: prefix,
+            text: '$label: ',
             style: textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
-          TextSpan(text: text, style: textStyle),
-          if (altChorus?.isNotEmpty == true) ...[
-            TextSpan(text: '\n'),
-            TextSpan(
-              text: 'Або: ',
-              style: textStyle.copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: (textStyle.fontSize ?? 16) * 0.85,
-              ),
-            ),
-            TextSpan(
-              text: altChorus!,
-              style: textStyle.copyWith(
-                fontSize: (textStyle.fontSize ?? 16) * 0.85,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ],
+          TextSpan(text: chorus, style: textStyle.copyWith(fontWeight: FontWeight.w600)),
         ]),
       ),
     );
   }
 }
+
 
 // ---------------------------------------------------------------------------
 

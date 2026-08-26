@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 
@@ -28,8 +30,27 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
     final filter = ref.watch(prayersFilterProvider);
     final allTags = ref.watch(allTagsProvider);
     final settings = ref.watch(settingsProvider);
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
+    return Stack(
+      children: [
+        IgnorePointer(
+          child: Container(
+            height: 140,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        Column(
       children: [
         // Search bar
         if (_searchExpanded)
@@ -133,6 +154,7 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
                             ? 'Выдаліць з улюбёных'
                             : 'Дадаць у улюбёныя',
                         onPressed: () {
+                          HapticFeedback.selectionClick();
                           ref
                               .read(settingsProvider.notifier)
                               .toggleFavorite(prayer.id);
@@ -141,6 +163,8 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
                     );
                   },
                 ),
+        ),
+        ],
         ),
       ],
     );
