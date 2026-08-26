@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "344097781816",
+    "project_id": "ibreviaryby",
+    "storage_bucket": "ibreviaryby.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344097781816:android:87ccd0e0b2d2ce93fd8ecd",
+        "android_client_info": {
+          "package_name": "com.example.ibrevapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqZtw0FW1n9TELjTUHQ5Z-VGx3Sb98alg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
