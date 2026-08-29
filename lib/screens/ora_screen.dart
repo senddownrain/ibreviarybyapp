@@ -6,8 +6,10 @@ import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
 
@@ -84,17 +86,46 @@ class OraScreen extends ConsumerStatefulWidget {
 
 class _OraScreenState extends ConsumerState<OraScreen> {
   int _selectedInvitIndex = 0;
+  late final Future<LiturgicalDay?> _dayFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _dayFuture = _loadDay();
+  }
+
+  Future<LiturgicalDay?> _loadDay() async {
+    final raw = HiveService.daysBox.get(widget.dayId);
+    if (raw != null) {
+      return LiturgicalDay.fromMap(Map<String, dynamic>.from(raw as Map));
+    }
+    return LiturgicalDayService().getDayById(widget.dayId);
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<LiturgicalDay?>(
+      future: _dayFuture,
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return _loadingState(context);
+        }
+        final day = snap.data;
+        if (day == null) return _emptyState(context);
+        return _buildForDay(context, day);
+      },
+    );
+  }
+
+  Widget _loadingState(BuildContext context) => Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+
+  Widget _buildForDay(BuildContext context, LiturgicalDay day) {
     final settings = ref.watch(settingsProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final raw = HiveService.daysBox.get(widget.dayId);
-    if (raw == null) return _emptyState(context);
-
-    final day = LiturgicalDay.fromMap(Map<String, dynamic>.from(raw as Map));
 
     // Invitatoriums — all variants for selection
     final allInvit = HiveService.invitatoriumsBox.values
@@ -138,20 +169,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         body: Stack(
           children: [
             _buildBody(context, day, allInvit, comp, textStyle),
-            IgnorePointer(
-              child: Container(
-                height: kToolbarHeight + 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
+            AmbientWash(
+              seasonColor: seasonColor,
+              height: kToolbarHeight + 120,
             ),
           ],
         ),
@@ -159,7 +179,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
   }
 
-  Widget _emptyState(BuildContext context) => Scaffold(
+  Widget _emptyState(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
         body: Center(
@@ -167,18 +189,23 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               PhosphorIcon(PhosphorIconsLight.bookOpen,
-                  size: 48, color: Colors.grey[400]),
+                  size: 48, color: cs.onSurfaceVariant),
               const SizedBox(height: 12),
-              const Text('Дзень не знойдзены'),
+              Text('Дзень не знойдзены',
+                  style: TextStyle(color: cs.onSurface)),
               const SizedBox(height: 4),
               Text(
                 'Магчыма, трэба сінхранізаваць дадзеныя ў Наладах',
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: cs.onSurfaceVariant),
               ),
             ],
           ),
         ),
       );
+  }
 
   Widget _buildBody(BuildContext context, LiturgicalDay day,
       List<Map<String, dynamic>> allInvit, Map<String, dynamic>? comp,

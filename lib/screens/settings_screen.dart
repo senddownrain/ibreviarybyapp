@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -18,28 +19,12 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final syncStatus = ref.watch(syncStatusProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final lastPrayersSync = HiveService.getLastSync('prayers');
 
-    return Stack(
-      children: [
-        IgnorePointer(
-          child: Container(
-            height: 160,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-        ListView(
+    return AmbientWash(
+      seasonColor: seasonColor,
+      child: ListView(
       padding: const EdgeInsets.all(16),
       children: [
         // Theme
@@ -214,7 +199,7 @@ class SettingsScreen extends ConsumerWidget {
         _StatRow(label: 'Малітвы', count: HiveService.prayersBox.length),
         _StatRow(label: 'Дні', count: HiveService.daysBox.length),
         _StatRow(label: 'Гады', count: HiveService.yearOptionsBox.length),
-        _StatRow(label: 'Чытанні ў кэшы', count: HiveService.parsedDataBox.length),
+        _StatRow(label: 'Чытанні ў кэшы', count: HiveService.readingsBox.length),
         _StatRow(label: 'Абраныя', count: settings.favoriteIds.length),
         const SizedBox(height: 24),
         const Divider(),
@@ -227,8 +212,7 @@ class SettingsScreen extends ConsumerWidget {
         const Text('Версія 1.0.0'),
         const SizedBox(height: 32),
       ],
-    ),
-      ],
+      ),
     );
   }
 

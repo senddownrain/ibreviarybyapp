@@ -38,20 +38,20 @@ class SyncStatus {
         progress: progress ?? this.progress,
         currentLabel: currentLabel ?? this.currentLabel,
         currentCollection: currentCollection ?? this.currentCollection,
-        completedCollections: completedCollections ?? this.completedCollections,
+        completedCollections:
+            completedCollections ?? this.completedCollections,
         totalCollections: totalCollections ?? this.totalCollections,
         currentDocCount: currentDocCount ?? this.currentDocCount,
         error: error ?? this.error,
       );
 }
 
-/// Collections to sync from Firestore → Hive.
-/// Key is the Firestore collection name; value is the UI label.
+/// Canonical Firestore collections (same as web) → Hive.
 const _kSyncCollections = [
   ('prayers', 'Малітвы'),
-  ('fixedDays', 'Дні'),
+  ('days', 'Дні'),
   ('yearOptions', 'Гады'),
-  ('parsedData', 'Чытанні'),
+  ('readings', 'Чытанні'),
   ('invitatoriums', 'Закліц'),
   ('completoriums', 'Камплета'),
 ];
@@ -61,15 +61,11 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
   SyncStatus build() => const SyncStatus();
 
   Future<void> forceSyncAll() async {
-    // ignore: avoid_print
-    print('[SyncProvider] forceSyncAll called, isSyncing=${state.isSyncing}');
     if (state.isSyncing) return;
     state = SyncStatus(
       isSyncing: true,
       totalCollections: _kSyncCollections.length,
     );
-    // ignore: avoid_print
-    print('[SyncProvider] state set to isSyncing=true');
 
     final db = FirebaseFirestore.instance;
 
@@ -85,24 +81,23 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
       );
 
       try {
-        // ignore: avoid_print
-        print('[SyncProvider] fetching $collection...');
         final box = _boxFor(collection);
         final snap = await db
             .collection(collection)
             .get(const GetOptions(source: Source.server));
-        // ignore: avoid_print
-        print('[SyncProvider] $collection: ${snap.docs.length} docs');
         await box.clear();
         for (final doc in snap.docs) {
           final data = _toStorable(doc.data()..['id'] = doc.id);
-          await box.put(doc.id, data);
+          if (collection == 'yearOptions') {
+            final year = data['year'];
+            await box.put(year?.toString() ?? doc.id, data);
+          } else {
+            await box.put(doc.id, data);
+          }
         }
         await HiveService.setLastSync(collection, DateTime.now());
         state = state.copyWith(currentDocCount: snap.docs.length);
-      } catch (e, st) {
-        // ignore: avoid_print
-        print('[SyncProvider] ERROR in $collection: $e\n$st');
+      } catch (e) {
         state = state.copyWith(error: '$label: $e');
         break;
       }
@@ -117,7 +112,6 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
     );
   }
 
-  // Recursively convert Firestore-specific types to plain Dart so Hive can store them.
   static Map<String, dynamic> _toStorable(Map<String, dynamic> data) =>
       data.map((k, v) => MapEntry(k, _convertValue(v)));
 
@@ -134,13 +128,13 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
   }
 
   dynamic _boxFor(String collection) => switch (collection) {
-        'prayers'      => HiveService.prayersBox,
-        'fixedDays'    => HiveService.daysBox,
-        'yearOptions'  => HiveService.yearOptionsBox,
-        'parsedData'   => HiveService.parsedDataBox,
-        'invitatoriums'=> HiveService.invitatoriumsBox,
-        'completoriums'=> HiveService.completoriumsBox,
-        _              => throw ArgumentError('Unknown collection: $collection'),
+        'prayers' => HiveService.prayersBox,
+        'days' => HiveService.daysBox,
+        'yearOptions' => HiveService.yearOptionsBox,
+        'readings' => HiveService.readingsBox,
+        'invitatoriums' => HiveService.invitatoriumsBox,
+        'completoriums' => HiveService.completoriumsBox,
+        _ => throw ArgumentError('Unknown collection: $collection'),
       };
 }
 

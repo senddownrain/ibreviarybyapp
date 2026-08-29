@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:share_plus/share_plus.dart';
 
 String _stripHtml(String html) => html
@@ -35,9 +36,9 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final raw = HiveService.readingsBox.get(widget.readingId);
     if (raw == null) {
+      final cs = Theme.of(context).colorScheme;
       return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: IosGlassAppBar.text('Чытанне'),
@@ -45,9 +46,11 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PhosphorIcon(PhosphorIconsLight.bookOpen, size: 48, color: Colors.grey[400]),
+              PhosphorIcon(PhosphorIconsLight.bookOpen,
+                  size: 48, color: cs.onSurfaceVariant),
               const SizedBox(height: 12),
-              const Text('Чытанне не знойдзена'),
+              Text('Чытанне не знойдзена',
+                  style: TextStyle(color: cs.onSurface)),
             ],
           ),
         ),
@@ -109,20 +112,9 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
             ],
           ),
             ),
-            IgnorePointer(
-              child: Container(
-                height: kToolbarHeight + 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
+            AmbientWash(
+              seasonColor: seasonColor,
+              height: kToolbarHeight + 120,
             ),
           ],
         ),

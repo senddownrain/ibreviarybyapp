@@ -6,17 +6,21 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 
+/// Direction of date slide animation on home (-1 back, 0 none, 1 forward).
+final homeNavDirectionProvider = StateProvider<int>((ref) => 0);
+
 /// Currently selected date in the liturgical calendar.
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 /// Day options for the selected date.
 final dayOptionsProvider = Provider<List<DayOption>>((ref) {
+  ref.watch(calendarReadyProvider);
   final date = ref.watch(selectedDateProvider);
   final calService = ref.watch(calendarServiceProvider);
 
   final opts = _loadYearOptions(date.year);
   final nextOpts = _loadYearOptions(date.year + 1);
-  final dynamicDates = calService.getDynamicDates(date.year);
+  final dynamicDates = calService.getDynamicDatesCached(date.year);
 
   final service = LiturgicalContentService();
   return service.getContentForDate(date, opts, nextOpts, dynamicDates);

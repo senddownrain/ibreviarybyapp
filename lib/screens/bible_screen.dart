@@ -329,18 +329,21 @@ class _ChapterPicker extends ConsumerWidget {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PhosphorIcon(PhosphorIconsLight.bookOpen, size: 56, color: Colors.grey[400]),
+          PhosphorIcon(PhosphorIconsLight.bookOpen,
+              size: 56, color: cs.onSurfaceVariant),
           const SizedBox(height: 16),
-          const Text('Біблія загружаецца...'),
+          Text('Біблія загружаецца...',
+              style: TextStyle(color: cs.onSurface)),
           const SizedBox(height: 8),
           Text(
             'Перазапусціце дадатак,\nкалі гэтае паведамленне застаецца',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[500], fontSize: 13),
+            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
           ),
         ],
       ),

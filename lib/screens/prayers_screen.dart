@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 class PrayersScreen extends ConsumerStatefulWidget {
   const PrayersScreen({super.key});
@@ -31,26 +32,10 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
     final allTags = ref.watch(allTagsProvider);
     final settings = ref.watch(settingsProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Stack(
-      children: [
-        IgnorePointer(
-          child: Container(
-            height: 140,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-        Column(
+    return AmbientWash(
+      seasonColor: seasonColor,
+      child: Column(
       children: [
         // Search bar
         if (_searchExpanded)
@@ -164,9 +149,8 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
                   },
                 ),
         ),
-        ],
-        ),
       ],
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 
 class MyPrayersScreen extends ConsumerWidget {
@@ -15,7 +16,7 @@ class MyPrayersScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prayers = ref.watch(localPrayersProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -25,54 +26,41 @@ class MyPrayersScreen extends ConsumerWidget {
         tooltip: 'Новая малітва',
         child: const PhosphorIcon(PhosphorIconsRegular.plus, size: 24),
       ),
-      body: Stack(
-        children: [
-          prayers.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PhosphorIcon(PhosphorIconsLight.notepad, size: 56, color: Colors.grey),
-                      SizedBox(height: 12),
-                      Text(
-                        'Тут будуць вашы малітвы',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Націсніце + каб дадаць першую',
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.paddingOf(context).top + kToolbarHeight + 8,
-                    bottom: 80,
-                  ),
-                  itemCount: prayers.length,
-                  itemBuilder: (context, index) {
-                    final prayer = prayers[index];
-                    return _MyPrayerTile(prayer: prayer);
-                  },
-                ),
-          IgnorePointer(
-            child: Container(
-              height: kToolbarHeight + 80,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                    Colors.transparent,
+      body: AmbientWash(
+        seasonColor: seasonColor,
+        height: kToolbarHeight + 100,
+        child: prayers.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PhosphorIcon(PhosphorIconsLight.notepad,
+                        size: 56, color: cs.onSurfaceVariant),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Тут будуць вашы малітвы',
+                      style: TextStyle(color: cs.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Націсніце + каб дадаць першую',
+                      style: TextStyle(
+                          color: cs.onSurfaceVariant, fontSize: 13),
+                    ),
                   ],
                 ),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.paddingOf(context).top + kToolbarHeight + 8,
+                  bottom: 80,
+                ),
+                itemCount: prayers.length,
+                itemBuilder: (context, index) {
+                  final prayer = prayers[index];
+                  return _MyPrayerTile(prayer: prayer);
+                },
               ),
-            ),
-          ),
-        ],
       ),
     );
   }

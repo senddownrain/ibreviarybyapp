@@ -62,43 +62,52 @@ class MyBrevApp extends ConsumerWidget {
   }
 
   Widget _buildApp(SettingsState settings, ColorScheme light, ColorScheme dark) {
-    final textTheme = settings.resolvedFontFamily != null
-        ? GoogleFonts.getTextTheme(settings.fontFamily)
-        : null;
-
     final isIOS = Platform.isIOS;
+    final customFont = settings.resolvedFontFamily != null;
 
-    ThemeData makeTheme(ColorScheme cs) => ThemeData(
-          useMaterial3: true,
-          colorScheme: cs,
-          textTheme: textTheme,
-          appBarTheme: AppBarTheme(
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: isIOS,
-            // Transparent so BlurAppBar can paint its own background
-            backgroundColor: isIOS ? Colors.transparent : cs.surface,
-            foregroundColor: cs.onSurface,
-            systemOverlayStyle: cs.brightness == Brightness.dark
-                ? SystemUiOverlayStyle.light
-                : SystemUiOverlayStyle.dark,
+    ThemeData makeTheme(ColorScheme cs) {
+      // Build from brightness first so textTheme colors match light/dark.
+      // GoogleFonts.getTextTheme without a base returns light-mode (dark) ink
+      // and makes body/title text unreadable on dark surfaces.
+      final base = ThemeData(
+        useMaterial3: true,
+        colorScheme: cs,
+        brightness: cs.brightness,
+      );
+      final textTheme = customFont
+          ? GoogleFonts.getTextTheme(settings.fontFamily, base.textTheme)
+          : base.textTheme;
+
+      return base.copyWith(
+        textTheme: textTheme,
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          centerTitle: isIOS,
+          // Transparent so BlurAppBar can paint its own background
+          backgroundColor: isIOS ? Colors.transparent : cs.surface,
+          foregroundColor: cs.onSurface,
+          systemOverlayStyle: cs.brightness == Brightness.dark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
+        ),
+        pageTransitionsTheme: PageTransitionsTheme(
+          builders: {
+            TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: isIOS
+                ? const FadeUpwardsPageTransitionsBuilder()
+                : const PredictiveBackPageTransitionsBuilder(),
+          },
+        ),
+        // Android: tonal surface elevation (Material You)
+        navigationBarTheme: NavigationBarThemeData(
+          indicatorColor: cs.secondaryContainer,
+          labelTextStyle: WidgetStateProperty.all(
+            const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
           ),
-          pageTransitionsTheme: PageTransitionsTheme(
-            builders: {
-              TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
-              TargetPlatform.android: isIOS
-                  ? const FadeUpwardsPageTransitionsBuilder()
-                  : const PredictiveBackPageTransitionsBuilder(),
-            },
-          ),
-          // Android: tonal surface elevation (Material You)
-          navigationBarTheme: NavigationBarThemeData(
-            indicatorColor: cs.secondaryContainer,
-            labelTextStyle: WidgetStateProperty.all(
-              const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-          ),
-        );
+        ),
+      );
+    }
 
     return MaterialApp.router(
       title: 'Mybrev',

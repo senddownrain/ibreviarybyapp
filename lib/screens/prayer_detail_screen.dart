@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:share_plus/share_plus.dart';
 
 String _stripHtmlForCopy(String html) => html
@@ -131,7 +132,6 @@ class PrayerDetailScreen extends ConsumerWidget {
     final localPrayers = ref.watch(localPrayersProvider);
     final settings = ref.watch(settingsProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final Prayer? prayer;
     try {
@@ -143,9 +143,13 @@ class PrayerDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PhosphorIcon(PhosphorIconsLight.magnifyingGlass, size: 48, color: Colors.grey[400]),
+              PhosphorIcon(PhosphorIconsLight.magnifyingGlass,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(height: 12),
-              const Text('Малітва не знойдзена'),
+              Text('Малітва не знойдзена',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
         ),
@@ -227,20 +231,9 @@ class PrayerDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            IgnorePointer(
-              child: Container(
-                height: kToolbarHeight + 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
+            AmbientWash(
+              seasonColor: seasonColor,
+              height: kToolbarHeight + 120,
             ),
           ],
         ),
