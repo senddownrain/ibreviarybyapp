@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
+import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
@@ -15,6 +16,7 @@ final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 /// Day options for the selected date.
 final dayOptionsProvider = Provider<List<DayOption>>((ref) {
   ref.watch(calendarReadyProvider);
+  ref.watch(cacheEpochProvider); // rebuild after warmup / sync fills Hive
   final date = ref.watch(selectedDateProvider);
   final calService = ref.watch(calendarServiceProvider);
 

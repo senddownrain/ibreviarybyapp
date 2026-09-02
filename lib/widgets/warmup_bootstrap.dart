@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mybrev_flutter/services/parsed_readings_service.dart';
+import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 
-/// Triggers background cache warmup once per app session.
-class WarmupBootstrap extends ConsumerStatefulWidget {
+/// Keeps [dataBootstrapProvider] alive for the app session.
+class WarmupBootstrap extends ConsumerWidget {
   final Widget child;
   const WarmupBootstrap({super.key, required this.child});
 
   @override
-  ConsumerState<WarmupBootstrap> createState() => _WarmupBootstrapState();
-}
-
-class _WarmupBootstrapState extends ConsumerState<WarmupBootstrap> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() => ref.read(cacheWarmupProvider));
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(dataBootstrapProvider);
+    return child;
   }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }

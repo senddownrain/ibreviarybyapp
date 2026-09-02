@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 
-class LiturgicalDayOptionsScreen extends StatelessWidget {
+class LiturgicalDayOptionsScreen extends ConsumerWidget {
   final String period;
   final int week;
   final int day;
@@ -57,13 +59,14 @@ class LiturgicalDayOptionsScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final periodLabel = _periodLabels[period] ?? period;
     final dayLabel = _dayLabels[day] ?? '$day';
     final dayId = _findDayId();
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: IosGlassAppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -81,11 +84,10 @@ class LiturgicalDayOptionsScreen extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.fromLTRB(24, MediaQuery.paddingOf(context).top + kToolbarHeight + 16, 24, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 16),
             FilledButton.icon(
               icon: const PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 20),
               label: const Text('Чытанні'),

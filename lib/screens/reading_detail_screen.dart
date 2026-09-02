@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -124,12 +123,19 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
 
   Widget _buildRendered(String text, TextStyle textStyle) {
     if (text.contains('<') && text.contains('>')) {
+      final textColor = textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       return Html(
         data: text,
         style: {
           'body': Style(
             fontSize: FontSize(textStyle.fontSize ?? 16),
             fontFamily: textStyle.fontFamily,
+            color: textColor,
+            lineHeight: LineHeight(1.6),
+          ),
+          'p': Style(
+            color: textColor,
+            margin: Margins.only(bottom: 10),
           ),
         },
       );

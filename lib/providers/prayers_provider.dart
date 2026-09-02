@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 
 // ── Filter state ──────────────────────────────────────────────────────────────
@@ -50,6 +51,7 @@ class PrayersFilterNotifier extends Notifier<PrayersFilter> {
 // ── Prayers from Hive ─────────────────────────────────────────────────────────
 
 final allPrayersProvider = Provider<List<Prayer>>((ref) {
+  ref.watch(cacheEpochProvider);
   final box = HiveService.prayersBox;
   final prayers = <Prayer>[];
   for (final key in box.keys) {

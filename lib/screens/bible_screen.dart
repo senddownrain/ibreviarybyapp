@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
-import 'package:mybrev_flutter/services/bible_seed_loader.dart';
+import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 
 class BibleScreen extends ConsumerStatefulWidget {
   const BibleScreen({super.key});
@@ -61,7 +61,8 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
     final nt = filtered.where((b) => b.order >= 40).toList();
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: IosGlassAppBar(
         title: _searching
             ? TextField(
                 controller: _searchCtrl,
@@ -90,7 +91,7 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
         children: [
           // ── Version picker ─────────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + kToolbarHeight + 8, 16, 4),
             child: SegmentedButton<String>(
               segments: allVersionMeta.map((e) {
                 final isAvailable =

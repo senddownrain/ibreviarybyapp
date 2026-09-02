@@ -55,7 +55,7 @@ class ParsedSection {
   }
 }
 
-/// A document from the parsedData Firestore collection.
+/// A document from the `readings` Firestore collection.
 class ParsedReading {
   final String id;
 

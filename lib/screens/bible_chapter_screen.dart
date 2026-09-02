@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
@@ -81,14 +82,16 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
 
     if (book == null || verses.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Біблія')),
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar.text('Біблія'),
         body: const Center(child: Text('Раздзел не знойдзены')),
       );
     }
 
     return ReadingScaffold(
       builder: (context, textStyle) => Scaffold(
-        appBar: AppBar(
+        extendBodyBehindAppBar: true,
+        appBar: IosGlassAppBar(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -164,8 +167,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
+                padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + kToolbarHeight + 4, 16, 12),
                 itemCount: verses.length,
                 itemBuilder: (context, i) {
                   final v = verses[i];

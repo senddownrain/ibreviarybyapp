@@ -107,12 +107,20 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     return FutureBuilder<LiturgicalDay?>(
       future: _dayFuture,
       builder: (context, snap) {
-        if (!snap.hasData) {
+        if (snap.connectionState != ConnectionState.done) {
           return _loadingState(context);
+        }
+        if (snap.hasError) {
+          return _errorState(context, snap.error.toString());
         }
         final day = snap.data;
         if (day == null) return _emptyState(context);
-        return _buildForDay(context, day);
+        try {
+          return _buildForDay(context, day);
+        } catch (e, st) {
+          debugPrint('[OraScreen] build failed: $e\n$st');
+          return _errorState(context, e.toString());
+        }
       },
     );
   }
@@ -168,11 +176,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
         body: Stack(
           children: [
+            AmbientWash.hero(seasonColor: seasonColor),
             _buildBody(context, day, allInvit, comp, textStyle),
-            AmbientWash(
-              seasonColor: seasonColor,
-              height: kToolbarHeight + 120,
-            ),
           ],
         ),
       ),
@@ -182,20 +187,53 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   Widget _emptyState(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
-        body: Center(
+      extendBodyBehindAppBar: true,
+      appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PhosphorIcon(PhosphorIconsLight.bookOpen,
+                size: 48, color: cs.onSurfaceVariant),
+            const SizedBox(height: 12),
+            Text('Дзень не знойдзены',
+                style: TextStyle(color: cs.onSurface)),
+            const SizedBox(height: 4),
+            Text(
+              'Магчыма, трэба сінхранізаваць дадзеныя ў Наладах',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: cs.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _errorState(BuildContext context, String message) {
+    final cs = Theme.of(context).colorScheme;
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PhosphorIcon(PhosphorIconsLight.bookOpen,
+              PhosphorIcon(PhosphorIconsLight.warning,
                   size: 48, color: cs.onSurfaceVariant),
               const SizedBox(height: 12),
-              Text('Дзень не знойдзены',
+              Text('Не атрымалася адкрыць гадзіну',
                   style: TextStyle(color: cs.onSurface)),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
-                'Магчыма, трэба сінхранізаваць дадзеныя ў Наладах',
+                message,
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall
@@ -204,7 +242,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             ],
           ),
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildBody(BuildContext context, LiturgicalDay day,
@@ -240,18 +279,24 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   // Solemnities/feasts → d1; holyweek → lent
 
   String _completoriumId(LiturgicalDay day) {
-    var period = (day.field('_periodType') ?? 'ordinary').trim();
+    var period = (day.periodType ?? day.field('_periodType') ?? 'ordinary').trim();
     if (period == 'holyweek') period = 'lent';
 
-    final rank = (day.field('_rank') ?? day.field('_feastType') ?? '').trim();
-    final isFeast = rank == 'solemnity' || rank == 'feast';
-    final dow = isFeast ? '1' : (day.field('_dayOfWeek') ?? '2');
+    final rank =
+        (day.rank ?? day.field('_rank') ?? day.field('_feastType') ?? '').trim();
+    final isFeast = rank == 'solemnity' ||
+        rank == 'feast' ||
+        rank == 'solemnitas' ||
+        rank == 'festum';
+    final dow = isFeast
+        ? 1
+        : (day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 2);
 
     return '$period-d$dow';
   }
 
   // ─── Invitatorium ─────────────────────────────────────────────────────────────
-  // Ant from fixedDays; Ps1–6 from invitatoriums collection.
+  // Ant from days; Ps1–6 from invitatoriums collection.
   // Pattern: Ant → Ps1 → Ant → Ps2 → Ant … → Ant
 
   List<_OraItem> _buildInvitatorium(
@@ -286,7 +331,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     // Collect psalm parts, stop on first empty
     for (var i = 1; i <= 6; i++) {
-      final ps = ((invit['invitatoriumPs$i'] as String?) ?? '').trim();
+      final ps = (invit['invitatoriumPs$i']?.toString() ?? '').trim();
       if (ps.isEmpty) break;
       items.add(_OraItem.antiphon(ant));
       items.add(_OraItem.html(ps));
@@ -427,7 +472,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   }
 
   // ─── Completorium (Камплета) ──────────────────────────────────────────────────
-  // Uses completoriums collection, not fixedDays
+  // Uses completoriums collection.
 
   List<_OraItem> _buildCompline(Map<String, dynamic>? comp) {
     final items = <_OraItem>[];
@@ -440,7 +485,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       return items;
     }
 
-    String cf(String name) => ((comp[name] as String?) ?? '').trim();
+    String cf(String name) {
+      final v = comp[name];
+      if (v == null) return '';
+      return v.toString().trim();
+    }
 
     items.add(_OraItem.html(
         '<p><span style="color:red">Кароткі выпытванне сумлення.</span></p>'));
@@ -752,21 +801,31 @@ class _HtmlOrText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (content.contains('<') && content.contains('>')) {
-      return Html(
-        data: content,
-        style: {
-          'body': Style(
-            fontSize: FontSize(textStyle.fontSize ?? 16),
-            fontFamily: textStyle.fontFamily,
-            fontWeight: textStyle.fontWeight,
-            lineHeight: LineHeight(1.75),
-            margin: Margins.zero,
-            padding: HtmlPaddings.zero,
-            textAlign: TextAlign.left,
-          ),
-          'p': Style(margin: Margins.only(bottom: 8)),
-        },
-      );
+      try {
+        final textColor = textStyle.color ?? Theme.of(context).colorScheme.onSurface;
+        return Html(
+          data: content,
+          style: {
+            'body': Style(
+              fontSize: FontSize(textStyle.fontSize ?? 16),
+              fontFamily: textStyle.fontFamily,
+              fontWeight: textStyle.fontWeight,
+              color: textColor,
+              lineHeight: LineHeight(1.75),
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+              textAlign: TextAlign.left,
+            ),
+            'p': Style(color: textColor, margin: Margins.only(bottom: 8)),
+          },
+        );
+      } catch (e) {
+        debugPrint('[OraScreen] Html parse failed: $e');
+        return SelectableText(
+          content.replaceAll(RegExp(r'<[^>]+>'), ' ').trim(),
+          style: textStyle,
+        );
+      }
     }
     return SelectableText(content, style: textStyle);
   }

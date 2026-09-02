@@ -8,11 +8,13 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 
 String _stripHtmlForCopy(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -156,7 +158,7 @@ class PrayerDetailScreen extends ConsumerWidget {
       );
     }
 
-    final p = prayer!;
+    final p = prayer;
     final isFav = settings.favoriteIds.contains(p.id);
     final isLocal = LocalPrayersNotifier.isLocal(p.id);
 
@@ -217,6 +219,7 @@ class PrayerDetailScreen extends ConsumerWidget {
         ),
         body: Stack(
           children: [
+            AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
                 16,
@@ -227,13 +230,9 @@ class PrayerDetailScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildContent(p, textStyle),
+                  _buildContent(context, p, textStyle),
                 ],
               ),
-            ),
-            AmbientWash(
-              seasonColor: seasonColor,
-              height: kToolbarHeight + 120,
             ),
           ],
         ),
@@ -241,77 +240,83 @@ class PrayerDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(Prayer prayer, TextStyle textStyle) {
-    final text = _removeLeadingDuplicateTitle(prayer.displayText, prayer.displayTitle);
-    if (text.contains('<') && text.contains('>')) {
+  Widget _buildContent(BuildContext context, Prayer prayer, TextStyle textStyle) {
+    final raw = _removeLeadingDuplicateTitle(
+      prayer.displayText,
+      prayer.displayTitle,
+    ).trim();
+
+    if (raw.isEmpty) {
+      final cs = Theme.of(context).colorScheme;
+      return Padding(
+        padding: const EdgeInsets.only(top: 48),
+        child: Center(
+          child: Column(
+            children: [
+              PhosphorIcon(PhosphorIconsLight.bookOpen,
+                  size: 48, color: cs.onSurfaceVariant),
+              const SizedBox(height: 12),
+              Text(
+                'Тэкст малітвы адсутнічае',
+                style: TextStyle(color: cs.onSurface),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Паспрабуйце сінхранізаваць дадзеныя ў Наладах.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final html = prayer.isMarkdown ||
+            (!raw.contains('<') && raw.contains(':::rubric'))
+        ? prayerMarkdownToHtml(raw)
+        : raw;
+
+    if (html.contains('<') && html.contains('>')) {
+      final reader = ReaderTheme.of(context);
+      final textColor = textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       return Html(
-        data: text,
+        data: html,
         style: {
           'body': Style(
             fontSize: FontSize(textStyle.fontSize ?? 16),
             fontFamily: textStyle.fontFamily,
+            color: textColor,
+            lineHeight: LineHeight(1.7),
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
           ),
           'p': Style(
             fontSize: FontSize(textStyle.fontSize ?? 16),
             fontFamily: textStyle.fontFamily,
+            color: textColor,
+            margin: Margins.only(bottom: 10),
+          ),
+          'h2': Style(
+            fontSize: FontSize((textStyle.fontSize ?? 16) * 1.2),
+            fontWeight: FontWeight.w700,
+            color: textColor,
+            margin: Margins.only(top: 16, bottom: 8),
+          ),
+          'h3': Style(
+            fontSize: FontSize((textStyle.fontSize ?? 16) * 1.1),
+            fontWeight: FontWeight.w700,
+            color: textColor,
+            margin: Margins.only(top: 14, bottom: 6),
+          ),
+          '.prayer-rubric': Style(
+            color: reader.rubric,
+            fontStyle: FontStyle.italic,
+            margin: Margins.symmetric(vertical: 10),
           ),
         },
       );
     }
-    return SelectableText(text, style: textStyle);
-  }
-
-  void _showAssignCategorySheet(
-    BuildContext context,
-    WidgetRef ref,
-    Prayer prayer,
-  ) {
-    final settings = ref.read(settingsProvider);
-    final cats = settings.userCategories;
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (ctx) {
-        if (cats.isEmpty) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Няма катэгорый. Дадайце іх у Наладах.',
-                style: Theme.of(ctx).textTheme.bodyMedium,
-              ),
-            ),
-          );
-        }
-        return SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              const ListTile(
-                title: Text('Дадаць у катэгорыі'),
-              ),
-              for (final cat in cats)
-                Consumer(
-                  builder: (context, ref, _) {
-                    final inCat = ref.watch(settingsProvider.select(
-                      (s) => s.prayerCategoryMap[prayer.id]?.contains(cat.id) ?? false,
-                    ));
-                    return CheckboxListTile(
-                      value: inCat,
-                      title: Text(cat.name),
-                      subtitle: cat.tags.isNotEmpty ? Text(cat.tags.join(', ')) : null,
-                      onChanged: (v) {
-                        ref
-                            .read(settingsProvider.notifier)
-                            .setPrayerCategory(prayer.id, cat.id, v ?? false);
-                      },
-                    );
-                  },
-                ),
-            ],
-          ),
-        );
-      },
-    );
+    return SelectableText(raw, style: textStyle);
   }
 }

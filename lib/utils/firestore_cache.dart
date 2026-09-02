@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/utils/readings_index.dart';
 
 Map<String, dynamic> firestoreToStorable(Map<String, dynamic> data) =>
     data.map((k, v) => MapEntry(k, _convertValue(v)));
@@ -21,8 +22,9 @@ Future<void> cacheDayDoc(String id, Map<String, dynamic> data) async {
 }
 
 Future<void> cacheReadingDoc(String id, Map<String, dynamic> data) async {
-  await HiveService.readingsBox
-      .put(id, firestoreToStorable({...data, 'id': id}));
+  final storable = firestoreToStorable({...data, 'id': id});
+  await HiveService.readingsBox.put(id, storable);
+  await ReadingsIndex.indexDoc(id, storable);
 }
 
 Future<void> cacheYearOptionsDoc(String id, Map<String, dynamic> data) async {

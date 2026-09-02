@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
+import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/utils/cache_stats.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -18,9 +21,16 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final syncStatus = ref.watch(syncStatusProvider);
+    final bootstrap = ref.watch(dataBootstrapProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    ref.watch(cacheEpochProvider); // refresh Hive stats after warmup
+    final stats = CacheStats.collect();
 
-    final lastPrayersSync = HiveService.getLastSync('prayers');
+    final lastSync = _latestSync([
+      HiveService.getLastSync('prayers'),
+      HiveService.getLastSync('days'),
+      HiveService.getLastSync('yearOptions'),
+    ]);
 
     return AmbientWash(
       seasonColor: seasonColor,
@@ -129,11 +139,13 @@ class SettingsScreen extends ConsumerWidget {
         // Sync
         Text('Сінхранізацыя', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        if (lastPrayersSync != null)
-          Text('Апошняя сінхранізацыя: ${_formatDate(lastPrayersSync)}',
+        if (lastSync != null)
+          Text('Апошняя сінхранізацыя: ${_formatDate(lastSync)}',
               style: Theme.of(context).textTheme.bodySmall),
         Text(
-          'Чытанні загружаюцца па дні аўтаматычна',
+          'Малітвы і статычныя зборнікі загружаюцца цалкам. '
+          'Дні і чытанні — толькі на бліжэйшыя даты (каля 2 месяцаў), '
+          'каб не цягнуць усю базу.',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -196,10 +208,40 @@ class SettingsScreen extends ConsumerWidget {
         // Stats
         Text('Статыстыка', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        _StatRow(label: 'Малітвы', count: HiveService.prayersBox.length),
-        _StatRow(label: 'Дні', count: HiveService.daysBox.length),
-        _StatRow(label: 'Гады', count: HiveService.yearOptionsBox.length),
-        _StatRow(label: 'Чытанні ў кэшы', count: HiveService.readingsBox.length),
+        if (stats.bootstrapNeeded)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              'База яшчэ не загружана — адкрыйце галоўны экран',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          )
+        else if (bootstrap.isRunning)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              'Загрузка: ${bootstrap.phase == 'static' ? 'база' : 'дні'}...',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+          ),
+        if (stats.coverageLabel != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              'Пакрыццё дат: ${stats.coverageLabel}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ),
+        _StatRow(label: 'Малітвы', count: stats.prayers),
+        _StatRow(label: 'Дні ў кэшы', count: stats.days),
+        _StatRow(label: 'Гады', count: stats.years),
+        _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
         _StatRow(label: 'Абраныя', count: settings.favoriteIds.length),
         const SizedBox(height: 24),
         const Divider(),
@@ -224,6 +266,15 @@ class SettingsScreen extends ConsumerWidget {
   String _formatDate(DateTime date) {
     return '${date.day}.${date.month.toString().padLeft(2, '0')}.${date.year} '
         '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  DateTime? _latestSync(List<DateTime?> times) {
+    DateTime? best;
+    for (final t in times) {
+      if (t == null) continue;
+      if (best == null || t.isAfter(best)) best = t;
+    }
+    return best;
   }
 }
 

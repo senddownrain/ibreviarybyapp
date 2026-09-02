@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
+import 'package:mybrev_flutter/utils/retry.dart';
 
 class CalendarService {
   final FirebaseFirestore _db;
@@ -34,11 +35,11 @@ class CalendarService {
     final cached = getYearOptionsCached(year);
     if (cached != null) return cached;
     try {
-      final snap = await _db
+      final snap = await retryFirestore(() => _db
           .collection('yearOptions')
           .where('year', isEqualTo: year)
           .limit(1)
-          .get();
+          .get());
       if (snap.docs.isEmpty) return null;
       final doc = snap.docs.first;
       final data = {...doc.data(), 'id': doc.id};

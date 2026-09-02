@@ -53,10 +53,38 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
   }
 
   bool _isAvailable(HoraItem hora, LiturgicalDay day) {
+    // Completorium lives in its own Hive box, not on the day document.
+    if (hora.type == 'completorium') {
+      return _completoriumAvailable(day);
+    }
     return hora.checkFields.any((k) {
       final v = day.field(k);
       return v != null && v.isNotEmpty;
     });
+  }
+
+  bool _completoriumAvailable(LiturgicalDay day) {
+    final id = _completoriumId(day);
+    if (HiveService.completoriumsBox.containsKey(id)) return true;
+    // Essentials sync filled the box — offer Compline even if key shape differs.
+    return HiveService.completoriumsBox.isNotEmpty;
+  }
+
+  String _completoriumId(LiturgicalDay day) {
+    var period = (day.periodType ?? day.field('_periodType') ?? 'ordinary').trim();
+    if (period == 'holyweek') period = 'lent';
+
+    final rank =
+        (day.rank ?? day.field('_rank') ?? day.field('_feastType') ?? '').trim();
+    final isFeast = rank == 'solemnity' ||
+        rank == 'feast' ||
+        rank == 'solemnitas' ||
+        rank == 'festum';
+    final dow = isFeast
+        ? 1
+        : (day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 2);
+
+    return '$period-d$dow';
   }
 
   String? _readingsDateKey() {

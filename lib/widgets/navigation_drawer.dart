@@ -62,6 +62,14 @@ class AppNavigationDrawer extends ConsumerWidget {
                 context.go('/prayers');
               },
             ),
+            ListTile(
+              leading: PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 22),
+              title: const Text('Біблія'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/bible');
+              },
+            ),
             const Divider(),
             ListTile(
               leading: PhosphorIcon(PhosphorIconsRegular.heart, size: 22),

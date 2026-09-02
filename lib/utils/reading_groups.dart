@@ -1,4 +1,5 @@
 import 'package:mybrev_flutter/models/parsed_reading.dart';
+import 'package:mybrev_flutter/utils/reading_content.dart';
 
 class ReadingCelebrationGroup {
   final String key;
@@ -25,7 +26,10 @@ String readingCelebrationKey(ParsedReading reading) {
   return 'id:${reading.id}';
 }
 
-String _groupLabel(ParsedReading reading) {
+String _groupLabel(List<ParsedReading> documents) {
+  final withContent =
+      documents.where(readingHasVisibleContent).toList();
+  final reading = withContent.isNotEmpty ? withContent.first : documents.first;
   final title = reading.firstReading?.title?.trim();
   if (title != null && title.isNotEmpty) return _stripHtml(title);
   if (reading.feast != null && reading.feast!.isNotEmpty) {
@@ -47,7 +51,7 @@ List<ReadingCelebrationGroup> groupReadings(List<ParsedReading> readings) {
   return map.entries
       .map((e) => ReadingCelebrationGroup(
             key: e.key,
-            label: _groupLabel(e.value.first),
+            label: _groupLabel(e.value),
             documents: e.value,
           ))
       .toList();
@@ -58,13 +62,21 @@ ParsedReading? pickReadingForCycle(
   String? cycle,
 ) {
   if (documents.isEmpty) return null;
+
+  List<ParsedReading> preferContent(List<ParsedReading> docs) {
+    final withContent = docs.where(readingHasVisibleContent).toList();
+    return withContent.isNotEmpty ? withContent : docs;
+  }
+
   if (cycle != null && cycle.isNotEmpty) {
-    final exact = documents.where((d) => d.year == cycle).toList();
+    final exact = preferContent(documents.where((d) => d.year == cycle).toList());
     if (exact.isNotEmpty) return exact.first;
   }
-  final shared = documents.where((d) => d.year == null || d.year!.isEmpty);
+  final shared = preferContent(
+    documents.where((d) => d.year == null || d.year!.isEmpty).toList(),
+  );
   if (shared.isNotEmpty) return shared.first;
-  return documents.first;
+  return preferContent(documents).first;
 }
 
 List<String> availableCyclesForGroup(List<ParsedReading> documents) {

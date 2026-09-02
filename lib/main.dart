@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +10,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 // Brand seed — used when Material You is unavailable
@@ -17,7 +22,12 @@ const _kSeedColor = Color(0xFF3A5FA0);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
   await HiveService.init();
+  await ReadingsIndex.ensureBuilt();
+  unawaited(BibleRepository.preload());
 
   // Transparent status bar so blurred AppBar can show beneath it on iOS
   if (Platform.isIOS) {

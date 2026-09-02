@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,9 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -16,6 +20,8 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final date = ref.watch(selectedDateProvider);
     final options = ref.watch(dayOptionsProvider);
+    final isLoading = ref.watch(homeDataLoadingProvider);
+    final bootstrap = ref.watch(dataBootstrapProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final navDir = ref.watch(homeNavDirectionProvider);
     final tokens = GlassTokens.of(context);
@@ -122,7 +128,47 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-            if (options.isEmpty)
+            if (options.isEmpty && isLoading)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+                  child: GlassSurface(
+                    style: GlassStyle.card,
+                    seasonColor: seasonColor,
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          bootstrap.phase == 'static'
+                              ? 'Загрузка базы дадзеных...'
+                              : 'Загрузка літургічных дзён...',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: cs.onSurface,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Гэта можа заняць некалькі секунд',
+                          style: TextStyle(
+                            color: cs.onSurfaceVariant,
+                            fontSize: 13,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else if (options.isEmpty)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -170,7 +216,7 @@ class HomeScreen extends ConsumerWidget {
                     }
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                      child: _DayOptionCard(option: opt),
+                      child: _DayOptionCard(option: opt, date: date),
                     );
                   },
                   childCount: options.length,
@@ -207,7 +253,8 @@ class HomeScreen extends ConsumerWidget {
 
 class _DayOptionCard extends ConsumerWidget {
   final DayOption option;
-  const _DayOptionCard({required this.option});
+  final DateTime date;
+  const _DayOptionCard({required this.option, required this.date});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -323,7 +370,11 @@ class _DayOptionCard extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => context.push('/hora/${day.id}'),
+        onTap: () {
+          final dayId = day.id;
+          unawaited(DayPrefetchService().prefetch(date, option));
+          context.push('/hora/$dayId');
+        },
         child: child,
       ),
     );
