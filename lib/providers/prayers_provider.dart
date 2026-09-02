@@ -8,16 +8,28 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 class PrayersFilter {
   final Set<String> selectedTags;
   final String searchQuery;
+  final String? selectedCategoryName;
 
-  const PrayersFilter({this.selectedTags = const {}, this.searchQuery = ''});
+  const PrayersFilter({
+    this.selectedTags = const {},
+    this.searchQuery = '',
+    this.selectedCategoryName,
+  });
 
   bool get isActive => selectedTags.isNotEmpty || searchQuery.isNotEmpty;
 
-  PrayersFilter copyWith({Set<String>? selectedTags, String? searchQuery}) =>
-      PrayersFilter(
-        selectedTags: selectedTags ?? this.selectedTags,
-        searchQuery: searchQuery ?? this.searchQuery,
-      );
+  PrayersFilter copyWith({
+    Set<String>? selectedTags,
+    String? searchQuery,
+    String? selectedCategoryName,
+    bool clearCategory = false,
+  }) => PrayersFilter(
+    selectedTags: selectedTags ?? this.selectedTags,
+    searchQuery: searchQuery ?? this.searchQuery,
+    selectedCategoryName: clearCategory
+        ? null
+        : selectedCategoryName ?? this.selectedCategoryName,
+  );
 }
 
 class PrayersFilterNotifier extends Notifier<PrayersFilter> {
@@ -35,7 +47,7 @@ class PrayersFilterNotifier extends Notifier<PrayersFilter> {
     } else {
       tags.add(tag);
     }
-    state = state.copyWith(selectedTags: tags);
+    state = state.copyWith(selectedTags: tags, clearCategory: true);
   }
 
   void clearFilters() {
@@ -43,8 +55,11 @@ class PrayersFilterNotifier extends Notifier<PrayersFilter> {
   }
 
   /// Select a user category: sets selectedTags to the category's tags.
-  void selectCategory(String categoryId, List<String> tags) {
-    state = state.copyWith(selectedTags: Set<String>.from(tags));
+  void selectCategory(String categoryId, List<String> tags, {String? name}) {
+    state = state.copyWith(
+      selectedTags: Set<String>.from(tags),
+      selectedCategoryName: name,
+    );
   }
 }
 
@@ -58,7 +73,9 @@ final allPrayersProvider = Provider<List<Prayer>>((ref) {
     final raw = box.get(key);
     if (raw == null) continue;
     try {
-      prayers.add(Prayer.fromMap(Map<String, dynamic>.from(raw), key as String));
+      prayers.add(
+        Prayer.fromMap(Map<String, dynamic>.from(raw), key as String),
+      );
     } catch (_) {}
   }
   prayers.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
@@ -77,7 +94,8 @@ final allTagsProvider = Provider<List<String>>((ref) {
 
 final prayersFilterProvider =
     NotifierProvider<PrayersFilterNotifier, PrayersFilter>(
-        PrayersFilterNotifier.new);
+      PrayersFilterNotifier.new,
+    );
 
 final filteredPrayersProvider = Provider<List<Prayer>>((ref) {
   final prayers = ref.watch(allPrayersProvider);

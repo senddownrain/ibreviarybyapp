@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
@@ -15,6 +14,8 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+
+const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
 String _stripHtmlForCopy(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -137,7 +138,10 @@ class PrayerDetailScreen extends ConsumerWidget {
 
     final Prayer? prayer;
     try {
-      prayer = [...prayers, ...localPrayers].firstWhere((p) => p.id == prayerId);
+      prayer = [
+        ...prayers,
+        ...localPrayers,
+      ].firstWhere((p) => p.id == prayerId);
     } catch (_) {
       return Scaffold(
         appBar: AppBar(title: const Text('Малітва')),
@@ -145,13 +149,18 @@ class PrayerDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PhosphorIcon(PhosphorIconsLight.magnifyingGlass,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+              PhosphorIcon(
+                PhosphorIconsLight.magnifyingGlass,
+                size: 48,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(height: 12),
-              Text('Малітва не знойдзена',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface)),
+              Text(
+                'Малітва не знойдзена',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             ],
           ),
         ),
@@ -160,21 +169,16 @@ class PrayerDetailScreen extends ConsumerWidget {
 
     final p = prayer;
     final isFav = settings.favoriteIds.contains(p.id);
-    final isLocal = LocalPrayersNotifier.isLocal(p.id);
 
     return ReadingScaffold(
       builder: (context, textStyle) => Scaffold(
         extendBodyBehindAppBar: true,
         appBar: IosGlassAppBar(
-          title: Text(p.displayTitle.isNotEmpty ? p.displayTitle : 'Малітва',
-              overflow: TextOverflow.ellipsis),
+          title: Text(
+            p.displayTitle.isNotEmpty ? p.displayTitle : 'Малітва',
+            overflow: TextOverflow.ellipsis,
+          ),
           actions: [
-            if (isLocal)
-              IconButton(
-                icon: const PhosphorIcon(PhosphorIconsRegular.pencilSimple, size: 22),
-                tooltip: 'Рэдагаваць',
-                onPressed: () => context.push('/prayer/edit/${p.id}'),
-              ),
             IconButton(
               icon: PhosphorIcon(
                 isFav ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
@@ -187,10 +191,14 @@ class PrayerDetailScreen extends ConsumerWidget {
               },
             ),
             IconButton(
-              icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork, size: 22),
+              icon: const PhosphorIcon(
+                PhosphorIconsRegular.shareNetwork,
+                size: 22,
+              ),
               tooltip: 'Падзяліцца',
               onPressed: () {
-                final text = '${p.displayTitle.isNotEmpty ? '${p.displayTitle}\n\n' : ''}'
+                final text =
+                    '${p.displayTitle.isNotEmpty ? '${p.displayTitle}\n\n' : ''}'
                     '${_stripHtmlForCopy(p.displayText)}';
                 Share.share(text);
               },
@@ -230,7 +238,7 @@ class PrayerDetailScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildContent(context, p, textStyle),
+                  _buildReadingSurface(context, p, textStyle, seasonColor),
                 ],
               ),
             ),
@@ -240,7 +248,98 @@ class PrayerDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, Prayer prayer, TextStyle textStyle) {
+  Widget _buildReadingSurface(
+    BuildContext context,
+    Prayer prayer,
+    TextStyle textStyle,
+    Color seasonColor,
+  ) {
+    final reader = ReaderTheme.of(context);
+    final cs = Theme.of(context).colorScheme;
+    final isMass = prayer.id == _kMassOrderPrayerId;
+
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: reader.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: reader.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.dark
+                  ? 0.24
+                  : 0.08,
+            ),
+            blurRadius: 38,
+            spreadRadius: -8,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  cs.tertiaryContainer,
+                  seasonColor.withValues(alpha: 0.04),
+                ],
+              ),
+              border: Border(bottom: BorderSide(color: reader.border)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isMass ? 'ЛІТУРГІЯ' : 'МАЛІТВА',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: cs.tertiary,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Text(prayer.displayTitle, style: reader.displayTitle(28)),
+                if (prayer.tags.isNotEmpty) ...[
+                  const SizedBox(height: 13),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 7,
+                    children: [
+                      for (final tag in prayer.tags.take(6))
+                        Chip(
+                          label: Text(tag),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
+            child: _buildContent(context, prayer, textStyle, isMass: isMass),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    Prayer prayer,
+    TextStyle textStyle, {
+    required bool isMass,
+  }) {
     final raw = _removeLeadingDuplicateTitle(
       prayer.displayText,
       prayer.displayTitle,
@@ -253,8 +352,11 @@ class PrayerDetailScreen extends ConsumerWidget {
         child: Center(
           child: Column(
             children: [
-              PhosphorIcon(PhosphorIconsLight.bookOpen,
-                  size: 48, color: cs.onSurfaceVariant),
+              PhosphorIcon(
+                PhosphorIconsLight.bookOpen,
+                size: 48,
+                color: cs.onSurfaceVariant,
+              ),
               const SizedBox(height: 12),
               Text(
                 'Тэкст малітвы адсутнічае',
@@ -272,14 +374,15 @@ class PrayerDetailScreen extends ConsumerWidget {
       );
     }
 
-    final html = prayer.isMarkdown ||
-            (!raw.contains('<') && raw.contains(':::rubric'))
+    final html =
+        prayer.isMarkdown || (!raw.contains('<') && raw.contains(':::rubric'))
         ? prayerMarkdownToHtml(raw)
         : raw;
 
     if (html.contains('<') && html.contains('>')) {
       final reader = ReaderTheme.of(context);
-      final textColor = textStyle.color ?? Theme.of(context).colorScheme.onSurface;
+      final textColor =
+          textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       return Html(
         data: html,
         style: {
@@ -300,15 +403,17 @@ class PrayerDetailScreen extends ConsumerWidget {
           'h2': Style(
             fontSize: FontSize((textStyle.fontSize ?? 16) * 1.2),
             fontWeight: FontWeight.w700,
-            color: textColor,
+            color: isMass ? reader.rubric : textColor,
             margin: Margins.only(top: 16, bottom: 8),
           ),
           'h3': Style(
             fontSize: FontSize((textStyle.fontSize ?? 16) * 1.1),
             fontWeight: FontWeight.w700,
-            color: textColor,
+            color: isMass ? reader.rubric : textColor,
             margin: Margins.only(top: 14, bottom: 6),
           ),
+          if (isMass)
+            'em': Style(color: reader.rubric, fontStyle: FontStyle.italic),
           '.prayer-rubric': Style(
             color: reader.rubric,
             fontStyle: FontStyle.italic,

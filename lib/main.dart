@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +13,9 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-
-// Brand seed — used when Material You is unavailable
-const _kSeedColor = Color(0xFF3A5FA0);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,32 +53,11 @@ class MyBrevApp extends ConsumerWidget {
       WakelockPlus.toggle(enable: settings.keepScreenOn);
     }
 
-    // Android uses DynamicColorBuilder (Material You).
-    // iOS gets a fixed seed scheme.
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      return DynamicColorBuilder(
-        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-          final light = _harmonize(lightDynamic, Brightness.light);
-          final dark = _harmonize(darkDynamic, Brightness.dark);
-          return _buildApp(settings, light, dark);
-        },
-      );
-    }
-
-    final light = ColorScheme.fromSeed(
-      seedColor: _kSeedColor,
-      brightness: Brightness.light,
-    );
-    final dark = ColorScheme.fromSeed(
-      seedColor: _kSeedColor,
-      brightness: Brightness.dark,
-    );
+    // Keep application chrome consistent with the PWA on Android and iOS.
+    // Liturgical colours are applied separately as contextual ambient washes.
+    final light = AppPalette.scheme(Brightness.light);
+    final dark = AppPalette.scheme(Brightness.dark);
     return _buildApp(settings, light, dark);
-  }
-
-  ColorScheme _harmonize(ColorScheme? dynamic, Brightness brightness) {
-    if (dynamic != null) return dynamic.harmonized();
-    return ColorScheme.fromSeed(seedColor: _kSeedColor, brightness: brightness);
   }
 
   Widget _buildApp(
@@ -90,7 +66,6 @@ class MyBrevApp extends ConsumerWidget {
     ColorScheme dark,
   ) {
     final isIOS = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
-    final customFont = settings.resolvedFontFamily != null;
 
     ThemeData makeTheme(ColorScheme cs) {
       // Build from brightness first so textTheme colors match light/dark.
@@ -101,18 +76,133 @@ class MyBrevApp extends ConsumerWidget {
         colorScheme: cs,
         brightness: cs.brightness,
       );
-      final textTheme = customFont
-          ? GoogleFonts.getTextTheme(settings.fontFamily, base.textTheme)
-          : base.textTheme;
+      // Reader font is applied only inside reading surfaces. Application
+      // chrome always keeps the PWA's Source Sans UI typography.
+      final textTheme = GoogleFonts.sourceSans3TextTheme(base.textTheme);
 
       return base.copyWith(
         textTheme: textTheme,
+        scaffoldBackgroundColor: cs.surfaceContainerLowest,
+        dividerTheme: DividerThemeData(
+          color: cs.outlineVariant,
+          thickness: 0.7,
+          space: 1,
+        ),
+        cardTheme: CardThemeData(
+          color: cs.surface.withValues(alpha: 0.92),
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: cs.outlineVariant, width: 0.7),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: cs.surface.withValues(alpha: 0.88),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: BorderSide(color: cs.outlineVariant),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: BorderSide(color: cs.outlineVariant),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: BorderSide(color: cs.primary, width: 1.4),
+          ),
+        ),
+        chipTheme: base.chipTheme.copyWith(
+          backgroundColor: Colors.transparent,
+          selectedColor: cs.tertiaryContainer,
+          side: BorderSide(color: cs.outlineVariant),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
+          labelStyle: TextStyle(color: cs.onSurfaceVariant),
+        ),
+        drawerTheme: DrawerThemeData(
+          backgroundColor: cs.surface.withValues(alpha: 0.97),
+          surfaceTintColor: Colors.transparent,
+          width: 320,
+          shape: const RoundedRectangleBorder(),
+        ),
+        listTileTheme: ListTileThemeData(
+          iconColor: cs.onSurfaceVariant,
+          textColor: cs.onSurface,
+          selectedColor: cs.primary,
+          selectedTileColor: cs.primary.withValues(alpha: 0.11),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(17),
+          ),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(48, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(48, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            side: BorderSide(color: cs.outlineVariant),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(shape: const StadiumBorder()),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          elevation: 8,
+          highlightElevation: 4,
+          backgroundColor: cs.surface,
+          foregroundColor: cs.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: cs.outlineVariant),
+          ),
+        ),
+        bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: cs.surface.withValues(alpha: 0.98),
+          surfaceTintColor: Colors.transparent,
+          modalBackgroundColor: cs.surface.withValues(alpha: 0.98),
+          modalElevation: 16,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: cs.surface.withValues(alpha: 0.98),
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+            side: BorderSide(color: cs.outlineVariant),
+          ),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: cs.inverseSurface,
+          contentTextStyle: TextStyle(color: cs.onInverseSurface),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+        ),
         appBarTheme: AppBarTheme(
           elevation: 0,
           scrolledUnderElevation: 0,
           centerTitle: isIOS,
           // Transparent so BlurAppBar can paint its own background
-          backgroundColor: isIOS ? Colors.transparent : cs.surface,
+          backgroundColor: Colors.transparent,
           foregroundColor: cs.onSurface,
           systemOverlayStyle: cs.brightness == Brightness.dark
               ? SystemUiOverlayStyle.light

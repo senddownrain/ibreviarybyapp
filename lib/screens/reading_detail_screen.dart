@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 String _stripHtml(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -34,7 +35,6 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final raw = HiveService.readingsBox.get(widget.readingId);
     if (raw == null) {
       return Scaffold(
@@ -44,7 +44,11 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PhosphorIcon(PhosphorIconsLight.bookOpen, size: 48, color: Colors.grey[400]),
+              PhosphorIcon(
+                PhosphorIconsLight.bookOpen,
+                size: 48,
+                color: Colors.grey[400],
+              ),
               const SizedBox(height: 12),
               const Text('Чытанне не знойдзена'),
             ],
@@ -59,19 +63,28 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
       builder: (context, textStyle) => Scaffold(
         extendBodyBehindAppBar: true,
         appBar: IosGlassAppBar(
-          title: Text(title.isNotEmpty ? title : 'Чытанне',
-              overflow: TextOverflow.ellipsis),
+          title: Text(
+            title.isNotEmpty ? title : 'Чытанне',
+            overflow: TextOverflow.ellipsis,
+          ),
           actions: [
             IconButton(
-              icon: PhosphorIcon(_showRaw ? PhosphorIconsFill.code : PhosphorIconsRegular.code, size: 22),
+              icon: PhosphorIcon(
+                _showRaw ? PhosphorIconsFill.code : PhosphorIconsRegular.code,
+                size: 22,
+              ),
               tooltip: _showRaw ? 'Аддаць рэндэрынг' : 'Паказаць HTML',
               onPressed: () => setState(() => _showRaw = !_showRaw),
             ),
             IconButton(
-              icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork, size: 22),
+              icon: const PhosphorIcon(
+                PhosphorIconsRegular.shareNetwork,
+                size: 22,
+              ),
               tooltip: 'Падзяліцца',
               onPressed: () {
-                final text = (title.isNotEmpty ? '$title\n\n' : '') +
+                final text =
+                    (title.isNotEmpty ? '$title\n\n' : '') +
                     _stripHtml(reading.text);
                 Share.share(text);
               },
@@ -80,6 +93,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
         ),
         body: Stack(
           children: [
+            AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
                 16,
@@ -87,39 +101,30 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
                 16,
                 40,
               ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (reading.cycle != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Chip(label: Text('Цыкл ${reading.cycle}')),
-                ),
-              if (_showRaw)
-                SelectableText(
-                  reading.text,
-                  style: textStyle.copyWith(
-                    fontFamily: 'monospace',
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                )
-              else
-                _buildRendered(reading.text, textStyle),
-            ],
-          ),
-            ),
-            IgnorePointer(
-              child: Container(
-                height: kToolbarHeight + 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      seasonColor.withValues(alpha: isDark ? 0.13 : 0.07),
-                      Colors.transparent,
-                    ],
-                  ),
+              child: GlassSurface(
+                style: GlassStyle.card,
+                seasonColor: seasonColor,
+                borderRadius: BorderRadius.circular(28),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (reading.cycle != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Chip(label: Text('Цыкл ${reading.cycle}')),
+                      ),
+                    if (_showRaw)
+                      SelectableText(
+                        reading.text,
+                        style: textStyle.copyWith(
+                          fontFamily: 'monospace',
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      )
+                    else
+                      _buildRendered(reading.text, textStyle),
+                  ],
                 ),
               ),
             ),
@@ -131,7 +136,8 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
 
   Widget _buildRendered(String text, TextStyle textStyle) {
     if (text.contains('<') && text.contains('>')) {
-      final textColor = textStyle.color ?? Theme.of(context).colorScheme.onSurface;
+      final textColor =
+          textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       return Html(
         data: text,
         style: {
@@ -141,10 +147,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
             color: textColor,
             lineHeight: LineHeight(1.6),
           ),
-          'p': Style(
-            color: textColor,
-            margin: Margins.only(bottom: 10),
-          ),
+          'p': Style(color: textColor, margin: Margins.only(bottom: 10)),
         },
       );
     }

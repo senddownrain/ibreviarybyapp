@@ -7,31 +7,43 @@ import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 class LiturgicalPickerScreen extends ConsumerWidget {
   const LiturgicalPickerScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     return DefaultTabController(
       length: 2,
-      child: Column(
-        children: [
-          const TabBar(
-            tabs: [
-              Tab(text: 'Перыяды'),
-              Tab(text: 'Святы'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                _PeriodPicker(ref: ref),
-                const _FeastsPickerCombined(),
-              ],
+      child: AmbientWash(
+        seasonColor: seasonColor,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: GlassSurface(
+                style: GlassStyle.soft,
+                borderRadius: BorderRadius.circular(22),
+                child: const TabBar(
+                  tabs: [
+                    Tab(text: 'Перыяды'),
+                    Tab(text: 'Святы'),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _PeriodPicker(ref: ref),
+                  const _FeastsPickerCombined(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -63,10 +75,17 @@ class _PeriodPicker extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: color.withValues(alpha: 0.2),
-              child: PhosphorIcon(PhosphorIconsRegular.calendarBlank, color: color, size: 22),
+              child: PhosphorIcon(
+                PhosphorIconsRegular.calendarBlank,
+                color: color,
+                size: 22,
+              ),
             ),
             title: Text(entry.value),
-            trailing: const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
+            trailing: const PhosphorIcon(
+              PhosphorIconsRegular.caretRight,
+              size: 18,
+            ),
             onTap: () => _showWeekDaySheet(context, entry.key, entry.value),
           ),
         );
@@ -75,15 +94,19 @@ class _PeriodPicker extends StatelessWidget {
   }
 
   void _showWeekDaySheet(
-      BuildContext context, String period, String periodLabel) {
+    BuildContext context,
+    String period,
+    String periodLabel,
+  ) {
     final maxWeeks = _maxWeeks[period] ?? 8;
     final startDay = period == 'holyweek' ? 2 : 1;
 
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (ctx) => _WeekDaySheet(
         periodLabel: periodLabel,
@@ -91,7 +114,7 @@ class _PeriodPicker extends StatelessWidget {
         startDay: startDay,
         onSelected: (week, day) {
           Navigator.of(ctx).pop();
-          context.push('/picker-options/$period/$week/$day');
+          context.push('/picker/options?period=$period&week=$week&day=$day');
         },
       ),
     );
@@ -154,8 +177,10 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(widget.periodLabel,
-              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            widget.periodLabel,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 16),
 
           Text('Тыдзень', style: Theme.of(context).textTheme.labelLarge),
@@ -256,9 +281,11 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
     // Sort: upcoming first, then by date
     filtered.sort((a, b) {
       final today = DateTime(now.year, now.month, now.day);
-      final aUpcoming = a.date != null &&
+      final aUpcoming =
+          a.date != null &&
           !DateTime(a.date!.year, a.date!.month, a.date!.day).isBefore(today);
-      final bUpcoming = b.date != null &&
+      final bUpcoming =
+          b.date != null &&
           !DateTime(b.date!.year, b.date!.month, b.date!.day).isBefore(today);
       if (aUpcoming != bUpcoming) return aUpcoming ? -1 : 1;
       if (a.date == null && b.date == null) return a.name.compareTo(b.name);
@@ -275,10 +302,16 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
             controller: _searchCtrl,
             decoration: InputDecoration(
               hintText: 'Пошук свята...',
-              prefixIcon: const PhosphorIcon(PhosphorIconsRegular.magnifyingGlass, size: 20),
+              prefixIcon: const PhosphorIcon(
+                PhosphorIconsRegular.magnifyingGlass,
+                size: 20,
+              ),
               suffixIcon: _query.isNotEmpty
                   ? IconButton(
-                      icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 20),
+                      icon: const PhosphorIcon(
+                        PhosphorIconsRegular.x,
+                        size: 20,
+                      ),
                       onPressed: () {
                         _searchCtrl.clear();
                         setState(() => _query = '');
@@ -297,8 +330,8 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                   child: Text(
                     'Нічога не знойдзена',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 )
               : ListView.builder(
@@ -315,26 +348,31 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                               : PhosphorIconsRegular.calendarBlank,
                           size: 22,
                           color: feast.isDynamic
-                              ? Colors.orange
-                              : Colors.blue,
+                              ? Theme.of(context).colorScheme.tertiary
+                              : Theme.of(context).colorScheme.primary,
                         ),
                         title: Text(feast.name),
                         subtitle: feast.dateLabel != null
                             ? Text(feast.dateLabel!)
                             : null,
                         trailing: feast.date != null
-                            ? const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18)
-                            : PhosphorIcon(PhosphorIconsRegular.lock,
+                            ? const PhosphorIcon(
+                                PhosphorIconsRegular.caretRight,
+                                size: 18,
+                              )
+                            : PhosphorIcon(
+                                PhosphorIconsRegular.lock,
                                 size: 16,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         onTap: feast.date == null
                             ? () {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content:
-                                          Text('Дата свята не знойдзена')),
+                                    content: Text('Дата свята не знойдзена'),
+                                  ),
                                 );
                               }
                             : () {
@@ -383,12 +421,14 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
         date = DateTime(now.year + 1, month, day);
       }
 
-      result.add(_FeastItem(
-        name: feastName,
-        dateLabel: DateFormat('d MMMM', 'be').format(date),
-        date: date,
-        isDynamic: false,
-      ));
+      result.add(
+        _FeastItem(
+          name: feastName,
+          dateLabel: DateFormat('d MMMM', 'be').format(date),
+          date: date,
+          isDynamic: false,
+        ),
+      );
     }
 
     return result;

@@ -7,7 +7,6 @@ import 'package:mybrev_flutter/screens/liturgical_day_options_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
-import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -73,9 +72,12 @@ final router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/readings/liturgical/:liturgicalKey',
+      path: '/readings/liturgical/:period/:week/:day',
       builder: (context, state) {
-        final key = state.pathParameters['liturgicalKey']!;
+        final key =
+            '${state.pathParameters['period']}/'
+            '${state.pathParameters['week']}/'
+            '${state.pathParameters['day']}';
         return ReadingsScreen(liturgicalKey: key);
       },
     ),
@@ -113,10 +115,6 @@ final router = GoRouter(
       builder: (context, state) => const FavoritesScreen(),
     ),
     GoRoute(
-      path: '/prayers/my',
-      builder: (context, state) => const MyPrayersScreen(),
-    ),
-    GoRoute(
       path: '/bible/:version/:book/:chapter',
       builder: (context, state) {
         final version = state.pathParameters['version']!;
@@ -124,7 +122,10 @@ final router = GoRouter(
         final chapter =
             int.tryParse(state.pathParameters['chapter'] ?? '') ?? 1;
         return BibleChapterScreen(
-            versionId: version, bookId: book, chapter: chapter);
+          versionId: version,
+          bookId: book,
+          chapter: chapter,
+        );
       },
     ),
   ],

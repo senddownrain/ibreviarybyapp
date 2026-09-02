@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -41,75 +42,85 @@ class HomeScreen extends ConsumerWidget {
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => _pickDate(context, ref, date),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 260),
-                    transitionBuilder: (child, anim) {
-                      final slide = Tween<Offset>(
-                        begin: Offset(navDir * 0.25, 0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(parent: anim, curve: Curves.easeOut),
-                      );
-                      return FadeTransition(
-                        opacity: anim,
-                        child: SlideTransition(position: slide, child: child),
-                      );
-                    },
-                    child: Column(
-                      key: ValueKey(date.toIso8601String()),
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PhosphorIcon(
-                              PhosphorIconsRegular.calendarBlank,
-                              size: 14,
-                              color: cs.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isToday ? 'Сёння' : 'Выбраная дата',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(color: cs.onSurfaceVariant),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          dayOfWeekLabel,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: titleColor,
-                                letterSpacing: -0.4,
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                child: GlassSurface(
+                  style: GlassStyle.card,
+                  seasonColor: seasonColor,
+                  borderRadius: BorderRadius.circular(26),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 22,
+                  ),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _pickDate(context, ref, date),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 260),
+                      transitionBuilder: (child, anim) {
+                        final slide =
+                            Tween<Offset>(
+                              begin: Offset(navDir * 0.25, 0),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: anim,
+                                curve: Curves.easeOut,
                               ),
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              dayMonthLabel,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: cs.onSurfaceVariant),
-                            ),
-                            const SizedBox(width: 4),
-                            PhosphorIcon(
-                              PhosphorIconsRegular.caretDown,
-                              size: 14,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ],
-                        ),
-                      ],
+                            );
+                        return FadeTransition(
+                          opacity: anim,
+                          child: SlideTransition(position: slide, child: child),
+                        );
+                      },
+                      child: Column(
+                        key: ValueKey(date.toIso8601String()),
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PhosphorIcon(
+                                PhosphorIconsRegular.calendarBlank,
+                                size: 14,
+                                color: cs.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                isToday ? 'Сёння' : 'Выбраная дата',
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(color: cs.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            dayOfWeekLabel.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: ReaderTheme.of(context)
+                                .displayTitle(31)
+                                .copyWith(
+                                  color: titleColor,
+                                  letterSpacing: 0.2,
+                                ),
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                dayMonthLabel,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: cs.onSurfaceVariant),
+                              ),
+                              const SizedBox(width: 4),
+                              PhosphorIcon(
+                                PhosphorIconsRegular.caretDown,
+                                size: 14,
+                                color: cs.onSurfaceVariant,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -121,17 +132,19 @@ class HomeScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
                   child: Text(
                     'Літургія гадзін',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: cs.onSurface,
-                        ),
+                    style: ReaderTheme.of(
+                      context,
+                    ).displayTitle(26).copyWith(color: cs.onSurface),
                   ),
                 ),
               ),
             if (options.isEmpty && isLoading)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 32,
+                  ),
                   child: GlassSurface(
                     style: GlassStyle.card,
                     seasonColor: seasonColor,
@@ -206,21 +219,18 @@ class HomeScreen extends ConsumerWidget {
               )
             else
               SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, i) {
-                    final opt = options[i];
-                    if (kDebugMode) {
-                      debugPrint(
-                        '[Home] DayOptionCard render - key=${opt.key}, source=${opt.source}',
-                      );
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                      child: _DayOptionCard(option: opt, date: date),
+                delegate: SliverChildBuilderDelegate((context, i) {
+                  final opt = options[i];
+                  if (kDebugMode) {
+                    debugPrint(
+                      '[Home] DayOptionCard render - key=${opt.key}, source=${opt.source}',
                     );
-                  },
-                  childCount: options.length,
-                ),
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                    child: _DayOptionCard(option: opt, date: date),
+                  );
+                }, childCount: options.length),
               ),
             SliverToBoxAdapter(
               child: SizedBox(
@@ -293,9 +303,7 @@ class _DayOptionCard extends ConsumerWidget {
               color: accentFg.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: PhosphorIcon(icon, size: 22, color: accentFg),
-            ),
+            child: Center(child: PhosphorIcon(icon, size: 22, color: accentFg)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -317,19 +325,18 @@ class _DayOptionCard extends ConsumerWidget {
                 Text(
                   _stripHtml(option.title),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
+                  ),
                 ),
                 if (option.source != LiturgicalOptionSource.period &&
                     option.subtitle != null) ...[
                   const SizedBox(height: 2),
                   Text(
                     option.subtitle!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
                 if (day?.feastComment != null) ...[
@@ -337,18 +344,18 @@ class _DayOptionCard extends ConsumerWidget {
                   Text(
                     day!.feastComment!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: cs.onSurfaceVariant,
-                        ),
+                      fontStyle: FontStyle.italic,
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                 ],
                 if (!hasDay) ...[
                   const SizedBox(height: 4),
                   Text(
                     'Сінхранізуйце дадзеныя ў Наладах',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ],

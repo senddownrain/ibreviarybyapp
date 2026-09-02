@@ -21,6 +21,11 @@ class AppBottomNav extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (currentLocation != '/' &&
+        currentLocation.isNotEmpty &&
+        !currentLocation.startsWith('/picker')) {
+      return const SizedBox.shrink();
+    }
     return _LiquidGlassNav(
       currentLocation: currentLocation,
       selectedIndex: _getIndex(),
@@ -45,8 +50,9 @@ class _LiquidGlassNav extends ConsumerWidget {
     HapticFeedback.selectionClick();
     final current = ref.read(selectedDateProvider);
     ref.read(homeNavDirectionProvider.notifier).state = days > 0 ? 1 : -1;
-    ref.read(selectedDateProvider.notifier).state =
-        current.add(Duration(days: days));
+    ref.read(selectedDateProvider.notifier).state = current.add(
+      Duration(days: days),
+    );
   }
 
   @override
@@ -154,9 +160,7 @@ class _DayArrowButton extends StatelessWidget {
           child: SizedBox(
             width: 44,
             height: 44,
-            child: Center(
-              child: PhosphorIcon(icon, size: 22, color: color),
-            ),
+            child: Center(child: PhosphorIcon(icon, size: 22, color: color)),
           ),
         ),
       ),
@@ -178,26 +182,24 @@ class _GlassPill extends StatelessWidget {
   static const _kItems = [
     (
       icon: PhosphorIconsRegular.listBullets,
-      fill: PhosphorIconsFill.listBullets
+      fill: PhosphorIconsFill.listBullets,
     ),
-    (
-      icon: PhosphorIconsRegular.sunHorizon,
-      fill: PhosphorIconsFill.sunHorizon
-    ),
+    (icon: PhosphorIconsRegular.sunHorizon, fill: PhosphorIconsFill.sunHorizon),
     (
       icon: PhosphorIconsRegular.calendarBlank,
-      fill: PhosphorIconsFill.calendarBlank
+      fill: PhosphorIconsFill.calendarBlank,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final tokens = GlassTokens.of(context);
+    final cs = Theme.of(context).colorScheme;
     final iconOff = tokens.isDark
         ? Colors.white.withValues(alpha: 0.55)
         : Colors.black.withValues(alpha: 0.42);
-    final iconOn = Colors.black;
-    const indicatorColor = Colors.white;
+    final iconOn = cs.primary;
+    final indicatorColor = cs.primary.withValues(alpha: 0.12);
 
     return GlassSurface(
       style: GlassStyle.pill,

@@ -25,13 +25,11 @@ class FavoritesScreen extends ConsumerWidget {
     final localPrayers = ref.watch(localPrayersProvider);
     final allCombined = [...allPrayers, ...localPrayers];
 
-    final favorites = allCombined
-        .where((p) => favIds.contains(p.id))
-        .toList();
+    final favorites = allCombined.where((p) => favIds.contains(p.id)).toList();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar.text('Улюбёныя малітвы'),
+      appBar: IosGlassAppBar.text('Абраныя малітвы'),
       body: AmbientWash(
         seasonColor: seasonColor,
         height: kToolbarHeight + 100,
@@ -40,19 +38,24 @@ class FavoritesScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    PhosphorIcon(PhosphorIconsLight.heart,
-                        size: 56, color: cs.onSurfaceVariant),
+                    PhosphorIcon(
+                      PhosphorIconsLight.heart,
+                      size: 56,
+                      color: cs.onSurfaceVariant,
+                    ),
                     const SizedBox(height: 12),
                     Text(
-                      'Няма ўлюбёных малітваў',
+                      'Няма абраных малітваў',
                       style: TextStyle(color: cs.onSurfaceVariant),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Дадайце малітву ў улюбёныя\nнацісканнем на іконку сэрца',
+                      'Дадайце малітву ў абраныя\nнацісканнем на іконку сэрца',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: cs.onSurfaceVariant, fontSize: 13),
+                        color: cs.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -65,7 +68,10 @@ class FavoritesScreen extends ConsumerWidget {
                 itemCount: favorites.length,
                 itemBuilder: (context, index) {
                   final prayer = favorites[index];
-                  return _FavoriteTile(prayer: prayer);
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 9),
+                    child: _FavoriteTile(prayer: prayer),
+                  );
                 },
               ),
       ),
@@ -79,18 +85,45 @@ class _FavoriteTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      title: Text(prayer.displayTitle),
-      subtitle: prayer.tags.isNotEmpty ? Text(prayer.tags.join(', ')) : null,
-      trailing: IconButton(
-        icon: const PhosphorIcon(PhosphorIconsFill.heart, color: Colors.red, size: 22),
-        tooltip: 'Выдаліць з улюбёных',
-        onPressed: () {
-          HapticFeedback.selectionClick();
-          ref.read(settingsProvider.notifier).toggleFavorite(prayer.id);
-        },
+    final cs = Theme.of(context).colorScheme;
+    return GlassSurface(
+      borderRadius: BorderRadius.circular(22),
+      child: ListTile(
+        minTileHeight: 76,
+        leading: Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: cs.errorContainer.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Center(
+            child: PhosphorIcon(
+              PhosphorIconsFill.heart,
+              color: cs.error,
+              size: 22,
+            ),
+          ),
+        ),
+        title: Text(
+          prayer.displayTitle,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: prayer.tags.isNotEmpty ? Text(prayer.tags.join(' · ')) : null,
+        trailing: IconButton(
+          icon: PhosphorIcon(
+            PhosphorIconsFill.heart,
+            color: cs.error,
+            size: 22,
+          ),
+          tooltip: 'Выдаліць з абраных',
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            ref.read(settingsProvider.notifier).toggleFavorite(prayer.id);
+          },
+        ),
+        onTap: () => context.push('/prayer/${prayer.id}'),
       ),
-      onTap: () => context.push('/prayer/${prayer.id}'),
     );
   }
 }

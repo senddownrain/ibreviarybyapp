@@ -25,55 +25,48 @@ class GlassTokens {
   double get ambientCard => isDark ? 0.10 : 0.06;
 
   // Glass fills
-  Color get cardFill => isDark
-      ? Colors.black.withValues(alpha: 0.38)
-      : Colors.white.withValues(alpha: 0.72);
-  Color get softFill => isDark
-      ? Colors.black.withValues(alpha: 0.28)
-      : Colors.white.withValues(alpha: 0.62);
-  Color get barFill => isDark
-      ? Colors.black.withValues(alpha: 0.48)
-      : Colors.white.withValues(alpha: 0.62);
-  Color get pillFill => isDark
-      ? Colors.black.withValues(alpha: 0.52)
-      : Colors.white.withValues(alpha: 0.80);
+  Color get cardFill =>
+      isDark ? const Color(0xE6171512) : const Color(0xE6FFFBF3);
+  Color get softFill =>
+      isDark ? const Color(0xD9171512) : const Color(0xD9FFFBF3);
+  Color get barFill =>
+      isDark ? const Color(0xF7171512) : const Color(0xF7FFFBF3);
+  Color get pillFill =>
+      isDark ? const Color(0xF7171512) : const Color(0xF7FFFBF3);
 
-  Color get border => isDark
-      ? Colors.white.withValues(alpha: 0.14)
-      : Colors.white.withValues(alpha: 0.92);
-  Color get softBorder => isDark
-      ? Colors.white.withValues(alpha: 0.10)
-      : Colors.black.withValues(alpha: 0.06);
-  Color get pillBorder => isDark
-      ? Colors.white.withValues(alpha: 0.18)
-      : Colors.white;
+  Color get border =>
+      isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
+  Color get softBorder =>
+      isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
+  Color get pillBorder =>
+      isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
   Color get specular => isDark
       ? Colors.white.withValues(alpha: 0.14)
       : Colors.white.withValues(alpha: 0.92);
 
   List<BoxShadow> get cardShadow => [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.08),
-          blurRadius: 18,
-          spreadRadius: -2,
-          offset: const Offset(0, 6),
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.08),
+      blurRadius: 18,
+      spreadRadius: -2,
+      offset: const Offset(0, 6),
+    ),
+  ];
 
   List<BoxShadow> get pillShadow => [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
-          blurRadius: 32,
-          spreadRadius: -4,
-          offset: const Offset(0, 10),
-        ),
-        BoxShadow(
-          color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.06),
-          blurRadius: 8,
-          spreadRadius: -1,
-          offset: const Offset(0, 2),
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+      blurRadius: 32,
+      spreadRadius: -4,
+      offset: const Offset(0, 10),
+    ),
+    BoxShadow(
+      color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.06),
+      blurRadius: 8,
+      spreadRadius: -1,
+      offset: const Offset(0, 2),
+    ),
+  ];
 
   Color tinted(Color base, Color season, double strength) =>
       Color.alphaBlend(season.withValues(alpha: strength), base);
@@ -110,8 +103,8 @@ class AmbientWash extends StatelessWidget {
     required this.seasonColor,
     this.duration = const Duration(milliseconds: 700),
     this.child,
-  })  : intensity = AmbientWashIntensity.hero,
-        height = double.infinity;
+  }) : intensity = AmbientWashIntensity.hero,
+       height = double.infinity;
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +192,8 @@ class GlassSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = GlassTokens.of(context);
-    final radius = borderRadius ??
+    final radius =
+        borderRadius ??
         BorderRadius.circular(style == GlassStyle.pill ? 32 : 14);
 
     final base = switch (style) {

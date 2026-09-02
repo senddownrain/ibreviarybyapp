@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 class BibleScreen extends ConsumerStatefulWidget {
   const BibleScreen({super.key});
@@ -37,7 +38,7 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (_) => _ChapterPicker(book: book),
     );
@@ -46,6 +47,7 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final currentVersionId = settings.bibleVersionId;
     final availableVersions = BibleRepository.getAvailableVersions();
 
@@ -59,68 +61,115 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
 
     final ot = filtered.where((b) => b.order <= 39).toList();
     final nt = filtered.where((b) => b.order >= 40).toList();
+    final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar(
-        title: _searching
-            ? TextField(
-                controller: _searchCtrl,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Пошук кнігі...',
-                  border: InputBorder.none,
-                ),
-                style: Theme.of(context).textTheme.titleMedium,
-              )
-            : const Text('Біблія'),
-        actions: [
-          if (books.isNotEmpty)
-            IconButton(
-              icon: PhosphorIcon(_searching ? PhosphorIconsRegular.x : PhosphorIconsRegular.magnifyingGlass, size: 20),
-              onPressed: () {
-                setState(() {
-                  _searching = !_searching;
-                  if (!_searching) _searchCtrl.clear();
-                });
-              },
-            ),
-        ],
-      ),
-      body: Column(
+    return AmbientWash(
+      seasonColor: seasonColor,
+      height: 260,
+      child: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _searching
+                      ? GlassSurface(
+                          style: GlassStyle.soft,
+                          borderRadius: BorderRadius.circular(20),
+                          child: TextField(
+                            controller: _searchCtrl,
+                            autofocus: true,
+                            decoration: const InputDecoration(
+                              hintText: 'Пошук кнігі...',
+                              prefixIcon: PhosphorIcon(
+                                PhosphorIconsRegular.magnifyingGlass,
+                                size: 20,
+                              ),
+                              filled: false,
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                          ),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'СВЯТОЕ ПІСАННЕ',
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: cs.tertiary,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.0,
+                                  ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'Біблія',
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                ),
+                if (books.isNotEmpty) ...[
+                  const SizedBox(width: 10),
+                  IconButton.filledTonal(
+                    tooltip: _searching ? 'Закрыць пошук' : 'Знайсці кнігу',
+                    icon: PhosphorIcon(
+                      _searching
+                          ? PhosphorIconsRegular.x
+                          : PhosphorIconsRegular.magnifyingGlass,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _searching = !_searching;
+                        if (!_searching) _searchCtrl.clear();
+                      });
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
           // ── Version picker ─────────────────────────────────────────────────
           Padding(
-            padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + kToolbarHeight + 8, 16, 4),
-            child: SegmentedButton<String>(
-              segments: allVersionMeta.map((e) {
-                final isAvailable =
-                    availableVersions.any((v) => v.id == e.key);
-                return ButtonSegment<String>(
-                  value: e.key,
-                  label: Text(
-                    e.value.langLabel,
-                    style: TextStyle(
-                      color: isAvailable
-                          ? null
-                          : Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.38),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+            child: GlassSurface(
+              style: GlassStyle.soft,
+              borderRadius: BorderRadius.circular(22),
+              padding: const EdgeInsets.all(5),
+              child: SegmentedButton<String>(
+                segments: allVersionMeta.map((e) {
+                  final isAvailable = availableVersions.any(
+                    (v) => v.id == e.key,
+                  );
+                  return ButtonSegment<String>(
+                    value: e.key,
+                    label: Text(
+                      e.value.langLabel,
+                      style: TextStyle(
+                        color: isAvailable
+                            ? null
+                            : Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.38),
+                      ),
                     ),
-                  ),
-                  enabled: isAvailable,
-                );
-              }).toList(),
-              selected: {currentVersionId},
-              onSelectionChanged: (s) {
-                ref
-                    .read(settingsProvider.notifier)
-                    .setBibleVersion(s.first);
-              },
-              style: const ButtonStyle(
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
+                    enabled: isAvailable,
+                  );
+                }).toList(),
+                selected: {currentVersionId},
+                onSelectionChanged: (s) {
+                  ref.read(settingsProvider.notifier).setBibleVersion(s.first);
+                },
+                style: const ButtonStyle(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
               ),
             ),
           ),
@@ -130,9 +179,9 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
               child: Text(
                 'Беларуская Біблія загружаецца ў фонавым рэжыме',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
           // ── Book list ──────────────────────────────────────────────────────
@@ -154,19 +203,16 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
                           child: Center(
                             child: Text(
                               'Нічога не знойдзена',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
+                              style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                             ),
                           ),
                         ),
-                      const SliverPadding(
-                          padding: EdgeInsets.only(bottom: 24)),
+                      const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
                     ],
                   ),
           ),
@@ -190,10 +236,10 @@ class _SectionHeader extends StatelessWidget {
         child: Text(
           title,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                letterSpacing: 0.8,
-                fontWeight: FontWeight.w700,
-              ),
+            color: Theme.of(context).colorScheme.primary,
+            letterSpacing: 0.8,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );
@@ -207,31 +253,57 @@ class _BookList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverList.separated(
-      separatorBuilder: (context, index) =>
-          const Divider(height: 1, indent: 16, endIndent: 16),
+    return SliverList.builder(
       itemCount: books.length,
       itemBuilder: (context, i) {
         final book = books[i];
-        return ListTile(
-          title: Text(book.name),
-          subtitle: book.isVerseTextRussian
-              ? Text(
-                  'тэкст па-руску',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          child: GlassSurface(
+            borderRadius: BorderRadius.circular(20),
+            child: ListTile(
+              minTileHeight: 64,
+              leading: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: PhosphorIcon(
+                    PhosphorIconsRegular.bookOpen,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+              title: Text(book.name),
+              subtitle: book.isVerseTextRussian
+                  ? Text(
+                      'тэкст па-руску',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.tertiary,
                         fontStyle: FontStyle.italic,
                       ),
-                )
-              : null,
-          isThreeLine: book.isVerseTextRussian,
-          trailing: Text(
-            '${book.chapterCount} гл.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                    )
+                  : null,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${book.chapterCount} гл.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 16),
+                ],
+              ),
+              onTap: () => onTap(book),
+            ),
           ),
-          onTap: () => onTap(book),
         );
       },
     );
@@ -269,16 +341,15 @@ class _ChapterPicker extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(book.name,
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text(book.name, style: Theme.of(context).textTheme.titleMedium),
                 if (book.isVerseTextRussian) ...[
                   const SizedBox(height: 6),
                   Text(
                     'Тэкст раздзелаў — па-руску (сінод.)',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontStyle: FontStyle.italic,
-                        ),
+                      color: Theme.of(context).colorScheme.tertiary,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
               ],
@@ -307,13 +378,14 @@ class _ChapterPicker extends ConsumerWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color:
-                            Theme.of(context).colorScheme.outlineVariant,
+                        color: Theme.of(context).colorScheme.outlineVariant,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text('$ch',
-                        style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text(
+                      '$ch',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
                 );
               },
@@ -335,11 +407,13 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PhosphorIcon(PhosphorIconsLight.bookOpen,
-              size: 56, color: cs.onSurfaceVariant),
+          PhosphorIcon(
+            PhosphorIconsLight.bookOpen,
+            size: 56,
+            color: cs.onSurfaceVariant,
+          ),
           const SizedBox(height: 16),
-          Text('Біблія загружаецца...',
-              style: TextStyle(color: cs.onSurface)),
+          Text('Біблія загружаецца...', style: TextStyle(color: cs.onSurface)),
           const SizedBox(height: 8),
           Text(
             'Перазапусціце дадатак,\nкалі гэтае паведамленне застаецца',

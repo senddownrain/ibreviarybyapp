@@ -26,46 +26,50 @@ class AppShell extends ConsumerWidget {
 
     return WarmupBootstrap(
       child: Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      backgroundColor: cs.surface,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: GlassBar(
-          seasonColor: seasonColor,
-          child: _AppBarContent(cs: cs),
-        ),
-      ),
-      drawer: const AppNavigationDrawer(),
-      body: Column(
-        children: [
-          SizedBox(height: topInset),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: isOffline ? 32 : 0,
-            color: const Color(0xFFB71C1C),
-            child: isOffline
-                ? const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.wifi_off_rounded, color: Colors.white, size: 14),
-                      SizedBox(width: 6),
-                      Text(
-                        'Няма злучэння з інтэрнэтам',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        backgroundColor: cs.surfaceContainerLowest,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: GlassBar(
+            seasonColor: seasonColor,
+            child: _AppBarContent(cs: cs),
           ),
-          Expanded(child: child),
-        ],
-      ),
-      bottomNavigationBar: AppBottomNav(currentLocation: location),
+        ),
+        drawer: const AppNavigationDrawer(),
+        body: Column(
+          children: [
+            SizedBox(height: topInset),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: isOffline ? 32 : 0,
+              color: const Color(0xFFB71C1C),
+              child: isOffline
+                  ? const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.wifi_off_rounded,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'Няма злучэння з інтэрнэтам',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            Expanded(child: child),
+          ],
+        ),
+        bottomNavigationBar: AppBottomNav(currentLocation: location),
       ),
     );
   }

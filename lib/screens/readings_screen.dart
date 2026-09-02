@@ -22,8 +22,10 @@ class ReadingsScreen extends ConsumerStatefulWidget {
   final String? liturgicalKey;
 
   const ReadingsScreen({super.key, this.dateStr, this.liturgicalKey})
-      : assert(dateStr != null || liturgicalKey != null,
-            'Either dateStr or liturgicalKey must be provided');
+    : assert(
+        dateStr != null || liturgicalKey != null,
+        'Either dateStr or liturgicalKey must be provided',
+      );
 
   @override
   ConsumerState<ReadingsScreen> createState() => _ReadingsScreenState();
@@ -71,12 +73,19 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         final period = parts[0];
         final week = int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
         final day = int.tryParse(parts.length > 2 ? parts[2] : '1') ?? 1;
-        readings = await service.fetchByLiturgicalKey(period, week, day,
-            forceRefresh: forceRefresh);
+        readings = await service.fetchByLiturgicalKey(
+          period,
+          week,
+          day,
+          forceRefresh: forceRefresh,
+        );
         // Use today's date for cycle detection
         final today = DateTime.now();
         final todayDow = today.weekday == 7 ? 1 : today.weekday + 1;
-        currentCycle = ParsedReadingsService.currentCycle(today, dayOfWeek: todayDow);
+        currentCycle = ParsedReadingsService.currentCycle(
+          today,
+          dayOfWeek: todayDow,
+        );
       } else {
         final date = DateTime.tryParse(widget.dateStr!) ?? DateTime.now();
         final calendar = ref.read(calendarServiceProvider);
@@ -86,10 +95,19 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         final opts = calendar.getYearOptionsCached(date.year);
         final nextOpts = calendar.getYearOptionsCached(date.year + 1);
         final dynamicDates = calendar.getDynamicDatesCached(date.year);
-        readings = await service.fetchForDate(date, opts, nextOpts, dynamicDates,
-            forceRefresh: forceRefresh, includeAlternatives: true);
+        readings = await service.fetchForDate(
+          date,
+          opts,
+          nextOpts,
+          dynamicDates,
+          forceRefresh: forceRefresh,
+          includeAlternatives: true,
+        );
         final dayOfWeek = date.weekday == 7 ? 1 : date.weekday + 1;
-        currentCycle = ParsedReadingsService.currentCycle(date, dayOfWeek: dayOfWeek);
+        currentCycle = ParsedReadingsService.currentCycle(
+          date,
+          dayOfWeek: dayOfWeek,
+        );
       }
 
       if (!mounted) return;
@@ -112,9 +130,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
           .toList();
       if (groupsWithContent.isNotEmpty) groups = groupsWithContent;
       final activeKey = groups.isNotEmpty ? groups.first.key : null;
-      final activeDocs = groups.isNotEmpty
-          ? groups.first.documents
-          : readings;
+      final activeDocs = groups.isNotEmpty ? groups.first.documents : readings;
 
       _tabController?.dispose();
       final tabState = _buildTabState(
@@ -191,8 +207,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     Map<String, ParsedReading?> byYear = {};
 
     final hasYearData = readings.any((r) => r.year != null);
-    final isFeastDay =
-        readings.any((r) => r.feast != null && r.feast!.isNotEmpty);
+    final isFeastDay = readings.any(
+      (r) => r.feast != null && r.feast!.isNotEmpty,
+    );
 
     if (isSunday && readings.isNotEmpty && hasYearData && !isFeastDay) {
       for (final r in readings) {
@@ -277,9 +294,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                             children: [
                               Text(
                                 group.label,
-                                style: reader.body(15).copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                style: reader
+                                    .body(15)
+                                    .copyWith(fontWeight: FontWeight.w600),
                               ),
                               Text(
                                 '${group.documents.length} варыянт(аў)',
@@ -318,19 +335,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       if (reading != null && readingHasVisibleContent(reading)) return reading;
     }
     final forYear = docs.where((r) => r.year == year).toList();
-    return pickReadingForCycle(
-      forYear.isNotEmpty ? forYear : docs,
-      year,
-    );
+    return pickReadingForCycle(forYear.isNotEmpty ? forYear : docs, year);
   }
 
   ParsedReading _displayReading() {
     final docs = _activeGroupDocuments();
     return pickReadingForCycle(docs, _currentCycle) ??
-        docs.firstWhere(
-          readingHasVisibleContent,
-          orElse: () => docs.first,
-        );
+        docs.firstWhere(readingHasVisibleContent, orElse: () => docs.first);
   }
 
   Widget _readingsBackdrop({required Widget child}) {
@@ -362,7 +373,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       'верасня',
       'кастрычніка',
       'лістапада',
-      'снежня'
+      'снежня',
     ];
     return '${date.day} ${months[date.month]}';
   }
@@ -406,7 +417,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     return '$period, тыд. $week – $dayLabel';
   }
 
-
   @override
   Widget build(BuildContext context) {
     final title = _title;
@@ -443,11 +453,16 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                PhosphorIcon(PhosphorIconsLight.warning,
-                    size: 56, color: cs.onSurfaceVariant),
+                PhosphorIcon(
+                  PhosphorIconsLight.warning,
+                  size: 56,
+                  color: cs.onSurfaceVariant,
+                ),
                 const SizedBox(height: 12),
-                Text('Не атрымалася загрузіць чытанні',
-                    style: TextStyle(color: cs.onSurface)),
+                Text(
+                  'Не атрымалася загрузіць чытанні',
+                  style: TextStyle(color: cs.onSurface),
+                ),
                 const SizedBox(height: 6),
                 Text(
                   _error!,
@@ -459,7 +474,10 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                 const SizedBox(height: 20),
                 FilledButton.icon(
                   onPressed: _load,
-                  icon: const PhosphorIcon(PhosphorIconsRegular.arrowsClockwise, size: 18),
+                  icon: const PhosphorIcon(
+                    PhosphorIconsRegular.arrowsClockwise,
+                    size: 18,
+                  ),
                   label: const Text('Паўтарыць'),
                 ),
               ],
@@ -479,15 +497,23 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PhosphorIcon(PhosphorIconsLight.bookOpen,
-                  size: 56, color: cs.onSurfaceVariant),
+              PhosphorIcon(
+                PhosphorIconsLight.bookOpen,
+                size: 56,
+                color: cs.onSurfaceVariant,
+              ),
               const SizedBox(height: 12),
-              Text('Чытанні не знойдзены',
-                  style: TextStyle(color: cs.onSurface)),
+              Text(
+                'Чытанні не знойдзены',
+                style: TextStyle(color: cs.onSurface),
+              ),
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: () => _load(forceRefresh: true),
-                icon: const PhosphorIcon(PhosphorIconsRegular.arrowsClockwise, size: 18),
+                icon: const PhosphorIcon(
+                  PhosphorIconsRegular.arrowsClockwise,
+                  size: 18,
+                ),
                 label: const Text('Абнавіць'),
               ),
             ],
@@ -513,8 +539,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                 controller: _tabController,
                 tabs: _tabs.map((y) => Tab(text: y)).toList(),
                 labelColor: ReaderTheme.of(context).rubric,
-                unselectedLabelColor:
-                    Theme.of(context).colorScheme.onSurfaceVariant,
+                unselectedLabelColor: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant,
                 indicatorColor: ReaderTheme.of(context).rubric,
               ),
               Expanded(
@@ -528,11 +555,16 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            PhosphorIcon(PhosphorIconsLight.bookOpen,
-                                size: 48, color: cs.onSurfaceVariant),
+                            PhosphorIcon(
+                              PhosphorIconsLight.bookOpen,
+                              size: 48,
+                              color: cs.onSurfaceVariant,
+                            ),
                             const SizedBox(height: 12),
-                            Text('Чытанні для году $y не знойдзены',
-                                style: TextStyle(color: cs.onSurface)),
+                            Text(
+                              'Чытанні для году $y не знойдзены',
+                              style: TextStyle(color: cs.onSurface),
+                            ),
                           ],
                         ),
                       );
@@ -622,8 +654,19 @@ class _ReadingBody extends ConsumerWidget {
     7: 'Субота',
   };
   static const _months = [
-    '', 'студзеня', 'лютага', 'сакавіка', 'красавіка', 'мая', 'чэрвеня',
-    'ліпеня', 'жніўня', 'верасня', 'кастрычніка', 'лістапада', 'снежня',
+    '',
+    'студзеня',
+    'лютага',
+    'сакавіка',
+    'красавіка',
+    'мая',
+    'чэрвеня',
+    'ліпеня',
+    'жніўня',
+    'верасня',
+    'кастрычніка',
+    'лістапада',
+    'снежня',
   ];
 
   String? _formattedDate() {
@@ -650,144 +693,160 @@ class _ReadingBody extends ConsumerWidget {
       builder: (context, textStyle) => LayoutBuilder(
         builder: (context, constraints) => Stack(
           children: [
+            AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (celebrationPicker != null) ...[
-                      celebrationPicker!,
-                      const SizedBox(height: 8),
-                    ],
-                    if (formattedDate != null) ...[
-                      Center(
-                        child: Text(
-                          formattedDate,
-                          style: reader.referenceStyle(13),
+                child: GlassSurface(
+                  style: GlassStyle.card,
+                  seasonColor: seasonColor,
+                  borderRadius: BorderRadius.circular(28),
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (celebrationPicker != null) ...[
+                        celebrationPicker!,
+                        const SizedBox(height: 8),
+                      ],
+                      if (formattedDate != null) ...[
+                        Center(
+                          child: Text(
+                            formattedDate,
+                            style: reader.referenceStyle(13),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    if (!reading.hasReadings) ...[
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            PhosphorIcon(PhosphorIconsRegular.info,
+                        const SizedBox(height: 8),
+                      ],
+                      if (!reading.hasReadings) ...[
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PhosphorIcon(
+                                PhosphorIconsRegular.info,
                                 size: 18,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
-                                style: TextStyle(
-                                  fontSize: (textStyle.fontSize ?? 16) * 0.875,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSecondaryContainer,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
+                                  style: TextStyle(
+                                    fontSize:
+                                        (textStyle.fontSize ?? 16) * 0.875,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondaryContainer,
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    if (!hasContent) ...[
-                      const SizedBox(height: 24),
-                      Center(
-                        child: Column(
-                          children: [
-                            PhosphorIcon(
-                              PhosphorIconsLight.bookOpen,
-                              size: 48,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Тэкст чытання пакуль не загружаны',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onSurfaceVariant,
-                                fontSize: 13,
-                              ),
-                            ),
-                            if (onRefresh != null) ...[
-                              const SizedBox(height: 16),
-                              FilledButton.icon(
-                                onPressed: onRefresh,
-                                icon: const PhosphorIcon(
-                                  PhosphorIconsRegular.arrowsClockwise,
-                                  size: 18,
-                                ),
-                                label: const Text('Абнавіць'),
                               ),
                             ],
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
+                      if (!hasContent) ...[
+                        const SizedBox(height: 24),
+                        Center(
+                          child: Column(
+                            children: [
+                              PhosphorIcon(
+                                PhosphorIconsLight.bookOpen,
+                                size: 48,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Тэкст чытання пакуль не загружаны',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              if (onRefresh != null) ...[
+                                const SizedBox(height: 16),
+                                FilledButton.icon(
+                                  onPressed: onRefresh,
+                                  icon: const PhosphorIcon(
+                                    PhosphorIconsRegular.arrowsClockwise,
+                                    size: 18,
+                                  ),
+                                  label: const Text('Абнавіць'),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                      if (reading.feast != null)
+                        _FeastChip(feast: reading.feast!),
+                      if (reading.firstReading != null)
+                        _ReadingSection(
+                          label: reading.hasTwoReadings
+                              ? 'ПЕРШАЕ ЧЫТАННЕ'
+                              : 'ЧЫТАННЕ',
+                          section: reading.firstReading!,
+                          textStyle: textStyle,
+                          reader: reader,
+                        ),
+                      if (reading.psalm != null)
+                        _PsalmSection(
+                          psalm: reading.psalm!,
+                          textStyle: textStyle,
+                          reader: reader,
+                        ),
+                      if (reading.reading2 != null)
+                        _ReadingSection(
+                          label: 'ДРУГОЕ ЧЫТАННЕ',
+                          section: reading.reading2!,
+                          textStyle: textStyle,
+                          reader: reader,
+                        ),
+                      if (reading.alleluia != null)
+                        _AlleluiaSection(
+                          alleluia: reading.alleluia!,
+                          textStyle: textStyle,
+                          reader: reader,
+                        ),
+                      if (reading.gospel != null)
+                        _ReadingSection(
+                          label: 'ЕВАНГЕЛЛЕ',
+                          section: reading.gospel!,
+                          textStyle: textStyle,
+                          reader: reader,
+                        ),
+                      const SizedBox(height: 32),
                     ],
-                    if (reading.feast != null) _FeastChip(feast: reading.feast!),
-                    if (reading.firstReading != null)
-                      _ReadingSection(
-                        label: reading.hasTwoReadings ? 'ПЕРШАЕ ЧЫТАННЕ' : 'ЧЫТАННЕ',
-                        section: reading.firstReading!,
-                        textStyle: textStyle,
-                        reader: reader,
-                      ),
-                    if (reading.psalm != null)
-                      _PsalmSection(
-                        psalm: reading.psalm!,
-                        textStyle: textStyle,
-                        reader: reader,
-                      ),
-                    if (reading.reading2 != null)
-                      _ReadingSection(
-                        label: 'ДРУГОЕ ЧЫТАННЕ',
-                        section: reading.reading2!,
-                        textStyle: textStyle,
-                        reader: reader,
-                      ),
-                    if (reading.alleluia != null)
-                      _AlleluiaSection(
-                        alleluia: reading.alleluia!,
-                        textStyle: textStyle,
-                        reader: reader,
-                      ),
-                    if (reading.gospel != null)
-                      _ReadingSection(
-                        label: 'ЕВАНГЕЛЛЕ',
-                        section: reading.gospel!,
-                        textStyle: textStyle,
-                        reader: reader,
-                      ),
-                    const SizedBox(height: 32),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            AmbientWash(
-              seasonColor: seasonColor,
-              height: kToolbarHeight + 120,
             ),
           ],
         ),
@@ -808,7 +867,8 @@ class _FontSizeButton extends StatelessWidget {
     return PopupMenuButton<double>(
       icon: const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
       tooltip: 'Памер шрыфту',
-      onSelected: (size) => ref.read(settingsProvider.notifier).setFontSize(size),
+      onSelected: (size) =>
+          ref.read(settingsProvider.notifier).setFontSize(size),
       itemBuilder: (_) => [
         for (final size in [14.0, 16.0, 18.0, 20.0, 24.0])
           PopupMenuItem(
@@ -868,7 +928,12 @@ class _BibleRef extends StatelessWidget {
     final theme = reader ?? ReaderTheme.of(context);
     return Text(
       text,
-      style: theme.referenceStyle(base * 0.85, family: textStyle?.fontFamily),
+      style: (textStyle ?? theme.body(base)).copyWith(
+        fontSize: base * 0.85,
+        color: theme.muted,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.02,
+      ),
     );
   }
 }
@@ -928,23 +993,34 @@ class _ReadingSectionState extends State<_ReadingSection> {
     }
 
     final truncated = bodyText.length > _threshold && !_expanded;
-    final display = truncated ? '${bodyText.substring(0, _threshold)}…' : bodyText;
+    final display = truncated
+        ? '${bodyText.substring(0, _threshold)}…'
+        : bodyText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel(widget.label,
-            textStyle: widget.textStyle, reader: widget.reader),
+        _SectionLabel(
+          widget.label,
+          textStyle: widget.textStyle,
+          reader: widget.reader,
+        ),
         if (s.bible != null)
-          _BibleRef(s.bible!, textStyle: widget.textStyle, reader: widget.reader),
+          _BibleRef(
+            s.bible!,
+            textStyle: widget.textStyle,
+            reader: widget.reader,
+          ),
         if (s.comment != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               s.comment!,
-              style: widget.reader.rubricStyle(
-                base * 0.875,
-                family: widget.textStyle.fontFamily,
+              style: widget.textStyle.copyWith(
+                fontSize: base * 0.875,
+                color: widget.reader.rubric,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -987,7 +1063,8 @@ class _ReadingSectionState extends State<_ReadingSection> {
 String _cleanChorus(String s) {
   final t = s.trim();
   const prefix = 'рэфрэн:';
-  if (t.toLowerCase().startsWith(prefix)) return t.substring(prefix.length).trim();
+  if (t.toLowerCase().startsWith(prefix))
+    return t.substring(prefix.length).trim();
   return t;
 }
 
@@ -1012,8 +1089,11 @@ class _PsalmSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel('РЭСПАНСАРЫЙНЫ ПСАЛЬМ',
-            textStyle: textStyle, reader: reader),
+        _SectionLabel(
+          'РЭСПАНСАРЫЙНЫ ПСАЛЬМ',
+          textStyle: textStyle,
+          reader: reader,
+        ),
         if (psalm.bible != null)
           _BibleRef(psalm.bible!, textStyle: textStyle, reader: reader),
 
@@ -1021,7 +1101,12 @@ class _PsalmSection extends StatelessWidget {
         if (!hasVerses) ...[
           if (hasChorus) ...[
             const SizedBox(height: 8),
-            _ChorusBox(label: 'Рэфрэн', chorus: chorus, cs: cs, textStyle: textStyle),
+            _ChorusBox(
+              label: 'Рэфрэн',
+              chorus: chorus,
+              cs: cs,
+              textStyle: textStyle,
+            ),
           ],
           if (psalm.text?.isNotEmpty == true) ...[
             const SizedBox(height: 8),
@@ -1035,7 +1120,12 @@ class _PsalmSection extends StatelessWidget {
             // Chorus before each verse
             if (hasChorus) ...[
               const SizedBox(height: 8),
-              _ChorusBox(label: 'Рэфрэн', chorus: chorus, cs: cs, textStyle: textStyle),
+              _ChorusBox(
+                label: 'Рэфрэн',
+                chorus: chorus,
+                cs: cs,
+                textStyle: textStyle,
+              ),
             ],
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1056,7 +1146,12 @@ class _PsalmSection extends StatelessWidget {
                 textStyle: textStyle,
               )
             else
-              _ChorusBox(label: 'Рэфрэн', chorus: chorus, cs: cs, textStyle: textStyle),
+              _ChorusBox(
+                label: 'Рэфрэн',
+                chorus: chorus,
+                cs: cs,
+                textStyle: textStyle,
+              ),
           ],
         ],
       ],
@@ -1094,18 +1189,22 @@ class _ChorusBox extends StatelessWidget {
         ),
       ),
       child: SelectableText.rich(
-        TextSpan(children: [
-          TextSpan(
-            text: '$label: ',
-            style: textStyle.copyWith(fontWeight: FontWeight.w700),
-          ),
-          TextSpan(text: chorus, style: textStyle.copyWith(fontWeight: FontWeight.w600)),
-        ]),
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: textStyle.copyWith(fontWeight: FontWeight.w700),
+            ),
+            TextSpan(
+              text: chorus,
+              style: textStyle.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 
 // ---------------------------------------------------------------------------
 
@@ -1125,13 +1224,15 @@ class _AlleluiaSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: SelectableText.rich(
-        TextSpan(children: [
-          TextSpan(
-            text: 'Акламацыя: ',
-            style: textStyle.copyWith(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(text: _acclamation, style: textStyle),
-        ]),
+        TextSpan(
+          children: [
+            TextSpan(
+              text: 'Акламацыя: ',
+              style: textStyle.copyWith(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(text: _acclamation, style: textStyle),
+          ],
+        ),
       ),
     );
   }
@@ -1141,8 +1242,11 @@ class _AlleluiaSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel('СПЕЎ ПЕРАД ЕВАНГЕЛЛЕМ',
-            textStyle: textStyle, reader: reader),
+        _SectionLabel(
+          'СПЕЎ ПЕРАД ЕВАНГЕЛЛЕМ',
+          textStyle: textStyle,
+          reader: reader,
+        ),
         _acclamationLine(context),
         if (alleluia.bible != null) ...[
           const SizedBox(height: 4),

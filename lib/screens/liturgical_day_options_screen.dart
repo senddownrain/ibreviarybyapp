@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 
 class LiturgicalDayOptionsScreen extends ConsumerWidget {
@@ -63,6 +65,7 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
     final periodLabel = _periodLabels[period] ?? period;
     final dayLabel = _dayLabels[day] ?? '$day';
     final dayId = _findDayId();
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -74,45 +77,81 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
             Text(
               'Тыдзень $week · $dayLabel',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .appBarTheme
-                        .foregroundColor
-                        ?.withValues(alpha: 0.7),
-                  ),
+                color: Theme.of(
+                  context,
+                ).appBarTheme.foregroundColor?.withValues(alpha: 0.7),
+              ),
             ),
           ],
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(24, MediaQuery.paddingOf(context).top + kToolbarHeight + 16, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            FilledButton.icon(
-              icon: const PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 20),
-              label: const Text('Чытанні'),
-              onPressed: () =>
-                  context.push('/readings/l/$period/$week/$day'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              icon: const PhosphorIcon(PhosphorIconsRegular.clockCountdown, size: 20),
-              label: const Text('Літургія'),
-              onPressed: dayId != null
-                  ? () => context.push('/hora/$dayId')
-                  : null,
-            ),
-            if (dayId == null) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Гадзіны малітвы для гэтага дня не знойдзены ў базе',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+      body: AmbientWash(
+        seasonColor: seasonColor,
+        height: 260,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            MediaQuery.paddingOf(context).top + kToolbarHeight + 18,
+            16,
+            24,
+          ),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: GlassSurface(
+              style: GlassStyle.card,
+              seasonColor: seasonColor,
+              borderRadius: BorderRadius.circular(28),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                     ),
-                textAlign: TextAlign.center,
+                    icon: const PhosphorIcon(
+                      PhosphorIconsRegular.bookOpen,
+                      size: 20,
+                    ),
+                    label: const Text('Чытанні'),
+                    onPressed: () =>
+                        context.push('/readings/liturgical/$period/$week/$day'),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    icon: const PhosphorIcon(
+                      PhosphorIconsRegular.clockCountdown,
+                      size: 20,
+                    ),
+                    label: const Text('Літургія гадзін'),
+                    onPressed: dayId != null
+                        ? () => context.push('/hora/$dayId')
+                        : null,
+                  ),
+                  if (dayId == null) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      'Гадзіны малітвы для гэтага дня не знойдзены ў базе',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ],
+            ),
+          ),
         ),
       ),
     );

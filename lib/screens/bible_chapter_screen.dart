@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 
@@ -76,9 +78,13 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final book = BibleRepository.getBook(widget.versionId, widget.bookId);
-    final verses =
-        BibleRepository.getChapter(widget.versionId, widget.bookId, widget.chapter);
+    final verses = BibleRepository.getChapter(
+      widget.versionId,
+      widget.bookId,
+      widget.chapter,
+    );
 
     if (book == null || verses.isEmpty) {
       return Scaffold(
@@ -95,14 +101,19 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(book.name,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600)),
-              Text('Раздзел ${widget.chapter}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(height: 1.2)),
+              Text(
+                book.name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'Раздзел ${widget.chapter}',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(height: 1.2),
+              ),
             ],
           ),
           actions: [
@@ -132,63 +143,80 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             ),
           ],
         ),
-        body: Column(
+        body: Stack(
           children: [
-            if (book.isVerseTextRussian)
-              Material(
-                color: Theme.of(context).colorScheme.secondaryContainer
-                    .withValues(alpha: 0.6),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PhosphorIcon(
-                        PhosphorIconsRegular.translate,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+            AmbientWash.hero(seasonColor: seasonColor),
+            Column(
+              children: [
+                SizedBox(
+                  height:
+                      MediaQuery.paddingOf(context).top + kToolbarHeight + 8,
+                ),
+                if (book.isVerseTextRussian)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                    child: GlassSurface(
+                      style: GlassStyle.soft,
+                      borderRadius: BorderRadius.circular(18),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Тэкст гэтае кнігі пададзены па-руску (сінод. пераклад), назва — па-беларуску.',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer,
-                                height: 1.35,
-                              ),
-                        ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PhosphorIcon(
+                            PhosphorIconsRegular.translate,
+                            size: 20,
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Тэкст гэтае кнігі пададзены па-руску (сінод. пераклад), назва — па-беларуску.',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(height: 1.35),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                  ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+                    child: GlassSurface(
+                      style: GlassStyle.card,
+                      seasonColor: seasonColor,
+                      borderRadius: BorderRadius.circular(28),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 16),
+                        itemCount: verses.length,
+                        itemBuilder: (context, i) {
+                          final v = verses[i];
+                          return _VerseRow(
+                            verseNum: v.verse,
+                            text: v.text,
+                            textStyle: textStyle,
+                            highlightColor: _resolveHighlightColor(
+                              context,
+                              _verseColorIndex[v.verse],
+                            ),
+                            onTap: () => _pickVerseColor(v.verse),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + kToolbarHeight + 4, 16, 12),
-                itemCount: verses.length,
-                itemBuilder: (context, i) {
-                  final v = verses[i];
-                  return _VerseRow(
-                    verseNum: v.verse,
-                    text: v.text,
-                    textStyle: textStyle,
-                    highlightColor: _resolveHighlightColor(
-                      context,
-                      _verseColorIndex[v.verse],
-                    ),
-                    onTap: () => _pickVerseColor(v.verse),
-                  );
-                },
-              ),
-            ),
-            _ChapterNavBar(
-              versionId: widget.versionId,
-              bookId: widget.bookId,
-              chapter: widget.chapter,
-              chapterCount: book.chapterCount,
+                _ChapterNavBar(
+                  versionId: widget.versionId,
+                  bookId: widget.bookId,
+                  chapter: widget.chapter,
+                  chapterCount: book.chapterCount,
+                ),
+              ],
             ),
           ],
         ),
@@ -233,7 +261,9 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                       Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(
-                            right: i == _kHighlightBaseColors.length - 1 ? 0 : 8,
+                            right: i == _kHighlightBaseColors.length - 1
+                                ? 0
+                                : 8,
                           ),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(14),
@@ -261,7 +291,10 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 const SizedBox(height: 14),
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context, -1),
-                  icon: const PhosphorIcon(PhosphorIconsRegular.eraser, size: 18),
+                  icon: const PhosphorIcon(
+                    PhosphorIconsRegular.eraser,
+                    size: 18,
+                  ),
                   label: const Text('Убрать выделение'),
                 ),
               ],
@@ -303,9 +336,7 @@ class _VerseRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final numSize = (textStyle.fontSize ?? 16) * 0.72;
     final colors = Theme.of(context).colorScheme;
-    final verseTextStyle = textStyle.copyWith(
-      color: colors.onSurface,
-    );
+    final verseTextStyle = textStyle.copyWith(color: colors.onSurface);
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
@@ -368,47 +399,50 @@ class _ChapterNavBar extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
-              width: 0.5,
-            ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+        child: GlassSurface(
+          style: GlassStyle.pill,
+          borderRadius: BorderRadius.circular(28),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          child: Row(
+            children: [
+              Expanded(
+                child: hasPrev
+                    ? TextButton.icon(
+                        onPressed: () => _go(context, chapter - 1),
+                        icon: const PhosphorIcon(
+                          PhosphorIconsRegular.caretLeft,
+                          size: 18,
+                        ),
+                        label: Text('Раздзел ${chapter - 1}'),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              Text(
+                '$chapter / $chapterCount',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              Expanded(
+                child: hasNext
+                    ? Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => _go(context, chapter + 1),
+                          label: Text('Раздзел ${chapter + 1}'),
+                          icon: const PhosphorIcon(
+                            PhosphorIconsRegular.caretRight,
+                            size: 18,
+                          ),
+                          iconAlignment: IconAlignment.end,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          children: [
-            Expanded(
-              child: hasPrev
-                  ? TextButton.icon(
-                      onPressed: () => _go(context, chapter - 1),
-                      icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft, size: 18),
-                      label: Text('Раздзел ${chapter - 1}'),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            Text(
-              '$chapter / $chapterCount',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
-            Expanded(
-              child: hasNext
-                  ? Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () => _go(context, chapter + 1),
-                        label: Text('Раздзел ${chapter + 1}'),
-                        icon: const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
-                        iconAlignment: IconAlignment.end,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
         ),
       ),
     );

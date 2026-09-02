@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -28,14 +27,6 @@ class IosGlassAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
     final canPop = Navigator.canPop(context);
-
-    // On older Android without blur perf concerns still use glass; fall back
-    // only when explicitly preferring stock Material (unused currently).
-    if (kIsWeb ||
-        (defaultTargetPlatform != TargetPlatform.iOS &&
-            defaultTargetPlatform != TargetPlatform.android)) {
-      return AppBar(title: title, actions: actions, leading: leading);
-    }
 
     return GlassBar(
       seasonColor: seasonColor,
