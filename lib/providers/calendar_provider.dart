@@ -10,7 +10,7 @@ class CalendarService {
   final FirebaseFirestore _db;
 
   CalendarService({FirebaseFirestore? db})
-      : _db = db ?? FirebaseFirestore.instance;
+    : _db = db ?? FirebaseFirestore.instance;
 
   final Map<int, YearOptions?> _yearCache = {};
   final Map<int, DynamicDates> _dynamicCache = {};
@@ -30,6 +30,11 @@ class CalendarService {
     _dynamicCache[year] = dates;
     return dates;
   }
+
+  /// Synchronous views used by screens after [calendarReadyProvider] warmup.
+  YearOptions? getYearOptions(int year) => getYearOptionsCached(year);
+
+  DynamicDates? getDynamicDates(int year) => getDynamicDatesCached(year);
 
   Future<YearOptions?> ensureYearOptions(int year) async {
     final cached = getYearOptionsCached(year);

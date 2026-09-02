@@ -165,7 +165,7 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: widget.maxWeeks,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (_, i) {
                 final w = i + 1;
                 final selected = w == _selectedWeek;
@@ -222,8 +222,8 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
   Widget build(BuildContext context) {
     final calSvc = ref.read(calendarServiceProvider);
     final now = DateTime.now();
-    final dynamicDates = calSvc.getDynamicDatesCached(now.year);
-    final nextDynamicDates = calSvc.getDynamicDatesCached(now.year + 1);
+    final dynamicDates = calSvc.getDynamicDates(now.year);
+    final nextDynamicDates = calSvc.getDynamicDates(now.year + 1);
 
     // Build dynamic feasts list
     final dynamicFeasts = _feastLabels.entries.map((entry) {

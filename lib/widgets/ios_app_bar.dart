@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -17,12 +17,8 @@ class IosGlassAppBar extends ConsumerWidget implements PreferredSizeWidget {
     this.leading,
   });
 
-  IosGlassAppBar.text(
-    String text, {
-    super.key,
-    this.actions,
-    this.leading,
-  }) : title = Text(text);
+  IosGlassAppBar.text(String text, {super.key, this.actions, this.leading})
+    : title = Text(text);
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -35,14 +31,17 @@ class IosGlassAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
     // On older Android without blur perf concerns still use glass; fall back
     // only when explicitly preferring stock Material (unused currently).
-    if (!Platform.isIOS && !Platform.isAndroid) {
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.iOS &&
+            defaultTargetPlatform != TargetPlatform.android)) {
       return AppBar(title: title, actions: actions, leading: leading);
     }
 
     return GlassBar(
       seasonColor: seasonColor,
       child: NavigationToolbar(
-        leading: leading ??
+        leading:
+            leading ??
             (canPop
                 ? IconButton(
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -59,10 +58,7 @@ class IosGlassAppBar extends ConsumerWidget implements PreferredSizeWidget {
           child: title,
         ),
         trailing: actions != null && actions!.isNotEmpty
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: actions!,
-              )
+            ? Row(mainAxisSize: MainAxisSize.min, children: actions!)
             : null,
         centerMiddle: true,
       ),

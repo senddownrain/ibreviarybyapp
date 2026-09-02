@@ -30,11 +30,13 @@ LiturgicalContext computeLiturgicalContext(
 
   if (easter != null) {
     final period = _getPeriodFromEaster(date, easter, dynamicDates);
-    if (period != null) return LiturgicalContext(
+    if (period != null) {
+      return LiturgicalContext(
       periodType: period.type,
       periodWeek: period.week,
       dayOfWeek: dayOfWeek,
     );
+    }
   }
 
   // Advent

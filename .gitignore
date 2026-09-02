@@ -4,6 +4,7 @@
 .flutter-plugins-dependencies
 build/
 *.iml
+**/flutter/ephemeral/
 
 # Android
 android/.gradle/

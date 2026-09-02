@@ -1,14 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/router/router.dart';
@@ -21,20 +22,24 @@ const _kSeedColor = Color(0xFF3A5FA0);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: true,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (!kIsWeb) {
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+    );
+  }
   await HiveService.init();
   await ReadingsIndex.ensureBuilt();
   unawaited(BibleRepository.preload());
 
   // Transparent status bar so blurred AppBar can show beneath it on iOS
-  if (Platform.isIOS) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarBrightness: Brightness.light,
-    ));
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
   }
 
   runApp(const ProviderScope(child: MyBrevApp()));
@@ -47,22 +52,30 @@ class MyBrevApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
 
-    WakelockPlus.toggle(enable: settings.keepScreenOn);
+    if (!kIsWeb) {
+      WakelockPlus.toggle(enable: settings.keepScreenOn);
+    }
 
     // Android uses DynamicColorBuilder (Material You).
     // iOS gets a fixed seed scheme.
-    if (Platform.isAndroid) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       return DynamicColorBuilder(
         builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
           final light = _harmonize(lightDynamic, Brightness.light);
-          final dark  = _harmonize(darkDynamic,  Brightness.dark);
+          final dark = _harmonize(darkDynamic, Brightness.dark);
           return _buildApp(settings, light, dark);
         },
       );
     }
 
-    final light = ColorScheme.fromSeed(seedColor: _kSeedColor, brightness: Brightness.light);
-    final dark  = ColorScheme.fromSeed(seedColor: _kSeedColor, brightness: Brightness.dark);
+    final light = ColorScheme.fromSeed(
+      seedColor: _kSeedColor,
+      brightness: Brightness.light,
+    );
+    final dark = ColorScheme.fromSeed(
+      seedColor: _kSeedColor,
+      brightness: Brightness.dark,
+    );
     return _buildApp(settings, light, dark);
   }
 
@@ -71,8 +84,12 @@ class MyBrevApp extends ConsumerWidget {
     return ColorScheme.fromSeed(seedColor: _kSeedColor, brightness: brightness);
   }
 
-  Widget _buildApp(SettingsState settings, ColorScheme light, ColorScheme dark) {
-    final isIOS = Platform.isIOS;
+  Widget _buildApp(
+    SettingsState settings,
+    ColorScheme light,
+    ColorScheme dark,
+  ) {
+    final isIOS = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
     final customFont = settings.resolvedFontFamily != null;
 
     ThemeData makeTheme(ColorScheme cs) {

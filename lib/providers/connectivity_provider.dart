@@ -12,6 +12,6 @@ final isOfflineProvider = Provider<bool>((ref) {
   return conn.when(
     data: (online) => !online,
     loading: () => false,
-    error: (_, __) => false,
+    error: (_, _) => false,
   );
 });

@@ -104,7 +104,7 @@ class ParsedReading {
   bool get hasTwoReadings => reading2 != null;
 
   factory ParsedReading.fromMap(String docId, Map<String, dynamic> map) {
-    ParsedSection? _section(String key) {
+    ParsedSection? section(String key) {
       final v = map[key];
       if (v == null) return null;
       return ParsedSection.fromMap(Map<String, dynamic>.from(v as Map));
@@ -113,12 +113,12 @@ class ParsedReading {
     return ParsedReading(
       id: docId,
       year: map['year']?.toString(),
-      reading: _section('reading'),
-      reading1: _section('reading1'),
-      reading2: _section('reading2'),
-      psalm: _section('psalm'),
-      alleluia: _section('alleluia'),
-      gospel: _section('gospel'),
+      reading: section('reading'),
+      reading1: section('reading1'),
+      reading2: section('reading2'),
+      psalm: section('psalm'),
+      alleluia: section('alleluia'),
+      gospel: section('gospel'),
       periodType: map['_periodType'] as String?,
       periodWeekNumber: _toInt(map['_periodWeekNumber']),
       dayOfWeek: _toInt(map['_dayOfWeek']),
