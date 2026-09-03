@@ -4,7 +4,7 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
-import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
+import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 
 const kCacheDaysBehind = 7;
@@ -23,9 +23,9 @@ class CacheWarmupService {
     CalendarService? calendar,
     ParsedReadingsService? readings,
     LiturgicalDayService? days,
-  })  : _calendar = calendar ?? CalendarService(),
-        _readings = readings ?? ParsedReadingsService(),
-        _days = days ?? LiturgicalDayService();
+  }) : _calendar = calendar ?? CalendarService(),
+       _readings = readings ?? ParsedReadingsService(),
+       _days = days ?? LiturgicalDayService();
 
   static List<DateTime> buildDateOrder(
     DateTime base, {
@@ -121,11 +121,15 @@ class CacheWarmupService {
       final opts = _calendar.getYearOptionsCached(date.year);
       final nextOpts = _calendar.getYearOptionsCached(date.year + 1);
       final dynamicDates = _calendar.getDynamicDatesCached(date.year);
-      final context =
-          computeLiturgicalContext(date, opts, nextOpts, dynamicDates);
+      final context = computeLiturgicalContext(
+        date,
+        opts,
+        nextOpts,
+        dynamicDates,
+      );
       final feastCodes = getDynamicFeastCodesForDate(date, dynamicDates);
 
-      await Future.wait([
+      final requests = <Future<dynamic>>[
         _readings.fetchForDate(
           date,
           opts,
@@ -140,7 +144,20 @@ class CacheWarmupService {
           dayOfWeek: context.dayOfWeek,
           feastCodes: feastCodes,
         ),
-      ]);
+      ];
+      if (context.periodType == 'christmas') {
+        final psalterWeek = calculatePsalterWeek(
+          date: date,
+          periodType: context.periodType,
+          periodWeek: context.periodWeek,
+        );
+        if (psalterWeek != null) {
+          requests.add(
+            _days.findDayByPeriod('advent', psalterWeek, context.dayOfWeek),
+          );
+        }
+      }
+      await Future.wait(requests);
       return true;
     } catch (e, st) {
       if (kDebugMode) {

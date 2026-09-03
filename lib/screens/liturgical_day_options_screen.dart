@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 
 class LiturgicalDayOptionsScreen extends ConsumerWidget {
   final String period;
@@ -65,6 +68,19 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
     final periodLabel = _periodLabels[period] ?? period;
     final dayLabel = _dayLabels[day] ?? '$day';
     final dayId = _findDayId();
+    final selectedDate = ref.watch(selectedDateProvider);
+    final calendar = ref.watch(calendarServiceProvider);
+    final targetDate = calculateDateForContext(
+      selectedDate.year,
+      period,
+      week,
+      day,
+      calendar.getYearOptionsCached(selectedDate.year),
+      calendar.getYearOptionsCached(selectedDate.year + 1),
+    );
+    final targetDateKey = targetDate == null
+        ? null
+        : DateFormat('yyyy-MM-dd').format(targetDate);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
 
     return Scaffold(
@@ -134,8 +150,8 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
                       size: 20,
                     ),
                     label: const Text('Літургія гадзін'),
-                    onPressed: dayId != null
-                        ? () => context.push('/hora/$dayId')
+                    onPressed: dayId != null && targetDateKey != null
+                        ? () => context.push('/hora/$targetDateKey/$dayId')
                         : null,
                   ),
                   if (dayId == null) ...[

@@ -68,7 +68,10 @@ final router = GoRouter(
       path: '/readings/:dateStr',
       builder: (context, state) {
         final dateStr = state.pathParameters['dateStr']!;
-        return ReadingsScreen(dateStr: dateStr);
+        return ReadingsScreen(
+          dateStr: dateStr,
+          dayId: state.uri.queryParameters['dayId'],
+        );
       },
     ),
     GoRoute(
@@ -89,18 +92,24 @@ final router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/hora/:dayId',
+      path: '/hora/:dateStr/:dayId',
       builder: (context, state) {
         final dayId = state.pathParameters['dayId']!;
-        return HoraPickerScreen(dayId: dayId);
+        final date =
+            DateTime.tryParse(state.pathParameters['dateStr'] ?? '') ??
+            DateTime.now();
+        return HoraPickerScreen(dayId: dayId, date: date);
       },
     ),
     GoRoute(
-      path: '/ora/:dayId/:type',
+      path: '/ora/:dateStr/:dayId/:type',
       builder: (context, state) {
         final dayId = state.pathParameters['dayId']!;
         final type = state.pathParameters['type']!;
-        return OraScreen(dayId: dayId, oraType: type);
+        final date =
+            DateTime.tryParse(state.pathParameters['dateStr'] ?? '') ??
+            DateTime.now();
+        return OraScreen(dayId: dayId, oraType: type, date: date);
       },
     ),
     GoRoute(

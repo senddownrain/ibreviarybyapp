@@ -20,9 +20,13 @@ const weekdayLabelMap = {
 };
 
 const feastTypeLabelMap = {
+  'solemnitas': 'Урачыстасць',
   'solemnity': 'Урачыстасць',
+  'festum': 'Свята',
   'feast': 'Свята',
+  'memoria': 'Успамін',
   'memorial': 'Успамін',
+  'memoria-ad-libitum': 'Неабавязковы ўспамін',
 };
 
 const periodColors = {
@@ -34,4 +38,4 @@ const periodColors = {
   'easter': Colors.amber,
 };
 
-enum LiturgicalOptionSource { period, dynamic, fixed }
+enum LiturgicalOptionSource { period, dynamic, fixed, officeForDead }

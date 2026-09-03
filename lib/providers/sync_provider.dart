@@ -39,24 +39,22 @@ class SyncStatus {
     int? totalCollections,
     Object? currentDocCount = _unset,
     Object? error = _unset,
-  }) =>
-      SyncStatus(
-        isSyncing: isSyncing ?? this.isSyncing,
-        progress: progress ?? this.progress,
-        currentLabel: identical(currentLabel, _unset)
-            ? this.currentLabel
-            : currentLabel as String?,
-        currentCollection: identical(currentCollection, _unset)
-            ? this.currentCollection
-            : currentCollection as String?,
-        completedCollections:
-            completedCollections ?? this.completedCollections,
-        totalCollections: totalCollections ?? this.totalCollections,
-        currentDocCount: identical(currentDocCount, _unset)
-            ? this.currentDocCount
-            : currentDocCount as int?,
-        error: identical(error, _unset) ? this.error : error as String?,
-      );
+  }) => SyncStatus(
+    isSyncing: isSyncing ?? this.isSyncing,
+    progress: progress ?? this.progress,
+    currentLabel: identical(currentLabel, _unset)
+        ? this.currentLabel
+        : currentLabel as String?,
+    currentCollection: identical(currentCollection, _unset)
+        ? this.currentCollection
+        : currentCollection as String?,
+    completedCollections: completedCollections ?? this.completedCollections,
+    totalCollections: totalCollections ?? this.totalCollections,
+    currentDocCount: identical(currentDocCount, _unset)
+        ? this.currentDocCount
+        : currentDocCount as int?,
+    error: identical(error, _unset) ? this.error : error as String?,
+  );
 }
 
 const Object _unset = Object();
@@ -76,8 +74,11 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
 
   /// Auto-bootstrap: sync static collections only when Hive is empty.
   Future<void> syncEssentialsIfEmpty() async {
-    if (!HiveService.needsBootstrap()) return;
-    await _syncCollections(kEssentialSyncCollections);
+    final missing = kEssentialSyncCollections.where((entry) {
+      return _boxFor(entry.$1).isEmpty;
+    }).toList();
+    if (missing.isEmpty) return;
+    await _syncCollections(missing);
     ref.read(cacheEpochProvider.notifier).state++;
   }
 
@@ -167,7 +168,7 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
   Future<void> _syncCollections(
     List<(String, String)> collections, {
     void Function(int index, String collection, String label, int count)?
-        onProgress,
+    onProgress,
   }) async {
     final db = FirebaseFirestore.instance;
 
@@ -176,7 +177,7 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
       try {
         final count = await _syncCollection(db, collection);
         await HiveService.setLastSync(collection, DateTime.now());
-        onProgress?.call(i, collection, label, count);
+        onProgress?.call(i + 1, collection, label, count);
       } catch (e) {
         throw '$label: $e';
       }
@@ -187,9 +188,11 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
   /// an empty box if the network call fails mid-way.
   Future<int> _syncCollection(FirebaseFirestore db, String collection) async {
     final box = _boxFor(collection);
-    final snap = await retryFirestore(() => db
-        .collection(collection)
-        .get(const GetOptions(source: Source.server)));
+    final snap = await retryFirestore(
+      () => db
+          .collection(collection)
+          .get(const GetOptions(source: Source.server)),
+    );
 
     final entries = <MapEntry<dynamic, Map<String, dynamic>>>[];
     for (final doc in snap.docs) {
@@ -210,15 +213,16 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
   }
 
   dynamic _boxFor(String collection) => switch (collection) {
-        'prayers' => HiveService.prayersBox,
-        'days' => HiveService.daysBox,
-        'yearOptions' => HiveService.yearOptionsBox,
-        'readings' => HiveService.readingsBox,
-        'invitatoriums' => HiveService.invitatoriumsBox,
-        'completoriums' => HiveService.completoriumsBox,
-        _ => throw ArgumentError('Unknown collection: $collection'),
-      };
+    'prayers' => HiveService.prayersBox,
+    'days' => HiveService.daysBox,
+    'yearOptions' => HiveService.yearOptionsBox,
+    'readings' => HiveService.readingsBox,
+    'invitatoriums' => HiveService.invitatoriumsBox,
+    'completoriums' => HiveService.completoriumsBox,
+    _ => throw ArgumentError('Unknown collection: $collection'),
+  };
 }
 
-final syncStatusProvider =
-    NotifierProvider<SyncStatusNotifier, SyncStatus>(SyncStatusNotifier.new);
+final syncStatusProvider = NotifierProvider<SyncStatusNotifier, SyncStatus>(
+  SyncStatusNotifier.new,
+);

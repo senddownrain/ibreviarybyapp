@@ -16,8 +16,10 @@ class BibleBookInfo {
   final String name;
   final int chapterCount;
   final String versionId;
+
   /// Canonical order: OT 1-39, NT 40+
   final int order;
+
   /// Whether verses use Russified spelling (e.g. RST text)
   final bool isVerseTextRussian;
 
@@ -107,10 +109,12 @@ class BibleRepository {
   }
 
   /// Returns chapter verses as typed [BibleVerse] objects.
-  /// Handles both asset format (chapters: List<List>) and
-  /// Firestore format (chapters: Map<"1","2",...> of List).
+  /// Handles both the asset list-of-lists format and the Firestore map format.
   static List<BibleVerse> getChapter(
-      String versionId, String bookId, int chapter) {
+    String versionId,
+    String bookId,
+    int chapter,
+  ) {
     final d = _versionData(versionId);
     if (d == null) return [];
     final books = d['books'] as List? ?? [];
@@ -160,7 +164,7 @@ class BibleRepository {
   /// Load bundled assets then try Firestore in background.
   static Future<void> preload() async {
     _dataBel ??= await BibleSeedLoader.load(lang: 'bel');
-    _data    ??= await BibleSeedLoader.load(lang: 'ru');
+    _data ??= await BibleSeedLoader.load(lang: 'ru');
     // Background: refresh both versions from Firestore when online.
     unawaited(_loadFromFirestore('bel'));
     unawaited(_loadFromFirestore('ru'));
@@ -174,21 +178,24 @@ class BibleRepository {
           .get(const GetOptions(source: Source.serverAndCache));
       if (snap.docs.isEmpty) return;
 
-      final books = snap.docs.map((doc) {
-        final d = doc.data();
-        return {
-          'id': doc.id,
-          'name': d['name'] ?? '',
-          'order': d['order'] ?? 0,
-          'chapterCount': d['chapterCount'] ?? 0,
-          'chapters': d['chapters'] ?? {},
-        };
-      }).toList()
-        ..sort((a, b) => (a['order'] as int).compareTo(b['order'] as int));
+      final books =
+          snap.docs.map((doc) {
+              final d = doc.data();
+              return {
+                'id': doc.id,
+                'name': d['name'] ?? '',
+                'order': d['order'] ?? 0,
+                'chapterCount': d['chapterCount'] ?? 0,
+                'chapters': d['chapters'] ?? {},
+              };
+            }).toList()
+            ..sort((a, b) => (a['order'] as int).compareTo(b['order'] as int));
 
       setData(versionId, {'books': books});
       if (kDebugMode) {
-        debugPrint('[BibleRepository] Loaded ${books.length} books from Firestore ($versionId)');
+        debugPrint(
+          '[BibleRepository] Loaded ${books.length} books from Firestore ($versionId)',
+        );
       }
     } catch (e) {
       if (kDebugMode) debugPrint('[BibleRepository] Firestore load failed: $e');

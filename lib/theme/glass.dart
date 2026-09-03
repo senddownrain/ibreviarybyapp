@@ -12,21 +12,21 @@ class GlassTokens {
 
   // Blur strengths
   double get barBlur => 24;
-  double get pillBlur => 18;
+  double get pillBlur => 20;
   double get cardBlur => 14;
   double get softBlur => 10;
 
   // Ambient wash (full / soft page tints)
-  double get ambientStrong => isDark ? 0.35 : 0.22;
-  double get ambientMid => isDark ? 0.12 : 0.08;
-  double get ambientSoft => isDark ? 0.14 : 0.08;
+  double get ambientStrong => isDark ? 0.22 : 0.14;
+  double get ambientMid => isDark ? 0.10 : 0.06;
+  double get ambientSoft => isDark ? 0.12 : 0.07;
   double get ambientBar => isDark ? 0.12 : 0.07;
   double get ambientPill => isDark ? 0.12 : 0.08;
   double get ambientCard => isDark ? 0.10 : 0.06;
 
   // Glass fills
   Color get cardFill =>
-      isDark ? const Color(0xE6171512) : const Color(0xE6FFFBF3);
+      isDark ? const Color(0xF0171512) : const Color(0xF0FFFBF3);
   Color get softFill =>
       isDark ? const Color(0xD9171512) : const Color(0xD9FFFBF3);
   Color get barFill =>
@@ -41,22 +41,25 @@ class GlassTokens {
   Color get pillBorder =>
       isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
   Color get specular => isDark
-      ? Colors.white.withValues(alpha: 0.14)
-      : Colors.white.withValues(alpha: 0.92);
+      ? Colors.white.withValues(alpha: 0.045)
+      : Colors.white.withValues(alpha: 0.28);
+
+  Color get ambientBase =>
+      isDark ? const Color(0xFF4A3A2D) : const Color(0xFFB49B71);
 
   List<BoxShadow> get cardShadow => [
     BoxShadow(
-      color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.08),
-      blurRadius: 18,
-      spreadRadius: -2,
-      offset: const Offset(0, 6),
+      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.07),
+      blurRadius: 14,
+      spreadRadius: -1,
+      offset: const Offset(0, 3),
     ),
   ];
 
   List<BoxShadow> get pillShadow => [
     BoxShadow(
       color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
-      blurRadius: 32,
+      blurRadius: 30,
       spreadRadius: -4,
       offset: const Offset(0, 10),
     ),
@@ -77,6 +80,39 @@ class GlassTokens {
     final hsl = HSLColor.fromColor(accent);
     if (hsl.lightness >= 0.55) return accent;
     return hsl.withLightness(0.62).toColor();
+  }
+}
+
+/// Warm neutral application material used below contextual liturgical washes.
+class AmbientBackdrop extends StatelessWidget {
+  final Widget child;
+
+  const AmbientBackdrop({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = GlassTokens.of(context);
+    final background = Theme.of(context).colorScheme.surfaceContainerLowest;
+    final strength = tokens.isDark ? 0.18 : 0.13;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: background,
+        gradient: RadialGradient(
+          center: const Alignment(0, -1.12),
+          radius: 1.22,
+          colors: [
+            Color.alphaBlend(
+              tokens.ambientBase.withValues(alpha: strength),
+              background,
+            ),
+            background,
+          ],
+          stops: const [0, 0.78],
+        ),
+      ),
+      child: child,
+    );
   }
 }
 
@@ -113,14 +149,14 @@ class AmbientWash extends StatelessWidget {
       child: AnimatedContainer(
         duration: duration,
         curve: Curves.easeInOut,
-        height: intensity == AmbientWashIntensity.hero ? null : height,
+        height: intensity == AmbientWashIntensity.hero ? 430 : height,
         decoration: BoxDecoration(gradient: _gradient(tokens)),
       ),
     );
 
     if (child == null) {
       if (intensity == AmbientWashIntensity.hero) {
-        return Positioned.fill(child: wash);
+        return Positioned(top: -72, left: -72, right: -72, child: wash);
       }
       return wash;
     }
@@ -128,7 +164,7 @@ class AmbientWash extends StatelessWidget {
     return Stack(
       children: [
         if (intensity == AmbientWashIntensity.hero)
-          Positioned.fill(child: wash)
+          Positioned(top: -72, left: -72, right: -72, child: wash)
         else
           Positioned(top: 0, left: 0, right: 0, child: wash),
         child!,
@@ -136,18 +172,18 @@ class AmbientWash extends StatelessWidget {
     );
   }
 
-  LinearGradient _gradient(GlassTokens tokens) {
+  Gradient _gradient(GlassTokens tokens) {
     switch (intensity) {
       case AmbientWashIntensity.hero:
-        return LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+        return RadialGradient(
+          center: const Alignment(0.62, -0.48),
+          radius: 0.92,
           colors: [
             seasonColor.withValues(alpha: tokens.ambientStrong),
             seasonColor.withValues(alpha: tokens.ambientMid),
             seasonColor.withValues(alpha: 0),
           ],
-          stops: const [0.0, 0.42, 0.88],
+          stops: const [0.0, 0.46, 1.0],
         );
       case AmbientWashIntensity.soft:
         return LinearGradient(
@@ -194,7 +230,12 @@ class GlassSurface extends StatelessWidget {
     final tokens = GlassTokens.of(context);
     final radius =
         borderRadius ??
-        BorderRadius.circular(style == GlassStyle.pill ? 32 : 14);
+        BorderRadius.circular(switch (style) {
+          GlassStyle.pill => 32,
+          GlassStyle.card => 22,
+          GlassStyle.soft => 20,
+          GlassStyle.bar => 24,
+        });
 
     final base = switch (style) {
       GlassStyle.card => tokens.cardFill,
@@ -255,8 +296,7 @@ class GlassSurface extends StatelessWidget {
             ? LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [tokens.specular, fill],
-                stops: const [0.0, 0.38],
+                colors: [Color.alphaBlend(tokens.specular, fill), fill],
               )
             : null,
         color: style == GlassStyle.pill ? null : fill,
@@ -294,7 +334,7 @@ class GlassSurface extends StatelessWidget {
   }
 }
 
-/// Full-width frosted bar (app bars).
+/// Inset frosted panel for full-screen route app bars.
 class GlassBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget child;
   final Color? seasonColor;
@@ -312,28 +352,23 @@ class GlassBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = GlassTokens.of(context);
-    final base = tokens.barFill;
-    final fill = seasonColor != null
-        ? tokens.tinted(base, seasonColor!, tokens.ambientBar)
-        : base;
-
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: tokens.barBlur,
-          sigmaY: tokens.barBlur,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: fill,
-            border: Border(
-              bottom: BorderSide(color: tokens.softBorder, width: 0.5),
+    return ColoredBox(
+      color: Colors.transparent,
+      child: SafeArea(
+        bottom: false,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+              child: GlassSurface(
+                style: GlassStyle.bar,
+                seasonColor: seasonColor,
+                borderRadius: BorderRadius.circular(24),
+                child: SizedBox(height: height - 8, child: child),
+              ),
             ),
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: SizedBox(height: height, child: child),
           ),
         ),
       ),

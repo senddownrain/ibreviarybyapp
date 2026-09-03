@@ -3,27 +3,20 @@ import 'package:flutter/foundation.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
+import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
+import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
+import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 import 'package:mybrev_flutter/utils/retry.dart';
 
 const kDaysCollection = 'days';
 const kLegacyDaysCollection = 'fixedDays';
 
 /// Canonical period day ID (mirrors web `getPeriodDayDocumentId`).
-String periodDayDocumentId(
-  String periodType,
-  int periodWeekNumber,
-  int dayOfWeek,
-) {
-  final period = periodType.trim();
-  if (period.isEmpty) return '';
-  if (periodWeekNumber < 0) return '';
-  if (dayOfWeek < 1 || dayOfWeek > 7) return '';
-  return '$period-w$periodWeekNumber-d$dayOfWeek';
-}
-
 List<String> feastCodeVariants(String code) {
   final normalized = code.replaceFirst(RegExp(r'^feast-'), '');
-  return [...{normalized, 'feast-$normalized'}];
+  return [
+    ...{normalized, 'feast-$normalized'},
+  ];
 }
 
 /// Firestore access for canonical `days` collection (with `fixedDays` fallback).
@@ -31,7 +24,7 @@ class LiturgicalDayService {
   final FirebaseFirestore _db;
 
   LiturgicalDayService({FirebaseFirestore? db})
-      : _db = db ?? FirebaseFirestore.instance;
+    : _db = db ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> _col(String name) =>
       _db.collection(name);
@@ -67,37 +60,58 @@ class LiturgicalDayService {
     int dayOfWeek,
   ) async {
     final fromHive = _hiveFindPeriod(periodType, periodWeek, dayOfWeek);
-    if (fromHive != null) return fromHive;
+    if (fromHive != null) {
+      return _withPeriodPsalterFallback(
+        fromHive,
+        periodType,
+        periodWeek,
+        dayOfWeek,
+      );
+    }
 
     final canonicalId = periodDayDocumentId(periodType, periodWeek, dayOfWeek);
     if (canonicalId.isNotEmpty) {
       final byId = await getDayById(canonicalId);
-      if (byId != null) return byId;
+      if (byId != null) {
+        return _withPeriodPsalterFallback(
+          byId,
+          periodType,
+          periodWeek,
+          dayOfWeek,
+        );
+      }
     }
 
     for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
       try {
-        final results = await retryFirestore(() => Future.wait([
-              _col(collection)
-                  .where('_periodType', isEqualTo: periodType)
-                  .where('_dayOfWeek', isEqualTo: '$dayOfWeek')
-                  .where('_periodWeekNumber', isEqualTo: '$periodWeek')
-                  .limit(1)
-                  .get(),
-              _col(collection)
-                  .where('_periodType', isEqualTo: periodType)
-                  .where('_dayOfWeek', isEqualTo: dayOfWeek)
-                  .where('_periodWeekNumber', isEqualTo: periodWeek)
-                  .limit(1)
-                  .get(),
-            ]));
+        final results = await retryFirestore(
+          () => Future.wait([
+            _col(collection)
+                .where('_periodType', isEqualTo: periodType)
+                .where('_dayOfWeek', isEqualTo: '$dayOfWeek')
+                .where('_periodWeekNumber', isEqualTo: '$periodWeek')
+                .limit(1)
+                .get(),
+            _col(collection)
+                .where('_periodType', isEqualTo: periodType)
+                .where('_dayOfWeek', isEqualTo: dayOfWeek)
+                .where('_periodWeekNumber', isEqualTo: periodWeek)
+                .limit(1)
+                .get(),
+          ]),
+        );
 
         for (final snap in results) {
           if (snap.docs.isEmpty) continue;
           final doc = snap.docs.first;
           final data = {...doc.data(), 'id': doc.id};
           await cacheDayDoc(doc.id, data);
-          return LiturgicalDay.fromMap(data);
+          return _withPeriodPsalterFallback(
+            LiturgicalDay.fromMap(data),
+            periodType,
+            periodWeek,
+            dayOfWeek,
+          );
         }
       } catch (e, st) {
         if (kDebugMode) {
@@ -127,10 +141,12 @@ class LiturgicalDayService {
 
     for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
       try {
-        final snaps = await retryFirestore(() => Future.wait([
-              for (final variant in feastCodeVariants(feastCode))
-                _col(collection).where('_feast', isEqualTo: variant).get(),
-            ]));
+        final snaps = await retryFirestore(
+          () => Future.wait([
+            for (final variant in feastCodeVariants(feastCode))
+              _col(collection).where('_feast', isEqualTo: variant).get(),
+          ]),
+        );
         for (final snap in snaps) {
           for (final doc in snap.docs) {
             final data = {...doc.data(), 'id': doc.id};
@@ -154,7 +170,9 @@ class LiturgicalDayService {
     final dM = '${date.day}.${date.month}';
     final ddMm =
         '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
-    final variants = {...{dM, ddMm}};
+    final variants = {
+      ...{dM, ddMm},
+    };
 
     final results = <String, LiturgicalDay>{};
     for (final key in HiveService.daysBox.keys) {
@@ -171,9 +189,12 @@ class LiturgicalDayService {
 
     for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
       try {
-        final snaps = await retryFirestore(() => Future.wait([
-              for (final v in variants) _col(collection).where('_date', isEqualTo: v).get(),
-            ]));
+        final snaps = await retryFirestore(
+          () => Future.wait([
+            for (final v in variants)
+              _col(collection).where('_date', isEqualTo: v).get(),
+          ]),
+        );
         for (final snap in snaps) {
           for (final doc in snap.docs) {
             final data = {...doc.data(), 'id': doc.id};
@@ -205,7 +226,91 @@ class LiturgicalDayService {
       findDayByPeriod(periodType, periodWeek, dayOfWeek),
       findDaysByFixedDate(date),
       for (final code in feastCodes) findDaysByFeast(code),
+      getDayById('office-for-dead'),
+      if (seasonalDateExceptionId(date, periodType) case final id?)
+        getDayById(id),
     ]);
+  }
+
+  /// Resolve the selected route day against its period/psalter template.
+  /// This is the Flutter counterpart of `useResolvedLiturgicalDay`.
+  Future<LiturgicalDay?> resolveDayForDate(
+    DateTime date,
+    String dayId,
+    LiturgicalContext context,
+    List<String> feastCodes,
+  ) async {
+    await prefetchForDate(
+      date,
+      periodType: context.periodType,
+      periodWeek: context.periodWeek,
+      dayOfWeek: context.dayOfWeek,
+      feastCodes: feastCodes,
+    );
+    final selected = await getDayById(dayId);
+    if (selected == null) return null;
+    var period = await findDayByPeriod(
+      context.periodType,
+      context.periodWeek,
+      context.dayOfWeek,
+    );
+    if (period == null && context.periodType == 'christmas') {
+      final psalterWeek = calculatePsalterWeek(
+        date: date,
+        periodType: context.periodType,
+        periodWeek: context.periodWeek,
+      );
+      if (psalterWeek != null) {
+        period = await findDayByPeriod(
+          'advent',
+          psalterWeek,
+          context.dayOfWeek,
+        );
+      }
+    }
+    final seasonalId = seasonalDateExceptionId(date, context.periodType);
+    LiturgicalDay? resolved;
+    if (seasonalId == dayId) {
+      resolved = context.periodType == 'christmas'
+          ? resolveChristmasDateAgainstPeriod(selected, period)
+          : resolveDayAgainstPeriod(selected, period, fillMissing: true);
+      resolved = applySeasonalWeekdayAntiphons(resolved!, context.dayOfWeek);
+    } else if (selected.date != null && selected.date!.isNotEmpty) {
+      resolved = resolveDayAgainstPeriod(selected, period, fillMissing: true);
+    } else {
+      resolved = resolveDayAgainstPeriod(selected, period);
+    }
+    final data = resolved!.toMap()
+      ..['_periodType'] = context.periodType
+      ..['_periodWeekNumber'] = context.periodWeek
+      ..['_dayOfWeek'] = context.dayOfWeek
+      ..['_calendarDate'] =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'
+      ..['_contextPeriodType'] = context.periodType;
+    return LiturgicalDay.fromMap(data);
+  }
+
+  Future<LiturgicalDay> _withPeriodPsalterFallback(
+    LiturgicalDay day,
+    String periodType,
+    int periodWeek,
+    int dayOfWeek,
+  ) async {
+    var resolved = resolveDayAgainstPeriod(day, null)!;
+    if (periodType == 'christmas') return resolved;
+    if (periodType != 'advent' && !hasMissingDaytimeFields(resolved)) {
+      return resolved;
+    }
+    final fallbackId = periodType == 'ordinary'
+        ? periodPsalterDayDocumentId(periodType, periodWeek, dayOfWeek)
+        : ordinaryPsalterDayDocumentId(periodWeek, dayOfWeek);
+    if (fallbackId.isEmpty || fallbackId == resolved.id) return resolved;
+    final fallback = await getDayById(fallbackId);
+    if (fallback == null) return resolved;
+    if (periodType == 'advent') {
+      return resolveDayAgainstPeriod(resolved, fallback, fillMissing: true)!;
+    }
+    return resolvePeriodDayAgainstPsalter(resolved, fallback)!;
   }
 
   LiturgicalDay? _hiveFindPeriod(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,20 +7,24 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
+import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 
 /// Screen showing list of available liturgical hours for a day.
 class HoraPickerScreen extends ConsumerStatefulWidget {
   final String dayId;
+  final DateTime date;
 
-  const HoraPickerScreen({
-    super.key,
-    required this.dayId,
-  });
+  const HoraPickerScreen({super.key, required this.dayId, required this.date});
 
   @override
   ConsumerState<HoraPickerScreen> createState() => _HoraPickerScreenState();
@@ -26,7 +32,9 @@ class HoraPickerScreen extends ConsumerStatefulWidget {
 
 class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
   LiturgicalDay? _day;
+  List<DayTemplate> _templates = const [];
   bool _loading = true;
+  String _readingSubtitle = 'Чытанні і Евангелле';
 
   @override
   void initState() {
@@ -34,62 +42,106 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     _loadDay();
   }
 
-  Future<void> _loadDay() async {
-    final raw = HiveService.daysBox.get(widget.dayId);
-    if (raw != null) {
+  @override
+  void didUpdateWidget(covariant HoraPickerScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.dayId != widget.dayId || oldWidget.date != widget.date) {
       setState(() {
-        _day = LiturgicalDay.fromMap(Map<String, dynamic>.from(raw));
-        _loading = false;
+        _loading = true;
+        _day = null;
+        _templates = const [];
       });
-      return;
+      _loadDay();
     }
+  }
 
-    final day = await LiturgicalDayService().getDayById(widget.dayId);
+  Future<void> _loadDay() async {
+    final calendar = CalendarService();
+    await Future.wait([
+      calendar.ensureYearOptions(widget.date.year),
+      calendar.ensureYearOptions(widget.date.year + 1),
+      calendar.ensureDynamicDates(widget.date.year),
+    ]);
+    final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
+    final context = computeLiturgicalContext(
+      widget.date,
+      calendar.getYearOptionsCached(widget.date.year),
+      calendar.getYearOptionsCached(widget.date.year + 1),
+      dynamicDates,
+    );
+    final day = await LiturgicalDayService().resolveDayForDate(
+      widget.date,
+      widget.dayId,
+      context,
+      getDynamicFeastCodesForDate(widget.date, dynamicDates),
+    );
+    final option = LiturgicalContentService()
+        .getContentForDate(
+          widget.date,
+          calendar.getYearOptionsCached(widget.date.year),
+          calendar.getYearOptionsCached(widget.date.year + 1),
+          dynamicDates,
+        )
+        .where(
+          (item) =>
+              item.templates.any((template) => template.id == widget.dayId),
+        )
+        .firstOrNull;
     if (!mounted) return;
     setState(() {
       _day = day;
+      _templates = option?.templates ?? const [];
       _loading = false;
     });
+    unawaited(
+      _loadReadingSubtitle(
+        calendar,
+        dynamicDates,
+      ),
+    );
   }
 
-  bool _isAvailable(HoraItem hora, LiturgicalDay day) {
-    // Completorium lives in its own Hive box, not on the day document.
-    if (hora.type == 'completorium') {
-      return _completoriumAvailable(day);
+  Future<void> _loadReadingSubtitle(
+    CalendarService calendar,
+    DynamicDates? dynamicDates,
+  ) async {
+    try {
+      final readings = await ParsedReadingsService().fetchForDate(
+        widget.date,
+        calendar.getYearOptionsCached(widget.date.year),
+        calendar.getYearOptionsCached(widget.date.year + 1),
+        dynamicDates,
+        includeAlternatives: true,
+        dayId: widget.dayId,
+      );
+      final references = <String>{};
+      for (final reading in readings) {
+        for (final reference in [
+          reading.firstReading?.bible,
+          reading.reading2?.bible,
+          reading.gospel?.bible,
+        ]) {
+          if ((reference ?? '').trim().isNotEmpty) {
+            references.add(reference!.trim());
+          }
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _readingSubtitle = references.isNotEmpty
+            ? references.join(' · ')
+            : readings.isEmpty
+            ? 'Чытанні для гэтай даты не знойдзены'
+            : 'Чытанні і Евангелле';
+      });
+    } catch (_) {
+      // The readings route remains available; offline cache may be populated
+      // later by warmup or manual synchronisation.
     }
-    return hora.checkFields.any((k) {
-      final v = day.field(k);
-      return v != null && v.isNotEmpty;
-    });
   }
 
-  bool _completoriumAvailable(LiturgicalDay day) {
-    final id = _completoriumId(day);
-    if (HiveService.completoriumsBox.containsKey(id)) return true;
-    // Essentials sync filled the box — offer Compline even if key shape differs.
-    return HiveService.completoriumsBox.isNotEmpty;
-  }
-
-  String _completoriumId(LiturgicalDay day) {
-    var period = (day.periodType ?? day.field('_periodType') ?? 'ordinary').trim();
-    if (period == 'holyweek') period = 'lent';
-
-    final rank =
-        (day.rank ?? day.field('_rank') ?? day.field('_feastType') ?? '').trim();
-    final isFeast = rank == 'solemnity' ||
-        rank == 'feast' ||
-        rank == 'solemnitas' ||
-        rank == 'festum';
-    final dow = isFeast
-        ? 1
-        : (day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 2);
-
-    return '$period-d$dow';
-  }
-
-  String? _readingsDateKey() {
-    final selected = ref.read(selectedDateProvider);
-    return DateFormat('yyyy-MM-dd').format(selected);
+  String _readingsDateKey() {
+    return DateFormat('yyyy-MM-dd').format(widget.date);
   }
 
   @override
@@ -129,118 +181,224 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
       );
     }
 
-    final dayTitle = day.feastName ?? day.title ?? '';
-    final available = kHoraItems.where((h) => _isAvailable(h, day)).toList();
-    final unavailable =
-        kHoraItems.where((h) => !_isAvailable(h, day)).toList();
+    final dayTitle = liturgicalDayDisplayTitle(day, widget.date)
+        .replaceAll(RegExp(r'\\?<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'<[^>]+>'), '')
+        .trim();
+    final periodLabel = liturgicalDayPeriodLabel(day);
+    final psalterLabel = liturgicalDayPsalterLabel(day, widget.date);
+    final rankLabel = liturgicalDayRankLabel(day);
+    final dayColor = liturgicalColorForDay(day);
     final dateKey = _readingsDateKey();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: IosGlassAppBar(
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Літургія гадзін'),
-            if (dayTitle.isNotEmpty)
-              Text(
-                dayTitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
+        title: const Text('Літургія гадзін'),
         actions: [
           IconButton(
             tooltip: 'Чытанні',
             icon: const PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 22),
-            onPressed: dateKey == null
-                ? null
-                : () => context.push('/readings/$dateKey'),
+            onPressed: () =>
+                context.push('/readings/$dateKey?dayId=${widget.dayId}'),
           ),
         ],
       ),
       body: Stack(
         children: [
-          AmbientWash.hero(seasonColor: seasonColor),
-          ListView(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              MediaQuery.paddingOf(context).top + kToolbarHeight + 12,
-              16,
-              32,
-            ),
-            children: [
-              if (available.isEmpty)
-                GlassSurface(
-                  style: GlassStyle.soft,
-                  seasonColor: seasonColor,
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    'Змест гадзін не знойдзены для гэтага дня',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
+          AmbientWash.hero(seasonColor: dayColor),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 760),
+              child: ListView(
+                padding: EdgeInsets.fromLTRB(
+                  12,
+                  MediaQuery.paddingOf(context).top + kToolbarHeight + 12,
+                  12,
+                  32,
                 ),
-              if (available.isNotEmpty)
-                GlassSurface(
-                  style: GlassStyle.card,
-                  seasonColor: seasonColor,
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      for (int i = 0; i < available.length; i++) ...[
-                        if (i > 0)
-                          Divider(
-                            height: 1,
-                            indent: 68,
-                            color: cs.outlineVariant.withValues(alpha: 0.5),
+                children: [
+                  GlassSurface(
+                    style: GlassStyle.card,
+                    seasonColor: dayColor,
+                    borderRadius: BorderRadius.circular(28),
+                    padding: const EdgeInsets.all(24),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 142),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.circle, size: 9, color: dayColor),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  [
+                                    periodLabel,
+                                    if (psalterLabel.isNotEmpty) psalterLabel,
+                                  ].join(' · '),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: dayColor,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
+                              ),
+                            ],
                           ),
-                        _HoraTile(
-                          hora: available[i],
-                          enabled: true,
-                          onTap: () => context.push(
-                            '/ora/${widget.dayId}/${available[i].type}',
+                          if (dayTitle.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              dayTitle,
+                              style: ReaderTheme.of(
+                                context,
+                              ).displayTitle(34).copyWith(color: cs.onSurface),
+                            ),
+                          ],
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                '${DateFormat('d MMMM y', 'be').format(widget.date)} г.',
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: cs.onSurfaceVariant),
+                              ),
+                              if (rankLabel.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: dayColor.withValues(alpha: 0.11),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    rankLabel,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: dayColor,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              if (unavailable.isNotEmpty && available.isNotEmpty) ...[
-                const SizedBox(height: 20),
-                Text(
-                  'Не запоўнена ў базе',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: cs.outline,
+                          if (_templates.length > 1) ...[
+                            const SizedBox(height: 14),
+                            Text(
+                              'ШАБЛОН ЛІТУРГІІ ДНЯ',
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.8,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                for (final template in _templates)
+                                  ChoiceChip(
+                                    label: Text(template.label),
+                                    selected: template.id == widget.dayId,
+                                    onSelected: (_) => context.replace(
+                                      '/hora/$dateKey/${template.id}',
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ],
                       ),
-                ),
-                const SizedBox(height: 8),
-                GlassSurface(
-                  style: GlassStyle.soft,
-                  seasonColor: seasonColor,
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      for (int i = 0; i < unavailable.length; i++) ...[
-                        if (i > 0)
-                          Divider(
-                            height: 1,
-                            indent: 68,
-                            color: cs.outlineVariant.withValues(alpha: 0.35),
-                          ),
-                        _HoraTile(hora: unavailable[i], enabled: false),
-                      ],
-                    ],
+                    ),
                   ),
-                ),
-              ],
-            ],
+                  const SizedBox(height: 14),
+                  GlassSurface(
+                    style: GlassStyle.card,
+                    seasonColor: dayColor,
+                    borderRadius: BorderRadius.circular(22),
+                    padding: EdgeInsets.zero,
+                child: _ReadingTile(
+                  color: dayColor,
+                  subtitle: _readingSubtitle,
+                      onTap: () => context.push(
+                        '/readings/$dateKey?dayId=${widget.dayId}',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  for (final hora in kHoraItems) ...[
+                    GlassSurface(
+                      style: GlassStyle.card,
+                      seasonColor: dayColor,
+                      borderRadius: BorderRadius.circular(22),
+                      padding: EdgeInsets.zero,
+                      child: _HoraTile(
+                        hora: hora,
+                        enabled: true,
+                        onTap: () => context.push(
+                          '/ora/$dateKey/${widget.dayId}/${hora.type}',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ],
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ReadingTile extends StatelessWidget {
+  final Color color;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _ReadingTile({
+    required this.color,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return ListTile(
+      minTileHeight: 78,
+      onTap: onTap,
+      leading: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: PhosphorIcon(PhosphorIconsRegular.bookOpenText, color: color),
+      ),
+      title: Text(
+        'Чытанні',
+        style: TextStyle(color: color, fontWeight: FontWeight.w700),
+      ),
+      subtitle: Text(subtitle),
+      trailing: PhosphorIcon(
+        PhosphorIconsRegular.caretRight,
+        size: 18,
+        color: cs.outline,
       ),
     );
   }
@@ -251,11 +409,7 @@ class _HoraTile extends StatelessWidget {
   final bool enabled;
   final VoidCallback? onTap;
 
-  const _HoraTile({
-    required this.hora,
-    required this.enabled,
-    this.onTap,
-  });
+  const _HoraTile({required this.hora, required this.enabled, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -268,18 +422,18 @@ class _HoraTile extends StatelessWidget {
       child: InkWell(
         onTap: enabled ? onTap : null,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: enabled ? 0.14 : 0.08),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
-                  child: PhosphorIcon(hora.icon, size: 20, color: iconColor),
+                  child: PhosphorIcon(hora.icon, size: 23, color: iconColor),
                 ),
               ),
               const SizedBox(width: 14),
@@ -290,17 +444,15 @@ class _HoraTile extends StatelessWidget {
                     Text(
                       hora.label,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: textColor,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: textColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     Text(
                       hora.subtitle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: enabled
-                                ? cs.onSurfaceVariant
-                                : cs.outline,
-                          ),
+                        color: enabled ? cs.onSurfaceVariant : cs.outline,
+                      ),
                     ),
                   ],
                 ),

@@ -3,15 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
+import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 
 class ReadingsScreen extends ConsumerStatefulWidget {
   /// Calendar date string, e.g. "2026-03-21" (date-based loading).
@@ -20,12 +21,17 @@ class ReadingsScreen extends ConsumerStatefulWidget {
   /// Liturgical key, e.g. "ordinary/12/6" (period/week/dayOfWeek).
   /// When set, loads readings directly by liturgical period+week+day.
   final String? liturgicalKey;
+  final String? dayId;
 
-  const ReadingsScreen({super.key, this.dateStr, this.liturgicalKey})
-    : assert(
-        dateStr != null || liturgicalKey != null,
-        'Either dateStr or liturgicalKey must be provided',
-      );
+  const ReadingsScreen({
+    super.key,
+    this.dateStr,
+    this.liturgicalKey,
+    this.dayId,
+  }) : assert(
+         dateStr != null || liturgicalKey != null,
+         'Either dateStr or liturgicalKey must be provided',
+       );
 
   @override
   ConsumerState<ReadingsScreen> createState() => _ReadingsScreenState();
@@ -43,8 +49,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   List<String> _tabs = [];
   bool _isSundayMode = false;
   Map<String, ParsedReading?> _byYear = {};
-  int _dayOfWeek = 1;
-  String _currentCycle = 'A';
+  String _sundayCycle = 'A';
+  String _weekdayCycle = '1';
 
   @override
   void initState() {
@@ -65,7 +71,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     try {
       final service = ParsedReadingsService();
       final List<ParsedReading> readings;
-      String currentCycle = 'A';
+      String sundayCycle = 'A';
+      String weekdayCycle = '1';
 
       if (widget.liturgicalKey != null) {
         // Liturgical key mode: period/week/dayOfWeek
@@ -81,11 +88,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         );
         // Use today's date for cycle detection
         final today = DateTime.now();
-        final todayDow = today.weekday == 7 ? 1 : today.weekday + 1;
-        currentCycle = ParsedReadingsService.currentCycle(
-          today,
-          dayOfWeek: todayDow,
-        );
+        sundayCycle = getCycleForDate(today, dayOfWeek: 1);
+        weekdayCycle = getWeekdayCycleForDate(today);
       } else {
         final date = DateTime.tryParse(widget.dateStr!) ?? DateTime.now();
         final calendar = ref.read(calendarServiceProvider);
@@ -102,26 +106,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
           dynamicDates,
           forceRefresh: forceRefresh,
           includeAlternatives: true,
+          dayId: widget.dayId,
         );
-        final dayOfWeek = date.weekday == 7 ? 1 : date.weekday + 1;
-        currentCycle = ParsedReadingsService.currentCycle(
-          date,
-          dayOfWeek: dayOfWeek,
-        );
+        sundayCycle = getCycleForDate(date, dayOfWeek: 1);
+        weekdayCycle = getWeekdayCycleForDate(date);
       }
 
       if (!mounted) return;
 
-      // Detect Sunday (dayOfWeek == 1)
-      final int dow;
-      if (widget.liturgicalKey != null) {
-        final parts = widget.liturgicalKey!.split('/');
-        dow = int.tryParse(parts.length > 2 ? parts[2] : '0') ?? 0;
-      } else {
-        final date = DateTime.tryParse(widget.dateStr!) ?? DateTime.now();
-        dow = date.weekday == 7 ? 1 : date.weekday + 1;
-      }
-      final isSunday = dow == 1;
       var groups = widget.dateStr != null
           ? groupReadings(readings)
           : <ReadingCelebrationGroup>[];
@@ -129,23 +121,33 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
           .where((g) => g.documents.any(readingHasVisibleContent))
           .toList();
       if (groupsWithContent.isNotEmpty) groups = groupsWithContent;
-      final activeKey = groups.isNotEmpty ? groups.first.key : null;
-      final activeDocs = groups.isNotEmpty ? groups.first.documents : readings;
+      final linkedGroup = widget.dayId == null
+          ? null
+          : groups.where((group) {
+              return group.documents.any(
+                (reading) =>
+                    reading.dayId == widget.dayId ||
+                    reading.dayIds.contains(widget.dayId),
+              );
+            }).firstOrNull;
+      final activeKey = linkedGroup?.key ??
+          (groups.isNotEmpty ? groups.first.key : null);
+      final activeDocs = linkedGroup?.documents ??
+          (groups.isNotEmpty ? groups.first.documents : readings);
 
       _tabController?.dispose();
       final tabState = _buildTabState(
         activeDocs,
-        dayOfWeek: dow,
-        currentCycle: currentCycle,
-        isSunday: isSunday,
+        sundayCycle: sundayCycle,
+        weekdayCycle: weekdayCycle,
       );
 
       setState(() {
         _readings = readings;
         _groups = groups;
         _activeGroupKey = activeKey;
-        _dayOfWeek = dow;
-        _currentCycle = currentCycle;
+        _sundayCycle = sundayCycle;
+        _weekdayCycle = weekdayCycle;
         _tabs = tabState.tabs;
         _tabController = tabState.controller;
         _isSundayMode = tabState.sundayMode;
@@ -182,9 +184,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     _tabController?.dispose();
     final tabState = _buildTabState(
       group.documents,
-      dayOfWeek: _dayOfWeek,
-      currentCycle: _currentCycle,
-      isSunday: _dayOfWeek == 1,
+      sundayCycle: _sundayCycle,
+      weekdayCycle: _weekdayCycle,
     );
     setState(() {
       _activeGroupKey = key;
@@ -197,45 +198,25 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
 
   _TabState _buildTabState(
     List<ParsedReading> readings, {
-    required int dayOfWeek,
-    required String currentCycle,
-    required bool isSunday,
+    required String sundayCycle,
+    required String weekdayCycle,
   }) {
     TabController? tc;
     List<String> tabs = [];
     bool sundayMode = false;
     Map<String, ParsedReading?> byYear = {};
 
-    final hasYearData = readings.any((r) => r.year != null);
-    final isFeastDay = readings.any(
-      (r) => r.feast != null && r.feast!.isNotEmpty,
-    );
-
-    if (isSunday && readings.isNotEmpty && hasYearData && !isFeastDay) {
-      for (final r in readings) {
-        if (r.year != null) byYear[r.year!] = r;
-      }
-      tabs = ['A', 'B', 'C'].where((y) => byYear.containsKey(y)).toList();
-      if (tabs.length > 1) {
-        sundayMode = true;
-        tc = TabController(length: tabs.length, vsync: this);
-        final idx = tabs.indexOf(currentCycle);
-        if (idx >= 0) tc.index = idx;
-      }
-    } else {
-      final hasYears = readings.any((r) => r.year != null);
-      if (hasYears) {
-        final seen = <String>{};
-        tabs = readings
-            .map((r) => r.year ?? '')
-            .where((y) => y.isNotEmpty && seen.add(y))
-            .toList();
-      }
-      if (tabs.length > 1) {
-        tc = TabController(length: tabs.length, vsync: this);
-        final idx = tabs.indexOf(currentCycle);
-        if (idx >= 0) tc.index = idx;
-      }
+    tabs = availableCyclesForGroup(readings);
+    for (final reading in readings) {
+      final cycle = normalizeReadingCycle(reading.year);
+      if (cycle.isNotEmpty) byYear[cycle] = reading;
+    }
+    sundayMode = tabs.any(const {'A', 'B', 'C'}.contains);
+    if (tabs.length > 1) {
+      tc = TabController(length: tabs.length, vsync: this);
+      final desired = sundayMode ? sundayCycle : weekdayCycle;
+      final idx = tabs.indexOf(desired);
+      if (idx >= 0) tc.index = idx;
     }
 
     return _TabState(
@@ -299,7 +280,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                                     .copyWith(fontWeight: FontWeight.w600),
                               ),
                               Text(
-                                '${group.documents.length} варыянт(аў)',
+                                _groupMeta(group),
                                 style: reader.referenceStyle(12),
                               ),
                             ],
@@ -334,14 +315,39 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       final reading = _byYear[year];
       if (reading != null && readingHasVisibleContent(reading)) return reading;
     }
-    final forYear = docs.where((r) => r.year == year).toList();
+    final forYear = docs
+        .where((r) => normalizeReadingCycle(r.year) == year)
+        .toList();
     return pickReadingForCycle(forYear.isNotEmpty ? forYear : docs, year);
   }
 
   ParsedReading _displayReading() {
     final docs = _activeGroupDocuments();
-    return pickReadingForCycle(docs, _currentCycle) ??
+    final cycles = availableCyclesForGroup(docs);
+    final desired = cycles.any(const {'A', 'B', 'C'}.contains)
+        ? _sundayCycle
+        : _weekdayCycle;
+    return pickReadingForCycle(docs, desired) ??
         docs.firstWhere(readingHasVisibleContent, orElse: () => docs.first);
+  }
+
+  String _cycleLabel(String cycle) => switch (cycle) {
+    '1' => 'I',
+    '2' => 'II',
+    _ => cycle,
+  };
+
+  String _groupMeta(ReadingCelebrationGroup group) {
+    final cycles = availableCyclesForGroup(group.documents);
+    if (cycles.isNotEmpty) {
+      return 'Цыклы ${cycles.map(_cycleLabel).join(', ')}';
+    }
+    final reading = group.documents.first;
+    if ((reading.date ?? '').isNotEmpty) {
+      return 'Уласныя чытанні святкавання';
+    }
+    if ((reading.feast ?? '').isNotEmpty) return 'Уласныя чытанні свята';
+    return 'Чытанні літургічнага перыяду';
   }
 
   Widget _readingsBackdrop({required Widget child}) {
@@ -357,33 +363,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   double get _contentTopInset =>
       MediaQuery.paddingOf(context).top + kToolbarHeight + 8;
 
-  String _formatDate(String dateStr) {
-    final date = DateTime.tryParse(dateStr);
-    if (date == null) return dateStr;
-    const months = [
-      '',
-      'студзеня',
-      'лютага',
-      'сакавіка',
-      'красавіка',
-      'мая',
-      'чэрвеня',
-      'ліпеня',
-      'жніўня',
-      'верасня',
-      'кастрычніка',
-      'лістапада',
-      'снежня',
-    ];
-    return '${date.day} ${months[date.month]}';
-  }
-
-  /// Title for the AppBar — date or liturgical label.
+  /// The date is shown in the page header, as in mybrev/ReadingsView.vue.
   String get _title {
     if (widget.liturgicalKey != null) {
       return _formatLiturgicalKey(widget.liturgicalKey!);
     }
-    return _formatDate(widget.dateStr ?? '');
+    return 'Чытанні';
   }
 
   static const _periodLabels = {
@@ -421,7 +406,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   Widget build(BuildContext context) {
     final title = _title;
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Loading
     if (_loading) {
@@ -528,21 +512,46 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         extendBodyBehindAppBar: true,
         appBar: IosGlassAppBar(
           title: Text(title),
-          actions: [_FontSizeButton(ref: ref)],
+          actions: const [TextScaleControl()],
         ),
         body: _readingsBackdrop(
           child: Column(
             children: [
               SizedBox(height: _contentTopInset),
               _celebrationPicker(context),
-              TabBar(
-                controller: _tabController,
-                tabs: _tabs.map((y) => Tab(text: y)).toList(),
-                labelColor: ReaderTheme.of(context).rubric,
-                unselectedLabelColor: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant,
-                indicatorColor: ReaderTheme.of(context).rubric,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                child: GlassSurface(
+                  style: GlassStyle.soft,
+                  seasonColor: seasonColor,
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ЛІТУРГІЧНЫ ЦЫКЛ',
+                        style: ReaderTheme.of(
+                          context,
+                        ).referenceStyle(11).copyWith(letterSpacing: 1.1),
+                      ),
+                      Text(
+                        'Актуальны на гэту дату адкрыты аўтаматычна',
+                        style: ReaderTheme.of(context).referenceStyle(12),
+                      ),
+                      TabBar(
+                        controller: _tabController,
+                        tabs: _tabs
+                            .map((cycle) => Tab(text: _cycleLabel(cycle)))
+                            .toList(),
+                        labelColor: ReaderTheme.of(context).rubric,
+                        unselectedLabelColor: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
+                        indicatorColor: ReaderTheme.of(context).rubric,
+                      ),
+                    ],
+                  ),
+                ),
               ),
               Expanded(
                 child: TabBarView(
@@ -573,7 +582,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                       reading: reading,
                       dateStr: widget.dateStr,
                       seasonColor: seasonColor,
-                      isDark: isDark,
                       compactTop: true,
                       onRefresh: () => _load(forceRefresh: true),
                     );
@@ -592,14 +600,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       extendBodyBehindAppBar: true,
       appBar: IosGlassAppBar(
         title: Text(title),
-        actions: [_FontSizeButton(ref: ref)],
+        actions: const [TextScaleControl()],
       ),
       body: _readingsBackdrop(
         child: _ReadingBody(
           reading: single,
           dateStr: widget.dateStr,
           seasonColor: seasonColor,
-          isDark: isDark,
           onRefresh: () => _load(forceRefresh: true),
           celebrationPicker: _groups.length > 1
               ? _celebrationPicker(context)
@@ -630,7 +637,6 @@ class _ReadingBody extends ConsumerWidget {
   final ParsedReading reading;
   final String? dateStr;
   final Color seasonColor;
-  final bool isDark;
   final bool compactTop;
   final Widget? celebrationPicker;
   final VoidCallback? onRefresh;
@@ -638,20 +644,19 @@ class _ReadingBody extends ConsumerWidget {
     required this.reading,
     this.dateStr,
     required this.seasonColor,
-    required this.isDark,
     this.compactTop = false,
     this.celebrationPicker,
     this.onRefresh,
   });
 
   static const _weekdays = {
-    1: 'Нядзеля',
-    2: 'Панядзелак',
-    3: 'Аўторак',
-    4: 'Серада',
-    5: 'Чацвер',
-    6: 'Пятніца',
-    7: 'Субота',
+    1: 'нядзеля',
+    2: 'панядзелак',
+    3: 'аўторак',
+    4: 'серада',
+    5: 'чацвер',
+    6: 'пятніца',
+    7: 'субота',
   };
   static const _months = [
     '',
@@ -677,7 +682,9 @@ class _ReadingBody extends ConsumerWidget {
     final dow = d.weekday == 7 ? 1 : d.weekday + 1;
     final dayName = _weekdays[dow] ?? '';
     final month = _months[d.month];
-    return '$dayName - ${d.day} $month ${d.year}';
+    final today = DateTime.now();
+    final prefix = DateUtils.isSameDay(d, today) ? 'Сёння, ' : '';
+    return '$prefix$dayName, ${d.day} $month ${d.year}';
   }
 
   @override
@@ -711,13 +718,80 @@ class _ReadingBody extends ConsumerWidget {
                         const SizedBox(height: 8),
                       ],
                       if (formattedDate != null) ...[
-                        Center(
-                          child: Text(
-                            formattedDate,
-                            style: reader.referenceStyle(13),
+                        Row(
+                          children: [
+                            Container(
+                              width: 9,
+                              height: 9,
+                              decoration: BoxDecoration(
+                                color: reader.rubric,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 9),
+                            Expanded(
+                              child: Text(
+                                formattedDate,
+                                style: reader
+                                    .referenceStyle(14)
+                                    .copyWith(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                      ],
+                      if ((reading.title ?? '').trim().isNotEmpty) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: reader.border),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ЛІТУРГІЯ СЛОВА',
+                                style: reader
+                                    .referenceStyle(11)
+                                    .copyWith(letterSpacing: 1.2),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                reading.title!,
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(
+                                      fontFamily: textStyle.fontFamily,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.28,
+                                    ),
+                              ),
+                              if ((reading.year ?? '').isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 9,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: reader.rubricSoft,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    'Цыкл ${reading.year == '1' ? 'I' : reading.year == '2' ? 'II' : reading.year}',
+                                    style: reader.referenceStyle(11).copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                       ],
                       if (!reading.hasReadings) ...[
                         Container(
@@ -805,8 +879,6 @@ class _ReadingBody extends ConsumerWidget {
                           ),
                         ),
                       ],
-                      if (reading.feast != null)
-                        _FeastChip(feast: reading.feast!),
                       if (reading.firstReading != null)
                         _ReadingSection(
                           label: reading.hasTwoReadings
@@ -851,39 +923,6 @@ class _ReadingBody extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-
-class _FontSizeButton extends StatelessWidget {
-  final WidgetRef ref;
-  const _FontSizeButton({required this.ref});
-
-  @override
-  Widget build(BuildContext context) {
-    final settings = ref.watch(settingsProvider);
-    return PopupMenuButton<double>(
-      icon: const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
-      tooltip: 'Памер шрыфту',
-      onSelected: (size) =>
-          ref.read(settingsProvider.notifier).setFontSize(size),
-      itemBuilder: (_) => [
-        for (final size in [14.0, 16.0, 18.0, 20.0, 24.0])
-          PopupMenuItem(
-            value: size,
-            child: Text(
-              '${size.toInt()} pt',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: size == settings.fontSize
-                    ? FontWeight.bold
-                    : FontWeight.normal,
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
@@ -963,9 +1002,6 @@ final _closingPhraseRe = RegExp(
 );
 
 class _ReadingSectionState extends State<_ReadingSection> {
-  bool _expanded = false;
-  static const _threshold = 600;
-
   // Strip leading bible reference duplicate from text
   String _cleanText(String text, String? bible) {
     if (bible == null || bible.isEmpty) return text;
@@ -992,10 +1028,8 @@ class _ReadingSectionState extends State<_ReadingSection> {
       bodyText = text.substring(0, match.start).trimRight();
     }
 
-    final truncated = bodyText.length > _threshold && !_expanded;
-    final display = truncated
-        ? '${bodyText.substring(0, _threshold)}…'
-        : bodyText;
+    final display = bodyText;
+    final isGospel = widget.label == 'ЕВАНГЕЛЛЕ';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1035,20 +1069,18 @@ class _ReadingSectionState extends State<_ReadingSection> {
         if (display.isNotEmpty) ...[
           const SizedBox(height: 6),
           SelectableText(display, style: widget.textStyle),
-          if (bodyText.length > _threshold)
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: TextStyle(fontSize: base * 0.9),
-              ),
-              onPressed: () => setState(() => _expanded = !_expanded),
-              child: Text(_expanded ? 'Згарнуць' : 'Паказаць поўны тэкст'),
-            ),
         ],
         // Closing phrase bold + separated
         if (closingPhrase != null) ...[
           const SizedBox(height: 8),
           Text(
             closingPhrase,
+            style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ] else if (display.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            isGospel ? 'Гэта Слова Пана.' : 'Гэта Слова Божае.',
             style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
@@ -1063,8 +1095,9 @@ class _ReadingSectionState extends State<_ReadingSection> {
 String _cleanChorus(String s) {
   final t = s.trim();
   const prefix = 'рэфрэн:';
-  if (t.toLowerCase().startsWith(prefix))
+  if (t.toLowerCase().startsWith(prefix)) {
     return t.substring(prefix.length).trim();
+  }
   return t;
 }
 
@@ -1218,7 +1251,7 @@ class _AlleluiaSection extends StatelessWidget {
     required this.reader,
   });
 
-  static const _acclamation = 'Алілуя, алілуя, алілуя.';
+  static const _acclamation = 'Аллелюя, аллелюя, аллелюя.';
 
   Widget _acclamationLine(BuildContext context) {
     return Padding(
@@ -1272,20 +1305,3 @@ class _AlleluiaSection extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-
-class _FeastChip extends StatelessWidget {
-  final String feast;
-  const _FeastChip({required this.feast});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Chip(
-        label: Text(feast, style: const TextStyle(fontSize: 12)),
-        visualDensity: VisualDensity.compact,
-      ),
-    );
-  }
-}

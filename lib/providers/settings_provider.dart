@@ -11,20 +11,37 @@ const kAvailableFonts = [
   'Source Serif 4',
 ];
 
+const kDefaultReaderFontSize = 16.0;
+const kMinReaderFontScale = 0.7;
+const kMaxReaderFontScale = 1.8;
+const kReaderFontScaleStep = 0.1;
+const kMinReaderFontSize = kDefaultReaderFontSize * kMinReaderFontScale;
+const kMaxReaderFontSize = kDefaultReaderFontSize * kMaxReaderFontScale;
+
+double normalizeReaderFontSize(double size) =>
+    size.clamp(kMinReaderFontSize, kMaxReaderFontSize).toDouble();
+
+int readerFontScalePercent(double size) =>
+    (normalizeReaderFontSize(size) / kDefaultReaderFontSize * 100).round();
+
 class UserCategory {
   final String id;
   final String name;
   final List<String> tags;
 
-  const UserCategory({required this.id, required this.name, required this.tags});
+  const UserCategory({
+    required this.id,
+    required this.name,
+    required this.tags,
+  });
 
   Map<String, dynamic> toMap() => {'id': id, 'name': name, 'tags': tags};
 
   factory UserCategory.fromMap(Map<String, dynamic> m) => UserCategory(
-        id: m['id'] as String,
-        name: m['name'] as String,
-        tags: List<String>.from(m['tags'] as List? ?? []),
-      );
+    id: m['id'] as String,
+    name: m['name'] as String,
+    tags: List<String>.from(m['tags'] as List? ?? []),
+  );
 }
 
 class SettingsState {
@@ -36,12 +53,12 @@ class SettingsState {
   final List<String> favoriteIds;
   final String bibleVersionId;
 
-  /// prayerId → Set<categoryId>
+  /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
 
   const SettingsState({
     this.themeMode = ThemeMode.system,
-    this.fontSize = 16.0,
+    this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = 'Сістэмны',
     this.keepScreenOn = false,
     this.userCategories = const [],
@@ -63,17 +80,16 @@ class SettingsState {
     List<String>? favoriteIds,
     String? bibleVersionId,
     Map<String, Set<String>>? prayerCategoryMap,
-  }) =>
-      SettingsState(
-        themeMode: themeMode ?? this.themeMode,
-        fontSize: fontSize ?? this.fontSize,
-        fontFamily: fontFamily ?? this.fontFamily,
-        keepScreenOn: keepScreenOn ?? this.keepScreenOn,
-        userCategories: userCategories ?? this.userCategories,
-        favoriteIds: favoriteIds ?? this.favoriteIds,
-        bibleVersionId: bibleVersionId ?? this.bibleVersionId,
-        prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
-      );
+  }) => SettingsState(
+    themeMode: themeMode ?? this.themeMode,
+    fontSize: fontSize ?? this.fontSize,
+    fontFamily: fontFamily ?? this.fontFamily,
+    keepScreenOn: keepScreenOn ?? this.keepScreenOn,
+    userCategories: userCategories ?? this.userCategories,
+    favoriteIds: favoriteIds ?? this.favoriteIds,
+    bibleVersionId: bibleVersionId ?? this.bibleVersionId,
+    prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
+  );
 }
 
 class SettingsNotifier extends Notifier<SettingsState> {
@@ -98,15 +114,17 @@ class SettingsNotifier extends Notifier<SettingsState> {
     };
     return SettingsState(
       themeMode: _parseTheme(mode),
-      fontSize: (_box.get('fontSize', defaultValue: 16.0) as num).toDouble(),
+      fontSize: normalizeReaderFontSize(
+        (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
+            .toDouble(),
+      ),
       fontFamily: _box.get('fontFamily', defaultValue: 'Сістэмны') as String,
       keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
       userCategories: (jsonDecode(cats) as List)
           .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
           .toList(),
       favoriteIds: List<String>.from(jsonDecode(favs) as List),
-      bibleVersionId:
-          _box.get('bibleVersionId', defaultValue: 'bel') as String,
+      bibleVersionId: _box.get('bibleVersionId', defaultValue: 'bel') as String,
       prayerCategoryMap: prayerCategoryMap,
     );
   }
@@ -116,14 +134,19 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
     await _box.put('keepScreenOn', state.keepScreenOn);
-    await _box.put('userCategories',
-        jsonEncode(state.userCategories.map((c) => c.toMap()).toList()));
+    await _box.put(
+      'userCategories',
+      jsonEncode(state.userCategories.map((c) => c.toMap()).toList()),
+    );
     await _box.put('favoriteIds', jsonEncode(state.favoriteIds));
     await _box.put('bibleVersionId', state.bibleVersionId);
-    await _box.put('prayerCategoryMap', jsonEncode({
-      for (final e in state.prayerCategoryMap.entries)
-        e.key: e.value.toList(),
-    }));
+    await _box.put(
+      'prayerCategoryMap',
+      jsonEncode({
+        for (final e in state.prayerCategoryMap.entries)
+          e.key: e.value.toList(),
+      }),
+    );
   }
 
   void setThemeMode(ThemeMode mode) {
@@ -132,8 +155,22 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void setFontSize(double size) {
-    state = state.copyWith(fontSize: size);
+    state = state.copyWith(fontSize: normalizeReaderFontSize(size));
     _save();
+  }
+
+  void increaseFontSize() => _stepFontSize(1);
+
+  void decreaseFontSize() => _stepFontSize(-1);
+
+  void _stepFontSize(int direction) {
+    final currentStep =
+        (state.fontSize / kDefaultReaderFontSize / kReaderFontScaleStep)
+            .round();
+    final minStep = (kMinReaderFontScale / kReaderFontScaleStep).round();
+    final maxStep = (kMaxReaderFontScale / kReaderFontScaleStep).round();
+    final nextStep = (currentStep + direction).clamp(minStep, maxStep);
+    setFontSize(kDefaultReaderFontSize * nextStep * kReaderFontScaleStep);
   }
 
   void setFontFamily(String family) {
@@ -159,14 +196,19 @@ class SettingsNotifier extends Notifier<SettingsState> {
 
   void addCategory(String name, List<String> tags) {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
-    final cats = [...state.userCategories, UserCategory(id: id, name: name, tags: tags)];
+    final cats = [
+      ...state.userCategories,
+      UserCategory(id: id, name: name, tags: tags),
+    ];
     state = state.copyWith(userCategories: cats);
     _save();
   }
 
   void updateCategory(String id, String name, List<String> tags) {
     final cats = state.userCategories
-        .map((c) => c.id == id ? UserCategory(id: id, name: name, tags: tags) : c)
+        .map(
+          (c) => c.id == id ? UserCategory(id: id, name: name, tags: tags) : c,
+        )
         .toList();
     state = state.copyWith(userCategories: cats);
     _save();
@@ -184,9 +226,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void setPrayerCategory(String prayerId, String categoryId, bool selected) {
-    final map = Map<String, Set<String>>.from(state.prayerCategoryMap.map(
-      (k, v) => MapEntry(k, Set<String>.from(v)),
-    ));
+    final map = Map<String, Set<String>>.from(
+      state.prayerCategoryMap.map((k, v) => MapEntry(k, Set<String>.from(v))),
+    );
     final set = map[prayerId] ?? <String>{};
     if (selected) {
       set.add(categoryId);
@@ -213,17 +255,18 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   ThemeMode _parseTheme(String s) => switch (s) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
-      };
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
 
   String _themeName(ThemeMode m) => switch (m) {
-        ThemeMode.light => 'light',
-        ThemeMode.dark => 'dark',
-        _ => 'system',
-      };
+    ThemeMode.light => 'light',
+    ThemeMode.dark => 'dark',
+    _ => 'system',
+  };
 }
 
-final settingsProvider =
-    NotifierProvider<SettingsNotifier, SettingsState>(SettingsNotifier.new);
+final settingsProvider = NotifierProvider<SettingsNotifier, SettingsState>(
+  SettingsNotifier.new,
+);

@@ -6,7 +6,9 @@ import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
+import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
+import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:mybrev_flutter/utils/retry.dart';
 
@@ -18,11 +20,9 @@ class ParsedReadingsService {
   final FirebaseFirestore _db;
   final LiturgicalDayService _days;
 
-  ParsedReadingsService({
-    FirebaseFirestore? db,
-    LiturgicalDayService? days,
-  })  : _db = db ?? FirebaseFirestore.instance,
-        _days = days ?? LiturgicalDayService();
+  ParsedReadingsService({FirebaseFirestore? db, LiturgicalDayService? days})
+    : _db = db ?? FirebaseFirestore.instance,
+      _days = days ?? LiturgicalDayService();
 
   CollectionReference<Map<String, dynamic>> _col(String name) =>
       _db.collection(name);
@@ -32,8 +32,13 @@ class ParsedReadingsService {
     if (cached != null) {
       return Map<String, dynamic>.from(cached);
     }
-    for (final collection in [_kReadingsCollection, _kLegacyReadingsCollection]) {
-      final snap = await retryFirestore(() => _col(collection).doc(docId).get());
+    for (final collection in [
+      _kReadingsCollection,
+      _kLegacyReadingsCollection,
+    ]) {
+      final snap = await retryFirestore(
+        () => _col(collection).doc(docId).get(),
+      );
       if (!snap.exists) continue;
       final data = snap.data()!;
       await cacheReadingDoc(docId, data);
@@ -54,7 +59,10 @@ class ParsedReadingsService {
     }
 
     final merged = <String, ParsedReading>{};
-    for (final collection in [_kReadingsCollection, _kLegacyReadingsCollection]) {
+    for (final collection in [
+      _kReadingsCollection,
+      _kLegacyReadingsCollection,
+    ]) {
       await _mergeFromQueries(
         _periodQueries(collection, period, week, day),
         merged,
@@ -73,20 +81,28 @@ class ParsedReadingsService {
     bool includeAlternatives = false,
     String? dayId,
   }) async {
-    final context =
-        computeLiturgicalContext(date, opts, nextYearOpts, dynamicDates);
+    final context = computeLiturgicalContext(
+      date,
+      opts,
+      nextYearOpts,
+      dynamicDates,
+    );
     final ddmm =
         '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
-    final cycle = getCycleForDate(date, dayOfWeek: context.dayOfWeek);
-
     if (!forceRefresh) {
       final cached = _filterWithContent(
         _getCachedForDate(context, ddmm, dynamicDates, date, dayId: dayId),
       );
       if (cached.isNotEmpty) {
         return includeAlternatives
-            ? cached
-            : _selectByCycle(cached, cycle, context.dayOfWeek);
+            ? _sortForDate(cached, dayId: dayId)
+            : _selectActiveForDate(
+                cached,
+                date: date,
+                context: context,
+                feastCodes: getDynamicFeastCodesForDate(date, dynamicDates),
+                dayId: dayId,
+              );
       }
     }
 
@@ -99,29 +115,39 @@ class ParsedReadingsService {
     );
 
     final merged = <String, ParsedReading>{};
-    for (final collection in [_kReadingsCollection, _kLegacyReadingsCollection]) {
+    for (final collection in [
+      _kReadingsCollection,
+      _kLegacyReadingsCollection,
+    ]) {
       final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[];
 
       for (final id in dayIds) {
         queries.add(_col(collection).where('_dayId', isEqualTo: id).get());
-        queries.add(
-          _col(collection).where('_dayIds', arrayContains: id).get(),
-        );
+        queries.add(_col(collection).where('_dayIds', arrayContains: id).get());
       }
 
       for (final code in feastCodes) {
         for (final variant in _feastVariants(code)) {
-          queries.add(_col(collection).where('_feast', isEqualTo: variant).get());
+          queries.add(
+            _col(collection).where('_feast', isEqualTo: variant).get(),
+          );
         }
       }
 
       queries.add(_col(collection).where('_date', isEqualTo: ddmm).get());
-      queries.addAll(_periodQueries(
-        collection,
-        context.periodType,
-        context.periodWeek,
-        context.dayOfWeek,
-      ));
+      final fixedDateOnly =
+          isSeasonalDateException(date, context.periodType) ||
+          isChristmasDateExceptionExclusion(date);
+      if (!fixedDateOnly) {
+        queries.addAll(
+          _periodQueries(
+            collection,
+            context.periodType,
+            context.periodWeek,
+            context.dayOfWeek,
+          ),
+        );
+      }
 
       await _mergeFromQueries(queries, merged);
       if (merged.isNotEmpty) break;
@@ -129,8 +155,14 @@ class ParsedReadingsService {
 
     final all = _filterWithContent(merged.values.toList());
     return includeAlternatives
-        ? all
-        : _selectByCycle(all, cycle, context.dayOfWeek);
+        ? _sortForDate(all, dayId: dayId)
+        : _selectActiveForDate(
+            all,
+            date: date,
+            context: context,
+            feastCodes: feastCodes,
+            dayId: dayId,
+          );
   }
 
   static String currentCycle(DateTime date, {int? dayOfWeek}) {
@@ -186,9 +218,10 @@ class ParsedReadingsService {
     DateTime date, {
     String? dayId,
   }) {
-    final feastSet = getDynamicFeastCodesForDate(date, dynamicDates)
-        .expand(_feastVariants)
-        .toSet();
+    final feastSet = getDynamicFeastCodesForDate(
+      date,
+      dynamicDates,
+    ).expand(_feastVariants).toSet();
 
     final ids = ReadingsIndex.lookupForDateContext(
       periodType: context.periodType,
@@ -198,10 +231,6 @@ class ParsedReadingsService {
       feastVariants: feastSet,
     );
 
-    if (ids.isEmpty) {
-      return _scanCachedForDate(context, ddmm, feastSet, dayId: dayId);
-    }
-
     final box = HiveService.readingsBox;
     final results = <String, ParsedReading>{};
     for (final id in ids) {
@@ -210,19 +239,13 @@ class ParsedReadingsService {
       results[id] = ParsedReading.fromMap(id, Map<String, dynamic>.from(raw));
     }
 
-    if (dayId != null && dayId.isNotEmpty) {
-      for (final key in box.keys) {
-        final raw = box.get(key);
-        if (raw == null) continue;
-        final data = Map<String, dynamic>.from(raw);
-        final linked = data['_dayId']?.toString();
-        final linkedMany = data['_dayIds'];
-        final matchesLinked = linked == dayId ||
-            (linkedMany is List && linkedMany.map((e) => e.toString()).contains(dayId));
-        if (matchesLinked) {
-          results[key as String] = ParsedReading.fromMap(key, data);
-        }
-      }
+    for (final reading in _scanCachedForDate(
+      context,
+      ddmm,
+      feastSet,
+      dayId: dayId,
+    )) {
+      results[reading.id] = reading;
     }
 
     return results.values.toList();
@@ -244,12 +267,14 @@ class ParsedReadingsService {
       final feast = data['_feast'] as String?;
       final matchesFeast = feast != null && feastSet.contains(feast);
       final matchesDate = data['_date'] == ddmm;
-      final matchesPeriod = data['_periodType'] == context.periodType &&
+      final matchesPeriod =
+          data['_periodType'] == context.periodType &&
           _toInt(data['_periodWeekNumber']) == context.periodWeek &&
           _toInt(data['_dayOfWeek']) == context.dayOfWeek;
       final linked = data['_dayId']?.toString();
       final linkedMany = data['_dayIds'];
-      final matchesDayId = dayId != null &&
+      final matchesDayId =
+          dayId != null &&
           dayId.isNotEmpty &&
           (linked == dayId ||
               (linkedMany is List &&
@@ -261,18 +286,19 @@ class ParsedReadingsService {
     return results.values.toList();
   }
 
-  List<ParsedReading> _getCachedByPeriod(
-      String periodType, int week, int day) {
+  List<ParsedReading> _getCachedByPeriod(String periodType, int week, int day) {
     final ids = ReadingsIndex.lookupByPeriod(periodType, week, day);
     if (ids.isNotEmpty) {
       final box = HiveService.readingsBox;
       return ids
           .map((id) => box.get(id))
           .whereType<Map>()
-          .map((raw) => ParsedReading.fromMap(
-                raw['id']?.toString() ?? '',
-                Map<String, dynamic>.from(raw),
-              ))
+          .map(
+            (raw) => ParsedReading.fromMap(
+              raw['id']?.toString() ?? '',
+              Map<String, dynamic>.from(raw),
+            ),
+          )
           .where((r) => r.id.isNotEmpty)
           .toList();
     }
@@ -307,7 +333,8 @@ class ParsedReadingsService {
   }
 
   Future<List<ParsedReading>> _storeDocs(
-      Iterable<QueryDocumentSnapshot<Map<String, dynamic>>> docs) async {
+    Iterable<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) async {
     final results = <ParsedReading>[];
     for (final doc in docs) {
       final data = {...doc.data(), 'id': doc.id};
@@ -321,17 +348,114 @@ class ParsedReadingsService {
   List<ParsedReading> _filterWithContent(List<ParsedReading> docs) =>
       docs.where(hasReadingDocumentContent).toList();
 
-  List<ParsedReading> _selectByCycle(
+  List<ParsedReading> _selectLectionaryVariants(
     List<ParsedReading> docs,
-    String cycle,
+    DateTime date,
+  ) {
+    final groups = <String, List<ParsedReading>>{};
+    for (final reading in docs) {
+      groups
+          .putIfAbsent(readingCelebrationKey(reading), () => [])
+          .add(reading);
+    }
+    final sundayCycle = getCycleForDate(date, dayOfWeek: 1);
+    final weekdayCycle = getWeekdayCycleForDate(date);
+    return groups.values.expand((group) {
+      final cycles = availableCyclesForGroup(group);
+      final desired = cycles.any(const {'A', 'B', 'C'}.contains)
+          ? sundayCycle
+          : weekdayCycle;
+      final exact = group
+          .where((reading) => normalizeReadingCycle(reading.year) == desired)
+          .toList();
+      if (exact.isNotEmpty) return exact;
+      final shared = group
+          .where((reading) => normalizeReadingCycle(reading.year).isEmpty)
+          .toList();
+      return shared.isNotEmpty ? shared : group;
+    }).toList();
+  }
+
+  List<ParsedReading> _selectCalendarDayVariants(
+    List<ParsedReading> docs,
     int dayOfWeek,
   ) {
-    if (docs.isEmpty) return docs;
-    final withCycle = docs.where((r) => r.year == cycle).toList();
-    if (withCycle.isNotEmpty) return withCycle;
-    final withoutCycle = docs.where((r) => r.year == null || r.year!.isEmpty);
-    if (withoutCycle.isNotEmpty) return withoutCycle.toList();
-    return docs;
+    final exact = docs
+        .where((reading) => reading.calendarDayOfWeek == dayOfWeek)
+        .toList();
+    if (exact.isNotEmpty) return exact;
+    return docs
+        .where((reading) => reading.calendarDayOfWeek == null)
+        .toList();
+  }
+
+  List<ParsedReading> _selectActiveForDate(
+    List<ParsedReading> docs, {
+    required DateTime date,
+    required LiturgicalContext context,
+    required List<String> feastCodes,
+    String? dayId,
+  }) {
+    if (dayId != null && dayId.isNotEmpty) {
+      final linked = docs
+          .where((reading) => _isLinked(reading, dayId))
+          .toList();
+      if (linked.isNotEmpty) {
+        return _selectLectionaryVariants(linked, date);
+      }
+    }
+    final feastVariants = feastCodes.expand(_feastVariants).toSet();
+    if (feastVariants.isNotEmpty) {
+      final feast = docs
+          .where((reading) => feastVariants.contains(reading.feast))
+          .toList();
+      if (feast.isNotEmpty) {
+        return _selectLectionaryVariants(feast, date);
+      }
+    }
+    final fixedOnly =
+        isSeasonalDateException(date, context.periodType) ||
+        isChristmasDateExceptionExclusion(date);
+    final fixed = _selectCalendarDayVariants(
+      docs.where((reading) => reading.date != null).toList(),
+      context.dayOfWeek,
+    );
+    if (fixedOnly && fixed.isNotEmpty) {
+      return _selectLectionaryVariants(fixed, date);
+    }
+    final period = docs.where((reading) => reading.date == null).toList();
+    return [
+      ..._selectLectionaryVariants(fixed, date),
+      ..._selectLectionaryVariants(period, date),
+    ];
+  }
+
+  List<ParsedReading> _sortForDate(List<ParsedReading> docs, {String? dayId}) {
+    final indexed = docs.indexed.toList();
+    indexed.sort((left, right) {
+      int rank(ParsedReading reading) {
+        if (dayId != null && dayId.isNotEmpty && _isLinked(reading, dayId)) {
+          return 0;
+        }
+        if ((reading.feast ?? '').isNotEmpty) return 1;
+        if ((reading.date ?? '').isNotEmpty) return 2;
+        if ((reading.periodType ?? '').isNotEmpty) return 3;
+        return 4;
+      }
+
+      final source = rank(left.$2).compareTo(rank(right.$2));
+      return source != 0 ? source : left.$1.compareTo(right.$1);
+    });
+    return indexed.map((entry) => entry.$2).toList();
+  }
+
+  bool _isLinked(ParsedReading reading, String dayId) {
+    final raw = HiveService.readingsBox.get(reading.id);
+    if (raw is! Map) return false;
+    final data = Map<String, dynamic>.from(raw);
+    if (data['_dayId']?.toString() == dayId) return true;
+    final many = data['_dayIds'];
+    return many is List && many.map((item) => item.toString()).contains(dayId);
   }
 
   static List<String> _feastVariants(String code) {
@@ -346,7 +470,9 @@ class ParsedReadingsService {
     int week,
     int day,
   ) {
-    final weekValues = week == 0 ? <Object?>[0, '0', null] : <Object?>[week, '$week'];
+    final weekValues = week == 0
+        ? <Object?>[0, '0', null]
+        : <Object?>[week, '$week'];
     final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[];
 
     for (final weekValue in weekValues) {

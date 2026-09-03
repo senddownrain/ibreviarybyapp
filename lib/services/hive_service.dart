@@ -77,5 +77,8 @@ class HiveService {
 
   /// True when essential offline data has never been synced.
   static bool needsBootstrap() =>
-      yearOptionsBox.isEmpty || prayersBox.isEmpty;
+      yearOptionsBox.isEmpty ||
+      prayersBox.isEmpty ||
+      invitatoriumsBox.isEmpty ||
+      completoriumsBox.isEmpty;
 }

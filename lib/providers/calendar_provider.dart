@@ -40,11 +40,13 @@ class CalendarService {
     final cached = getYearOptionsCached(year);
     if (cached != null) return cached;
     try {
-      final snap = await retryFirestore(() => _db
-          .collection('yearOptions')
-          .where('year', isEqualTo: year)
-          .limit(1)
-          .get());
+      final snap = await retryFirestore(
+        () => _db
+            .collection('yearOptions')
+            .where('year', isEqualTo: year)
+            .limit(1)
+            .get(),
+      );
       if (snap.docs.isEmpty) return null;
       final doc = snap.docs.first;
       final data = {...doc.data(), 'id': doc.id};
@@ -79,6 +81,10 @@ class CalendarService {
     DateTime? parse(dynamic v) {
       if (v == null) return null;
       if (v is DateTime) return DateTime(v.year, v.month, v.day);
+      if (v is int) {
+        final dt = DateTime.fromMillisecondsSinceEpoch(v);
+        return DateTime(dt.year, dt.month, dt.day);
+      }
       if (v is String) {
         final dt = DateTime.tryParse(v);
         if (dt == null) return null;

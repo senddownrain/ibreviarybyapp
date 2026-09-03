@@ -6,6 +6,8 @@ class CacheStats {
   final int days;
   final int readings;
   final int years;
+  final int invitatoriums;
+  final int completoriums;
   final String? coverageLabel;
   final bool bootstrapNeeded;
 
@@ -14,6 +16,8 @@ class CacheStats {
     required this.days,
     required this.readings,
     required this.years,
+    required this.invitatoriums,
+    required this.completoriums,
     this.coverageLabel,
     required this.bootstrapNeeded,
   });
@@ -31,6 +35,8 @@ class CacheStats {
       days: HiveService.daysBox.length,
       readings: HiveService.readingsBox.length,
       years: HiveService.yearOptionsBox.length,
+      invitatoriums: HiveService.invitatoriumsBox.length,
+      completoriums: HiveService.completoriumsBox.length,
       coverageLabel: label,
       bootstrapNeeded: HiveService.needsBootstrap(),
     );

@@ -1,163 +1,295 @@
+import 'package:mybrev_flutter/constants/liturgical_feasts_map.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
 class LiturgicalContext {
   final String periodType;
   final int periodWeek;
-  /// Day of week: 1=Sunday, 2=Monday … 7=Saturday
+
+  /// Liturgical numbering: 1=Sunday, 2=Monday, … 7=Saturday.
   final int dayOfWeek;
+  final String? feast;
 
   const LiturgicalContext({
     required this.periodType,
     required this.periodWeek,
     required this.dayOfWeek,
+    this.feast,
   });
+
+  LiturgicalContext copyWith({
+    String? periodType,
+    int? periodWeek,
+    int? dayOfWeek,
+    String? feast,
+  }) => LiturgicalContext(
+    periodType: periodType ?? this.periodType,
+    periodWeek: periodWeek ?? this.periodWeek,
+    dayOfWeek: dayOfWeek ?? this.dayOfWeek,
+    feast: feast ?? this.feast,
+  );
 }
 
-/// Computes the liturgical context for a date.
-/// [opts] — YearOptions for the current liturgical year.
-/// [nextYearOpts] — YearOptions for the next liturgical year (may be null).
-/// [dynamicDates] — dynamic feast dates (Easter, Pentecost, etc.).
+DateTime _day(DateTime value) => DateTime(value.year, value.month, value.day);
+
+DateTime? _parseDate(dynamic value) {
+  if (value is DateTime) return _day(value);
+  if (value is int) return _day(DateTime.fromMillisecondsSinceEpoch(value));
+  if (value is String) {
+    final parsed = DateTime.tryParse(value);
+    if (parsed != null) return _day(parsed);
+  }
+  return null;
+}
+
+bool _sameDay(DateTime left, DateTime right) =>
+    left.year == right.year &&
+    left.month == right.month &&
+    left.day == right.day;
+
+int _catholicWeekday(DateTime date) => date.weekday % 7 + 1;
+
+DateTime calculateHolyFamilyDate(int year) {
+  final christmas = DateTime(year, 12, 25);
+  if (christmas.weekday == DateTime.sunday) return DateTime(year, 12, 30);
+  return christmas.add(Duration(days: DateTime.sunday - christmas.weekday));
+}
+
+DateTime calculateBaptismOfLordDate(int year) {
+  final epiphany = DateTime(year, 1, 6);
+  final days = epiphany.weekday == DateTime.sunday
+      ? 7
+      : DateTime.sunday - epiphany.weekday;
+  return epiphany.add(Duration(days: days));
+}
+
+DateTime _firstSundayAfterChristmas(DateTime christmas) {
+  final days = christmas.weekday == DateTime.sunday
+      ? 7
+      : DateTime.sunday - christmas.weekday;
+  return christmas.add(Duration(days: days));
+}
+
+int calculateChristmasPeriodWeek(DateTime value) {
+  final date = _day(value);
+  if (date.month != 12 && date.month != 1) return -1;
+  final christmasYear = date.month == 1 ? date.year - 1 : date.year;
+  final christmas = DateTime(christmasYear, 12, 25);
+  if (date.isBefore(christmas)) return -1;
+  final firstSunday = _firstSundayAfterChristmas(christmas);
+  if (date.isBefore(firstSunday)) return 1;
+  return date.difference(firstSunday).inDays ~/ 7 + 1;
+}
+
+/// Exact port of `mybrev/src/utils/liturgicalCalendar.js`.
 LiturgicalContext computeLiturgicalContext(
-  DateTime date,
+  DateTime value,
   YearOptions? opts,
   YearOptions? nextYearOpts,
   DynamicDates? dynamicDates,
 ) {
-  final dayOfWeek = _toCatholicDayOfWeek(date.weekday); // 1=Sun … 7=Sat
+  final date = _day(value);
+  String? feast;
+  for (final entry in feastNameMap.entries) {
+    final feastDate = dynamicDates?[entry.key];
+    if (feastDate != null && _sameDay(feastDate, date)) {
+      feast = entry.value;
+      break;
+    }
+  }
 
-  // Extract Easter from dynamicDates (or opts)
-  final easter = _getEaster(date, dynamicDates, opts);
+  var context = LiturgicalContext(
+    periodType: 'ordinary',
+    periodWeek: -1,
+    dayOfWeek: _catholicWeekday(date),
+    feast: feast,
+  );
+  if (opts == null) return context;
 
-  if (easter != null) {
-    final period = _getPeriodFromEaster(date, easter, dynamicDates);
-    if (period != null) {
-      return LiturgicalContext(
-      periodType: period.type,
-      periodWeek: period.week,
-      dayOfWeek: dayOfWeek,
+  final advent = _parseDate(opts.data['firstAdventSunday']);
+  final easter = _parseDate(opts.data['easterSunday']);
+  final ash = _parseDate(opts.data['ashWednesday']);
+  final pentecost = _parseDate(opts.data['pentecost']);
+  if (advent == null || easter == null || ash == null || pentecost == null) {
+    return context;
+  }
+  final christmas = DateTime(date.year, 12, 25);
+
+  if (!date.isBefore(advent) && date.isBefore(christmas)) {
+    final diff = date.difference(advent).inDays;
+    return context.copyWith(
+      periodType: 'advent',
+      periodWeek: diff ~/ 7 + 1,
+      dayOfWeek: diff % 7 + 1,
     );
+  }
+
+  final startsThisYear = !date.isBefore(christmas);
+  final startsPreviousYear = date.month == 1;
+  if (startsThisYear || startsPreviousYear) {
+    final start = startsThisYear ? christmas : DateTime(date.year - 1, 12, 25);
+    final end = calculateBaptismOfLordDate(start.year + 1);
+    if (!date.isBefore(start) && !date.isAfter(end)) {
+      return context.copyWith(
+        periodType: 'christmas',
+        periodWeek: calculateChristmasPeriodWeek(date),
+      );
     }
   }
 
-  // Advent
-  final advent = _getAdventStart(date.year);
-  if (!date.isBefore(advent)) {
-    final week = _weekNumber(date, advent);
-    return LiturgicalContext(
-        periodType: 'advent', periodWeek: week, dayOfWeek: dayOfWeek);
-  }
-
-  // Christmas (Dec 25 – Jan 12 approx)
-  if ((date.month == 12 && date.day >= 25) ||
-      (date.month == 1 && date.day <= 12)) {
-    return LiturgicalContext(
-        periodType: 'christmas', periodWeek: 0, dayOfWeek: dayOfWeek);
-  }
-  if (date.month == 1 && date.day <= 24) {
-    return LiturgicalContext(
-        periodType: 'ordinary', periodWeek: 1, dayOfWeek: dayOfWeek);
-  }
-
-  // Fallback: ordinary time
-  final epiphany = DateTime(date.year, 1, 6);
-  final epiphanyWeek = _weekNumber(date, epiphany);
-  return LiturgicalContext(
-      periodType: 'ordinary', periodWeek: epiphanyWeek.clamp(1, 34), dayOfWeek: dayOfWeek);
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-DateTime? _getEaster(
-    DateTime date, DynamicDates? dynamicDates, YearOptions? opts) {
-  // Try dynamicDates first
-  if (dynamicDates != null) {
-    final e = dynamicDates['easter'] ?? dynamicDates['easterSunday'];
-    if (e != null) return e;
-  }
-  // Try yearOptions data
-  if (opts?.data['easter'] != null) {
-    final raw = opts!.data['easter'];
-    if (raw is String) return DateTime.tryParse(raw);
-    if (raw is DateTime) return raw;
-  }
-  // Computus (Gregorian Easter)
-  return _computeEaster(date.year);
-}
-
-class _Period {
-  final String type;
-  final int week;
-  _Period(this.type, this.week);
-}
-
-_Period? _getPeriodFromEaster(
-    DateTime date, DateTime easter, DynamicDates? dynamicDates) {
-  final diff = date.difference(easter).inDays;
-
-  // Lent: ~46 days before Easter (Ash Wednesday = -46)
-  if (diff >= -46 && diff < 0) {
-    // Holy Week: last 7 days before Easter
-    if (diff >= -7) {
-      return _Period('holyweek', 0);
+  if (!date.isBefore(ash) && date.isBefore(easter)) {
+    final firstLentSunday = ash.add(const Duration(days: 4));
+    final palmSunday = easter.subtract(const Duration(days: 7));
+    final startDiff = date.difference(firstLentSunday).inDays;
+    final endDiff = date.difference(palmSunday).inDays;
+    if (startDiff < 0) {
+      return context.copyWith(
+        periodType: 'lent',
+        periodWeek: 0,
+        dayOfWeek: 8 + startDiff,
+      );
     }
-    // Lent weeks
-    final week = ((diff + 46) ~/ 7) + 1;
-    return _Period('lent', week.clamp(1, 6));
+    if (endDiff > 0 && endDiff < 8) {
+      return context.copyWith(
+        periodType: 'holyweek',
+        periodWeek: 1,
+        dayOfWeek: endDiff + 1,
+      );
+    }
+    if (endDiff == 0) {
+      return LiturgicalContext(
+        periodType: 'holyweek',
+        periodWeek: 1,
+        dayOfWeek: 1,
+        feast: feastNameMap['palmSunday'],
+      );
+    }
+    return context.copyWith(
+      periodType: 'lent',
+      periodWeek: startDiff ~/ 7 + 1,
+      dayOfWeek: startDiff % 7 + 1,
+    );
   }
 
-  // Paschal (Easter to Pentecost = +49 days)
-  if (diff >= 0 && diff <= 49) {
-    final week = (diff ~/ 7) + 1;
-    return _Period('easter', week.clamp(1, 7));
+  if (!date.isBefore(easter) && !date.isAfter(pentecost)) {
+    final diff = date.difference(easter).inDays;
+    return context.copyWith(
+      periodType: 'easter',
+      periodWeek: diff ~/ 7 + 1,
+      dayOfWeek: diff % 7 + 1,
+    );
   }
 
-  // After Pentecost: ordinary time
-  if (diff > 49) {
-    // Ordinary time weeks after Pentecost (week 9 onwards roughly)
-    final pentecost = easter.add(const Duration(days: 49));
-    final afterPentecost = date.difference(pentecost).inDays;
-    // Ordinary time continues numbering from where it left off after Epiphany
-    // Rough estimate: Pentecost week ≈ ordinary week 10
-    final week = 10 + (afterPentecost ~/ 7);
-    return _Period('ordinary', week.clamp(1, 34));
+  final firstOrdinaryWeeks = _asInt(opts.data['ordintaryWeeks1']);
+  if (firstOrdinaryWeeks != null) {
+    final firstOrdinary = ash
+        .subtract(const Duration(days: 3))
+        .subtract(Duration(days: (firstOrdinaryWeeks - 1) * 7));
+    if (!date.isBefore(firstOrdinary) && date.isBefore(ash)) {
+      final diff = date.difference(firstOrdinary).inDays;
+      return context.copyWith(
+        periodType: 'ordinary',
+        periodWeek: diff ~/ 7 + 1,
+        dayOfWeek: diff % 7 + 1,
+      );
+    }
   }
 
-  return null;
+  if (date.isAfter(pentecost) && date.isBefore(advent)) {
+    final lastOrdinarySunday = advent.subtract(const Duration(days: 7));
+    final currentSunday = date.subtract(Duration(days: context.dayOfWeek - 1));
+    final weeksBefore34 =
+        lastOrdinarySunday.difference(currentSunday).inDays ~/ 7;
+    return context.copyWith(
+      periodType: 'ordinary',
+      periodWeek: 34 - weeksBefore34,
+    );
+  }
+
+  return context;
 }
 
-DateTime _getAdventStart(int year) {
+List<String> getDynamicFeastCodesForDate(
+  DateTime date,
+  DynamicDates? dynamicDates,
+) {
+  if (dynamicDates == null) return const [];
+  final result = <String>[];
+  for (final entry in feastNameMap.entries) {
+    final feastDate = dynamicDates[entry.key];
+    if (feastDate != null && _sameDay(feastDate, date)) result.add(entry.value);
+  }
+  return result;
+}
+
+DateTime? calculateDateForContext(
+  int year,
+  String periodType,
+  int periodWeek,
+  int dayOfWeek,
+  YearOptions? opts,
+  YearOptions? nextYearOpts,
+) {
+  if (opts == null) return null;
+  final advent = _parseDate(opts.data['firstAdventSunday']);
+  final easter = _parseDate(opts.data['easterSunday']);
+  final ash = _parseDate(opts.data['ashWednesday']);
+  if (advent == null || easter == null || ash == null) return null;
   final christmas = DateTime(year, 12, 25);
-  final weekday = christmas.weekday;
-  final daysToLastSunday = weekday % 7;
-  final lastSunday = christmas.subtract(Duration(days: daysToLastSunday));
-  return lastSunday.subtract(const Duration(days: 21));
+  DateTime? base;
+  var adjustedWeek = periodWeek;
+
+  switch (periodType) {
+    case 'advent':
+      base = advent;
+      break;
+    case 'christmas':
+      if (periodWeek != 1 && periodWeek != 2) return null;
+      final targetWeekday = dayOfWeek == 1 ? 7 : dayOfWeek - 1;
+      final baptism = calculateBaptismOfLordDate(year + 1);
+      final weekStart = _firstSundayAfterChristmas(
+        christmas,
+      ).add(Duration(days: (periodWeek - 1) * 7));
+      final result = weekStart.add(Duration(days: targetWeekday % 7));
+      return result.isBefore(baptism) ? result : null;
+    case 'lent':
+      base = ash.add(const Duration(days: 4));
+      break;
+    case 'holyweek':
+      base = easter.subtract(const Duration(days: 7));
+      break;
+    case 'easter':
+      base = easter;
+      break;
+    case 'ordinary':
+      final firstLastWeek = _asInt(opts.data['ordintaryWeeks1']);
+      final secondFirstWeek = _asInt(opts.data['ordintaryWeeks2']);
+      if (firstLastWeek == null || secondFirstWeek == null) return null;
+      final firstOrdinary = ash
+          .subtract(const Duration(days: 3))
+          .subtract(Duration(days: (firstLastWeek - 1) * 7));
+      if (periodWeek <= firstLastWeek) {
+        base = firstOrdinary;
+      } else if (periodWeek >= secondFirstWeek) {
+        final lastOrdinarySunday = advent.subtract(const Duration(days: 7));
+        base = lastOrdinarySunday.subtract(
+          Duration(days: (34 - periodWeek) * 7),
+        );
+        adjustedWeek = 1;
+      } else {
+        return null;
+      }
+      break;
+    default:
+      return null;
+  }
+
+  final baseDay = _catholicWeekday(base);
+  final daysToAdd = (adjustedWeek - 1) * 7 + (dayOfWeek - baseDay);
+  return base.add(Duration(days: daysToAdd));
 }
 
-int _weekNumber(DateTime date, DateTime start) {
-  final diff = date.difference(start).inDays;
-  return (diff ~/ 7) + 1;
-}
-
-/// Flutter weekday: 1=Mon … 7=Sun → Catholic: 1=Sun, 2=Mon … 7=Sat
-int _toCatholicDayOfWeek(int flutterWeekday) {
-  return flutterWeekday % 7 + 1;
-}
-
-/// Gregorian Easter algorithm (Anonymous Gregorian).
-DateTime _computeEaster(int year) {
-  final a = year % 19;
-  final b = year ~/ 100;
-  final c = year % 100;
-  final d = b ~/ 4;
-  final e = b % 4;
-  final f = (b + 8) ~/ 25;
-  final g = (b - f + 1) ~/ 3;
-  final h = (19 * a + b - d - g + 15) % 30;
-  final i = c ~/ 4;
-  final k = c % 4;
-  final l = (32 + 2 * e + 2 * i - h - k) % 7;
-  final m = (a + 11 * h + 22 * l) ~/ 451;
-  final month = (h + l - 7 * m + 114) ~/ 31;
-  final day = ((h + l - 7 * m + 114) % 31) + 1;
-  return DateTime(year, month, day);
+int? _asInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '');
 }

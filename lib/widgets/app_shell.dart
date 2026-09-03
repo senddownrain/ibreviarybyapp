@@ -15,59 +15,57 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
     final location = GoRouterState.of(context).uri.toString();
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final isOffline = ref.watch(isOfflineProvider);
 
-    // Content scrolls under frosted glass bars on both platforms.
-    // Content scrolls under frosted glass app bar; spacer keeps it below the bar.
-    final topInset = MediaQuery.viewPaddingOf(context).top + kToolbarHeight;
+    // Match the PWA: the top chrome is an isolated floating control, not a
+    // full-width toolbar. Content keeps a small breathing space below it.
+    final topInset = MediaQuery.viewPaddingOf(context).top + 68;
 
     return WarmupBootstrap(
       child: Scaffold(
         extendBodyBehindAppBar: true,
         extendBody: true,
-        backgroundColor: cs.surfaceContainerLowest,
+        backgroundColor: Colors.transparent,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: GlassBar(
-            seasonColor: seasonColor,
-            child: _AppBarContent(cs: cs),
-          ),
+          preferredSize: const Size.fromHeight(68),
+          child: _FloatingMenuBar(seasonColor: seasonColor),
         ),
         drawer: const AppNavigationDrawer(),
-        body: Column(
-          children: [
-            SizedBox(height: topInset),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: isOffline ? 32 : 0,
-              color: const Color(0xFFB71C1C),
-              child: isOffline
-                  ? const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.wifi_off_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'Няма злучэння з інтэрнэтам',
-                          style: TextStyle(
+        body: AmbientBackdrop(
+          child: Column(
+            children: [
+              SizedBox(height: topInset),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: isOffline ? 32 : 0,
+                color: const Color(0xFFB71C1C),
+                child: isOffline
+                    ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.wifi_off_rounded,
                             color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            size: 14,
                           ),
-                        ),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            Expanded(child: child),
-          ],
+                          SizedBox(width: 6),
+                          Text(
+                            'Няма злучэння з інтэрнэтам',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              Expanded(child: child),
+            ],
+          ),
         ),
         bottomNavigationBar: AppBottomNav(currentLocation: location),
       ),
@@ -75,55 +73,47 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-class _AppBarContent extends StatelessWidget {
-  final ColorScheme cs;
-  const _AppBarContent({required this.cs});
+class _FloatingMenuBar extends StatelessWidget {
+  final Color seasonColor;
+
+  const _FloatingMenuBar({required this.seasonColor});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Builder(
-          builder: (ctx) => IconButton(
-            icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
-            color: cs.onSurface,
-            onPressed: () => Scaffold.of(ctx).openDrawer(),
+    final cs = Theme.of(context).colorScheme;
+    return SafeArea(
+      bottom: false,
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+          child: Builder(
+            builder: (ctx) => GlassSurface(
+              style: GlassStyle.pill,
+              seasonColor: seasonColor,
+              borderRadius: BorderRadius.circular(24),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Scaffold.of(ctx).openDrawer(),
+                  borderRadius: BorderRadius.circular(24),
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Center(
+                      child: PhosphorIcon(
+                        PhosphorIconsRegular.list,
+                        size: 23,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
-        const Spacer(),
-        _AppBarTitle(cs: cs),
-        const Spacer(),
-        // Mirror leading for centering (iOS-style); keep balance on Android too.
-        SizedBox(width: 48),
-      ],
-    );
-  }
-}
-
-class _AppBarTitle extends StatelessWidget {
-  final ColorScheme cs;
-  const _AppBarTitle({required this.cs});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        PhosphorIcon(
-          PhosphorIconsLight.cross,
-          size: 15,
-          color: cs.primary.withValues(alpha: 0.75),
-        ),
-        const SizedBox(width: 7),
-        Text(
-          'Малітоўнік',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: cs.onSurface,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

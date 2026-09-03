@@ -1,4 +1,5 @@
-/// Parse psalm verses — supports both List<String> and List<{number, text}> formats.
+/// Parse psalm verses — supports both `List<String>` and
+/// `List<{number, text}>` formats.
 List<String> _parseVerses(dynamic raw) {
   if (raw == null) return [];
   final list = raw as List<dynamic>;
@@ -71,13 +72,20 @@ class ParsedReading {
   final ParsedSection? gospel;
 
   // Metadata
+  final String? title;
   final String? periodType;
   final int? periodWeekNumber;
   final int? dayOfWeek;
   final String? date; // DD.MM
   final String? feast;
   final String? sourceId;
-  final bool hasReadings; // false = commune stub (feast exists but no own readings)
+  final String? dayId;
+  final List<String> dayIds;
+  final String? rank;
+  final List<String> places;
+  final String? variant;
+  final int? calendarDayOfWeek;
+  final bool hasReadings; // false = commune stub without own readings
 
   const ParsedReading({
     required this.id,
@@ -88,12 +96,19 @@ class ParsedReading {
     this.psalm,
     this.alleluia,
     this.gospel,
+    this.title,
     this.periodType,
     this.periodWeekNumber,
     this.dayOfWeek,
     this.date,
     this.feast,
     this.sourceId,
+    this.dayId,
+    this.dayIds = const [],
+    this.rank,
+    this.places = const [],
+    this.variant,
+    this.calendarDayOfWeek,
     this.hasReadings = true,
   });
 
@@ -119,12 +134,19 @@ class ParsedReading {
       psalm: section('psalm'),
       alleluia: section('alleluia'),
       gospel: section('gospel'),
+      title: _asString(map['title']),
       periodType: map['_periodType'] as String?,
       periodWeekNumber: _toInt(map['_periodWeekNumber']),
       dayOfWeek: _toInt(map['_dayOfWeek']),
       date: map['_date'] as String?,
       feast: map['_feast'] as String?,
       sourceId: map['_sourceId'] as String?,
+      dayId: _asString(map['_dayId']),
+      dayIds: _asStringList(map['_dayIds']),
+      rank: _asString(map['_rank']),
+      places: _asStringList(map['_place']),
+      variant: _asString(map['_variant']),
+      calendarDayOfWeek: _toInt(map['_calendarDayOfWeek']),
       hasReadings: (map['_hasReadings'] as bool?) ?? true,
     );
   }
@@ -133,6 +155,22 @@ class ParsedReading {
     if (v is int) return v;
     if (v is String) return int.tryParse(v);
     return null;
+  }
+
+  static String? _asString(dynamic value) {
+    final result = value?.toString().trim() ?? '';
+    return result.isEmpty ? null : result;
+  }
+
+  static List<String> _asStringList(dynamic value) {
+    if (value is List) {
+      return value
+          .map((item) => item.toString().trim())
+          .where((item) => item.isNotEmpty)
+          .toList();
+    }
+    final single = value?.toString().trim() ?? '';
+    return single.isEmpty ? const [] : [single];
   }
 
   Map<String, dynamic> toMap() {
@@ -145,23 +183,32 @@ class ParsedReading {
       if (psalm != null) 'psalm': _sectionToMap(psalm!),
       if (alleluia != null) 'alleluia': _sectionToMap(alleluia!),
       if (gospel != null) 'gospel': _sectionToMap(gospel!),
+      if (title != null) 'title': title,
       if (periodType != null) '_periodType': periodType,
       if (periodWeekNumber != null) '_periodWeekNumber': periodWeekNumber,
       if (dayOfWeek != null) '_dayOfWeek': dayOfWeek,
       if (date != null) '_date': date,
       if (feast != null) '_feast': feast,
       if (sourceId != null) '_sourceId': sourceId,
+      if (dayId != null) '_dayId': dayId,
+      if (dayIds.isNotEmpty) '_dayIds': dayIds,
+      if (rank != null) '_rank': rank,
+      if (places.isNotEmpty) '_place': places,
+      if (variant != null) '_variant': variant,
+      if (calendarDayOfWeek != null)
+        '_calendarDayOfWeek': calendarDayOfWeek,
+      '_hasReadings': hasReadings,
     };
   }
 
   static Map<String, dynamic> _sectionToMap(ParsedSection s) => {
-        if (s.bible != null) 'bible': s.bible,
-        if (s.comment != null) 'comment': s.comment,
-        if (s.title != null) 'title': s.title,
-        if (s.text != null) 'text': s.text,
-        if (s.chorus != null) 'chorus': s.chorus,
-        if (s.altChorus != null) 'altChorus': s.altChorus,
-        if (s.verses.isNotEmpty) 'verses': s.verses,
-        if (s.verse != null) 'verse': s.verse,
-      };
+    if (s.bible != null) 'bible': s.bible,
+    if (s.comment != null) 'comment': s.comment,
+    if (s.title != null) 'title': s.title,
+    if (s.text != null) 'text': s.text,
+    if (s.chorus != null) 'chorus': s.chorus,
+    if (s.altChorus != null) 'altChorus': s.altChorus,
+    if (s.verses.isNotEmpty) 'verses': s.verses,
+    if (s.verse != null) 'verse': s.verse,
+  };
 }

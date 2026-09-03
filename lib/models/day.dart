@@ -37,6 +37,9 @@ class LiturgicalDay {
     return value.toString();
   }
 
+  /// Complete normalized document used by the day resolver and hour renderer.
+  Map<String, dynamic> get data => Map.unmodifiable(_raw);
+
   factory LiturgicalDay.fromMap(Map<String, dynamic> data) {
     return LiturgicalDay(
       id: data['id']?.toString() ?? data['_id']?.toString() ?? '',
@@ -53,18 +56,7 @@ class LiturgicalDay {
     );
   }
 
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        if (title != null) 'title': title,
-        if (feastName != null) 'feastName': feastName,
-        if (feastComment != null) 'feastComment': feastComment,
-        if (periodType != null) '_periodType': periodType,
-        if (periodWeekNumber != null) '_periodWeekNumber': periodWeekNumber,
-        if (dayOfWeek != null) '_dayOfWeek': dayOfWeek,
-        if (feast != null) '_feast': feast,
-        if (date != null) '_date': date,
-        if (rank != null) 'rank': rank,
-      };
+  Map<String, dynamic> toMap() => {..._raw, 'id': id};
 
   static String? _asString(dynamic v) {
     if (v == null) return null;

@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -116,32 +116,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               ),
             ],
           ),
-          actions: [
-            PopupMenuButton<double>(
-              icon: const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
-              tooltip: 'Памер шрыфту',
-              onSelected: (size) =>
-                  ref.read(settingsProvider.notifier).setFontSize(size),
-              itemBuilder: (_) {
-                final current = ref.read(settingsProvider).fontSize;
-                return [
-                  for (final size in [14.0, 16.0, 18.0, 20.0, 24.0])
-                    PopupMenuItem(
-                      value: size,
-                      child: Text(
-                        '${size.toInt()} pt',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: size == current
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                ];
-              },
-            ),
-          ],
+          actions: const [TextScaleControl()],
         ),
         body: Stack(
           children: [

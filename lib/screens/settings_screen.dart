@@ -30,6 +30,8 @@ class SettingsScreen extends ConsumerWidget {
       HiveService.getLastSync('prayers'),
       HiveService.getLastSync('days'),
       HiveService.getLastSync('yearOptions'),
+      HiveService.getLastSync('invitatoriums'),
+      HiveService.getLastSync('completoriums'),
     ]);
 
     return AmbientWash(
@@ -84,10 +86,10 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Slider(
                   value: settings.fontSize,
-                  min: 12,
-                  max: 28,
-                  divisions: 8,
-                  label: '${settings.fontSize.toInt()}',
+                  min: kMinReaderFontSize,
+                  max: kMaxReaderFontSize,
+                  divisions: 11,
+                  label: '${readerFontScalePercent(settings.fontSize)}%',
                   onChanged: (val) =>
                       ref.read(settingsProvider.notifier).setFontSize(val),
                 ),
@@ -104,46 +106,51 @@ class SettingsScreen extends ConsumerWidget {
                 // Font family
                 Text('Шрыфт', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                ...kAvailableFonts.map((font) {
-                  final selected = settings.fontFamily == font;
-                  const previewSize = 15.0;
-                  final previewStyle = font == 'Сістэмны'
-                      ? const TextStyle(fontSize: previewSize)
-                      : GoogleFonts.getFont(font, fontSize: previewSize);
-                  return InkWell(
-                    onTap: () =>
-                        ref.read(settingsProvider.notifier).setFontFamily(font),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          Radio<String>(
-                            value: font,
-                            groupValue: settings.fontFamily,
-                            onChanged: (v) => ref
-                                .read(settingsProvider.notifier)
-                                .setFontFamily(v!),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(font, style: previewStyle),
-                                Text(
-                                  'Аб вечнай радасці спявае душа мая.',
-                                  style: previewStyle.copyWith(
-                                    fontSize: 13,
-                                    color: selected ? null : Colors.grey,
-                                  ),
+                RadioGroup<String>(
+                  groupValue: settings.fontFamily,
+                  onChanged: (font) {
+                    if (font != null) {
+                      ref.read(settingsProvider.notifier).setFontFamily(font);
+                    }
+                  },
+                  child: Column(
+                    children: kAvailableFonts.map((font) {
+                      final selected = settings.fontFamily == font;
+                      const previewSize = 15.0;
+                      final previewStyle = font == 'Сістэмны'
+                          ? const TextStyle(fontSize: previewSize)
+                          : GoogleFonts.getFont(font, fontSize: previewSize);
+                      return InkWell(
+                        onTap: () => ref
+                            .read(settingsProvider.notifier)
+                            .setFontFamily(font),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Row(
+                            children: [
+                              Radio<String>(value: font),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(font, style: previewStyle),
+                                    Text(
+                                      'Аб вечнай радасці спявае душа мая.',
+                                      style: previewStyle.copyWith(
+                                        fontSize: 13,
+                                        color: selected ? null : Colors.grey,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -295,6 +302,8 @@ class SettingsScreen extends ConsumerWidget {
                 _StatRow(label: 'Дні ў кэшы', count: stats.days),
                 _StatRow(label: 'Гады', count: stats.years),
                 _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
+                _StatRow(label: 'Заклік', count: stats.invitatoriums),
+                _StatRow(label: 'Камплета', count: stats.completoriums),
                 _StatRow(label: 'Абраныя', count: settings.favoriteIds.length),
                 const SizedBox(height: 24),
                 const Divider(),

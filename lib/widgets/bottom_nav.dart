@@ -10,9 +10,14 @@ class AppBottomNav extends ConsumerWidget {
   final String currentLocation;
   const AppBottomNav({super.key, required this.currentLocation});
 
-  int _getIndex() {
+  int _getIndex(DateTime selectedDate) {
     if (currentLocation.startsWith('/picker')) return 0;
-    return 1;
+    final now = DateTime.now();
+    final isToday =
+        selectedDate.year == now.year &&
+        selectedDate.month == now.month &&
+        selectedDate.day == now.day;
+    return isToday ? 1 : 2;
   }
 
   bool _showDayArrows() {
@@ -28,7 +33,7 @@ class AppBottomNav extends ConsumerWidget {
     }
     return _LiquidGlassNav(
       currentLocation: currentLocation,
-      selectedIndex: _getIndex(),
+      selectedIndex: _getIndex(ref.watch(selectedDateProvider)),
       showDayArrows: _showDayArrows(),
     );
   }
@@ -58,42 +63,39 @@ class _LiquidGlassNav extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final tokens = GlassTokens.of(context);
-    final arrowColor = tokens.isDark
-        ? Colors.white.withValues(alpha: 0.82)
-        : Colors.black.withValues(alpha: 0.72);
+    final narrow = MediaQuery.sizeOf(context).width < 360;
+    final controlSize = narrow ? 52.0 : 56.0;
+    final gap = narrow ? 8.0 : 12.0;
 
     return SizedBox(
-      height: 72 + bottomInset,
+      height: 88 + bottomInset,
       child: Stack(
         children: [
           Positioned(
             left: 0,
             right: 0,
-            top: 4,
+            top: 10,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (showDayArrows) ...[
                   _DayArrowButton(
                     icon: PhosphorIconsRegular.caretLeft,
-                    color: arrowColor,
+                    size: controlSize,
                     tooltip: 'Папярэдні дзень',
                     onTap: () => _shiftDay(ref, -1),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: gap),
                 ],
                 _GlassPill(
-                  seasonColor: seasonColor,
                   selectedIndex: selectedIndex,
                   onTap: (i) => _onTap(i, context, ref),
                 ),
                 if (showDayArrows) ...[
-                  const SizedBox(width: 10),
+                  SizedBox(width: gap),
                   _DayArrowButton(
                     icon: PhosphorIconsRegular.caretRight,
-                    color: arrowColor,
+                    size: controlSize,
                     tooltip: 'Наступны дзень',
                     onTap: () => _shiftDay(ref, 1),
                   ),
@@ -137,30 +139,37 @@ class _LiquidGlassNav extends ConsumerWidget {
 
 class _DayArrowButton extends StatelessWidget {
   final PhosphorIconData icon;
-  final Color color;
+  final double size;
   final String tooltip;
   final VoidCallback onTap;
 
   const _DayArrowButton({
     required this.icon,
-    required this.color,
+    required this.size,
     required this.tooltip,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Tooltip(
       message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(22),
-          child: SizedBox(
-            width: 44,
-            height: 44,
-            child: Center(child: PhosphorIcon(icon, size: 22, color: color)),
+      child: GlassSurface(
+        style: GlassStyle.pill,
+        borderRadius: BorderRadius.circular(size / 2),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(size / 2),
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: Center(
+                child: PhosphorIcon(icon, size: 20, color: cs.onSurface),
+              ),
+            ),
           ),
         ),
       ),
@@ -169,15 +178,10 @@ class _DayArrowButton extends StatelessWidget {
 }
 
 class _GlassPill extends StatelessWidget {
-  final Color seasonColor;
   final int selectedIndex;
   final ValueChanged<int> onTap;
 
-  const _GlassPill({
-    required this.seasonColor,
-    required this.selectedIndex,
-    required this.onTap,
-  });
+  const _GlassPill({required this.selectedIndex, required this.onTap});
 
   static const _kItems = [
     (
@@ -203,9 +207,8 @@ class _GlassPill extends StatelessWidget {
 
     return GlassSurface(
       style: GlassStyle.pill,
-      seasonColor: seasonColor,
       child: SizedBox(
-        height: 62,
+        height: 64,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -254,24 +257,17 @@ class _PillItem extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 56,
-        height: 62,
+        height: 64,
         child: Center(
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeInOut,
-            width: isSelected ? 48 : 40,
-            height: 40,
+            width: 48,
+            height: 48,
             decoration: isSelected
                 ? BoxDecoration(
                     color: indicatorColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(24),
                   )
                 : null,
             child: Center(
