@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/models/year_options.dart';
 
 /// Screen showing list of available liturgical hours for a day.
 class HoraPickerScreen extends ConsumerStatefulWidget {
@@ -93,12 +94,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
       _templates = option?.templates ?? const [];
       _loading = false;
     });
-    unawaited(
-      _loadReadingSubtitle(
-        calendar,
-        dynamicDates,
-      ),
-    );
+    unawaited(_loadReadingSubtitle(calendar, dynamicDates));
   }
 
   Future<void> _loadReadingSubtitle(
@@ -329,9 +325,9 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                     seasonColor: dayColor,
                     borderRadius: BorderRadius.circular(22),
                     padding: EdgeInsets.zero,
-                child: _ReadingTile(
-                  color: dayColor,
-                  subtitle: _readingSubtitle,
+                    child: _ReadingTile(
+                      color: dayColor,
+                      subtitle: _readingSubtitle,
                       onTap: () => context.push(
                         '/readings/$dateKey?dayId=${widget.dayId}',
                       ),

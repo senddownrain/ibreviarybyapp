@@ -79,11 +79,13 @@ List<ReadingCelebrationGroup> groupReadings(List<ParsedReading> readings) {
     map.putIfAbsent(key, () => []).add(reading);
   }
   return map.entries
-      .map((e) => ReadingCelebrationGroup(
-            key: e.key,
-            label: _groupLabel(e.value),
-            documents: e.value,
-          ))
+      .map(
+        (e) => ReadingCelebrationGroup(
+          key: e.key,
+          label: _groupLabel(e.value),
+          documents: e.value,
+        ),
+      )
       .toList();
 }
 

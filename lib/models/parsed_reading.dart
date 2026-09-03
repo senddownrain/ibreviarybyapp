@@ -195,8 +195,7 @@ class ParsedReading {
       if (rank != null) '_rank': rank,
       if (places.isNotEmpty) '_place': places,
       if (variant != null) '_variant': variant,
-      if (calendarDayOfWeek != null)
-        '_calendarDayOfWeek': calendarDayOfWeek,
+      if (calendarDayOfWeek != null) '_calendarDayOfWeek': calendarDayOfWeek,
       '_hasReadings': hasReadings,
     };
   }

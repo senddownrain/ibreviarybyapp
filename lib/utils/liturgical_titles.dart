@@ -81,7 +81,8 @@ String formatLiturgicalPeriodTitle({
 String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {
   final periodType = day.periodType ?? day.field('_periodType') ?? '';
   final periodWeek =
-      day.periodWeekNumber ?? int.tryParse(day.field('_periodWeekNumber') ?? '');
+      day.periodWeekNumber ??
+      int.tryParse(day.field('_periodWeekNumber') ?? '');
   final dayOfWeek =
       day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '');
   final hasCelebration =
@@ -110,8 +111,7 @@ String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {
 }
 
 String liturgicalDayPeriodLabel(LiturgicalDay day) {
-  if (day.field('_kind') == 'office-for-dead' ||
-      day.id == 'office-for-dead') {
+  if (day.field('_kind') == 'office-for-dead' || day.id == 'office-for-dead') {
     return 'Памінальны афіцый';
   }
   return periodLabelMap[day.periodType ?? day.field('_periodType')] ??
@@ -119,8 +119,7 @@ String liturgicalDayPeriodLabel(LiturgicalDay day) {
 }
 
 String liturgicalDayRankLabel(LiturgicalDay day) {
-  if (day.field('_kind') == 'office-for-dead' ||
-      day.id == 'office-for-dead') {
+  if (day.field('_kind') == 'office-for-dead' || day.id == 'office-for-dead') {
     return '';
   }
   final rank = day.rank ?? day.field('_feastType') ?? '';
@@ -130,7 +129,8 @@ String liturgicalDayRankLabel(LiturgicalDay day) {
 String liturgicalDayPsalterLabel(LiturgicalDay day, DateTime date) {
   final periodType = day.periodType ?? day.field('_periodType') ?? '';
   final periodWeek =
-      day.periodWeekNumber ?? int.tryParse(day.field('_periodWeekNumber') ?? '');
+      day.periodWeekNumber ??
+      int.tryParse(day.field('_periodWeekNumber') ?? '');
   if (periodType.isEmpty || periodWeek == null) return '';
   final week = calculatePsalterWeek(
     date: date,
@@ -140,4 +140,3 @@ String liturgicalDayPsalterLabel(LiturgicalDay day, DateTime date) {
   final numeral = toRomanNumeral(week);
   return numeral.isEmpty ? '' : '$numeral тыдзень Псалтыра';
 }
-

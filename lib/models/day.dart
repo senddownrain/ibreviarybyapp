@@ -43,9 +43,10 @@ class LiturgicalDay {
   factory LiturgicalDay.fromMap(Map<String, dynamic> data) {
     return LiturgicalDay(
       id: data['id']?.toString() ?? data['_id']?.toString() ?? '',
-      title: _asString(data['title']),
+      title: _asString(data['title']) ?? _asString(data['_title']),
       feastName: _asString(data['feastName']) ?? _asString(data['_feastName']),
-      feastComment: _asString(data['feastComment']),
+      feastComment:
+          _asString(data['feastComment']) ?? _asString(data['comment']),
       periodType: _asString(data['_periodType']),
       periodWeekNumber: _asInt(data['_periodWeekNumber']),
       dayOfWeek: _asInt(data['_dayOfWeek']),

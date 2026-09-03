@@ -42,9 +42,28 @@ const _kInvitRubric =
     'у залежнасці ад таго, якая з гэтых літургічных гадзінаў распачынае '
     'малітву дня.</em></span></p>';
 
-const _kEndOfHour =
-    '<p><span style="color:red">К.</span> Няхай Пан благаславіць нас, абароніць ад усялякага зла і давядзе да жыцця вечнага.</p>'
-    '<p><span style="color:red">Н.</span> Амэн.</p>';
+const _kEndOfSext =
+    '<p><span style="color:red">К.</span> Благаславім Пана.</p>'
+    '<p><span style="color:red">Н.</span> Дзякуем Пану Богу.</p>';
+
+const _kEndOfVesper =
+    '<p><span style="color:red"><em>Потым, калі прысутнічае святар або дыякан, '
+    'ён рассылае народ, кажучы:</em></span></p>'
+    '<p><span style="color:red">С.</span> Пан з вамі.<br>'
+    '<span style="color:red">Н.</span> І з духам тваім.<br>'
+    '<span style="color:red">С.</span> Няхай благаславіць вас Бог усемагутны, '
+    'Айцец і Сын, і Дух Святы.<br>'
+    '<span style="color:red">Н.</span> Амэн.</p>'
+    '<p><span style="color:red"><em>Калі адбываецца рассыланне народу, '
+    'дадаецца заклік:</em></span></p>'
+    '<p><span style="color:red">С.</span> Ідзіце ў супакоі Хрыста.<br>'
+    '<span style="color:red">Н.</span> Дзякуем Пану Богу.</p>'
+    '<p><span style="color:red"><em>Калі святар або дыякан адсутнічаюць ці '
+    'калі Гадзіна чытаецца індывідуальна, то яна завяршаецца наступным '
+    'чынам:</em></span></p>'
+    '<p><span style="color:red">К.</span> Няхай Пан благаславіць нас, абароніць '
+    'ад усялякага зла і давядзе да жыцця вечнага.<br>'
+    '<span style="color:red">Н.</span> Амэн.</p>';
 
 const _kEndOfComplineBlessing =
     '<p><span style="color:red">К.</span> Ноч спакойную і смерць шчаслівую няхай дасць нам Бог усемагутны, Айцец і Сын, і Дух Святы.</p>'
@@ -222,8 +241,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         final tomorrowDay = candidates.where(isUniversal).firstOrNull;
         if (tomorrowDay != null) {
           final title = liturgicalDayDisplayTitle(tomorrowDay, tomorrow);
-          _vespersRubric =
-              'I Нешпары · ${title.isEmpty ? 'нядзелі' : title}';
+          _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'нядзелі' : title}';
           return tomorrowDay;
         }
       }
@@ -533,7 +551,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(_OraItem.html(_kTeDeum));
     }
     _addField(items, day, 'officeOfReadingsPr', 'Малітва');
-    if (!skipEnding) items.add(_OraItem.html(_kEndOfHour));
+    if (!skipEnding) items.add(_OraItem.html(_kEndOfSext));
     return items;
   }
 
@@ -563,7 +581,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'laudesInter', 'Просьбы');
     items.add(_OraItem.plain(_kPaterNoster));
     _addField(items, day, 'laudesPr', 'Малітва');
-    items.add(_OraItem.html(_kEndOfHour));
+    items.add(_OraItem.html(_kEndOfVesper));
     return items;
   }
 
@@ -603,7 +621,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final pr = daytimeHourField(day, num, 'Pr');
     if (pr.isNotEmpty) items.add(_OraItem.labeled('Малітва', pr));
 
-    items.add(_OraItem.html(_kEndOfHour));
+    items.add(_OraItem.html(_kEndOfSext));
     return items;
   }
 
@@ -658,7 +676,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(_OraItem.labeled('Малітва', effectivePr));
     }
 
-    items.add(_OraItem.html(_kEndOfHour));
+    items.add(_OraItem.html(_kEndOfVesper));
     return items;
   }
 
@@ -791,7 +809,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'laudesInter', 'Просьбы');
     items.add(_OraItem.plain(_kPaterNoster));
     _addField(items, day, 'laudesPr', 'Малітва');
-    items.add(_OraItem.html(_kEndOfHour));
+    items.add(_OraItem.html(_kEndOfVesper));
     return items;
   }
 
@@ -959,9 +977,10 @@ class _OraItem {
           child: Text(
             content.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              fontSize: 16,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.5,
-              color: cs.onSurface.withValues(alpha: 0.45),
+              letterSpacing: 1.3,
+              color: cs.onSurface.withValues(alpha: 0.55),
             ),
           ),
         );
@@ -1175,9 +1194,9 @@ class _DayHeading extends StatelessWidget {
                 Expanded(
                   child: Text(
                     dateText,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ),
                 if (rankLabel.isNotEmpty)

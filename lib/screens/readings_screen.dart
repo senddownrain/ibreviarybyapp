@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
+import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
@@ -13,6 +15,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
+import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 
 class ReadingsScreen extends ConsumerStatefulWidget {
   /// Calendar date string, e.g. "2026-03-21" (date-based loading).
@@ -130,9 +133,10 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                     reading.dayIds.contains(widget.dayId),
               );
             }).firstOrNull;
-      final activeKey = linkedGroup?.key ??
-          (groups.isNotEmpty ? groups.first.key : null);
-      final activeDocs = linkedGroup?.documents ??
+      final activeKey =
+          linkedGroup?.key ?? (groups.isNotEmpty ? groups.first.key : null);
+      final activeDocs =
+          linkedGroup?.documents ??
           (groups.isNotEmpty ? groups.first.documents : readings);
 
       _tabController?.dispose();
@@ -240,7 +244,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: GlassSurface(
         style: GlassStyle.soft,
-        seasonColor: ref.watch(liturgicalSeasonColorProvider),
+        seasonColor: _readingColor(),
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,12 +355,27 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   }
 
   Widget _readingsBackdrop({required Widget child}) {
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final seasonColor = _readingColor();
     return Stack(
       children: [
         AmbientWash.hero(seasonColor: seasonColor),
         child,
       ],
+    );
+  }
+
+  Color _readingColor() {
+    final documents = _activeGroupDocuments();
+    if (documents.isEmpty) {
+      return ref.watch(liturgicalSeasonColorProvider);
+    }
+    final data = documents.first.toMap();
+    if (widget.dayId == 'office-for-dead') {
+      data['_kind'] = 'office-for-dead';
+    }
+    return liturgicalColorForDay(
+      LiturgicalDay.fromMap(data),
+      fallbackPeriodType: documents.first.periodType ?? 'ordinary',
     );
   }
 
@@ -405,7 +424,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   @override
   Widget build(BuildContext context) {
     final title = _title;
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final seasonColor = _readingColor();
 
     // Loading
     if (_loading) {
@@ -444,7 +463,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Не атрымалася загрузіць чытанні',
+                  'Памылка загрузкі чытанняў',
                   style: TextStyle(color: cs.onSurface),
                 ),
                 const SizedBox(height: 6),
@@ -488,8 +507,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
               ),
               const SizedBox(height: 12),
               Text(
-                'Чытанні не знойдзены',
+                'Чытанні для гэтага дня не знойдзены',
                 style: TextStyle(color: cs.onSurface),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Магчыма, яны яшчэ не дададзены ў базу даных',
+                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
               ),
               const SizedBox(height: 16),
               FilledButton.icon(
@@ -518,6 +542,10 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
           child: Column(
             children: [
               SizedBox(height: _contentTopInset),
+              _ReadingsPageHeading(
+                dateStr: widget.dateStr,
+                seasonColor: seasonColor,
+              ),
               _celebrationPicker(context),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -633,20 +661,13 @@ class _TabState {
 
 // ---------------------------------------------------------------------------
 
-class _ReadingBody extends ConsumerWidget {
-  final ParsedReading reading;
+class _ReadingsPageHeading extends StatelessWidget {
   final String? dateStr;
   final Color seasonColor;
-  final bool compactTop;
-  final Widget? celebrationPicker;
-  final VoidCallback? onRefresh;
-  const _ReadingBody({
-    required this.reading,
-    this.dateStr,
+
+  const _ReadingsPageHeading({
+    required this.dateStr,
     required this.seasonColor,
-    this.compactTop = false,
-    this.celebrationPicker,
-    this.onRefresh,
   });
 
   static const _weekdays = {
@@ -674,23 +695,78 @@ class _ReadingBody extends ConsumerWidget {
     'снежня',
   ];
 
-  String? _formattedDate() {
-    if (dateStr == null) return null;
-    final d = DateTime.tryParse(dateStr!);
-    if (d == null) return null;
-    // Flutter weekday: Mon=1..Sun=7; our map: Sun=1..Sat=7
-    final dow = d.weekday == 7 ? 1 : d.weekday + 1;
-    final dayName = _weekdays[dow] ?? '';
-    final month = _months[d.month];
-    final today = DateTime.now();
-    final prefix = DateUtils.isSameDay(d, today) ? 'Сёння, ' : '';
-    return '$prefix$dayName, ${d.day} $month ${d.year}';
+  String? get formattedDate {
+    final date = DateTime.tryParse(dateStr ?? '');
+    if (date == null) return null;
+    final dayOfWeek = date.weekday == DateTime.sunday ? 1 : date.weekday + 1;
+    final prefix = DateUtils.isSameDay(date, DateTime.now()) ? 'Сёння, ' : '';
+    return '$prefix${_weekdays[dayOfWeek]}, '
+        '${date.day} ${_months[date.month]} ${date.year}';
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final reader = ReaderTheme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Чытанні', style: reader.displayTitle(36)),
+          if (formattedDate case final date?) ...[
+            const SizedBox(height: 9),
+            Row(
+              children: [
+                Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    color: seasonColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text(
+                    date,
+                    style: reader
+                        .referenceStyle(14)
+                        .copyWith(
+                          color: seasonColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+class _ReadingBody extends ConsumerWidget {
+  final ParsedReading reading;
+  final String? dateStr;
+  final Color seasonColor;
+  final bool compactTop;
+  final Widget? celebrationPicker;
+  final VoidCallback? onRefresh;
+  const _ReadingBody({
+    required this.reading,
+    this.dateStr,
+    required this.seasonColor,
+    this.compactTop = false,
+    this.celebrationPicker,
+    this.onRefresh,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reader = ReaderTheme.of(context);
-    final formattedDate = _formattedDate();
     final topPad = compactTop
         ? 12.0
         : MediaQuery.paddingOf(context).top + kToolbarHeight + 12;
@@ -705,218 +781,214 @@ class _ReadingBody extends ConsumerWidget {
               padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: GlassSurface(
-                  style: GlassStyle.card,
-                  seasonColor: seasonColor,
-                  borderRadius: BorderRadius.circular(28),
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (celebrationPicker != null) ...[
-                        celebrationPicker!,
-                        const SizedBox(height: 8),
-                      ],
-                      if (formattedDate != null) ...[
-                        Row(
-                          children: [
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (!compactTop)
+                      _ReadingsPageHeading(
+                        dateStr: dateStr,
+                        seasonColor: seasonColor,
+                      ),
+                    if (celebrationPicker != null) ...[
+                      celebrationPicker!,
+                      const SizedBox(height: 8),
+                    ],
+                    GlassSurface(
+                      style: GlassStyle.card,
+                      seasonColor: seasonColor,
+                      borderRadius: BorderRadius.circular(28),
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if ((reading.title ?? '').trim().isNotEmpty) ...[
                             Container(
-                              width: 9,
-                              height: 9,
+                              width: double.infinity,
+                              padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
                               decoration: BoxDecoration(
-                                color: reader.rubric,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 9),
-                            Expanded(
-                              child: Text(
-                                formattedDate,
-                                style: reader
-                                    .referenceStyle(14)
-                                    .copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-                      ],
-                      if ((reading.title ?? '').trim().isNotEmpty) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: reader.border),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'ЛІТУРГІЯ СЛОВА',
-                                style: reader
-                                    .referenceStyle(11)
-                                    .copyWith(letterSpacing: 1.2),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                reading.title!,
-                                style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(
-                                      fontFamily: textStyle.fontFamily,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.28,
-                                    ),
-                              ),
-                              if ((reading.year ?? '').isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 9,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: reader.rubricSoft,
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(
-                                    'Цыкл ${reading.year == '1' ? 'I' : reading.year == '2' ? 'II' : reading.year}',
-                                    style: reader.referenceStyle(11).copyWith(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
+                                border: Border(
+                                  bottom: BorderSide(color: reader.border),
                                 ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                      ],
-                      if (!reading.hasReadings) ...[
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              PhosphorIcon(
-                                PhosphorIconsRegular.info,
-                                size: 18,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ЛІТУРГІЯ СЛОВА',
+                                    style: reader
+                                        .referenceStyle(11)
+                                        .copyWith(letterSpacing: 1.2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    reading.title!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          fontFamily: textStyle.fontFamily,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.28,
+                                        ),
+                                  ),
+                                  if ((reading.year ?? '').isNotEmpty) ...[
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 9,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: reader.rubricSoft,
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Цыкл ${reading.year == '1'
+                                            ? 'I'
+                                            : reading.year == '2'
+                                            ? 'II'
+                                            : reading.year}',
+                                        style: reader
+                                            .referenceStyle(11)
+                                            .copyWith(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                          ],
+                          if (!reading.hasReadings) ...[
+                            Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSecondaryContainer,
+                                ).colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
-                                  style: TextStyle(
-                                    fontSize:
-                                        (textStyle.fontSize ?? 16) * 0.875,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  PhosphorIcon(
+                                    PhosphorIconsRegular.info,
+                                    size: 18,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSecondaryContainer,
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      if (!hasContent) ...[
-                        const SizedBox(height: 24),
-                        Center(
-                          child: Column(
-                            children: [
-                              PhosphorIcon(
-                                PhosphorIconsLight.bookOpen,
-                                size: 48,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Тэкст чытання пакуль не загружаны',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              if (onRefresh != null) ...[
-                                const SizedBox(height: 16),
-                                FilledButton.icon(
-                                  onPressed: onRefresh,
-                                  icon: const PhosphorIcon(
-                                    PhosphorIconsRegular.arrowsClockwise,
-                                    size: 18,
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
+                                      style: TextStyle(
+                                        fontSize:
+                                            (textStyle.fontSize ?? 16) * 0.875,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondaryContainer,
+                                      ),
+                                    ),
                                   ),
-                                  label: const Text('Абнавіць'),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                      if (reading.firstReading != null)
-                        _ReadingSection(
-                          label: reading.hasTwoReadings
-                              ? 'ПЕРШАЕ ЧЫТАННЕ'
-                              : 'ЧЫТАННЕ',
-                          section: reading.firstReading!,
-                          textStyle: textStyle,
-                          reader: reader,
-                        ),
-                      if (reading.psalm != null)
-                        _PsalmSection(
-                          psalm: reading.psalm!,
-                          textStyle: textStyle,
-                          reader: reader,
-                        ),
-                      if (reading.reading2 != null)
-                        _ReadingSection(
-                          label: 'ДРУГОЕ ЧЫТАННЕ',
-                          section: reading.reading2!,
-                          textStyle: textStyle,
-                          reader: reader,
-                        ),
-                      if (reading.alleluia != null)
-                        _AlleluiaSection(
-                          alleluia: reading.alleluia!,
-                          textStyle: textStyle,
-                          reader: reader,
-                        ),
-                      if (reading.gospel != null)
-                        _ReadingSection(
-                          label: 'ЕВАНГЕЛЛЕ',
-                          section: reading.gospel!,
-                          textStyle: textStyle,
-                          reader: reader,
-                        ),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (!hasContent) ...[
+                            const SizedBox(height: 24),
+                            Center(
+                              child: Column(
+                                children: [
+                                  PhosphorIcon(
+                                    PhosphorIconsLight.bookOpen,
+                                    size: 48,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Тэкст чытання пакуль не загружаны',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  if (onRefresh != null) ...[
+                                    const SizedBox(height: 16),
+                                    FilledButton.icon(
+                                      onPressed: onRefresh,
+                                      icon: const PhosphorIcon(
+                                        PhosphorIconsRegular.arrowsClockwise,
+                                        size: 18,
+                                      ),
+                                      label: const Text('Абнавіць'),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (reading.firstReading != null)
+                            _ReadingSection(
+                              label: reading.hasTwoReadings
+                                  ? 'ПЕРШАЕ ЧЫТАННЕ'
+                                  : 'ЧЫТАННЕ',
+                              section: reading.firstReading!,
+                              textStyle: textStyle,
+                              reader: reader,
+                            ),
+                          if (reading.psalm != null)
+                            _PsalmSection(
+                              psalm: reading.psalm!,
+                              textStyle: textStyle,
+                              reader: reader,
+                            ),
+                          if (reading.reading2 != null)
+                            _ReadingSection(
+                              label: 'ДРУГОЕ ЧЫТАННЕ',
+                              section: reading.reading2!,
+                              textStyle: textStyle,
+                              reader: reader,
+                            ),
+                          if (reading.alleluia != null)
+                            _AlleluiaSection(
+                              alleluia: reading.alleluia!,
+                              textStyle: textStyle,
+                              reader: reader,
+                            ),
+                          if (reading.gospel != null)
+                            _ReadingSection(
+                              label: 'ЕВАНГЕЛЛЕ',
+                              section: reading.gospel!,
+                              textStyle: textStyle,
+                              reader: reader,
+                            ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -979,6 +1051,38 @@ class _BibleRef extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 
+class _ReadingText extends StatelessWidget {
+  final String text;
+  final TextStyle textStyle;
+
+  const _ReadingText({required this.text, required this.textStyle});
+
+  @override
+  Widget build(BuildContext context) {
+    if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(text)) {
+      return Html(
+        data: text,
+        style: {
+          'body': Style(
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+            color: textStyle.color ?? ReaderTheme.of(context).ink,
+            fontFamily: textStyle.fontFamily,
+            fontSize: FontSize(textStyle.fontSize ?? 16),
+            fontWeight: textStyle.fontWeight,
+            lineHeight: LineHeight(1.78),
+            textAlign: TextAlign.left,
+          ),
+          'p': Style(margin: Margins.only(bottom: 14)),
+        },
+      );
+    }
+    return SelectableText(text, style: textStyle.copyWith(height: 1.78));
+  }
+}
+
+// ---------------------------------------------------------------------------
+
 class _ReadingSection extends StatefulWidget {
   final String label;
   final ParsedSection section;
@@ -1009,6 +1113,13 @@ class _ReadingSectionState extends State<_ReadingSection> {
     if (trimmed.startsWith(bible)) {
       return trimmed.substring(bible.length).trimLeft();
     }
+    final withoutReference = trimmed.replaceFirst(
+      RegExp(
+        r'^[А-ЯЁІЎA-Z][а-яёіўa-z]{0,4}\.?\s+\d+[\d\s,.\-–()абвabcABC]*\s*',
+      ),
+      '',
+    );
+    if (withoutReference != trimmed) return withoutReference.trimLeft();
     return text;
   }
 
@@ -1030,6 +1141,10 @@ class _ReadingSectionState extends State<_ReadingSection> {
 
     final display = bodyText;
     final isGospel = widget.label == 'ЕВАНГЕЛЛЕ';
+    final hasAcclamation = RegExp(
+      r'Гэта\s+слова\s+(Пана|Бога|Божае|Пана\s+Бога)',
+      caseSensitive: false,
+    ).hasMatch(text);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1052,7 +1167,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
               s.comment!,
               style: widget.textStyle.copyWith(
                 fontSize: base * 0.875,
-                color: widget.reader.rubric,
+                color: widget.reader.muted,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w500,
               ),
@@ -1068,7 +1183,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
           ),
         if (display.isNotEmpty) ...[
           const SizedBox(height: 6),
-          SelectableText(display, style: widget.textStyle),
+          _ReadingText(text: display, textStyle: widget.textStyle),
         ],
         // Closing phrase bold + separated
         if (closingPhrase != null) ...[
@@ -1077,7 +1192,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
             closingPhrase,
             style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
-        ] else if (display.isNotEmpty) ...[
+        ] else if (display.isNotEmpty && !hasAcclamation) ...[
           const SizedBox(height: 12),
           Text(
             isGospel ? 'Гэта Слова Пана.' : 'Гэта Слова Божае.',
@@ -1143,7 +1258,7 @@ class _PsalmSection extends StatelessWidget {
           ],
           if (psalm.text?.isNotEmpty == true) ...[
             const SizedBox(height: 8),
-            SelectableText(psalm.text!, style: textStyle),
+            _ReadingText(text: psalm.text!, textStyle: textStyle),
           ],
         ],
 
@@ -1162,14 +1277,11 @@ class _PsalmSection extends StatelessWidget {
             ],
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: SelectableText(psalm.verses[i], style: textStyle),
+              child: _ReadingText(text: psalm.verses[i], textStyle: textStyle),
             ),
-            if (i < psalm.verses.length - 1)
-              Divider(height: 1, color: cs.outlineVariant),
           ],
           // After last verse: altChorus or chorus again
           if (hasChorus) ...[
-            Divider(height: 1, color: cs.outlineVariant),
             const SizedBox(height: 8),
             if (psalm.altChorus?.isNotEmpty == true)
               _ChorusBox(
@@ -1280,28 +1392,18 @@ class _AlleluiaSection extends StatelessWidget {
           textStyle: textStyle,
           reader: reader,
         ),
-        _acclamationLine(context),
         if (alleluia.bible != null) ...[
           const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              alleluia.bible!,
-              style: textStyle.copyWith(
-                fontStyle: FontStyle.italic,
-                fontSize: (textStyle.fontSize ?? 16) * 0.85,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
+          _BibleRef(alleluia.bible!, textStyle: textStyle, reader: reader),
         ],
+        const SizedBox(height: 8),
+        _acclamationLine(context),
         if (alleluia.verse != null) ...[
           const SizedBox(height: 4),
-          SelectableText(alleluia.verse!, style: textStyle),
+          _ReadingText(text: alleluia.verse!, textStyle: textStyle),
         ],
         _acclamationLine(context),
       ],
     );
   }
 }
-

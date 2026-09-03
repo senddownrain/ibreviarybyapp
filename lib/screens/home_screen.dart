@@ -436,18 +436,6 @@ class _DayOptionCard extends ConsumerWidget {
                     ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
-                if (day?.feastComment != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    day!.feastComment!,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: cs.onSurfaceVariant,
-                    ),
-                  ),
-                ],
                 if (!hasDay) ...[
                   const SizedBox(height: 4),
                   Text(

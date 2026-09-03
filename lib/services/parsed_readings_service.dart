@@ -354,9 +354,7 @@ class ParsedReadingsService {
   ) {
     final groups = <String, List<ParsedReading>>{};
     for (final reading in docs) {
-      groups
-          .putIfAbsent(readingCelebrationKey(reading), () => [])
-          .add(reading);
+      groups.putIfAbsent(readingCelebrationKey(reading), () => []).add(reading);
     }
     final sundayCycle = getCycleForDate(date, dayOfWeek: 1);
     final weekdayCycle = getWeekdayCycleForDate(date);
@@ -384,9 +382,7 @@ class ParsedReadingsService {
         .where((reading) => reading.calendarDayOfWeek == dayOfWeek)
         .toList();
     if (exact.isNotEmpty) return exact;
-    return docs
-        .where((reading) => reading.calendarDayOfWeek == null)
-        .toList();
+    return docs.where((reading) => reading.calendarDayOfWeek == null).toList();
   }
 
   List<ParsedReading> _selectActiveForDate(
