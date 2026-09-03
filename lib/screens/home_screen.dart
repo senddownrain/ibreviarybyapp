@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
+import 'package:mybrev_flutter/widgets/platform_date_picker.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -340,12 +341,11 @@ class HomeScreen extends ConsumerWidget {
     WidgetRef ref,
     DateTime date,
   ) async {
-    final picked = await showDatePicker(
+    final picked = await showPlatformDatePicker(
       context: context,
       initialDate: date,
       firstDate: DateTime(2019),
       lastDate: DateTime(2027, 12, 31),
-      locale: const Locale('be'),
     );
     if (picked != null && context.mounted) {
       ref.read(selectedDateProvider.notifier).state = picked;

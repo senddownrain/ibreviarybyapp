@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/widgets/platform_date_picker.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -123,12 +124,11 @@ class _LiquidGlassNav extends ConsumerWidget {
 
   Future<void> _pickDate(BuildContext context, WidgetRef ref) async {
     final current = ref.read(selectedDateProvider);
-    final picked = await showDatePicker(
+    final picked = await showPlatformDatePicker(
       context: context,
       initialDate: current,
       firstDate: DateTime(2019),
       lastDate: DateTime(2030),
-      locale: const Locale('be'),
     );
     if (picked != null && context.mounted) {
       ref.read(selectedDateProvider.notifier).state = picked;
