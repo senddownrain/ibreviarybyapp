@@ -152,35 +152,58 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
               style: GlassStyle.soft,
               borderRadius: BorderRadius.circular(22),
               padding: const EdgeInsets.all(5),
-              child: SegmentedButton<String>(
-                segments: allVersionMeta.map((e) {
-                  final isAvailable = availableVersions.any(
-                    (v) => v.id == e.key,
-                  );
-                  return ButtonSegment<String>(
-                    value: e.key,
-                    label: Text(
-                      e.value.langLabel,
-                      style: TextStyle(
-                        color: isAvailable
-                            ? null
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.38),
+              child: defaultTargetPlatform == TargetPlatform.iOS
+                  ? CupertinoSlidingSegmentedControl<String>(
+                      children: {
+                        for (final v in availableVersions)
+                          v.id: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: Text(
+                              kBibleVersionMeta[v.id]?.langLabel ?? v.id,
+                            ),
+                          ),
+                      },
+                      groupValue: currentVersionId,
+                      onValueChanged: (v) {
+                        if (v != null) {
+                          ref
+                              .read(settingsProvider.notifier)
+                              .setBibleVersion(v);
+                        }
+                      },
+                    )
+                  : SegmentedButton<String>(
+                      segments: allVersionMeta.map((e) {
+                        final isAvailable = availableVersions.any(
+                          (v) => v.id == e.key,
+                        );
+                        return ButtonSegment<String>(
+                          value: e.key,
+                          label: Text(
+                            e.value.langLabel,
+                            style: TextStyle(
+                              color: isAvailable
+                                  ? null
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.38),
+                            ),
+                          ),
+                          enabled: isAvailable,
+                        );
+                      }).toList(),
+                      selected: {currentVersionId},
+                      onSelectionChanged: (s) {
+                        ref
+                            .read(settingsProvider.notifier)
+                            .setBibleVersion(s.first);
+                      },
+                      style: const ButtonStyle(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
                       ),
                     ),
-                    enabled: isAvailable,
-                  );
-                }).toList(),
-                selected: {currentVersionId},
-                onSelectionChanged: (s) {
-                  ref.read(settingsProvider.notifier).setBibleVersion(s.first);
-                },
-                style: const ButtonStyle(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
             ),
           ),
           if (availableVersions.length < allVersionMeta.length)

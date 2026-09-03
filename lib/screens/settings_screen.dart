@@ -53,31 +53,55 @@ class SettingsScreen extends ConsumerWidget {
                 // Theme
                 Text('Тэма', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                SegmentedButton<ThemeMode>(
-                  segments: const [
-                    ButtonSegment(
-                      value: ThemeMode.system,
-                      icon: PhosphorIcon(
-                        PhosphorIconsRegular.circleHalf,
-                        size: 18,
+                if (defaultTargetPlatform == TargetPlatform.iOS)
+                  CupertinoSlidingSegmentedControl<ThemeMode>(
+                    children: const {
+                      ThemeMode.system: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text('Сістэма'),
                       ),
-                      label: Text('Сістэма'),
-                    ),
-                    ButtonSegment(
-                      value: ThemeMode.light,
-                      icon: PhosphorIcon(PhosphorIconsRegular.sun, size: 18),
-                      label: Text('Светлая'),
-                    ),
-                    ButtonSegment(
-                      value: ThemeMode.dark,
-                      icon: PhosphorIcon(PhosphorIconsRegular.moon, size: 18),
-                      label: Text('Цёмная'),
-                    ),
-                  ],
-                  selected: {settings.themeMode},
-                  onSelectionChanged: (s) =>
-                      ref.read(settingsProvider.notifier).setThemeMode(s.first),
-                ),
+                      ThemeMode.light: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text('Светлая'),
+                      ),
+                      ThemeMode.dark: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text('Цёмная'),
+                      ),
+                    },
+                    groupValue: settings.themeMode,
+                    onValueChanged: (v) {
+                      if (v != null) {
+                        ref.read(settingsProvider.notifier).setThemeMode(v);
+                      }
+                    },
+                  )
+                else
+                  SegmentedButton<ThemeMode>(
+                    segments: const [
+                      ButtonSegment(
+                        value: ThemeMode.system,
+                        icon: PhosphorIcon(
+                          PhosphorIconsRegular.circleHalf,
+                          size: 18,
+                        ),
+                        label: Text('Сістэма'),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.light,
+                        icon: PhosphorIcon(PhosphorIconsRegular.sun, size: 18),
+                        label: Text('Светлая'),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.dark,
+                        icon: PhosphorIcon(PhosphorIconsRegular.moon, size: 18),
+                        label: Text('Цёмная'),
+                      ),
+                    ],
+                    selected: {settings.themeMode},
+                    onSelectionChanged: (s) =>
+                        ref.read(settingsProvider.notifier).setThemeMode(s.first),
+                  ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -160,16 +184,30 @@ class SettingsScreen extends ConsumerWidget {
 
                 // Keep screen on
                 Text('Экран', style: Theme.of(context).textTheme.titleMedium),
-                SwitchListTile(
-                  title: const Text('Не гасіць экран'),
-                  subtitle: const Text(
-                    'Экран застаецца ўключаным падчас чытання малітваў',
+                if (defaultTargetPlatform == TargetPlatform.iOS)
+                  ListTile(
+                    title: const Text('Не гасіць экран'),
+                    subtitle: const Text(
+                      'Экран застаецца ўключаным падчас чытання малітваў',
+                    ),
+                    trailing: CupertinoSwitch(
+                      value: settings.keepScreenOn,
+                      onChanged: (v) =>
+                          ref.read(settingsProvider.notifier).setKeepScreenOn(v),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  )
+                else
+                  SwitchListTile(
+                    title: const Text('Не гасіць экран'),
+                    subtitle: const Text(
+                      'Экран застаецца ўключаным падчас чытання малітваў',
+                    ),
+                    value: settings.keepScreenOn,
+                    onChanged: (v) =>
+                        ref.read(settingsProvider.notifier).setKeepScreenOn(v),
+                    contentPadding: EdgeInsets.zero,
                   ),
-                  value: settings.keepScreenOn,
-                  onChanged: (v) =>
-                      ref.read(settingsProvider.notifier).setKeepScreenOn(v),
-                  contentPadding: EdgeInsets.zero,
-                ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
