@@ -53,7 +53,7 @@ class _LiquidGlassNav extends ConsumerWidget {
   });
 
   void _shiftDay(WidgetRef ref, int days) {
-    HapticFeedback.selectionClick();
+    HapticFeedback.lightImpact();
     final current = ref.read(selectedDateProvider);
     ref.read(homeNavDirectionProvider.notifier).state = days > 0 ? 1 : -1;
     ref.read(selectedDateProvider.notifier).state = current.add(
@@ -110,7 +110,7 @@ class _LiquidGlassNav extends ConsumerWidget {
   }
 
   void _onTap(int i, BuildContext context, WidgetRef ref) {
-    HapticFeedback.selectionClick();
+    HapticFeedback.lightImpact();
     switch (i) {
       case 0:
         context.go('/picker');

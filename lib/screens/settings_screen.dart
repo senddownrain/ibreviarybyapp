@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,6 +27,7 @@ class SettingsScreen extends ConsumerWidget {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     ref.watch(cacheEpochProvider); // refresh Hive stats after warmup
     final stats = CacheStats.collect();
+    final topPad = MediaQuery.paddingOf(context).top;
 
     final lastSync = _latestSync([
       HiveService.getLastSync('prayers'),
@@ -37,7 +40,7 @@ class SettingsScreen extends ConsumerWidget {
     return AmbientWash(
       seasonColor: seasonColor,
       child: ListView(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.fromLTRB(12, topPad + 62, 12, 12),
         children: [
           GlassSurface(
             style: GlassStyle.card,
@@ -418,22 +421,40 @@ class _CategoriesSection extends ConsumerWidget {
                   ),
                   tooltip: 'Выдаліць',
                   onPressed: () async {
-                    final ok = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Выдаліць катэгорыю?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('Адмена'),
+                    final ok = await (defaultTargetPlatform == TargetPlatform.iOS
+                      ? showCupertinoDialog<bool>(
+                          context: context,
+                          builder: (ctx) => CupertinoAlertDialog(
+                            title: const Text('Выдаліць катэгорыю?'),
+                            actions: [
+                              CupertinoDialogAction(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Адмена'),
+                              ),
+                              CupertinoDialogAction(
+                                isDestructiveAction: true,
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Выдаліць'),
+                              ),
+                            ],
                           ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text('Выдаліць'),
+                        )
+                      : showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Выдаліць катэгорыю?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Адмена'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Выдаліць'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
+                        ));
                     if (ok == true) {
                       ref
                           .read(settingsProvider.notifier)

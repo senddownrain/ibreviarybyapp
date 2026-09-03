@@ -778,7 +778,7 @@ class _ReadingBody extends ConsumerWidget {
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
+              padding: EdgeInsets.fromLTRB(12, topPad, 12, 40),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Column(
@@ -797,7 +797,7 @@ class _ReadingBody extends ConsumerWidget {
                       style: GlassStyle.card,
                       seasonColor: seasonColor,
                       borderRadius: BorderRadius.circular(28),
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                      padding: const EdgeInsets.fromLTRB(14, 18, 14, 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

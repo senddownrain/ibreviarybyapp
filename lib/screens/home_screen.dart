@@ -27,6 +27,7 @@ class HomeScreen extends ConsumerWidget {
     final bootstrap = ref.watch(dataBootstrapProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final navDir = ref.watch(homeNavDirectionProvider);
+    final topPad = MediaQuery.paddingOf(context).top;
     final tokens = GlassTokens.of(context);
     final titleColor = tokens.accentOnSurface(seasonColor);
     final cs = Theme.of(context).colorScheme;
@@ -48,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 22),
+                    padding: EdgeInsets.fromLTRB(12, topPad + 62, 12, 22),
                     child: GlassSurface(
                       style: GlassStyle.card,
                       seasonColor: seasonColor,

@@ -265,7 +265,7 @@ class PrayerDetailScreen extends ConsumerWidget {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+            padding: const EdgeInsets.fromLTRB(14, 22, 14, 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -308,7 +308,7 @@ class PrayerDetailScreen extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
+            padding: const EdgeInsets.fromLTRB(14, 22, 14, 28),
             child: _buildContent(context, prayer, textStyle, isMass: isMass),
           ),
         ],

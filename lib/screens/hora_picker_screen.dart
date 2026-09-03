@@ -228,7 +228,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.circle, size: 9, color: dayColor),
+                              PhosphorIcon(PhosphorIconsFill.circle, size: 9, color: dayColor),
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(

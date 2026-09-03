@@ -426,7 +426,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final topPad = MediaQuery.paddingOf(context).top + kToolbarHeight + 12;
     return ListView.builder(
-      padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
+      padding: EdgeInsets.fromLTRB(12, topPad, 12, 40),
       itemCount: sections.length,
       itemBuilder: (_, i) => sections[i].build(context, textStyle),
     );

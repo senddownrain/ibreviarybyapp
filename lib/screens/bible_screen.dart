@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,14 +36,21 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
   }
 
   void _openChapterPicker(BibleBookInfo book) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (_) => _ChapterPicker(book: book),
-    );
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (_) => _ChapterPicker(book: book),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        builder: (_) => _ChapterPicker(book: book),
+      );
+    }
   }
 
   @override
@@ -62,6 +71,7 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
     final ot = filtered.where((b) => b.order <= 39).toList();
     final nt = filtered.where((b) => b.order >= 40).toList();
     final cs = Theme.of(context).colorScheme;
+    final topPad = MediaQuery.paddingOf(context).top;
 
     return AmbientWash(
       seasonColor: seasonColor,
@@ -69,7 +79,7 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: EdgeInsets.fromLTRB(16, topPad + 62, 16, 8),
             child: Row(
               children: [
                 Expanded(
