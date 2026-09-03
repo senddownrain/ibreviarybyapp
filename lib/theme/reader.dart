@@ -32,9 +32,17 @@ class ReaderTheme {
   TextStyle body(double size, {String? family}) {
     final base = TextStyle(fontSize: size, height: 1.65, color: ink);
     if (family == null || family == 'Сістэмны') {
-      return GoogleFonts.literata(textStyle: base);
+      try {
+        return GoogleFonts.literata(textStyle: base);
+      } catch (_) {
+        return base;
+      }
     }
-    return GoogleFonts.getFont(family, textStyle: base);
+    try {
+      return GoogleFonts.getFont(family, textStyle: base);
+    } catch (_) {
+      return base;
+    }
   }
 
   TextStyle rubricStyle(double size, {String? family}) =>
