@@ -9,7 +9,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -174,7 +174,7 @@ class PrayerDetailScreen extends ConsumerWidget {
     return ReadingScaffold(
       builder: (context, textStyle) => Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar(
+        appBar: PlatformAppBar(
           title: Text(
             p.displayTitle.isNotEmpty ? p.displayTitle : 'Малітва',
             overflow: TextOverflow.ellipsis,

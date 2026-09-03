@@ -7,7 +7,7 @@ import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -430,7 +430,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (_loading) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(title),
+        appBar: PlatformAppBar.text(title),
         body: const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -449,7 +449,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       final cs = Theme.of(context).colorScheme;
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(title),
+        appBar: PlatformAppBar.text(title),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -495,7 +495,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       final cs = Theme.of(context).colorScheme;
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(title),
+        appBar: PlatformAppBar.text(title),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -534,7 +534,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (_tabs.length > 1 && _tabController != null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar(
+        appBar: PlatformAppBar(
           title: Text(title),
           actions: const [TextScaleControl()],
         ),
@@ -626,7 +626,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     final single = _displayReading();
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar(
+      appBar: PlatformAppBar(
         title: Text(title),
         actions: const [TextScaleControl()],
       ),

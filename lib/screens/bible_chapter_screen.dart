@@ -6,7 +6,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
@@ -89,7 +89,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     if (book == null || verses.isEmpty) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text('Біблія'),
+        appBar: PlatformAppBar.text('Біблія'),
         body: const Center(child: Text('Раздзел не знойдзены')),
       );
     }
@@ -97,7 +97,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     return ReadingScaffold(
       builder: (context, textStyle) => Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar(
+        appBar: PlatformAppBar(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

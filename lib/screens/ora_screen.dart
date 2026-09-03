@@ -15,7 +15,7 @@ import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -279,7 +279,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   Widget _loadingState(BuildContext context) => Scaffold(
     extendBodyBehindAppBar: true,
-    appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
+    appBar: PlatformAppBar.text(_oraTitle(widget.oraType)),
     body: const Center(child: CircularProgressIndicator()),
   );
 
@@ -311,7 +311,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       child: ReadingScaffold(
         builder: (context, textStyle) => Scaffold(
           extendBodyBehindAppBar: true,
-          appBar: IosGlassAppBar.text(
+          appBar: PlatformAppBar.text(
             _oraTitle(widget.oraType),
             actions: const [TextScaleControl()],
           ),
@@ -330,7 +330,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
+      appBar: PlatformAppBar.text(_oraTitle(widget.oraType)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -359,7 +359,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar.text(_oraTitle(widget.oraType)),
+      appBar: PlatformAppBar.text(_oraTitle(widget.oraType)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

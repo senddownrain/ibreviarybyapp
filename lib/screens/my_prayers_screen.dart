@@ -7,7 +7,7 @@ import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
 
 class MyPrayersScreen extends ConsumerWidget {
   const MyPrayersScreen({super.key});
@@ -20,7 +20,7 @@ class MyPrayersScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar.text('Мае малітвы'),
+      appBar: PlatformAppBar.text('Мае малітвы'),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/prayer/add'),
         tooltip: 'Новая малітва',

@@ -5,7 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/reading.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -39,7 +39,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
     if (raw == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text('Чытанне'),
+        appBar: PlatformAppBar.text('Чытанне'),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -62,7 +62,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
     return ReadingScaffold(
       builder: (context, textStyle) => Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar(
+        appBar: PlatformAppBar(
           title: Text(
             title.isNotEmpty ? title : 'Чытанне',
             overflow: TextOverflow.ellipsis,
