@@ -187,7 +187,7 @@ class PrayerDetailScreen extends ConsumerWidget {
                 color: isFav ? Colors.red : null,
               ),
               onPressed: () {
-                HapticFeedback.selectionClick();
+                HapticFeedback.lightImpact();
                 ref.read(settingsProvider.notifier).toggleFavorite(p.id);
               },
             ),

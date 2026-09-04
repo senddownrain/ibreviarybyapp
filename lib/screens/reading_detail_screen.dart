@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -68,14 +69,15 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
             overflow: TextOverflow.ellipsis,
           ),
           actions: [
-            IconButton(
-              icon: PhosphorIcon(
-                _showRaw ? PhosphorIconsFill.code : PhosphorIconsRegular.code,
-                size: 22,
+            if (kDebugMode)
+              IconButton(
+                icon: PhosphorIcon(
+                  _showRaw ? PhosphorIconsFill.code : PhosphorIconsRegular.code,
+                  size: 22,
+                ),
+                tooltip: _showRaw ? 'Аддаць рэндэрынг' : 'Паказаць HTML',
+                onPressed: () => setState(() => _showRaw = !_showRaw),
               ),
-              tooltip: _showRaw ? 'Аддаць рэндэрынг' : 'Паказаць HTML',
-              onPressed: () => setState(() => _showRaw = !_showRaw),
-            ),
             IconButton(
               icon: const PhosphorIcon(
                 PhosphorIconsRegular.shareNetwork,

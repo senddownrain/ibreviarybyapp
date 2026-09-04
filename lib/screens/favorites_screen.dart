@@ -118,7 +118,7 @@ class _FavoriteTile extends ConsumerWidget {
           ),
           tooltip: 'Выдаліць з абраных',
           onPressed: () {
-            HapticFeedback.selectionClick();
+            HapticFeedback.lightImpact();
             ref.read(settingsProvider.notifier).toggleFavorite(prayer.id);
           },
         ),

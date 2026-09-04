@@ -468,7 +468,7 @@ class _DayOptionCard extends ConsumerWidget {
         onTap: () {
           final dayId = day.id;
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
-          unawaited(DayPrefetchService().prefetch(date, option));
+          unawaited(DayPrefetchService().prefetch(date, option).catchError((_) {}));
           context.push('/hora/$dateKey/$dayId');
         },
         child: child,

@@ -512,21 +512,24 @@ class _CategoriesSection extends ConsumerWidget {
     WidgetRef ref,
     UserCategory? existing,
   ) {
-    showDialog(
-      context: context,
-      builder: (ctx) => _CategoryDialog(
-        existing: existing,
-        onSave: (name, tags) {
-          if (existing == null) {
-            ref.read(settingsProvider.notifier).addCategory(name, tags);
-          } else {
-            ref
-                .read(settingsProvider.notifier)
-                .updateCategory(existing.id, name, tags);
-          }
-        },
-      ),
-    );
+    void onSave(String name, List<String> tags) {
+      if (existing == null) {
+        ref.read(settingsProvider.notifier).addCategory(name, tags);
+      } else {
+        ref.read(settingsProvider.notifier).updateCategory(existing.id, name, tags);
+      }
+    }
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      showCupertinoDialog(
+        context: context,
+        builder: (ctx) => _CategoryDialog(existing: existing, onSave: onSave),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (ctx) => _CategoryDialog(existing: existing, onSave: onSave),
+      );
+    }
   }
 }
 

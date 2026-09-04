@@ -226,7 +226,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Стих $verseNum: цвет выделения',
+                  'Верш $verseNum: колер выдзялення',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
@@ -270,7 +270,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                     PhosphorIconsRegular.eraser,
                     size: 18,
                   ),
-                  label: const Text('Убрать выделение'),
+                  label: const Text('Зняць выдзяленне'),
                 ),
               ],
             ),

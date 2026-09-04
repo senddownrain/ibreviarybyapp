@@ -809,7 +809,7 @@ class _ReadingBody extends ConsumerWidget {
       builder: (context, textStyle) => LayoutBuilder(
         builder: (context, constraints) => Stack(
           children: [
-            AmbientWash.hero(seasonColor: seasonColor),
+            if (!compactTop) AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(12, topPad, 12, 40),
               child: ConstrainedBox(
