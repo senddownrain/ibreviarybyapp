@@ -97,6 +97,12 @@ class AppNavigationDrawer extends ConsumerWidget {
                         selected: location == '/prayers/favorites',
                         onTap: () => openDetail('/prayers/favorites'),
                       ),
+                      _DrawerItem(
+                        icon: PhosphorIconsRegular.notepad,
+                        title: 'Мае малітвы',
+                        selected: location.startsWith('/my-prayers'),
+                        onTap: () => navigate('/my-prayers'),
+                      ),
                       for (final category in settings.userCategories)
                         _DrawerItem(
                           icon: PhosphorIconsRegular.bookmark,
