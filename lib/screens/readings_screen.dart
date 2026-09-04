@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
@@ -180,6 +181,38 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       orElse: () => _groups.first,
     );
     return group.documents;
+  }
+
+  void _navigateDay(BuildContext context, int delta) {
+    if (widget.dateStr == null) return;
+    final date = DateTime.tryParse(widget.dateStr!);
+    if (date == null) return;
+    final newDate = date.add(Duration(days: delta));
+    final y = newDate.year.toString().padLeft(4, '0');
+    final m = newDate.month.toString().padLeft(2, '0');
+    final d = newDate.day.toString().padLeft(2, '0');
+    final newDateStr = '$y-$m-$d';
+    final dayId = widget.dayId;
+    context.replace(
+      '/readings/$newDateStr${dayId != null ? '?dayId=$dayId' : ''}',
+    );
+  }
+
+  List<Widget> _dayNavActions(BuildContext context) {
+    if (widget.dateStr == null) return const [TextScaleControl()];
+    return [
+      IconButton(
+        tooltip: 'Папярэдні дзень',
+        icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft, size: 20),
+        onPressed: () => _navigateDay(context, -1),
+      ),
+      IconButton(
+        tooltip: 'Наступны дзень',
+        icon: const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 20),
+        onPressed: () => _navigateDay(context, 1),
+      ),
+      const TextScaleControl(),
+    ];
   }
 
   void _selectCelebrationGroup(String key) {
@@ -536,7 +569,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         extendBodyBehindAppBar: true,
         appBar: PlatformAppBar(
           title: Text(title),
-          actions: const [TextScaleControl()],
+          actions: _dayNavActions(context),
         ),
         body: _readingsBackdrop(
           child: Column(
@@ -628,7 +661,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       extendBodyBehindAppBar: true,
       appBar: PlatformAppBar(
         title: Text(title),
-        actions: const [TextScaleControl()],
+        actions: _dayNavActions(context),
       ),
       body: _readingsBackdrop(
         child: _ReadingBody(

@@ -140,6 +140,12 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     return DateFormat('yyyy-MM-dd').format(widget.date);
   }
 
+  bool _isHoraAvailable(HoraItem hora) {
+    final day = _day;
+    if (day == null) return false;
+    return hora.checkFields.any((f) => (day.field(f) ?? '').isNotEmpty);
+  }
+
   @override
   Widget build(BuildContext context) {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
@@ -342,7 +348,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                       padding: EdgeInsets.zero,
                       child: _HoraTile(
                         hora: hora,
-                        enabled: true,
+                        enabled: _isHoraAvailable(hora),
                         onTap: () => context.push(
                           '/ora/$dateKey/${widget.dayId}/${hora.type}',
                         ),
