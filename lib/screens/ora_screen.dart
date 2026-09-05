@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/cache_warmup_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -16,6 +17,7 @@ import 'package:mybrev_flutter/utils/liturgical_office.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
+import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -277,11 +279,33 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
   }
 
-  Widget _loadingState(BuildContext context) => Scaffold(
-    extendBodyBehindAppBar: true,
-    appBar: PlatformAppBar.text(_oraTitle(widget.oraType)),
-    body: const Center(child: CircularProgressIndicator()),
-  );
+  Widget _loadingState(BuildContext context) {
+    final seasonColor = ref.read(liturgicalSeasonColorProvider);
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: PlatformAppBar.text(_oraTitle(widget.oraType)),
+      body: Stack(
+        children: [
+          AmbientWash.hero(seasonColor: seasonColor),
+          ListView(
+            padding: EdgeInsets.fromLTRB(
+              0,
+              MediaQuery.paddingOf(context).top + kToolbarHeight + 16,
+              0,
+              24,
+            ),
+            children: const [
+              TileShimmer(),
+              TileShimmer(),
+              TileShimmer(),
+              TileShimmer(),
+              TileShimmer(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildForDay(BuildContext context, LiturgicalDay day) {
     final seasonColor = liturgicalColorForDay(day);

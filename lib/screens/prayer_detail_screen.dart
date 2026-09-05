@@ -18,16 +18,6 @@ import 'package:mybrev_flutter/theme/reader.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
-String _stripHtmlForCopy(String html) => html
-    .replaceAll(RegExp(r'<[^>]*>'), '')
-    .replaceAll('&nbsp;', ' ')
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll(RegExp(r'\s+'), ' ')
-    .trim();
-
 String _stripHtmlText(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
     .replaceAll('&nbsp;', ' ')
@@ -145,7 +135,8 @@ class PrayerDetailScreen extends ConsumerWidget {
       ].firstWhere((p) => p.id == prayerId);
     } catch (_) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Малітва')),
+        extendBodyBehindAppBar: true,
+        appBar: PlatformAppBar.text('Малітва'),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -172,7 +163,9 @@ class PrayerDetailScreen extends ConsumerWidget {
     final isFav = settings.favoriteIds.contains(p.id);
 
     return ReadingScaffold(
-      builder: (context, textStyle) => Scaffold(
+      builder: (context, textStyle) {
+        final cs = Theme.of(context).colorScheme;
+        return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: PlatformAppBar(
           title: Text(
@@ -181,10 +174,11 @@ class PrayerDetailScreen extends ConsumerWidget {
           ),
           actions: [
             IconButton(
+              tooltip: isFav ? 'Выдаліць з абраных' : 'Дадаць у абраныя',
               icon: PhosphorIcon(
                 isFav ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
                 size: 22,
-                color: isFav ? Colors.red : null,
+                color: isFav ? cs.error : null,
               ),
               onPressed: () {
                 HapticFeedback.lightImpact();
@@ -200,7 +194,7 @@ class PrayerDetailScreen extends ConsumerWidget {
               onPressed: () {
                 final text =
                     '${p.displayTitle.isNotEmpty ? '${p.displayTitle}\n\n' : ''}'
-                    '${_stripHtmlForCopy(p.displayText)}';
+                    '${_stripHtmlText(p.displayText)}';
                 Share.share(text);
               },
             ),
@@ -226,8 +220,9 @@ class PrayerDetailScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
+    },
+  );
   }
 
   Widget _buildReadingSurface(

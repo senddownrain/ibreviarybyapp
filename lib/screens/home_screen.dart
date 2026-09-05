@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/widgets/app_shell_scope.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -38,6 +40,8 @@ class HomeScreen extends ConsumerWidget {
     final dayOfWeekLabel = _sentenceCase(DateFormat('EEEE', 'be').format(date));
     final dayMonthLabel = DateFormat('d MMMM y', 'be').format(date);
 
+    final shellScope = AppShellScope.maybeOf(context);
+
     return Stack(
       children: [
         AmbientWash.hero(seasonColor: seasonColor),
@@ -49,7 +53,7 @@ class HomeScreen extends ConsumerWidget {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(12, topPad + 62, 12, 22),
+                    padding: EdgeInsets.fromLTRB(12, topPad + kShellMenuButtonClearance, 12, 22),
                     child: GlassSurface(
                       style: GlassStyle.card,
                       seasonColor: seasonColor,
@@ -80,12 +84,12 @@ class HomeScreen extends ConsumerWidget {
                           },
                           child: SizedBox(
                             key: ValueKey(date.toIso8601String()),
-                            height: 190,
+                            height: 156,
                             child: Stack(
                               children: [
                                 Positioned(
-                                  top: -30,
-                                  right: -24,
+                                  top: -20,
+                                  right: -20,
                                   child: Container(
                                     width: 116,
                                     height: 116,
@@ -98,7 +102,7 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(24),
+                                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -131,14 +135,14 @@ class HomeScreen extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 10),
+                                      const SizedBox(height: 6),
                                       Text(
                                         dayOfWeekLabel,
                                         style: ReaderTheme.of(context)
-                                            .displayTitle(38)
+                                            .displayTitle(34)
                                             .copyWith(color: cs.onSurface),
                                       ),
-                                      const SizedBox(height: 14),
+                                      const SizedBox(height: 10),
                                       Row(
                                         children: [
                                           PhosphorIcon(
@@ -241,11 +245,12 @@ class HomeScreen extends ConsumerWidget {
                         padding: const EdgeInsets.all(28),
                         child: Column(
                           children: [
-                            const SizedBox(
+                            SizedBox(
                               width: 36,
                               height: 36,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
+                                color: seasonColor,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -333,6 +338,12 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
         ),
+        if (shellScope != null)
+          Positioned(
+            top: topPad + 10,
+            left: 14,
+            child: ShellMenuButton(onTap: shellScope.openDrawer),
+          ),
       ],
     );
   }
@@ -345,8 +356,8 @@ class HomeScreen extends ConsumerWidget {
     final picked = await showPlatformDatePicker(
       context: context,
       initialDate: date,
-      firstDate: DateTime(2019),
-      lastDate: DateTime(2027, 12, 31),
+      firstDate: kCalendarFirstDate,
+      lastDate: kCalendarLastDate,
     );
     if (picked != null && context.mounted) {
       ref.read(selectedDateProvider.notifier).state = picked;
@@ -466,6 +477,7 @@ class _DayOptionCard extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
         onTap: () {
+          HapticFeedback.lightImpact();
           final dayId = day.id;
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
           unawaited(DayPrefetchService().prefetch(date, option).catchError((_) {}));

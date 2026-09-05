@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/widgets/app_shell_scope.dart';
 
 class LiturgicalPickerScreen extends ConsumerWidget {
   const LiturgicalPickerScreen({super.key});
@@ -15,14 +16,17 @@ class LiturgicalPickerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    return DefaultTabController(
+    final topPad = MediaQuery.paddingOf(context).top;
+    return Stack(
+      children: [
+        DefaultTabController(
       length: 2,
       child: AmbientWash(
         seasonColor: seasonColor,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              padding: EdgeInsets.fromLTRB(12, topPad + kShellMenuButtonClearance, 12, 4),
               child: GlassSurface(
                 style: GlassStyle.soft,
                 borderRadius: BorderRadius.circular(22),
@@ -45,6 +49,13 @@ class LiturgicalPickerScreen extends ConsumerWidget {
           ],
         ),
       ),
+        ),
+        Positioned(
+          top: topPad + 10,
+          left: 14,
+          child: ShellMenuButton.fromScope(context),
+        ),
+      ],
     );
   }
 }
@@ -67,26 +78,30 @@ class _PeriodPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(12, 8, 12, 16 + MediaQuery.viewPaddingOf(context).bottom),
       children: periodLabelMap.entries.map((entry) {
         final color = periodColors[entry.key] ?? Colors.green;
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: color.withValues(alpha: 0.2),
-              child: PhosphorIcon(
-                PhosphorIconsRegular.calendarBlank,
-                color: color,
-                size: 22,
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: GlassSurface(
+            borderRadius: BorderRadius.circular(22),
+            child: ListTile(
+              contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+              leading: CircleAvatar(
+                backgroundColor: color.withValues(alpha: 0.2),
+                child: PhosphorIcon(
+                  PhosphorIconsRegular.calendarBlank,
+                  color: color,
+                  size: 22,
+                ),
               ),
+              title: Text(entry.value),
+              trailing: const PhosphorIcon(
+                PhosphorIconsRegular.caretRight,
+                size: 18,
+              ),
+              onTap: () => _showWeekDaySheet(context, entry.key, entry.value),
             ),
-            title: Text(entry.value),
-            trailing: const PhosphorIcon(
-              PhosphorIconsRegular.caretRight,
-              size: 18,
-            ),
-            onTap: () => _showWeekDaySheet(context, entry.key, entry.value),
           ),
         );
       }).toList(),
@@ -335,13 +350,16 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: EdgeInsets.fromLTRB(12, 0, 12, 16 + MediaQuery.viewPaddingOf(context).bottom),
                   itemCount: filtered.length,
                   itemBuilder: (context, i) {
                     final feast = filtered[i];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: GlassSurface(
+                      borderRadius: BorderRadius.circular(22),
                       child: ListTile(
+                        contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                         leading: PhosphorIcon(
                           feast.isDynamic
                               ? PhosphorIconsRegular.sparkle
@@ -381,6 +399,7 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                                 context.go('/');
                               },
                       ),
+                    ),
                     );
                   },
                 ),

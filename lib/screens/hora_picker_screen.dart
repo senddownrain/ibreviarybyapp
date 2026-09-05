@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,7 @@ import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/platform_app_bar.dart';
+import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
 /// Screen showing list of available liturgical hours for a day.
@@ -158,7 +160,20 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
-            const Center(child: CircularProgressIndicator()),
+            ListView(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                MediaQuery.paddingOf(context).top + kToolbarHeight + 16,
+                0,
+                24,
+              ),
+              children: const [
+                TileShimmer(),
+                TileShimmer(),
+                TileShimmer(),
+                TileShimmer(),
+              ],
+            ),
           ],
         ),
       );
@@ -173,9 +188,40 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
             Center(
-              child: Text(
-                'Дзень не знойдзены',
-                style: TextStyle(color: cs.onSurfaceVariant),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PhosphorIcon(
+                      PhosphorIconsLight.arrowsClockwise,
+                      size: 48,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Дзень не знойдзены',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Паспрабуйце сінхранізаваць дадзеныя ў Наладах',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: cs.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.tonal(
+                      onPressed: () => Navigator.maybePop(context),
+                      child: const Text('Назад'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -334,9 +380,10 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                     child: _ReadingTile(
                       color: dayColor,
                       subtitle: _readingSubtitle,
-                      onTap: () => context.push(
-                        '/readings/$dateKey?dayId=${widget.dayId}',
-                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push('/readings/$dateKey?dayId=${widget.dayId}');
+                      },
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -349,9 +396,10 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                       child: _HoraTile(
                         hora: hora,
                         enabled: _isHoraAvailable(hora),
-                        onTap: () => context.push(
-                          '/ora/$dateKey/${widget.dayId}/${hora.type}',
-                        ),
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          context.push('/ora/$dateKey/${widget.dayId}/${hora.type}');
+                        },
                       ),
                     ),
                     const SizedBox(height: 12),

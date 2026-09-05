@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/widgets/platform_date_picker.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -65,46 +66,57 @@ class _LiquidGlassNav extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     final narrow = MediaQuery.sizeOf(context).width < 360;
-    final controlSize = narrow ? 52.0 : 56.0;
-    final gap = narrow ? 8.0 : 12.0;
+    final arrowWidth = narrow ? 48.0 : 52.0;
+    final cs = Theme.of(context).colorScheme;
 
     return SizedBox(
       height: 88 + bottomInset,
-      child: Stack(
-        children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 10,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (showDayArrows) ...[
-                  _DayArrowButton(
-                    icon: PhosphorIconsRegular.caretLeft,
-                    size: controlSize,
-                    tooltip: 'Папярэдні дзень',
-                    onTap: () => _shiftDay(ref, -1),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: GlassSurface(
+            style: GlassStyle.pill,
+            child: SizedBox(
+              height: 64,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showDayArrows) ...[
+                    _ArrowBtn(
+                      icon: PhosphorIconsRegular.caretLeft,
+                      width: arrowWidth,
+                      tooltip: 'Папярэдні дзень',
+                      onTap: () => _shiftDay(ref, -1),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 28,
+                      color: cs.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ],
+                  _GlassPill(
+                    selectedIndex: selectedIndex,
+                    onTap: (i) => _onTap(i, context, ref),
                   ),
-                  SizedBox(width: gap),
+                  if (showDayArrows) ...[
+                    Container(
+                      width: 1,
+                      height: 28,
+                      color: cs.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                    _ArrowBtn(
+                      icon: PhosphorIconsRegular.caretRight,
+                      width: arrowWidth,
+                      tooltip: 'Наступны дзень',
+                      onTap: () => _shiftDay(ref, 1),
+                    ),
+                  ],
                 ],
-                _GlassPill(
-                  selectedIndex: selectedIndex,
-                  onTap: (i) => _onTap(i, context, ref),
-                ),
-                if (showDayArrows) ...[
-                  SizedBox(width: gap),
-                  _DayArrowButton(
-                    icon: PhosphorIconsRegular.caretRight,
-                    size: controlSize,
-                    tooltip: 'Наступны дзень',
-                    onTap: () => _shiftDay(ref, 1),
-                  ),
-                ],
-              ],
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -127,8 +139,8 @@ class _LiquidGlassNav extends ConsumerWidget {
     final picked = await showPlatformDatePicker(
       context: context,
       initialDate: current,
-      firstDate: DateTime(2019),
-      lastDate: DateTime(2030),
+      firstDate: kCalendarFirstDate,
+      lastDate: kCalendarLastDate,
     );
     if (picked != null && context.mounted) {
       ref.read(selectedDateProvider.notifier).state = picked;
@@ -137,15 +149,15 @@ class _LiquidGlassNav extends ConsumerWidget {
   }
 }
 
-class _DayArrowButton extends StatelessWidget {
+class _ArrowBtn extends StatelessWidget {
   final PhosphorIconData icon;
-  final double size;
+  final double width;
   final String tooltip;
   final VoidCallback onTap;
 
-  const _DayArrowButton({
+  const _ArrowBtn({
     required this.icon,
-    required this.size,
+    required this.width,
     required this.tooltip,
     required this.onTap,
   });
@@ -155,20 +167,16 @@ class _DayArrowButton extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Tooltip(
       message: tooltip,
-      child: GlassSurface(
-        style: GlassStyle.pill,
-        borderRadius: BorderRadius.circular(size / 2),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(size / 2),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Center(
-                child: PhosphorIcon(icon, size: 20, color: cs.onSurface),
-              ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(32),
+          child: SizedBox(
+            width: width,
+            height: 64,
+            child: Center(
+              child: PhosphorIcon(icon, size: 20, color: cs.onSurface),
             ),
           ),
         ),
@@ -187,11 +195,17 @@ class _GlassPill extends StatelessWidget {
     (
       icon: PhosphorIconsRegular.listBullets,
       fill: PhosphorIconsFill.listBullets,
+      label: 'Службы',
     ),
-    (icon: PhosphorIconsRegular.sunHorizon, fill: PhosphorIconsFill.sunHorizon),
+    (
+      icon: PhosphorIconsRegular.sunHorizon,
+      fill: PhosphorIconsFill.sunHorizon,
+      label: 'Сёння',
+    ),
     (
       icon: PhosphorIconsRegular.calendarBlank,
       fill: PhosphorIconsFill.calendarBlank,
+      label: 'Выбраць дату',
     ),
   ];
 
@@ -205,28 +219,23 @@ class _GlassPill extends StatelessWidget {
     final iconOn = cs.primary;
     final indicatorColor = cs.primary.withValues(alpha: 0.12);
 
-    return GlassSurface(
-      style: GlassStyle.pill,
-      child: SizedBox(
-        height: 64,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(width: 4),
-            for (int i = 0; i < _kItems.length; i++)
-              _PillItem(
-                icon: _kItems[i].icon,
-                fillIcon: _kItems[i].fill,
-                isSelected: selectedIndex == i,
-                iconOn: iconOn,
-                iconOff: iconOff,
-                indicatorColor: indicatorColor,
-                onTap: () => onTap(i),
-              ),
-            const SizedBox(width: 4),
-          ],
-        ),
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(width: 4),
+        for (int i = 0; i < _kItems.length; i++)
+          _PillItem(
+            icon: _kItems[i].icon,
+            fillIcon: _kItems[i].fill,
+            label: _kItems[i].label,
+            isSelected: selectedIndex == i,
+            iconOn: iconOn,
+            iconOff: iconOff,
+            indicatorColor: indicatorColor,
+            onTap: () => onTap(i),
+          ),
+        const SizedBox(width: 4),
+      ],
     );
   }
 }
@@ -234,6 +243,7 @@ class _GlassPill extends StatelessWidget {
 class _PillItem extends StatelessWidget {
   final PhosphorIconData icon;
   final PhosphorIconData fillIcon;
+  final String label;
   final bool isSelected;
   final Color iconOn;
   final Color iconOff;
@@ -243,6 +253,7 @@ class _PillItem extends StatelessWidget {
   const _PillItem({
     required this.icon,
     required this.fillIcon,
+    required this.label,
     required this.isSelected,
     required this.iconOn,
     required this.iconOff,
@@ -252,29 +263,40 @@ class _PillItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 56,
-        height: 64,
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeInOut,
-            width: 48,
-            height: 48,
-            decoration: isSelected
-                ? BoxDecoration(
-                    color: indicatorColor,
-                    borderRadius: BorderRadius.circular(24),
-                  )
-                : null,
-            child: Center(
-              child: PhosphorIcon(
-                isSelected ? fillIcon : icon,
-                size: 23,
-                color: isSelected ? iconOn : iconOff,
+    return Semantics(
+      label: label,
+      button: true,
+      selected: isSelected,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(24),
+            child: SizedBox(
+              width: 56,
+              height: 64,
+              child: Center(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeInOut,
+                  width: 48,
+                  height: 48,
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          color: indicatorColor,
+                          borderRadius: BorderRadius.circular(24),
+                        )
+                      : null,
+                  child: Center(
+                    child: PhosphorIcon(
+                      isSelected ? fillIcon : icon,
+                      size: 23,
+                      color: isSelected ? iconOn : iconOff,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/widgets/app_shell_scope.dart';
 
 class BibleScreen extends ConsumerStatefulWidget {
   const BibleScreen({super.key});
@@ -73,13 +74,15 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
     final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.paddingOf(context).top;
 
-    return AmbientWash(
+    return Stack(
+      children: [
+        AmbientWash(
       seasonColor: seasonColor,
       height: 260,
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(16, topPad + 62, 16, 8),
+            padding: EdgeInsets.fromLTRB(16, topPad + kShellMenuButtonClearance, 16, 8),
             child: Row(
               children: [
                 Expanded(
@@ -245,12 +248,19 @@ class _BibleScreenState extends ConsumerState<BibleScreen> {
                             ),
                           ),
                         ),
-                      const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+                      SliverPadding(padding: EdgeInsets.only(bottom: 24 + MediaQuery.viewPaddingOf(context).bottom)),
                     ],
                   ),
           ),
         ],
       ),
+        ),
+        Positioned(
+          top: topPad + 10,
+          left: 14,
+          child: ShellMenuButton.fromScope(context),
+        ),
+      ],
     );
   }
 }

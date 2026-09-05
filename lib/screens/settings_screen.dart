@@ -13,6 +13,8 @@ import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/cache_stats.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:mybrev_flutter/widgets/app_shell_scope.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -37,10 +39,12 @@ class SettingsScreen extends ConsumerWidget {
       HiveService.getLastSync('completoriums'),
     ]);
 
-    return AmbientWash(
-      seasonColor: seasonColor,
-      child: ListView(
-        padding: EdgeInsets.fromLTRB(12, topPad + 62, 12, 12),
+    return Stack(
+      children: [
+        AmbientWash(
+          seasonColor: seasonColor,
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(12, topPad + kShellMenuButtonClearance, 12, 12),
         children: [
           GlassSurface(
             style: GlassStyle.card,
@@ -165,7 +169,7 @@ class SettingsScreen extends ConsumerWidget {
                                       'Аб вечнай радасці спявае душа мая.',
                                       style: previewStyle.copyWith(
                                         fontSize: 13,
-                                        color: selected ? null : Colors.grey,
+                                        color: selected ? null : Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -357,7 +361,13 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text('Mybrev — беларускі каталіцкі малітоўнік'),
-                const Text('Версія 1.0.0'),
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snap) {
+                    final version = snap.data?.version ?? '—';
+                    return Text('Версія $version');
+                  },
+                ),
                 const SizedBox(height: 14),
               ],
             ),
@@ -365,6 +375,13 @@ class SettingsScreen extends ConsumerWidget {
           SizedBox(height: 24 + MediaQuery.viewPaddingOf(context).bottom),
         ],
       ),
+        ),
+        Positioned(
+          top: topPad + 10,
+          left: 14,
+          child: ShellMenuButton.fromScope(context),
+        ),
+      ],
     );
   }
 

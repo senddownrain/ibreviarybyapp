@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/widgets/app_shell_scope.dart';
 
 class PrayersScreen extends ConsumerStatefulWidget {
   const PrayersScreen({super.key});
@@ -33,14 +34,17 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
     final settings = ref.watch(settingsProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
+    final topPad = MediaQuery.paddingOf(context).top;
 
-    return AmbientWash(
+    return Stack(
+      children: [
+        AmbientWash(
       seasonColor: seasonColor,
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 16, 12),
+              padding: EdgeInsets.fromLTRB(20, topPad + kShellMenuButtonClearance, 16, 12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -199,6 +203,13 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
           ),
         ],
       ),
+        ),
+        Positioned(
+          top: topPad + 10,
+          left: 14,
+          child: ShellMenuButton.fromScope(context),
+        ),
+      ],
     );
   }
 }
@@ -216,7 +227,10 @@ class _PrayerCard extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
-        onTap: () => context.push('/prayer/${prayer.id}'),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          context.push('/prayer/${prayer.id}');
+        },
         child: GlassSurface(
           borderRadius: BorderRadius.circular(22),
           padding: const EdgeInsets.fromLTRB(14, 13, 8, 13),

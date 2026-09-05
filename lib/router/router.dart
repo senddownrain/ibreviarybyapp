@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
@@ -17,6 +17,18 @@ import 'package:mybrev_flutter/screens/bible_screen.dart';
 import 'package:mybrev_flutter/screens/bible_chapter_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
 
+class _ShellFadePage<T> extends CustomTransitionPage<T> {
+  _ShellFadePage({required super.child, super.key})
+      : super(
+          transitionDuration: const Duration(milliseconds: 180),
+          reverseTransitionDuration: const Duration(milliseconds: 120),
+          transitionsBuilder: (_, animation, _, child) => FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+            child: child,
+          ),
+        );
+}
+
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -31,32 +43,32 @@ final router = GoRouter(
         GoRoute(
           path: '/',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HomeScreen()),
+              _ShellFadePage(child: const HomeScreen()),
         ),
         GoRoute(
           path: '/picker',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: LiturgicalPickerScreen()),
+              _ShellFadePage(child: const LiturgicalPickerScreen()),
         ),
         GoRoute(
           path: '/prayers',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: PrayersScreen()),
+              _ShellFadePage(child: const PrayersScreen()),
         ),
         GoRoute(
           path: '/bible',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: BibleScreen()),
+              _ShellFadePage(child: const BibleScreen()),
         ),
         GoRoute(
           path: '/settings',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SettingsScreen()),
+              _ShellFadePage(child: const SettingsScreen()),
         ),
         GoRoute(
           path: '/my-prayers',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: MyPrayersScreen()),
+              _ShellFadePage(child: const MyPrayersScreen()),
         ),
       ],
     ),
@@ -64,96 +76,129 @@ final router = GoRouter(
     // Full-screen routes (no shell nav)
     GoRoute(
       path: '/picker/options',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final period = state.uri.queryParameters['period'] ?? '';
         final week = int.tryParse(state.uri.queryParameters['week'] ?? '') ?? 0;
         final day = int.tryParse(state.uri.queryParameters['day'] ?? '') ?? 1;
-        return LiturgicalDayOptionsScreen(period: period, week: week, day: day);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: LiturgicalDayOptionsScreen(period: period, week: week, day: day),
+        );
       },
     ),
     // Specific pattern BEFORE the catch-all /:dateStr
     GoRoute(
       path: '/readings/liturgical/:period/:week/:day',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final key =
             '${state.pathParameters['period']}/'
             '${state.pathParameters['week']}/'
             '${state.pathParameters['day']}';
-        return ReadingsScreen(liturgicalKey: key);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: ReadingsScreen(liturgicalKey: key),
+        );
       },
     ),
     GoRoute(
       path: '/readings/:dateStr',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final dateStr = state.pathParameters['dateStr']!;
-        return ReadingsScreen(
-          dateStr: dateStr,
-          dayId: state.uri.queryParameters['dayId'],
+        return CupertinoPage(
+          key: state.pageKey,
+          child: ReadingsScreen(
+            dateStr: dateStr,
+            dayId: state.uri.queryParameters['dayId'],
+          ),
         );
       },
     ),
     GoRoute(
       path: '/reading/:readingId',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final readingId = state.pathParameters['readingId']!;
-        return ReadingDetailScreen(readingId: readingId);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: ReadingDetailScreen(readingId: readingId),
+        );
       },
     ),
     GoRoute(
       path: '/hora/:dateStr/:dayId',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final dayId = state.pathParameters['dayId']!;
         final date =
             DateTime.tryParse(state.pathParameters['dateStr'] ?? '') ??
             DateTime.now();
-        return HoraPickerScreen(dayId: dayId, date: date);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: HoraPickerScreen(dayId: dayId, date: date),
+        );
       },
     ),
     GoRoute(
       path: '/ora/:dateStr/:dayId/:type',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final dayId = state.pathParameters['dayId']!;
         final type = state.pathParameters['type']!;
         final date =
             DateTime.tryParse(state.pathParameters['dateStr'] ?? '') ??
             DateTime.now();
-        return OraScreen(dayId: dayId, oraType: type, date: date);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: OraScreen(dayId: dayId, oraType: type, date: date),
+        );
       },
     ),
     // Specific prayer routes BEFORE the catch-all /prayer/:id
     GoRoute(
       path: '/prayer/add',
-      builder: (context, state) => const PrayerFormScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const PrayerFormScreen(),
+      ),
     ),
     GoRoute(
       path: '/prayer/edit/:id',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id']!;
-        return PrayerFormScreen(prayerId: id);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: PrayerFormScreen(prayerId: id),
+        );
       },
     ),
     GoRoute(
       path: '/prayer/:id',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id']!;
-        return PrayerDetailScreen(prayerId: id);
+        return CupertinoPage(
+          key: state.pageKey,
+          child: PrayerDetailScreen(prayerId: id),
+        );
       },
     ),
     GoRoute(
       path: '/prayers/favorites',
-      builder: (context, state) => const FavoritesScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const FavoritesScreen(),
+      ),
     ),
     GoRoute(
       path: '/bible/:version/:book/:chapter',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final version = state.pathParameters['version']!;
         final book = state.pathParameters['book']!;
         final chapter =
             int.tryParse(state.pathParameters['chapter'] ?? '') ?? 1;
-        return BibleChapterScreen(
-          versionId: version,
-          bookId: book,
-          chapter: chapter,
+        return CupertinoPage(
+          key: state.pageKey,
+          child: BibleChapterScreen(
+            versionId: version,
+            bookId: book,
+            chapter: chapter,
+          ),
         );
       },
     ),

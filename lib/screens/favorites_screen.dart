@@ -122,7 +122,10 @@ class _FavoriteTile extends ConsumerWidget {
             ref.read(settingsProvider.notifier).toggleFavorite(prayer.id);
           },
         ),
-        onTap: () => context.push('/prayer/${prayer.id}'),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          context.push('/prayer/${prayer.id}');
+        },
       ),
     );
   }

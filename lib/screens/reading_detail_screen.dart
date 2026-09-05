@@ -48,10 +48,25 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
               PhosphorIcon(
                 PhosphorIconsLight.bookOpen,
                 size: 48,
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               const SizedBox(height: 12),
-              const Text('Чытанне не знойдзена'),
+              Text(
+                'Чытанне не знойдзена',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Паспрабуйце сінхранізаваць дадзеныя ў Наладах',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 13,
+                ),
+              ),
             ],
           ),
         ),

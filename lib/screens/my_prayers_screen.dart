@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -74,28 +75,41 @@ class _MyPrayerTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isFav = ref.watch(settingsProvider).favoriteIds.contains(prayer.id);
 
-    return ListTile(
-      title: Text(prayer.displayTitle),
-      subtitle: prayer.tags.isNotEmpty ? Text(prayer.tags.join(', ')) : null,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: PhosphorIcon(
-              isFav ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
-              size: 22,
-              color: isFav ? Colors.red : null,
-            ),
-            onPressed: () =>
-                ref.read(settingsProvider.notifier).toggleFavorite(prayer.id),
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 9),
+      child: GlassSurface(
+        borderRadius: BorderRadius.circular(22),
+        child: ListTile(
+          contentPadding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+          title: Text(prayer.displayTitle),
+          subtitle: prayer.tags.isNotEmpty ? Text(prayer.tags.join(', ')) : null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: isFav ? 'Выдаліць з абраных' : 'Дадаць у абраныя',
+                icon: PhosphorIcon(
+                  isFav ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
+                  size: 22,
+                  color: isFav ? cs.error : cs.onSurfaceVariant,
+                ),
+                onPressed: () =>
+                    ref.read(settingsProvider.notifier).toggleFavorite(prayer.id),
+              ),
+              IconButton(
+                tooltip: 'Рэдагаваць',
+                icon: PhosphorIcon(PhosphorIconsRegular.pencilSimple, size: 20, color: cs.onSurfaceVariant),
+                onPressed: () => context.push('/prayer/edit/${prayer.id}'),
+              ),
+            ],
           ),
-          IconButton(
-            icon: const PhosphorIcon(PhosphorIconsRegular.pencilSimple, size: 20),
-            onPressed: () => context.push('/prayer/edit/${prayer.id}'),
-          ),
-        ],
+          onTap: () {
+            HapticFeedback.lightImpact();
+            context.push('/prayer/${prayer.id}');
+          },
+        ),
       ),
-      onTap: () => context.push('/prayer/${prayer.id}'),
     );
   }
 }
