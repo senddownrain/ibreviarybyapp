@@ -39,3 +39,7 @@ const periodColors = {
 };
 
 enum LiturgicalOptionSource { period, dynamic, fixed, officeForDead }
+
+/// Shared date-picker bounds used across the app.
+final kCalendarFirstDate = DateTime(2019);
+final kCalendarLastDate = DateTime(2030, 12, 31);

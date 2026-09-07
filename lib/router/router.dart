@@ -6,7 +6,9 @@ import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
 import 'package:mybrev_flutter/screens/liturgical_day_options_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
+import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
+import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -14,6 +16,7 @@ import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/bible_screen.dart';
 import 'package:mybrev_flutter/screens/bible_chapter_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
+import 'package:mybrev_flutter/screens/about_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -54,6 +57,16 @@ final router = GoRouter(
           pageBuilder: (context, state) =>
               const NoTransitionPage(child: SettingsScreen()),
         ),
+        GoRoute(
+          path: '/my-prayers',
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: MyPrayersScreen()),
+        ),
+        GoRoute(
+          path: '/about',
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: AboutScreen()),
+        ),
       ],
     ),
 
@@ -68,16 +81,6 @@ final router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/readings/:dateStr',
-      builder: (context, state) {
-        final dateStr = state.pathParameters['dateStr']!;
-        return ReadingsScreen(
-          dateStr: dateStr,
-          dayId: state.uri.queryParameters['dayId'],
-        );
-      },
-    ),
-    GoRoute(
       path: '/readings/liturgical/:period/:week/:day',
       builder: (context, state) {
         final key =
@@ -85,6 +88,16 @@ final router = GoRouter(
             '${state.pathParameters['week']}/'
             '${state.pathParameters['day']}';
         return ReadingsScreen(liturgicalKey: key);
+      },
+    ),
+    GoRoute(
+      path: '/readings/:dateStr',
+      builder: (context, state) {
+        final dateStr = state.pathParameters['dateStr']!;
+        return ReadingsScreen(
+          dateStr: dateStr,
+          dayId: state.uri.queryParameters['dayId'],
+        );
       },
     ),
     GoRoute(
@@ -114,6 +127,15 @@ final router = GoRouter(
             DateTime.now();
         return OraScreen(dayId: dayId, oraType: type, date: date);
       },
+    ),
+    GoRoute(
+      path: '/prayer/add',
+      builder: (context, state) => const PrayerFormScreen(),
+    ),
+    GoRoute(
+      path: '/prayer/edit/:id',
+      builder: (context, state) =>
+          PrayerFormScreen(prayerId: state.pathParameters['id']!),
     ),
     GoRoute(
       path: '/prayer/:id',

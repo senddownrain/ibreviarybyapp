@@ -18,8 +18,9 @@ class LocalPrayersNotifier extends Notifier<List<Prayer>> {
       final raw = box.get(key);
       if (raw == null) continue;
       try {
-        prayers.add(Prayer.fromMap(
-            Map<String, dynamic>.from(raw), key as String));
+        prayers.add(
+          Prayer.fromMap(Map<String, dynamic>.from(raw), key as String),
+        );
       } catch (_) {}
     }
     prayers.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
@@ -57,4 +58,5 @@ class LocalPrayersNotifier extends Notifier<List<Prayer>> {
 
 final localPrayersProvider =
     NotifierProvider<LocalPrayersNotifier, List<Prayer>>(
-        LocalPrayersNotifier.new);
+      LocalPrayersNotifier.new,
+    );

@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-typedef RetryCallback = void Function(Object error, int attempt, int maxAttempts);
+typedef RetryCallback =
+    void Function(Object error, int attempt, int maxAttempts);
 
 /// Retry with exponential backoff (mirrors web `retry.js`).
 Future<T> retry<T>(
@@ -52,10 +53,7 @@ bool _isRetryableFirestoreError(Object error) {
 }
 
 /// Firestore reads with short per-attempt timeout and backoff.
-Future<T> retryFirestore<T>(
-  Future<T> Function() fn, {
-  int maxAttempts = 3,
-}) {
+Future<T> retryFirestore<T>(Future<T> Function() fn, {int maxAttempts = 3}) {
   return retry(
     fn,
     maxAttempts: maxAttempts,

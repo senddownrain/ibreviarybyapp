@@ -16,14 +16,9 @@ class ReadingsIndex {
     }
   }
 
-  static List<String> lookupByDate(String ddmm) =>
-      _lookup('$_datePrefix$ddmm');
+  static List<String> lookupByDate(String ddmm) => _lookup('$_datePrefix$ddmm');
 
-  static List<String> lookupByPeriod(
-    String periodType,
-    int week,
-    int day,
-  ) =>
+  static List<String> lookupByPeriod(String periodType, int week, int day) =>
       _lookup('$_periodPrefix$periodType:$week:$day');
 
   static List<String> lookupByFeast(String feast) =>

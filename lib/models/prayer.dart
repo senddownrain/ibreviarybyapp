@@ -47,14 +47,14 @@ class Prayer {
   }
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        if (titleBe != null) 'titleBe': titleBe,
-        // Persist under Firestore-canonical `text` so re-sync/round-trip matches web.
-        if (body != null) 'text': body,
-        if (textFormat != null) 'textFormat': textFormat,
-        'tags': tags,
-        'isLocal': isLocal,
-      };
+    'title': title,
+    if (titleBe != null) 'titleBe': titleBe,
+    // Persist under Firestore-canonical `text` so re-sync/round-trip matches web.
+    if (body != null) 'text': body,
+    if (textFormat != null) 'textFormat': textFormat,
+    'tags': tags,
+    'isLocal': isLocal,
+  };
 
   Prayer copyWith({
     String? id,
@@ -64,16 +64,15 @@ class Prayer {
     String? textFormat,
     List<String>? tags,
     bool? isLocal,
-  }) =>
-      Prayer(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        titleBe: titleBe ?? this.titleBe,
-        body: body ?? this.body,
-        textFormat: textFormat ?? this.textFormat,
-        tags: tags ?? this.tags,
-        isLocal: isLocal ?? this.isLocal,
-      );
+  }) => Prayer(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    titleBe: titleBe ?? this.titleBe,
+    body: body ?? this.body,
+    textFormat: textFormat ?? this.textFormat,
+    tags: tags ?? this.tags,
+    isLocal: isLocal ?? this.isLocal,
+  );
 
   static String _resolveTitle(Map<String, dynamic> data) {
     final title = _asString(data['title']);

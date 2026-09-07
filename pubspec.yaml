@@ -26,6 +26,8 @@ dependencies:
   phosphor_flutter: ^2.1.0
   connectivity_plus: ^6.1.4
   share_plus: ^10.1.4
+  package_info_plus: ^9.0.1
+  url_launcher: ^6.3.2
 
 dependency_overrides:
   # objective_c >=6.0.0 uses Dart native assets which fail to bundle on this

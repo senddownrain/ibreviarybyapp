@@ -59,6 +59,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   Map<String, ParsedReading?> _byYear = {};
   String _sundayCycle = 'A';
   String _weekdayCycle = '1';
+  int _loadGeneration = 0;
 
   @override
   void initState() {
@@ -66,15 +67,31 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     _load();
   }
 
+  @override
+  void didUpdateWidget(covariant ReadingsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.dateStr != widget.dateStr ||
+        oldWidget.liturgicalKey != widget.liturgicalKey ||
+        oldWidget.dayId != widget.dayId) {
+      _bottomNavVisible = true;
+      _scrollDelta = 0;
+      _load();
+    }
+  }
+
   Future<void> _load({bool forceRefresh = false}) async {
     if (!mounted) return;
+    final generation = ++_loadGeneration;
+    final requestedDateStr = widget.dateStr;
+    final requestedLiturgicalKey = widget.liturgicalKey;
+    final requestedDayId = widget.dayId;
     setState(() {
       _loading = true;
       _error = null;
     });
     // Yield to event loop so loading spinner renders before fetch
     await Future.delayed(const Duration(milliseconds: 32));
-    if (!mounted) return;
+    if (!mounted || generation != _loadGeneration) return;
 
     try {
       final service = ParsedReadingsService();
@@ -82,9 +99,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       String sundayCycle = 'A';
       String weekdayCycle = '1';
 
-      if (widget.liturgicalKey != null) {
+      if (requestedLiturgicalKey != null) {
         // Liturgical key mode: period/week/dayOfWeek
-        final parts = widget.liturgicalKey!.split('/');
+        final parts = requestedLiturgicalKey.split('/');
         final period = parts[0];
         final week = int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
         final day = int.tryParse(parts.length > 2 ? parts[2] : '1') ?? 1;
@@ -99,7 +116,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         sundayCycle = getCycleForDate(today, dayOfWeek: 1);
         weekdayCycle = getWeekdayCycleForDate(today);
       } else {
-        final date = DateTime.tryParse(widget.dateStr!) ?? DateTime.now();
+        final date = DateTime.tryParse(requestedDateStr!) ?? DateTime.now();
         final calendar = ref.read(calendarServiceProvider);
         await calendar.ensureYearOptions(date.year);
         await calendar.ensureYearOptions(date.year + 1);
@@ -114,28 +131,28 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
           dynamicDates,
           forceRefresh: forceRefresh,
           includeAlternatives: true,
-          dayId: widget.dayId,
+          dayId: requestedDayId,
         );
         sundayCycle = getCycleForDate(date, dayOfWeek: 1);
         weekdayCycle = getWeekdayCycleForDate(date);
       }
 
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
 
-      var groups = widget.dateStr != null
+      var groups = requestedDateStr != null
           ? groupReadings(readings)
           : <ReadingCelebrationGroup>[];
       final groupsWithContent = groups
           .where((g) => g.documents.any(readingHasVisibleContent))
           .toList();
       if (groupsWithContent.isNotEmpty) groups = groupsWithContent;
-      final linkedGroup = widget.dayId == null
+      final linkedGroup = requestedDayId == null
           ? null
           : groups.where((group) {
               return group.documents.any(
                 (reading) =>
-                    reading.dayId == widget.dayId ||
-                    reading.dayIds.contains(widget.dayId),
+                    reading.dayId == requestedDayId ||
+                    reading.dayIds.contains(requestedDayId),
               );
             }).firstOrNull;
       final activeKey =
@@ -164,7 +181,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         _loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         _error = e.toString();
         _loading = false;

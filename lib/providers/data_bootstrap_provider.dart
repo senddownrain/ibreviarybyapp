@@ -28,13 +28,12 @@ class DataBootstrapState {
     bool? initialComplete,
     Object? phase = _unset,
     Object? error = _unset,
-  }) =>
-      DataBootstrapState(
-        isRunning: isRunning ?? this.isRunning,
-        initialComplete: initialComplete ?? this.initialComplete,
-        phase: identical(phase, _unset) ? this.phase : phase as String?,
-        error: identical(error, _unset) ? this.error : error as String?,
-      );
+  }) => DataBootstrapState(
+    isRunning: isRunning ?? this.isRunning,
+    initialComplete: initialComplete ?? this.initialComplete,
+    phase: identical(phase, _unset) ? this.phase : phase as String?,
+    error: identical(error, _unset) ? this.error : error as String?,
+  );
 }
 
 const Object _unset = Object();
@@ -162,8 +161,8 @@ class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
 
 final dataBootstrapProvider =
     NotifierProvider<DataBootstrapNotifier, DataBootstrapState>(
-  DataBootstrapNotifier.new,
-);
+      DataBootstrapNotifier.new,
+    );
 
 /// True while first-load bootstrap or calendar prerequisites are pending.
 final homeDataLoadingProvider = Provider<bool>((ref) {

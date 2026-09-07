@@ -10,8 +10,9 @@ dynamic _convertValue(dynamic v) {
   if (v is DocumentReference) return v.path;
   if (v is GeoPoint) return {'lat': v.latitude, 'lng': v.longitude};
   if (v is Map) {
-    return (v as Map<Object?, Object?>)
-        .map((k, val) => MapEntry(k.toString(), _convertValue(val)));
+    return (v as Map<Object?, Object?>).map(
+      (k, val) => MapEntry(k.toString(), _convertValue(val)),
+    );
   }
   if (v is List) return v.map(_convertValue).toList();
   return v;
@@ -29,6 +30,8 @@ Future<void> cacheReadingDoc(String id, Map<String, dynamic> data) async {
 
 Future<void> cacheYearOptionsDoc(String id, Map<String, dynamic> data) async {
   final year = data['year'];
-  await HiveService.yearOptionsBox
-      .put(year?.toString() ?? id, firestoreToStorable({...data, 'id': id}));
+  await HiveService.yearOptionsBox.put(
+    year?.toString() ?? id,
+    firestoreToStorable({...data, 'id': id}),
+  );
 }

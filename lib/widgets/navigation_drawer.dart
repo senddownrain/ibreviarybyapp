@@ -97,6 +97,12 @@ class AppNavigationDrawer extends ConsumerWidget {
                         selected: location == '/prayers/favorites',
                         onTap: () => openDetail('/prayers/favorites'),
                       ),
+                      _DrawerItem(
+                        icon: PhosphorIconsRegular.notepad,
+                        title: 'Мае малітвы',
+                        selected: location.startsWith('/my-prayers'),
+                        onTap: () => navigate('/my-prayers'),
+                      ),
                       for (final category in settings.userCategories)
                         _DrawerItem(
                           icon: PhosphorIconsRegular.bookmark,
@@ -127,6 +133,12 @@ class AppNavigationDrawer extends ConsumerWidget {
                         title: 'Налады',
                         selected: location == '/settings',
                         onTap: () => navigate('/settings'),
+                      ),
+                      _DrawerItem(
+                        icon: PhosphorIconsRegular.info,
+                        title: 'Інфармацыя',
+                        selected: location == '/about',
+                        onTap: () => navigate('/about'),
                       ),
                     ],
                   ),

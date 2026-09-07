@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 
 // ── Filter state ──────────────────────────────────────────────────────────────
@@ -16,7 +17,7 @@ class PrayersFilter {
     this.selectedCategoryName,
   });
 
-  bool get isActive => selectedTags.isNotEmpty || searchQuery.isNotEmpty;
+  bool get isActive => selectedTags.isNotEmpty || searchQuery.trim().isNotEmpty;
 
   PrayersFilter copyWith({
     Set<String>? selectedTags,
@@ -52,6 +53,10 @@ class PrayersFilterNotifier extends Notifier<PrayersFilter> {
 
   void clearFilters() {
     state = const PrayersFilter();
+  }
+
+  void clearTags() {
+    state = state.copyWith(selectedTags: const {}, clearCategory: true);
   }
 
   /// Select a user category: sets selectedTags to the category's tags.
@@ -100,18 +105,46 @@ final prayersFilterProvider =
 final filteredPrayersProvider = Provider<List<Prayer>>((ref) {
   final prayers = ref.watch(allPrayersProvider);
   final filter = ref.watch(prayersFilterProvider);
+  final favoriteIds = ref.watch(
+    settingsProvider.select((settings) => settings.favoriteIds),
+  );
 
-  if (!filter.isActive) return prayers;
+  return filterAndSortPrayers(prayers, filter, favoriteIds);
+});
 
-  return prayers.where((p) {
+/// Mirrors the web prayer list: selected tags use OR semantics, search checks
+/// both the resolved title and plain prayer text, and favorites stay on top.
+List<Prayer> filterAndSortPrayers(
+  List<Prayer> prayers,
+  PrayersFilter filter,
+  List<String> favoriteIds,
+) {
+  final favorites = favoriteIds.toSet();
+
+  final filtered = prayers.where((p) {
     if (filter.selectedTags.isNotEmpty) {
       final hasTag = p.tags.any((t) => filter.selectedTags.contains(t));
       if (!hasTag) return false;
     }
-    if (filter.searchQuery.isNotEmpty) {
-      final q = filter.searchQuery.toLowerCase();
-      if (!p.displayTitle.toLowerCase().contains(q)) return false;
+    final query = filter.searchQuery.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      final title = p.displayTitle.toLowerCase();
+      final text = p.displayText
+          .replaceAll(RegExp(r'<[^>]*>'), '')
+          .toLowerCase();
+      if (!title.contains(query) && !text.contains(query)) return false;
     }
     return true;
   }).toList();
-});
+
+  filtered.sort((a, b) {
+    final aFavorite = favorites.contains(a.id);
+    final bFavorite = favorites.contains(b.id);
+    if (aFavorite != bFavorite) return aFavorite ? -1 : 1;
+    return a.displayTitle.trim().toLowerCase().compareTo(
+      b.displayTitle.trim().toLowerCase(),
+    );
+  });
+
+  return filtered;
+}

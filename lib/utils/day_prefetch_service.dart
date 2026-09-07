@@ -7,11 +7,9 @@ class DayPrefetchService {
   final CacheWarmupService _warmup;
   final LiturgicalDayService _days;
 
-  DayPrefetchService({
-    CacheWarmupService? warmup,
-    LiturgicalDayService? days,
-  })  : _warmup = warmup ?? CacheWarmupService(),
-        _days = days ?? LiturgicalDayService();
+  DayPrefetchService({CacheWarmupService? warmup, LiturgicalDayService? days})
+    : _warmup = warmup ?? CacheWarmupService(),
+      _days = days ?? LiturgicalDayService();
 
   Future<void> prefetch(DateTime date, DayOption option) async {
     await _warmup.warmupDate(date);
