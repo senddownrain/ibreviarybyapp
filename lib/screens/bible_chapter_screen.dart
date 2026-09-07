@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
@@ -491,20 +492,20 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Column(
                     children: [
-                      SegmentedButton<bool>(
+                      AdaptiveSegmentedControl<bool>(
                         segments: const [
-                          ButtonSegment(
+                          AdaptiveSegment(
                             value: false,
                             label: Text('Стары Запавет'),
                           ),
-                          ButtonSegment(
+                          AdaptiveSegment(
                             value: true,
                             label: Text('Новы Запавет'),
                           ),
                         ],
-                        selected: {newTestament},
-                        onSelectionChanged: (value) => setSheetState(() {
-                          newTestament = value.first;
+                        value: newTestament,
+                        onChanged: (value) => setSheetState(() {
+                          newTestament = value;
                           expandedBookId = null;
                         }),
                       ),

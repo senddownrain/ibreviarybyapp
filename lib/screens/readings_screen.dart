@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 class ReadingsScreen extends ConsumerStatefulWidget {
   /// Calendar date string, e.g. "2026-03-21" (date-based loading).
@@ -1195,30 +1196,84 @@ class _BibleRef extends StatelessWidget {
 class _ReadingText extends StatelessWidget {
   final String text;
   final TextStyle textStyle;
+  final bool isPsalm;
+  final double leftInset;
 
-  const _ReadingText({required this.text, required this.textStyle});
+  const _ReadingText({
+    required this.text,
+    required this.textStyle,
+    this.isPsalm = false,
+    this.leftInset = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(text)) {
-      return Html(
-        data: text,
-        style: {
-          'body': Style(
-            margin: Margins.zero,
-            padding: HtmlPaddings.zero,
-            color: textStyle.color ?? ReaderTheme.of(context).ink,
-            fontFamily: textStyle.fontFamily,
-            fontSize: FontSize(textStyle.fontSize ?? 16),
-            fontWeight: textStyle.fontWeight,
-            lineHeight: LineHeight(1.78),
-            textAlign: TextAlign.left,
-          ),
-          'p': Style(margin: Margins.only(bottom: 14)),
-        },
+      final reader = ReaderTheme.of(context);
+      final base = textStyle.fontSize ?? 16;
+      return Padding(
+        padding: EdgeInsets.only(left: leftInset),
+        child: Html(
+          data: isPsalm ? formatPsalmHtml(text) : formatLiturgicalHtml(text),
+          style: {
+            'body': Style(
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+              color: textStyle.color ?? reader.ink,
+              fontFamily: textStyle.fontFamily,
+              fontSize: FontSize(base),
+              fontWeight: textStyle.fontWeight,
+              lineHeight: LineHeight(1.78),
+              textAlign: TextAlign.left,
+            ),
+            'p': Style(margin: Margins.only(bottom: 14)),
+            '.liturgical-subheading': Style(
+              fontSize: FontSize(base * 0.84),
+              lineHeight: LineHeight(1.45),
+              color: reader.muted,
+              margin: Margins.only(bottom: 7),
+            ),
+            '.liturgical-heading': Style(
+              fontSize: FontSize(base * 0.94),
+              lineHeight: LineHeight(1.3),
+              color: reader.rubric,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.7,
+            ),
+            '.psalm-strophe-even': Style(
+              margin: Margins.only(left: 16, bottom: 14),
+            ),
+            '.psalm-marker': Style(
+              color: reader.rubric,
+              fontWeight: FontWeight.w600,
+            ),
+            '.liturgical-rubric-inline': Style(color: reader.rubric),
+          },
+        ),
       );
     }
-    return SelectableText(text, style: textStyle.copyWith(height: 1.78));
+    final reader = ReaderTheme.of(context);
+    final pieces = text.split(RegExp(r'(?=[*†])|(?<=[*†])'));
+    return Padding(
+      padding: EdgeInsets.only(left: leftInset),
+      child: SelectableText.rich(
+        TextSpan(
+          children: [
+            for (final piece in pieces)
+              TextSpan(
+                text: piece,
+                style: piece == '*' || piece == '†'
+                    ? textStyle.copyWith(
+                        height: 1.78,
+                        color: reader.rubric,
+                        fontWeight: FontWeight.w600,
+                      )
+                    : textStyle.copyWith(height: 1.78),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -1399,7 +1454,11 @@ class _PsalmSection extends StatelessWidget {
           ],
           if (psalm.text?.isNotEmpty == true) ...[
             const SizedBox(height: 8),
-            _ReadingText(text: psalm.text!, textStyle: textStyle),
+            _ReadingText(
+              text: psalm.text!,
+              textStyle: textStyle,
+              isPsalm: true,
+            ),
           ],
         ],
 
@@ -1418,7 +1477,12 @@ class _PsalmSection extends StatelessWidget {
             ],
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: _ReadingText(text: psalm.verses[i], textStyle: textStyle),
+              child: _ReadingText(
+                text: psalm.verses[i],
+                textStyle: textStyle,
+                isPsalm: true,
+                leftInset: i.isOdd ? 16 : 0,
+              ),
             ),
           ],
           // After last verse: altChorus or chorus again

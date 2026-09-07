@@ -15,6 +15,7 @@ import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
@@ -367,7 +368,7 @@ class PrayerDetailScreen extends ConsumerWidget {
       final textColor =
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       return Html(
-        data: html,
+        data: formatLiturgicalHtml(html),
         style: {
           'body': Style(
             fontSize: FontSize(textStyle.fontSize ?? 16),
@@ -382,6 +383,16 @@ class PrayerDetailScreen extends ConsumerWidget {
             fontFamily: textStyle.fontFamily,
             color: textColor,
             margin: Margins.only(bottom: 10),
+          ),
+          'ul': Style(
+            margin: Margins.symmetric(vertical: 10),
+            padding: HtmlPaddings.only(left: 24),
+            listStylePosition: ListStylePosition.outside,
+          ),
+          'ol': Style(
+            margin: Margins.symmetric(vertical: 10),
+            padding: HtmlPaddings.only(left: 24),
+            listStylePosition: ListStylePosition.outside,
           ),
           'h2': Style(
             fontSize: FontSize((textStyle.fontSize ?? 16) * 1.2),
@@ -400,8 +411,17 @@ class PrayerDetailScreen extends ConsumerWidget {
           '.prayer-rubric': Style(
             color: reader.rubric,
             fontStyle: FontStyle.italic,
-            margin: Margins.symmetric(vertical: 10),
+            fontSize: FontSize((textStyle.fontSize ?? 16) * 0.86),
+            lineHeight: LineHeight(1.45),
+            margin: Margins.symmetric(vertical: 14),
+            padding: HtmlPaddings.only(left: 13, top: 1, bottom: 1),
+            border: Border(left: BorderSide(color: reader.rubric, width: 3)),
           ),
+          '.psalm-marker': Style(
+            color: reader.rubric,
+            fontWeight: FontWeight.w600,
+          ),
+          '.liturgical-rubric-inline': Style(color: reader.rubric),
         },
       );
     }

@@ -83,6 +83,7 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
     final settings = ref.watch(settingsProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
+    final topPad = MediaQuery.paddingOf(context).top;
     final bottomPad = MediaQuery.viewPaddingOf(context).bottom;
 
     return Stack(
@@ -94,7 +95,7 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 16, 22),
+                  padding: EdgeInsets.fromLTRB(20, topPad + 78, 16, 22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -215,6 +216,7 @@ class _PrayerSearchDock extends StatelessWidget {
                 textInputAction: TextInputAction.search,
                 decoration: const InputDecoration(
                   hintText: 'Пошук малітваў',
+                  filled: false,
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
@@ -426,22 +428,36 @@ class _PrayerCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                child: IconButton(
-                  tooltip: isFavorite
+                child: Tooltip(
+                  message: isFavorite
                       ? 'Выдаліць з абраных'
                       : 'Дадаць у абраныя',
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    ref
-                        .read(settingsProvider.notifier)
-                        .toggleFavorite(prayer.id);
-                  },
-                  icon: PhosphorIcon(
-                    isFavorite
-                        ? PhosphorIconsFill.heart
-                        : PhosphorIconsRegular.heart,
-                    size: 22,
-                    color: isFavorite ? cs.error : cs.tertiary,
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      hoverColor: (isFavorite ? cs.error : cs.tertiary)
+                          .withValues(alpha: 0.07),
+                      splashColor: (isFavorite ? cs.error : cs.tertiary)
+                          .withValues(alpha: 0.11),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        ref
+                            .read(settingsProvider.notifier)
+                            .toggleFavorite(prayer.id);
+                      },
+                      child: Center(
+                        child: PhosphorIcon(
+                          isFavorite
+                              ? PhosphorIconsFill.heart
+                              : PhosphorIconsRegular.heart,
+                          size: 22,
+                          color: isFavorite ? cs.error : cs.tertiary,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

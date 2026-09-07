@@ -9,6 +9,8 @@ import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 String _stripHtml(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -136,18 +138,40 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
 
   Widget _buildRendered(String text, TextStyle textStyle) {
     if (text.contains('<') && text.contains('>')) {
+      final reader = ReaderTheme.of(context);
+      final base = textStyle.fontSize ?? 16;
       final textColor =
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       return Html(
-        data: text,
+        data: formatLiturgicalHtml(text),
         style: {
           'body': Style(
-            fontSize: FontSize(textStyle.fontSize ?? 16),
+            fontSize: FontSize(base),
             fontFamily: textStyle.fontFamily,
             color: textColor,
-            lineHeight: LineHeight(1.6),
+            lineHeight: LineHeight(1.78),
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+            textAlign: TextAlign.left,
           ),
-          'p': Style(color: textColor, margin: Margins.only(bottom: 10)),
+          'p': Style(color: textColor, margin: Margins.only(bottom: 14)),
+          '.liturgical-subheading': Style(
+            fontSize: FontSize(base * 0.84),
+            lineHeight: LineHeight(1.45),
+            color: reader.muted,
+          ),
+          '.liturgical-heading': Style(
+            fontSize: FontSize(base * 0.94),
+            lineHeight: LineHeight(1.3),
+            color: reader.rubric,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.7,
+          ),
+          '.psalm-marker': Style(
+            color: reader.rubric,
+            fontWeight: FontWeight.w600,
+          ),
+          '.liturgical-rubric-inline': Style(color: reader.rubric),
         },
       );
     }

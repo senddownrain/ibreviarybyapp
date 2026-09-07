@@ -141,10 +141,32 @@ List<Prayer> filterAndSortPrayers(
     final aFavorite = favorites.contains(a.id);
     final bFavorite = favorites.contains(b.id);
     if (aFavorite != bFavorite) return aFavorite ? -1 : 1;
-    return a.displayTitle.trim().toLowerCase().compareTo(
-      b.displayTitle.trim().toLowerCase(),
-    );
+    return _comparePrayerTitles(a.displayTitle, b.displayTitle);
   });
 
   return filtered;
+}
+
+int _comparePrayerTitles(String a, String b) {
+  final titleA = a.trim().toLowerCase();
+  final titleB = b.trim().toLowerCase();
+  final alphabetDifference = _alphabetRank(titleA) - _alphabetRank(titleB);
+  return alphabetDifference != 0
+      ? alphabetDifference
+      : titleA.compareTo(titleB);
+}
+
+// Belarusian locale collation keeps Cyrillic prayer titles before Latin ones.
+// Dart has no browser-style Intl.Collator, so preserve that visible behavior
+// explicitly before applying the stable alphabetical comparison.
+int _alphabetRank(String value) {
+  if (value.isEmpty) return 2;
+  final first = value.runes.first;
+  if (first >= 0x0400 && first <= 0x052f) return 0;
+  if ((first >= 0x0041 && first <= 0x005a) ||
+      (first >= 0x0061 && first <= 0x007a) ||
+      (first >= 0x00c0 && first <= 0x024f)) {
+    return 1;
+  }
+  return 2;
 }

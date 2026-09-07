@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -464,9 +465,12 @@ class _DayOptionCard extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
         onTap: () {
+          HapticFeedback.lightImpact();
           final dayId = day.id;
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
-          unawaited(DayPrefetchService().prefetch(date, option));
+          unawaited(
+            DayPrefetchService().prefetch(date, option).catchError((_) {}),
+          );
           context.push('/hora/$dateKey/$dayId');
         },
         child: child,

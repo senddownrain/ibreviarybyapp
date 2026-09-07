@@ -60,7 +60,9 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
+    final routeUri = GoRouterState.of(context).uri;
+    final location = routeUri.toString();
+    final contentBehindMenu = routeUri.path == '/prayers';
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final isOffline = ref.watch(isOfflineProvider);
 
@@ -84,9 +86,10 @@ class _AppShellState extends ConsumerState<AppShell> {
                 Positioned.fill(
                   child: Column(
                     children: [
-                      // Keep every shell page below the status bar and the
-                      // complete 52 px floating menu control.
-                      SizedBox(height: topPadding + 78),
+                      // Most shell pages start below the floating menu.
+                      // Prayers paints its ambient background behind it and
+                      // supplies its own title spacing.
+                      SizedBox(height: contentBehindMenu ? 0 : topPadding + 78),
 
                       //
                       // Offline banner

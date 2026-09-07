@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,9 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/utils/cache_stats.dart';
+import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -50,9 +53,9 @@ class SettingsScreen extends ConsumerWidget {
                 // Theme
                 Text('Тэма', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                SegmentedButton<ThemeMode>(
+                AdaptiveSegmentedControl<ThemeMode>(
                   segments: const [
-                    ButtonSegment(
+                    AdaptiveSegment(
                       value: ThemeMode.system,
                       icon: PhosphorIcon(
                         PhosphorIconsRegular.circleHalf,
@@ -60,20 +63,20 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                       label: Text('Сістэма'),
                     ),
-                    ButtonSegment(
+                    AdaptiveSegment(
                       value: ThemeMode.light,
                       icon: PhosphorIcon(PhosphorIconsRegular.sun, size: 18),
                       label: Text('Светлая'),
                     ),
-                    ButtonSegment(
+                    AdaptiveSegment(
                       value: ThemeMode.dark,
                       icon: PhosphorIcon(PhosphorIconsRegular.moon, size: 18),
                       label: Text('Цёмная'),
                     ),
                   ],
-                  selected: {settings.themeMode},
-                  onSelectionChanged: (s) =>
-                      ref.read(settingsProvider.notifier).setThemeMode(s.first),
+                  value: settings.themeMode,
+                  onChanged: (mode) =>
+                      ref.read(settingsProvider.notifier).setThemeMode(mode),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -138,7 +141,11 @@ class SettingsScreen extends ConsumerWidget {
                                       'Аб вечнай радасці спявае душа мая.',
                                       style: previewStyle.copyWith(
                                         fontSize: 13,
-                                        color: selected ? null : Colors.grey,
+                                        color: selected
+                                            ? null
+                                            : Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -418,22 +425,40 @@ class _CategoriesSection extends ConsumerWidget {
                   ),
                   tooltip: 'Выдаліць',
                   onPressed: () async {
-                    final ok = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Выдаліць катэгорыю?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('Адмена'),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text('Выдаліць'),
-                          ),
-                        ],
-                      ),
-                    );
+                    final ok = usesCupertinoGlass(context)
+                        ? await showCupertinoDialog<bool>(
+                            context: context,
+                            builder: (ctx) => CupertinoAlertDialog(
+                              title: const Text('Выдаліць катэгорыю?'),
+                              actions: [
+                                CupertinoDialogAction(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Адмена'),
+                                ),
+                                CupertinoDialogAction(
+                                  isDestructiveAction: true,
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Выдаліць'),
+                                ),
+                              ],
+                            ),
+                          )
+                        : await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Выдаліць катэгорыю?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Адмена'),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Выдаліць'),
+                                ),
+                              ],
+                            ),
+                          );
                     if (ok == true) {
                       ref
                           .read(settingsProvider.notifier)

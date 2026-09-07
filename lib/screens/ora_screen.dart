@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/cache_warmup_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -17,8 +18,11 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
 
@@ -280,7 +284,26 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   Widget _loadingState(BuildContext context) => Scaffold(
     extendBodyBehindAppBar: true,
     appBar: AdaptiveAppBar.text(_oraTitle(widget.oraType)),
-    body: const Center(child: CircularProgressIndicator()),
+    body: Stack(
+      children: [
+        AmbientWash(seasonColor: ref.watch(liturgicalSeasonColorProvider)),
+        ListView(
+          padding: EdgeInsets.fromLTRB(
+            0,
+            MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
+            0,
+            24,
+          ),
+          children: const [
+            TileShimmer(),
+            TileShimmer(),
+            TileShimmer(),
+            TileShimmer(),
+            TileShimmer(),
+          ],
+        ),
+      ],
+    ),
   );
 
   Widget _buildForDay(BuildContext context, LiturgicalDay day) {
@@ -426,10 +449,41 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final topPad =
         MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
-    return ListView.builder(
+    final reader = ReaderTheme.of(context);
+    final dayHeading = sections.first;
+    final hourContent = sections.skip(1);
+    return ListView(
       padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
-      itemCount: sections.length,
-      itemBuilder: (_, i) => sections[i].build(context, textStyle),
+      children: [
+        dayHeading.build(context, textStyle),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 30),
+          decoration: BoxDecoration(
+            color: reader.surface,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: reader.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: Theme.of(context).brightness == Brightness.dark
+                      ? 0.24
+                      : 0.08,
+                ),
+                blurRadius: 38,
+                spreadRadius: -8,
+                offset: const Offset(0, 16),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final item in hourContent) item.build(context, textStyle),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -509,7 +563,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       final ps = (invit['invitatoriumPs$i']?.toString() ?? '').trim();
       if (ps.isEmpty) break;
       items.add(_OraItem.antiphon(ant));
-      items.add(_OraItem.html(ps));
+      items.add(_OraItem.psalm(ps));
     }
     items.add(_OraItem.antiphon(ant));
   }
@@ -575,7 +629,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
       );
       items.add(_OraItem.antiphon(antBen));
-      items.add(_OraItem.html(_kBenedictus));
+      items.add(_OraItem.psalm(_kBenedictus));
       items.add(_OraItem.antiphon(antBen));
     }
 
@@ -661,7 +715,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
       );
       items.add(_OraItem.antiphon(antMag));
-      items.add(_OraItem.html(_kMagnificat));
+      items.add(_OraItem.psalm(_kMagnificat));
       items.add(_OraItem.antiphon(antMag));
     }
 
@@ -737,7 +791,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
       );
       items.add(_OraItem.antiphon(antS));
-      items.add(_OraItem.html(_kNunc));
+      items.add(_OraItem.psalm(_kNunc));
       items.add(_OraItem.antiphon(antS));
     }
 
@@ -804,7 +858,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
       );
       items.add(_OraItem.antiphon(antBen));
-      items.add(_OraItem.html(_kBenedictus));
+      items.add(_OraItem.psalm(_kBenedictus));
       items.add(_OraItem.antiphon(antBen));
     }
     _addField(items, day, 'laudesInter', 'Просьбы');
@@ -884,13 +938,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     if (isSingleAnt) {
       items.add(_OraItem.antiphon(pairs[0].$1));
       for (final (_, ps) in pairs) {
-        if (ps.isNotEmpty) items.add(_OraItem.html(ps));
+        if (ps.isNotEmpty) items.add(_OraItem.psalm(ps));
       }
       items.add(_OraItem.antiphon(pairs[0].$1));
     } else {
       for (final (ant, ps) in pairs) {
         if (ant.isNotEmpty) items.add(_OraItem.antiphon(ant));
-        if (ps.isNotEmpty) items.add(_OraItem.html(ps));
+        if (ps.isNotEmpty) items.add(_OraItem.psalm(ps));
         if (ant.isNotEmpty && ps.isNotEmpty) items.add(_OraItem.antiphon(ant));
       }
     }
@@ -918,6 +972,7 @@ enum _OraItemType {
   antiphon,
   labeled,
   html,
+  psalm,
   plain,
   custom,
 }
@@ -949,6 +1004,8 @@ class _OraItem {
 
   factory _OraItem.html(String html) => _OraItem._(_OraItemType.html, html);
 
+  factory _OraItem.psalm(String html) => _OraItem._(_OraItemType.psalm, html);
+
   factory _OraItem.plain(String text, {String? label}) =>
       _OraItem._(_OraItemType.plain, text, label: label);
 
@@ -960,48 +1017,47 @@ class _OraItem {
 
     switch (type) {
       case _OraItemType.sectionTitle:
+        final reader = ReaderTheme.of(context);
         return Padding(
-          padding: const EdgeInsets.only(top: 8, bottom: 20),
+          padding: const EdgeInsets.fromLTRB(8, 12, 8, 18),
           child: Text(
             content,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: cs.primary,
-              letterSpacing: 0.5,
+              color: reader.rubric,
+              letterSpacing: 0.9,
             ),
           ),
         );
 
       case _OraItemType.blockHeader:
+        final reader = ReaderTheme.of(context);
         return Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 8),
+          padding: const EdgeInsets.only(top: 24, bottom: 9),
           child: Text(
             content.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.3,
-              color: cs.onSurface.withValues(alpha: 0.55),
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.9,
+              color: reader.rubric,
             ),
           ),
         );
 
       case _OraItemType.antiphon:
+        final reader = ReaderTheme.of(context);
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          width: double.infinity,
+          margin: const EdgeInsets.fromLTRB(0, 12, 0, 18),
+          padding: const EdgeInsets.fromLTRB(14, 11, 14, 11),
           decoration: BoxDecoration(
-            color: cs.primaryContainer.withValues(alpha: 0.22),
+            color: reader.rubricSoft,
             borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(4),
-              bottomRight: Radius.circular(4),
+              topRight: Radius.circular(13),
+              bottomRight: Radius.circular(13),
             ),
-            border: Border(
-              left: BorderSide(
-                color: cs.primary.withValues(alpha: 0.5),
-                width: 3,
-              ),
-            ),
+            border: Border(left: BorderSide(color: reader.rubric, width: 3)),
           ),
           child: _HtmlOrText(
             content: content,
@@ -1022,6 +1078,16 @@ class _OraItem {
           child: _HtmlOrText(content: content, textStyle: textStyle),
         );
 
+      case _OraItemType.psalm:
+        return Padding(
+          padding: const EdgeInsets.only(top: 2, bottom: 6),
+          child: _HtmlOrText(
+            content: content,
+            textStyle: textStyle,
+            isPsalm: true,
+          ),
+        );
+
       case _OraItemType.plain:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1037,7 +1103,7 @@ class _OraItem {
                   ),
                 ),
               ),
-            Text(content, style: textStyle),
+            _LiturgicalSelectableText(content: content, textStyle: textStyle),
             const SizedBox(height: 12),
           ],
         );
@@ -1086,8 +1152,13 @@ class _LabeledSection extends StatelessWidget {
 class _HtmlOrText extends StatelessWidget {
   final String content;
   final TextStyle textStyle;
+  final bool isPsalm;
 
-  const _HtmlOrText({required this.content, required this.textStyle});
+  const _HtmlOrText({
+    required this.content,
+    required this.textStyle,
+    this.isPsalm = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1095,8 +1166,12 @@ class _HtmlOrText extends StatelessWidget {
       try {
         final textColor =
             textStyle.color ?? Theme.of(context).colorScheme.onSurface;
+        final reader = ReaderTheme.of(context);
+        final baseSize = textStyle.fontSize ?? 16;
         return Html(
-          data: content,
+          data: isPsalm
+              ? formatPsalmHtml(content)
+              : formatLiturgicalHtml(content),
           style: {
             'body': Style(
               fontSize: FontSize(textStyle.fontSize ?? 16),
@@ -1109,6 +1184,34 @@ class _HtmlOrText extends StatelessWidget {
               textAlign: TextAlign.left,
             ),
             'p': Style(color: textColor, margin: Margins.only(bottom: 8)),
+            '.liturgical-subheading': Style(
+              fontSize: FontSize(baseSize * 0.84),
+              lineHeight: LineHeight(1.45),
+              color: reader.muted,
+              margin: Margins.only(bottom: 7),
+            ),
+            '.liturgical-heading': Style(
+              fontSize: FontSize(baseSize * 0.94),
+              lineHeight: LineHeight(1.3),
+              color: reader.rubric,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.7,
+              margin: Margins.only(bottom: 12),
+            ),
+            '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
+            '.psalm-strophe-even': Style(
+              margin: Margins.only(left: 16, bottom: 8),
+            ),
+            '.psalm-marker': Style(
+              color: reader.rubric,
+              fontWeight: FontWeight.w600,
+            ),
+            '.liturgical-rubric': Style(
+              color: reader.rubric,
+              fontSize: FontSize(baseSize * 0.84),
+              lineHeight: LineHeight(1.45),
+            ),
+            '.liturgical-rubric-inline': Style(color: reader.rubric),
           },
         );
       } catch (e) {
@@ -1119,7 +1222,39 @@ class _HtmlOrText extends StatelessWidget {
         );
       }
     }
-    return SelectableText(content, style: textStyle);
+    return _LiturgicalSelectableText(content: content, textStyle: textStyle);
+  }
+}
+
+class _LiturgicalSelectableText extends StatelessWidget {
+  final String content;
+  final TextStyle textStyle;
+
+  const _LiturgicalSelectableText({
+    required this.content,
+    required this.textStyle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final rubric = ReaderTheme.of(context).rubric;
+    final pieces = content.split(RegExp(r'(?=[*†])|(?<=[*†])'));
+    return SelectableText.rich(
+      TextSpan(
+        children: [
+          for (final piece in pieces)
+            TextSpan(
+              text: piece,
+              style: piece == '*' || piece == '†'
+                  ? textStyle.copyWith(
+                      color: rubric,
+                      fontWeight: FontWeight.w600,
+                    )
+                  : textStyle,
+            ),
+        ],
+      ),
+    );
   }
 }
 

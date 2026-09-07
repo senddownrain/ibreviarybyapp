@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 
 void main() {
@@ -61,5 +62,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(CalendarDatePicker), findsOneWidget);
     expect(find.byType(CupertinoDatePicker), findsNothing);
+  });
+
+  testWidgets('segmented choices follow the target platform', (tester) async {
+    Widget app(TargetPlatform platform) => MaterialApp(
+      key: ValueKey(platform),
+      theme: ThemeData(platform: platform),
+      home: Scaffold(
+        body: AdaptiveSegmentedControl<bool>(
+          value: false,
+          segments: const [
+            AdaptiveSegment(value: false, label: Text('First')),
+            AdaptiveSegment(value: true, label: Text('Second')),
+          ],
+          onChanged: (_) {},
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(TargetPlatform.iOS));
+    expect(find.byType(CupertinoSlidingSegmentedControl<bool>), findsOneWidget);
+    expect(find.byType(SegmentedButton<bool>), findsNothing);
+
+    await tester.pumpWidget(app(TargetPlatform.android));
+    expect(find.byType(SegmentedButton<bool>), findsOneWidget);
+    expect(find.byType(CupertinoSlidingSegmentedControl<bool>), findsNothing);
   });
 }

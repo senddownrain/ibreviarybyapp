@@ -17,6 +17,7 @@ void main() {
       tags: ['вечар', 'штодзённыя'],
     ),
     Prayer(id: 'c', title: '  Вітай, Марыя', tags: ['марыйныя']),
+    Prayer(id: 'd', title: 'Ordo Missae'),
   ];
 
   test('selected tags match any selected tag', () {
@@ -50,6 +51,6 @@ void main() {
       'b',
     ]);
 
-    expect(result.map((prayer) => prayer.id), ['b', 'a', 'c']);
+    expect(result.map((prayer) => prayer.id), ['b', 'a', 'c', 'd']);
   });
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,7 @@ import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
 /// Screen showing list of available liturgical hours for a day.
@@ -140,6 +142,12 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     return DateFormat('yyyy-MM-dd').format(widget.date);
   }
 
+  bool _isHoraAvailable(HoraItem hora) {
+    final day = _day;
+    if (day == null) return false;
+    return hora.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
+  }
+
   @override
   Widget build(BuildContext context) {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
@@ -152,7 +160,20 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
-            const Center(child: CircularProgressIndicator()),
+            ListView(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
+                0,
+                24,
+              ),
+              children: const [
+                TileShimmer(),
+                TileShimmer(),
+                TileShimmer(),
+                TileShimmer(),
+              ],
+            ),
           ],
         ),
       );
@@ -229,7 +250,11 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.circle, size: 9, color: dayColor),
+                              PhosphorIcon(
+                                PhosphorIconsFill.circle,
+                                size: 9,
+                                color: dayColor,
+                              ),
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
@@ -329,9 +354,12 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                     child: _ReadingTile(
                       color: dayColor,
                       subtitle: _readingSubtitle,
-                      onTap: () => context.push(
-                        '/readings/$dateKey?dayId=${widget.dayId}',
-                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(
+                          '/readings/$dateKey?dayId=${widget.dayId}',
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -343,10 +371,13 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                       padding: EdgeInsets.zero,
                       child: _HoraTile(
                         hora: hora,
-                        enabled: true,
-                        onTap: () => context.push(
-                          '/ora/$dateKey/${widget.dayId}/${hora.type}',
-                        ),
+                        enabled: _isHoraAvailable(hora),
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          context.push(
+                            '/ora/$dateKey/${widget.dayId}/${hora.type}',
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 12),

@@ -18,6 +18,18 @@ import 'package:mybrev_flutter/screens/bible_chapter_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
 
+class _ShellFadePage<T> extends CustomTransitionPage<T> {
+  _ShellFadePage({required super.child, super.key})
+    : super(
+        transitionDuration: const Duration(milliseconds: 180),
+        reverseTransitionDuration: const Duration(milliseconds: 120),
+        transitionsBuilder: (_, animation, _, child) => FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: child,
+        ),
+      );
+}
+
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -32,11 +44,12 @@ final router = GoRouter(
         GoRoute(
           path: '/',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HomeScreen()),
+              _ShellFadePage(key: state.pageKey, child: const HomeScreen()),
         ),
         GoRoute(
           path: '/picker',
-          pageBuilder: (context, state) => NoTransitionPage(
+          pageBuilder: (context, state) => _ShellFadePage(
+            key: state.pageKey,
             child: LiturgicalPickerScreen(
               mode: state.uri.queryParameters['mode'] ?? 'hours',
             ),
@@ -45,27 +58,29 @@ final router = GoRouter(
         GoRoute(
           path: '/prayers',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: PrayersScreen()),
+              _ShellFadePage(key: state.pageKey, child: const PrayersScreen()),
         ),
         GoRoute(
           path: '/bible',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: BibleScreen()),
+              _ShellFadePage(key: state.pageKey, child: const BibleScreen()),
         ),
         GoRoute(
           path: '/settings',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SettingsScreen()),
+              _ShellFadePage(key: state.pageKey, child: const SettingsScreen()),
         ),
         GoRoute(
           path: '/my-prayers',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: MyPrayersScreen()),
+          pageBuilder: (context, state) => _ShellFadePage(
+            key: state.pageKey,
+            child: const MyPrayersScreen(),
+          ),
         ),
         GoRoute(
           path: '/about',
           pageBuilder: (context, state) =>
-              const NoTransitionPage(child: AboutScreen()),
+              _ShellFadePage(key: state.pageKey, child: const AboutScreen()),
         ),
       ],
     ),

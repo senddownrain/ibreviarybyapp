@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 
@@ -13,8 +14,8 @@ Future<DateTime?> showAmbientDatePicker({
 }) {
   final today = DateUtils.dateOnly(DateTime.now());
   final safeInitial = DateUtils.dateOnly(initialDate);
-  final firstDate = DateTime(2019);
-  final lastDate = DateTime(2030, 12, 31);
+  final firstDate = kCalendarFirstDate;
+  final lastDate = kCalendarLastDate;
   if (usesCupertinoGlass(context)) {
     return showCupertinoModalPopup<DateTime>(
       context: context,
