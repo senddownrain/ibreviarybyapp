@@ -84,7 +84,16 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.paddingOf(context).top;
-    final bottomPad = MediaQuery.viewPaddingOf(context).bottom;
+    final mediaBottomPad = MediaQuery.viewPaddingOf(context).bottom;
+    final rootView = View.of(context);
+    final rootBottomPad =
+        rootView.viewPadding.bottom / rootView.devicePixelRatio;
+    // A Scaffold can consume MediaQuery.padding for an edge-to-edge body.
+    // The root FlutterView keeps the actual Android navigation-bar inset,
+    // including the traditional three-button bar.
+    final bottomPad = rootBottomPad > mediaBottomPad
+        ? rootBottomPad
+        : mediaBottomPad;
 
     return Stack(
       children: [
