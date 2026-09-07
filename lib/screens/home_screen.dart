@@ -14,6 +14,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -340,12 +341,10 @@ class HomeScreen extends ConsumerWidget {
     WidgetRef ref,
     DateTime date,
   ) async {
-    final picked = await showDatePicker(
+    final picked = await showAmbientDatePicker(
       context: context,
       initialDate: date,
-      firstDate: DateTime(2019),
-      lastDate: DateTime(2027, 12, 31),
-      locale: const Locale('be'),
+      seasonColor: ref.read(liturgicalSeasonColorProvider),
     );
     if (picked != null && context.mounted) {
       ref.read(selectedDateProvider.notifier).state = picked;

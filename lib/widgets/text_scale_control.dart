@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-/// Shared floating reader-size control used by every reading surface.
+/// Circular entry point for the shared reader-size panel.
 class TextScaleControl extends ConsumerWidget {
   const TextScaleControl({super.key});
 
@@ -13,39 +16,176 @@ class TextScaleControl extends ConsumerWidget {
     final fontSize = ref.watch(
       settingsProvider.select((settings) => settings.fontSize),
     );
-    final notifier = ref.read(settingsProvider.notifier);
-    final canDecrease = fontSize > kMinReaderFontSize + 0.01;
-    final canIncrease = fontSize < kMaxReaderFontSize - 0.01;
 
     return Semantics(
-      container: true,
+      button: true,
       label: 'Памер тэксту, ${readerFontScalePercent(fontSize)} адсоткаў',
-      child: Padding(
-        padding: const EdgeInsets.only(right: 4),
-        child: GlassSurface(
-          style: GlassStyle.pill,
-          borderRadius: BorderRadius.circular(24),
-          child: SizedBox(
-            height: 46,
-            child: Row(
+      child: AdaptiveChromeSurface(
+        role: ChromeSurfaceRole.control,
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox.square(
+          dimension: 48,
+          child: IconButton(
+            key: const Key('text-scale-open'),
+            tooltip: 'Памер тэксту',
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              _showTextScalePanel(context);
+            },
+            icon: const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _showTextScalePanel(BuildContext context) {
+  if (usesCupertinoGlass(context)) {
+    return showCupertinoModalPopup<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.28),
+      builder: (_) => const Material(
+        color: Colors.transparent,
+        child: SafeArea(top: false, child: _TextScalePanel()),
+      ),
+    );
+  }
+  return showModalBottomSheet<void>(
+    context: context,
+    useSafeArea: true,
+    enableDrag: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withValues(alpha: 0.28),
+    builder: (_) => const _TextScalePanel(),
+  );
+}
+
+class _TextScalePanel extends ConsumerWidget {
+  const _TextScalePanel();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fontSize = ref.watch(
+      settingsProvider.select((settings) => settings.fontSize),
+    );
+    final notifier = ref.read(settingsProvider.notifier);
+    final percent = readerFontScalePercent(fontSize);
+    final canDecrease = fontSize > kMinReaderFontSize + 0.01;
+    final canIncrease = fontSize < kMaxReaderFontSize - 0.01;
+    final cs = Theme.of(context).colorScheme;
+    final accent = GlassTokens.of(context).accentOnSurface(cs.tertiary);
+
+    return Center(
+      heightFactor: 1,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          child: AdaptiveChromeSurface(
+            role: ChromeSurfaceRole.group,
+            seasonColor: cs.tertiary,
+            borderRadius: BorderRadius.circular(30),
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _ScaleButton(
-                  key: const Key('text-scale-decrease'),
-                  tooltip: 'Паменшыць тэкст',
-                  icon: PhosphorIconsBold.minus,
-                  onPressed: canDecrease ? notifier.decreaseFontSize : null,
-                ),
                 Container(
-                  width: 1,
-                  height: 20,
-                  color: GlassTokens.of(context).pillBorder,
+                  width: 38,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: cs.onSurfaceVariant.withValues(alpha: 0.32),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                _ScaleButton(
-                  key: const Key('text-scale-increase'),
-                  tooltip: 'Павялічыць тэкст',
-                  icon: PhosphorIconsBold.plus,
-                  onPressed: canIncrease ? notifier.increaseFontSize : null,
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    PhosphorIcon(
+                      PhosphorIconsRegular.textAa,
+                      size: 23,
+                      color: accent,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Памер тэксту',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    AnimatedContainer(
+                      key: const Key('text-scale-value'),
+                      duration: const Duration(milliseconds: 160),
+                      curve: Curves.easeOut,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: cs.tertiary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: Text(
+                        '$percent%',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: accent,
+                          fontWeight: FontWeight.w700,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      tooltip: 'Закрыць',
+                      onPressed: () => Navigator.pop(context),
+                      icon: const PhosphorIcon(
+                        PhosphorIconsRegular.x,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    _ScaleStepButton(
+                      key: const Key('text-scale-decrease'),
+                      tooltip: 'Паменшыць тэкст',
+                      icon: PhosphorIconsBold.minus,
+                      onPressed: canDecrease ? notifier.decreaseFontSize : null,
+                    ),
+                    Expanded(
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 5,
+                          activeTrackColor: accent,
+                          inactiveTrackColor: cs.onSurfaceVariant.withValues(
+                            alpha: 0.16,
+                          ),
+                          thumbColor: accent,
+                          overlayColor: cs.tertiary.withValues(alpha: 0.12),
+                        ),
+                        child: Slider.adaptive(
+                          key: const Key('text-scale-slider'),
+                          value: fontSize,
+                          min: kMinReaderFontSize,
+                          max: kMaxReaderFontSize,
+                          divisions: 11,
+                          label: '$percent%',
+                          onChanged: notifier.setFontSize,
+                          semanticFormatterCallback: (value) =>
+                              '${readerFontScalePercent(value)} адсоткаў',
+                        ),
+                      ),
+                    ),
+                    _ScaleStepButton(
+                      key: const Key('text-scale-increase'),
+                      tooltip: 'Павялічыць тэкст',
+                      icon: PhosphorIconsBold.plus,
+                      onPressed: canIncrease ? notifier.increaseFontSize : null,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -56,12 +196,12 @@ class TextScaleControl extends ConsumerWidget {
   }
 }
 
-class _ScaleButton extends StatelessWidget {
+class _ScaleStepButton extends StatelessWidget {
   final String tooltip;
   final IconData icon;
   final VoidCallback? onPressed;
 
-  const _ScaleButton({
+  const _ScaleStepButton({
     super.key,
     required this.tooltip,
     required this.icon,
@@ -69,13 +209,11 @@ class _ScaleButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => IconButton(
+  Widget build(BuildContext context) => IconButton.filledTonal(
     tooltip: tooltip,
     onPressed: onPressed,
     icon: PhosphorIcon(icon, size: 18),
-    padding: EdgeInsets.zero,
-    constraints: const BoxConstraints.tightFor(width: 38, height: 40),
+    constraints: const BoxConstraints.tightFor(width: 42, height: 42),
     visualDensity: VisualDensity.compact,
-    splashRadius: 20,
   );
 }

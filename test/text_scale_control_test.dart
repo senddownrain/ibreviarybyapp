@@ -5,7 +5,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
 void main() {
-  testWidgets('changes reader size in 10% steps and respects limits', (
+  testWidgets('opens the slider panel and respects reader-size limits', (
     tester,
   ) async {
     final container = ProviderContainer(
@@ -27,11 +27,19 @@ void main() {
       ),
     );
 
-    expect(find.byKey(const Key('text-scale-decrease')), findsOneWidget);
-    expect(find.byKey(const Key('text-scale-increase')), findsOneWidget);
+    expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
+    expect(find.byKey(const Key('text-scale-slider')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('text-scale-open')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
+    expect(find.byKey(const Key('text-scale-value')), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pump();
+    expect(find.text('110%'), findsOneWidget);
     expect(
       container.read(settingsProvider).fontSize,
       closeTo(kDefaultReaderFontSize * 1.1, 0.001),

@@ -22,6 +22,7 @@ class BibleBookInfo {
 
   /// Whether verses use Russified spelling (e.g. RST text)
   final bool isVerseTextRussian;
+  final bool isNewTestament;
 
   const BibleBookInfo({
     required this.id,
@@ -30,6 +31,7 @@ class BibleBookInfo {
     required this.versionId,
     this.order = 0,
     this.isVerseTextRussian = false,
+    this.isNewTestament = false,
   });
 }
 
@@ -38,12 +40,16 @@ class BibleVersionMeta {
   final String name;
   final String shortName;
   final String langLabel;
+  final String shortLabel;
+  final String attribution;
 
   const BibleVersionMeta({
     required this.id,
     required this.name,
     required this.shortName,
     required this.langLabel,
+    required this.shortLabel,
+    required this.attribution,
   });
 }
 
@@ -53,12 +59,16 @@ const kBibleVersionMeta = {
     name: 'Беларуская Біблія',
     shortName: 'ББ',
     langLabel: 'Беларуская',
+    shortLabel: 'БЕЛ',
+    attribution: 'А. Бокун · catholic.by',
   ),
   'ru': BibleVersionMeta(
     id: 'ru',
     name: 'Сінадальны пераклад',
     shortName: 'СП',
     langLabel: 'Руская',
+    shortLabel: 'РУС',
+    attribution: 'Синодальный перевод',
   ),
 };
 
@@ -90,6 +100,9 @@ class BibleRepository {
     final d = _versionData(versionId);
     if (d == null) return [];
     final books = d['books'] as List? ?? [];
+    final newTestamentIndex = books.indexWhere(
+      (book) => book is Map && book['id'] == 'mt',
+    );
     return books.asMap().entries.map((entry) {
       final b = entry.value as Map;
       final order = (b['order'] as int?) ?? (entry.key + 1);
@@ -100,12 +113,54 @@ class BibleRepository {
         versionId: versionId,
         order: order,
         isVerseTextRussian: versionId != 'bel',
+        isNewTestament:
+            newTestamentIndex >= 0 && entry.key >= newTestamentIndex,
       );
     }).toList();
   }
 
   static BibleBookInfo? getBook(String versionId, String bookId) {
     return getBooks(versionId).where((b) => b.id == bookId).firstOrNull;
+  }
+
+  /// Finds the same canonical book in another translation. The Russian seed
+  /// has seven additional Old Testament books, so raw order is insufficient.
+  static BibleBookInfo? getParallelBook(
+    String fromVersionId,
+    String bookId,
+    String toVersionId,
+  ) {
+    const russianOnlyIds = {'tob', 'jdt', '1mac', '2mac', 'wis', 'sir', 'bar'};
+    List<BibleBookInfo> canonicalBooks(String versionId) => getBooks(versionId)
+        .where((book) => versionId != 'ru' || !russianOnlyIds.contains(book.id))
+        .toList(growable: false);
+
+    final source = canonicalBooks(fromVersionId);
+    final sourceIndex = source.indexWhere((book) => book.id == bookId);
+    if (sourceIndex < 0) return null;
+    final target = canonicalBooks(toVersionId);
+    return sourceIndex < target.length ? target[sourceIndex] : null;
+  }
+
+  static List<({int chapter, BibleVerse verse})> searchBook(
+    String versionId,
+    String bookId,
+    String query, {
+    int limit = 60,
+  }) {
+    final book = getBook(versionId, bookId);
+    final normalized = query.trim().toLowerCase();
+    if (book == null || normalized.length < 2) return const [];
+    final results = <({int chapter, BibleVerse verse})>[];
+    for (var chapter = 1; chapter <= book.chapterCount; chapter++) {
+      for (final verse in getChapter(versionId, bookId, chapter)) {
+        if (verse.text.toLowerCase().contains(normalized)) {
+          results.add((chapter: chapter, verse: verse));
+          if (results.length >= limit) return results;
+        }
+      }
+    }
+    return results;
   }
 
   /// Returns chapter verses as typed [BibleVerse] objects.

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 
 /// Floating top controls inspired by Samsung One UI.
 ///
@@ -40,7 +40,9 @@ class FloatingTopActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final resolvedSeasonColor =
-        seasonColor ?? ref.watch(liturgicalSeasonColorProvider) ?? Colors.transparent;
+        seasonColor ??
+        ref.watch(liturgicalSeasonColorProvider) ??
+        Colors.transparent;
 
     final cs = Theme.of(context).colorScheme;
 
@@ -68,8 +70,8 @@ class FloatingTopActions extends ConsumerWidget {
             const Spacer(),
 
             if (actions.isNotEmpty)
-              GlassSurface(
-                style: GlassStyle.pill,
+              AdaptiveChromeSurface(
+                role: ChromeSurfaceRole.group,
                 seasonColor: resolvedSeasonColor,
                 borderRadius: BorderRadius.circular(28),
                 child: Material(
@@ -105,8 +107,8 @@ class _FloatingTopButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = GlassSurface(
-      style: GlassStyle.pill,
+    final button = AdaptiveChromeSurface(
+      role: ChromeSurfaceRole.control,
       seasonColor: seasonColor,
       borderRadius: BorderRadius.circular(28),
       child: Material(
@@ -114,13 +116,7 @@ class _FloatingTopButton extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(28),
-          child: SizedBox(
-            width: 52,
-            height: 52,
-            child: Center(
-              child: child,
-            ),
-          ),
+          child: SizedBox(width: 52, height: 52, child: Center(child: child)),
         ),
       ),
     );
@@ -129,9 +125,6 @@ class _FloatingTopButton extends StatelessWidget {
       return button;
     }
 
-    return Tooltip(
-      message: tooltip!,
-      child: button,
-    );
+    return Tooltip(message: tooltip!, child: button);
   }
 }

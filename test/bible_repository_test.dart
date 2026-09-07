@@ -1,29 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
+import 'package:mybrev_flutter/services/bible_seed_loader.dart';
 
 void main() {
-  test('BibleRepository exposes loaded books and chapters', () {
-    BibleRepository.setData('bel', {
-      'books': [
-        {
-          'id': 'gen',
-          'name': 'Быццё',
-          'order': 1,
-          'chapters': [
-            [
-              {'num': 1, 'text': 'На пачатку...'},
-            ],
-          ],
-        },
-      ],
-    });
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    final books = BibleRepository.getBooks('bel');
-    expect(books.single.name, 'Быццё');
-    expect(books.single.chapterCount, 1);
-    expect(
-      BibleRepository.getChapter('bel', 'gen', 1).single.text,
-      'На пачатку...',
-    );
+  setUpAll(() async {
+    BibleRepository.setData('bel', await BibleSeedLoader.load(lang: 'bel'));
+    BibleRepository.setData('ru', await BibleSeedLoader.load(lang: 'ru'));
+  });
+
+  test('testament boundary accounts for Russian additional books', () {
+    expect(BibleRepository.getBook('ru', 'ml')?.isNewTestament, isFalse);
+    expect(BibleRepository.getBook('ru', 'mt')?.isNewTestament, isTrue);
+    expect(BibleRepository.getBook('bel', 'ml')?.isNewTestament, isFalse);
+    expect(BibleRepository.getBook('bel', 'mt')?.isNewTestament, isTrue);
+  });
+
+  test('parallel translation keeps the canonical book', () {
+    expect(BibleRepository.getParallelBook('bel', 'jn', 'ru')?.id, 'jo');
+    expect(BibleRepository.getParallelBook('ru', 'jn', 'bel')?.id, 'jon');
+    expect(BibleRepository.getParallelBook('ru', 'tob', 'bel'), isNull);
+  });
+
+  test('book search returns matches with chapter and verse', () {
+    final firstVerse = BibleRepository.getChapter('bel', 'gn', 1).first;
+    final word = firstVerse.text
+        .split(RegExp(r'\s+'))
+        .firstWhere((part) => part.length >= 2)
+        .replaceAll(RegExp(r'[^\p{L}]', unicode: true), '');
+    final results = BibleRepository.searchBook('bel', 'gn', word);
+    expect(results, isNotEmpty);
+    expect(results.first.chapter, greaterThanOrEqualTo(1));
   });
 }

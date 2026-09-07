@@ -7,7 +7,7 @@ import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 
 class MyPrayersScreen extends ConsumerWidget {
   const MyPrayersScreen({super.key});
@@ -20,7 +20,7 @@ class MyPrayersScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar.text('Мае малітвы'),
+      appBar: AdaptiveAppBar.text('Мае малітвы'),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/prayer/add'),
         tooltip: 'Новая малітва',
@@ -34,8 +34,11 @@ class MyPrayersScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    PhosphorIcon(PhosphorIconsLight.notepad,
-                        size: 56, color: cs.onSurfaceVariant),
+                    PhosphorIcon(
+                      PhosphorIconsLight.notepad,
+                      size: 56,
+                      color: cs.onSurfaceVariant,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'Тут будуць вашы малітвы',
@@ -45,14 +48,18 @@ class MyPrayersScreen extends ConsumerWidget {
                     Text(
                       'Націсніце + каб дадаць першую',
                       style: TextStyle(
-                          color: cs.onSurfaceVariant, fontSize: 13),
+                        color: cs.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
               )
             : ListView.builder(
                 padding: EdgeInsets.only(
-                  top: MediaQuery.paddingOf(context).top + kToolbarHeight + 8,
+                  top:
+                      MediaQuery.paddingOf(context).top +
+                      kFloatingAppBarContentInset,
                   bottom: 80,
                 ),
                 itemCount: prayers.length,
@@ -90,7 +97,10 @@ class _MyPrayerTile extends ConsumerWidget {
                 ref.read(settingsProvider.notifier).toggleFavorite(prayer.id),
           ),
           IconButton(
-            icon: const PhosphorIcon(PhosphorIconsRegular.pencilSimple, size: 20),
+            icon: const PhosphorIcon(
+              PhosphorIconsRegular.pencilSimple,
+              size: 20,
+            ),
             onPressed: () => context.push('/prayer/edit/${prayer.id}'),
           ),
         ],

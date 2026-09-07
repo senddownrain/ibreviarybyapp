@@ -84,7 +84,7 @@ class SettingsScreen extends ConsumerWidget {
                   'Памер шрыфту',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                Slider(
+                Slider.adaptive(
                   value: settings.fontSize,
                   min: kMinReaderFontSize,
                   max: kMaxReaderFontSize,
@@ -157,7 +157,7 @@ class SettingsScreen extends ConsumerWidget {
 
                 // Keep screen on
                 Text('Экран', style: Theme.of(context).textTheme.titleMedium),
-                SwitchListTile(
+                SwitchListTile.adaptive(
                   title: const Text('Не гасіць экран'),
                   subtitle: const Text(
                     'Экран застаецца ўключаным падчас чытання малітваў',

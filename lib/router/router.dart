@@ -33,8 +33,11 @@ final router = GoRouter(
         ),
         GoRoute(
           path: '/picker',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: LiturgicalPickerScreen()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: LiturgicalPickerScreen(
+              mode: state.uri.queryParameters['mode'] ?? 'hours',
+            ),
+          ),
         ),
         GoRoute(
           path: '/prayers',

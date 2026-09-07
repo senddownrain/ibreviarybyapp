@@ -8,7 +8,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 
 class LiturgicalDayOptionsScreen extends ConsumerWidget {
@@ -85,7 +85,7 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar(
+      appBar: AdaptiveAppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -107,7 +107,7 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             16,
-            MediaQuery.paddingOf(context).top + kToolbarHeight + 18,
+            MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
             16,
             24,
           ),

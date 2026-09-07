@@ -11,7 +11,6 @@ class GlassTokens {
   final bool isDark;
 
   // Blur strengths
-  double get barBlur => 24;
   double get pillBlur => 20;
   double get cardBlur => 14;
   double get softBlur => 10;
@@ -20,7 +19,6 @@ class GlassTokens {
   double get ambientStrong => isDark ? 0.22 : 0.14;
   double get ambientMid => isDark ? 0.10 : 0.06;
   double get ambientSoft => isDark ? 0.12 : 0.07;
-  double get ambientBar => isDark ? 0.12 : 0.07;
   double get ambientPill => isDark ? 0.12 : 0.08;
   double get ambientCard => isDark ? 0.10 : 0.06;
 
@@ -29,8 +27,6 @@ class GlassTokens {
       isDark ? const Color(0xF0171512) : const Color(0xF0FFFBF3);
   Color get softFill =>
       isDark ? const Color(0xD9171512) : const Color(0xD9FFFBF3);
-  Color get barFill =>
-      isDark ? const Color(0xF7171512) : const Color(0xF7FFFBF3);
   Color get pillFill =>
       isDark ? const Color(0xF7171512) : const Color(0xF7FFFBF3);
 
@@ -200,7 +196,7 @@ class AmbientWash extends StatelessWidget {
 
 enum AmbientWashIntensity { hero, soft }
 
-enum GlassStyle { card, soft, bar, pill }
+enum GlassStyle { card, soft, pill }
 
 /// Frosted / liquid-glass surface with optional season tint.
 class GlassSurface extends StatelessWidget {
@@ -234,19 +230,16 @@ class GlassSurface extends StatelessWidget {
           GlassStyle.pill => 32,
           GlassStyle.card => 22,
           GlassStyle.soft => 20,
-          GlassStyle.bar => 24,
         });
 
     final base = switch (style) {
       GlassStyle.card => tokens.cardFill,
       GlassStyle.soft => tokens.softFill,
-      GlassStyle.bar => tokens.barFill,
       GlassStyle.pill => tokens.pillFill,
     };
     final tintStrength = switch (style) {
       GlassStyle.card => tokens.ambientCard,
       GlassStyle.soft => tokens.ambientCard,
-      GlassStyle.bar => tokens.ambientBar,
       GlassStyle.pill => tokens.ambientPill,
     };
     final fill = seasonColor != null
@@ -254,12 +247,11 @@ class GlassSurface extends StatelessWidget {
         : base;
     final borderColor = switch (style) {
       GlassStyle.pill => tokens.pillBorder,
-      GlassStyle.bar || GlassStyle.soft => tokens.softBorder,
+      GlassStyle.soft => tokens.softBorder,
       GlassStyle.card => tokens.border,
     };
     final blurSigma = switch (style) {
       GlassStyle.pill => tokens.pillBlur,
-      GlassStyle.bar => tokens.barBlur,
       GlassStyle.soft => tokens.softBlur,
       GlassStyle.card => tokens.cardBlur,
     };
@@ -330,48 +322,6 @@ class GlassSurface extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(borderRadius: radius, boxShadow: shadows),
       child: clipped,
-    );
-  }
-}
-
-/// Inset frosted panel for full-screen route app bars.
-class GlassBar extends StatelessWidget implements PreferredSizeWidget {
-  final Widget child;
-  final Color? seasonColor;
-  final double height;
-
-  const GlassBar({
-    super.key,
-    required this.child,
-    this.seasonColor,
-    this.height = kToolbarHeight,
-  });
-
-  @override
-  Size get preferredSize => Size.fromHeight(height);
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: Colors.transparent,
-      child: SafeArea(
-        bottom: false,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-              child: GlassSurface(
-                style: GlassStyle.bar,
-                seasonColor: seasonColor,
-                borderRadius: BorderRadius.circular(24),
-                child: SizedBox(height: height - 8, child: child),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

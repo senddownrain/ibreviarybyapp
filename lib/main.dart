@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,6 +13,7 @@ import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -27,13 +27,16 @@ void main() async {
   }
   await HiveService.init();
   await ReadingsIndex.ensureBuilt();
-  unawaited(BibleRepository.preload());
+  await BibleRepository.preload();
 
-  // Transparent status bar so blurred AppBar can show beneath it on iOS
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+  // Both designs are edge-to-edge. Platform chrome floats above the content;
+  // only iOS uses blur while Android uses tonal Material surfaces.
+  if (!kIsWeb) {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
         statusBarBrightness: Brightness.light,
       ),
     );
@@ -53,8 +56,8 @@ class MyBrevApp extends ConsumerWidget {
       WakelockPlus.toggle(enable: settings.keepScreenOn);
     }
 
-    // Keep application chrome consistent with the PWA on Android and iOS.
-    // Liturgical colours are applied separately as contextual ambient washes.
+    // Content stays consistent with the PWA. Navigation and system controls
+    // adapt inside the shared theme and the platform-chrome widgets.
     final light = AppPalette.scheme(Brightness.light);
     final dark = AppPalette.scheme(Brightness.dark);
     return _buildApp(settings, light, dark);
@@ -65,7 +68,8 @@ class MyBrevApp extends ConsumerWidget {
     ColorScheme light,
     ColorScheme dark,
   ) {
-    final isIOS = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+    final targetPlatform = appTargetPlatform();
+    final isIOS = targetPlatform == TargetPlatform.iOS;
 
     ThemeData makeTheme(ColorScheme cs) {
       // Build from brightness first so textTheme colors match light/dark.
@@ -75,12 +79,23 @@ class MyBrevApp extends ConsumerWidget {
         useMaterial3: true,
         colorScheme: cs,
         brightness: cs.brightness,
+        platform: targetPlatform,
       );
       // Reader font is applied only inside reading surfaces. Application
       // chrome always keeps the PWA's Source Sans UI typography.
       final textTheme = GoogleFonts.sourceSans3TextTheme(base.textTheme);
 
       return base.copyWith(
+        platform: targetPlatform,
+        splashFactory: isIOS
+            ? NoSplash.splashFactory
+            : InkSparkle.splashFactory,
+        highlightColor: isIOS ? Colors.transparent : null,
+        cupertinoOverrideTheme: CupertinoThemeData(
+          primaryColor: cs.primary,
+          brightness: cs.brightness,
+          scaffoldBackgroundColor: cs.surfaceContainerLowest,
+        ),
         textTheme: textTheme,
         scaffoldBackgroundColor: cs.surfaceContainerLowest,
         dividerTheme: DividerThemeData(
@@ -146,7 +161,7 @@ class MyBrevApp extends ConsumerWidget {
           style: FilledButton.styleFrom(
             minimumSize: const Size(48, 48),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(isIOS ? 24 : 18),
             ),
           ),
         ),
@@ -154,7 +169,7 @@ class MyBrevApp extends ConsumerWidget {
           style: OutlinedButton.styleFrom(
             minimumSize: const Size(48, 48),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(isIOS ? 24 : 18),
             ),
             side: BorderSide(color: cs.outlineVariant),
           ),
@@ -168,7 +183,7 @@ class MyBrevApp extends ConsumerWidget {
           backgroundColor: cs.surface,
           foregroundColor: cs.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(isIOS ? 24 : 20),
             side: BorderSide(color: cs.outlineVariant),
           ),
         ),

@@ -17,7 +17,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
 /// Screen showing list of available liturgical hours for a day.
@@ -148,7 +148,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     if (_loading) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text('Літургія гадзін'),
+        appBar: AdaptiveAppBar.text('Літургія гадзін'),
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
@@ -162,7 +162,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     if (day == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text('Літургія гадзін'),
+        appBar: AdaptiveAppBar.text('Літургія гадзін'),
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
@@ -189,7 +189,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar(
+      appBar: AdaptiveAppBar(
         title: const Text('Літургія гадзін'),
         actions: [
           IconButton(
@@ -210,7 +210,8 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(
                   12,
-                  MediaQuery.paddingOf(context).top + kToolbarHeight + 12,
+                  MediaQuery.paddingOf(context).top +
+                      kFloatingAppBarContentInset,
                   12,
                   32,
                 ),

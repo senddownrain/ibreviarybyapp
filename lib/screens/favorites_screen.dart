@@ -9,7 +9,7 @@ import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -29,7 +29,7 @@ class FavoritesScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar.text('Абраныя малітвы'),
+      appBar: AdaptiveAppBar.text('Абраныя малітвы'),
       body: AmbientWash(
         seasonColor: seasonColor,
         height: kToolbarHeight + 100,
@@ -62,7 +62,9 @@ class FavoritesScreen extends ConsumerWidget {
               )
             : ListView.builder(
                 padding: EdgeInsets.only(
-                  top: MediaQuery.paddingOf(context).top + kToolbarHeight + 8,
+                  top:
+                      MediaQuery.paddingOf(context).top +
+                      kFloatingAppBarContentInset,
                   bottom: 16,
                 ),
                 itemCount: favorites.length,

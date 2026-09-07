@@ -7,9 +7,11 @@ import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/widgets/ios_app_bar.dart';
+import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/bottom_nav.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
@@ -43,6 +45,8 @@ class ReadingsScreen extends ConsumerStatefulWidget {
 class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     with TickerProviderStateMixin {
   TabController? _tabController;
+  bool _bottomNavVisible = true;
+  double _scrollDelta = 0;
 
   bool _loading = true;
   String? _error;
@@ -51,6 +55,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   String? _activeGroupKey;
   List<String> _tabs = [];
   bool _isSundayMode = false;
+  bool _celebrationPickerExpanded = false;
   Map<String, ParsedReading?> _byYear = {};
   String _sundayCycle = 'A';
   String _weekdayCycle = '1';
@@ -193,6 +198,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     );
     setState(() {
       _activeGroupKey = key;
+      _celebrationPickerExpanded = false;
       _tabs = tabState.tabs;
       _tabController = tabState.controller;
       _isSundayMode = tabState.sundayMode;
@@ -249,69 +255,123 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'НА ГЭТЫ ДЗЕНЬ',
-              style: reader.referenceStyle(11).copyWith(letterSpacing: 1.1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'НА ГЭТЫ ДЗЕНЬ',
+                      style: reader
+                          .referenceStyle(11)
+                          .copyWith(letterSpacing: 1.1),
+                    ),
+                  ),
+                  Text(
+                    'Варыянтаў: ${_groups.length}',
+                    style: reader.referenceStyle(11),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
-            for (final group in _groups)
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () => _selectCelebrationGroup(group.key),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: group.key == active.key
-                          ? reader.rubricSoft
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                group.label,
-                                style: reader
-                                    .body(15)
-                                    .copyWith(fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                _groupMeta(group),
-                                style: reader.referenceStyle(12),
-                              ),
-                            ],
-                          ),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => setState(
+                  () =>
+                      _celebrationPickerExpanded = !_celebrationPickerExpanded,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: reader.rubricSoft,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(child: _celebrationLabel(active, reader)),
+                      AnimatedRotation(
+                        turns: _celebrationPickerExpanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 180),
+                        child: PhosphorIcon(
+                          PhosphorIconsRegular.caretDown,
+                          size: 18,
+                          color: cs.onSurfaceVariant,
                         ),
-                        if (group.key == active.key)
-                          PhosphorIcon(
-                            PhosphorIconsFill.checkCircle,
-                            size: 20,
-                            color: reader.rubric,
-                          )
-                        else
-                          PhosphorIcon(
-                            PhosphorIconsRegular.caretRight,
-                            size: 18,
-                            color: cs.outline,
-                          ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              child: _celebrationPickerExpanded
+                  ? Column(
+                      children: [
+                        const SizedBox(height: 6),
+                        for (final group in _groups)
+                          if (group.key != active.key)
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () => _selectCelebrationGroup(group.key),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: _celebrationLabel(group, reader),
+                                      ),
+                                      PhosphorIcon(
+                                        PhosphorIconsRegular.caretRight,
+                                        size: 18,
+                                        color: cs.outline,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ],
         ),
       ),
     );
   }
+
+  Widget _celebrationLabel(ReadingCelebrationGroup group, ReaderTheme reader) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            group.label,
+            style: reader.body(15).copyWith(fontWeight: FontWeight.w600),
+          ),
+          Text(_groupMeta(group), style: reader.referenceStyle(12)),
+        ],
+      );
+
+  Widget _menuLeading() => Builder(
+    builder: (context) => IconButton(
+      tooltip: 'Меню',
+      icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
+      onPressed: () => Scaffold.of(context).openDrawer(),
+    ),
+  );
 
   ParsedReading? _readingForTab(String year) {
     final docs = _activeGroupDocuments();
@@ -380,7 +440,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   }
 
   double get _contentTopInset =>
-      MediaQuery.paddingOf(context).top + kToolbarHeight + 8;
+      MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
 
   /// The date is shown in the page header, as in mybrev/ReadingsView.vue.
   String get _title {
@@ -421,16 +481,57 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     return '$period, тыд. $week – $dayLabel';
   }
 
+  bool _onScroll(ScrollNotification notification) {
+    if (notification.metrics.axis != Axis.vertical) return false;
+    if (notification.metrics.pixels <= 8) {
+      _scrollDelta = 0;
+      if (!_bottomNavVisible) setState(() => _bottomNavVisible = true);
+      return false;
+    }
+    if (notification is ScrollUpdateNotification) {
+      final delta = notification.scrollDelta;
+      if (delta == null) return false;
+      if (_scrollDelta != 0 && delta.sign != _scrollDelta.sign) {
+        _scrollDelta = 0;
+      }
+      _scrollDelta += delta;
+      if (_scrollDelta > 12 && _bottomNavVisible) {
+        setState(() => _bottomNavVisible = false);
+        _scrollDelta = 0;
+      } else if (_scrollDelta < -12 && !_bottomNavVisible) {
+        setState(() => _bottomNavVisible = true);
+        _scrollDelta = 0;
+      }
+    }
+    return false;
+  }
+
+  Widget _trackScroll(Widget child) => NotificationListener<ScrollNotification>(
+    onNotification: _onScroll,
+    child: child,
+  );
+
+  Widget _animatedBottomNav(Widget child) =>
+      AutoHidingBottomNavigation(visible: _bottomNavVisible, child: child);
+
   @override
   Widget build(BuildContext context) {
     final title = _title;
     final seasonColor = _readingColor();
+    final navigationDate =
+        DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
+    final bottomNav = ReadingsBottomNav(
+      currentDate: navigationDate,
+      showDayArrows: widget.dateStr != null,
+    );
 
     // Loading
     if (_loading) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(title),
+        drawer: const AppNavigationDrawer(),
+        appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
+        bottomNavigationBar: _animatedBottomNav(bottomNav),
         body: const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -449,7 +550,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       final cs = Theme.of(context).colorScheme;
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(title),
+        drawer: const AppNavigationDrawer(),
+        appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
+        bottomNavigationBar: _animatedBottomNav(bottomNav),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -495,7 +598,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       final cs = Theme.of(context).colorScheme;
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar.text(title),
+        drawer: const AppNavigationDrawer(),
+        appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
+        bottomNavigationBar: _animatedBottomNav(bottomNav),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -534,89 +639,102 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (_tabs.length > 1 && _tabController != null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: IosGlassAppBar(
+        drawer: const AppNavigationDrawer(),
+        appBar: AdaptiveAppBar(
           title: Text(title),
+          leading: _menuLeading(),
           actions: const [TextScaleControl()],
         ),
-        body: _readingsBackdrop(
-          child: Column(
-            children: [
-              SizedBox(height: _contentTopInset),
-              _ReadingsPageHeading(
-                dateStr: widget.dateStr,
-                seasonColor: seasonColor,
-              ),
-              _celebrationPicker(context),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                child: GlassSurface(
-                  style: GlassStyle.soft,
-                  seasonColor: seasonColor,
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+        bottomNavigationBar: _animatedBottomNav(bottomNav),
+        body: _trackScroll(
+          _readingsBackdrop(
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                SliverToBoxAdapter(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'ЛІТУРГІЧНЫ ЦЫКЛ',
-                        style: ReaderTheme.of(
-                          context,
-                        ).referenceStyle(11).copyWith(letterSpacing: 1.1),
+                      SizedBox(height: _contentTopInset),
+                      _ReadingsPageHeading(
+                        dateStr: widget.dateStr,
+                        seasonColor: seasonColor,
                       ),
-                      Text(
-                        'Актуальны на гэту дату адкрыты аўтаматычна',
-                        style: ReaderTheme.of(context).referenceStyle(12),
-                      ),
-                      TabBar(
-                        controller: _tabController,
-                        tabs: _tabs
-                            .map((cycle) => Tab(text: _cycleLabel(cycle)))
-                            .toList(),
-                        labelColor: ReaderTheme.of(context).rubric,
-                        unselectedLabelColor: Theme.of(
-                          context,
-                        ).colorScheme.onSurfaceVariant,
-                        indicatorColor: ReaderTheme.of(context).rubric,
+                      _celebrationPicker(context),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                        child: GlassSurface(
+                          style: GlassStyle.soft,
+                          seasonColor: seasonColor,
+                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ЛІТУРГІЧНЫ ЦЫКЛ',
+                                style: ReaderTheme.of(context)
+                                    .referenceStyle(11)
+                                    .copyWith(letterSpacing: 1.1),
+                              ),
+                              Text(
+                                'Актуальны на гэту дату адкрыты аўтаматычна',
+                                style: ReaderTheme.of(
+                                  context,
+                                ).referenceStyle(12),
+                              ),
+                              TabBar(
+                                controller: _tabController,
+                                tabs: _tabs
+                                    .map(
+                                      (cycle) => Tab(text: _cycleLabel(cycle)),
+                                    )
+                                    .toList(),
+                                labelColor: ReaderTheme.of(context).rubric,
+                                unselectedLabelColor: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                                indicatorColor: ReaderTheme.of(context).rubric,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: _tabs.map((y) {
-                    final reading = _readingForTab(y);
-                    if (reading == null) {
-                      final cs = Theme.of(context).colorScheme;
-                      return Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            PhosphorIcon(
-                              PhosphorIconsLight.bookOpen,
-                              size: 48,
-                              color: cs.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Чытанні для году $y не знойдзены',
-                              style: TextStyle(color: cs.onSurface),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return _ReadingBody(
-                      reading: reading,
-                      dateStr: widget.dateStr,
-                      seasonColor: seasonColor,
-                      compactTop: true,
-                      onRefresh: () => _load(forceRefresh: true),
+              ],
+              body: TabBarView(
+                controller: _tabController,
+                children: _tabs.map((y) {
+                  final reading = _readingForTab(y);
+                  if (reading == null) {
+                    final cs = Theme.of(context).colorScheme;
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PhosphorIcon(
+                            PhosphorIconsLight.bookOpen,
+                            size: 48,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Чытанні для году $y не знойдзены',
+                            style: TextStyle(color: cs.onSurface),
+                          ),
+                        ],
+                      ),
                     );
-                  }).toList(),
-                ),
+                  }
+                  return _ReadingBody(
+                    reading: reading,
+                    dateStr: widget.dateStr,
+                    seasonColor: seasonColor,
+                    compactTop: true,
+                    onRefresh: () => _load(forceRefresh: true),
+                  );
+                }).toList(),
               ),
-            ],
+            ),
           ),
         ),
       );
@@ -626,19 +744,24 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     final single = _displayReading();
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: IosGlassAppBar(
+      drawer: const AppNavigationDrawer(),
+      appBar: AdaptiveAppBar(
         title: Text(title),
+        leading: _menuLeading(),
         actions: const [TextScaleControl()],
       ),
-      body: _readingsBackdrop(
-        child: _ReadingBody(
-          reading: single,
-          dateStr: widget.dateStr,
-          seasonColor: seasonColor,
-          onRefresh: () => _load(forceRefresh: true),
-          celebrationPicker: _groups.length > 1
-              ? _celebrationPicker(context)
-              : null,
+      bottomNavigationBar: _animatedBottomNav(bottomNav),
+      body: _trackScroll(
+        _readingsBackdrop(
+          child: _ReadingBody(
+            reading: single,
+            dateStr: widget.dateStr,
+            seasonColor: seasonColor,
+            onRefresh: () => _load(forceRefresh: true),
+            celebrationPicker: _groups.length > 1
+                ? _celebrationPicker(context)
+                : null,
+          ),
         ),
       ),
     );
@@ -769,7 +892,7 @@ class _ReadingBody extends ConsumerWidget {
     final reader = ReaderTheme.of(context);
     final topPad = compactTop
         ? 12.0
-        : MediaQuery.paddingOf(context).top + kToolbarHeight + 12;
+        : MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
     final hasContent = readingHasVisibleContent(reading);
 
     return ReadingScaffold(
@@ -778,6 +901,7 @@ class _ReadingBody extends ConsumerWidget {
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
+              primary: compactTop ? true : null,
               padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
