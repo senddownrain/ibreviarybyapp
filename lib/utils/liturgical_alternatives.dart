@@ -91,9 +91,10 @@ List<Node> _directNodes(DocumentFragment root) => List<Node>.from(root.nodes);
 List<Element> _directElements(DocumentFragment root) =>
     root.nodes.whereType<Element>().toList();
 
-String _nodeHtml(Node node) => node is Element ? node.outerHtml : node.text;
+String _nodeHtml(Node node) =>
+    node is Element ? node.outerHtml : node.text ?? '';
 
-String _textOf(String value) => parseFragment(value).text
+String _textOf(String value) => (parseFragment(value).text ?? '')
     .replaceAll(RegExp(r'&nbsp;|&#x0*20;', caseSensitive: false), ' ')
     .replaceAll(RegExp(r'\s+'), ' ')
     .trim();
@@ -108,7 +109,9 @@ bool _isAlternativeBoundary(Element element) =>
 
 List<_RawAlternative> _splitAtRules(DocumentFragment root) {
   final nodes = _directNodes(root);
-  final hasRule = nodes.any((node) => node is Element && node.localName == 'hr');
+  final hasRule = nodes.any(
+    (node) => node is Element && node.localName == 'hr',
+  );
   final repeated = <String, int>{};
   if (!hasRule) {
     for (final node in nodes.whereType<Element>()) {
@@ -127,13 +130,15 @@ List<_RawAlternative> _splitAtRules(DocumentFragment root) {
     }
     String marker = '';
     if (node is Element && node.localName == 'p') {
-      marker = _repeatedSectionMarker
+      marker =
+          _repeatedSectionMarker
               .firstMatch(_textOf(node.outerHtml))
               ?.group(0)
               ?.toLowerCase() ??
           '';
     }
-    final startsNew = !hasRule &&
+    final startsNew =
+        !hasRule &&
         groups.last.isNotEmpty &&
         ((node is Element && _isAlternativeBoundary(node)) ||
             (marker.isNotEmpty && (repeated[marker] ?? 0) > 1));
@@ -150,11 +155,15 @@ List<_RawAlternative> _splitAtRules(DocumentFragment root) {
 List<_RawAlternative>? _structuredAlternatives(DocumentFragment root) {
   final elements = _directElements(root);
   final blocks = elements
-      .where((element) => element.attributes.containsKey('data-alternative-title'))
+      .where(
+        (element) => element.attributes.containsKey('data-alternative-title'),
+      )
       .toList();
   if (blocks.length < 2) return null;
   final suffixes = elements
-      .where((element) => element.attributes.containsKey('data-alternative-suffix'))
+      .where(
+        (element) => element.attributes.containsKey('data-alternative-suffix'),
+      )
       .toList();
   final excluded = <Node>{...blocks, ...suffixes};
   final shared = root.nodes
@@ -166,9 +175,11 @@ List<_RawAlternative>? _structuredAlternatives(DocumentFragment root) {
   return blocks
       .map(
         (block) => _RawAlternative(
-          [shared, block.innerHtml.trim(), suffix]
-              .where((part) => part.isNotEmpty)
-              .join('\n'),
+          [
+            shared,
+            block.innerHtml.trim(),
+            suffix,
+          ].where((part) => part.isNotEmpty).join('\n'),
           block.attributes['data-alternative-title'] ?? '',
         ),
       )
@@ -279,8 +290,10 @@ String _firstVerseLine(String html) {
   for (final line in lines.split('\n')) {
     final text = _textOf(line);
     if (text.isNotEmpty &&
-        !RegExp(r'^(?:Гімн|А\s*бо|Пра\s+[^:]+):?$', caseSensitive: false)
-            .hasMatch(text)) {
+        !RegExp(
+          r'^(?:Гімн|А\s*бо|Пра\s+[^:]+):?$',
+          caseSensitive: false,
+        ).hasMatch(text)) {
       return text;
     }
   }
@@ -297,8 +310,7 @@ String _readingTitle(List<String> paragraphs) {
   }
   for (final paragraph in paragraphs.take(4)) {
     if (RegExp(r'\d').hasMatch(paragraph) &&
-        RegExp(r'(?:пар\.|[А-ЯЁІЎ][а-яёіў]{0,5})\s*\d')
-            .hasMatch(paragraph)) {
+        RegExp(r'(?:пар\.|[А-ЯЁІЎ][а-яёіў]{0,5})\s*\d').hasMatch(paragraph)) {
       return _shorten(
         paragraph.replaceFirst(
           RegExp(r'^(?:Першае|Другое)\s+чытанне\s*', caseSensitive: false),
@@ -328,8 +340,10 @@ String _optionTitle(_RawAlternative option, int index, String kind) {
   }
   for (final text in paragraphs) {
     if (!_isMarkerText(text) &&
-        !RegExp(r'^(?:Гімн|Кароткае чытанне)$', caseSensitive: false)
-            .hasMatch(text) &&
+        !RegExp(
+          r'^(?:Гімн|Кароткае чытанне)$',
+          caseSensitive: false,
+        ).hasMatch(text) &&
         text.length <= _maxTitleLength) {
       return _shorten(text);
     }
@@ -351,7 +365,9 @@ String formatIntercessions(String html) {
         .map((entry) => '${entry.key}="${entry.value}"')
         .join(' ');
     final prefix = attrs.isEmpty ? '' : ' $attrs';
-    for (final line in node.innerHtml.split(RegExp(r'<br\s*/?>', caseSensitive: false))) {
+    for (final line in node.innerHtml.split(
+      RegExp(r'<br\s*/?>', caseSensitive: false),
+    )) {
       if (_textOf(line).isNotEmpty) normalized.add('<p$prefix>$line</p>');
     }
   }
@@ -360,13 +376,17 @@ String formatIntercessions(String html) {
   if (paragraphs.isEmpty) return html;
 
   var refrain = paragraphs.indexWhere(
-    (paragraph) => paragraphs.indexOf(paragraph) < 3 && paragraph.querySelector('em') != null,
+    (paragraph) =>
+        paragraphs.indexOf(paragraph) < 3 &&
+        paragraph.querySelector('em') != null,
   );
   if (refrain < 0) {
     for (var index = 1; index < paragraphs.length && index <= 3; index++) {
       final previous = _textOf(paragraphs[index - 1].outerHtml);
       final current = _textOf(paragraphs[index].outerHtml);
-      if (previous.endsWith(':') && current.isNotEmpty && current.length <= 120) {
+      if (previous.endsWith(':') &&
+          current.isNotEmpty &&
+          current.length <= 120) {
         refrain = index;
         break;
       }

@@ -433,13 +433,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   }
 
   Widget _readingsBackdrop({required Widget child}) {
-    final seasonColor = _readingColor();
-    return Stack(
-      children: [
-        AmbientWash.hero(seasonColor: seasonColor),
-        child,
-      ],
-    );
+    return child;
   }
 
   Color _readingColor() {
@@ -917,7 +911,6 @@ class _ReadingBody extends ConsumerWidget {
       builder: (context, textStyle) => LayoutBuilder(
         builder: (context, constraints) => Stack(
           children: [
-            AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
               primary: compactTop ? true : null,
               padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
@@ -935,200 +928,190 @@ class _ReadingBody extends ConsumerWidget {
                       celebrationPicker!,
                       const SizedBox(height: 8),
                     ],
-                    GlassSurface(
-                      style: GlassStyle.card,
-                      seasonColor: seasonColor,
-                      borderRadius: BorderRadius.circular(28),
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if ((reading.title ?? '').trim().isNotEmpty) ...[
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(color: reader.border),
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'ЛІТУРГІЯ СЛОВА',
-                                    style: reader
-                                        .referenceStyle(11)
-                                        .copyWith(letterSpacing: 1.2),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    reading.title!,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          fontFamily: textStyle.fontFamily,
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.28,
-                                        ),
-                                  ),
-                                  if ((reading.year ?? '').isNotEmpty) ...[
-                                    const SizedBox(height: 12),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 9,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: reader.rubricSoft,
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Цыкл ${reading.year == '1'
-                                            ? 'I'
-                                            : reading.year == '2'
-                                            ? 'II'
-                                            : reading.year}',
-                                        style: reader
-                                            .referenceStyle(11)
-                                            .copyWith(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if ((reading.title ?? '').trim().isNotEmpty) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: reader.border),
                               ),
                             ),
-                            const SizedBox(height: 4),
-                          ],
-                          if (!reading.hasReadings) ...[
-                            Container(
-                              width: double.infinity,
-                              margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.secondaryContainer,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  PhosphorIcon(
-                                    PhosphorIconsRegular.info,
-                                    size: 18,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'ЛІТУРГІЯ СЛОВА',
+                                  style: reader
+                                      .referenceStyle(11)
+                                      .copyWith(letterSpacing: 1.2),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  reading.title!,
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(
+                                        fontFamily: textStyle.fontFamily,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.28,
+                                      ),
+                                ),
+                                if ((reading.year ?? '').isNotEmpty) ...[
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 9,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: reader.rubricSoft,
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      'Цыкл ${reading.year == '1'
+                                          ? 'I'
+                                          : reading.year == '2'
+                                          ? 'II'
+                                          : reading.year}',
+                                      style: reader
+                                          .referenceStyle(11)
+                                          .copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                        if (!reading.hasReadings) ...[
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PhosphorIcon(
+                                  PhosphorIconsRegular.info,
+                                  size: 18,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondaryContainer,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
+                                    style: TextStyle(
+                                      fontSize:
+                                          (textStyle.fontSize ?? 16) * 0.875,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSecondaryContainer,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        if (!hasContent) ...[
+                          const SizedBox(height: 24),
+                          Center(
+                            child: Column(
+                              children: [
+                                PhosphorIcon(
+                                  PhosphorIconsLight.bookOpen,
+                                  size: 48,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Тэкст чытання пакуль не загружаны',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSecondaryContainer,
+                                    ).colorScheme.onSurface,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
-                                      style: TextStyle(
-                                        fontSize:
-                                            (textStyle.fontSize ?? 16) * 0.875,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondaryContainer,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                          if (!hasContent) ...[
-                            const SizedBox(height: 24),
-                            Center(
-                              child: Column(
-                                children: [
-                                  PhosphorIcon(
-                                    PhosphorIconsLight.bookOpen,
-                                    size: 48,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurfaceVariant,
+                                    fontSize: 13,
                                   ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    'Тэкст чытання пакуль не загружаны',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
+                                ),
+                                if (onRefresh != null) ...[
+                                  const SizedBox(height: 16),
+                                  FilledButton.icon(
+                                    onPressed: onRefresh,
+                                    icon: const PhosphorIcon(
+                                      PhosphorIconsRegular.arrowsClockwise,
+                                      size: 18,
                                     ),
+                                    label: const Text('Абнавіць'),
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  if (onRefresh != null) ...[
-                                    const SizedBox(height: 16),
-                                    FilledButton.icon(
-                                      onPressed: onRefresh,
-                                      icon: const PhosphorIcon(
-                                        PhosphorIconsRegular.arrowsClockwise,
-                                        size: 18,
-                                      ),
-                                      label: const Text('Абнавіць'),
-                                    ),
-                                  ],
                                 ],
-                              ),
+                              ],
                             ),
-                          ],
-                          if (reading.firstReading != null)
-                            _ReadingSection(
-                              label: reading.hasTwoReadings
-                                  ? 'ПЕРШАЕ ЧЫТАННЕ'
-                                  : 'ЧЫТАННЕ',
-                              section: reading.firstReading!,
-                              textStyle: textStyle,
-                              reader: reader,
-                            ),
-                          if (reading.psalm != null)
-                            _PsalmSection(
-                              psalm: reading.psalm!,
-                              textStyle: textStyle,
-                              reader: reader,
-                            ),
-                          if (reading.reading2 != null)
-                            _ReadingSection(
-                              label: 'ДРУГОЕ ЧЫТАННЕ',
-                              section: reading.reading2!,
-                              textStyle: textStyle,
-                              reader: reader,
-                            ),
-                          if (reading.alleluia != null)
-                            _AlleluiaSection(
-                              alleluia: reading.alleluia!,
-                              textStyle: textStyle,
-                              reader: reader,
-                            ),
-                          if (reading.gospel != null)
-                            _ReadingSection(
-                              label: 'ЕВАНГЕЛЛЕ',
-                              section: reading.gospel!,
-                              textStyle: textStyle,
-                              reader: reader,
-                            ),
-                          const SizedBox(height: 32),
+                          ),
                         ],
-                      ),
+                        if (reading.firstReading != null)
+                          _ReadingSection(
+                            label: reading.hasTwoReadings
+                                ? 'ПЕРШАЕ ЧЫТАННЕ'
+                                : 'ЧЫТАННЕ',
+                            section: reading.firstReading!,
+                            textStyle: textStyle,
+                            reader: reader,
+                          ),
+                        if (reading.psalm != null)
+                          _PsalmSection(
+                            psalm: reading.psalm!,
+                            textStyle: textStyle,
+                            reader: reader,
+                          ),
+                        if (reading.reading2 != null)
+                          _ReadingSection(
+                            label: 'ДРУГОЕ ЧЫТАННЕ',
+                            section: reading.reading2!,
+                            textStyle: textStyle,
+                            reader: reader,
+                          ),
+                        if (reading.alleluia != null)
+                          _AlleluiaSection(
+                            alleluia: reading.alleluia!,
+                            textStyle: textStyle,
+                            reader: reader,
+                          ),
+                        if (reading.gospel != null)
+                          _ReadingSection(
+                            label: 'ЕВАНГЕЛЛЕ',
+                            section: reading.gospel!,
+                            textStyle: textStyle,
+                            reader: reader,
+                          ),
+                        const SizedBox(height: 32),
+                      ],
                     ),
                   ],
                 ),

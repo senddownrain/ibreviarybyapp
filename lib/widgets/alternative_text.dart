@@ -3,10 +3,8 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-typedef AlternativeContentBuilder = Widget Function(
-  BuildContext context,
-  String html,
-);
+typedef AlternativeContentBuilder =
+    Widget Function(BuildContext context, String html);
 
 /// Flutter counterpart of web `AlternativeText.vue`.
 class AlternativeText extends StatefulWidget {
@@ -107,7 +105,7 @@ class _AlternativeTextState extends State<AlternativeText> {
           switchInCurve: Curves.easeOutCubic,
           switchOutCurve: Curves.easeInCubic,
           child: KeyedSubtree(
-            key: ValueKey('${widget.kind}-${_activeIndex}-${active.title}'),
+            key: ValueKey('${widget.kind}-$_activeIndex-${active.title}'),
             child: widget.contentBuilder(context, active.html),
           ),
         ),
@@ -195,9 +193,7 @@ class _AlternativeOption extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(13),
         side: BorderSide(
-          color: selected
-              ? cs.primary.withValues(alpha: 0.28)
-              : reader.border,
+          color: selected ? cs.primary.withValues(alpha: 0.28) : reader.border,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -233,7 +229,7 @@ class _AlternativeOption extends StatelessWidget {
                     title,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: selected ? cs.primary : cs.onSurface,
-                      fontWeight: selected ? FontWeight.w650 : FontWeight.w500,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                       height: 1.35,
                     ),
                   ),

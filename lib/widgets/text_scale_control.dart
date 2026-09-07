@@ -57,7 +57,11 @@ Future<void> _showTextScalePanel(BuildContext context) {
     enableDrag: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.28),
-    builder: (_) => const _TextScalePanel(),
+    builder: (_) => const SafeArea(
+      top: false,
+      minimum: EdgeInsets.only(bottom: 6),
+      child: _TextScalePanel(),
+    ),
   );
 }
 

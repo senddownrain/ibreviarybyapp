@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/reading.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
@@ -36,7 +34,6 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final raw = HiveService.readingsBox.get(widget.readingId);
     if (raw == null) {
       return Scaffold(
@@ -95,7 +92,6 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
         ),
         body: Stack(
           children: [
-            AmbientWash.hero(seasonColor: seasonColor),
             SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
                 16,
@@ -103,31 +99,25 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
                 16,
                 40,
               ),
-              child: GlassSurface(
-                style: GlassStyle.card,
-                seasonColor: seasonColor,
-                borderRadius: BorderRadius.circular(28),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 26),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (reading.cycle != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Chip(label: Text('Цыкл ${reading.cycle}')),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (reading.cycle != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Chip(label: Text('Цыкл ${reading.cycle}')),
+                    ),
+                  if (_showRaw)
+                    SelectableText(
+                      reading.text,
+                      style: textStyle.copyWith(
+                        fontFamily: 'monospace',
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                    if (_showRaw)
-                      SelectableText(
-                        reading.text,
-                        style: textStyle.copyWith(
-                          fontFamily: 'monospace',
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      )
-                    else
-                      _buildRendered(reading.text, textStyle),
-                  ],
-                ),
+                    )
+                  else
+                    _buildRendered(reading.text, textStyle),
+                ],
               ),
             ),
           ],

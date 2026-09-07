@@ -37,6 +37,9 @@ void main() async {
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemStatusBarContrastEnforced: false,
+        systemNavigationBarContrastEnforced: false,
         statusBarBrightness: Brightness.light,
       ),
     );
@@ -219,9 +222,22 @@ class MyBrevApp extends ConsumerWidget {
           // Transparent so BlurAppBar can paint its own background
           backgroundColor: Colors.transparent,
           foregroundColor: cs.onSurface,
-          systemOverlayStyle: cs.brightness == Brightness.dark
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+            statusBarIconBrightness: cs.brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+            statusBarBrightness: cs.brightness == Brightness.dark
+                ? Brightness.dark
+                : Brightness.light,
+            systemNavigationBarIconBrightness: cs.brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+            systemStatusBarContrastEnforced: false,
+            systemNavigationBarContrastEnforced: false,
+          ),
         ),
         pageTransitionsTheme: PageTransitionsTheme(
           builders: {

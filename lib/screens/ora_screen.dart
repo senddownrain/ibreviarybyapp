@@ -17,12 +17,14 @@ import 'package:mybrev_flutter/utils/liturgical_office.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/widgets/alternative_text.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
 
@@ -163,11 +165,23 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   int? _selectedInvitIndex;
   String? _vespersRubric;
   late final Future<LiturgicalDay?> _dayFuture;
+  final Map<String, ValueNotifier<int>> _alternativeControllers = {};
+
+  ValueNotifier<int> _alternativeController(String key) =>
+      _alternativeControllers.putIfAbsent(key, () => ValueNotifier<int>(0));
 
   @override
   void initState() {
     super.initState();
     _dayFuture = _loadDay();
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _alternativeControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   Future<LiturgicalDay?> _loadDay() async {
@@ -449,39 +463,22 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final topPad =
         MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
-    final reader = ReaderTheme.of(context);
     final dayHeading = sections.first;
     final hourContent = sections.skip(1);
     return ListView(
-      padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        topPad,
+        16,
+        40 + MediaQuery.viewPaddingOf(context).bottom,
+      ),
       children: [
         dayHeading.build(context, textStyle),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 30),
-          decoration: BoxDecoration(
-            color: reader.surface,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: reader.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: Theme.of(context).brightness == Brightness.dark
-                      ? 0.24
-                      : 0.08,
-                ),
-                blurRadius: 38,
-                spreadRadius: -8,
-                offset: const Offset(0, 16),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final item in hourContent) item.build(context, textStyle),
-            ],
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final item in hourContent) item.build(context, textStyle),
+          ],
         ),
       ],
     );
@@ -559,13 +556,18 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final invit = allInvit[selectedIndex];
 
     // Collect psalm parts, stop on first empty
+    final antController = _alternativeController('invitatorium-antiphon');
     for (var i = 1; i <= 6; i++) {
       final ps = (invit['invitatoriumPs$i']?.toString() ?? '').trim();
       if (ps.isEmpty) break;
-      items.add(_OraItem.antiphon(ant));
+      items.add(
+        _OraItem.antiphon(ant, controller: antController, showPicker: i == 1),
+      );
       items.add(_OraItem.psalm(ps));
     }
-    items.add(_OraItem.antiphon(ant));
+    items.add(
+      _OraItem.antiphon(ant, controller: antController, showPicker: false),
+    );
   }
 
   String _invitName(Map<String, dynamic> m) {
@@ -622,15 +624,29 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final antBen = (day.field('laudesAntBen') ?? '').trim();
     if (antBen.isNotEmpty) {
+      final antController = _alternativeController('laudes-ant-ben');
       items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
       items.add(
         _OraItem.html(
           '<p><em>Песня Захарыі (Лк 1, 68–79) — Месія і Яго папярэднік</em></p>',
         ),
       );
-      items.add(_OraItem.antiphon(antBen));
+      items.add(
+        _OraItem.antiphon(
+          antBen,
+          kind: 'gospel-antiphon',
+          controller: antController,
+        ),
+      );
       items.add(_OraItem.psalm(_kBenedictus));
-      items.add(_OraItem.antiphon(antBen));
+      items.add(
+        _OraItem.antiphon(
+          antBen,
+          kind: 'gospel-antiphon',
+          controller: antController,
+          showPicker: false,
+        ),
+      );
     }
 
     _addField(items, day, 'laudesInter', 'Просьбы');
@@ -661,7 +677,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final hymn = _sextF(day, 'Hymn', num);
     if (hymn.isNotEmpty) {
       items.add(_OraItem.blockHeader('ГІМН'));
-      items.add(_OraItem.html(hymn));
+      items.add(_OraItem.html(hymn, kind: 'hymn'));
     }
 
     _addPsalmBlockResolved(items, [
@@ -671,10 +687,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     ]);
 
     final r = daytimeHourField(day, num, 'R');
-    if (r.isNotEmpty) items.add(_OraItem.html(r));
+    if (r.isNotEmpty) items.add(_OraItem.html(r, kind: 'reading'));
 
     final pr = daytimeHourField(day, num, 'Pr');
-    if (pr.isNotEmpty) items.add(_OraItem.labeled('Малітва', pr));
+    if (pr.isNotEmpty) {
+      items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
+    }
 
     items.add(_OraItem.html(_kEndOfSext));
     return items;
@@ -708,15 +726,29 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final antMag = (day.field('vesperAntMag') ?? '').trim();
     if (antMag.isNotEmpty) {
+      final antController = _alternativeController('vespers-ant-mag');
       items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
       items.add(
         _OraItem.html(
           '<p><em>Песня Марыі (Лк 1, 46–55) — Радасць душы ў Пану</em></p>',
         ),
       );
-      items.add(_OraItem.antiphon(antMag));
+      items.add(
+        _OraItem.antiphon(
+          antMag,
+          kind: 'gospel-antiphon',
+          controller: antController,
+        ),
+      );
       items.add(_OraItem.psalm(_kMagnificat));
-      items.add(_OraItem.antiphon(antMag));
+      items.add(
+        _OraItem.antiphon(
+          antMag,
+          kind: 'gospel-antiphon',
+          controller: antController,
+          showPicker: false,
+        ),
+      );
     }
 
     _addField(items, day, 'vesperInter', 'Просьбы');
@@ -728,7 +760,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ? pr
         : (day.field('laudesPr') ?? '').trim();
     if (effectivePr.isNotEmpty) {
-      items.add(_OraItem.labeled('Малітва', effectivePr));
+      items.add(_OraItem.labeled('Малітва', effectivePr, kind: 'prayer'));
     }
 
     items.add(_OraItem.html(_kEndOfVesper));
@@ -767,7 +799,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final hymn = cf('compHymn');
     if (hymn.isNotEmpty) {
       items.add(_OraItem.blockHeader('ГІМН'));
-      items.add(_OraItem.html(hymn));
+      items.add(_OraItem.html(hymn, kind: 'hymn'));
     }
 
     final ant1 = cf('compAnt1');
@@ -777,26 +809,31 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addPsalmBlockResolved(items, [(ant1, ps1), (ant2, ps2)]);
 
     final r = cf('compR');
-    if (r.isNotEmpty) items.add(_OraItem.html(r));
+    if (r.isNotEmpty) items.add(_OraItem.html(r, kind: 'reading'));
 
     final resp = cf('compResp');
-    if (resp.isNotEmpty) items.add(_OraItem.html(resp));
+    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'reading'));
 
     final antS = cf('compAntS');
     if (antS.isNotEmpty) {
+      final antController = _alternativeController('compline-ant-s');
       items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
       items.add(
         _OraItem.html(
           '<p><em>Песня Сімяона (Лк 2, 29–32) — Хрыстус — святло народаў і хвала Ізраэля</em></p>',
         ),
       );
-      items.add(_OraItem.antiphon(antS));
+      items.add(_OraItem.antiphon(antS, controller: antController));
       items.add(_OraItem.psalm(_kNunc));
-      items.add(_OraItem.antiphon(antS));
+      items.add(
+        _OraItem.antiphon(antS, controller: antController, showPicker: false),
+      );
     }
 
     final pr = cf('compPr');
-    if (pr.isNotEmpty) items.add(_OraItem.labeled('Малітва', pr));
+    if (pr.isNotEmpty) {
+      items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
+    }
 
     items.add(
       _OraItem.html(
@@ -812,7 +849,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           'АНТЫФОНЫ НА ЗАКАНЧЭННЕ ДА НАЙСВЯЦЕЙШАЙ ПАННЫ МАРЫІ',
         ),
       );
-      items.add(_OraItem.html(antM));
+      items.add(_OraItem.html(antM, kind: 'marian-antiphon'));
     }
 
     return items;
@@ -851,15 +888,29 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'laudesR', '');
     final antBen = (day.field('laudesAntBen') ?? '').trim();
     if (antBen.isNotEmpty) {
+      final antController = _alternativeController('morning-ant-ben');
       items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
       items.add(
         _OraItem.html(
           '<p><em>Песня Захарыі (Лк 1, 68–79)<br>Месія і Яго папярэднік</em></p>',
         ),
       );
-      items.add(_OraItem.antiphon(antBen));
+      items.add(
+        _OraItem.antiphon(
+          antBen,
+          kind: 'gospel-antiphon',
+          controller: antController,
+        ),
+      );
       items.add(_OraItem.psalm(_kBenedictus));
-      items.add(_OraItem.antiphon(antBen));
+      items.add(
+        _OraItem.antiphon(
+          antBen,
+          kind: 'gospel-antiphon',
+          controller: antController,
+          showPicker: false,
+        ),
+      );
     }
     _addField(items, day, 'laudesInter', 'Просьбы');
     items.add(_OraItem.plain(_kPaterNoster));
@@ -878,7 +929,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final v = (day.field(fieldName) ?? '').trim();
     if (v.isEmpty) return;
     items.add(_OraItem.blockHeader('ГІМН'));
-    items.add(_OraItem.html(v));
+    items.add(_OraItem.html(v, kind: 'hymn'));
   }
 
   void _addField(
@@ -890,10 +941,17 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final v = (day.field(fieldName) ?? '').trim();
     if (v.isEmpty) return;
     if (label.isNotEmpty) {
-      items.add(_OraItem.labeled(label, v));
+      items.add(_OraItem.labeled(label, v, kind: _alternativeKind(fieldName)));
     } else {
-      items.add(_OraItem.html(v));
+      items.add(_OraItem.html(v, kind: _alternativeKind(fieldName)));
     }
+  }
+
+  String _alternativeKind(String fieldName) {
+    if (fieldName.endsWith('Inter')) return 'intercession';
+    if (fieldName.endsWith('Pr')) return 'prayer';
+    if (fieldName.contains('R')) return 'reading';
+    return 'generic';
   }
 
   // Reads ant/ps pairs from day and calls _addPsalmBlockResolved
@@ -936,16 +994,35 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         pairs[2].$1.isEmpty;
 
     if (isSingleAnt) {
-      items.add(_OraItem.antiphon(pairs[0].$1));
+      final controller = _alternativeController(
+        '${widget.oraType}-psalmody-ant-0',
+      );
+      items.add(_OraItem.antiphon(pairs[0].$1, controller: controller));
       for (final (_, ps) in pairs) {
         if (ps.isNotEmpty) items.add(_OraItem.psalm(ps));
       }
-      items.add(_OraItem.antiphon(pairs[0].$1));
+      items.add(
+        _OraItem.antiphon(
+          pairs[0].$1,
+          controller: controller,
+          showPicker: false,
+        ),
+      );
     } else {
-      for (final (ant, ps) in pairs) {
-        if (ant.isNotEmpty) items.add(_OraItem.antiphon(ant));
+      for (var index = 0; index < pairs.length; index++) {
+        final (ant, ps) = pairs[index];
+        final controller = _alternativeController(
+          '${widget.oraType}-psalmody-ant-$index',
+        );
+        if (ant.isNotEmpty) {
+          items.add(_OraItem.antiphon(ant, controller: controller));
+        }
         if (ps.isNotEmpty) items.add(_OraItem.psalm(ps));
-        if (ant.isNotEmpty && ps.isNotEmpty) items.add(_OraItem.antiphon(ant));
+        if (ant.isNotEmpty && ps.isNotEmpty) {
+          items.add(
+            _OraItem.antiphon(ant, controller: controller, showPicker: false),
+          );
+        }
       }
     }
   }
@@ -981,12 +1058,18 @@ class _OraItem {
   final _OraItemType type;
   final String? label;
   final String content;
+  final String alternativeKind;
+  final ValueNotifier<int>? alternativeController;
+  final bool showPicker;
   final Widget Function(BuildContext, TextStyle)? _customWidget;
 
   const _OraItem._(
     this.type,
     this.content, {
     this.label,
+    this.alternativeKind = 'generic',
+    this.alternativeController,
+    this.showPicker = true,
     Widget Function(BuildContext, TextStyle)? customWidget,
   }) : _customWidget = customWidget;
 
@@ -996,13 +1079,32 @@ class _OraItem {
   factory _OraItem.blockHeader(String title) =>
       _OraItem._(_OraItemType.blockHeader, title);
 
-  factory _OraItem.antiphon(String text) =>
-      _OraItem._(_OraItemType.antiphon, text);
+  factory _OraItem.antiphon(
+    String text, {
+    String kind = 'generic',
+    ValueNotifier<int>? controller,
+    bool showPicker = true,
+  }) => _OraItem._(
+    _OraItemType.antiphon,
+    text,
+    alternativeKind: kind,
+    alternativeController: controller,
+    showPicker: showPicker,
+  );
 
-  factory _OraItem.labeled(String label, String content) =>
-      _OraItem._(_OraItemType.labeled, content, label: label);
+  factory _OraItem.labeled(
+    String label,
+    String content, {
+    String kind = 'generic',
+  }) => _OraItem._(
+    _OraItemType.labeled,
+    content,
+    label: label,
+    alternativeKind: kind,
+  );
 
-  factory _OraItem.html(String html) => _OraItem._(_OraItemType.html, html);
+  factory _OraItem.html(String html, {String kind = 'generic'}) =>
+      _OraItem._(_OraItemType.html, html, alternativeKind: kind);
 
   factory _OraItem.psalm(String html) => _OraItem._(_OraItemType.psalm, html);
 
@@ -1062,6 +1164,10 @@ class _OraItem {
           child: _HtmlOrText(
             content: content,
             textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
+            alternativeKind: alternativeKind,
+            alternativeController: alternativeController,
+            showPicker: showPicker,
+            pickerLabel: 'Выбар антыфоны',
           ),
         );
 
@@ -1070,12 +1176,18 @@ class _OraItem {
           label: label!,
           content: content,
           textStyle: textStyle,
+          alternativeKind: alternativeKind,
         );
 
       case _OraItemType.html:
         return Padding(
           padding: const EdgeInsets.only(bottom: 4),
-          child: _HtmlOrText(content: content, textStyle: textStyle),
+          child: _HtmlOrText(
+            content: content,
+            textStyle: textStyle,
+            alternativeKind: alternativeKind,
+            pickerLabel: _pickerLabel(alternativeKind),
+          ),
         );
 
       case _OraItemType.psalm:
@@ -1112,6 +1224,15 @@ class _OraItem {
         return _customWidget!(context, textStyle);
     }
   }
+
+  static String _pickerLabel(String kind) => switch (kind) {
+    'hymn' => 'Выбар варыянта гімна',
+    'reading' => 'Выбар чытання або рэспансорыя',
+    'prayer' => 'Выбар малітвы',
+    'intercession' => 'Выбар просьбаў',
+    'marian-antiphon' => 'Выбар антыфоны да Найсвяцейшай Панны Марыі',
+    _ => 'Выбар варыянта',
+  };
 }
 
 // ─── Section widgets ──────────────────────────────────────────────────────────
@@ -1120,11 +1241,13 @@ class _LabeledSection extends StatelessWidget {
   final String label;
   final String content;
   final TextStyle textStyle;
+  final String alternativeKind;
 
   const _LabeledSection({
     required this.label,
     required this.content,
     required this.textStyle,
+    this.alternativeKind = 'generic',
   });
 
   @override
@@ -1142,7 +1265,12 @@ class _LabeledSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        _HtmlOrText(content: content, textStyle: textStyle),
+        _HtmlOrText(
+          content: content,
+          textStyle: textStyle,
+          alternativeKind: alternativeKind,
+          pickerLabel: _OraItem._pickerLabel(alternativeKind),
+        ),
         const SizedBox(height: 8),
       ],
     );
@@ -1153,76 +1281,109 @@ class _HtmlOrText extends StatelessWidget {
   final String content;
   final TextStyle textStyle;
   final bool isPsalm;
+  final String alternativeKind;
+  final ValueNotifier<int>? alternativeController;
+  final bool showPicker;
+  final String pickerLabel;
 
   const _HtmlOrText({
     required this.content,
     required this.textStyle,
     this.isPsalm = false,
+    this.alternativeKind = 'generic',
+    this.alternativeController,
+    this.showPicker = true,
+    this.pickerLabel = 'Выбар варыянта',
   });
 
   @override
   Widget build(BuildContext context) {
     if (content.contains('<') && content.contains('>')) {
-      try {
-        final textColor =
-            textStyle.color ?? Theme.of(context).colorScheme.onSurface;
-        final reader = ReaderTheme.of(context);
-        final baseSize = textStyle.fontSize ?? 16;
-        return Html(
-          data: isPsalm
-              ? formatPsalmHtml(content)
-              : formatLiturgicalHtml(content),
-          style: {
-            'body': Style(
-              fontSize: FontSize(textStyle.fontSize ?? 16),
-              fontFamily: textStyle.fontFamily,
-              fontWeight: textStyle.fontWeight,
-              color: textColor,
-              lineHeight: LineHeight(1.75),
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              textAlign: TextAlign.left,
-            ),
-            'p': Style(color: textColor, margin: Margins.only(bottom: 8)),
-            '.liturgical-subheading': Style(
-              fontSize: FontSize(baseSize * 0.84),
-              lineHeight: LineHeight(1.45),
-              color: reader.muted,
-              margin: Margins.only(bottom: 7),
-            ),
-            '.liturgical-heading': Style(
-              fontSize: FontSize(baseSize * 0.94),
-              lineHeight: LineHeight(1.3),
-              color: reader.rubric,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.7,
-              margin: Margins.only(bottom: 12),
-            ),
-            '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
-            '.psalm-strophe-even': Style(
-              margin: Margins.only(left: 16, bottom: 8),
-            ),
-            '.psalm-marker': Style(
-              color: reader.rubric,
-              fontWeight: FontWeight.w600,
-            ),
-            '.liturgical-rubric': Style(
-              color: reader.rubric,
-              fontSize: FontSize(baseSize * 0.84),
-              lineHeight: LineHeight(1.45),
-            ),
-            '.liturgical-rubric-inline': Style(color: reader.rubric),
-          },
-        );
-      } catch (e) {
-        debugPrint('[OraScreen] Html parse failed: $e');
-        return SelectableText(
-          content.replaceAll(RegExp(r'<[^>]+>'), ' ').trim(),
-          style: textStyle,
-        );
-      }
+      return AlternativeText(
+        text: content,
+        label: pickerLabel,
+        kind: alternativeKind,
+        controller: alternativeController,
+        showPicker: showPicker,
+        contentBuilder: (context, selectedHtml) {
+          final displayedHtml = alternativeKind == 'intercession'
+              ? formatIntercessions(selectedHtml)
+              : selectedHtml;
+          return _renderHtml(context, displayedHtml);
+        },
+      );
     }
     return _LiturgicalSelectableText(content: content, textStyle: textStyle);
+  }
+
+  Widget _renderHtml(BuildContext context, String html) {
+    final textColor =
+        textStyle.color ?? Theme.of(context).colorScheme.onSurface;
+    final reader = ReaderTheme.of(context);
+    final baseSize = textStyle.fontSize ?? 16;
+    return Html(
+      data: isPsalm ? formatPsalmHtml(html) : formatLiturgicalHtml(html),
+      style: {
+        'body': Style(
+          fontSize: FontSize(textStyle.fontSize ?? 16),
+          fontFamily: textStyle.fontFamily,
+          fontWeight: textStyle.fontWeight,
+          color: textColor,
+          lineHeight: LineHeight(1.75),
+          margin: Margins.zero,
+          padding: HtmlPaddings.zero,
+          textAlign: TextAlign.left,
+        ),
+        'p': Style(color: textColor, margin: Margins.only(bottom: 8)),
+        '.liturgical-subheading': Style(
+          fontSize: FontSize(baseSize * 0.84),
+          lineHeight: LineHeight(1.45),
+          color: reader.muted,
+          margin: Margins.only(bottom: 7),
+        ),
+        '.liturgical-heading': Style(
+          fontSize: FontSize(baseSize * 0.94),
+          lineHeight: LineHeight(1.3),
+          color: reader.rubric,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.7,
+          margin: Margins.only(bottom: 12),
+        ),
+        '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
+        '.psalm-strophe-even': Style(margin: Margins.only(left: 16, bottom: 8)),
+        '.psalm-marker': Style(
+          color: reader.rubric,
+          fontWeight: FontWeight.w600,
+        ),
+        '.liturgical-rubric': Style(
+          color: reader.rubric,
+          fontSize: FontSize(baseSize * 0.84),
+          lineHeight: LineHeight(1.45),
+        ),
+        '.liturgical-rubric-inline': Style(color: reader.rubric),
+        '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),
+        '.intercessions__refrain': Style(
+          margin: Margins.only(top: 4, bottom: 22),
+          padding: HtmlPaddings.symmetric(horizontal: 15, vertical: 11),
+          border: Border(left: BorderSide(color: reader.rubric, width: 3)),
+          backgroundColor: reader.rubricSoft,
+          color: reader.ink,
+          fontWeight: FontWeight.w700,
+        ),
+        '.intercessions__petition': Style(
+          margin: Margins.only(top: 18, bottom: 5),
+        ),
+        '.intercessions__response': Style(
+          margin: Margins.only(left: 22, bottom: 15),
+          color: reader.muted,
+        ),
+        '.intercessions__conclusion': Style(
+          margin: Margins.only(top: 22),
+          color: reader.muted,
+          fontStyle: FontStyle.italic,
+        ),
+      },
+    );
   }
 }
 

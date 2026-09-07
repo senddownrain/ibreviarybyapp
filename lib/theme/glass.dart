@@ -24,24 +24,24 @@ class GlassTokens {
 
   // Glass fills
   Color get cardFill =>
-      isDark ? const Color(0xF0171512) : const Color(0xF0FFFBF3);
+      isDark ? const Color(0xF0151515) : const Color(0xF0FAFAFA);
   Color get softFill =>
-      isDark ? const Color(0xD9171512) : const Color(0xD9FFFBF3);
+      isDark ? const Color(0xD9151515) : const Color(0xD9FAFAFA);
   Color get pillFill =>
-      isDark ? const Color(0xF7171512) : const Color(0xF7FFFBF3);
+      isDark ? const Color(0xF7151515) : const Color(0xF7FAFAFA);
 
   Color get border =>
-      isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
+      isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
   Color get softBorder =>
-      isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
+      isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
   Color get pillBorder =>
-      isDark ? const Color(0x21F4EDE1) : const Color(0x1A372F26);
+      isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
   Color get specular => isDark
       ? Colors.white.withValues(alpha: 0.045)
       : Colors.white.withValues(alpha: 0.28);
 
   Color get ambientBase =>
-      isDark ? const Color(0xFF4A3A2D) : const Color(0xFFB49B71);
+      isDark ? const Color(0xFF3A3A3A) : const Color(0xFFBEBEBE);
 
   List<BoxShadow> get cardShadow => [
     BoxShadow(
@@ -79,7 +79,7 @@ class GlassTokens {
   }
 }
 
-/// Warm neutral application material used below contextual liturgical washes.
+/// Neutral application material used below contextual liturgical washes.
 class AmbientBackdrop extends StatelessWidget {
   final Widget child;
 

@@ -217,13 +217,11 @@ class PrayerDetailScreen extends ConsumerWidget {
                 MediaQuery.paddingOf(context).top +
                     kFloatingReaderAppBarContentInset,
                 16,
-                40,
+                40 + MediaQuery.viewPaddingOf(context).bottom,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildReadingSurface(context, p, textStyle, seasonColor),
-                ],
+                children: [_buildReadingSurface(context, p, textStyle)],
               ),
             ),
           ],
@@ -236,85 +234,38 @@ class PrayerDetailScreen extends ConsumerWidget {
     BuildContext context,
     Prayer prayer,
     TextStyle textStyle,
-    Color seasonColor,
   ) {
     final reader = ReaderTheme.of(context);
     final cs = Theme.of(context).colorScheme;
     final isMass = prayer.id == _kMassOrderPrayerId;
 
-    return Container(
-      width: double.infinity,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: reader.surface,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: reader.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(
-              alpha: Theme.of(context).brightness == Brightness.dark
-                  ? 0.24
-                  : 0.08,
-            ),
-            blurRadius: 38,
-            spreadRadius: -8,
-            offset: const Offset(0, 16),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          isMass ? 'ЛІТУРГІЯ' : 'МАЛІТВА',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: cs.tertiary,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.1,
+          ),
+        ),
+        const SizedBox(height: 7),
+        Text(prayer.displayTitle, style: reader.displayTitle(28)),
+        if (prayer.tags.isNotEmpty) ...[
+          const SizedBox(height: 13),
+          Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: [
+              for (final tag in prayer.tags.take(6))
+                Chip(label: Text(tag), visualDensity: VisualDensity.compact),
+            ],
           ),
         ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  cs.tertiaryContainer,
-                  seasonColor.withValues(alpha: 0.04),
-                ],
-              ),
-              border: Border(bottom: BorderSide(color: reader.border)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isMass ? 'ЛІТУРГІЯ' : 'МАЛІТВА',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: cs.tertiary,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 7),
-                Text(prayer.displayTitle, style: reader.displayTitle(28)),
-                if (prayer.tags.isNotEmpty) ...[
-                  const SizedBox(height: 13),
-                  Wrap(
-                    spacing: 7,
-                    runSpacing: 7,
-                    children: [
-                      for (final tag in prayer.tags.take(6))
-                        Chip(
-                          label: Text(tag),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
-            child: _buildContent(context, prayer, textStyle, isMass: isMass),
-          ),
-        ],
-      ),
+        Divider(height: 36, color: reader.border),
+        _buildContent(context, prayer, textStyle, isMass: isMass),
+      ],
     );
   }
 

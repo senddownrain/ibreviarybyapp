@@ -10,16 +10,16 @@ class ReaderTheme {
 
   final bool isDark;
 
-  Color get ink => isDark ? const Color(0xFFF2EBDD) : const Color(0xFF2A221B);
-  Color get muted => isDark ? const Color(0xFFB4A89A) : const Color(0xFF6F6357);
+  Color get ink => isDark ? const Color(0xFFF1F1F1) : const Color(0xFF1C1C1C);
+  Color get muted => isDark ? const Color(0xFFB0B0B0) : const Color(0xFF686868);
   Color get rubric =>
       isDark ? const Color(0xFFEF9188) : const Color(0xFF9B302A);
   Color get rubricSoft =>
       isDark ? const Color(0x17EF9188) : const Color(0x139B302A);
   Color get surface =>
-      isDark ? const Color(0xE6171512) : const Color(0xE6FFFBF3);
+      isDark ? const Color(0xE6151515) : const Color(0xE6FAFAFA);
   Color get border =>
-      isDark ? const Color(0x21F4EDE1) : const Color(0x1F504232);
+      isDark ? const Color(0x21FFFFFF) : const Color(0x1F000000);
 
   TextStyle displayTitle(double size) => GoogleFonts.cormorantGaramond(
     fontSize: size,

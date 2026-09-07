@@ -147,23 +147,27 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
           ),
         ),
         Positioned(
-          left: 16,
-          right: 16,
-          bottom: 16 + bottomPad,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: _PrayerSearchDock(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                queryIsEmpty: _searchController.text.isEmpty,
-                selectedTagCount: filter.selectedTags.length,
-                onChanged: (value) {
-                  setState(() {});
-                  _setSearch(value);
-                },
-                onClear: _clearSearch,
-                onFilter: _openTagFilter,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: SafeArea(
+            top: false,
+            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: _PrayerSearchDock(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  queryIsEmpty: _searchController.text.isEmpty,
+                  selectedTagCount: filter.selectedTags.length,
+                  onChanged: (value) {
+                    setState(() {});
+                    _setSearch(value);
+                  },
+                  onClear: _clearSearch,
+                  onFilter: _openTagFilter,
+                ),
               ),
             ),
           ),
@@ -295,97 +299,96 @@ class _PrayerTagsSheet extends ConsumerWidget {
     );
     final cs = Theme.of(context).colorScheme;
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * 0.78,
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          4,
-          20,
-          16 + MediaQuery.viewPaddingOf(context).bottom,
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: 8),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.78,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'МАЛІТВЫ',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: cs.tertiary,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.1,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Фільтр па тэгах',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Закрыць фільтр',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Можна выбраць некалькі тэгаў',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      Text(
-                        'МАЛІТВЫ',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.tertiary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.1,
+                      for (final tag in tags)
+                        FilterChip(
+                          label: Text(tag),
+                          selected: selectedTags.contains(tag),
+                          onSelected: (_) => ref
+                              .read(prayersFilterProvider.notifier)
+                              .toggleTag(tag),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Фільтр па тэгах',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                IconButton(
-                  tooltip: 'Закрыць фільтр',
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 20),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Можна выбраць некалькі тэгаў',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(height: 12),
-            Flexible(
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final tag in tags)
-                      FilterChip(
-                        label: Text(tag),
-                        selected: selectedTags.contains(tag),
-                        onSelected: (_) => ref
-                            .read(prayersFilterProvider.notifier)
-                            .toggleTag(tag),
-                      ),
-                  ],
-                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: selectedTags.isEmpty
-                      ? null
-                      : () => ref
-                            .read(prayersFilterProvider.notifier)
-                            .clearTags(),
-                  child: const Text('Ачысціць'),
-                ),
-                const Spacer(),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Гатова'),
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: selectedTags.isEmpty
+                        ? null
+                        : () => ref
+                              .read(prayersFilterProvider.notifier)
+                              .clearTags(),
+                    child: const Text('Ачысціць'),
+                  ),
+                  const Spacer(),
+                  FilledButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Гатова'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

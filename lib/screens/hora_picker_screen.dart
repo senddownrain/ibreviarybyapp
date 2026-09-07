@@ -165,7 +165,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                 0,
                 MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
                 0,
-                24,
+                24 + MediaQuery.viewPaddingOf(context).bottom,
               ),
               children: const [
                 TileShimmer(),
@@ -234,7 +234,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                   MediaQuery.paddingOf(context).top +
                       kFloatingAppBarContentInset,
                   12,
-                  32,
+                  32 + MediaQuery.viewPaddingOf(context).bottom,
                 ),
                 children: [
                   GlassSurface(

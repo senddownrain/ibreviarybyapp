@@ -177,8 +177,9 @@ class _PeriodPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 104 + bottomInset),
       children: periodLabelMap.entries.map((entry) {
         final color = periodColors[entry.key] ?? Colors.green;
         return Card(
@@ -216,28 +217,26 @@ class _PeriodPicker extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
+      useSafeArea: true,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (ctx) => _WeekDaySheet(
-        periodLabel: periodLabel,
-        maxWeeks: maxWeeks,
-        startDay: startDay,
-        exactDates: exactDates,
-        exactDatesFirst: period == 'lent',
-        onExactDateSelected: (date) {
-          Navigator.of(ctx).pop();
-          if (readingsMode) {
-            context.push('/readings/${_dateKey(date)}');
-          } else {
-            ref.read(selectedDateProvider.notifier).state = date;
-            context.go('/');
-          }
-        },
-        onSelected: (week, day) {
-          Navigator.of(ctx).pop();
-          if (readingsMode) {
+      builder: (ctx) => SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 8),
+        child: _WeekDaySheet(
+          periodLabel: periodLabel,
+          maxWeeks: maxWeeks,
+          startDay: startDay,
+          exactDates: exactDates,
+          exactDatesFirst: period == 'lent',
+          onExactDateSelected: (date) {
+            Navigator.of(ctx).pop();
+            _openDate(context, date);
+          },
+          onSelected: (week, day) {
+            Navigator.of(ctx).pop();
             final calendar = ref.read(calendarServiceProvider);
             final date = lit_calendar.calculateDateForContext(
               year,
@@ -255,14 +254,20 @@ class _PeriodPicker extends StatelessWidget {
               );
               return;
             }
-            context.push('/readings/${_dateKey(date)}');
-          } else {
-            ref.read(selectedDateProvider.notifier).state = DateTime(year);
-            context.push('/picker/options?period=$period&week=$week&day=$day');
-          }
-        },
+            _openDate(context, date);
+          },
+        ),
       ),
     );
+  }
+
+  void _openDate(BuildContext context, DateTime date) {
+    if (readingsMode) {
+      context.push('/readings/${_dateKey(date)}');
+      return;
+    }
+    ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(date);
+    context.go('/');
   }
 
   static String _dateKey(DateTime date) =>
@@ -338,83 +343,88 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.86,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colorScheme.outline,
-                borderRadius: BorderRadius.circular(2),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 20,
+          bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.outline,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            widget.periodLabel,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 16),
-          if (widget.exactDatesFirst) ...[
-            _ExactDateChoices(
-              dates: widget.exactDates,
-              onSelected: widget.onExactDateSelected,
+            const SizedBox(height: 16),
+            Text(
+              widget.periodLabel,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            if (widget.maxWeeks > 0) const Divider(height: 28),
-          ],
-          if (widget.maxWeeks > 0) ...[
-            Text('Тыдзень', style: Theme.of(context).textTheme.labelLarge),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: widget.maxWeeks,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (_, i) {
-                  final w = i + 1;
-                  final selected = w == _selectedWeek;
-                  return ChoiceChip(
-                    label: Text('$w'),
-                    selected: selected,
-                    onSelected: (_) => setState(() => _selectedWeek = w),
+            const SizedBox(height: 16),
+            if (widget.exactDatesFirst) ...[
+              _ExactDateChoices(
+                dates: widget.exactDates,
+                onSelected: widget.onExactDateSelected,
+              ),
+              if (widget.maxWeeks > 0) const Divider(height: 28),
+            ],
+            if (widget.maxWeeks > 0) ...[
+              Text('Тыдзень', style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.maxWeeks,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (_, i) {
+                    final w = i + 1;
+                    final selected = w == _selectedWeek;
+                    return ChoiceChip(
+                      label: Text('$w'),
+                      selected: selected,
+                      onSelected: (_) => setState(() => _selectedWeek = w),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text('Дзень', style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: List.generate(7 - widget.startDay + 1, (i) {
+                  final d = widget.startDay + i;
+                  return FilledButton.tonal(
+                    onPressed: () => widget.onSelected(_selectedWeek, d),
+                    child: Text(_dayLabels[d] ?? '$d'),
                   );
-                },
+                }),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text('Дзень', style: Theme.of(context).textTheme.labelLarge),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: List.generate(7 - widget.startDay + 1, (i) {
-                final d = widget.startDay + i;
-                return FilledButton.tonal(
-                  onPressed: () => widget.onSelected(_selectedWeek, d),
-                  child: Text(_dayLabels[d] ?? '$d'),
-                );
-              }),
-            ),
+            ],
+            if (!widget.exactDatesFirst && widget.exactDates.isNotEmpty) ...[
+              if (widget.maxWeeks > 0) const Divider(height: 28),
+              _ExactDateChoices(
+                dates: widget.exactDates,
+                onSelected: widget.onExactDateSelected,
+              ),
+            ],
           ],
-          if (!widget.exactDatesFirst && widget.exactDates.isNotEmpty) ...[
-            if (widget.maxWeeks > 0) const Divider(height: 28),
-            _ExactDateChoices(
-              dates: widget.exactDates,
-              onSelected: widget.onExactDateSelected,
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -559,7 +569,12 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    0,
+                    16,
+                    104 + MediaQuery.viewPaddingOf(context).bottom,
+                  ),
                   itemCount: filtered.length,
                   itemBuilder: (context, i) {
                     final feast = filtered[i];
