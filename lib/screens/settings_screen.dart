@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
+import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -359,7 +360,9 @@ class SettingsScreen extends ConsumerWidget {
 class _CategoriesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cats = ref.watch(settingsProvider).userCategories;
+    final settings = ref.watch(settingsProvider);
+    final cats = ref.watch(prayerMenuCategoriesProvider);
+    final globalCategories = ref.watch(globalPrayerCategoriesProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,15 +370,17 @@ class _CategoriesSection extends ConsumerWidget {
         Row(
           children: [
             Text(
-              'Мае катэгорыі',
+              'Катэгорыі ў меню',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Spacer(),
-            TextButton(
-              onPressed: () =>
-                  ref.read(settingsProvider.notifier).resetDefaultCategories(),
-              child: const Text('Скінуць'),
-            ),
+            if (settings.hiddenGlobalPrayerCategoryIds.isNotEmpty)
+              TextButton(
+                onPressed: () => ref
+                    .read(settingsProvider.notifier)
+                    .resetDefaultCategories(),
+                child: const Text('Аднавіць'),
+              ),
             TextButton.icon(
               onPressed: () => _showCategoryDialog(context, ref, null),
               icon: const PhosphorIcon(PhosphorIconsRegular.plus, size: 18),
@@ -383,11 +388,23 @@ class _CategoriesSection extends ConsumerWidget {
             ),
           ],
         ),
-        if (cats.isEmpty)
+        if (globalCategories.isLoading && cats.isEmpty)
+          const LinearProgressIndicator(),
+        if (globalCategories.hasError && cats.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              'Стварыце ўласныя катэгорыі для малітваў',
+              'Не атрымалася загрузіць катэгорыі. Праверце падключэнне.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        if (!globalCategories.isLoading &&
+            !globalCategories.hasError &&
+            cats.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              'У меню няма катэгорый',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -400,7 +417,19 @@ class _CategoriesSection extends ConsumerWidget {
               PhosphorIconsRegular.bookmark,
               size: 22,
             ),
-            title: Text(cat.name),
+            title: Row(
+              children: [
+                Flexible(child: Text(cat.name)),
+                if (cat.isGlobal) ...[
+                  const SizedBox(width: 8),
+                  Chip(
+                    label: const Text('Па змаўчанні'),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ],
+            ),
             subtitle: cat.tags.isNotEmpty
                 ? Text(
                     cat.tags.join(', '),
@@ -410,14 +439,19 @@ class _CategoriesSection extends ConsumerWidget {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  icon: const PhosphorIcon(
-                    PhosphorIconsRegular.pencilSimple,
-                    size: 20,
+                if (!cat.isGlobal)
+                  IconButton(
+                    icon: const PhosphorIcon(
+                      PhosphorIconsRegular.pencilSimple,
+                      size: 20,
+                    ),
+                    tooltip: 'Рэдагаваць',
+                    onPressed: () => _showCategoryDialog(
+                      context,
+                      ref,
+                      UserCategory(id: cat.id, name: cat.name, tags: cat.tags),
+                    ),
                   ),
-                  tooltip: 'Рэдагаваць',
-                  onPressed: () => _showCategoryDialog(context, ref, cat),
-                ),
                 IconButton(
                   icon: const PhosphorIcon(
                     PhosphorIconsRegular.trash,
@@ -429,7 +463,11 @@ class _CategoriesSection extends ConsumerWidget {
                         ? await showCupertinoDialog<bool>(
                             context: context,
                             builder: (ctx) => CupertinoAlertDialog(
-                              title: const Text('Выдаліць катэгорыю?'),
+                              title: Text(
+                                cat.isGlobal
+                                    ? 'Прыбраць катэгорыю з меню?'
+                                    : 'Выдаліць катэгорыю?',
+                              ),
                               actions: [
                                 CupertinoDialogAction(
                                   onPressed: () => Navigator.pop(ctx, false),
@@ -446,7 +484,11 @@ class _CategoriesSection extends ConsumerWidget {
                         : await showDialog<bool>(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              title: const Text('Выдаліць катэгорыю?'),
+                              title: Text(
+                                cat.isGlobal
+                                    ? 'Прыбраць катэгорыю з меню?'
+                                    : 'Выдаліць катэгорыю?',
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx, false),
@@ -460,9 +502,12 @@ class _CategoriesSection extends ConsumerWidget {
                             ),
                           );
                     if (ok == true) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .deleteCategory(cat.id);
+                      final notifier = ref.read(settingsProvider.notifier);
+                      if (cat.isGlobal) {
+                        notifier.hideGlobalPrayerCategory(cat.id);
+                      } else {
+                        notifier.deleteCategory(cat.id);
+                      }
                     }
                   },
                 ),

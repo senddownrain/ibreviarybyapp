@@ -50,6 +50,7 @@ class SettingsState {
   final String fontFamily;
   final bool keepScreenOn;
   final List<UserCategory> userCategories;
+  final List<String> hiddenGlobalPrayerCategoryIds;
   final List<String> favoriteIds;
   final String bibleVersionId;
 
@@ -62,6 +63,7 @@ class SettingsState {
     this.fontFamily = 'Сістэмны',
     this.keepScreenOn = false,
     this.userCategories = const [],
+    this.hiddenGlobalPrayerCategoryIds = const [],
     this.favoriteIds = const [],
     this.bibleVersionId = 'bel',
     this.prayerCategoryMap = const {},
@@ -77,6 +79,7 @@ class SettingsState {
     String? fontFamily,
     bool? keepScreenOn,
     List<UserCategory>? userCategories,
+    List<String>? hiddenGlobalPrayerCategoryIds,
     List<String>? favoriteIds,
     String? bibleVersionId,
     Map<String, Set<String>>? prayerCategoryMap,
@@ -86,6 +89,8 @@ class SettingsState {
     fontFamily: fontFamily ?? this.fontFamily,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
     userCategories: userCategories ?? this.userCategories,
+    hiddenGlobalPrayerCategoryIds:
+        hiddenGlobalPrayerCategoryIds ?? this.hiddenGlobalPrayerCategoryIds,
     favoriteIds: favoriteIds ?? this.favoriteIds,
     bibleVersionId: bibleVersionId ?? this.bibleVersionId,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
@@ -106,6 +111,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
     final mode = _box.get('themeMode', defaultValue: 'system') as String;
     final cats = (_box.get('userCategories', defaultValue: '[]') as String);
     final favs = (_box.get('favoriteIds', defaultValue: '[]') as String);
+    final hiddenCategories =
+        (_box.get('hiddenGlobalPrayerCategoryIds', defaultValue: '[]')
+            as String);
     final pcm = (_box.get('prayerCategoryMap', defaultValue: '{}') as String);
     final pcmRaw = jsonDecode(pcm) as Map;
     final prayerCategoryMap = {
@@ -123,6 +131,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
       userCategories: (jsonDecode(cats) as List)
           .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
           .toList(),
+      hiddenGlobalPrayerCategoryIds: List<String>.from(
+        jsonDecode(hiddenCategories) as List,
+      ),
       favoriteIds: List<String>.from(jsonDecode(favs) as List),
       bibleVersionId: _box.get('bibleVersionId', defaultValue: 'bel') as String,
       prayerCategoryMap: prayerCategoryMap,
@@ -137,6 +148,10 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put(
       'userCategories',
       jsonEncode(state.userCategories.map((c) => c.toMap()).toList()),
+    );
+    await _box.put(
+      'hiddenGlobalPrayerCategoryIds',
+      jsonEncode(state.hiddenGlobalPrayerCategoryIds),
     );
     await _box.put('favoriteIds', jsonEncode(state.favoriteIds));
     await _box.put('bibleVersionId', state.bibleVersionId);
@@ -220,6 +235,12 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
+  void hideGlobalPrayerCategory(String id) {
+    final hidden = {...state.hiddenGlobalPrayerCategoryIds, id}.toList();
+    state = state.copyWith(hiddenGlobalPrayerCategoryIds: hidden);
+    _save();
+  }
+
   void setBibleVersion(String versionId) {
     state = state.copyWith(bibleVersionId: versionId);
     _save();
@@ -245,12 +266,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void resetDefaultCategories() {
-    final defaults = [
-      UserCategory(id: 'morning', name: 'Раніца', tags: ['раніца', 'morning']),
-      UserCategory(id: 'evening', name: 'Вечар', tags: ['вечар', 'evening']),
-      UserCategory(id: 'praise', name: 'Хвала', tags: ['хвала', 'praise']),
-    ];
-    state = state.copyWith(userCategories: defaults);
+    state = state.copyWith(hiddenGlobalPrayerCategoryIds: const []);
     _save();
   }
 

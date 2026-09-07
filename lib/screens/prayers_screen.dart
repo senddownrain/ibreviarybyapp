@@ -142,17 +142,18 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
                     );
                   },
                 ),
-              SliverToBoxAdapter(child: SizedBox(height: 100 + bottomPad)),
+              SliverToBoxAdapter(child: SizedBox(height: 124 + bottomPad)),
             ],
           ),
         ),
         Positioned(
           left: 0,
           right: 0,
-          bottom: 0,
+          bottom: 24 + bottomPad,
           child: SafeArea(
             top: false,
-            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            bottom: false,
+            minimum: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),

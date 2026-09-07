@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
-import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
@@ -14,7 +14,7 @@ class AppNavigationDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
-    final settings = ref.watch(settingsProvider);
+    final categories = ref.watch(prayerMenuCategoriesProvider);
     final selectedDate = ref.watch(selectedDateProvider);
     final location = GoRouterState.of(context).uri.path;
 
@@ -103,7 +103,7 @@ class AppNavigationDrawer extends ConsumerWidget {
                         selected: location.startsWith('/my-prayers'),
                         onTap: () => navigate('/my-prayers'),
                       ),
-                      for (final category in settings.userCategories)
+                      for (final category in categories)
                         _DrawerItem(
                           icon: PhosphorIconsRegular.bookmark,
                           title: category.name,
@@ -118,7 +118,7 @@ class AppNavigationDrawer extends ConsumerWidget {
                             navigate('/prayers');
                           },
                         ),
-                      if (settings.userCategories.isEmpty)
+                      if (categories.isEmpty)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(14, 5, 14, 8),
                           child: Text(

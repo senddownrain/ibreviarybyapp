@@ -540,6 +540,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     // Loading
     if (_loading) {
       return Scaffold(
+        extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
         appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
@@ -561,6 +562,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (_error != null) {
       final cs = Theme.of(context).colorScheme;
       return Scaffold(
+        extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
         appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
@@ -609,6 +611,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (_readings.isEmpty) {
       final cs = Theme.of(context).colorScheme;
       return Scaffold(
+        extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
         appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
@@ -650,6 +653,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     // Multiple year variants — tabs
     if (_tabs.length > 1 && _tabController != null) {
       return Scaffold(
+        extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
         appBar: AdaptiveAppBar(
@@ -755,6 +759,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     // Single reading
     final single = _displayReading();
     return Scaffold(
+      extendBody: true,
       extendBodyBehindAppBar: true,
       drawer: const AppNavigationDrawer(),
       appBar: AdaptiveAppBar(
@@ -913,7 +918,12 @@ class _ReadingBody extends ConsumerWidget {
           children: [
             SingleChildScrollView(
               primary: compactTop ? true : null,
-              padding: EdgeInsets.fromLTRB(16, topPad, 16, 40),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                topPad,
+                16,
+                104 + MediaQuery.viewPaddingOf(context).bottom,
+              ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Column(
@@ -1445,21 +1455,21 @@ class _PsalmSection extends StatelessWidget {
           ],
         ],
 
-        // Structured verses: chorus → verse → chorus → verse → … → chorus/altChorus
+        // Structured verses: prominent opening refrain, lighter repeats between
+        // strophes, then the final (or alternative) refrain.
         if (hasVerses) ...[
+          if (hasChorus) ...[
+            const SizedBox(height: 10),
+            _ChorusBox(
+              label: 'Рэфрэн',
+              chorus: chorus,
+              cs: cs,
+              textStyle: textStyle,
+            ),
+          ],
           for (var i = 0; i < psalm.verses.length; i++) ...[
-            // Chorus before each verse
-            if (hasChorus) ...[
-              const SizedBox(height: 8),
-              _ChorusBox(
-                label: 'Рэфрэн',
-                chorus: chorus,
-                cs: cs,
-                textStyle: textStyle,
-              ),
-            ],
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: _ReadingText(
                 text: psalm.verses[i],
                 textStyle: textStyle,
@@ -1467,6 +1477,14 @@ class _PsalmSection extends StatelessWidget {
                 leftInset: i.isOdd ? 16 : 0,
               ),
             ),
+            if (hasChorus && i < psalm.verses.length - 1)
+              _ChorusBox(
+                label: 'Рэфрэн',
+                chorus: chorus,
+                cs: cs,
+                textStyle: textStyle,
+                compact: true,
+              ),
           ],
           // After last verse: altChorus or chorus again
           if (hasChorus) ...[
@@ -1477,6 +1495,7 @@ class _PsalmSection extends StatelessWidget {
                 chorus: psalm.altChorus!,
                 cs: cs,
                 textStyle: textStyle,
+                alternate: true,
               )
             else
               _ChorusBox(
@@ -1484,6 +1503,7 @@ class _PsalmSection extends StatelessWidget {
                 chorus: chorus,
                 cs: cs,
                 textStyle: textStyle,
+                isFinal: true,
               ),
           ],
         ],
@@ -1497,43 +1517,93 @@ class _ChorusBox extends StatelessWidget {
   final String chorus;
   final ColorScheme cs;
   final TextStyle textStyle;
+  final bool compact;
+  final bool alternate;
+  final bool isFinal;
 
   const _ChorusBox({
     required this.label,
     required this.chorus,
     required this.cs,
     required this.textStyle,
+    this.compact = false,
+    this.alternate = false,
+    this.isFinal = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final reader = ReaderTheme.of(context);
+    final accent = alternate ? reader.muted : reader.rubric;
+    final fill = alternate
+        ? cs.onSurface.withValues(alpha: 0.035)
+        : compact
+        ? Colors.transparent
+        : reader.rubricSoft.withValues(alpha: 0.95);
+    final base = textStyle.fontSize ?? 16;
+
     return Container(
+      key: ValueKey(
+        'psalm-refrain-${alternate
+            ? 'alternate'
+            : compact
+            ? 'repeat'
+            : isFinal
+            ? 'final'
+            : 'opening'}',
+      ),
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      margin: EdgeInsets.fromLTRB(0, compact ? 5 : 2, 0, compact ? 9 : 13),
+      padding: EdgeInsets.fromLTRB(
+        compact ? 11 : 14,
+        compact ? 7 : 11,
+        compact ? 10 : 14,
+        compact ? 7 : 12,
+      ),
       decoration: BoxDecoration(
-        color: cs.primaryContainer.withValues(alpha: 0.30),
+        color: fill,
         borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(4),
-          bottomRight: Radius.circular(4),
+          topRight: Radius.circular(13),
+          bottomRight: Radius.circular(13),
         ),
         border: Border(
-          left: BorderSide(color: cs.primary.withValues(alpha: 0.45), width: 3),
+          left: BorderSide(color: accent, width: compact ? 3 : 4),
         ),
+        boxShadow: compact || alternate
+            ? null
+            : [
+                BoxShadow(
+                  color: reader.rubric.withValues(alpha: 0.07),
+                  blurRadius: 16,
+                  spreadRadius: -8,
+                  offset: const Offset(0, 7),
+                ),
+              ],
       ),
-      child: SelectableText.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: '$label: ',
-              style: textStyle.copyWith(fontWeight: FontWeight.w700),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: textStyle.copyWith(
+              fontSize: base * (compact ? 0.67 : 0.70),
+              height: 1.2,
+              color: accent,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.05,
             ),
-            TextSpan(
-              text: chorus,
-              style: textStyle.copyWith(fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: compact ? 3 : 5),
+          SelectableText(
+            chorus,
+            style: textStyle.copyWith(
+              fontSize: base * (compact ? 0.96 : 1.04),
+              height: compact ? 1.48 : 1.5,
+              color: reader.ink,
+              fontWeight: compact ? FontWeight.w600 : FontWeight.w700,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
