@@ -1,7 +1,7 @@
 /* A local interaction model. No Firebase, Flutter imports, analytics or network writes. */
 (() => {
   'use strict';
-  const M=UXModel, F=UX_FIXTURES, $=(s,r=document)=>r.querySelector(s);
+  const M=UXModel, F=UX_FIXTURES, R=UXRefinement, $=(s,r=document)=>r.querySelector(s);
   const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const paths={
     clock:'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>',
@@ -63,11 +63,11 @@
   function hours(s) {
     const c=celebration(s),opts=M.CALENDAR[s.hours.date]||[];
     if(s.hours.ora)return ora(s);
-    return `<div class="page"><h1>Гадзіны</h1>${dateBar(s,'hours')}${!c||s.mode==='empty-day'?empty('Няма варыянтаў на гэтую дату','У дэманстрацыйным календары даступныя 8, 9 і 13 верасня. Выберыце іншую дату.','date:hours','Выбраць дату','calendar'):`<section class="celebration ${c.color}"><span class="rank">${E(c.rank)}</span><h2>${E(c.title)}</h2><p>${s.hours.choice===0?'Асноўны варыянт дня':'Выбраны іншы варыянт'}</p></section>${opts.length>1?button('celebrations',`Іншыя літургічныя варыянты · ${opts.length-1}`,'options'):''}<div class="hours-heading"><h2>Літургія гадзінаў</h2></div>${M.HOURS.map(([id,title,sub,ic])=>button('hour:'+id,`<span class="hour-icon">${icon(ic)}</span><span class="row-text"><strong>${E(title)}</strong><small>${E(sub)}</small></span>${icon('chevron')}`,null,'list-row'+(id==='laudes'?' recommended':''))).join('')}`}</div>`;
+    return `<div class="page"><h1>Гадзіны</h1>${dateBar(s,'hours')}${!c||s.mode==='empty-day'?empty('Няма варыянтаў на гэтую дату','Для гэтай даты няма даступнага набору. Параметры літургічнага года ў прыкладзе — 2026. Выберыце іншую дату.','date:hours','Выбраць дату','calendar'):`<section class="celebration ${c.color}"><span class="rank">${E(c.rank)}</span><h2>${E(c.title)}</h2><p>${s.hours.choice===0?'Асноўны варыянт дня':'Выбраны іншы варыянт'}</p></section>${opts.length>1?button('celebrations',`Іншыя літургічныя варыянты · ${opts.length-1}`,'options'):''}<div class="hours-heading"><h2>Літургія гадзінаў</h2></div>${M.HOURS.map(([id,title,sub,ic])=>button('hour:'+id,`<span class="hour-icon">${icon(ic)}</span><span class="row-text"><strong>${E(title)}</strong><small>${E(sub)}</small></span>${icon('chevron')}`,null,'list-row'+(id==='laudes'?' recommended':''))).join('')}`}</div>`;
   }
   function ora(s) {
     const c=celebration(s),hour=M.HOURS.find(h=>h[0]===s.hours.ora),h=s.hours.ora;
-    const feast=F.feasts[c?.id];
+    const feast=F.feasts[c?.id==='peter'&&s.hours.template==='works-of-mercy'?'peterMercy':c?.id];
     const prefix={office:'officeOfReadings',laudes:'laudes',terce:'sext1',sext:'sext2',none:'sext3',vespers:'vesper2',compline:'completorium'}[h];
     let body=`<h2>${h==='invit'?'Заклік':'Уступ'}</h2>${clean(h==='invit'?F.constants.InvitIntro:F.constants.StandardIntro)}`;
     if(h==='invit'&&feast?.invitatoriumAnt)body+=`<h2>Антыфона</h2>${clean(feast.invitatoriumAnt)}`;
@@ -80,7 +80,7 @@
     if(h==='compline')body+=`<h2>Благаслаўленне</h2>${clean(F.constants.EndOfComplineBlessing)}`;
     if(feast?.[prefix+'Pr'])body+=`<h2>Малітва</h2>${clean(feast[prefix+'Pr'])}`;
     if(['terce','sext','none'].includes(h))body+=`<h2>Заканчэнне</h2>${clean(F.constants.EndOfSext)}`;
-    return `<div class="reader-context">${dateBar(s,'hours')}<p>${E(c?.title)}</p><h1>${E(hour[1])}</h1><div class="context-link">${button('ora-readings','Чытанні','book')}</div></div><article class="reader" aria-label="Тэкст Ora">${body}${source('Скарочаны ўзор Ora: агульныя часткі з Flutter і ўласныя тэксты з MyBrev. Гэта не поўны сабраны афіцый.')}<div class="end-mark" aria-hidden="true">· · ·</div></article>`;
+    return `<div class="reader-context">${dateBar(s,'hours')}<p>${E(c?.title)}</p><h1>${button('change-hour',E(hour[1]),'down','hour-title')}</h1><div class="context-link">${button('ora-readings','Чытанні','book')}</div></div><article class="reader" aria-label="Тэкст Ora">${body}${source('Скарочаны ўзор Ora: агульныя часткі з Flutter і ўласныя тэксты з MyBrev. Гэта не поўны сабраны афіцый.')}<div class="end-mark" aria-hidden="true">· · ·</div></article>`;
   }
   function readingSelection(s) { const groups=M.readingGroups(s.readings.date),group=groups[s.readings.group];return {groups,group,cycle:s.readings.cycle}; }
   function readingText(s) {
@@ -99,10 +99,14 @@
   }
   function prayerRow(s,p) {return `<div class="favorite-row">${row('prayer:'+p.id,p.title,p.sub)}${button('favorite:'+p.id,'','heart','plain',`aria-label="${s.favorites.includes(p.id)?'Прыбраць з Абраных':'Дадаць у Абраныя'}: ${E(p.title)}" aria-pressed="${s.favorites.includes(p.id)}"`)}</div>`;}
   function filteredPrayers(s) {
+    return R.filteredPrayers(s);
+    /* Legacy fixture-only category filter retained below for source comparison.
     const p=s.prayers,q=p.query.toLocaleLowerCase('be');
     return prayers.filter(x=>(p.filter==='all'||(p.filter==='favorites'?s.favorites.includes(x.id):x.category===p.filter))&&(!p.collection||p.collection==='morning'?(!p.collection||['glory','benedictus'].includes(x.id)):x.category===p.collection)&&(!q||(x.title+' '+x.sub+' '+strip(x.html)).toLocaleLowerCase('be').includes(q)));
+    */
   }
   function prayerPage(s) {
+    const refined=R.prayerRoot(s);if(refined!==null)return refined;
     const p=s.prayers;
     if(p.detail) {const prayer=prayers.find(x=>x.id===p.detail);return `<div class="reader-context"><p>${E(categoryNames[p.collection]||'Малітоўнік')}</p><h1>${E(prayer.title)}</h1><p>${E(prayer.sub)}</p></div><article class="reader" aria-label="Тэкст малітвы">${clean(prayer.html)}${source('Тэкст з рэпазіторыя праекта. Дадаванне ў Абраныя змяняе толькі лакальны прататып.')}<div class="end-mark" aria-hidden="true">· · ·</div></article>`;}
     if(p.page!=='home') {const list=filteredPrayers(s);return `<div class="page"><h1>${E(categoryNames[p.collection]||'Усе малітвы')}</h1>${button('search-prayers','Пошук і фільтры','search')}${list.length?list.map(x=>prayerRow(s,x)).join(''):empty('Малітваў не знойдзена','Змяніце запыт або фільтр.','clear-prayer-filter','Скінуць фільтры','search')}</div>`;}
@@ -117,26 +121,28 @@
   function content(s) {
     if(s.mode==='loading')return `<div class="page" role="status"><h1>Адкрываем тэксты</h1><p class="muted">Загрузка з лакальнай бібліятэкі…</p><div class="loading"></div><div class="loading"></div><div class="loading"></div>${button('ready','Завяршыць загрузку',null,'text-action')}</div>`;
     if(s.mode==='missing')return `<div class="page">${['hours','readings'].includes(s.tab)?dateBar(s,s.tab):''}${empty('Тэкст яшчэ не спампаваны','Гэтага тэксту няма ў лакальнай бібліятэцы. Спампуйце яго, калі будзе злучэнне.','sync','Адкрыць сінхранізацыю','book')}${button('ready','Паказаць даступны ўзор',null)}</div>`;
-    return {hours,readings,prayers:prayerPage,bible}[s.tab](s);
+    return {hours,readings,prayers:prayerPage,bible:R.bible}[s.tab](s);
   }
   function isReader(s) {return s.tab==='readings'||s.tab==='bible'||(s.tab==='hours'&&s.hours.ora)||(s.tab==='prayers'&&s.prayers.detail);}
   function topbar(d) {
     const s=d.state,reader=isReader(s),label=tabs.find(x=>x[0]===s.tab)[1];
     let back=s.tab==='hours'&&s.hours.ora||s.tab==='prayers'&&(s.prayers.detail||s.prayers.page!=='home')||s.tab==='readings'&&s.readings.returnTo;
-    return `<header class="topbar">${back?round('back',s.tab==='readings'?'Назад да Ora':'Назад',d.id==='ios'?'back':'arrow'):round('menu','Меню','menu')}<span class="top-label">${back&&s.tab==='readings'?'Да Ora':reader?label:'iBreviary'}</span><div class="actions">${s.tab==='prayers'&&!s.prayers.detail?round('search-prayers','Пошук малітваў','search'):''}${s.tab==='bible'?round('search-bible','Пошук у Бібліі','search'):''}${s.tab==='prayers'&&s.prayers.detail?round('favorite:'+s.prayers.detail,s.favorites.includes(s.prayers.detail)?'Прыбраць з Абраных':'Дадаць у Абраныя','heart'):''}${reader?button('appearance','Aa',null,'round chrome','aria-label="Выгляд тэксту"'):round('appearance','Выгляд тэксту','options')}</div></header>`;
+    return `<header class="topbar">${back?round('back',s.tab==='readings'?'Назад да Ora':'Назад',d.id==='ios'?'back':'arrow'):round('menu','Меню','menu')}<span class="chrome-spacer">${back&&s.tab==='readings'?'Да Ora':''}</span><div class="actions">${s.tab==='prayers'&&!s.prayers.detail?round('search-prayers','Пошук малітваў','search'):''}${s.tab==='bible'?round('search-bible','Пошук у Бібліі','search'):''}${s.tab==='prayers'&&s.prayers.detail?button('favorite:'+s.prayers.detail,'','heart','round chrome',`aria-label="Абраныя" aria-pressed="${s.favorites.includes(s.prayers.detail)}"`):''}${reader?button('appearance','Aa',null,'round chrome','aria-label="Памер тэксту"'):''}${reader&&back?round('reader-menu','Дзеянні чытання','menu'):''}</div></header>`;
   }
   function navigation(d) {
     const s=d.state;
-    if(d.id==='ios'&&s.compact)return `<footer class="nav-wrap"><div class="compact-tabs chrome">${button('expand-tabs',tabs.find(x=>x[0]===s.tab)[1],tabs.find(x=>x[0]===s.tab)[2],'plain')}${round('expand-tabs','Паказаць усе раздзелы','grid')}</div></footer>`;
+    if(s.compact)return `<footer class="nav-wrap"><div class="compact-tabs chrome">${button('expand-tabs',tabs.find(x=>x[0]===s.tab)[1],tabs.find(x=>x[0]===s.tab)[2],'plain')}${round('expand-tabs','Паказаць усе раздзелы','grid')}</div></footer>`;
     return `<footer class="nav-wrap"><nav class="tabs chrome" role="tablist" aria-label="Асноўныя раздзелы">${tabs.map(([id,label,ic])=>button('tab:'+id,`<span class="tab-icon">${icon(ic)}</span><span>${label}</span>`,null,'',`role="tab" aria-selected="${s.tab===id}" aria-controls="${d.id}-content"`)).join('')}</nav></footer>`;
   }
   function render(d) {
+    R.beforeRender(d);
     const s=d.state;d.key=M.key(s);
     d.el.className=`phone ${d.id} ${app.theme==='dark'?'dark':''} ${app.scale>=1.6?'large-text':''} ${s.focus?'focus-mode':''} ${s.reduceEffects?'reduce-effects':''}`;
     d.el.style.setProperty('--ui-scale',app.scale);d.el.style.setProperty('--reader-scale',s.readerScale);
-    d.el.innerHTML=`${s.focus?button('exit-focus','Вярнуць кіраванне','expand','focus-exit'):`<div class="status-bar" aria-hidden="true"><span>${d.id==='ios'?'9:41':'09:41'}</span><span class="status-icons">${icon('wifi')}${icon('battery')}</span></div>${topbar(d)}`}<div class="content" id="${d.id}-content" role="tabpanel" aria-label="${tabs.find(x=>x[0]===s.tab)[1]}">${content(s)}</div>${s.focus?'':navigation(d)}<div class="modal-root"></div><div class="announcement" aria-live="polite"></div>`;
+    R.applyAtmosphere(d);
+    d.el.innerHTML=`${s.focus?button('exit-focus','Вярнуць кіраванне','expand','focus-exit'):`<div class="status-bar" aria-hidden="true"><span>${d.id==='ios'?'9:41':'09:41'}</span><span class="status-icons">${icon('wifi')}${icon('battery')}</span></div>${topbar(d)}`}<div class="content" id="${d.id}-content" role="tabpanel" aria-label="${tabs.find(x=>x[0]===s.tab)[1]}">${content(s)}</div>${s.focus?'':R.highlightDock(d)||navigation(d)}<div class="modal-root"></div><div class="announcement" aria-live="polite"></div>`;
     const viewport=$('.content',d.el);viewport.scrollTop=s.scroll[d.key]||0;
-    viewport.addEventListener('scroll',()=>{s.scroll[d.key]=viewport.scrollTop;save(d);},{passive:true});
+    viewport.addEventListener('scroll',()=>{s.scroll[d.key]=viewport.scrollTop;if(s.tab==='readings'&&viewport.scrollTop>180&&!s.readings.started&&!d.modal&&!String(window.getSelection())&&s.nav==='auto'&&app.navigation==='auto'){s.readings.started=true;s.compact=true;const dock=$('.nav-wrap',d.el);if(dock)dock.outerHTML=navigation(d);d.el.dataset.navigation='compact';}save(d);},{passive:true});
     if(d.modal)renderModal(d);save(d);
   }
   function save(d) {try{localStorage.setItem('ibreviary-ux-prototype-v1:'+d.id,JSON.stringify(d.state));}catch{/* Storage is optional, including file:// privacy modes. */}}
@@ -150,12 +156,13 @@
   function bibleSearchResults(d) {
     const s=d.state,b=s.bible,q=(d.modalQuery||'').toLocaleLowerCase(),books=F.bible[b.translation];
     if(!q)return `<p class="muted">${d.searchScope==='text'?'Пошук тэксту ва ўсіх раздзелах бягучай кнігі.':'Знайдзіце кнігу па назве.'}</p>`;
-    if(d.searchScope!=='text') {const found=books.filter(x=>x.name.toLocaleLowerCase().includes(q));return found.length?found.map(x=>row('search-book:'+x.id,x.name,`${x.chapters.length} раздзелаў`)).join(''):empty('Кніг не знойдзена','У прататыпе ёсць шэсць кніг. Удакладніце запыт.',null,null,'search');}
+    if(d.searchScope!=='text') {const found=books.filter(x=>x.name.toLocaleLowerCase().includes(q));return found.length?found.map(x=>row('search-book:'+x.id,x.name,`${x.chapters.length} раздзелаў`)).join(''):empty('Кніг не знойдзена','Удакладніце назву кнігі або змяніце пераклад.',null,null,'search');}
     const book=books.find(x=>x.id===b.book),matches=[];
     book.chapters.forEach((c,ci)=>c.forEach(v=>{if(v.text.toLocaleLowerCase().includes(q))matches.push({chapter:ci+1,verse:v.num,text:v.text});}));
     return matches.length?`<p class="muted">Знойдзена: ${matches.length}${matches.length>80?' · паказаныя першыя 80, удакладніце запыт':''}</p>${matches.slice(0,80).map(x=>row(`search-verse:${x.chapter}:${x.verse}`,`${x.chapter}:${x.verse}`,x.text)).join('')}`:empty('Нічога не знойдзена','У бягучай кнізе няма такога тэксту.',null,null,'search');
   }
   function modalContents(d) {
+    const refined=R.modal(d);if(refined)return refined;
     const s=d.state,name=d.modal;
     if(name.startsWith('date:')) {const branch=name.split(':')[1];return ['Дата',`${row('today:'+branch,'Сёння',dateLabel(M.TODAY),'sun')}${row('day-prev:'+branch,'Папярэдні дзень',dateLabel(M.plusDate(s[branch].date,-1)),'back')}${row('day-next:'+branch,'Наступны дзень',dateLabel(M.plusDate(s[branch].date,1)),'chevron')}${row('calendar:'+branch,'Выбраць дату','Каляндар','calendar')}${row('liturgical:'+branch,'Знайсці літургічны дзень / свята','Перыяд або назва свята','search')}`];}
     if(name.startsWith('calendar:')) {const branch=name.split(':')[1];return ['Выбраць дату',`<label for="${d.id}-date">Дата</label><input id="${d.id}-date" type="date" value="${s[branch].date}" data-input="date-value"><p class="muted">Узор календара: 8, 9 і 13 верасня 2026. Для астатніх дат паказваецца адсутнасць набору.</p>${button('apply-date:'+branch,'Адкрыць дату',null,'primary-button')}${row('liturgical:'+branch,'Знайсці літургічны дзень / свята','','search')}`];}
@@ -166,7 +173,7 @@
       return ['Варыянты чытанняў',`${groups.map((g,i)=>row('reading-group:'+i,g.title,i===0?'Аўтаматычны набор':'Іншае святкаванне',s.readings.group===i?'check':'chevron')).join('')}${group?.cycles.length>1?`<label>Даступныя цыклы</label><div class="chips">${group.cycles.map(c=>button('reading-cycle:'+c,c==='1'?'I':c==='2'?'II':c,null,'chip'+(c===s.readings.cycle?' active':''),`aria-pressed="${c===s.readings.cycle}"`)).join('')}</div>`:''}${button('readings-auto','Аўтаматычны выбар','sync')}<p class="muted">Наборы тут дэманстрацыйныя. Пераход з Ora перадае дату; святкаванне Ora не вызначае набор чытанняў.</p>`];
     }
     if(name==='search-prayers') return ['Пошук малітваў',`<label for="${d.id}-prayer-query">Назва або тэкст малітвы</label><input id="${d.id}-prayer-query" data-input="prayer-query" type="search" value="${E(s.prayers.query)}" placeholder="Знайсці малітву" autofocus><label for="${d.id}-prayer-filter">Фільтр${s.prayers.collection?' · '+E(categoryNames[s.prayers.collection]):''}</label><select id="${d.id}-prayer-filter" data-input="prayer-filter">${['all','favorites','canticles','daily','liturgical'].map(x=>`<option value="${x}" ${s.prayers.filter===x?'selected':''}>${categoryNames[x]}</option>`).join('')}</select><div data-results="prayers">${searchPrayerResults(d)}</div>`];
-    if(name==='bible-picker') {const books=F.bible[s.bible.translation],book=books.find(b=>b.id===d.modalBook)||books[0];return ['Кніга і раздзел',`<label for="${d.id}-translation">Пераклад</label><select id="${d.id}-translation" data-input="translation"><option value="bel" ${s.bible.translation==='bel'?'selected':''}>Беларускі · bible_seed_bel</option><option value="ru" ${s.bible.translation==='ru'?'selected':''}>Русский · bible_seed_ru</option></select><label for="${d.id}-book">Кніга</label><select id="${d.id}-book" data-input="book">${books.map(b=>`<option value="${b.id}" ${b.id===book.id?'selected':''}>${E(b.name)}</option>`).join('')}</select><label>Раздзел</label><div class="chapter-grid">${book.chapters.map((_,i)=>button('pick-chapter:'+i,String(i+1),null,s.bible.book===book.id&&s.bible.chapter===i+1?'active':'',`aria-label="Раздзел ${i+1}"`)).join('')}</div><p class="muted">Дэманстрацыйны корпус: шэсць кніг, усе іх раздзелы.</p>`];}
+    if(name==='bible-picker') {const books=F.bible[s.bible.translation],book=books.find(b=>b.id===d.modalBook)||books[0];return ['Кніга і раздзел',`<label for="${d.id}-translation">Пераклад</label><select id="${d.id}-translation" data-input="translation"><option value="bel" ${s.bible.translation==='bel'?'selected':''}>Беларускі · bible_seed_bel</option><option value="ru" ${s.bible.translation==='ru'?'selected':''}>Русский · bible_seed_ru</option></select><label for="${d.id}-book">Кніга</label><select id="${d.id}-book" data-input="book">${books.map(b=>`<option value="${b.id}" ${b.id===book.id?'selected':''}>${E(b.name)}</option>`).join('')}</select><label>Раздзел</label><div class="chapter-grid">${book.chapters.map((_,i)=>button('pick-chapter:'+i,String(i+1),null,s.bible.book===book.id&&s.bible.chapter===i+1?'active':'',`aria-label="Раздзел ${i+1}"`)).join('')}</div><p class="muted">Поўны корпус абранага перакладу, усе раздзелы.</p>`];}
     if(name==='search-bible')return ['Пошук у Бібліі',`<div class="chips">${button('bible-scope:books','Назвы кніг',null,'chip'+(d.searchScope!=='text'?' active':''))}${button('bible-scope:text','Тэкст бягучай кнігі',null,'chip'+(d.searchScope==='text'?' active':''))}</div><label for="${d.id}-bible-query">${d.searchScope==='text'?E(F.bible[s.bible.translation].find(b=>b.id===s.bible.book).name):'Назва кнігі'}</label><input id="${d.id}-bible-query" data-input="bible-query" type="search" value="${E(d.modalQuery)}" placeholder="Пошук" autofocus><div data-results="bible">${bibleSearchResults(d)}</div>`];
     if(name==='appearance')return ['Выгляд тэксту',`<label for="${d.id}-reader-size">Памер тэксту: ${Math.round(s.readerScale*100)}%</label><input id="${d.id}-reader-size" type="range" min="0.85" max="1.6" step="0.05" value="${s.readerScale}" data-input="reader-size">${row('reduce-effects',s.reduceEffects?'Эфекты выключаныя':'Паменшыць эфекты','Непразрыстае кіраванне',s.reduceEffects?'check':'chevron')}${isReader(s)?row('focus','Поўнаэкраннае чытанне','Кнопка вяртання заўсёды даступная','expand'):''}${d.id==='ios'&&isReader(s)?row('compact','Згарнуць панэль раздзелаў','Браузерная мадэль мінімізацыі iOS','grid'):''}`];
     if(name==='menu')return ['Меню',`${row('settings','Налады','Пачатковы раздзел і выгляд','options')}${row('sync','Сінхранізацыя',s.mode==='sync-error'?'Не ўдалося абнавіць тэксты':'Кіраванне лакальнымі тэкстамі','sync')}${row('about','Пра праграму','iBreviary','info')}`];
@@ -182,8 +189,9 @@
     const focus=$('[autofocus]',d.el)||$('.sheet button',d.el);focus?.focus();
   }
   function notify(d,message) {const a=$('.announcement',d.el);a.innerHTML=`<div class="toast">${E(message)}</div>`;setTimeout(()=>{if(a.isConnected)a.innerHTML='';},2400);}
-  function setDate(d,branch,date) {M.dateChange(d.state,branch,date);d.modal=null;render(d);}
+  function setDate(d,branch,date) {R.chooseDate(d,branch,date);}
   function action(d,value,trigger) {
+    if(R.action(d,value))return;
     const s=d.state,[type,arg,arg2]=value.split(':');
     if(['menu','settings','about','appearance','sync','celebrations','reading-options','search-prayers','search-bible','bible-picker'].includes(type)){if(type==='search-bible')d.searchScope='books';openModal(d,type,value);return;}
     if(['date','calendar','liturgical'].includes(type)){d.period='all';openModal(d,value,value);return;}
@@ -230,6 +238,7 @@
     if(['hour','prayer','search-prayer','back','ora-readings'].includes(type))$('.content',d.el).setAttribute('aria-live','polite');
   }
   function onInput(d,el) {
+    if(R.input(d,el))return;
     const type=el.dataset.input,s=d.state;
     if(type==='prayer-query'){s.prayers.query=el.value;$('[data-results=prayers]',d.el).innerHTML=searchPrayerResults(d);}
     if(type==='prayer-filter'){s.prayers.filter=el.value;$('[data-results=prayers]',d.el).innerHTML=searchPrayerResults(d);}
@@ -241,6 +250,7 @@
     if(type==='start')s.start=el.value;
     save(d);
   }
+  R.setup({E,icon,button,row,round,clean,prayers,tabs,app,dateLabel,source,empty,save,render,renderModal,openModal,closeModal,notify,prayerRow,searchPrayerResults});
   for(const id of ['ios','android']) {
     let state=M.createState();
     try {const saved=JSON.parse(localStorage.getItem('ibreviary-ux-prototype-v1:'+id));if(saved?.hours&&saved?.bible&&tabs.some(t=>t[0]===saved.tab)){state={...state,...saved,mode:'ready',focus:false,compact:false};if(state.start!=='last')state.tab=state.start;}}catch{/* Use fresh local fixtures. */}

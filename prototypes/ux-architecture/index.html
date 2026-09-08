@@ -7,8 +7,11 @@
   <meta name="description" content="Ізаляваная інтэрактыўная мадэль новай навігацыі iBreviary для iOS і Android.">
   <title>iBreviary — UX prototype</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="refinement.css">
   <script defer src="fixtures.js"></script>
   <script defer src="model.js"></script>
+  <script defer src="calendar-fixtures.js"></script>
+  <script defer src="refinement.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -18,6 +21,8 @@
       <label>Выгляд <select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
       <label>Тэкст <select id="scale"><option value="1">100%</option><option value="1.3">130%</option><option value="1.6">160%</option><option value="2">200%</option></select></label>
       <label>Платформа <select id="platform"><option value="both">iOS + Android</option><option value="ios">iOS</option><option value="android">Android</option></select></label>
+      <label>Navigation <select id="navigation"><option value="auto">Auto</option><option value="full">Full</option><option value="compact">Compact</option><option value="hidden">Hidden</option></select></label>
+      <label>Season <select id="season"><option value="auto">З кантэксту</option><option value="ordinary">Ordinary</option><option value="advent">Advent</option><option value="christmas">Christmas</option><option value="lent">Lent</option><option value="holyweek">Holy Week</option><option value="easter">Easter</option><option value="red">Red / Martyr</option><option value="marian">Marian</option><option value="solemnity">Solemnity</option><option value="requiem">Requiem</option></select></label>
     </div>
   </header>
   <main class="studio" id="studio" data-platform="both">

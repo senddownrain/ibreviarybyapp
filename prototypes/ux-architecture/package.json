@@ -1,0 +1,1 @@
+{"name":"ibreviary-ux-prototype","version":"1.1.0","private":true,"scripts":{"dev":"node serve.mjs","build":"node build.mjs","test":"node --test model.test.cjs refinement.test.cjs"}}

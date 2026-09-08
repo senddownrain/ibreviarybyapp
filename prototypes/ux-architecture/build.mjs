@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const publicFiles=['index.html','styles.css','refinement.css','fixtures.js','calendar-fixtures.js','model.js','refinement.js','app.js','README.md','QA.md','REFINEMENT.md'];
+for(const file of ['model.js','refinement.js','app.js'])execFileSync(process.execPath,['--check',path.join(root,file)]);
+await fs.mkdir(path.join(root,'dist'),{recursive:true});
+for(const name of publicFiles)await fs.copyFile(path.join(root,name),path.join(root,'dist',name));
+console.log(`Static build complete: ${publicFiles.length} local assets. No external dependencies.`);

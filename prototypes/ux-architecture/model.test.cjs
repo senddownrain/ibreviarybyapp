@@ -5,9 +5,9 @@ const M=require('./model.js');
 test('Hours opens first ordered fixture immediately; disabled alternative remains visible',()=>{
   const s=M.createState();assert.equal(s.hours.choice,0);assert.equal(M.CALENDAR[s.hours.date][s.hours.choice].id,'mary');assert.equal(M.CALENDAR[s.hours.date][2].disabled,true);assert.equal(M.HOURS.length,8);
 });
-test('Non-today Ora forwards only date, selects default readings and returns to the exact office',()=>{
+test('Non-today Ora forwards explicit day context and returns to the exact office',()=>{
   const s=M.createState();M.dateChange(s,'hours','2026-09-09');s.hours.choice=1;s.hours.ora='laudes';s.scroll[M.key(s)]=418;
-  M.oraToReadings(s);assert.equal(s.tab,'readings');assert.equal(s.readings.date,'2026-09-09');assert.equal(M.readingGroups(s.readings.date)[s.readings.group].id,'ordinary');assert.equal(s.readings.cycle,'2');
+  M.oraToReadings(s);assert.equal(s.tab,'readings');assert.equal(s.readings.date,'2026-09-09');assert.equal(M.readingGroups(s.readings.date)[s.readings.group].id,'peter');assert.equal(s.readings.cycle,'');assert.equal(s.readings.context.dayId,'peter');
   M.backToOra(s);assert.equal(s.tab,'hours');assert.equal(s.hours.choice,1);assert.equal(s.hours.ora,'laudes');assert.equal(s.scroll[M.key(s)],418);
 });
 test('Ordinary tab switching preserves dates, manual variants, reader and scroll independently',()=>{
@@ -36,7 +36,7 @@ test('Date arithmetic crosses month/year and leap-day boundaries',()=>{
 });
 test('Fixture text is local, nonempty and contains both complete chapter corpora',()=>{
   require('./fixtures.js');const f=globalThis.UX_FIXTURES;
-  for(const lang of ['bel','ru']) {assert.equal(f.bible[lang].length,6);assert.equal(f.bible[lang].find(b=>b.id==='jn').chapters.length,21);assert.ok(f.bible[lang].every(b=>b.chapters.every(c=>c.length>0&&c.every(v=>typeof v.text==='string'&&v.text.length>0&&typeof v.num==='number'))));}
+  for(const lang of ['bel','ru']) {assert.ok(f.bible[lang].length>=66);assert.equal(f.bible[lang].find(b=>b.id==='jn').chapters.length,21);assert.ok(f.bible[lang].every(b=>b.chapters.every(c=>c.length>0&&c.every(v=>typeof v.text==='string'&&typeof v.num==='number'))));}
   assert.match(f.bible.bel.find(b=>b.id==='jn').chapters[0][0].text,/На пачатку было Слова/);
   assert.match(f.bible.ru.find(b=>b.id==='jn').chapters[0][0].text,/В начале было Слово/);
   assert.match(f.constants.StandardIntro,/Божа/);assert.match(f.constants.Magnificat,/Велічае/);assert.ok(f.feasts.mary.laudesPr);assert.ok(f.feasts.peter.officeOfReadingsPr);

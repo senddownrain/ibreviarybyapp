@@ -37,6 +37,7 @@
       {id:'ordinary', title:CALENDAR[TODAY][1].title, cycles:['1','2'], references:['Лк 6, 12–19','Лк 6, 20–26']}
     ];
     if (date === '2026-09-13') return [{id:'sunday', title:CALENDAR[date][0].title, cycles:['A','B','C'], references:['Мц 18, 21–35','Мк 8, 27–35','Лк 15, 1–7']}];
+    if(date !== '2026-09-09') return CALENDAR[date].filter(c=>!c.disabled).map(c=>({id:c.id,title:c.title,cycles:c.source==='period'?(new Date(date+'T12:00:00').getDay()===0?['A','B','C']:['1','2']):[],references:['Лк 6, 20–26']}));
     return [
       {id:'ordinary', title:CALENDAR[date][0].title, cycles:['1','2'], references:['Лк 6, 20–26','Лк 6, 27–36']},
       {id:'peter', title:CALENDAR[date][1].title, cycles:[], references:['Мц 25, 31–40']}
@@ -55,12 +56,17 @@
   }
   function oraToReadings(s) {
     const origin=JSON.parse(JSON.stringify(s.hours)); resetReadings(s,origin.date);
+    // Explicit day identity only; no matching by office name or inferred feast title.
+    const dayId=CALENDAR[origin.date]?.[origin.choice]?.id;
+    const groups=readingGroups(origin.date),linked=groups.findIndex(g=>g.id===dayId);
+    if(linked>=0){s.readings.group=linked;s.readings.cycle=defaultCycle(origin.date,groups[linked]);}
+    s.readings.context={dayId,template:origin.template||null};
     s.readings.returnTo=origin; s.tab='readings'; s.focus=false; s.compact=false;
   }
   function backToOra(s) { if(s.readings.returnTo) {s.hours=s.readings.returnTo; s.readings.returnTo=null; s.tab='hours';} }
   function toggleFavorite(s,id) { s.favorites=s.favorites.includes(id)?s.favorites.filter(x=>x!==id):[...s.favorites,id]; }
   function key(s) {
-    if(s.tab==='hours') return `hours:${s.hours.date}:${s.hours.choice}:${s.hours.ora||'root'}`;
+    if(s.tab==='hours') return `hours:${s.hours.date}:${s.hours.choice}:${s.hours.template||''}:${s.hours.ora||'root'}`;
     if(s.tab==='readings') return `readings:${s.readings.date}:${s.readings.group}:${s.readings.cycle}`;
     if(s.tab==='prayers') return `prayers:${s.prayers.detail||s.prayers.page}:${s.prayers.collection||''}:${s.prayers.query}:${s.prayers.filter}`;
     return `bible:${s.bible.translation}:${s.bible.book}:${s.bible.chapter}`;
