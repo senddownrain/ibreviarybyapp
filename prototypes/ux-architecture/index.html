@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="be">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Ізаляваная інтэрактыўная мадэль новай навігацыі iBreviary для iOS і Android.">
+  <title>iBreviary — UX prototype</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="fixtures.js"></script>
+  <script defer src="model.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="studio-header">
+    <div class="studio-brand"><span class="brand-mark" aria-hidden="true">iB</span><div><strong>iBreviary</strong><span>Інтэрактыўны UX-прататып</span></div></div>
+    <div class="studio-controls">
+      <label>Выгляд <select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+      <label>Тэкст <select id="scale"><option value="1">100%</option><option value="1.3">130%</option><option value="1.6">160%</option><option value="2">200%</option></select></label>
+      <label>Платформа <select id="platform"><option value="both">iOS + Android</option><option value="ios">iOS</option><option value="android">Android</option></select></label>
+    </div>
+  </header>
+  <main class="studio" id="studio" data-platform="both">
+    <aside class="review-panel">
+      <p class="eyebrow">Архітэктура · 01</p>
+      <h1>Чатыры раздзелы.<br>Сваё месца ў кожным.</h1>
+      <p class="review-intro">Даследуйце пераходы на экране або адкрыйце патрэбны сцэнар.</p>
+      <nav aria-label="Сцэнары прататыпа" id="scenarios">
+        <button data-scenario="hours" class="selected"><span>01</span> Гадзіны · сёння</button>
+        <button data-scenario="alternative"><span>02</span> Іншае святкаванне</button>
+        <button data-scenario="date"><span>03</span> Іншая дата → сёння</button>
+        <button data-scenario="ora"><span>04</span> Ora → Чытанні</button>
+        <button data-scenario="readings"><span>05</span> Чытанні · сёння</button>
+        <button data-scenario="reading-options"><span>06</span> Варыянты чытанняў</button>
+        <button data-scenario="prayers"><span>07</span> Малітоўнік · Абраныя</button>
+        <button data-scenario="prayer"><span>08</span> Тэкст малітвы</button>
+        <button data-scenario="bible"><span>09</span> Біблія · апошняе месца</button>
+      </nav>
+      <label class="state-control">Стан прыкладу
+        <select id="state"><option value="ready">Гатова · offline</option><option value="loading">Загрузка лакальных даных</option><option value="missing">Няма лакальнага тэксту</option><option value="empty-day">Пусты вынік дня</option><option value="empty-favorites">Пустыя Абраныя</option><option value="empty-search">Пусты пошук</option><option value="sync-error">Памылка сінхранізацыі</option></select>
+      </label>
+      <p class="mobile-disclosure">Браузерная мадэль · дэма-даныя · «сёння» 08.09.2026<br>iOS glass — імітацыя сістэмнага матэрыялу.</p>
+      <div class="review-note"><strong>Мадэль для праверкі UX</strong><p>«Сёння» зафіксавана: 8 верасня 2026. Каляндарныя наборы, зборнікі і Абраныя — дэманстрацыйныя. Тэксты ўзятыя з рэпазіторыяў праекта.</p><p>iOS glass — браузерная імітацыя. Натыўны матэрыял, жэсты і прадукцыйнасць правяраюцца на прыладах.</p><a href="README.md">Крыніцы і сцэнары праверкі ↗</a></div>
+    </aside>
+    <section class="devices" aria-label="Параўнанне платформ">
+      <div class="device-column ios-column"><div class="device-caption"><strong>iOS</strong><span>Floating chrome · glass model</span></div><section class="phone ios" id="ios" aria-label="Прататып iOS"></section></div>
+      <div class="device-column android-column"><div class="device-caption"><strong>Android</strong><span>Ambient · tonal Material</span></div><section class="phone android" id="android" aria-label="Прататып Android"></section></div>
+    </section>
+  </main>
+  <footer class="studio-footer">UX handoff · 08.09.2026 <span>Лакальная мадэль · production Flutter UI не зменены</span></footer>
+</body>
+</html>

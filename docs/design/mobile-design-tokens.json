@@ -1,0 +1,463 @@
+{
+  "version": "1.1.0-proposed",
+  "status": "design-spec; not imported by Flutter",
+  "units": {
+    "geometry": "Flutter logical pixels",
+    "fontSize": "unscaled Flutter logical pixels",
+    "duration": "milliseconds",
+    "opacity": "0..1",
+    "blur": "sigma for custom fallback only; native material is system-owned"
+  },
+  "colors": {
+    "light": {
+      "page": "#F4F3EF",
+      "reader": "#FCFBF8",
+      "standard": "#FFFFFF",
+      "elevated": "#EEEFE9",
+      "floating": "#E8ECE5",
+      "ink": "#242824",
+      "muted": "#586054",
+      "primary": "#30342F",
+      "onPrimary": "#FFFFFF",
+      "rubric": "#963D35",
+      "rubricTint": "#F7EEEB",
+      "error": "#A52F2F",
+      "errorTint": "#FBEDEC",
+      "outline": "#7A8178"
+    },
+    "dark": {
+      "page": "#101211",
+      "reader": "#171A18",
+      "standard": "#1C201D",
+      "elevated": "#242A26",
+      "floating": "#30372F",
+      "ink": "#EDF0E9",
+      "muted": "#B4BDB4",
+      "primary": "#DFE5DF",
+      "onPrimary": "#20251F",
+      "rubric": "#F0A198",
+      "rubricTint": "#30221F",
+      "error": "#FFB4AB",
+      "errorTint": "#3B2220",
+      "outline": "#909A90"
+    }
+  },
+  "ambient": {
+    "requiredDefault": true,
+    "light": {"color": "#706FA8", "peakOpacity": 0.16},
+    "dark": {"color": "#7166CB", "peakOpacity": 0.24},
+    "source": "fixed identity; independent of liturgical color",
+    "overviewFieldHeightMax": 240,
+    "readerTopZoneMax": 96,
+    "readerBottomZoneMax": 112,
+    "underReaderBody": false,
+    "focusVisible": false,
+    "reduceEffectsVisible": false,
+    "loopAnimation": false
+  },
+  "liturgical": {
+    "green": {
+      "light": {
+        "marker": "#447451",
+        "ink": "#365D40",
+        "tint": "#EAF1E9"
+      },
+      "dark": {
+        "marker": "#8CBF96",
+        "ink": "#ADD6B3",
+        "tint": "#202E23"
+      }
+    },
+    "violet": {
+      "light": {
+        "marker": "#795599",
+        "ink": "#654181",
+        "tint": "#F0EAF5"
+      },
+      "dark": {
+        "marker": "#BDA0DC",
+        "ink": "#D2BCE8",
+        "tint": "#2A2233"
+      }
+    },
+    "whiteGold": {
+      "light": {
+        "marker": "#957022",
+        "ink": "#715114",
+        "tint": "#F6EFDF"
+      },
+      "dark": {
+        "marker": "#D4B66E",
+        "ink": "#E7CA8C",
+        "tint": "#302A1D"
+      }
+    },
+    "red": {
+      "light": {
+        "marker": "#A64C43",
+        "ink": "#863B34",
+        "tint": "#F7EBE8"
+      },
+      "dark": {
+        "marker": "#DC9A90",
+        "ink": "#EDB5AD",
+        "tint": "#342320"
+      }
+    },
+    "rose": {
+      "light": {
+        "marker": "#A14F73",
+        "ink": "#843958",
+        "tint": "#F6EAF0"
+      },
+      "dark": {
+        "marker": "#D79AB6",
+        "ink": "#E7B6CA",
+        "tint": "#32232A"
+      }
+    },
+    "neutral": {
+      "light": {
+        "marker": "#697369",
+        "ink": "#4D594F",
+        "tint": "#EEF0EB"
+      },
+      "dark": {
+        "marker": "#A9B4AA",
+        "ink": "#CAD3CA",
+        "tint": "#272E28"
+      }
+    }
+  },
+  "spacing": {
+    "s1": 4,
+    "s2": 8,
+    "s3": 12,
+    "s4": 16,
+    "s5": 20,
+    "s6": 24,
+    "s7": 32,
+    "s8": 40,
+    "s9": 48
+  },
+  "layout": {
+    "compactBreakpoint": 600,
+    "expandedBreakpoint": 840,
+    "contentGutterNarrow": 16,
+    "contentGutterPhone": 20,
+    "contentGutterWide": 24,
+    "phoneGutterBreakpoint": 360,
+    "readerMaxWidth": 680,
+    "customTouchTargetMin": 48,
+    "iconSize": 24,
+    "inlineIconSize": 18,
+    "readerTopGap": 24,
+    "readerEndGap": 48
+  },
+  "radii": {
+    "inline": 8,
+    "selection": 12,
+    "group": 16,
+    "card": 20,
+    "popover": 20,
+    "modalFallback": 28,
+    "capsule": "height / 2; controls only",
+    "reader": 0
+  },
+  "typography": {
+    "readerFamily": "Literata",
+    "readerFallback": "platform system font",
+    "uiFamilyIOS": "platform system / SF",
+    "uiFamilyAndroid": "platform system / Roboto",
+    "reader": {
+      "title": {
+        "size": 28,
+        "height": 1.22,
+        "weight": 600
+      },
+      "subtitle": {
+        "size": 18,
+        "height": 1.4,
+        "weight": 400
+      },
+      "body": {
+        "size": 18,
+        "height": 1.6,
+        "weight": 400
+      },
+      "rubric": {
+        "size": 16,
+        "height": 1.5,
+        "weight": 400,
+        "style": "italic"
+      },
+      "blockHeader": {
+        "size": 14,
+        "height": 1.43,
+        "weight": 600,
+        "family": "platform",
+        "letterSpacing": 0.2
+      },
+      "antiphon": {
+        "size": 18,
+        "height": 1.55,
+        "weight": 600
+      },
+      "psalm": {
+        "size": 18,
+        "height": 1.6,
+        "weight": 400
+      },
+      "response": {
+        "size": 18,
+        "height": 1.6,
+        "weight": 600
+      },
+      "reference": {
+        "size": 15,
+        "height": 1.47,
+        "weight": 400
+      },
+      "metadata": {
+        "size": 14,
+        "height": 1.43,
+        "weight": 400,
+        "family": "platform"
+      }
+    },
+    "ui": {
+      "ios": {
+        "largeTitle": {
+          "size": 32,
+          "height": 1.19,
+          "weight": 700
+        },
+        "toolbar": {
+          "size": 17,
+          "height": 1.29,
+          "weight": 600
+        },
+        "body": {
+          "size": 17,
+          "height": 1.41,
+          "weight": 400
+        },
+        "label": {
+          "size": 13,
+          "height": 1.38,
+          "weight": 500
+        },
+        "tab": {
+          "size": 12,
+          "height": 1.33,
+          "weight": 500
+        }
+      },
+      "android": {
+        "largeTitle": {
+          "size": 28,
+          "height": 1.29,
+          "weight": 600
+        },
+        "toolbar": {
+          "size": 20,
+          "height": 1.4,
+          "weight": 500
+        },
+        "body": {
+          "size": 16,
+          "height": 1.5,
+          "weight": 400
+        },
+        "label": {
+          "size": 14,
+          "height": 1.43,
+          "weight": 500
+        },
+        "tab": {
+          "size": 12,
+          "height": 1.33,
+          "weight": 500
+        }
+      }
+    },
+    "scaling": {
+      "default": 1,
+      "min": 0.85,
+      "max": 1.6,
+      "step": 0.05,
+      "system": "TextScaler.scale(baseSize * readerMultiplier); exactly once",
+      "responsiveThresholdAt16": 1.3
+    },
+    "readerSpacingEm": {
+      "paragraph": 0.65,
+      "strophe": 0.85,
+      "section": 1.55,
+      "headerAfter": 0.55,
+      "antiphonBefore": 0.8,
+      "antiphonAfter": 0.9,
+      "psalmHangingIndent": 0.85
+    }
+  },
+  "surfaces": {
+    "page": {
+      "color": "page",
+      "opacity": 1,
+      "shadowLevel": 0
+    },
+    "reader": {
+      "color": "reader",
+      "opacity": 1,
+      "radius": 0,
+      "shadowLevel": 0,
+      "blurSigma": 0
+    },
+    "standard": {
+      "color": "standard",
+      "opacity": 1,
+      "radius": 16,
+      "shadowLevel": 0
+    },
+    "elevated": {
+      "color": "elevated",
+      "opacity": 1,
+      "radius": 20,
+      "shadowLevel": 1
+    },
+    "floating": {
+      "ios": "glassRegular",
+      "android": "floating",
+      "radius": "control-specific"
+    },
+    "glass": {
+      "platform": "ios only",
+      "native": "system regular material",
+      "fallbackSigma": 24,
+      "fallbackLightOpacity": 0.82,
+      "fallbackDarkOpacity": 0.86,
+      "reduceTransparencyOpacity": 1,
+      "reduceTransparencySigma": 0
+    },
+    "modal": {
+      "iosColor": "standard",
+      "androidColor": "elevated",
+      "opacity": 1,
+      "radiusFallback": 28,
+      "shadowLevel": 3,
+      "scrimLightOpacity": 0.32,
+      "scrimDarkOpacity": 0.48
+    }
+  },
+  "elevation": {
+    "androidDp": {
+      "content": 0,
+      "scrolledBar": 0,
+      "floatingControls": 3,
+      "menu": 3,
+      "modal": 6
+    },
+    "customShadows": {
+      "level0": [],
+      "level1": [
+        {
+          "x": 0,
+          "y": 2,
+          "blur": 8,
+          "spread": -2,
+          "lightOpacity": 0.08,
+          "darkOpacity": 0.16
+        }
+      ],
+      "level2": [
+        {
+          "x": 0,
+          "y": 4,
+          "blur": 16,
+          "spread": -4,
+          "lightOpacity": 0.12,
+          "darkOpacity": 0.22
+        }
+      ],
+      "level3": [
+        {
+          "x": 0,
+          "y": 8,
+          "blur": 24,
+          "spread": -6,
+          "lightOpacity": 0.16,
+          "darkOpacity": 0.28
+        }
+      ]
+    },
+    "rule": "native shadow OR custom shadow, never both"
+  },
+  "opacity": {
+    "text": 1,
+    "secondaryText": 1,
+    "separatorLight": 0.12,
+    "separatorDark": 0.16,
+    "disabledDecorative": 0.38,
+    "androidPressed": 0.1,
+    "iosPressed": 0.08,
+    "focusOverlay": 0.1
+  },
+  "motion": {
+    "press": 90,
+    "release": 140,
+    "disclosure": 180,
+    "contextChange": 200,
+    "chrome": 180,
+    "sheetFallback": 280,
+    "reduceMotion": 0,
+    "easingEnter": "easeOutCubic",
+    "easingExit": "easeInCubic",
+    "fontResize": 0,
+    "readerTextTransition": 0,
+    "decorativeLoop": false
+  },
+  "readerChrome": {
+    "collapseForwardDistance": 64,
+    "revealBackwardDistance": 24,
+    "topRevealDistance": 16,
+    "minimumViewportHeightForAutoCollapse": 480,
+    "autoCollapseLiturgicalDock": true,
+    "focusManual": true,
+    "revealTarget": 48
+  },
+  "controls": {
+    "topBarIOSMin": 56,
+    "topBarAndroidMin": 64,
+    "bottomBarIOSFallbackMin": 64,
+    "bottomBarAndroidMin": 64,
+    "liturgicalDock": {"centerItemWidthMin": 56, "centerInset": 4, "sideTarget": 48, "groupGap": 8, "centerRadius": 32, "minWidth": 290, "safeAreaGap": 8},
+    "dayNavigatorMin": 48,
+    "hourRowMin": 64,
+    "actionMin": 48,
+    "modalContentPadding": 24,
+    "modalMaxHeightFraction": 0.9
+  },
+  "accessibility": {
+    "textContrastMin": 4.5,
+    "readerBodyContrastGoal": 7,
+    "controlContrastMin": 3,
+    "focusStroke": 2,
+    "focusGap": 2,
+    "boldText": "raise 400 to 500, 500 to 600; max 700",
+    "highContrast": "opaque surfaces; ink for metadata and semantic-color labels; keep labels and markers"
+  },
+  "policies": {
+    "designDirection": "ambient",
+    "ambientTonalHierarchyRequired": true,
+    "ambientVisibleEffectRequired": true,
+    "floatingDockBothPlatforms": true,
+    "primarySectionNavigation": "labeled top SectionSwitcher",
+    "liturgicalNavigation": "previousDay, explorer, today, calendar, nextDay",
+    "seasonalWashDefault": false,
+    "dynamicColorDefault": false,
+    "liturgicalColorsAffectPrimary": false,
+    "glassOverReaderText": false,
+    "offlineIsError": false,
+    "runtimeFontDownload": false,
+    "keepScreenOnOnlyWhileReaderForeground": true
+  }
+}
