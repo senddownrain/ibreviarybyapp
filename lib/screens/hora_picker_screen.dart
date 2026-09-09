@@ -23,7 +23,11 @@ import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
-/// Screen showing list of available liturgical hours for a day.
+/// Compatibility/fallback screen showing liturgical hours for a day.
+///
+/// Stage 3 keeps this route for old links and transitional navigation. The
+/// normal daily flow now opens an hour directly from the Hours root.
+/// Status: KEEP / DEPRECATE / REMOVE LATER.
 class HoraPickerScreen extends ConsumerStatefulWidget {
   final String dayId;
   final DateTime date;

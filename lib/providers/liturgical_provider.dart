@@ -6,6 +6,7 @@ import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 
 /// Direction of date slide animation on home (-1 back, 0 none, 1 forward).
 final homeNavDirectionProvider = StateProvider<int>((ref) => 0);
@@ -28,16 +29,57 @@ final dayOptionsProvider = Provider<List<DayOption>>((ref) {
   return service.getContentForDate(date, opts, nextOpts, dynamicDates);
 });
 
+class HoursLiturgicalOverrideNotifier
+    extends StateNotifier<Map<String, String>> {
+  HoursLiturgicalOverrideNotifier() : super(const {});
+
+  void select(DateTime date, String dayId) {
+    state = {...state, _dateKey(date): dayId};
+  }
+
+  void clear(DateTime date) {
+    final next = Map<String, String>.from(state)..remove(_dateKey(date));
+    state = next;
+  }
+}
+
+/// Session-scoped manual choices, keyed by date so they never leak to another
+/// liturgical day. They intentionally are not persisted as user preferences.
+final hoursLiturgicalOverridesProvider =
+    StateNotifierProvider<HoursLiturgicalOverrideNotifier, Map<String, String>>(
+      (ref) => HoursLiturgicalOverrideNotifier(),
+    );
+
+final hoursLiturgicalSelectionProvider = Provider<HoursLiturgicalSelection>((
+  ref,
+) {
+  final date = ref.watch(selectedDateProvider);
+  final selectedDayId = ref.watch(
+    hoursLiturgicalOverridesProvider.select(
+      (overrides) => overrides[_dateKey(date)],
+    ),
+  );
+  return resolveHoursLiturgicalSelection(
+    ref.watch(dayOptionsProvider),
+    selectedDayId: selectedDayId,
+  );
+});
+
 /// Ambient color representing the current liturgical season.
 final liturgicalSeasonColorProvider = Provider<Color>((ref) {
-  final options = ref.watch(dayOptionsProvider);
-  if (options.isEmpty) return const Color(0xFF3A7D44);
-  final first = options.first;
+  final selection = ref.watch(hoursLiturgicalSelectionProvider);
+  final first = selection.selected;
+  if (first == null) return const Color(0xFF3A7D44);
   return liturgicalColorForDay(
-    first.day,
+    selection.day,
     fallbackPeriodType: first.contextPeriodType,
   );
 });
+
+String _dateKey(DateTime date) =>
+    '${date.year.toString().padLeft(4, '0')}-'
+    '${date.month.toString().padLeft(2, '0')}-'
+    '${date.day.toString().padLeft(2, '0')}';
 
 YearOptions? _loadYearOptions(int year) {
   final box = HiveService.yearOptionsBox;
