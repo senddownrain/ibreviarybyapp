@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -21,6 +23,8 @@ import 'package:mybrev_flutter/widgets/alternative_text.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
@@ -165,6 +169,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   int? _selectedInvitIndex;
   String? _vespersRubric;
   late final Future<LiturgicalDay?> _dayFuture;
+  late final ScrollController _scrollController;
+  ReaderChromeMode _chromeMode = ReaderChromeMode.compact;
   final Map<String, ValueNotifier<int>> _alternativeControllers = {};
 
   ValueNotifier<int> _alternativeController(String key) =>
@@ -173,11 +179,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _dayFuture = _loadDay();
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     for (final controller in _alternativeControllers.values) {
       controller.dispose();
     }
@@ -346,18 +354,26 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     return Theme(
       data: baseTheme.copyWith(colorScheme: themedScheme),
       child: ReadingScaffold(
-        builder: (context, textStyle) => Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: AdaptiveAppBar.text(
-            _oraTitle(widget.oraType),
-            actions: const [TextScaleControl()],
+        builder: (context, textStyle) => ReaderScaffold(
+          seasonColor: seasonColor,
+          chromeMode: _chromeMode,
+          onChromeModeChanged: (mode) => setState(() => _chromeMode = mode),
+          scrollController: _scrollController,
+          scrollKey: PageStorageKey(
+            'ora-${widget.date.toIso8601String()}-${widget.dayId}-${widget.oraType}',
           ),
-          body: Stack(
-            children: [
-              AmbientWash.hero(seasonColor: seasonColor),
-              _buildBody(context, day, allInvit, comp, textStyle),
-            ],
-          ),
+          semanticLabel: 'Тэкст Ora',
+          actions: const [TextScaleControl()],
+          secondaryActions: [
+            ReaderSecondaryAction(
+              label: 'Поўнаэкраннае чытанне',
+              icon: Icons.fullscreen_rounded,
+              onSelected: () =>
+                  setState(() => _chromeMode = ReaderChromeMode.hidden),
+            ),
+          ],
+          contextHeader: _buildReaderContext(context, day),
+          content: _buildContent(context, day, allInvit, comp, textStyle),
         ),
       ),
     );
@@ -430,7 +446,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
   }
 
-  Widget _buildBody(
+  Widget _buildContent(
     BuildContext context,
     LiturgicalDay day,
     List<Map<String, dynamic>> allInvit,
@@ -449,38 +465,92 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       'completorium' => _buildCompline(comp),
       _ => <_OraItem>[],
     };
-    final sections = <_OraItem>[
-      _OraItem.custom(
-        (context, textStyle) =>
-            _DayHeading(day: day, date: widget.date, textStyle: textStyle),
-      ),
-      ...hourSections,
-    ];
-
-    if (sections.isEmpty) {
+    if (hourSections.isEmpty) {
       return const Center(child: Text('Няма зместу'));
     }
 
-    final topPad =
-        MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
-    final dayHeading = sections.first;
-    final hourContent = sections.skip(1);
-    return ListView(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        topPad,
-        16,
-        40 + MediaQuery.viewPaddingOf(context).bottom,
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        dayHeading.build(context, textStyle),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (final item in hourContent) item.build(context, textStyle),
-          ],
+        for (final item in hourSections) item.build(context, textStyle),
+        const SizedBox(height: 12),
+        Center(
+          child: Text(
+            '· · ·',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: ReaderTheme.of(context).muted,
+              letterSpacing: 6,
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildReaderContext(BuildContext context, LiturgicalDay day) {
+    final dayTitle = liturgicalDayDisplayTitle(day, widget.date)
+        .replaceAll(RegExp(r'\\?<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'<[^>]+>'), '')
+        .trim();
+    final periodLabel = liturgicalDayPeriodLabel(day);
+    final psalterLabel = liturgicalDayPsalterLabel(day, widget.date);
+    final rankLabel = liturgicalDayRankLabel(day);
+    final feastComment = (day.feastComment ?? '').trim();
+    final contextSummary = [
+      if (periodLabel.isNotEmpty) periodLabel,
+      if (psalterLabel.isNotEmpty) psalterLabel,
+      if (rankLabel.isNotEmpty) rankLabel,
+    ].join(' · ');
+    final metadata = [
+      if (contextSummary.isNotEmpty) contextSummary,
+      if (feastComment.isNotEmpty) feastComment,
+    ].join('\n');
+
+    return ReaderContextHeader(
+      accentColor: liturgicalColorForDay(day),
+      eyebrow: '${DateFormat('d MMMM y', 'be').format(widget.date)} г.',
+      subtitle: dayTitle,
+      title: _oraTitle(widget.oraType),
+      metadata: metadata,
+      onTitleTap: () => _changeHour(day),
+      actions: [
+        TextButton.icon(
+          key: const Key('ora-readings-action'),
+          onPressed: () => context.push(
+            readingsRouteForContext(date: widget.date, dayId: widget.dayId),
+          ),
+          icon: const PhosphorIcon(PhosphorIconsRegular.bookOpenText, size: 19),
+          label: const Text('Чытанні'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _changeHour(LiturgicalDay day) async {
+    final selected = await showReaderChoiceSheet<String>(
+      context: context,
+      title: 'Літургія гадзінаў',
+      selectedValue: widget.oraType,
+      choices: [
+        for (final hora in kHoraItems)
+          ReaderChoice(
+            value: hora.type,
+            label: hora.label,
+            subtitle: hora.subtitle,
+            icon: hora.icon,
+            enabled: hora.checkFields.any(
+              (field) => (day.field(field) ?? '').isNotEmpty,
+            ),
+          ),
+      ],
+    );
+    if (!mounted || selected == null || selected == widget.oraType) return;
+    context.replace(
+      oraRouteForContext(
+        date: widget.date,
+        dayId: widget.dayId,
+        oraType: selected,
+      ),
     );
   }
 
@@ -1414,110 +1484,6 @@ class _LiturgicalSelectableText extends StatelessWidget {
                   : textStyle,
             ),
         ],
-      ),
-    );
-  }
-}
-
-// ─── Invitatorium variant selector ────────────────────────────────────────────
-
-class _DayHeading extends StatelessWidget {
-  final LiturgicalDay day;
-  final DateTime date;
-  final TextStyle textStyle;
-
-  const _DayHeading({
-    required this.day,
-    required this.date,
-    required this.textStyle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = liturgicalColorForDay(day);
-    final cs = Theme.of(context).colorScheme;
-    final title = liturgicalDayDisplayTitle(day, date)
-        .replaceAll(RegExp(r'\\?<br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'<[^>]+>'), '')
-        .trim();
-    final periodLabel = liturgicalDayPeriodLabel(day);
-    final psalterLabel = liturgicalDayPsalterLabel(day, date);
-    final rankLabel = liturgicalDayRankLabel(day);
-    final dateText = '${DateFormat('d MMMM y', 'be').format(date)} г.';
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: GlassSurface(
-        style: GlassStyle.card,
-        seasonColor: color,
-        accentBar: color,
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              [
-                periodLabel,
-                if (psalterLabel.isNotEmpty) psalterLabel,
-              ].join(' · '),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            if (title.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Text(
-                title.replaceAll(RegExp(r'<[^>]+>'), ' ').trim(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: cs.onSurface,
-                  fontFamily: textStyle.fontFamily,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    dateText,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ),
-                if (rankLabel.isNotEmpty)
-                  Text(
-                    rankLabel,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-              ],
-            ),
-            if ((day.feastComment ?? '').trim().isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                day.feastComment!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: cs.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }

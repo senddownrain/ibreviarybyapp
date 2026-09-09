@@ -17,7 +17,7 @@ class ReaderTheme {
   Color get rubricSoft =>
       isDark ? const Color(0x17EF9188) : const Color(0x139B302A);
   Color get surface =>
-      isDark ? const Color(0xE6151515) : const Color(0xE6FAFAFA);
+      isDark ? const Color(0xFF171A18) : const Color(0xFFFCFBF8);
   Color get border =>
       isDark ? const Color(0x21FFFFFF) : const Color(0x1F000000);
 
