@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -280,6 +281,65 @@ void main() {
         Hive.box('settings').get(BibleNavigation.highlightKey(location)),
         isEmpty,
       );
+    });
+
+    testWidgets('verse palette exposes names, state, and 48dp targets', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await _pumpBible(tester);
+      await tester.tap(find.byKey(const Key('bible-verse-1')));
+      await tester.pumpAndSettle();
+
+      final amber = find.byKey(const Key('bible-highlight-amber'));
+      expect(tester.getSize(amber).width, greaterThanOrEqualTo(48));
+      expect(tester.getSize(amber).height, greaterThanOrEqualTo(48));
+      expect(tester.getSemantics(amber).label, 'Бурштынавы колер');
+      expect(
+        tester.getSize(find.byKey(const Key('bible-highlight-clear'))).width,
+        greaterThanOrEqualTo(48),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('bible-highlight-cancel'))).width,
+        greaterThanOrEqualTo(48),
+      );
+
+      await tester.tap(amber);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('bible-verse-1')));
+      await tester.pumpAndSettle();
+      expect(
+        tester.getSemantics(amber).flagsCollection.isSelected,
+        ui.Tristate.isTrue,
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('system TextScaler increases rendered verse body', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(320, 720);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await _pumpBible(tester);
+      final normal = tester.getSize(
+        find.byKey(const Key('bible-verse-body-1')),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      await _pumpBible(tester, textScale: 2);
+      final scaled = tester.getSize(
+        find.byKey(const Key('bible-verse-body-1')),
+      );
+
+      expect(scaled.height, greaterThan(normal.height));
+      final richText = tester.widget<RichText>(
+        find.byKey(const Key('bible-verse-body-1')),
+      );
+      expect(richText.textScaler.scale(20), 40);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('Aa changes only the shared reader text size', (tester) async {

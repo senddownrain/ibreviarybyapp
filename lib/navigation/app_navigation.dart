@@ -61,17 +61,21 @@ class BranchShellController extends ReaderChromeModeController {
   bool containsEntry(String entryId) => _entries.containsKey(entryId);
 
   void activate(AppRouteEntry entry) {
+    final routeChanged =
+        _activeEntryId != entry.id || _activeDescriptor != entry.descriptor;
     _entries[entry.id] = entry.descriptor;
     _activeEntryId = entry.id;
     _activeDescriptor = entry.descriptor;
-    _publishResolvedMode();
+    _publishResolvedMode(routeChanged: routeChanged);
   }
 
   void reveal(AppRouteEntry entry) {
+    final routeChanged =
+        _activeEntryId != entry.id || _activeDescriptor != entry.descriptor;
     _entries[entry.id] = entry.descriptor;
     _activeEntryId = entry.id;
     _activeDescriptor = entry.descriptor;
-    _publishResolvedMode();
+    _publishResolvedMode(routeChanged: routeChanged);
   }
 
   void remove(AppRouteEntry entry, {AppRouteEntry? revealed}) {
@@ -114,11 +118,18 @@ class BranchShellController extends ReaderChromeModeController {
     if (changed) notifyListeners();
   }
 
-  void _publishResolvedMode() {
+  void _publishResolvedMode({bool routeChanged = false}) {
     final resolved = _activeEntryId == null
         ? _activeDescriptor.defaultChromeMode
         : _overrides[_activeEntryId] ?? _activeDescriptor.defaultChromeMode;
-    if (value != resolved) value = resolved;
+    if (value != resolved) {
+      value = resolved;
+    } else if (routeChanged) {
+      // Shell chrome depends on the active descriptor and owner as well as on
+      // the coarse Full/Compact/Hidden value. Publish Full -> Full route
+      // changes so local Back controls cannot be covered by stale shell chrome.
+      notifyListeners();
+    }
   }
 }
 

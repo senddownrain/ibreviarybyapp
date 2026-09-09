@@ -29,6 +29,12 @@ const _prayerbookRoot = AppRouteDescriptor(
   topChromeOwner: TopChromeOwner.shell,
   isBranchRoot: true,
 );
+const _prayerList = AppRouteDescriptor(
+  id: 'prayerbook.list',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
 const _bibleRoot = AppRouteDescriptor(
   id: 'bible.root',
   branch: AppBranch.bible,
@@ -92,6 +98,35 @@ void main() {
 
     expect(shell.branches[AppBranch.readings]!.value, ReaderChromeMode.full);
     expect(shell.branches[AppBranch.bible]!.value, ReaderChromeMode.compact);
+  });
+
+  test('Full to Full route change publishes descriptor ownership', () {
+    final shell = AppShellState(
+      roots: const [_hoursRoot, _readingsRoot, _prayerbookRoot, _bibleRoot],
+    );
+    addTearDown(shell.dispose);
+    final prayerbook = shell.branches[AppBranch.prayerbook]!;
+    var notifications = 0;
+    prayerbook.addListener(() => notifications++);
+
+    const root = AppRouteEntry(
+      id: 'prayerbook-root',
+      descriptor: _prayerbookRoot,
+    );
+    const list = AppRouteEntry(id: 'prayer-list', descriptor: _prayerList);
+    prayerbook.activate(root);
+    notifications = 0;
+    prayerbook.activate(list);
+
+    expect(prayerbook.value, ReaderChromeMode.full);
+    expect(prayerbook.activeEntryId, list.id);
+    expect(prayerbook.activeDescriptor.topChromeOwner, TopChromeOwner.legacy);
+    expect(notifications, 1);
+
+    notifications = 0;
+    prayerbook.remove(list, revealed: root);
+    expect(prayerbook.activeDescriptor.topChromeOwner, TopChromeOwner.shell);
+    expect(notifications, 1);
   });
 
   test('contextual bottom slot does not change the reader chrome mode', () {

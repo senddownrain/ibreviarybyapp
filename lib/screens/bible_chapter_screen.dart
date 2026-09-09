@@ -39,6 +39,12 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     'sky': Color(0xFF4F9FC1),
     'leaf': Color(0xFF59A46B),
   };
+  static const _colorLabels = <String, String>{
+    'amber': 'Бурштынавы колер',
+    'rose': 'Ружовы колер',
+    'sky': 'Блакітны колер',
+    'leaf': 'Зялёны колер',
+  };
   final Map<int, String> _highlights = {};
   final Set<int> _selected = {};
   final Map<int, GlobalKey> _verseKeys = {};
@@ -297,7 +303,12 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               ),
             ),
             if (_selected.isNotEmpty)
-              Positioned(left: 12, right: 12, bottom: 8, child: _colorBar()),
+              Positioned(
+                left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
+                right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
+                bottom: 8,
+                child: SafeArea(top: false, child: _colorBar()),
+              ),
           ],
         ),
       ),
@@ -371,20 +382,29 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             ),
           const Spacer(),
           for (final color in _colors.entries)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
+            Semantics(
+              button: true,
+              label: _colorLabels[color.key],
+              selected:
+                  _selected.isNotEmpty &&
+                  _selected.every((verse) => _highlights[verse] == color.key),
               child: InkWell(
                 key: Key('bible-highlight-${color.key}'),
                 customBorder: const CircleBorder(),
                 onTap: () => _applyColor(color.key),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color.value,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
+                child: SizedBox.square(
+                  dimension: 48,
+                  child: Center(
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color.value,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -392,13 +412,14 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             ),
           IconButton(
             key: const Key('bible-highlight-clear'),
-            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints.tightFor(width: 48, height: 48),
             tooltip: 'Прыбраць вылучэнне',
             onPressed: () => _applyColor(null),
             icon: const PhosphorIcon(PhosphorIconsRegular.eraser, size: 20),
           ),
           IconButton(
-            visualDensity: VisualDensity.compact,
+            key: const Key('bible-highlight-cancel'),
+            constraints: const BoxConstraints.tightFor(width: 48, height: 48),
             tooltip: 'Скасаваць выбар',
             onPressed: () {
               setState(_selected.clear);
@@ -685,6 +706,8 @@ class _VerseRow extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
             child: RichText(
+              key: Key('bible-verse-body-$verseNum'),
+              textScaler: MediaQuery.textScalerOf(context),
               text: TextSpan(
                 style: textStyle.copyWith(color: cs.onSurface, height: 1.72),
                 children: [

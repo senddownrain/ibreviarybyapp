@@ -120,12 +120,12 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
               descriptor.topChromeOwner == TopChromeOwner.shell;
           final topPadding = MediaQuery.paddingOf(context).top;
           return WarmupBootstrap(
-            child: Scaffold(
-              key: const Key('production-app-shell'),
-              backgroundColor: Colors.transparent,
-              drawer: const AppNavigationDrawer(),
-              body: AmbientBackdrop(
-                child: Stack(
+            child: AmbientBackdrop(
+              child: Scaffold(
+                key: const Key('production-app-shell'),
+                backgroundColor: Colors.transparent,
+                drawer: const AppNavigationDrawer(),
+                body: Stack(
                   children: [
                     Positioned.fill(
                       child: descriptor.reserveShellTopInset
@@ -151,15 +151,15 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                       ),
                   ],
                 ),
-              ),
-              bottomNavigationBar: AppNavigationDock(
-                activeBranch: widget.activeBranch,
-                mode: controller.navigationDockSuppressed
-                    ? ReaderChromeMode.hidden
-                    : mode,
-                seasonColor: seasonColor,
-                onSelect: AppNavigationScope.of(context).selectBranch,
-                onExpand: () => _requestActiveMode(ReaderChromeMode.full),
+                bottomNavigationBar: AppNavigationDock(
+                  activeBranch: widget.activeBranch,
+                  mode: controller.navigationDockSuppressed
+                      ? ReaderChromeMode.hidden
+                      : mode,
+                  seasonColor: seasonColor,
+                  onSelect: AppNavigationScope.of(context).selectBranch,
+                  onExpand: () => _requestActiveMode(ReaderChromeMode.full),
+                ),
               ),
             ),
           );

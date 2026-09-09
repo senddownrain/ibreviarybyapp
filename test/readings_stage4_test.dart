@@ -205,6 +205,26 @@ void main() {
         findsNothing,
       );
       expect(find.textContaining('Тэкст B'), findsWidgets);
+
+      await tester.tap(find.byKey(const Key('readings-options-action')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Іншае святкаванне'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('readings-manual-cycle-marker')),
+        findsOneWidget,
+      );
+      expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('readings-options-action')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('readings-selection-auto')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Тэкст B'), findsWidgets);
+      expect(
+        find.byKey(const Key('readings-manual-cycle-marker')),
+        findsNothing,
+      );
     },
   );
 

@@ -54,6 +54,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   List<ParsedReading> _readings = [];
   List<ReadingCelebrationGroup> _groups = [];
   String? _activeGroupKey;
+  String? _automaticGroupKey;
   String _sundayCycle = 'A';
   String _weekdayCycle = '1';
   int _loadGeneration = 0;
@@ -74,6 +75,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         oldWidget.dayId != widget.dayId) {
       _didRequestCompact = false;
       _manualCycle = null;
+      _activeGroupKey = null;
+      _automaticGroupKey = null;
       ReaderChromeModeScope.maybeControllerOf(context)?.value =
           ReaderChromeMode.full;
       _load();
@@ -120,6 +123,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         _readings = readings;
         _groups = selection.groups;
         _activeGroupKey = selection.activeGroupKey;
+        _automaticGroupKey = selection.activeGroupKey;
         _sundayCycle = sundayCycle;
         _weekdayCycle = weekdayCycle;
         _loading = false;
@@ -152,6 +156,19 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     if (key == _activeGroupKey) return;
     setState(() {
       _activeGroupKey = key;
+      final group = _groups.where((group) => group.key == key).firstOrNull;
+      if (group != null &&
+          _manualCycle != null &&
+          !availableCyclesForGroup(group.documents).contains(_manualCycle)) {
+        _manualCycle = null;
+      }
+    });
+    _resetDocumentScroll();
+  }
+
+  void _selectAutomatic() {
+    setState(() {
+      _activeGroupKey = _automaticGroupKey;
       _manualCycle = null;
     });
     _resetDocumentScroll();
@@ -342,9 +359,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       builder: (sheetContext) => _ReadingsOptionsSheet(
         groups: selection.groups,
         activeGroupKey: selection.activeGroupKey,
+        automaticGroupKey: _automaticGroupKey,
         cycles: cycles,
         automaticCycle: selection.automaticCycle,
         manualCycle: _manualCycle,
+        onAutomaticSelected: () {
+          Navigator.pop(sheetContext);
+          _selectAutomatic();
+        },
         onGroupSelected: (key) {
           Navigator.pop(sheetContext);
           _selectCelebrationGroup(key);
@@ -408,9 +430,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
             );
     }
 
-    final manualLabel = _manualCycle == null
-        ? null
-        : 'Цыкл ${_cycleLabel(_manualCycle!)} · зменены';
+    final manualGroup = _activeGroupKey != _automaticGroupKey;
+    final manualLabel = switch ((manualGroup, _manualCycle)) {
+      (false, null) => null,
+      (true, null) => 'Набор чытанняў · зменены',
+      (false, final cycle?) => 'Цыкл ${_cycleLabel(cycle)} · зменены',
+      (true, final cycle?) => 'Набор і цыкл ${_cycleLabel(cycle)} · зменены',
+    };
     final today = DateUtils.isSameDay(_currentDate, DateTime.now());
     final hasOraReturn =
         AppNavigationScope.maybeOf(context)?.shellState.canReturnToOra() ??
@@ -659,18 +685,22 @@ class _ReadingsOptionsSheet extends StatelessWidget {
   const _ReadingsOptionsSheet({
     required this.groups,
     required this.activeGroupKey,
+    required this.automaticGroupKey,
     required this.cycles,
     required this.automaticCycle,
     required this.manualCycle,
+    required this.onAutomaticSelected,
     required this.onGroupSelected,
     required this.onCycleSelected,
   });
 
   final List<ReadingCelebrationGroup> groups;
   final String? activeGroupKey;
+  final String? automaticGroupKey;
   final List<String> cycles;
   final String automaticCycle;
   final String? manualCycle;
+  final VoidCallback onAutomaticSelected;
   final ValueChanged<String> onGroupSelected;
   final ValueChanged<String?> onCycleSelected;
 
@@ -687,6 +717,17 @@ class _ReadingsOptionsSheet extends StatelessWidget {
             context,
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
+        if (activeGroupKey != automaticGroupKey || manualCycle != null) ...[
+          const SizedBox(height: 12),
+          ListTile(
+            key: const Key('readings-selection-auto'),
+            selected: false,
+            leading: const Icon(Icons.auto_awesome_rounded),
+            title: const Text('Па календары'),
+            subtitle: const Text('Вярнуць аўтаматычны набор і цыкл'),
+            onTap: onAutomaticSelected,
+          ),
+        ],
         if (groups.length > 1) ...[
           const SizedBox(height: 18),
           const _OptionsHeading('Святкаванне / набор чытанняў'),
