@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
-import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
@@ -77,16 +76,8 @@ class AppNavigationDrawer extends ConsumerWidget {
                         _DrawerItem(
                           icon: PhosphorIconsRegular.bookmark,
                           title: category.name,
-                          onTap: () {
-                            ref
-                                .read(prayersFilterProvider.notifier)
-                                .selectCategory(
-                                  category.id,
-                                  category.tags,
-                                  name: category.name,
-                                );
-                            navigate('/prayers');
-                          },
+                          onTap: () =>
+                              navigate('/prayers/category/${category.id}'),
                         ),
                       if (categories.isEmpty)
                         Padding(

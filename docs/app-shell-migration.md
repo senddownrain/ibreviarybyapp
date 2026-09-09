@@ -11,6 +11,10 @@
 > Update 2026-09-09: Stage 4 Readings root также завершён. Реализация и
 > сохранённые compatibility boundaries описаны в
 > [readings-root-migration.md](readings-root-migration.md).
+>
+> Update 2026-09-09: Stage 5 Prayerbook также завершён. Новый root, единый
+> каталог/категории, shared Prayer Detail и compatibility disposition описаны
+> в [prayerbook-migration.md](prayerbook-migration.md).
 
 Stage 2 меняет навигационный каркас. Stage 3+ мигрируют содержимое branches по одному. Обязательное промежуточное состояние: новая Ora и немигрированные Readings / Prayer / Bible работают под одним Shell.
 

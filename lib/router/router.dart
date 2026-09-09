@@ -101,7 +101,7 @@ const _prayerDetailRoute = AppRouteDescriptor(
   id: 'prayerbook.detail',
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.compact,
-  topChromeOwner: TopChromeOwner.legacy,
+  topChromeOwner: TopChromeOwner.reader,
 );
 const _prayerFormRoute = AppRouteDescriptor(
   id: 'prayerbook.form',
@@ -298,6 +298,40 @@ final router = GoRouter(
               ),
               routes: [
                 GoRoute(
+                  path: 'all',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerListRoute,
+                    const PrayerCatalogScreen(),
+                  ),
+                ),
+                GoRoute(
+                  path: 'search',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerListRoute,
+                    const PrayerCatalogScreen(searchInitially: true),
+                  ),
+                ),
+                GoRoute(
+                  path: 'categories',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerListRoute,
+                    const PrayerCategoriesScreen(),
+                  ),
+                ),
+                GoRoute(
+                  path: 'category/:id',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerListRoute,
+                    PrayerCategoryScreen(
+                      categoryId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ),
+                GoRoute(
                   path: 'favorites',
                   pageBuilder: (context, state) => _branchPage(
                     state,
@@ -419,6 +453,14 @@ final router = GoRouter(
         _encodedPath(['prayers', 'prayer', state.pathParameters['id']!]),
         state,
       ),
+    ),
+    GoRoute(
+      path: '/favorites',
+      redirect: (_, state) => _withSameQuery('/prayers/favorites', state),
+    ),
+    GoRoute(
+      path: '/my',
+      redirect: (_, state) => _withSameQuery('/prayers/my', state),
     ),
     GoRoute(
       path: '/my-prayers',

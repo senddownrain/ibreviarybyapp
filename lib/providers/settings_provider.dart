@@ -209,7 +209,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
-  void addCategory(String name, List<String> tags) {
+  String addCategory(String name, List<String> tags) {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
     final cats = [
       ...state.userCategories,
@@ -217,6 +217,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     ];
     state = state.copyWith(userCategories: cats);
     _save();
+    return id;
   }
 
   void updateCategory(String id, String name, List<String> tags) {
@@ -231,13 +232,44 @@ class SettingsNotifier extends Notifier<SettingsState> {
 
   void deleteCategory(String id) {
     final cats = state.userCategories.where((c) => c.id != id).toList();
-    state = state.copyWith(userCategories: cats);
+    final memberships = <String, Set<String>>{
+      for (final entry in state.prayerCategoryMap.entries)
+        if (entry.value.where((categoryId) => categoryId != id).isNotEmpty)
+          entry.key: entry.value
+              .where((categoryId) => categoryId != id)
+              .toSet(),
+    };
+    state = state.copyWith(
+      userCategories: cats,
+      prayerCategoryMap: memberships,
+    );
     _save();
   }
 
   void hideGlobalPrayerCategory(String id) {
     final hidden = {...state.hiddenGlobalPrayerCategoryIds, id}.toList();
     state = state.copyWith(hiddenGlobalPrayerCategoryIds: hidden);
+    _save();
+  }
+
+  void showGlobalPrayerCategory(String id) {
+    final hidden = state.hiddenGlobalPrayerCategoryIds
+        .where((categoryId) => categoryId != id)
+        .toList();
+    state = state.copyWith(hiddenGlobalPrayerCategoryIds: hidden);
+    _save();
+  }
+
+  void clearPrayerReferences(String prayerId) {
+    final favorites = state.favoriteIds
+        .where((favoriteId) => favoriteId != prayerId)
+        .toList();
+    final memberships = Map<String, Set<String>>.from(state.prayerCategoryMap)
+      ..remove(prayerId);
+    state = state.copyWith(
+      favoriteIds: favorites,
+      prayerCategoryMap: memberships,
+    );
     _save();
   }
 

@@ -50,7 +50,20 @@ void main() {
       containsAll(['ora/:date/:dayId/:type', 'hora/:date/:dayId']),
     );
     expect(_descendantPaths(roots[1]), contains('reading/:readingId'));
-    expect(_descendantPaths(roots[2]), contains('prayer/:id'));
+    expect(
+      _descendantPaths(roots[2]),
+      containsAll({
+        'all',
+        'search',
+        'categories',
+        'category/:id',
+        'favorites',
+        'my',
+        'prayer/add',
+        'prayer/:id/edit',
+        'prayer/:id',
+      }),
+    );
     expect(
       roots[3].routes,
       isEmpty,
@@ -90,6 +103,8 @@ void main() {
         '/prayer/:id',
         '/prayer/add',
         '/prayer/edit/:id',
+        '/favorites',
+        '/my',
         '/my-prayers',
         '/bible/:version/:book/:chapter',
         '/picker',

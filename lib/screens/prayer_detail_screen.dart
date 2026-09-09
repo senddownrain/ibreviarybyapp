@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
-import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
@@ -136,7 +135,6 @@ class PrayerDetailScreen extends ConsumerWidget {
     final prayers = ref.watch(allPrayersProvider);
     final localPrayers = ref.watch(localPrayersProvider);
     final settings = ref.watch(settingsProvider);
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
 
     final Prayer? prayer;
     try {
@@ -145,127 +143,67 @@ class PrayerDetailScreen extends ConsumerWidget {
         ...localPrayers,
       ].firstWhere((p) => p.id == prayerId);
     } catch (_) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Малітва')),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PhosphorIcon(
-                PhosphorIconsLight.magnifyingGlass,
-                size: 48,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Малітва не знойдзена',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-        ),
+      return ReaderScaffold(
+        semanticLabel: 'Малітва не знойдзена',
+        content: const Center(child: Text('Малітва не знойдзена')),
       );
     }
 
     final p = prayer;
     final isFav = settings.favoriteIds.contains(p.id);
 
-    return ReadingScaffold(
-      builder: (context, textStyle) => Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar(
-          title: Text(
-            p.displayTitle.isNotEmpty ? p.displayTitle : 'Малітва',
-            overflow: TextOverflow.ellipsis,
-          ),
-          actions: [
-            IconButton(
-              icon: PhosphorIcon(
-                isFav ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
-                size: 22,
-                color: isFav ? Colors.red : null,
-              ),
-              onPressed: () {
-                HapticFeedback.selectionClick();
-                ref.read(settingsProvider.notifier).toggleFavorite(p.id);
-              },
-            ),
-            IconButton(
-              icon: const PhosphorIcon(
-                PhosphorIconsRegular.shareNetwork,
-                size: 22,
-              ),
-              tooltip: 'Падзяліцца',
-              onPressed: () {
-                final text =
-                    '${p.displayTitle.isNotEmpty ? '${p.displayTitle}\n\n' : ''}'
-                    '${_stripHtmlForCopy(p.displayText)}';
-                Share.share(text);
-              },
-            ),
-            const TextScaleControl(),
-          ],
-        ),
-        body: Stack(
-          children: [
-            AmbientWash.hero(seasonColor: seasonColor),
-            SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                MediaQuery.paddingOf(context).top +
-                    kFloatingReaderAppBarContentInset,
-                16,
-                40 + MediaQuery.viewPaddingOf(context).bottom,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [_buildReadingSurface(context, p, textStyle)],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReadingSurface(
-    BuildContext context,
-    Prayer prayer,
-    TextStyle textStyle,
-  ) {
-    final reader = ReaderTheme.of(context);
     final cs = Theme.of(context).colorScheme;
-    final isMass = prayer.id == _kMassOrderPrayerId;
+    void share() {
+      final text =
+          '${p.displayTitle.isNotEmpty ? '${p.displayTitle}\n\n' : ''}'
+          '${_stripHtmlForCopy(p.displayText)}';
+      Share.share(text);
+    }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          isMass ? 'ЛІТУРГІЯ' : 'МАЛІТВА',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: cs.tertiary,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.1,
+    return ReadingScaffold(
+      builder: (context, textStyle) => ReaderScaffold(
+        key: ValueKey('prayer-reader-${p.id}'),
+        scrollKey: PageStorageKey('prayer-detail-${p.id}-scroll'),
+        semanticLabel: 'Тэкст малітвы ${p.displayTitle}',
+        seasonColor: cs.tertiary,
+        chromeMode: ReaderChromeMode.compact,
+        actions: [
+          _PrayerFavoriteControl(prayerId: p.id, favorite: isFav),
+          const TextScaleControl(),
+        ],
+        secondaryActions: [
+          ReaderSecondaryAction(
+            label: 'Падзяліцца',
+            icon: Icons.share_outlined,
+            onSelected: share,
           ),
-        ),
-        const SizedBox(height: 7),
-        Text(prayer.displayTitle, style: reader.displayTitle(28)),
-        if (prayer.tags.isNotEmpty) ...[
-          const SizedBox(height: 13),
-          Wrap(
-            spacing: 7,
-            runSpacing: 7,
-            children: [
-              for (final tag in prayer.tags.take(6))
-                Chip(label: Text(tag), visualDensity: VisualDensity.compact),
-            ],
+          if (p.isLocal)
+            ReaderSecondaryAction(
+              label: 'Рэдагаваць',
+              icon: Icons.edit_outlined,
+              onSelected: () => context.push('/prayers/prayer/${p.id}/edit'),
+            ),
+          ReaderSecondaryAction(
+            label: 'Поўнаэкраннае чытанне',
+            icon: Icons.fullscreen_rounded,
+            onSelected: () =>
+                ReaderChromeModeScope.maybeControllerOf(context)?.value =
+                    ReaderChromeMode.hidden,
           ),
         ],
-        Divider(height: 36, color: reader.border),
-        _buildContent(context, prayer, textStyle, isMass: isMass),
-      ],
+        contextHeader: ReaderContextHeader(
+          eyebrow: p.id == _kMassOrderPrayerId ? 'ЛІТУРГІЯ' : 'МАЛІТВА',
+          title: p.displayTitle.isEmpty ? 'Малітва' : p.displayTitle,
+          metadata: p.tags.isEmpty ? null : p.tags.join(' · '),
+          accentColor: cs.tertiary,
+        ),
+        content: _buildContent(
+          context,
+          p,
+          textStyle,
+          isMass: p.id == _kMassOrderPrayerId,
+        ),
+      ),
     );
   }
 
@@ -377,5 +315,36 @@ class PrayerDetailScreen extends ConsumerWidget {
       );
     }
     return SelectableText(raw, style: textStyle);
+  }
+}
+
+class _PrayerFavoriteControl extends ConsumerWidget {
+  const _PrayerFavoriteControl({
+    required this.prayerId,
+    required this.favorite,
+  });
+
+  final String prayerId;
+  final bool favorite;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    return SizedBox.square(
+      dimension: 48,
+      child: IconButton.filledTonal(
+        key: const Key('prayer-detail-favorite'),
+        tooltip: favorite ? 'Выдаліць з абраных' : 'Дадаць у абраныя',
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          ref.read(settingsProvider.notifier).toggleFavorite(prayerId);
+        },
+        icon: PhosphorIcon(
+          favorite ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
+          size: 21,
+          color: favorite ? cs.error : null,
+        ),
+      ),
+    );
   }
 }

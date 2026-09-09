@@ -58,6 +58,7 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
       raw.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
 
   Future<void> _save() async {
+    if (_isEdit && _original == null) return;
     if (!_formKey.currentState!.validate()) return;
     if (_saving) return;
     setState(() => _saving = true);
@@ -107,6 +108,13 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.paddingOf(context).top;
+
+    if (_isEdit && _original == null) {
+      return Scaffold(
+        appBar: AdaptiveAppBar.text('Мае малітвы'),
+        body: const Center(child: Text('Асабістая малітва не знойдзена')),
+      );
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
