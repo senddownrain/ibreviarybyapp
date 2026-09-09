@@ -414,3 +414,28 @@ Web позволяет проверить layout, очевидные touch dimen
 **Dependencies:** стабилизированные A–C; доступ к Android/iPhone для native sign-off. **Risks:** ложный PASS по web scale/эмуляции MediaQuery, незафиксированные остаточные gaps. У каждого NOT VERIFIED должен быть результат либо явное решение владельца merge о допустимом ограничении.
 
 **Merge decision:** после устранения P1, согласованного polish/cleanup и закрытия QA текущая migration architecture достаточна для main. Сейчас готова к финальному Sol cleanup stage, но не к безусловному merge. Stage 8 этим audit не начат.
+
+# Stage 8 resolution
+
+Дата завершения automated pass: 2026-09-10. Ветка: `feature/mobile-ux-migration`.
+
+| Finding | Status | Commit | Verification |
+| ------- | ------ | ------ | ------------ |
+| P1-01 | FIXED | `9841062` | Controller regression на Full → Full и полный test suite; production route descriptors сохранены |
+| P1-02 | FIXED | `9841062` | Реальный 320 px test surface подтверждает рост RenderBox при system TextScaler 2.0 |
+| P1-03 | FIXED | `9841062` | Semantics names/selected state, 48 dp targets, clear/cancel и SafeArea покрыты widget tests |
+| P1-04 | FIXED | `9841062` | Group-only, cycle и возврат «Па календары» покрыты regression test |
+| P1-05 | DEFERRED DEVICE QA | `9841062` | AmbientBackdrop охватывает весь Scaffold/dock; Light/Dark native visual confirmation остаётся |
+| P2-01 | FIXED | `c1016e2` | Selector без checkmark, single-line БЕЛ/РУС; 320 px / 200% Bible test зелёный |
+| P2-02 | FIXED | `c1016e2` | Shared context header занимает стабильную reader column width |
+| P2-03 | PARTIAL | `c1016e2` | Reader family/width roles согласованы; полный device typography comparison остаётся |
+| P2-04 | FIXED | `c1016e2` | Feast comment compact by default, полный текст раскрывается и имеет expanded semantics |
+| P2-05 | PARTIAL | `c1016e2` | Non-liturgical branches нейтральны, alternative accent следует selection; seasonal device matrix остаётся |
+| P2-06 | PARTIAL | `c1016e2` | Settings/About/Material calendar очищены, advanced picker получил Back; remaining secondary visual sweep остаётся |
+| P2-07 | FIXED | `c1016e2` | Start section/last opened, metadata version, size-only UI, canonical visible category editor |
+| P2-08 | FIXED | `c1016e2` | Repeat-entry query/results regression test |
+| P2-09 | PARTIAL | `c1016e2` | Blocking reader/date/Aa sheets принадлежат root navigator; keyboard/native focus QA остаётся |
+| P2-10 | FIXED | `c1016e2` | Empty/invalid corpus получает конечное actionable state и bundled retry |
+| P2-11 | DEFERRED DEVICE QA | `c1016e2` | Branch pages используют platform PageTransitionsTheme; iOS swipe/Android predictive Back требуют devices |
+
+Automated gates: `flutter analyze` PASS, `dart analyze` PASS, `flutter test` **114 passed**, Android/iOS Flutter Web platform builds PASS. Детали, cleanup inventory и device-only checklist: `docs/migration-stage8-finalization.md`.
