@@ -85,7 +85,11 @@ class BibleRepository {
   }
 
   static Map<String, dynamic>? _versionData(String versionId) {
-    return versionId == 'bel' ? _dataBel : _data;
+    return switch (versionId) {
+      'bel' => _dataBel,
+      'ru' => _data,
+      _ => null,
+    };
   }
 
   static List<BibleVersionMeta> getAvailableVersions() {
@@ -99,16 +103,19 @@ class BibleRepository {
   static List<BibleBookInfo> getBooks(String versionId) {
     final d = _versionData(versionId);
     if (d == null) return [];
-    final books = d['books'] as List? ?? [];
+    final books = d['books'];
+    if (books is! List) return const [];
     final newTestamentIndex = books.indexWhere(
-      (book) => book is Map && book['id'] == 'mt',
+      (book) => book is Map && book['id']?.toString() == 'mt',
     );
-    return books.asMap().entries.map((entry) {
+    return books.asMap().entries.where((entry) => entry.value is Map).map((
+      entry,
+    ) {
       final b = entry.value as Map;
-      final order = (b['order'] as int?) ?? (entry.key + 1);
+      final order = (b['order'] as num?)?.toInt() ?? (entry.key + 1);
       return BibleBookInfo(
-        id: b['id'] as String? ?? '',
-        name: b['name'] as String? ?? '',
+        id: b['id']?.toString() ?? '',
+        name: b['name']?.toString() ?? '',
         chapterCount: _chapterCount(b),
         versionId: versionId,
         order: order,
@@ -172,17 +179,19 @@ class BibleRepository {
   ) {
     final d = _versionData(versionId);
     if (d == null) return [];
-    final books = d['books'] as List? ?? [];
+    final books = d['books'];
+    if (books is! List) return const [];
     for (final b in books) {
-      final bm = b as Map;
+      if (b is! Map) continue;
+      final bm = b;
       if (bm['id'] == bookId) {
         final rawVerses = _chapterVerses(bm, chapter);
         return rawVerses.asMap().entries.map((e) {
           final v = e.value;
           if (v is Map) {
             return BibleVerse(
-              verse: (v['num'] as int?) ?? (e.key + 1),
-              text: (v['text'] as String?) ?? '',
+              verse: (v['num'] as num?)?.toInt() ?? (e.key + 1),
+              text: v['text']?.toString() ?? '',
             );
           }
           return BibleVerse(verse: e.key + 1, text: v.toString());
@@ -195,7 +204,7 @@ class BibleRepository {
   /// Chapter count — supports both List and Map formats.
   static int _chapterCount(Map b) {
     final explicit = b['chapterCount'];
-    if (explicit is int) return explicit;
+    if (explicit is num) return explicit.toInt();
     final chapters = b['chapters'];
     if (chapters is List) return chapters.length;
     if (chapters is Map) return chapters.length;
@@ -208,10 +217,12 @@ class BibleRepository {
     if (chapters is List) {
       final idx = chapter - 1;
       if (idx < 0 || idx >= chapters.length) return [];
-      return chapters[idx] as List? ?? [];
+      final value = chapters[idx];
+      return value is List ? value : const [];
     }
     if (chapters is Map) {
-      return chapters[chapter.toString()] as List? ?? [];
+      final value = chapters[chapter.toString()];
+      return value is List ? value : const [];
     }
     return [];
   }
@@ -235,16 +246,19 @@ class BibleRepository {
 
       final books =
           snap.docs.map((doc) {
-              final d = doc.data();
-              return {
-                'id': doc.id,
-                'name': d['name'] ?? '',
-                'order': d['order'] ?? 0,
-                'chapterCount': d['chapterCount'] ?? 0,
-                'chapters': d['chapters'] ?? {},
-              };
-            }).toList()
-            ..sort((a, b) => (a['order'] as int).compareTo(b['order'] as int));
+            final d = doc.data();
+            return {
+              'id': doc.id,
+              'name': d['name'] ?? '',
+              'order': d['order'] ?? 0,
+              'chapterCount': d['chapterCount'] ?? 0,
+              'chapters': d['chapters'] ?? {},
+            };
+          }).toList()..sort(
+            (a, b) => ((a['order'] as num?)?.toInt() ?? 0).compareTo(
+              (b['order'] as num?)?.toInt() ?? 0,
+            ),
+          );
 
       setData(versionId, {'books': books});
       if (kDebugMode) {

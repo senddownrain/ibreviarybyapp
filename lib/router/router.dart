@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
+import 'package:mybrev_flutter/screens/bible_search_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -45,8 +46,20 @@ const bibleRootRoute = AppRouteDescriptor(
   id: 'bible.root',
   branch: AppBranch.bible,
   defaultChromeMode: ReaderChromeMode.compact,
-  topChromeOwner: TopChromeOwner.legacy,
+  topChromeOwner: TopChromeOwner.reader,
   isBranchRoot: true,
+);
+const _bibleSearchRoute = AppRouteDescriptor(
+  id: 'bible.search',
+  branch: AppBranch.bible,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _bibleSearchResultRoute = AppRouteDescriptor(
+  id: 'bible.search.result',
+  branch: AppBranch.bible,
+  defaultChromeMode: ReaderChromeMode.compact,
+  topChromeOwner: TopChromeOwner.reader,
 );
 
 const _hoursPickerRoute = AppRouteDescriptor(
@@ -387,6 +400,26 @@ final router = GoRouter(
               path: '/bible',
               pageBuilder: (context, state) =>
                   _branchPage(state, bibleRootRoute, _bibleHost(state)),
+              routes: [
+                GoRoute(
+                  path: 'search',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _bibleSearchRoute,
+                    _bibleSearchHost(state),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: 'result',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _bibleSearchResultRoute,
+                        _bibleHost(state),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -584,6 +617,18 @@ Widget _bibleHost(GoRouterState state) {
     book: query['book'],
     chapter: chapter,
   );
+}
+
+Widget _bibleSearchHost(GoRouterState state) {
+  final query = state.uri.queryParameters;
+  final version = query['version'];
+  final book = query['book'];
+  if (version == null || book == null) {
+    return const BibleBranchHost(
+      invalidContext: 'Некарэктны кантэкст пошуку ў Бібліі.',
+    );
+  }
+  return BibleSearchScreen(versionId: version, bookId: book);
 }
 
 Widget _pickerOptions(GoRouterState state) {

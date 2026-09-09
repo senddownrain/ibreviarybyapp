@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/navigation/bible_navigation.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -173,18 +174,24 @@ class BibleBranchHost extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
     final savedRaw = HiveService.settingsBox.get(
-      'bibleLastLocation:$resolvedVersion',
+      BibleNavigation.lastLocationKey(resolvedVersion),
     );
     final saved = savedRaw is Map ? savedRaw : const <String, dynamic>{};
-    final resolvedBook = book ?? saved['bookId']?.toString() ?? books.first.id;
-    final requestedChapter =
-        chapter ?? int.tryParse(saved['chapter']?.toString() ?? '') ?? 1;
+    final location = BibleNavigation.resolve(
+      versionId: resolvedVersion,
+      requestedBookId: book,
+      requestedChapter: chapter,
+      saved: saved,
+    );
+    if (location == null) {
+      return const _BranchError(message: 'Даныя Бібліі недаступныя.');
+    }
 
     return BibleChapterScreen(
-      key: ValueKey('bible-$resolvedVersion-$resolvedBook-$requestedChapter'),
-      versionId: resolvedVersion,
-      bookId: resolvedBook,
-      chapter: requestedChapter,
+      key: ValueKey('bible-${location.documentKey}'),
+      versionId: location.versionId,
+      bookId: location.bookId,
+      chapter: location.chapter,
     );
   }
 }

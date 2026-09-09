@@ -65,9 +65,9 @@ void main() {
       }),
     );
     expect(
-      roots[3].routes,
-      isEmpty,
-      reason: 'Bible chapter is the branch root document',
+      _descendantPaths(roots[3]),
+      containsAll({'search', 'result'}),
+      reason: 'Bible chapter remains the root while search keeps its own stack',
     );
   });
 

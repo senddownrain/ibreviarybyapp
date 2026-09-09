@@ -15,6 +15,10 @@
 > Update 2026-09-09: Stage 5 Prayerbook также завершён. Новый root, единый
 > каталог/категории, shared Prayer Detail и compatibility disposition описаны
 > в [prayerbook-migration.md](prayerbook-migration.md).
+>
+> Update 2026-09-09: Stage 6 Bible завершён. Last-location root, production
+> navigation/search/highlights и shared neutral Reader описаны в
+> [bible-migration.md](bible-migration.md).
 
 Stage 2 меняет навигационный каркас. Stage 3+ мигрируют содержимое branches по одному. Обязательное промежуточное состояние: новая Ora и немигрированные Readings / Prayer / Bible работают под одним Shell.
 

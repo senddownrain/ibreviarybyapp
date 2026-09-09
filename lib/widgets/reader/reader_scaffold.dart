@@ -62,6 +62,7 @@ class ReaderScaffold extends StatelessWidget {
     this.scrollKey,
     this.maxContentWidth = 760,
     this.semanticLabel,
+    this.showAmbient = true,
   });
 
   final Widget content;
@@ -81,6 +82,7 @@ class ReaderScaffold extends StatelessWidget {
   final PageStorageKey<String>? scrollKey;
   final double maxContentWidth;
   final String? semanticLabel;
+  final bool showAmbient;
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +105,10 @@ class ReaderScaffold extends StatelessWidget {
       drawer: drawer,
       body: Stack(
         children: [
-          AmbientWash.hero(
-            seasonColor: seasonColor ?? Theme.of(context).colorScheme.primary,
-          ),
+          if (showAmbient)
+            AmbientWash.hero(
+              seasonColor: seasonColor ?? Theme.of(context).colorScheme.primary,
+            ),
           CustomScrollView(
             key: scrollKey,
             controller: scrollController,
@@ -126,13 +129,16 @@ class ReaderScaffold extends StatelessWidget {
                     ),
                   ),
                 ),
-              SliverFillRemaining(
-                hasScrollBody: false,
+              SliverToBoxAdapter(
                 child: ReaderContentSurface(
                   maxContentWidth: maxContentWidth,
                   semanticLabel: semanticLabel,
                   child: content,
                 ),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: ColoredBox(color: ReaderTheme.of(context).surface),
               ),
             ],
           ),
@@ -338,6 +344,7 @@ class ReaderContextHeader extends StatelessWidget {
     this.subtitle,
     this.metadata,
     this.onTitleTap,
+    this.titleActionLabel,
     this.actions = const [],
   });
 
@@ -347,6 +354,7 @@ class ReaderContextHeader extends StatelessWidget {
   final String? subtitle;
   final String? metadata;
   final VoidCallback? onTitleTap;
+  final String? titleActionLabel;
   final List<Widget> actions;
 
   @override
@@ -393,7 +401,7 @@ class ReaderContextHeader extends StatelessWidget {
           else
             Semantics(
               button: true,
-              label: 'Змяніць гадзіну: $title',
+              label: titleActionLabel ?? 'Змяніць гадзіну: $title',
               child: InkWell(
                 key: const Key('reader-context-title-action'),
                 borderRadius: BorderRadius.circular(12),

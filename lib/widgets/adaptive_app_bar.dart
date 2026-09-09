@@ -19,21 +19,29 @@ class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
     required this.title,
     this.actions,
     this.leading,
+    this.seasonColor,
   });
 
-  AdaptiveAppBar.text(String text, {super.key, this.actions, this.leading})
-    : title = Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
+  AdaptiveAppBar.text(
+    String text, {
+    super.key,
+    this.actions,
+    this.leading,
+    this.seasonColor,
+  }) : title = Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
 
   final Widget title;
   final List<Widget>? actions;
   final Widget? leading;
+  final Color? seasonColor;
 
   @override
   Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final resolvedSeasonColor =
+        seasonColor ?? ref.watch(liturgicalSeasonColorProvider);
     final cupertino = usesCupertinoGlass(context);
     final cs = Theme.of(context).colorScheme;
     final canPop = Navigator.canPop(context);
@@ -69,7 +77,7 @@ class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
               children: [
                 if (leadingWidget != null) ...[
                   AdaptiveChromeSurface(
-                    seasonColor: seasonColor,
+                    seasonColor: resolvedSeasonColor,
                     role: ChromeSurfaceRole.control,
                     child: SizedBox.square(dimension: 48, child: leadingWidget),
                   ),
@@ -99,7 +107,7 @@ class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 if (pageActions != null && pageActions.isNotEmpty) ...[
                   const SizedBox(width: 10),
                   AdaptiveChromeSurface(
-                    seasonColor: seasonColor,
+                    seasonColor: resolvedSeasonColor,
                     role: ChromeSurfaceRole.group,
                     child: SizedBox(
                       height: 48,
