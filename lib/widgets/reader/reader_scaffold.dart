@@ -56,6 +56,8 @@ class ReaderScaffold extends StatelessWidget {
     this.chromeMode = ReaderChromeMode.compact,
     this.onChromeModeChanged,
     this.onBack,
+    this.leading,
+    this.drawer,
     this.scrollController,
     this.scrollKey,
     this.maxContentWidth = 760,
@@ -70,6 +72,11 @@ class ReaderScaffold extends StatelessWidget {
   final ReaderChromeMode chromeMode;
   final ValueChanged<ReaderChromeMode>? onChromeModeChanged;
   final VoidCallback? onBack;
+
+  /// Optional root-level leading control (for example the application menu).
+  /// Detail readers continue to use the default platform back control.
+  final Widget? leading;
+  final Widget? drawer;
   final ScrollController? scrollController;
   final PageStorageKey<String>? scrollKey;
   final double maxContentWidth;
@@ -93,6 +100,7 @@ class ReaderScaffold extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: drawer,
       body: Stack(
         children: [
           AmbientWash.hero(
@@ -138,6 +146,7 @@ class ReaderScaffold extends StatelessWidget {
               actions: actions,
               secondaryActions: secondaryActions,
               onBack: onBack,
+              leading: leading,
               onModeChanged: setMode,
             ),
           ),
@@ -192,6 +201,7 @@ class ReaderChrome extends StatelessWidget {
     this.secondaryActions = const [],
     this.seasonColor,
     this.onBack,
+    this.leading,
   });
 
   final ReaderChromeMode mode;
@@ -200,6 +210,7 @@ class ReaderChrome extends StatelessWidget {
   final List<ReaderSecondaryAction> secondaryActions;
   final Color? seasonColor;
   final VoidCallback? onBack;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -231,16 +242,24 @@ class ReaderChrome extends StatelessWidget {
           height: 48,
           child: Row(
             children: [
-              _ReaderChromeButton(
-                key: const Key('reader-chrome-back'),
-                tooltip: 'Назад',
-                icon: cupertino
-                    ? Icons.arrow_back_ios_new
-                    : Icons.arrow_back_rounded,
-                iconSize: cupertino ? 18 : 22,
-                seasonColor: seasonColor,
-                onPressed: onBack ?? () => Navigator.maybePop(context),
-              ),
+              if (leading != null)
+                AdaptiveChromeSurface(
+                  role: ChromeSurfaceRole.control,
+                  seasonColor: seasonColor,
+                  borderRadius: BorderRadius.circular(24),
+                  child: SizedBox.square(dimension: 48, child: leading),
+                )
+              else
+                _ReaderChromeButton(
+                  key: const Key('reader-chrome-back'),
+                  tooltip: 'Назад',
+                  icon: cupertino
+                      ? Icons.arrow_back_ios_new
+                      : Icons.arrow_back_rounded,
+                  iconSize: cupertino ? 18 : 22,
+                  seasonColor: seasonColor,
+                  onPressed: onBack ?? () => Navigator.maybePop(context),
+                ),
               const Spacer(),
               ...actions.expand((action) => [action, const SizedBox(width: 8)]),
               if (secondaryActions.isNotEmpty)

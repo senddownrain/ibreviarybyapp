@@ -4,6 +4,10 @@ This stage introduces the production long-form reader boundary and migrates
 Ora as the first vertical slice. It deliberately does not migrate the shell,
 Readings, Prayer Detail, or Bible Chapter.
 
+> Migration update: AppShell Stage 2, Hours Stage 3 and Readings Stage 4 are
+> now implemented. Readings reuses this foundation; see
+> [readings-root-migration.md](readings-root-migration.md).
+
 ## Shared contract
 
 - `ReaderScaffold` composes ambient context, floating platform chrome, one

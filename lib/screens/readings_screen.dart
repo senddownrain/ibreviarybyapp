@@ -4,11 +4,10 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/day.dart';
-import 'package:mybrev_flutter/providers/calendar_provider.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/services/parsed_readings_service.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
+import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
@@ -16,11 +15,10 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
-import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
-import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
+import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
@@ -47,10 +45,8 @@ class ReadingsScreen extends ConsumerStatefulWidget {
   ConsumerState<ReadingsScreen> createState() => _ReadingsScreenState();
 }
 
-class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
-    with TickerProviderStateMixin {
+class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   static const double _compactThreshold = 180;
-  TabController? _tabController;
   bool _didRequestCompact = false;
 
   bool _loading = true;
@@ -58,13 +54,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   List<ParsedReading> _readings = [];
   List<ReadingCelebrationGroup> _groups = [];
   String? _activeGroupKey;
-  List<String> _tabs = [];
-  bool _isSundayMode = false;
-  bool _celebrationPickerExpanded = false;
-  Map<String, ParsedReading?> _byYear = {};
   String _sundayCycle = 'A';
   String _weekdayCycle = '1';
   int _loadGeneration = 0;
+  final ScrollController _scrollController = ScrollController();
+  String? _manualCycle;
 
   @override
   void initState() {
@@ -79,9 +73,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         oldWidget.liturgicalKey != widget.liturgicalKey ||
         oldWidget.dayId != widget.dayId) {
       _didRequestCompact = false;
+      _manualCycle = null;
       ReaderChromeModeScope.maybeControllerOf(context)?.value =
           ReaderChromeMode.full;
       _load();
+      _resetDocumentScroll();
     }
   }
 
@@ -100,90 +96,32 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (!mounted || generation != _loadGeneration) return;
 
     try {
-      final service = ParsedReadingsService();
-      final List<ParsedReading> readings;
-      String sundayCycle = 'A';
-      String weekdayCycle = '1';
-
-      if (requestedLiturgicalKey != null) {
-        // Liturgical key mode: period/week/dayOfWeek
-        final parts = requestedLiturgicalKey.split('/');
-        final period = parts[0];
-        final week = int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
-        final day = int.tryParse(parts.length > 2 ? parts[2] : '1') ?? 1;
-        readings = await service.fetchByLiturgicalKey(
-          period,
-          week,
-          day,
-          forceRefresh: forceRefresh,
-        );
-        // Use today's date for cycle detection
-        final today = DateTime.now();
-        sundayCycle = getCycleForDate(today, dayOfWeek: 1);
-        weekdayCycle = getWeekdayCycleForDate(today);
-      } else {
-        final date = DateTime.tryParse(requestedDateStr!) ?? DateTime.now();
-        final calendar = ref.read(calendarServiceProvider);
-        await calendar.ensureYearOptions(date.year);
-        await calendar.ensureYearOptions(date.year + 1);
-        await calendar.ensureDynamicDates(date.year);
-        final opts = calendar.getYearOptionsCached(date.year);
-        final nextOpts = calendar.getYearOptionsCached(date.year + 1);
-        final dynamicDates = calendar.getDynamicDatesCached(date.year);
-        readings = await service.fetchForDate(
-          date,
-          opts,
-          nextOpts,
-          dynamicDates,
-          forceRefresh: forceRefresh,
-          includeAlternatives: true,
-          dayId: requestedDayId,
-        );
-        sundayCycle = getCycleForDate(date, dayOfWeek: 1);
-        weekdayCycle = getWeekdayCycleForDate(date);
-      }
+      final result = await ref.read(readingsLoaderProvider)(
+        dateStr: requestedDateStr,
+        liturgicalKey: requestedLiturgicalKey,
+        dayId: requestedDayId,
+        forceRefresh: forceRefresh,
+      );
+      final readings = result.readings;
+      final sundayCycle = result.sundayCycle;
+      final weekdayCycle = result.weekdayCycle;
 
       if (!mounted || generation != _loadGeneration) return;
 
-      var groups = requestedDateStr != null
-          ? groupReadings(readings)
-          : <ReadingCelebrationGroup>[];
-      final groupsWithContent = groups
-          .where((g) => g.documents.any(readingHasVisibleContent))
-          .toList();
-      if (groupsWithContent.isNotEmpty) groups = groupsWithContent;
-      final linkedGroup = requestedDayId == null
-          ? null
-          : groups.where((group) {
-              return group.documents.any(
-                (reading) =>
-                    reading.dayId == requestedDayId ||
-                    reading.dayIds.contains(requestedDayId),
-              );
-            }).firstOrNull;
-      final activeKey =
-          linkedGroup?.key ?? (groups.isNotEmpty ? groups.first.key : null);
-      final activeDocs =
-          linkedGroup?.documents ??
-          (groups.isNotEmpty ? groups.first.documents : readings);
-
-      _tabController?.dispose();
-      final tabState = _buildTabState(
-        activeDocs,
+      final selection = resolveDefaultReadings(
+        readings: readings,
         sundayCycle: sundayCycle,
         weekdayCycle: weekdayCycle,
+        dayId: requestedDayId,
+        groupByCelebration: requestedDateStr != null,
       );
 
       setState(() {
         _readings = readings;
-        _groups = groups;
-        _activeGroupKey = activeKey;
+        _groups = selection.groups;
+        _activeGroupKey = selection.activeGroupKey;
         _sundayCycle = sundayCycle;
         _weekdayCycle = weekdayCycle;
-        _tabs = tabState.tabs;
-        _tabController = tabState.controller;
-        _isSundayMode = tabState.sundayMode;
-        _byYear = tabState.byYear;
         _loading = false;
       });
     } catch (e) {
@@ -197,7 +135,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
 
   @override
   void dispose() {
-    _tabController?.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -212,181 +150,34 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
 
   void _selectCelebrationGroup(String key) {
     if (key == _activeGroupKey) return;
-    final group = _groups.firstWhere((g) => g.key == key);
-    _tabController?.dispose();
-    final tabState = _buildTabState(
-      group.documents,
-      sundayCycle: _sundayCycle,
-      weekdayCycle: _weekdayCycle,
-    );
     setState(() {
       _activeGroupKey = key;
-      _celebrationPickerExpanded = false;
-      _tabs = tabState.tabs;
-      _tabController = tabState.controller;
-      _isSundayMode = tabState.sundayMode;
-      _byYear = tabState.byYear;
+      _manualCycle = null;
+    });
+    _resetDocumentScroll();
+  }
+
+  DefaultReadingsSelection get _selection => resolveDefaultReadings(
+    readings: _readings,
+    sundayCycle: _sundayCycle,
+    weekdayCycle: _weekdayCycle,
+    dayId: widget.dayId,
+    groupKey: _activeGroupKey,
+    manualCycle: _manualCycle,
+    groupByCelebration: widget.dateStr != null,
+  );
+
+  void _resetDocumentScroll() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) _scrollController.jumpTo(0);
     });
   }
 
-  _TabState _buildTabState(
-    List<ParsedReading> readings, {
-    required String sundayCycle,
-    required String weekdayCycle,
-  }) {
-    TabController? tc;
-    List<String> tabs = [];
-    bool sundayMode = false;
-    Map<String, ParsedReading?> byYear = {};
-
-    tabs = availableCyclesForGroup(readings);
-    for (final reading in readings) {
-      final cycle = normalizeReadingCycle(reading.year);
-      if (cycle.isNotEmpty) byYear[cycle] = reading;
-    }
-    sundayMode = tabs.any(const {'A', 'B', 'C'}.contains);
-    if (tabs.length > 1) {
-      tc = TabController(length: tabs.length, vsync: this);
-      final desired = sundayMode ? sundayCycle : weekdayCycle;
-      final idx = tabs.indexOf(desired);
-      if (idx >= 0) tc.index = idx;
-    }
-
-    return _TabState(
-      tabs: tabs,
-      controller: tc,
-      sundayMode: sundayMode,
-      byYear: byYear,
-    );
+  void _selectManualCycle(String? cycle) {
+    if (_manualCycle == cycle) return;
+    setState(() => _manualCycle = cycle);
+    _resetDocumentScroll();
   }
-
-  Widget _celebrationPicker(BuildContext context) {
-    if (_groups.length <= 1) return const SizedBox.shrink();
-    final active = _groups.firstWhere(
-      (g) => g.key == _activeGroupKey,
-      orElse: () => _groups.first,
-    );
-    final reader = ReaderTheme.of(context);
-    final cs = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: GlassSurface(
-        style: GlassStyle.soft,
-        seasonColor: _readingColor(),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'НА ГЭТЫ ДЗЕНЬ',
-                      style: reader
-                          .referenceStyle(11)
-                          .copyWith(letterSpacing: 1.1),
-                    ),
-                  ),
-                  Text(
-                    'Варыянтаў: ${_groups.length}',
-                    style: reader.referenceStyle(11),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () => setState(
-                  () =>
-                      _celebrationPickerExpanded = !_celebrationPickerExpanded,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: reader.rubricSoft,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(child: _celebrationLabel(active, reader)),
-                      AnimatedRotation(
-                        turns: _celebrationPickerExpanded ? 0.5 : 0,
-                        duration: const Duration(milliseconds: 180),
-                        child: PhosphorIcon(
-                          PhosphorIconsRegular.caretDown,
-                          size: 18,
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOutCubic,
-              child: _celebrationPickerExpanded
-                  ? Column(
-                      children: [
-                        const SizedBox(height: 6),
-                        for (final group in _groups)
-                          if (group.key != active.key)
-                            Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(10),
-                                onTap: () => _selectCelebrationGroup(group.key),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 10,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: _celebrationLabel(group, reader),
-                                      ),
-                                      PhosphorIcon(
-                                        PhosphorIconsRegular.caretRight,
-                                        size: 18,
-                                        color: cs.outline,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _celebrationLabel(ReadingCelebrationGroup group, ReaderTheme reader) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            group.label,
-            style: reader.body(15).copyWith(fontWeight: FontWeight.w600),
-          ),
-          Text(_groupMeta(group), style: reader.referenceStyle(12)),
-        ],
-      );
 
   Widget _menuLeading() {
     final navigation = AppNavigationScope.maybeOf(context);
@@ -406,55 +197,16 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     );
   }
 
-  ParsedReading? _readingForTab(String year) {
-    final docs = _activeGroupDocuments();
-    if (_isSundayMode) {
-      final reading = _byYear[year];
-      if (reading != null && readingHasVisibleContent(reading)) return reading;
-    }
-    final forYear = docs
-        .where((r) => normalizeReadingCycle(r.year) == year)
-        .toList();
-    return pickReadingForCycle(forYear.isNotEmpty ? forYear : docs, year);
-  }
-
-  ParsedReading _displayReading() {
-    final docs = _activeGroupDocuments();
-    final cycles = availableCyclesForGroup(docs);
-    final desired = cycles.any(const {'A', 'B', 'C'}.contains)
-        ? _sundayCycle
-        : _weekdayCycle;
-    return pickReadingForCycle(docs, desired) ??
-        docs.firstWhere(readingHasVisibleContent, orElse: () => docs.first);
-  }
-
   String _cycleLabel(String cycle) => switch (cycle) {
     '1' => 'I',
     '2' => 'II',
     _ => cycle,
   };
 
-  String _groupMeta(ReadingCelebrationGroup group) {
-    final cycles = availableCyclesForGroup(group.documents);
-    if (cycles.isNotEmpty) {
-      return 'Цыклы ${cycles.map(_cycleLabel).join(', ')}';
-    }
-    final reading = group.documents.first;
-    if ((reading.date ?? '').isNotEmpty) {
-      return 'Уласныя чытанні святкавання';
-    }
-    if ((reading.feast ?? '').isNotEmpty) return 'Уласныя чытанні свята';
-    return 'Чытанні літургічнага перыяду';
-  }
-
-  Widget _readingsBackdrop({required Widget child}) {
-    return child;
-  }
-
   Color _readingColor() {
     final documents = _activeGroupDocuments();
     if (documents.isEmpty) {
-      return ref.watch(liturgicalSeasonColorProvider);
+      return Theme.of(context).colorScheme.primary;
     }
     final data = documents.first.toMap();
     if (widget.dayId == 'office-for-dead') {
@@ -465,9 +217,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       fallbackPeriodType: documents.first.periodType ?? 'ordinary',
     );
   }
-
-  double get _contentTopInset =>
-      MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
 
   /// The date is shown in the page header, as in mybrev/ReadingsView.vue.
   String get _title {
@@ -526,332 +275,192 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     child: child,
   );
 
-  Future<void> _pickDate() async {
-    final current = DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
-    final picked = await showAmbientDatePicker(
-      context: context,
-      initialDate: current,
-      seasonColor: _readingColor(),
-    );
-    if (!mounted || picked == null) return;
+  DateTime get _currentDate =>
+      DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
+
+  void _openDate(DateTime date) {
+    final normalized = DateUtils.dateOnly(date);
     AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
-    context.go(readingsRouteForContext(date: picked));
+    ref.read(readingsBranchStateProvider.notifier).state = ref
+        .read(readingsBranchStateProvider)
+        .copyWith(date: normalized, clearLiturgicalKey: true, clearDayId: true);
+    context.go(readingsRouteForContext(date: normalized));
   }
 
-  List<Widget> _dateActions({bool includeTextScale = false}) => [
-    IconButton(
-      key: const Key('readings-date-action'),
-      tooltip: 'Выбраць дату',
-      onPressed: _pickDate,
-      icon: const PhosphorIcon(PhosphorIconsRegular.calendarBlank, size: 21),
-    ),
-    IconButton(
-      key: const Key('readings-advanced-picker-action'),
-      tooltip: 'Знайсці літургічны дзень',
-      onPressed: () => context.push('/readings/picker?mode=readings'),
-      icon: const PhosphorIcon(
-        PhosphorIconsRegular.listMagnifyingGlass,
-        size: 21,
+  Future<void> _showDateActions() async {
+    final date = _currentDate;
+    final action = await showModalBottomSheet<_ReadingsDateAction>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      builder: (context) => const _ReadingsDateSheet(),
+    );
+    if (!mounted || action == null) return;
+    switch (action) {
+      case _ReadingsDateAction.today:
+        _openDate(DateTime.now());
+        return;
+      case _ReadingsDateAction.previous:
+        final target = date.subtract(const Duration(days: 1));
+        if (!target.isBefore(kCalendarFirstDate)) _openDate(target);
+        return;
+      case _ReadingsDateAction.next:
+        final target = date.add(const Duration(days: 1));
+        if (!target.isAfter(kCalendarLastDate)) _openDate(target);
+        return;
+      case _ReadingsDateAction.calendar:
+        final picked = await showAmbientDatePicker(
+          context: context,
+          initialDate: date,
+          seasonColor: _readingColor(),
+        );
+        if (mounted && picked != null) _openDate(picked);
+        return;
+      case _ReadingsDateAction.advanced:
+        context.push('/readings/picker?mode=readings');
+        return;
+    }
+  }
+
+  bool get _hasOptions {
+    final selection = _selection;
+    return selection.groups.length > 1 ||
+        availableCyclesForGroup(selection.documents).length > 1;
+  }
+
+  Future<void> _showOptions() async {
+    final selection = _selection;
+    final cycles = availableCyclesForGroup(selection.documents);
+    await showModalBottomSheet<void>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      builder: (sheetContext) => _ReadingsOptionsSheet(
+        groups: selection.groups,
+        activeGroupKey: selection.activeGroupKey,
+        cycles: cycles,
+        automaticCycle: selection.automaticCycle,
+        manualCycle: _manualCycle,
+        onGroupSelected: (key) {
+          Navigator.pop(sheetContext);
+          _selectCelebrationGroup(key);
+        },
+        onCycleSelected: (cycle) {
+          Navigator.pop(sheetContext);
+          _selectManualCycle(cycle);
+        },
       ),
-    ),
-    if (includeTextScale) const TextScaleControl(),
-  ];
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final title = _title;
     final seasonColor = _readingColor();
-
-    // Loading
+    Widget document;
+    String contextTitle = _title;
     if (_loading) {
-      return Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar.text(
-          title,
-          leading: _menuLeading(),
-          actions: _dateActions(),
-        ),
-        body: const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Загрузка чытанняў...'),
-            ],
-          ),
-        ),
+      document = const _ReadingsStatus(
+        icon: null,
+        title: 'Загрузка чытанняў...',
+        loading: true,
       );
+    } else if (_error != null) {
+      document = _ReadingsStatus(
+        icon: PhosphorIconsLight.warning,
+        title: 'Памылка загрузкі чытанняў',
+        message: _error,
+        actionLabel: 'Паўтарыць',
+        onAction: _load,
+      );
+    } else if (_readings.isEmpty) {
+      document = _ReadingsStatus(
+        icon: PhosphorIconsLight.bookOpen,
+        title: 'Чытанні для гэтага дня не знойдзены',
+        message: 'Магчыма, тэкст яшчэ не загружаны на гэтую прыладу.',
+        actionLabel: 'Абнавіць',
+        onAction: () => _load(forceRefresh: true),
+      );
+    } else {
+      final selection = _selection;
+      final reading = selection.reading;
+      contextTitle =
+          selection.groups
+              .where((group) => group.key == selection.activeGroupKey)
+              .firstOrNull
+              ?.label ??
+          reading?.title ??
+          _title;
+      document = reading == null
+          ? const _ReadingsStatus(
+              icon: PhosphorIconsLight.bookOpen,
+              title: 'Тэкст чытання не знойдзены',
+            )
+          : _ReadingBody(
+              key: ValueKey(
+                'reading-document-${reading.id}-${_manualCycle ?? 'auto'}',
+              ),
+              reading: reading,
+              onRefresh: () => _load(forceRefresh: true),
+            );
     }
 
-    // Error
-    if (_error != null) {
-      final cs = Theme.of(context).colorScheme;
-      return Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
+    final manualLabel = _manualCycle == null
+        ? null
+        : 'Цыкл ${_cycleLabel(_manualCycle!)} · зменены';
+    final today = DateUtils.isSameDay(_currentDate, DateTime.now());
+    final hasOraReturn =
+        AppNavigationScope.maybeOf(context)?.shellState.canReturnToOra() ??
+        false;
+    return _trackScroll(
+      ReaderScaffold(
+        scrollController: _scrollController,
+        scrollKey: const PageStorageKey('readings-root-scroll'),
+        semanticLabel: 'Чытанні дня',
+        seasonColor: seasonColor,
+        chromeMode: ReaderChromeMode.full,
         drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar.text(
-          title,
-          leading: _menuLeading(),
-          actions: _dateActions(),
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PhosphorIcon(
-                  PhosphorIconsLight.warning,
-                  size: 56,
-                  color: cs.onSurfaceVariant,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Памылка загрузкі чытанняў',
-                  style: TextStyle(color: cs.onSurface),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _error!,
-                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
-                  textAlign: TextAlign.center,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 20),
-                FilledButton.icon(
-                  onPressed: _load,
-                  icon: const PhosphorIcon(
-                    PhosphorIconsRegular.arrowsClockwise,
-                    size: 18,
-                  ),
-                  label: const Text('Паўтарыць'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    // No readings
-    if (_readings.isEmpty) {
-      final cs = Theme.of(context).colorScheme;
-      return Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar.text(
-          title,
-          leading: _menuLeading(),
-          actions: _dateActions(),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PhosphorIcon(
-                PhosphorIconsLight.bookOpen,
-                size: 56,
-                color: cs.onSurfaceVariant,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Чытанні для гэтага дня не знойдзены',
-                style: TextStyle(color: cs.onSurface),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Магчыма, яны яшчэ не дададзены ў базу даных',
-                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: () => _load(forceRefresh: true),
-                icon: const PhosphorIcon(
-                  PhosphorIconsRegular.arrowsClockwise,
-                  size: 18,
-                ),
-                label: const Text('Абнавіць'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Multiple year variants — tabs
-    if (_tabs.length > 1 && _tabController != null) {
-      return Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar(
-          title: Text(title),
-          leading: _menuLeading(),
-          actions: _dateActions(includeTextScale: true),
-        ),
-        body: _trackScroll(
-          _readingsBackdrop(
-            child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      SizedBox(height: _contentTopInset),
-                      _ReadingsPageHeading(
-                        dateStr: widget.dateStr,
-                        seasonColor: seasonColor,
-                      ),
-                      _celebrationPicker(context),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                        child: GlassSurface(
-                          style: GlassStyle.soft,
-                          seasonColor: seasonColor,
-                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'ЛІТУРГІЧНЫ ЦЫКЛ',
-                                style: ReaderTheme.of(context)
-                                    .referenceStyle(11)
-                                    .copyWith(letterSpacing: 1.1),
-                              ),
-                              Text(
-                                'Актуальны на гэту дату адкрыты аўтаматычна',
-                                style: ReaderTheme.of(
-                                  context,
-                                ).referenceStyle(12),
-                              ),
-                              TabBar(
-                                controller: _tabController,
-                                tabs: _tabs
-                                    .map(
-                                      (cycle) => Tab(text: _cycleLabel(cycle)),
-                                    )
-                                    .toList(),
-                                labelColor: ReaderTheme.of(context).rubric,
-                                unselectedLabelColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                                indicatorColor: ReaderTheme.of(context).rubric,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              body: TabBarView(
-                controller: _tabController,
-                children: _tabs.map((y) {
-                  final reading = _readingForTab(y);
-                  if (reading == null) {
-                    final cs = Theme.of(context).colorScheme;
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          PhosphorIcon(
-                            PhosphorIconsLight.bookOpen,
-                            size: 48,
-                            color: cs.onSurfaceVariant,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Чытанні для году $y не знойдзены',
-                            style: TextStyle(color: cs.onSurface),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return _ReadingBody(
-                    reading: reading,
-                    dateStr: widget.dateStr,
-                    seasonColor: seasonColor,
-                    compactTop: true,
-                    onRefresh: () => _load(forceRefresh: true),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Single reading
-    final single = _displayReading();
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      drawer: const AppNavigationDrawer(),
-      appBar: AdaptiveAppBar(
-        title: Text(title),
         leading: _menuLeading(),
-        actions: _dateActions(includeTextScale: true),
-      ),
-      body: _trackScroll(
-        _readingsBackdrop(
-          child: _ReadingBody(
-            reading: single,
-            dateStr: widget.dateStr,
-            seasonColor: seasonColor,
-            onRefresh: () => _load(forceRefresh: true),
-            celebrationPicker: _groups.length > 1
-                ? _celebrationPicker(context)
-                : null,
+        actions: const [TextScaleControl()],
+        secondaryActions: [
+          ReaderSecondaryAction(
+            label: 'Рэжым чытання',
+            icon: Icons.fullscreen_rounded,
+            onSelected: () =>
+                ReaderChromeModeScope.maybeControllerOf(context)?.value =
+                    ReaderChromeMode.hidden,
           ),
+        ],
+        onBack: hasOraReturn
+            ? AppNavigationScope.maybeOf(context)?.returnToOra
+            : null,
+        contextHeader: _ReadingsContextHeader(
+          title: contextTitle,
+          dateLabel: _formatReadingsDate(widget.dateStr, widget.liturgicalKey),
+          seasonColor: seasonColor,
+          manualCycleLabel: manualLabel,
+          showToday: widget.dateStr != null && !today,
+          showOptions: !_loading && _error == null && _hasOptions,
+          onDateTap: _showDateActions,
+          onToday: () => _openDate(DateTime.now()),
+          onOptions: _showOptions,
         ),
+        content: document,
       ),
     );
   }
 }
 
-class _TabState {
-  final List<String> tabs;
-  final TabController? controller;
-  final bool sundayMode;
-  final Map<String, ParsedReading?> byYear;
+enum _ReadingsDateAction { today, previous, next, calendar, advanced }
 
-  const _TabState({
-    required this.tabs,
-    required this.controller,
-    required this.sundayMode,
-    required this.byYear,
-  });
-}
-
-// ---------------------------------------------------------------------------
-
-class _ReadingsPageHeading extends StatelessWidget {
-  final String? dateStr;
-  final Color seasonColor;
-
-  const _ReadingsPageHeading({
-    required this.dateStr,
-    required this.seasonColor,
-  });
-
-  static const _weekdays = {
-    1: 'нядзеля',
-    2: 'панядзелак',
-    3: 'аўторак',
-    4: 'серада',
-    5: 'чацвер',
-    6: 'пятніца',
-    7: 'субота',
-  };
-  static const _months = [
+String _formatReadingsDate(String? dateStr, String? liturgicalKey) {
+  if (liturgicalKey != null) return 'Літургічны кантэкст';
+  final date = DateTime.tryParse(dateStr ?? '');
+  if (date == null) return 'Дата не вызначана';
+  const months = [
     '',
     'студзеня',
     'лютага',
@@ -866,49 +475,121 @@ class _ReadingsPageHeading extends StatelessWidget {
     'лістапада',
     'снежня',
   ];
+  return '${date.day} ${months[date.month]} ${date.year}';
+}
 
-  String? get formattedDate {
-    final date = DateTime.tryParse(dateStr ?? '');
-    if (date == null) return null;
-    final dayOfWeek = date.weekday == DateTime.sunday ? 1 : date.weekday + 1;
-    final prefix = DateUtils.isSameDay(date, DateTime.now()) ? 'Сёння, ' : '';
-    return '$prefix${_weekdays[dayOfWeek]}, '
-        '${date.day} ${_months[date.month]} ${date.year}';
-  }
+String _readingsCycleLabel(String cycle) => switch (cycle) {
+  '1' => 'I',
+  '2' => 'II',
+  _ => cycle,
+};
+
+class _ReadingsContextHeader extends StatelessWidget {
+  const _ReadingsContextHeader({
+    required this.title,
+    required this.dateLabel,
+    required this.seasonColor,
+    required this.showToday,
+    required this.showOptions,
+    required this.onDateTap,
+    required this.onToday,
+    required this.onOptions,
+    this.manualCycleLabel,
+  });
+
+  final String title;
+  final String dateLabel;
+  final Color seasonColor;
+  final String? manualCycleLabel;
+  final bool showToday;
+  final bool showOptions;
+  final VoidCallback onDateTap;
+  final VoidCallback onToday;
+  final VoidCallback onOptions;
 
   @override
   Widget build(BuildContext context) {
-    final reader = ReaderTheme.of(context);
+    final cs = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 6, 12, 22),
+      padding: const EdgeInsets.fromLTRB(22, 8, 22, 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Чытанні', style: reader.displayTitle(36)),
-          if (formattedDate case final date?) ...[
-            const SizedBox(height: 9),
-            Row(
-              children: [
-                Container(
-                  width: 9,
-                  height: 9,
-                  decoration: BoxDecoration(
-                    color: seasonColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 9),
-                Expanded(
-                  child: Text(
-                    date,
-                    style: reader
-                        .referenceStyle(14)
-                        .copyWith(
+          Text('Чытанні', style: ReaderTheme.of(context).displayTitle(36)),
+          const SizedBox(height: 10),
+          Semantics(
+            button: true,
+            label: 'Змяніць дату: $dateLabel',
+            child: InkWell(
+              key: const Key('readings-date-action'),
+              borderRadius: BorderRadius.circular(12),
+              onTap: onDateTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 7),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 18,
+                      color: seasonColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        dateLabel,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: seasonColor,
                           fontWeight: FontWeight.w700,
                         ),
-                  ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: seasonColor),
+                  ],
                 ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              height: 1.2,
+            ),
+          ),
+          if (manualCycleLabel != null) ...[
+            const SizedBox(height: 7),
+            Text(
+              manualCycleLabel!,
+              key: const Key('readings-manual-cycle-marker'),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: cs.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+          if (showToday || showOptions) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (showToday)
+                  TextButton.icon(
+                    key: const Key('readings-today-action'),
+                    onPressed: onToday,
+                    icon: const Icon(Icons.today_rounded, size: 18),
+                    label: const Text('Сёння'),
+                  ),
+                if (showOptions)
+                  OutlinedButton.icon(
+                    key: const Key('readings-options-action'),
+                    onPressed: onOptions,
+                    icon: const Icon(Icons.tune_rounded, size: 18),
+                    label: const Text('Варыянты'),
+                  ),
               ],
             ),
           ],
@@ -918,249 +599,338 @@ class _ReadingsPageHeading extends StatelessWidget {
   }
 }
 
+class _ReadingsDateSheet extends StatelessWidget {
+  const _ReadingsDateSheet();
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 620, maxHeight: 620),
+    child: ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+      children: const [
+        _ReadingsDateTile(
+          Icons.today_rounded,
+          'Сёння',
+          _ReadingsDateAction.today,
+        ),
+        _ReadingsDateTile(
+          Icons.arrow_back_rounded,
+          'Папярэдні дзень',
+          _ReadingsDateAction.previous,
+        ),
+        _ReadingsDateTile(
+          Icons.arrow_forward_rounded,
+          'Наступны дзень',
+          _ReadingsDateAction.next,
+        ),
+        Divider(),
+        _ReadingsDateTile(
+          Icons.calendar_month_rounded,
+          'Выбраць дату',
+          _ReadingsDateAction.calendar,
+        ),
+        _ReadingsDateTile(
+          Icons.search_rounded,
+          'Знайсці літургічны дзень / свята',
+          _ReadingsDateAction.advanced,
+        ),
+      ],
+    ),
+  );
+}
+
+class _ReadingsDateTile extends StatelessWidget {
+  const _ReadingsDateTile(this.icon, this.label, this.action);
+  final IconData icon;
+  final String label;
+  final _ReadingsDateAction action;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    minTileHeight: 52,
+    leading: Icon(icon),
+    title: Text(label),
+    onTap: () => Navigator.pop(context, action),
+  );
+}
+
+class _ReadingsOptionsSheet extends StatelessWidget {
+  const _ReadingsOptionsSheet({
+    required this.groups,
+    required this.activeGroupKey,
+    required this.cycles,
+    required this.automaticCycle,
+    required this.manualCycle,
+    required this.onGroupSelected,
+    required this.onCycleSelected,
+  });
+
+  final List<ReadingCelebrationGroup> groups;
+  final String? activeGroupKey;
+  final List<String> cycles;
+  final String automaticCycle;
+  final String? manualCycle;
+  final ValueChanged<String> onGroupSelected;
+  final ValueChanged<String?> onCycleSelected;
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 620, maxHeight: 680),
+    child: ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      children: [
+        Text(
+          'Варыянты чытанняў',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        if (groups.length > 1) ...[
+          const SizedBox(height: 18),
+          const _OptionsHeading('Святкаванне / набор чытанняў'),
+          for (final group in groups)
+            ListTile(
+              selected: group.key == activeGroupKey,
+              title: Text(group.label),
+              subtitle: Text(_groupCycles(group.documents)),
+              trailing: group.key == activeGroupKey
+                  ? const Icon(Icons.check_rounded)
+                  : null,
+              onTap: () => onGroupSelected(group.key),
+            ),
+        ],
+        if (cycles.length > 1) ...[
+          const SizedBox(height: 18),
+          const _OptionsHeading('Цыкл'),
+          ListTile(
+            key: const Key('readings-cycle-auto'),
+            selected: manualCycle == null,
+            title: const Text('Па календары'),
+            subtitle: Text('Цыкл ${_readingsCycleLabel(automaticCycle)}'),
+            trailing: manualCycle == null
+                ? const Icon(Icons.check_rounded)
+                : null,
+            onTap: () => onCycleSelected(null),
+          ),
+          for (final cycle in cycles)
+            ListTile(
+              key: ValueKey('readings-cycle-$cycle'),
+              selected: cycle == manualCycle,
+              title: Text('Цыкл ${_readingsCycleLabel(cycle)}'),
+              trailing: cycle == manualCycle
+                  ? const Icon(Icons.check_rounded)
+                  : null,
+              onTap: () => onCycleSelected(cycle),
+            ),
+        ],
+      ],
+    ),
+  );
+
+  static String _groupCycles(List<ParsedReading> documents) {
+    final cycles = availableCyclesForGroup(documents);
+    if (cycles.isEmpty) return 'Уласны набор чытанняў';
+    return 'Цыклы ${cycles.map(_readingsCycleLabel).join(', ')}';
+  }
+}
+
+class _OptionsHeading extends StatelessWidget {
+  const _OptionsHeading(this.label);
+  final String label;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    child: Text(
+      label.toUpperCase(),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.05,
+      ),
+    ),
+  );
+}
+
+class _ReadingsStatus extends StatelessWidget {
+  const _ReadingsStatus({
+    required this.icon,
+    required this.title,
+    this.message,
+    this.loading = false,
+    this.actionLabel,
+    this.onAction,
+  });
+  final PhosphorIconData? icon;
+  final String title;
+  final String? message;
+  final bool loading;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 360,
+    child: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (loading)
+            const CircularProgressIndicator()
+          else if (icon != null)
+            PhosphorIcon(
+              icon!,
+              size: 52,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          const SizedBox(height: 14),
+          Text(title, textAlign: TextAlign.center),
+          if (message != null) ...[
+            const SizedBox(height: 7),
+            Text(
+              message!,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+          if (onAction != null && actionLabel != null) ...[
+            const SizedBox(height: 18),
+            FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
 // ---------------------------------------------------------------------------
 
 class _ReadingBody extends ConsumerWidget {
   final ParsedReading reading;
-  final String? dateStr;
-  final Color seasonColor;
-  final bool compactTop;
-  final Widget? celebrationPicker;
   final VoidCallback? onRefresh;
-  const _ReadingBody({
-    required this.reading,
-    this.dateStr,
-    required this.seasonColor,
-    this.compactTop = false,
-    this.celebrationPicker,
-    this.onRefresh,
-  });
+  const _ReadingBody({super.key, required this.reading, this.onRefresh});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reader = ReaderTheme.of(context);
-    final topPad = compactTop
-        ? 12.0
-        : MediaQuery.paddingOf(context).top + kFloatingReaderAppBarContentInset;
     final hasContent = readingHasVisibleContent(reading);
 
     return ReadingScaffold(
-      builder: (context, textStyle) => LayoutBuilder(
-        builder: (context, constraints) => Stack(
-          children: [
-            SingleChildScrollView(
-              primary: compactTop ? true : null,
-              padding: EdgeInsets.fromLTRB(
-                16,
-                topPad,
-                16,
-                104 + MediaQuery.viewPaddingOf(context).bottom,
+      builder: (context, textStyle) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!reading.hasReadings) ...[
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (!compactTop)
-                      _ReadingsPageHeading(
-                        dateStr: dateStr,
-                        seasonColor: seasonColor,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PhosphorIcon(
+                    PhosphorIconsRegular.info,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
+                      style: TextStyle(
+                        fontSize: (textStyle.fontSize ?? 16) * 0.875,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSecondaryContainer,
                       ),
-                    if (celebrationPicker != null) ...[
-                      celebrationPicker!,
-                      const SizedBox(height: 8),
-                    ],
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if ((reading.title ?? '').trim().isNotEmpty) ...[
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(color: reader.border),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'ЛІТУРГІЯ СЛОВА',
-                                  style: reader
-                                      .referenceStyle(11)
-                                      .copyWith(letterSpacing: 1.2),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  reading.title!,
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(
-                                        fontFamily: textStyle.fontFamily,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.28,
-                                      ),
-                                ),
-                                if ((reading.year ?? '').isNotEmpty) ...[
-                                  const SizedBox(height: 12),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 9,
-                                      vertical: 5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: reader.rubricSoft,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      'Цыкл ${reading.year == '1'
-                                          ? 'I'
-                                          : reading.year == '2'
-                                          ? 'II'
-                                          : reading.year}',
-                                      style: reader
-                                          .referenceStyle(11)
-                                          .copyWith(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                        ],
-                        if (!reading.hasReadings) ...[
-                          Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.secondaryContainer,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                PhosphorIcon(
-                                  PhosphorIconsRegular.info,
-                                  size: 18,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSecondaryContainer,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Успамін / апцыянальны памятны дзень. Чытанні звычайнага дня або commune sanctorum.',
-                                    style: TextStyle(
-                                      fontSize:
-                                          (textStyle.fontSize ?? 16) * 0.875,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSecondaryContainer,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        if (!hasContent) ...[
-                          const SizedBox(height: 24),
-                          Center(
-                            child: Column(
-                              children: [
-                                PhosphorIcon(
-                                  PhosphorIconsLight.bookOpen,
-                                  size: 48,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Тэкст чытання пакуль не загружаны',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                if (onRefresh != null) ...[
-                                  const SizedBox(height: 16),
-                                  FilledButton.icon(
-                                    onPressed: onRefresh,
-                                    icon: const PhosphorIcon(
-                                      PhosphorIconsRegular.arrowsClockwise,
-                                      size: 18,
-                                    ),
-                                    label: const Text('Абнавіць'),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
-                        if (reading.firstReading != null)
-                          _ReadingSection(
-                            label: reading.hasTwoReadings
-                                ? 'ПЕРШАЕ ЧЫТАННЕ'
-                                : 'ЧЫТАННЕ',
-                            section: reading.firstReading!,
-                            textStyle: textStyle,
-                            reader: reader,
-                          ),
-                        if (reading.psalm != null)
-                          _PsalmSection(
-                            psalm: reading.psalm!,
-                            textStyle: textStyle,
-                            reader: reader,
-                          ),
-                        if (reading.reading2 != null)
-                          _ReadingSection(
-                            label: 'ДРУГОЕ ЧЫТАННЕ',
-                            section: reading.reading2!,
-                            textStyle: textStyle,
-                            reader: reader,
-                          ),
-                        if (reading.alleluia != null)
-                          _AlleluiaSection(
-                            alleluia: reading.alleluia!,
-                            textStyle: textStyle,
-                            reader: reader,
-                          ),
-                        if (reading.gospel != null)
-                          _ReadingSection(
-                            label: 'ЕВАНГЕЛЛЕ',
-                            section: reading.gospel!,
-                            textStyle: textStyle,
-                            reader: reader,
-                          ),
-                        const SizedBox(height: 32),
-                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
+          if (!hasContent) ...[
+            const SizedBox(height: 24),
+            Center(
+              child: Column(
+                children: [
+                  PhosphorIcon(
+                    PhosphorIconsLight.bookOpen,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Тэкст чытання пакуль не загружаны',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (onRefresh != null) ...[
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: onRefresh,
+                      icon: const PhosphorIcon(
+                        PhosphorIconsRegular.arrowsClockwise,
+                        size: 18,
+                      ),
+                      label: const Text('Абнавіць'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+          if (reading.firstReading != null)
+            _ReadingSection(
+              label: reading.hasTwoReadings ? 'ПЕРШАЕ ЧЫТАННЕ' : 'ЧЫТАННЕ',
+              section: reading.firstReading!,
+              textStyle: textStyle,
+              reader: reader,
+            ),
+          if (reading.psalm != null)
+            _PsalmSection(
+              psalm: reading.psalm!,
+              textStyle: textStyle,
+              reader: reader,
+            ),
+          if (reading.reading2 != null)
+            _ReadingSection(
+              label: 'ДРУГОЕ ЧЫТАННЕ',
+              section: reading.reading2!,
+              textStyle: textStyle,
+              reader: reader,
+            ),
+          if (reading.alleluia != null)
+            _AlleluiaSection(
+              alleluia: reading.alleluia!,
+              textStyle: textStyle,
+              reader: reader,
+            ),
+          if (reading.gospel != null)
+            _ReadingSection(
+              label: 'ЕВАНГЕЛЛЕ',
+              section: reading.gospel!,
+              textStyle: textStyle,
+              reader: reader,
+            ),
+          const SizedBox(height: 32),
+        ],
       ),
     );
   }

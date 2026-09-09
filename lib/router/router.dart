@@ -31,7 +31,7 @@ const readingsRootRoute = AppRouteDescriptor(
   id: 'readings.root',
   branch: AppBranch.readings,
   defaultChromeMode: ReaderChromeMode.full,
-  topChromeOwner: TopChromeOwner.legacy,
+  topChromeOwner: TopChromeOwner.reader,
   isBranchRoot: true,
 );
 const prayerbookRootRoute = AppRouteDescriptor(

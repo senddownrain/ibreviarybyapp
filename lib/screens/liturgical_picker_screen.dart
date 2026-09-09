@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart' as lit_calendar;
@@ -30,7 +31,9 @@ class _LiturgicalPickerScreenState
   @override
   void initState() {
     super.initState();
-    _year = ref.read(selectedDateProvider).year;
+    _year = widget.isReadingsMode
+        ? ref.read(readingsBranchStateProvider).date.year
+        : ref.read(selectedDateProvider).year;
     _ensureCalendarYear();
   }
 

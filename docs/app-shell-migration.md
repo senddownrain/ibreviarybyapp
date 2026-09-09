@@ -7,6 +7,10 @@
 > Update 2026-09-09: Stage 2 AppShell реализован, а Stage 3 Hours root завершён.
 > Текущий disposition и следующий migration boundary описаны в
 > [hours-root-migration.md](hours-root-migration.md).
+>
+> Update 2026-09-09: Stage 4 Readings root также завершён. Реализация и
+> сохранённые compatibility boundaries описаны в
+> [readings-root-migration.md](readings-root-migration.md).
 
 Stage 2 меняет навигационный каркас. Stage 3+ мигрируют содержимое branches по одному. Обязательное промежуточное состояние: новая Ora и немигрированные Readings / Prayer / Bible работают под одним Shell.
 
