@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -15,7 +14,6 @@ class AppNavigationDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final categories = ref.watch(prayerMenuCategoriesProvider);
-    final selectedDate = ref.watch(selectedDateProvider);
     final location = GoRouterState.of(context).uri.path;
 
     void navigate(String path) {
@@ -26,11 +24,6 @@ class AppNavigationDrawer extends ConsumerWidget {
     void openDetail(String path) {
       Navigator.pop(context);
       context.push(path);
-    }
-
-    void showAllPrayers() {
-      ref.read(prayersFilterProvider.notifier).clearFilters();
-      navigate('/prayers');
     }
 
     return Drawer(
@@ -58,37 +51,14 @@ class AppNavigationDrawer extends ConsumerWidget {
                       bottom: MediaQuery.viewPaddingOf(context).bottom + 8,
                     ),
                     children: [
-                      const _SectionLabel('Асноўнае'),
-                      _DrawerItem(
-                        icon: PhosphorIconsLight.cross,
-                        title: 'Літургія гадзін',
-                        selected: location == '/',
-                        onTap: () => navigate('/'),
-                      ),
-                      _DrawerItem(
-                        icon: PhosphorIconsRegular.bookOpenText,
-                        title: 'Чытанні',
-                        selected: location.startsWith('/readings'),
-                        onTap: () =>
-                            openDetail('/readings/${_datePath(selectedDate)}'),
-                      ),
+                      const _SectionLabel('Хуткі доступ'),
                       _DrawerItem(
                         icon: PhosphorIconsRegular.church,
                         title: 'Святая Імша',
-                        selected: location == '/prayer/$_kMassOrderPrayerId',
-                        onTap: () => openDetail('/prayer/$_kMassOrderPrayerId'),
-                      ),
-                      _DrawerItem(
-                        icon: PhosphorIconsRegular.bookOpen,
-                        title: 'Біблія',
-                        selected: location.startsWith('/bible'),
-                        onTap: () => navigate('/bible'),
-                      ),
-                      _DrawerItem(
-                        icon: PhosphorIconsRegular.bookBookmark,
-                        title: 'Малітвы',
-                        selected: location == '/prayers',
-                        onTap: showAllPrayers,
+                        selected:
+                            location == '/prayers/prayer/$_kMassOrderPrayerId',
+                        onTap: () =>
+                            openDetail('/prayers/prayer/$_kMassOrderPrayerId'),
                       ),
                       const _SectionLabel('Малітоўныя зборнікі', spaced: true),
                       _DrawerItem(
@@ -100,8 +70,8 @@ class AppNavigationDrawer extends ConsumerWidget {
                       _DrawerItem(
                         icon: PhosphorIconsRegular.notepad,
                         title: 'Мае малітвы',
-                        selected: location.startsWith('/my-prayers'),
-                        onTap: () => navigate('/my-prayers'),
+                        selected: location.startsWith('/prayers/my'),
+                        onTap: () => navigate('/prayers/my'),
                       ),
                       for (final category in categories)
                         _DrawerItem(
@@ -132,13 +102,13 @@ class AppNavigationDrawer extends ConsumerWidget {
                         icon: PhosphorIconsRegular.gear,
                         title: 'Налады',
                         selected: location == '/settings',
-                        onTap: () => navigate('/settings'),
+                        onTap: () => openDetail('/settings'),
                       ),
                       _DrawerItem(
                         icon: PhosphorIconsRegular.info,
                         title: 'Інфармацыя',
                         selected: location == '/about',
-                        onTap: () => navigate('/about'),
+                        onTap: () => openDetail('/about'),
                       ),
                     ],
                   ),
@@ -272,8 +242,3 @@ class _DrawerItem extends StatelessWidget {
     );
   }
 }
-
-String _datePath(DateTime date) =>
-    '${date.year.toString().padLeft(4, '0')}-'
-    '${date.month.toString().padLeft(2, '0')}-'
-    '${date.day.toString().padLeft(2, '0')}';

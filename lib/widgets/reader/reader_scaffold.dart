@@ -84,8 +84,11 @@ class ReaderScaffold extends StatelessWidget {
         : MediaQuery.paddingOf(context).top + 76;
 
     void setMode(ReaderChromeMode mode) {
-      if (scopedController != null) scopedController.value = mode;
-      onChromeModeChanged?.call(mode);
+      if (scopedController != null) {
+        scopedController.value = mode;
+      } else {
+        onChromeModeChanged?.call(mode);
+      }
     }
 
     return Scaffold(

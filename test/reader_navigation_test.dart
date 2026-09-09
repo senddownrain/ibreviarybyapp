@@ -9,14 +9,15 @@ void main() {
     );
     final uri = Uri.parse(route);
 
-    expect(uri.path, '/readings/2026-09-09');
+    expect(uri.path, '/readings');
+    expect(uri.queryParameters['date'], '2026-09-09');
     expect(uri.queryParameters['dayId'], 'fixed/peter claver');
   });
 
   test('readings route omits an empty optional day context', () {
     expect(
       readingsRouteForContext(date: DateTime(2026, 9, 9), dayId: '  '),
-      '/readings/2026-09-09',
+      '/readings?date=2026-09-09',
     );
   });
 
@@ -29,10 +30,25 @@ void main() {
     final uri = Uri.parse(route);
 
     expect(uri.pathSegments, [
+      'hours',
       'ora',
       '2026-09-09',
       'fixed/peter claver',
       'laudes',
+    ]);
+  });
+
+  test('Hora route encodes a day id as one path segment', () {
+    final route = horaRouteForContext(
+      date: DateTime(2026, 9, 9),
+      dayId: 'fixed/peter claver',
+    );
+
+    expect(Uri.parse(route).pathSegments, [
+      'hours',
+      'hora',
+      '2026-09-09',
+      'fixed/peter claver',
     ]);
   });
 }

@@ -420,7 +420,7 @@ class _PrayerCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(22),
         onTap: () {
           HapticFeedback.lightImpact();
-          context.push('/prayer/${prayer.id}');
+          context.push('/prayers/prayer/${prayer.id}');
         },
         child: GlassSurface(
           borderRadius: BorderRadius.circular(22),

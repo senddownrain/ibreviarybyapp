@@ -24,6 +24,7 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -369,7 +370,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
               label: 'Поўнаэкраннае чытанне',
               icon: Icons.fullscreen_rounded,
               onSelected: () =>
-                  setState(() => _chromeMode = ReaderChromeMode.hidden),
+                  _requestChromeMode(context, ReaderChromeMode.hidden),
             ),
           ],
           contextHeader: _buildReaderContext(context, day),
@@ -516,14 +517,25 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       actions: [
         TextButton.icon(
           key: const Key('ora-readings-action'),
-          onPressed: () => context.push(
-            readingsRouteForContext(date: widget.date, dayId: widget.dayId),
+          onPressed: () => AppNavigationScope.of(context).openReadingsFromOra(
+            context,
+            date: widget.date,
+            dayId: widget.dayId,
           ),
           icon: const PhosphorIcon(PhosphorIconsRegular.bookOpenText, size: 19),
           label: const Text('Чытанні'),
         ),
       ],
     );
+  }
+
+  void _requestChromeMode(BuildContext context, ReaderChromeMode mode) {
+    final scoped = ReaderChromeModeScope.maybeControllerOf(context);
+    if (scoped != null) {
+      scoped.value = mode;
+    } else {
+      setState(() => _chromeMode = mode);
+    }
   }
 
   Future<void> _changeHour(LiturgicalDay day) async {

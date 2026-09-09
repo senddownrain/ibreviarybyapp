@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
@@ -11,7 +12,10 @@ import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
-import 'package:mybrev_flutter/widgets/bottom_nav.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
+import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
@@ -45,9 +49,9 @@ class ReadingsScreen extends ConsumerStatefulWidget {
 
 class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     with TickerProviderStateMixin {
+  static const double _compactThreshold = 180;
   TabController? _tabController;
-  bool _bottomNavVisible = true;
-  double _scrollDelta = 0;
+  bool _didRequestCompact = false;
 
   bool _loading = true;
   String? _error;
@@ -74,8 +78,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     if (oldWidget.dateStr != widget.dateStr ||
         oldWidget.liturgicalKey != widget.liturgicalKey ||
         oldWidget.dayId != widget.dayId) {
-      _bottomNavVisible = true;
-      _scrollDelta = 0;
+      _didRequestCompact = false;
+      ReaderChromeModeScope.maybeControllerOf(context)?.value =
+          ReaderChromeMode.full;
       _load();
     }
   }
@@ -383,13 +388,23 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         ],
       );
 
-  Widget _menuLeading() => Builder(
-    builder: (context) => IconButton(
-      tooltip: 'Меню',
-      icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
-      onPressed: () => Scaffold.of(context).openDrawer(),
-    ),
-  );
+  Widget _menuLeading() {
+    final navigation = AppNavigationScope.maybeOf(context);
+    if (navigation?.shellState.canReturnToOra() ?? false) {
+      return IconButton(
+        tooltip: 'Вярнуцца да Ora',
+        onPressed: navigation!.returnToOra,
+        icon: const Icon(Icons.arrow_back_rounded),
+      );
+    }
+    return Builder(
+      builder: (scaffoldContext) => IconButton(
+        tooltip: 'Меню',
+        icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
+        onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
+      ),
+    );
+  }
 
   ParsedReading? _readingForTab(String year) {
     final docs = _activeGroupDocuments();
@@ -494,26 +509,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
   }
 
   bool _onScroll(ScrollNotification notification) {
-    if (notification.metrics.axis != Axis.vertical) return false;
-    if (notification.metrics.pixels <= 8) {
-      _scrollDelta = 0;
-      if (!_bottomNavVisible) setState(() => _bottomNavVisible = true);
-      return false;
-    }
-    if (notification is ScrollUpdateNotification) {
-      final delta = notification.scrollDelta;
-      if (delta == null) return false;
-      if (_scrollDelta != 0 && delta.sign != _scrollDelta.sign) {
-        _scrollDelta = 0;
-      }
-      _scrollDelta += delta;
-      if (_scrollDelta > 12 && _bottomNavVisible) {
-        setState(() => _bottomNavVisible = false);
-        _scrollDelta = 0;
-      } else if (_scrollDelta < -12 && !_bottomNavVisible) {
-        setState(() => _bottomNavVisible = true);
-        _scrollDelta = 0;
-      }
+    if (!_didRequestCompact &&
+        notification.metrics.axis == Axis.vertical &&
+        notification.metrics.pixels >= _compactThreshold &&
+        notification is ScrollUpdateNotification &&
+        notification.dragDetails != null) {
+      _didRequestCompact = true;
+      ReaderChromeModeScope.maybeControllerOf(context)?.value =
+          ReaderChromeMode.compact;
     }
     return false;
   }
@@ -523,19 +526,41 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
     child: child,
   );
 
-  Widget _animatedBottomNav(Widget child) =>
-      AutoHidingBottomNavigation(visible: _bottomNavVisible, child: child);
+  Future<void> _pickDate() async {
+    final current = DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
+    final picked = await showAmbientDatePicker(
+      context: context,
+      initialDate: current,
+      seasonColor: _readingColor(),
+    );
+    if (!mounted || picked == null) return;
+    AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
+    context.go(readingsRouteForContext(date: picked));
+  }
+
+  List<Widget> _dateActions({bool includeTextScale = false}) => [
+    IconButton(
+      key: const Key('readings-date-action'),
+      tooltip: 'Выбраць дату',
+      onPressed: _pickDate,
+      icon: const PhosphorIcon(PhosphorIconsRegular.calendarBlank, size: 21),
+    ),
+    IconButton(
+      key: const Key('readings-advanced-picker-action'),
+      tooltip: 'Знайсці літургічны дзень',
+      onPressed: () => context.push('/readings/picker?mode=readings'),
+      icon: const PhosphorIcon(
+        PhosphorIconsRegular.listMagnifyingGlass,
+        size: 21,
+      ),
+    ),
+    if (includeTextScale) const TextScaleControl(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final title = _title;
     final seasonColor = _readingColor();
-    final navigationDate =
-        DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
-    final bottomNav = ReadingsBottomNav(
-      currentDate: navigationDate,
-      showDayArrows: widget.dateStr != null,
-    );
 
     // Loading
     if (_loading) {
@@ -543,8 +568,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
-        bottomNavigationBar: _animatedBottomNav(bottomNav),
+        appBar: AdaptiveAppBar.text(
+          title,
+          leading: _menuLeading(),
+          actions: _dateActions(),
+        ),
         body: const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -565,8 +593,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
-        bottomNavigationBar: _animatedBottomNav(bottomNav),
+        appBar: AdaptiveAppBar.text(
+          title,
+          leading: _menuLeading(),
+          actions: _dateActions(),
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -614,8 +645,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         extendBody: true,
         extendBodyBehindAppBar: true,
         drawer: const AppNavigationDrawer(),
-        appBar: AdaptiveAppBar.text(title, leading: _menuLeading()),
-        bottomNavigationBar: _animatedBottomNav(bottomNav),
+        appBar: AdaptiveAppBar.text(
+          title,
+          leading: _menuLeading(),
+          actions: _dateActions(),
+        ),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -659,9 +693,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
         appBar: AdaptiveAppBar(
           title: Text(title),
           leading: _menuLeading(),
-          actions: const [TextScaleControl()],
+          actions: _dateActions(includeTextScale: true),
         ),
-        bottomNavigationBar: _animatedBottomNav(bottomNav),
         body: _trackScroll(
           _readingsBackdrop(
             child: NestedScrollView(
@@ -765,9 +798,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen>
       appBar: AdaptiveAppBar(
         title: Text(title),
         leading: _menuLeading(),
-        actions: const [TextScaleControl()],
+        actions: _dateActions(includeTextScale: true),
       ),
-      bottomNavigationBar: _animatedBottomNav(bottomNav),
       body: _trackScroll(
         _readingsBackdrop(
           child: _ReadingBody(

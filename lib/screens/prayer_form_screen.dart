@@ -95,7 +95,7 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
       await ref.read(localPrayersProvider.notifier).delete(_original!.id);
       if (mounted) {
         // Pop both the form and the detail screen if we came from there.
-        context.go('/my-prayers');
+        context.go('/prayers/my');
       }
     } finally {
       if (mounted) setState(() => _deleting = false);

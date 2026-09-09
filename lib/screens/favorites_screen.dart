@@ -126,7 +126,7 @@ class _FavoriteTile extends ConsumerWidget {
         ),
         onTap: () {
           HapticFeedback.lightImpact();
-          context.push('/prayer/${prayer.id}');
+          context.push('/prayers/prayer/${prayer.id}');
         },
       ),
     );

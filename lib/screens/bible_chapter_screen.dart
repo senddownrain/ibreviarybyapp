@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -38,7 +39,8 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   final Map<int, String> _highlights = {};
   final Set<int> _selected = {};
   final Map<int, GlobalKey> _verseKeys = {};
-  bool _requestedVerseScheduled = false;
+  int? _requestedVerse;
+  bool _bottomSlotInitialized = false;
 
   String get _highlightKey =>
       'bibleHighlight:${widget.versionId}:${widget.bookId}:${widget.chapter}';
@@ -56,6 +58,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
         oldWidget.bookId != widget.bookId ||
         oldWidget.chapter != widget.chapter) {
       _selected.clear();
+      AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(false);
       _verseKeys.clear();
       _loadState();
     }
@@ -64,12 +67,19 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_requestedVerseScheduled) return;
+    if (!_bottomSlotInitialized) {
+      _bottomSlotInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(false);
+        }
+      });
+    }
     final verse = int.tryParse(
       GoRouterState.of(context).uri.queryParameters['verse'] ?? '',
     );
-    if (verse == null) return;
-    _requestedVerseScheduled = true;
+    if (verse == null || verse == _requestedVerse) return;
+    _requestedVerse = verse;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final target = _verseKeys[verse]?.currentContext;
       if (target != null) {
@@ -115,9 +125,16 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       return Scaffold(
         appBar: AdaptiveAppBar.text('Біблія'),
         body: Center(
-          child: FilledButton(
-            onPressed: () => context.go('/bible'),
-            child: const Text('Адкрыць бібліятэку'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Кніга або раздзел Бібліі не знойдзены.'),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => context.go('/bible'),
+                child: const Text('Адкрыць бібліятэку'),
+              ),
+            ],
           ),
         ),
       );
@@ -128,88 +145,92 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       widget.chapter,
     );
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    return ReadingScaffold(
-      builder: (context, textStyle) => Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar.text(
-          'Біблія',
-          leading: IconButton(
-            tooltip: 'На галоўную',
-            onPressed: () => context.go('/'),
-            icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+    return PopScope<void>(
+      canPop: _selected.isEmpty,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _selected.isNotEmpty) {
+          setState(_selected.clear);
+          AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(false);
+        }
+      },
+      child: ReadingScaffold(
+        builder: (context, textStyle) => Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AdaptiveAppBar.text(
+            'Біблія',
+            actions: const [TextScaleControl()],
           ),
-          actions: const [TextScaleControl()],
-        ),
-        body: Stack(
-          children: [
-            AmbientWash.hero(seasonColor: seasonColor),
-            Positioned.fill(
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(
-                  12,
-                  MediaQuery.paddingOf(context).top +
-                      kFloatingReaderAppBarContentInset +
-                      12,
-                  12,
-                  _selected.isEmpty ? 92 : 164,
-                ),
-                children: [
-                  _toolbar(book),
-                  const SizedBox(height: 14),
-                  _heading(book, seasonColor),
-                  const SizedBox(height: 14),
-                  GlassSurface(
-                    style: GlassStyle.card,
-                    seasonColor: seasonColor,
-                    borderRadius: BorderRadius.circular(26),
-                    padding: const EdgeInsets.fromLTRB(12, 16, 12, 24),
-                    child: verses.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.all(32),
-                            child: Center(
-                              child: Text('У гэтым раздзеле няма тэксту.'),
-                            ),
-                          )
-                        : Column(
-                            children: [
-                              for (final verse in verses)
-                                _VerseRow(
-                                  key: _verseKeys.putIfAbsent(
-                                    verse.verse,
-                                    GlobalKey.new,
-                                  ),
-                                  verseNum: verse.verse,
-                                  text: verse.text,
-                                  textStyle: textStyle,
-                                  highlightColor: _resolvedColor(
-                                    _highlights[verse.verse],
-                                  ),
-                                  selected: _selected.contains(verse.verse),
-                                  onTap: () => _toggleVerse(verse.verse),
-                                ),
-                            ],
-                          ),
+          body: Stack(
+            children: [
+              AmbientWash.hero(seasonColor: seasonColor),
+              Positioned.fill(
+                child: ListView(
+                  padding: EdgeInsets.fromLTRB(
+                    12,
+                    MediaQuery.paddingOf(context).top +
+                        kFloatingReaderAppBarContentInset +
+                        12,
+                    12,
+                    _selected.isEmpty ? 92 : 164,
                   ),
-                ],
+                  children: [
+                    _toolbar(book),
+                    const SizedBox(height: 14),
+                    _heading(book, seasonColor),
+                    const SizedBox(height: 14),
+                    GlassSurface(
+                      style: GlassStyle.card,
+                      seasonColor: seasonColor,
+                      borderRadius: BorderRadius.circular(26),
+                      padding: const EdgeInsets.fromLTRB(12, 16, 12, 24),
+                      child: verses.isEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.all(32),
+                              child: Center(
+                                child: Text('У гэтым раздзеле няма тэксту.'),
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                for (final verse in verses)
+                                  _VerseRow(
+                                    key: _verseKeys.putIfAbsent(
+                                      verse.verse,
+                                      GlobalKey.new,
+                                    ),
+                                    verseNum: verse.verse,
+                                    text: verse.text,
+                                    textStyle: textStyle,
+                                    highlightColor: _resolvedColor(
+                                      _highlights[verse.verse],
+                                    ),
+                                    selected: _selected.contains(verse.verse),
+                                    onTap: () => _toggleVerse(verse.verse),
+                                  ),
+                              ],
+                            ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            if (_selected.isNotEmpty)
-              Positioned(left: 12, right: 12, bottom: 80, child: _colorBar()),
-            Positioned(
-              left: 12,
-              right: 12,
-              bottom: 8,
-              child: _ChapterNavBar(
-                book: book,
-                chapter: widget.chapter,
-                hasPrevious: _relative(-1) != null,
-                hasNext: _relative(1) != null,
-                onPrevious: () => _goRelative(-1),
-                onCurrent: () => _openPicker(book),
-                onNext: () => _goRelative(1),
+              if (_selected.isNotEmpty)
+                Positioned(left: 12, right: 12, bottom: 80, child: _colorBar()),
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 8,
+                child: _ChapterNavBar(
+                  book: book,
+                  chapter: widget.chapter,
+                  hasPrevious: _relative(-1) != null,
+                  hasNext: _relative(1) != null,
+                  onPrevious: () => _goRelative(-1),
+                  onCurrent: () => _openPicker(book),
+                  onNext: () => _goRelative(1),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -326,6 +347,9 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     setState(() {
       if (!_selected.add(verse)) _selected.remove(verse);
     });
+    AppRouteEntryScope.maybeOf(
+      context,
+    )?.showContextualBottomBar(_selected.isNotEmpty);
     if (_selected.contains(verse)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final target = _verseKeys[verse]?.currentContext;
@@ -383,7 +407,10 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Скасаваць выбар',
-          onPressed: () => setState(_selected.clear),
+          onPressed: () {
+            setState(_selected.clear);
+            AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(false);
+          },
           icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 19),
         ),
       ],
@@ -401,6 +428,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       }
       _selected.clear();
     });
+    AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(false);
     await _saveHighlights();
   }
 
@@ -430,9 +458,16 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   }
 
   void _navigate(String bookId, int chapter, {int? verse}) {
-    final query = verse == null ? '' : '?verse=$verse';
-    context.pushReplacement(
-      '/bible/${widget.versionId}/$bookId/$chapter$query',
+    context.replace(
+      Uri(
+        path: '/bible',
+        queryParameters: {
+          'version': widget.versionId,
+          'book': bookId,
+          'chapter': '$chapter',
+          if (verse != null) 'verse': '$verse',
+        },
+      ).toString(),
     );
   }
 
@@ -460,7 +495,16 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       target.chapterCount,
     );
     ref.read(settingsProvider.notifier).setBibleVersion(versionId);
-    context.pushReplacement('/bible/$versionId/${target.id}/$chapter');
+    context.replace(
+      Uri(
+        path: '/bible',
+        queryParameters: {
+          'version': versionId,
+          'book': target.id,
+          'chapter': '$chapter',
+        },
+      ).toString(),
+    );
   }
 
   Future<void> _openPicker(BibleBookInfo currentBook) async {

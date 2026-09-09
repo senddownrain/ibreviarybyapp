@@ -134,8 +134,9 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
                       size: 20,
                     ),
                     label: const Text('Чытанні'),
-                    onPressed: () =>
-                        context.push('/readings/liturgical/$period/$week/$day'),
+                    onPressed: () => context.go(
+                      '/readings?mode=liturgical&period=$period&week=$week&day=$day',
+                    ),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
@@ -151,7 +152,17 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
                     ),
                     label: const Text('Літургія гадзін'),
                     onPressed: dayId != null && targetDateKey != null
-                        ? () => context.push('/hora/$targetDateKey/$dayId')
+                        ? () => context.push(
+                            Uri(
+                              pathSegments: [
+                                '',
+                                'hours',
+                                'hora',
+                                targetDateKey,
+                                dayId,
+                              ],
+                            ).toString(),
+                          )
                         : null,
                   ),
                   if (dayId == null) ...[

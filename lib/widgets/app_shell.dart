@@ -3,206 +3,205 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/providers/connectivity_provider.dart';
+import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
-import 'package:mybrev_flutter/widgets/bottom_nav.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/warmup_bootstrap.dart';
 
 class AppShell extends ConsumerStatefulWidget {
-  final Widget child;
+  const AppShell({
+    super.key,
+    required this.navigationShell,
+    required this.shellState,
+    required this.activeBranch,
+  });
 
-  const AppShell({super.key, required this.child});
+  final StatefulNavigationShell navigationShell;
+  final AppShellState shellState;
+  final AppBranch activeBranch;
 
   @override
   ConsumerState<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends ConsumerState<AppShell> {
-  bool _bottomNavVisible = true;
-  double _scrollDelta = 0;
+class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
+  late final RestorableDateTime _hoursDate = RestorableDateTime(
+    DateUtils.dateOnly(ref.read(selectedDateProvider)),
+  );
+  late final RestorableDateTime _readingsDate = RestorableDateTime(
+    ref.read(readingsBranchStateProvider).date,
+  );
+  late final ProviderSubscription<DateTime> _hoursDateSubscription;
+  late final ProviderSubscription<ReadingsBranchState>
+  _readingsDateSubscription;
+
+  @override
+  String? get restorationId => 'production-app-shell';
+
+  @override
+  void initState() {
+    super.initState();
+    widget.shellState.setActiveBranch(widget.activeBranch);
+    _hoursDateSubscription = ref.listenManual<DateTime>(selectedDateProvider, (
+      previous,
+      next,
+    ) {
+      final date = DateUtils.dateOnly(next);
+      if (!DateUtils.isSameDay(_hoursDate.value, date)) {
+        _hoursDate.value = date;
+      }
+    });
+    _readingsDateSubscription = ref.listenManual<ReadingsBranchState>(
+      readingsBranchStateProvider,
+      (previous, next) {
+        final date = DateUtils.dateOnly(next.date);
+        if (!DateUtils.isSameDay(_readingsDate.value, date)) {
+          _readingsDate.value = date;
+        }
+      },
+    );
+  }
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_hoursDate, 'hours-date');
+    registerForRestoration(_readingsDate, 'readings-date');
+    ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(
+      _hoursDate.value,
+    );
+    final readings = ref.read(readingsBranchStateProvider);
+    ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
+      date: _readingsDate.value,
+    );
+  }
 
   @override
   void didUpdateWidget(covariant AppShell oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.child.runtimeType != widget.child.runtimeType) {
-      _scrollDelta = 0;
-      _bottomNavVisible = true;
+    if (oldWidget.activeBranch != widget.activeBranch ||
+        oldWidget.shellState != widget.shellState) {
+      widget.shellState.setActiveBranch(widget.activeBranch);
     }
   }
 
-  bool _onScroll(ScrollNotification notification) {
-    if (notification.metrics.axis != Axis.vertical) return false;
-    if (notification.metrics.pixels <= 8) {
-      _scrollDelta = 0;
-      if (!_bottomNavVisible) setState(() => _bottomNavVisible = true);
-      return false;
-    }
-    if (notification is ScrollUpdateNotification) {
-      final delta = notification.scrollDelta;
-      if (delta == null) return false;
-      if (_scrollDelta != 0 && delta.sign != _scrollDelta.sign) {
-        _scrollDelta = 0;
-      }
-      _scrollDelta += delta;
-      if (_scrollDelta > 12 && _bottomNavVisible) {
-        setState(() => _bottomNavVisible = false);
-        _scrollDelta = 0;
-      } else if (_scrollDelta < -12 && !_bottomNavVisible) {
-        setState(() => _bottomNavVisible = true);
-        _scrollDelta = 0;
-      }
-    }
-    return false;
+  void _requestActiveMode(ReaderChromeMode mode) {
+    final controller = widget.shellState.activeController;
+    final entryId = controller.activeEntryId;
+    if (entryId != null) controller.request(entryId, mode);
+  }
+
+  @override
+  void dispose() {
+    _hoursDateSubscription.close();
+    _readingsDateSubscription.close();
+    _hoursDate.dispose();
+    _readingsDate.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final routeUri = GoRouterState.of(context).uri;
-    final location = routeUri.toString();
-    final contentBehindMenu = routeUri.path == '/prayers';
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final isOffline = ref.watch(isOfflineProvider);
-
-    final topPadding = MediaQuery.paddingOf(context).top;
-
-    return WarmupBootstrap(
-      child: Scaffold(
-        extendBody: true,
-        backgroundColor: Colors.transparent,
-
-        drawer: const AppNavigationDrawer(),
-
-        body: NotificationListener<ScrollNotification>(
-          onNotification: _onScroll,
-          child: AmbientBackdrop(
-            child: Stack(
-              children: [
-                //
-                // Основной контент.
-                //
-                Positioned.fill(
-                  child: Column(
-                    children: [
-                      // Most shell pages start below the floating menu.
-                      // Prayers paints its ambient background behind it and
-                      // supplies its own title spacing.
-                      SizedBox(height: contentBehindMenu ? 0 : topPadding + 78),
-
-                      //
-                      // Offline banner
-                      //
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        height: isOffline ? 32 : 0,
-                        color: const Color(0xFFB71C1C),
-                        child: isOffline
-                            ? const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.wifi_off_rounded,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Няма злучэння з інтэрнэтам',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
+    return AppNavigationScope(
+      shell: widget.navigationShell,
+      shellState: widget.shellState,
+      child: AnimatedBuilder(
+        animation: widget.shellState,
+        builder: (context, _) {
+          final controller = widget.shellState.activeController;
+          final descriptor = controller.activeDescriptor;
+          final mode = controller.value;
+          final shellOwnsTop =
+              descriptor.topChromeOwner == TopChromeOwner.shell;
+          final topPadding = MediaQuery.paddingOf(context).top;
+          return WarmupBootstrap(
+            child: Scaffold(
+              key: const Key('production-app-shell'),
+              backgroundColor: Colors.transparent,
+              drawer: const AppNavigationDrawer(),
+              body: AmbientBackdrop(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: descriptor.reserveShellTopInset
+                          ? Column(
+                              children: [
+                                SizedBox(height: topPadding + 78),
+                                Expanded(child: widget.navigationShell),
+                              ],
+                            )
+                          : widget.navigationShell,
+                    ),
+                    if (shellOwnsTop)
+                      Positioned(
+                        top: topPadding + 10,
+                        left: 14,
+                        child: Builder(
+                          builder: (scaffoldContext) => _FloatingMenuButton(
+                            seasonColor: seasonColor,
+                            onTap: () =>
+                                Scaffold.of(scaffoldContext).openDrawer(),
+                          ),
+                        ),
                       ),
-
-                      //
-                      // Сам экран.
-                      //
-                      Expanded(child: widget.child),
-                    ],
-                  ),
+                  ],
                 ),
-
-                //
-                // Плавающая кнопка меню.
-                //
-                Positioned(
-                  top: topPadding + 10,
-                  left: 14,
-                  child: Builder(
-                    builder: (scaffoldContext) {
-                      return _FloatingMenuButton(
-                        seasonColor: seasonColor,
-                        icon: PhosphorIconsRegular.list,
-                        tooltip: 'Меню',
-                        onTap: () {
-                          Scaffold.of(scaffoldContext).openDrawer();
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
+              ),
+              bottomNavigationBar: AppNavigationDock(
+                activeBranch: widget.activeBranch,
+                mode: controller.navigationDockSuppressed
+                    ? ReaderChromeMode.hidden
+                    : mode,
+                seasonColor: seasonColor,
+                onSelect: AppNavigationScope.of(context).selectBranch,
+                onExpand: () => _requestActiveMode(ReaderChromeMode.full),
+              ),
             ),
-          ),
-        ),
-
-        bottomNavigationBar: AutoHidingBottomNavigation(
-          visible: _bottomNavVisible,
-          child: AppBottomNav(currentLocation: location),
-        ),
+          );
+        },
       ),
     );
   }
 }
 
 class _FloatingMenuButton extends StatelessWidget {
-  final Color seasonColor;
-  final PhosphorIconData icon;
-  final VoidCallback onTap;
-  final String? tooltip;
+  const _FloatingMenuButton({required this.seasonColor, required this.onTap});
 
-  const _FloatingMenuButton({
-    required this.seasonColor,
-    required this.icon,
-    required this.onTap,
-    this.tooltip,
-  });
+  final Color seasonColor;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    final button = AdaptiveChromeSurface(
-      role: ChromeSurfaceRole.control,
-      seasonColor: seasonColor,
-      borderRadius: BorderRadius.circular(28),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(28),
-          child: SizedBox(
-            width: 52,
-            height: 52,
-            child: Center(
-              child: PhosphorIcon(icon, size: 24, color: colorScheme.onSurface),
+    final cs = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: 'Меню',
+      child: AdaptiveChromeSurface(
+        role: ChromeSurfaceRole.control,
+        seasonColor: seasonColor,
+        borderRadius: BorderRadius.circular(28),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(28),
+            child: SizedBox.square(
+              dimension: 52,
+              child: Center(
+                child: PhosphorIcon(
+                  PhosphorIconsRegular.list,
+                  size: 24,
+                  color: cs.onSurface,
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
-
-    if (tooltip == null) {
-      return button;
-    }
-
-    return Tooltip(message: tooltip!, child: button);
   }
 }

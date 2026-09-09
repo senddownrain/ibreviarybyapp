@@ -16,6 +16,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -467,11 +468,10 @@ class _DayOptionCard extends ConsumerWidget {
         onTap: () {
           HapticFeedback.lightImpact();
           final dayId = day.id;
-          final dateKey = DateFormat('yyyy-MM-dd').format(date);
           unawaited(
             DayPrefetchService().prefetch(date, option).catchError((_) {}),
           );
-          context.push('/hora/$dateKey/$dayId');
+          context.push(horaRouteForContext(date: date, dayId: dayId));
         },
         child: child,
       ),
