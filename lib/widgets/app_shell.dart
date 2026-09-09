@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
@@ -47,6 +48,9 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
   void initState() {
     super.initState();
     widget.shellState.setActiveBranch(widget.activeBranch);
+    ref
+        .read(settingsProvider.notifier)
+        .rememberLastSection(widget.activeBranch.name);
     _hoursDateSubscription = ref.listenManual<DateTime>(selectedDateProvider, (
       previous,
       next,
@@ -86,6 +90,9 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     if (oldWidget.activeBranch != widget.activeBranch ||
         oldWidget.shellState != widget.shellState) {
       widget.shellState.setActiveBranch(widget.activeBranch);
+      ref
+          .read(settingsProvider.notifier)
+          .rememberLastSection(widget.activeBranch.name);
     }
   }
 
@@ -106,7 +113,13 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
 
   @override
   Widget build(BuildContext context) {
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final liturgicalColor = ref.watch(liturgicalSeasonColorProvider);
+    final seasonColor = switch (widget.activeBranch) {
+      AppBranch.hours => liturgicalColor,
+      AppBranch.readings ||
+      AppBranch.prayerbook ||
+      AppBranch.bible => Theme.of(context).colorScheme.primary,
+    };
     return AppNavigationScope(
       shell: widget.navigationShell,
       shellState: widget.shellState,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
 import 'package:mybrev_flutter/screens/bible_search_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
@@ -142,7 +144,7 @@ final appShellState = AppShellState(
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: '/hours',
+  initialLocation: _initialLocation(),
   restorationScopeId: 'ibreviary-router',
   routes: [
     StatefulShellRoute.indexedStack(
@@ -553,6 +555,18 @@ final router = GoRouter(
   ],
 );
 
+String _initialLocation() {
+  try {
+    final box = HiveService.settingsBox;
+    return startSectionLocation(
+      box.get('startSection', defaultValue: 'hours') as String,
+      box.get('lastSection', defaultValue: 'hours') as String,
+    );
+  } catch (_) {
+    return '/hours';
+  }
+}
+
 Page<void> _branchPage(
   GoRouterState state,
   AppRouteDescriptor descriptor,
@@ -659,21 +673,14 @@ String _withSameQuery(String path, GoRouterState state) =>
 String _withQuery(String path, Map<String, String> query) =>
     Uri(path: path, queryParameters: query.isEmpty ? null : query).toString();
 
-class _ShellFadePage<T> extends CustomTransitionPage<T> {
-  _ShellFadePage({
+class _ShellFadePage<T> extends MaterialPage<T> {
+  const _ShellFadePage({
     required super.child,
     super.key,
     super.name,
     super.arguments,
     super.restorationId,
-  }) : super(
-         transitionDuration: const Duration(milliseconds: 180),
-         reverseTransitionDuration: const Duration(milliseconds: 120),
-         transitionsBuilder: (_, animation, _, child) => FadeTransition(
-           opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
-           child: child,
-         ),
-       );
+  });
 }
 
 class _InvalidRoute extends StatelessWidget {

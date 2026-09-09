@@ -324,11 +324,20 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   );
 
   Widget _translationControl(BibleBookInfo book) => SizedBox(
-    width: 154,
+    width: 136,
     child: AdaptiveSegmentedControl<String>(
+      showSelectedIcon: false,
       segments: [
         for (final version in kBibleVersionMeta.values)
-          AdaptiveSegment(value: version.id, label: Text(version.shortLabel)),
+          AdaptiveSegment(
+            value: version.id,
+            label: Text(
+              version.shortLabel,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.visible,
+            ),
+          ),
       ],
       value: widget.versionId,
       onChanged: _changeLanguage,
@@ -500,6 +509,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     String? expandedBookId = currentBook.id;
     final result = await showModalBottomSheet<_BibleLocation>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (sheetContext) => StatefulBuilder(

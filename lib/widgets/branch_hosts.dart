@@ -144,7 +144,7 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
   }
 }
 
-class BibleBranchHost extends ConsumerWidget {
+class BibleBranchHost extends ConsumerStatefulWidget {
   const BibleBranchHost({
     super.key,
     this.version,
@@ -159,19 +159,46 @@ class BibleBranchHost extends ConsumerWidget {
   final String? invalidContext;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (invalidContext case final message?) {
+  ConsumerState<BibleBranchHost> createState() => _BibleBranchHostState();
+}
+
+class _BibleBranchHostState extends ConsumerState<BibleBranchHost> {
+  bool _retrying = false;
+  String? _retryError;
+
+  Future<void> _retry() async {
+    setState(() {
+      _retrying = true;
+      _retryError = null;
+    });
+    try {
+      await BibleRepository.reloadBundled();
+    } catch (error) {
+      _retryError = error.toString();
+    }
+    if (mounted) setState(() => _retrying = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.invalidContext case final message?) {
       return _BranchError(message: message);
     }
 
     final resolvedVersion =
-        version ?? ref.watch(settingsProvider).bibleVersionId;
+        widget.version ?? ref.watch(settingsProvider).bibleVersionId;
     final books = BibleRepository.getBooks(resolvedVersion);
     if (books.isEmpty) {
-      if (version != null) {
+      if (widget.version != null) {
         return const _BranchError(message: 'Невядомы пераклад Бібліі.');
       }
-      return const Center(child: CircularProgressIndicator());
+      return _BranchError(
+        message: _retryError == null
+            ? 'Тэкст Бібліі недаступны на гэтай прыладзе.'
+            : 'Не ўдалося аднавіць тэкст Бібліі. $_retryError',
+        actionLabel: _retrying ? 'Загрузка…' : 'Паўтарыць',
+        onAction: _retrying ? null : _retry,
+      );
     }
     final savedRaw = HiveService.settingsBox.get(
       BibleNavigation.lastLocationKey(resolvedVersion),
@@ -179,8 +206,8 @@ class BibleBranchHost extends ConsumerWidget {
     final saved = savedRaw is Map ? savedRaw : const <String, dynamic>{};
     final location = BibleNavigation.resolve(
       versionId: resolvedVersion,
-      requestedBookId: book,
-      requestedChapter: chapter,
+      requestedBookId: widget.book,
+      requestedChapter: widget.chapter,
       saved: saved,
     );
     if (location == null) {
@@ -238,16 +265,27 @@ class SecondaryPageScaffold extends StatelessWidget {
 }
 
 class _BranchError extends StatelessWidget {
-  const _BranchError({required this.message});
+  const _BranchError({required this.message, this.actionLabel, this.onAction});
 
   final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Text(message, textAlign: TextAlign.center),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, textAlign: TextAlign.center),
+            if (actionLabel != null) ...[
+              const SizedBox(height: 16),
+              FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+            ],
+          ],
+        ),
       ),
     ),
   );

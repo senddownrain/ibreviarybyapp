@@ -308,6 +308,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     final date = _currentDate;
     final action = await showModalBottomSheet<_ReadingsDateAction>(
       context: context,
+      useRootNavigator: true,
       useSafeArea: true,
       showDragHandle: true,
       isScrollControlled: true,
@@ -352,6 +353,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     final cycles = availableCyclesForGroup(selection.documents);
     await showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       useSafeArea: true,
       showDragHandle: true,
       isScrollControlled: true,

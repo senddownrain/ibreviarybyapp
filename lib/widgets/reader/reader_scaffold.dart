@@ -343,6 +343,7 @@ class ReaderContextHeader extends StatelessWidget {
     this.eyebrow,
     this.subtitle,
     this.metadata,
+    this.details,
     this.onTitleTap,
     this.titleActionLabel,
     this.actions = const [],
@@ -353,6 +354,7 @@ class ReaderContextHeader extends StatelessWidget {
   final String? eyebrow;
   final String? subtitle;
   final String? metadata;
+  final Widget? details;
   final VoidCallback? onTitleTap;
   final String? titleActionLabel;
   final List<Widget> actions;
@@ -371,68 +373,72 @@ class ReaderContextHeader extends StatelessWidget {
       ),
     );
 
-    return Padding(
-      key: const Key('reader-context-header'),
-      padding: const EdgeInsets.fromLTRB(22, 10, 22, 22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if ((eyebrow ?? '').isNotEmpty)
-            Text(
-              eyebrow!,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: accent,
-                fontWeight: FontWeight.w700,
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        key: const Key('reader-context-header'),
+        padding: const EdgeInsets.fromLTRB(22, 10, 22, 22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if ((eyebrow ?? '').isNotEmpty)
+              Text(
+                eyebrow!,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-          if ((subtitle ?? '').isNotEmpty) ...[
-            const SizedBox(height: 7),
-            Text(
-              subtitle!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: cs.onSurfaceVariant,
-                height: 1.45,
+            if ((subtitle ?? '').isNotEmpty) ...[
+              const SizedBox(height: 7),
+              Text(
+                subtitle!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurfaceVariant,
+                  height: 1.45,
+                ),
               ),
-            ),
-          ],
-          const SizedBox(height: 9),
-          if (onTitleTap == null)
-            titleText
-          else
-            Semantics(
-              button: true,
-              label: titleActionLabel ?? 'Змяніць гадзіну: $title',
-              child: InkWell(
-                key: const Key('reader-context-title-action'),
-                borderRadius: BorderRadius.circular(12),
-                onTap: onTitleTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(child: titleText),
-                      const SizedBox(width: 8),
-                      Icon(Icons.keyboard_arrow_down_rounded, color: accent),
-                    ],
+            ],
+            const SizedBox(height: 9),
+            if (onTitleTap == null)
+              titleText
+            else
+              Semantics(
+                button: true,
+                label: titleActionLabel ?? 'Змяніць гадзіну: $title',
+                child: InkWell(
+                  key: const Key('reader-context-title-action'),
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: onTitleTap,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(child: titleText),
+                        const SizedBox(width: 8),
+                        Icon(Icons.keyboard_arrow_down_rounded, color: accent),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          if ((metadata ?? '').isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              metadata!,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-            ),
+            if ((metadata ?? '').isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                metadata!,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+              ),
+            ],
+            if (details != null) ...[const SizedBox(height: 8), details!],
+            if (actions.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, runSpacing: 4, children: actions),
+            ],
           ],
-          if (actions.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(spacing: 8, runSpacing: 4, children: actions),
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -469,6 +475,7 @@ Future<T?> showReaderChoiceSheet<T>({
   if (usesCupertinoGlass(context)) {
     return showModalBottomSheet<T>(
       context: context,
+      useRootNavigator: true,
       useSafeArea: true,
       showDragHandle: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -477,6 +484,7 @@ Future<T?> showReaderChoiceSheet<T>({
   }
   return showModalBottomSheet<T>(
     context: context,
+    useRootNavigator: true,
     useSafeArea: true,
     showDragHandle: true,
     backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,

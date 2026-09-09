@@ -144,11 +144,6 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
   @override
   void initState() {
     super.initState();
-    if (!widget.searchInitially) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) ref.read(prayersFilterProvider.notifier).clearFilters();
-      });
-    }
     final filter = ref.read(prayersFilterProvider);
     _query = TextEditingController(text: filter.searchQuery);
     _focus = FocusNode();

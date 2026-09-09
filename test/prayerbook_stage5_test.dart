@@ -159,6 +159,49 @@ void main() {
     expect(tester.widget<TextField>(field).controller!.text, 'дзякуй');
   });
 
+  testWidgets('All Prayers re-entry keeps query and results synchronized', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        settingsProvider.overrideWith(_TestSettingsNotifier.new),
+        liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
+        allPrayersProvider.overrideWithValue(_builtIn),
+        localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
+        prayerMenuCategoriesProvider.overrideWithValue(_categories),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    Widget app(Key key, {bool searchInitially = false}) =>
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: PrayerCatalogScreen(
+              key: key,
+              searchInitially: searchInitially,
+            ),
+          ),
+        );
+
+    await tester.pumpWidget(
+      app(const ValueKey('search-entry'), searchInitially: true),
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.byKey(const Key('prayer-search-field')),
+      'дзякуй',
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpWidget(app(const ValueKey('all-prayers-reentry')));
+    await tester.pump();
+
+    final field = find.byKey(const Key('prayer-search-field'));
+    expect(tester.widget<TextField>(field).controller!.text, 'дзякуй');
+    expect(find.byKey(const ValueKey('prayer-row-evening')), findsOneWidget);
+    expect(find.byKey(const ValueKey('prayer-row-morning')), findsNothing);
+  });
+
   testWidgets('category page includes tag and explicit members', (
     tester,
   ) async {

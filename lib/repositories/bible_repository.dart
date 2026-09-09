@@ -236,6 +236,12 @@ class BibleRepository {
     unawaited(_loadFromFirestore('ru'));
   }
 
+  /// Replaces missing or corrupt in-memory corpora from bundled offline data.
+  static Future<void> reloadBundled() async {
+    _dataBel = await BibleSeedLoader.load(lang: 'bel');
+    _data = await BibleSeedLoader.load(lang: 'ru');
+  }
+
   static Future<void> _loadFromFirestore(String versionId) async {
     try {
       final collection = 'bible_$versionId';

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
@@ -43,9 +43,7 @@ class SettingsScreen extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          GlassSurface(
-            style: GlassStyle.card,
-            seasonColor: seasonColor,
+          _NeutralContentSurface(
             borderRadius: BorderRadius.circular(28),
             padding: const EdgeInsets.all(18),
             child: Column(
@@ -99,65 +97,40 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Text(
                   'Прыклад: Госпадзе, памілуй нас.',
-                  style: _textStyle(
-                    settings,
-                  ).copyWith(fontSize: settings.fontSize),
+                  style: TextStyle(fontSize: settings.fontSize),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Font family
-                Text('Шрыфт', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Стартовы раздзел',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
-                RadioGroup<String>(
-                  groupValue: settings.fontFamily,
-                  onChanged: (font) {
-                    if (font != null) {
-                      ref.read(settingsProvider.notifier).setFontFamily(font);
+                DropdownButtonFormField<String>(
+                  key: const Key('settings-start-section'),
+                  initialValue: settings.startSection,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'last',
+                      child: Text('Апошні адкрыты'),
+                    ),
+                    DropdownMenuItem(value: 'hours', child: Text('Гадзіны')),
+                    DropdownMenuItem(value: 'readings', child: Text('Чытанні')),
+                    DropdownMenuItem(
+                      value: 'prayerbook',
+                      child: Text('Малітоўнік'),
+                    ),
+                    DropdownMenuItem(value: 'bible', child: Text('Біблія')),
+                  ],
+                  onChanged: (section) {
+                    if (section != null) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .setStartSection(section);
                     }
                   },
-                  child: Column(
-                    children: kAvailableFonts.map((font) {
-                      final selected = settings.fontFamily == font;
-                      const previewSize = 15.0;
-                      final previewStyle = font == 'Сістэмны'
-                          ? const TextStyle(fontSize: previewSize)
-                          : GoogleFonts.getFont(font, fontSize: previewSize);
-                      return InkWell(
-                        onTap: () => ref
-                            .read(settingsProvider.notifier)
-                            .setFontFamily(font),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Row(
-                            children: [
-                              Radio<String>(value: font),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(font, style: previewStyle),
-                                    Text(
-                                      'Аб вечнай радасці спявае душа мая.',
-                                      style: previewStyle.copyWith(
-                                        fontSize: 13,
-                                        color: selected
-                                            ? null
-                                            : Theme.of(
-                                                context,
-                                              ).colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -175,12 +148,6 @@ class SettingsScreen extends ConsumerWidget {
                       ref.read(settingsProvider.notifier).setKeepScreenOn(v),
                   contentPadding: EdgeInsets.zero,
                 ),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-
-                // User categories
-                _CategoriesSection(),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -324,7 +291,11 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text('Mybrev — беларускі каталіцкі малітоўнік'),
-                const Text('Версія 1.0.0'),
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) =>
+                      Text('Версія ${snapshot.data?.version ?? '—'}'),
+                ),
                 const SizedBox(height: 14),
               ],
             ),
@@ -333,11 +304,6 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  TextStyle _textStyle(SettingsState settings) {
-    if (settings.resolvedFontFamily == null) return const TextStyle();
-    return GoogleFonts.getFont(settings.fontFamily);
   }
 
   String _formatDate(DateTime date) {
@@ -355,8 +321,37 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
+class _NeutralContentSurface extends StatelessWidget {
+  const _NeutralContentSurface({
+    required this.child,
+    required this.padding,
+    required this.borderRadius,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final BorderRadius borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Material(
+      color: cs.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+        side: BorderSide(color: cs.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(padding: padding, child: child),
+    );
+  }
+}
+
 // ── Categories section ────────────────────────────────────────────────────────
 
+// Kept temporarily for storage-compatible migration; the only visible editor
+// is now the canonical Prayerbook categories route.
+// ignore: unused_element
 class _CategoriesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {

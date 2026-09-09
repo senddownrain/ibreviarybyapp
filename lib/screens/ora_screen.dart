@@ -502,17 +502,15 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       if (psalterLabel.isNotEmpty) psalterLabel,
       if (rankLabel.isNotEmpty) rankLabel,
     ].join(' · ');
-    final metadata = [
-      if (contextSummary.isNotEmpty) contextSummary,
-      if (feastComment.isNotEmpty) feastComment,
-    ].join('\n');
-
     return ReaderContextHeader(
       accentColor: liturgicalColorForDay(day),
       eyebrow: '${DateFormat('d MMMM y', 'be').format(widget.date)} г.',
       subtitle: dayTitle,
       title: _oraTitle(widget.oraType),
-      metadata: metadata,
+      metadata: contextSummary,
+      details: feastComment.isEmpty
+          ? null
+          : _ExpandableFeastComment(feastComment),
       onTitleTap: () => _changeHour(day),
       actions: [
         TextButton.icon(
@@ -1134,6 +1132,69 @@ enum _OraItemType {
   psalm,
   plain,
   custom,
+}
+
+class _ExpandableFeastComment extends StatefulWidget {
+  const _ExpandableFeastComment(this.text);
+
+  final String text;
+
+  @override
+  State<_ExpandableFeastComment> createState() =>
+      _ExpandableFeastCommentState();
+}
+
+class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      expanded: _expanded,
+      child: InkWell(
+        key: const Key('ora-feast-comment-toggle'),
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => setState(() => _expanded = !_expanded),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 180),
+                crossFadeState: _expanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: Text(
+                  widget.text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                ),
+                secondChild: Text(
+                  widget.text,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                _expanded ? 'Згарнуць' : 'Чытаць цалкам',
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: cs.primary),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _OraItem {

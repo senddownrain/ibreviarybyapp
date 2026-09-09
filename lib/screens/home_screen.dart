@@ -473,6 +473,7 @@ Future<void> _showDateActions(
   final color = ref.read(liturgicalSeasonColorProvider);
   final action = await showModalBottomSheet<_DateAction>(
     context: context,
+    useRootNavigator: true,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (sheetContext) => SafeArea(
@@ -581,6 +582,7 @@ Future<void> _showAlternatives(
   Color color,
 ) => showModalBottomSheet<void>(
   context: context,
+  useRootNavigator: true,
   backgroundColor: Colors.transparent,
   isScrollControlled: true,
   useSafeArea: true,
@@ -596,6 +598,12 @@ class _AlternativesSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selection = ref.watch(hoursLiturgicalSelectionProvider);
     final selected = selection.selected;
+    final selectedColor = selected == null
+        ? color
+        : liturgicalColorForDay(
+            selection.day,
+            fallbackPeriodType: selected.contextPeriodType,
+          );
     final groups = <String, List<DayOption>>{};
     for (final option in selection.sortedOptions) {
       if (!option.disabled && option.day != null) {
@@ -608,7 +616,7 @@ class _AlternativesSheet extends ConsumerWidget {
         constraints: const BoxConstraints(maxWidth: 640, maxHeight: 720),
         child: AdaptiveChromeSurface(
           role: ChromeSurfaceRole.group,
-          seasonColor: color,
+          seasonColor: selectedColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           child: Column(
             children: [
@@ -639,10 +647,7 @@ class _AlternativesSheet extends ConsumerWidget {
                     option: selected,
                     day: selection.day,
                     isManual: selected.key != selection.primary?.key,
-                    color: liturgicalColorForDay(
-                      selection.day,
-                      fallbackPeriodType: selected.contextPeriodType,
-                    ),
+                    color: selectedColor,
                   ),
                 ),
               Expanded(

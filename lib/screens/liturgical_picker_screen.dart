@@ -56,6 +56,18 @@ class _LiturgicalPickerScreenState
         seasonColor: seasonColor,
         child: Column(
           children: [
+            SafeArea(
+              bottom: false,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  key: const Key('liturgical-picker-back'),
+                  tooltip: 'Назад',
+                  onPressed: () => Navigator.maybePop(context),
+                  icon: const Icon(Icons.arrow_back_rounded),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
               child: Column(

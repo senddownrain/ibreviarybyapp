@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
 
 void main() {
@@ -127,6 +128,15 @@ void main() {
       container.read(readingsBranchStateProvider).date,
       DateTime(2026, 9, 9),
     );
+  });
+
+  test('start section preference resolves only to the four branch roots', () {
+    expect(startSectionLocation('hours', 'bible'), '/hours');
+    expect(startSectionLocation('readings', 'hours'), '/readings');
+    expect(startSectionLocation('prayerbook', 'hours'), '/prayers');
+    expect(startSectionLocation('bible', 'hours'), '/bible');
+    expect(startSectionLocation('last', 'bible'), '/bible');
+    expect(startSectionLocation('invalid', 'invalid'), '/hours');
   });
 }
 

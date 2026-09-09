@@ -13,10 +13,7 @@ class ReadingScaffold extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final reader = ReaderTheme.of(context);
-    final textStyle = reader.body(
-      settings.fontSize,
-      family: settings.resolvedFontFamily == null ? null : settings.fontFamily,
-    );
+    final textStyle = reader.body(settings.fontSize);
     return builder(context, textStyle);
   }
 }
