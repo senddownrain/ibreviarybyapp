@@ -231,7 +231,6 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               ),
               semanticLabel: '${book.name}, раздзел ${widget.chapter}',
               chromeMode: ReaderChromeMode.compact,
-              drawer: isSearchResult ? null : const AppNavigationDrawer(),
               leading: isSearchResult ? null : _menuLeading(),
               actions: [
                 _ChromeAction(
@@ -315,12 +314,10 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     );
   }
 
-  Widget _menuLeading() => Builder(
-    builder: (scaffoldContext) => IconButton(
-      tooltip: 'Меню',
-      onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
-      icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
-    ),
+  Widget _menuLeading() => IconButton(
+    tooltip: 'Меню',
+    onPressed: () => showSecondaryMenu(context),
+    icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
   );
 
   Widget _translationControl(BibleBookInfo book) => SizedBox(

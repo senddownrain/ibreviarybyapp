@@ -66,9 +66,13 @@ void main() {
     );
   });
 
-  testWidgets('root order is Favorites, unified Categories, All Prayers', (
+  testWidgets('root order is Favorites, Holy Mass, Categories, All Prayers', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(800, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       _app(
         const PrayersScreen(),
@@ -87,20 +91,23 @@ void main() {
     await tester.pump();
 
     final favoritesY = tester.getTopLeft(find.text('Абраныя')).dy;
+    final massY = tester.getTopLeft(find.text('Святая Імша').first).dy;
     final categoriesY = tester.getTopLeft(find.text('Катэгорыі')).dy;
     final allY = tester.getTopLeft(find.text('Усе малітвы')).dy;
-    expect(favoritesY, lessThan(categoriesY));
+    expect(favoritesY, lessThan(massY));
+    expect(massY, lessThan(categoriesY));
     expect(categoriesY, lessThan(allY));
     expect(find.byKey(const ValueKey('prayer-row-evening')), findsOneWidget);
     expect(find.byKey(const ValueKey('prayer-row-morning')), findsOneWidget);
     expect(find.text('Ранішнія'), findsOneWidget);
     expect(find.text('Мая катэгорыя'), findsOneWidget);
+    expect(find.byKey(const Key('holy-mass-destination')), findsOneWidget);
   });
 
   testWidgets('empty favorites is compact and categories remain visible', (
     tester,
   ) async {
-    await tester.pumpWidget(_app(const PrayersScreen()));
+    await tester.pumpWidget(_app(const Scaffold(body: PrayersScreen())));
     await tester.pump();
 
     expect(find.byKey(const Key('prayerbook-empty-favorites')), findsOneWidget);
@@ -109,6 +116,18 @@ void main() {
       find.byKey(const Key('prayerbook-empty-favorites')),
     );
     expect(emptySize.height, lessThan(80));
+  });
+
+  testWidgets('missing Holy Mass stays recognizable and offers sync', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app(const Scaffold(body: PrayersScreen())));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('holy-mass-destination')));
+    await tester.pump();
+    expect(find.text('Тэкст пакуль недаступны'), findsOneWidget);
+    expect(find.text('Сінхранізацыя'), findsOneWidget);
   });
 
   testWidgets('favorite toggle is shared by catalog and root providers', (

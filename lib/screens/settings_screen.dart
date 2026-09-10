@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
@@ -18,11 +19,37 @@ import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
-class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({super.key});
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key, this.scrollToSync = false});
+
+  final bool scrollToSync;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  final _syncKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.scrollToSync) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final target = _syncKey.currentContext;
+        if (target != null) {
+          Scrollable.ensureVisible(
+            target,
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final syncStatus = ref.watch(syncStatusProvider);
     final bootstrap = ref.watch(dataBootstrapProvider);
@@ -153,9 +180,12 @@ class SettingsScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 // Sync
-                Text(
-                  'Сінхранізацыя',
-                  style: Theme.of(context).textTheme.titleMedium,
+                SizedBox(
+                  key: _syncKey,
+                  child: Text(
+                    'Сінхранізацыя',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 if (lastSync != null)
@@ -237,66 +267,60 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Stats
-                Text(
-                  'Статыстыка',
-                  style: Theme.of(context).textTheme.titleMedium,
+                ExpansionTile(
+                  key: const Key('settings-diagnostics'),
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: const EdgeInsets.only(bottom: 8),
+                  title: const Text('Дыягностыка'),
+                  subtitle: const Text('Кэш і пакрыццё даных'),
+                  children: [
+                    if (stats.bootstrapNeeded)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'База яшчэ не загружана — адкрыйце галоўны экран',
+                        ),
+                      )
+                    else if (bootstrap.isRunning)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'Загрузка: ${bootstrap.phase == 'static' ? 'база' : 'дні'}...',
+                        ),
+                      ),
+                    if (stats.coverageLabel != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text('Пакрыццё дат: ${stats.coverageLabel}'),
+                      ),
+                    _StatRow(label: 'Малітвы', count: stats.prayers),
+                    _StatRow(label: 'Дні ў кэшы', count: stats.days),
+                    _StatRow(label: 'Гады', count: stats.years),
+                    _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
+                    _StatRow(label: 'Заклік', count: stats.invitatoriums),
+                    _StatRow(label: 'Камплета', count: stats.completoriums),
+                    _StatRow(
+                      label: 'Абраныя',
+                      count: settings.favoriteIds.length,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                if (stats.bootstrapNeeded)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      'База яшчэ не загружана — адкрыйце галоўны экран',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  )
-                else if (bootstrap.isRunning)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      'Загрузка: ${bootstrap.phase == 'static' ? 'база' : 'дні'}...',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                if (stats.coverageLabel != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      'Пакрыццё дат: ${stats.coverageLabel}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                _StatRow(label: 'Малітвы', count: stats.prayers),
-                _StatRow(label: 'Дні ў кэшы', count: stats.days),
-                _StatRow(label: 'Гады', count: stats.years),
-                _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
-                _StatRow(label: 'Заклік', count: stats.invitatoriums),
-                _StatRow(label: 'Камплета', count: stats.completoriums),
-                _StatRow(label: 'Абраныя', count: settings.favoriteIds.length),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // About
-                Text(
-                  'Пра дадатак',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                const Text('Mybrev — беларускі каталіцкі малітоўнік'),
                 FutureBuilder<PackageInfo>(
                   future: PackageInfo.fromPlatform(),
                   builder: (context, snapshot) =>
                       Text('Версія ${snapshot.data?.version ?? '—'}'),
                 ),
-                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => context.push('/about'),
+                    child: const Text('Інфармацыя пра дадатак'),
+                  ),
+                ),
               ],
             ),
           ),

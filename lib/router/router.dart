@@ -534,9 +534,11 @@ final router = GoRouter(
       pageBuilder: (context, state) => MaterialPage<void>(
         key: state.pageKey,
         restorationId: 'settings',
-        child: const SecondaryPageScaffold(
+        child: SecondaryPageScaffold(
           title: 'Налады',
-          child: SettingsScreen(),
+          child: SettingsScreen(
+            scrollToSync: state.uri.queryParameters['section'] == 'sync',
+          ),
         ),
       ),
     ),

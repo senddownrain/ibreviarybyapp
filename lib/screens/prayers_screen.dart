@@ -13,6 +13,8 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 
+const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
+
 class PrayersScreen extends ConsumerWidget {
   const PrayersScreen({super.key});
 
@@ -21,7 +23,11 @@ class PrayersScreen extends ConsumerWidget {
     final favorites = ref.watch(favoritePrayersProvider);
     final categories = ref.watch(prayerMenuCategoriesProvider);
     final catalog = ref.watch(prayerCatalogProvider);
+    final massAvailable = catalog.any(
+      (prayer) => prayer.id == _kMassOrderPrayerId,
+    );
     final categoryState = ref.watch(globalPrayerCategoriesProvider);
+    final massLoading = categoryState.isLoading && catalog.isEmpty;
     final cs = Theme.of(context).colorScheme;
     final top = MediaQuery.paddingOf(context).top + 78;
 
@@ -59,6 +65,39 @@ class PrayersScreen extends ConsumerWidget {
                 else
                   for (final prayer in favorites)
                     PrayerListRow(prayer: prayer, showFavorite: true),
+                const SizedBox(height: 24),
+                const _SectionTitle(title: 'Святая Імша'),
+                _DestinationRow(
+                  key: const Key('holy-mass-destination'),
+                  title: 'Святая Імша',
+                  subtitle: massLoading && !massAvailable
+                      ? 'Загрузка тэксту…'
+                      : 'Парадак святой Імшы',
+                  icon: PhosphorIconsRegular.church,
+                  trailing: massLoading && !massAvailable
+                      ? const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : null,
+                  onTap: () {
+                    if (massAvailable) {
+                      context.push('/prayers/prayer/$_kMassOrderPrayerId');
+                      return;
+                    }
+                    if (massLoading) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Тэкст пакуль недаступны'),
+                        action: SnackBarAction(
+                          label: 'Сінхранізацыя',
+                          onPressed: () =>
+                              context.push('/settings?section=sync'),
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(height: 24),
                 _SectionTitle(
                   title: 'Катэгорыі',
@@ -715,11 +754,13 @@ class _DestinationRow extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.subtitle,
+    this.trailing,
   });
   final String title;
   final String? subtitle;
   final IconData icon;
   final VoidCallback onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) => ListTile(
@@ -728,7 +769,7 @@ class _DestinationRow extends StatelessWidget {
     leading: Icon(icon),
     title: Text(title),
     subtitle: subtitle == null ? null : Text(subtitle!),
-    trailing: const Icon(Icons.chevron_right_rounded),
+    trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
     onTap: onTap,
   );
 }

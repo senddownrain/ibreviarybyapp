@@ -137,7 +137,6 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
               child: Scaffold(
                 key: const Key('production-app-shell'),
                 backgroundColor: Colors.transparent,
-                drawer: const AppNavigationDrawer(),
                 body: Stack(
                   children: [
                     Positioned.fill(
@@ -154,12 +153,9 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                       Positioned(
                         top: topPadding + 10,
                         left: 14,
-                        child: Builder(
-                          builder: (scaffoldContext) => _FloatingMenuButton(
-                            seasonColor: seasonColor,
-                            onTap: () =>
-                                Scaffold.of(scaffoldContext).openDrawer(),
-                          ),
+                        child: _FloatingMenuButton(
+                          seasonColor: seasonColor,
+                          onTap: () => showSecondaryMenu(context),
                         ),
                       ),
                   ],
