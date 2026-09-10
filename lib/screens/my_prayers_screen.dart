@@ -23,7 +23,7 @@ class MyPrayersScreen extends ConsumerWidget {
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar.text('Мае малітвы'),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/prayer/add'),
+        onPressed: () => context.push('/prayers/prayer/add'),
         tooltip: 'Новая малітва',
         child: const PhosphorIcon(PhosphorIconsRegular.plus, size: 24),
       ),
@@ -114,13 +114,14 @@ class _MyPrayerTile extends ConsumerWidget {
                   size: 20,
                   color: cs.onSurfaceVariant,
                 ),
-                onPressed: () => context.push('/prayer/edit/${prayer.id}'),
+                onPressed: () =>
+                    context.push('/prayers/prayer/${prayer.id}/edit'),
               ),
             ],
           ),
           onTap: () {
             HapticFeedback.lightImpact();
-            context.push('/prayer/${prayer.id}');
+            context.push('/prayers/prayer/${prayer.id}');
           },
         ),
       ),

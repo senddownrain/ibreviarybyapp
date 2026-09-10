@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
@@ -18,11 +19,37 @@ import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
-class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({super.key});
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key, this.scrollToSync = false});
+
+  final bool scrollToSync;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  final _syncKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.scrollToSync) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final target = _syncKey.currentContext;
+        if (target != null) {
+          Scrollable.ensureVisible(
+            target,
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final syncStatus = ref.watch(syncStatusProvider);
     final bootstrap = ref.watch(dataBootstrapProvider);
@@ -43,9 +70,7 @@ class SettingsScreen extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          GlassSurface(
-            style: GlassStyle.card,
-            seasonColor: seasonColor,
+          _NeutralContentSurface(
             borderRadius: BorderRadius.circular(28),
             padding: const EdgeInsets.all(18),
             child: Column(
@@ -99,65 +124,40 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Text(
                   'Прыклад: Госпадзе, памілуй нас.',
-                  style: _textStyle(
-                    settings,
-                  ).copyWith(fontSize: settings.fontSize),
+                  style: TextStyle(fontSize: settings.fontSize),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Font family
-                Text('Шрыфт', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Стартовы раздзел',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
-                RadioGroup<String>(
-                  groupValue: settings.fontFamily,
-                  onChanged: (font) {
-                    if (font != null) {
-                      ref.read(settingsProvider.notifier).setFontFamily(font);
+                DropdownButtonFormField<String>(
+                  key: const Key('settings-start-section'),
+                  initialValue: settings.startSection,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'last',
+                      child: Text('Апошні адкрыты'),
+                    ),
+                    DropdownMenuItem(value: 'hours', child: Text('Гадзіны')),
+                    DropdownMenuItem(value: 'readings', child: Text('Чытанні')),
+                    DropdownMenuItem(
+                      value: 'prayerbook',
+                      child: Text('Малітоўнік'),
+                    ),
+                    DropdownMenuItem(value: 'bible', child: Text('Біблія')),
+                  ],
+                  onChanged: (section) {
+                    if (section != null) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .setStartSection(section);
                     }
                   },
-                  child: Column(
-                    children: kAvailableFonts.map((font) {
-                      final selected = settings.fontFamily == font;
-                      const previewSize = 15.0;
-                      final previewStyle = font == 'Сістэмны'
-                          ? const TextStyle(fontSize: previewSize)
-                          : GoogleFonts.getFont(font, fontSize: previewSize);
-                      return InkWell(
-                        onTap: () => ref
-                            .read(settingsProvider.notifier)
-                            .setFontFamily(font),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Row(
-                            children: [
-                              Radio<String>(value: font),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(font, style: previewStyle),
-                                    Text(
-                                      'Аб вечнай радасці спявае душа мая.',
-                                      style: previewStyle.copyWith(
-                                        fontSize: 13,
-                                        color: selected
-                                            ? null
-                                            : Theme.of(
-                                                context,
-                                              ).colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -179,16 +179,13 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // User categories
-                _CategoriesSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-
                 // Sync
-                Text(
-                  'Сінхранізацыя',
-                  style: Theme.of(context).textTheme.titleMedium,
+                SizedBox(
+                  key: _syncKey,
+                  child: Text(
+                    'Сінхранізацыя',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 if (lastSync != null)
@@ -270,62 +267,60 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Stats
-                Text(
-                  'Статыстыка',
-                  style: Theme.of(context).textTheme.titleMedium,
+                ExpansionTile(
+                  key: const Key('settings-diagnostics'),
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: const EdgeInsets.only(bottom: 8),
+                  title: const Text('Дыягностыка'),
+                  subtitle: const Text('Кэш і пакрыццё даных'),
+                  children: [
+                    if (stats.bootstrapNeeded)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'База яшчэ не загружана — адкрыйце галоўны экран',
+                        ),
+                      )
+                    else if (bootstrap.isRunning)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'Загрузка: ${bootstrap.phase == 'static' ? 'база' : 'дні'}...',
+                        ),
+                      ),
+                    if (stats.coverageLabel != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text('Пакрыццё дат: ${stats.coverageLabel}'),
+                      ),
+                    _StatRow(label: 'Малітвы', count: stats.prayers),
+                    _StatRow(label: 'Дні ў кэшы', count: stats.days),
+                    _StatRow(label: 'Гады', count: stats.years),
+                    _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
+                    _StatRow(label: 'Заклік', count: stats.invitatoriums),
+                    _StatRow(label: 'Камплета', count: stats.completoriums),
+                    _StatRow(
+                      label: 'Абраныя',
+                      count: settings.favoriteIds.length,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                if (stats.bootstrapNeeded)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      'База яшчэ не загружана — адкрыйце галоўны экран',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  )
-                else if (bootstrap.isRunning)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      'Загрузка: ${bootstrap.phase == 'static' ? 'база' : 'дні'}...',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                if (stats.coverageLabel != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      'Пакрыццё дат: ${stats.coverageLabel}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                _StatRow(label: 'Малітвы', count: stats.prayers),
-                _StatRow(label: 'Дні ў кэшы', count: stats.days),
-                _StatRow(label: 'Гады', count: stats.years),
-                _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
-                _StatRow(label: 'Заклік', count: stats.invitatoriums),
-                _StatRow(label: 'Камплета', count: stats.completoriums),
-                _StatRow(label: 'Абраныя', count: settings.favoriteIds.length),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // About
-                Text(
-                  'Пра дадатак',
-                  style: Theme.of(context).textTheme.titleMedium,
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) =>
+                      Text('Версія ${snapshot.data?.version ?? '—'}'),
                 ),
-                const SizedBox(height: 8),
-                const Text('Mybrev — беларускі каталіцкі малітоўнік'),
-                const Text('Версія 1.0.0'),
-                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => context.push('/about'),
+                    child: const Text('Інфармацыя пра дадатак'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -333,11 +328,6 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  TextStyle _textStyle(SettingsState settings) {
-    if (settings.resolvedFontFamily == null) return const TextStyle();
-    return GoogleFonts.getFont(settings.fontFamily);
   }
 
   String _formatDate(DateTime date) {
@@ -355,8 +345,37 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
+class _NeutralContentSurface extends StatelessWidget {
+  const _NeutralContentSurface({
+    required this.child,
+    required this.padding,
+    required this.borderRadius,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final BorderRadius borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Material(
+      color: cs.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+        side: BorderSide(color: cs.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(padding: padding, child: child),
+    );
+  }
+}
+
 // ── Categories section ────────────────────────────────────────────────────────
 
+// Kept temporarily for storage-compatible migration; the only visible editor
+// is now the canonical Prayerbook categories route.
+// ignore: unused_element
 class _CategoriesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {

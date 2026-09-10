@@ -19,7 +19,7 @@ class HiveService {
   static late Box _readings;
   static late Box _readingsIndex;
   static late Box _localPrayers;
-  static late Box _settings;
+  static Box? _settings;
   static late Box _invitatoriums;
   static late Box _completoriums;
 
@@ -29,7 +29,7 @@ class HiveService {
   static Box get readingsBox => _readings;
   static Box get readingsIndexBox => _readingsIndex;
   static Box get localPrayersBox => _localPrayers;
-  static Box get settingsBox => _settings;
+  static Box get settingsBox => _settings ?? Hive.box(_settingsBoxName);
   static Box get invitatoriumsBox => _invitatoriums;
   static Box get completoriumsBox => _completoriums;
 

@@ -33,11 +33,20 @@ class AboutScreen extends ConsumerWidget {
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 540),
-                      child: GlassSurface(
-                        seasonColor: seasonColor,
-                        borderRadius: BorderRadius.circular(28),
-                        padding: const EdgeInsets.fromLTRB(28, 36, 28, 28),
-                        child: const _AboutContent(),
+                      child: Material(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerLow,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(28, 36, 28, 28),
+                          child: _AboutContent(),
+                        ),
                       ),
                     ),
                   ),

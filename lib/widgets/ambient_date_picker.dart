@@ -82,10 +82,13 @@ class _MaterialAmbientDatePickerDialogState
       backgroundColor: Colors.transparent,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
-        child: GlassSurface(
-          style: GlassStyle.card,
-          seasonColor: widget.seasonColor,
-          borderRadius: BorderRadius.circular(28),
+        child: Material(
+          color: cs.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+            side: BorderSide(color: cs.outlineVariant),
+          ),
+          clipBehavior: Clip.antiAlias,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(28),
             child: Stack(

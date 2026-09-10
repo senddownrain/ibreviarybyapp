@@ -259,6 +259,7 @@ class MyBrevApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Mybrev',
+      restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       themeMode: settings.themeMode,

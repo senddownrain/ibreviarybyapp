@@ -4,295 +4,649 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 import 'package:mybrev_flutter/models/prayer.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 
-class PrayersScreen extends ConsumerStatefulWidget {
+const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
+
+class PrayersScreen extends ConsumerWidget {
   const PrayersScreen({super.key});
 
   @override
-  ConsumerState<PrayersScreen> createState() => _PrayersScreenState();
-}
-
-class _PrayersScreenState extends ConsumerState<PrayersScreen> {
-  late final TextEditingController _searchController;
-  final _searchFocusNode = FocusNode();
-  Timer? _searchDebounce;
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController(
-      text: ref.read(prayersFilterProvider).searchQuery,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorites = ref.watch(favoritePrayersProvider);
+    final categories = ref.watch(prayerMenuCategoriesProvider);
+    final catalog = ref.watch(prayerCatalogProvider);
+    final massAvailable = catalog.any(
+      (prayer) => prayer.id == _kMassOrderPrayerId,
     );
-  }
-
-  @override
-  void dispose() {
-    _searchDebounce?.cancel();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    super.dispose();
-  }
-
-  void _setSearch(String value) {
-    _searchDebounce?.cancel();
-    if (value.trim().isEmpty) {
-      ref.read(prayersFilterProvider.notifier).setSearch('');
-      return;
-    }
-    _searchDebounce = Timer(
-      const Duration(milliseconds: 300),
-      () => ref.read(prayersFilterProvider.notifier).setSearch(value),
-    );
-  }
-
-  void _clearSearch() {
-    _searchDebounce?.cancel();
-    _searchController.clear();
-    ref.read(prayersFilterProvider.notifier).setSearch('');
-    _searchFocusNode.requestFocus();
-  }
-
-  void _clearFilters() {
-    _searchDebounce?.cancel();
-    _searchController.clear();
-    ref.read(prayersFilterProvider.notifier).clearFilters();
-  }
-
-  Future<void> _openTagFilter() async {
-    FocusScope.of(context).unfocus();
-    await showModalBottomSheet<void>(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (_) => const _PrayerTagsSheet(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final prayers = ref.watch(filteredPrayersProvider);
-    final filter = ref.watch(prayersFilterProvider);
-    final settings = ref.watch(settingsProvider);
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final categoryState = ref.watch(globalPrayerCategoriesProvider);
+    final massLoading = categoryState.isLoading && catalog.isEmpty;
     final cs = Theme.of(context).colorScheme;
-    final topPad = MediaQuery.paddingOf(context).top;
-    final mediaBottomPad = MediaQuery.viewPaddingOf(context).bottom;
-    final rootView = View.of(context);
-    final rootBottomPad =
-        rootView.viewPadding.bottom / rootView.devicePixelRatio;
-    // A Scaffold can consume MediaQuery.padding for an edge-to-edge body.
-    // The root FlutterView keeps the actual Android navigation-bar inset,
-    // including the traditional three-button bar.
-    final bottomPad = rootBottomPad > mediaBottomPad
-        ? rootBottomPad
-        : mediaBottomPad;
+    final top = MediaQuery.paddingOf(context).top + 78;
 
-    return Stack(
-      children: [
-        AmbientWash(
-          seasonColor: seasonColor,
-          child: CustomScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, topPad + 78, 16, 22),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'МАЛІТОЎНІК',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.tertiary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        filter.selectedCategoryName ?? 'Малітвы',
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.5,
-                            ),
-                      ),
-                    ],
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          AmbientWash(
+            seasonColor: cs.tertiary,
+            child: ListView(
+              key: const PageStorageKey('prayerbook-root-scroll'),
+              padding: EdgeInsets.fromLTRB(
+                20,
+                top + 16,
+                20,
+                120 + MediaQuery.viewPaddingOf(context).bottom,
+              ),
+              children: [
+                Text(
+                  'Малітоўнік',
+                  key: const Key('prayerbook-title'),
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.7,
                   ),
                 ),
-              ),
-              if (prayers.isEmpty)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _EmptyPrayersState(
-                    hasActiveFilters: filter.isActive,
-                    onReset: _clearFilters,
-                  ),
-                )
-              else
-                SliverList.builder(
-                  itemCount: prayers.length,
-                  itemBuilder: (context, index) {
-                    final prayer = prayers[index];
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                      child: _PrayerCard(
-                        prayer: prayer,
-                        isFavorite: settings.favoriteIds.contains(prayer.id),
+                const SizedBox(height: 30),
+                const _SectionTitle(title: 'Абраныя'),
+                if (favorites.isEmpty)
+                  const Padding(
+                    key: Key('prayerbook-empty-favorites'),
+                    padding: EdgeInsets.fromLTRB(2, 8, 2, 12),
+                    child: Text('Дадавайце частыя малітвы ў Абраныя'),
+                  )
+                else
+                  for (final prayer in favorites)
+                    PrayerListRow(prayer: prayer, showFavorite: true),
+                const SizedBox(height: 24),
+                const _SectionTitle(title: 'Святая Імша'),
+                _DestinationRow(
+                  key: const Key('holy-mass-destination'),
+                  title: 'Святая Імша',
+                  subtitle: massLoading && !massAvailable
+                      ? 'Загрузка тэксту…'
+                      : 'Парадак святой Імшы',
+                  icon: PhosphorIconsRegular.church,
+                  trailing: massLoading && !massAvailable
+                      ? const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : null,
+                  onTap: () {
+                    if (massAvailable) {
+                      context.push('/prayers/prayer/$_kMassOrderPrayerId');
+                      return;
+                    }
+                    if (massLoading) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Тэкст пакуль недаступны'),
+                        action: SnackBarAction(
+                          label: 'Сінхранізацыя',
+                          onPressed: () =>
+                              context.push('/settings?section=sync'),
+                        ),
                       ),
                     );
                   },
                 ),
-              SliverToBoxAdapter(child: SizedBox(height: 124 + bottomPad)),
-            ],
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 24 + bottomPad,
-          child: SafeArea(
-            top: false,
-            bottom: false,
-            minimum: const EdgeInsets.symmetric(horizontal: 16),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 480),
-                child: _PrayerSearchDock(
-                  controller: _searchController,
-                  focusNode: _searchFocusNode,
-                  queryIsEmpty: _searchController.text.isEmpty,
-                  selectedTagCount: filter.selectedTags.length,
-                  onChanged: (value) {
-                    setState(() {});
-                    _setSearch(value);
-                  },
-                  onClear: _clearSearch,
-                  onFilter: _openTagFilter,
+                const SizedBox(height: 24),
+                _SectionTitle(
+                  title: 'Катэгорыі',
+                  action: TextButton(
+                    key: const Key('manage-prayer-categories'),
+                    onPressed: () => context.push('/prayers/categories'),
+                    child: const Text('Кіраваць'),
+                  ),
                 ),
-              ),
+                if (categoryState.isLoading && categories.isEmpty)
+                  const LinearProgressIndicator()
+                else if (categoryState.hasError && categories.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text('Катэгорыі пакуль недаступныя'),
+                  )
+                else if (categories.isEmpty)
+                  const Padding(
+                    key: Key('prayerbook-empty-categories'),
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text('Катэгорый пакуль няма'),
+                  )
+                else
+                  for (final category in categories)
+                    _CategoryRow(category: category),
+                const SizedBox(height: 28),
+                const _SectionTitle(title: 'Усе малітвы'),
+                _DestinationRow(
+                  key: const Key('all-prayers-destination'),
+                  title: 'Адкрыць увесь малітоўнік',
+                  subtitle: '${catalog.length} малітваў',
+                  icon: PhosphorIconsRegular.books,
+                  onTap: () => context.push('/prayers/all'),
+                ),
+                const SizedBox(height: 12),
+                _DestinationRow(
+                  key: const Key('my-prayers-destination'),
+                  title: 'Мае малітвы',
+                  subtitle: 'Стварыць або змяніць асабістую малітву',
+                  icon: PhosphorIconsRegular.notepad,
+                  onTap: () => context.push('/prayers/my'),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+          FloatingTopActions(
+            seasonColor: cs.tertiary,
+            actions: [
+              IconButton(
+                key: const Key('prayerbook-search-action'),
+                tooltip: 'Пошук малітваў',
+                onPressed: () => context.push('/prayers/search'),
+                icon: const PhosphorIcon(
+                  PhosphorIconsRegular.magnifyingGlass,
+                  size: 22,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _PrayerSearchDock extends StatelessWidget {
-  const _PrayerSearchDock({
-    required this.controller,
-    required this.focusNode,
-    required this.queryIsEmpty,
-    required this.selectedTagCount,
-    required this.onChanged,
-    required this.onClear,
-    required this.onFilter,
+class PrayerCatalogScreen extends ConsumerStatefulWidget {
+  const PrayerCatalogScreen({super.key, this.searchInitially = false});
+
+  final bool searchInitially;
+
+  @override
+  ConsumerState<PrayerCatalogScreen> createState() =>
+      _PrayerCatalogScreenState();
+}
+
+class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
+  late final TextEditingController _query;
+  late final FocusNode _focus;
+  final ScrollController _scrollController = ScrollController();
+  Timer? _debounce;
+  late bool _searching;
+
+  @override
+  void initState() {
+    super.initState();
+    final filter = ref.read(prayersFilterProvider);
+    _query = TextEditingController(text: filter.searchQuery);
+    _focus = FocusNode();
+    _searching = widget.searchInitially || filter.searchQuery.isNotEmpty;
+    if (widget.searchInitially) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _focus.requestFocus(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _query.dispose();
+    _focus.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _setQuery(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(
+      const Duration(milliseconds: 250),
+      () => ref.read(prayersFilterProvider.notifier).setSearch(value),
+    );
+  }
+
+  void _showSearch() {
+    setState(() => _searching = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _focus.requestFocus());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final catalog = ref.watch(prayerCatalogProvider);
+    final filter = ref.watch(prayersFilterProvider);
+    final visible = filterAndSortPrayers(
+      catalog,
+      filter,
+      ref.watch(settingsProvider).favoriteIds,
+    );
+    return _PrayerListPage(
+      title: widget.searchInitially ? 'Пошук' : 'Усе малітвы',
+      subtitle: widget.searchInitially
+          ? 'Назва або тэкст малітвы'
+          : 'Увесь малітоўнік адным спісам',
+      scrollController: _scrollController,
+      scrollKey: widget.searchInitially
+          ? const PageStorageKey('prayer-search-scroll')
+          : const PageStorageKey('all-prayers-scroll'),
+      topAction: IconButton(
+        key: const Key('catalog-search-action'),
+        tooltip: 'Пошук малітваў',
+        onPressed: _showSearch,
+        icon: const PhosphorIcon(PhosphorIconsRegular.magnifyingGlass),
+      ),
+      searchField: _searching
+          ? TextField(
+              key: const Key('prayer-search-field'),
+              controller: _query,
+              focusNode: _focus,
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: 'Знайсці малітву',
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: _query.text.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Ачысціць пошук',
+                        onPressed: () {
+                          _debounce?.cancel();
+                          _query.clear();
+                          ref
+                              .read(prayersFilterProvider.notifier)
+                              .setSearch('');
+                          setState(() {});
+                          _focus.requestFocus();
+                        },
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+              ),
+              onChanged: (value) {
+                _setQuery(value);
+                setState(() {});
+              },
+            )
+          : null,
+      filterAction: _searching
+          ? TextButton.icon(
+              key: const Key('prayer-filter-action'),
+              onPressed: () => _showTagFilter(context),
+              icon: const Icon(Icons.tune_rounded),
+              label: Text(
+                filter.selectedTags.isEmpty
+                    ? 'Фільтры'
+                    : 'Фільтры · ${filter.selectedTags.length}',
+              ),
+            )
+          : null,
+      prayers: visible,
+      emptyTitle: filter.isActive
+          ? 'Малітваў не знойдзена'
+          : 'Малітоўнік пакуль пусты',
+    );
+  }
+
+  Future<void> _showTagFilter(BuildContext context) =>
+      showModalBottomSheet<void>(
+        context: context,
+        useSafeArea: true,
+        showDragHandle: true,
+        isScrollControlled: true,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+        builder: (_) => const _PrayerTagsSheet(),
+      );
+}
+
+class PrayerCategoryScreen extends ConsumerStatefulWidget {
+  const PrayerCategoryScreen({super.key, required this.categoryId});
+
+  final String categoryId;
+
+  @override
+  ConsumerState<PrayerCategoryScreen> createState() =>
+      _PrayerCategoryScreenState();
+}
+
+class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final category = ref
+        .watch(prayerMenuCategoriesProvider)
+        .where((item) => item.id == widget.categoryId)
+        .firstOrNull;
+    if (category == null) {
+      return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
+    }
+    final settings = ref.watch(settingsProvider);
+    final prayers = prayersForCategory(
+      ref.watch(prayerCatalogProvider),
+      category,
+      settings,
+    );
+    return _PrayerListPage(
+      title: category.name,
+      subtitle: 'Малітвы гэтай катэгорыі',
+      scrollController: _scrollController,
+      scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
+      topAction: IconButton(
+        key: const Key('category-manage-action'),
+        tooltip: 'Кіраваць катэгорыямі',
+        onPressed: () => context.push('/prayers/categories'),
+        icon: const Icon(Icons.more_horiz_rounded),
+      ),
+      prayers: prayers,
+      emptyTitle: 'У гэтай катэгорыі няма малітваў',
+    );
+  }
+}
+
+class PrayerCategoriesScreen extends ConsumerWidget {
+  const PrayerCategoriesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final globals = ref.watch(globalPrayerCategoriesProvider);
+    final cs = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: Stack(
+        children: [
+          AmbientWash(
+            seasonColor: cs.tertiary,
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                MediaQuery.paddingOf(context).top + 90,
+                20,
+                120 + MediaQuery.viewPaddingOf(context).bottom,
+              ),
+              children: [
+                Text(
+                  'Катэгорыі',
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Стандартныя можна схаваць, асабістыя — змяняць і выдаляць.',
+                  style: TextStyle(color: cs.onSurfaceVariant),
+                ),
+                const SizedBox(height: 24),
+                globals.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, _) => const Text(
+                    'Не атрымалася загрузіць стандартныя катэгорыі',
+                  ),
+                  data: (items) => Column(
+                    children: [
+                      for (final category in items)
+                        _ManageCategoryRow(
+                          key: ValueKey('manage-global-${category.id}'),
+                          category: category,
+                          hidden: settings.hiddenGlobalPrayerCategoryIds
+                              .contains(category.id),
+                          onVisibility: () {
+                            final notifier = ref.read(
+                              settingsProvider.notifier,
+                            );
+                            if (settings.hiddenGlobalPrayerCategoryIds.contains(
+                              category.id,
+                            )) {
+                              notifier.showGlobalPrayerCategory(category.id);
+                            } else {
+                              notifier.hideGlobalPrayerCategory(category.id);
+                            }
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                for (final category in settings.userCategories)
+                  _ManageCategoryRow(
+                    key: ValueKey('manage-user-${category.id}'),
+                    category: PrayerMenuCategory.personal(category),
+                    onEdit: () => _editCategory(context, ref, category),
+                    onDelete: () => _deleteCategory(context, ref, category),
+                  ),
+                const SizedBox(height: 18),
+                FilledButton.icon(
+                  key: const Key('create-category-action'),
+                  onPressed: () => _editCategory(context, ref, null),
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Стварыць катэгорыю'),
+                ),
+              ],
+            ),
+          ),
+          FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editCategory(
+    BuildContext context,
+    WidgetRef ref,
+    UserCategory? existing,
+  ) async {
+    final catalog = ref.read(prayerCatalogProvider);
+    final settings = ref.read(settingsProvider);
+    final result = await showDialog<_CategoryDraft>(
+      context: context,
+      builder: (_) => _CategoryEditorDialog(
+        existing: existing,
+        prayers: catalog,
+        memberIds: existing == null
+            ? const {}
+            : {
+                for (final prayer in catalog)
+                  if (settings.prayerCategoryMap[prayer.id]?.contains(
+                        existing.id,
+                      ) ==
+                      true)
+                    prayer.id,
+              },
+      ),
+    );
+    if (result == null || !context.mounted) return;
+    final notifier = ref.read(settingsProvider.notifier);
+    final id = existing == null
+        ? notifier.addCategory(result.name, result.tags)
+        : existing.id;
+    if (existing != null) {
+      notifier.updateCategory(id, result.name, result.tags);
+    }
+    for (final prayer in catalog) {
+      notifier.setPrayerCategory(
+        prayer.id,
+        id,
+        result.memberIds.contains(prayer.id),
+      );
+    }
+  }
+
+  Future<void> _deleteCategory(
+    BuildContext context,
+    WidgetRef ref,
+    UserCategory category,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Выдаліць катэгорыю?'),
+        content: Text(category.name),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Адмена'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Выдаліць'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      ref.read(settingsProvider.notifier).deleteCategory(category.id);
+    }
+  }
+}
+
+class PrayerListRow extends ConsumerWidget {
+  const PrayerListRow({
+    super.key,
+    required this.prayer,
+    this.showFavorite = true,
   });
 
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool queryIsEmpty;
-  final int selectedTagCount;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-  final VoidCallback onFilter;
+  final Prayer prayer;
+  final bool showFavorite;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorite = ref
+        .watch(settingsProvider)
+        .favoriteIds
+        .contains(prayer.id);
+    final cs = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: prayer.displayTitle,
+      child: InkWell(
+        key: ValueKey('prayer-row-${prayer.id}'),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          context.push('/prayers/prayer/${prayer.id}');
+        },
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 62),
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Text(
+                    prayer.displayTitle,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium?.copyWith(height: 1.3),
+                  ),
+                ),
+              ),
+              if (showFavorite)
+                IconButton(
+                  key: ValueKey('favorite-${prayer.id}'),
+                  tooltip: favorite ? 'Выдаліць з абраных' : 'Дадаць у абраныя',
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(settingsProvider.notifier)
+                        .toggleFavorite(prayer.id);
+                  },
+                  icon: PhosphorIcon(
+                    favorite
+                        ? PhosphorIconsFill.heart
+                        : PhosphorIconsRegular.heart,
+                    color: favorite ? cs.error : cs.onSurfaceVariant,
+                    size: 21,
+                  ),
+                ),
+              Icon(Icons.chevron_right_rounded, color: cs.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrayerListPage extends StatelessWidget {
+  const _PrayerListPage({
+    required this.title,
+    required this.subtitle,
+    required this.prayers,
+    required this.emptyTitle,
+    required this.scrollController,
+    required this.scrollKey,
+    this.topAction,
+    this.searchField,
+    this.filterAction,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<Prayer> prayers;
+  final String emptyTitle;
+  final ScrollController scrollController;
+  final PageStorageKey<String> scrollKey;
+  final Widget? topAction;
+  final Widget? searchField;
+  final Widget? filterAction;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return GlassSurface(
-      style: GlassStyle.pill,
-      borderRadius: BorderRadius.circular(29),
-      child: SizedBox(
-        height: 58,
-        child: Row(
-          children: [
-            const SizedBox(width: 18),
-            PhosphorIcon(
-              PhosphorIconsRegular.magnifyingGlass,
-              size: 23,
-              color: cs.tertiary,
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                textInputAction: TextInputAction.search,
-                decoration: const InputDecoration(
-                  hintText: 'Пошук малітваў',
-                  filled: false,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                ),
-                onChanged: onChanged,
+    return Scaffold(
+      body: Stack(
+        children: [
+          AmbientWash(
+            seasonColor: cs.tertiary,
+            child: ListView(
+              key: scrollKey,
+              controller: scrollController,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(
+                20,
+                MediaQuery.paddingOf(context).top + 90,
+                20,
+                120 + MediaQuery.viewPaddingOf(context).bottom,
               ),
-            ),
-            if (!queryIsEmpty)
-              IconButton(
-                tooltip: 'Ачысціць пошук',
-                onPressed: onClear,
-                icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 19),
-              ),
-            Stack(
-              clipBehavior: Clip.none,
               children: [
-                IconButton(
-                  tooltip: selectedTagCount == 0
-                      ? 'Адкрыць фільтр'
-                      : 'Фільтр: выбрана $selectedTagCount',
-                  onPressed: onFilter,
-                  style: selectedTagCount == 0
-                      ? null
-                      : IconButton.styleFrom(
-                          backgroundColor: cs.tertiaryContainer,
-                          foregroundColor: cs.tertiary,
-                        ),
-                  icon: const PhosphorIcon(
-                    PhosphorIconsRegular.slidersHorizontal,
-                    size: 21,
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                if (selectedTagCount > 0)
-                  Positioned(
-                    top: -1,
-                    right: -1,
-                    child: Container(
-                      constraints: const BoxConstraints(minWidth: 17),
-                      height: 17,
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: cs.tertiary,
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                      child: Text(
-                        '$selectedTagCount',
-                        style: TextStyle(
-                          color: cs.onTertiary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          height: 1,
-                        ),
-                      ),
-                    ),
-                  ),
+                const SizedBox(height: 6),
+                Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
+                if (searchField != null) ...[
+                  const SizedBox(height: 20),
+                  searchField!,
+                  Align(alignment: Alignment.centerRight, child: filterAction),
+                ] else
+                  const SizedBox(height: 18),
+                if (prayers.isEmpty)
+                  Padding(
+                    key: const Key('prayer-list-empty'),
+                    padding: const EdgeInsets.symmetric(vertical: 42),
+                    child: Text(emptyTitle, textAlign: TextAlign.center),
+                  )
+                else
+                  for (final prayer in prayers) PrayerListRow(prayer: prayer),
               ],
             ),
-            const SizedBox(width: 8),
-          ],
-        ),
+          ),
+          FloatingTopActions(
+            showBack: true,
+            seasonColor: cs.tertiary,
+            actions: topAction == null ? const [] : [topAction!],
+          ),
+        ],
       ),
     );
   }
@@ -304,247 +658,292 @@ class _PrayerTagsSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tags = ref.watch(allTagsProvider);
-    final selectedTags = ref.watch(
-      prayersFilterProvider.select((filter) => filter.selectedTags),
-    );
-    final cs = Theme.of(context).colorScheme;
-
+    final selected = ref.watch(prayersFilterProvider).selectedTags;
     return SafeArea(
       top: false,
-      minimum: const EdgeInsets.only(bottom: 8),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * 0.78,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'МАЛІТВЫ',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: cs.tertiary,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.1,
-                              ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Фільтр па тэгах',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Закрыць фільтр',
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 20),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Можна выбраць некалькі тэгаў',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-              ),
-              const SizedBox(height: 12),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final tag in tags)
-                        FilterChip(
-                          label: Text(tag),
-                          selected: selectedTags.contains(tag),
-                          onSelected: (_) => ref
-                              .read(prayersFilterProvider.notifier)
-                              .toggleTag(tag),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: selectedTags.isEmpty
-                        ? null
-                        : () => ref
-                              .read(prayersFilterProvider.notifier)
-                              .clearTags(),
-                    child: const Text('Ачысціць'),
-                  ),
-                  const Spacer(),
-                  FilledButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Гатова'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PrayerCard extends ConsumerWidget {
-  const _PrayerCard({required this.prayer, required this.isFavorite});
-
-  final Prayer prayer;
-  final bool isFavorite;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(22),
-        onTap: () {
-          HapticFeedback.lightImpact();
-          context.push('/prayer/${prayer.id}');
-        },
-        child: GlassSurface(
-          borderRadius: BorderRadius.circular(22),
-          padding: const EdgeInsets.fromLTRB(8, 14, 10, 14),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isFavorite
-                      ? cs.errorContainer.withValues(alpha: 0.5)
-                      : cs.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: (isFavorite ? cs.error : cs.tertiary).withValues(
-                      alpha: 0.18,
-                    ),
-                  ),
-                ),
-                child: Tooltip(
-                  message: isFavorite
-                      ? 'Выдаліць з абраных'
-                      : 'Дадаць у абраныя',
-                  child: Material(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      hoverColor: (isFavorite ? cs.error : cs.tertiary)
-                          .withValues(alpha: 0.07),
-                      splashColor: (isFavorite ? cs.error : cs.tertiary)
-                          .withValues(alpha: 0.11),
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        ref
-                            .read(settingsProvider.notifier)
-                            .toggleFavorite(prayer.id);
-                      },
-                      child: Center(
-                        child: PhosphorIcon(
-                          isFavorite
-                              ? PhosphorIconsFill.heart
-                              : PhosphorIconsRegular.heart,
-                          size: 22,
-                          color: isFavorite ? cs.error : cs.tertiary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  prayer.displayTitle,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    height: 1.35,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              PhosphorIcon(
-                PhosphorIconsRegular.caretRight,
-                size: 20,
-                color: cs.onSurfaceVariant,
-              ),
-              const SizedBox(width: 2),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyPrayersState extends StatelessWidget {
-  const _EmptyPrayersState({
-    required this.hasActiveFilters,
-    required this.onReset,
-  });
-
-  final bool hasActiveFilters;
-  final VoidCallback onReset;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Center(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(28, 28, 28, 110),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PhosphorIcon(
-              PhosphorIconsLight.noteBlank,
-              size: 48,
-              color: cs.onSurfaceVariant,
-            ),
-            const SizedBox(height: 12),
             Text(
-              'Малітвы не знойдзены',
-              style: Theme.of(context).textTheme.titleMedium,
+              'Фільтр па тэгах',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            if (hasActiveFilters) ...[
-              const SizedBox(height: 6),
-              Text(
-                'Паспрабуйце змяніць пошук або фільтры',
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            const SizedBox(height: 16),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final tag in tags)
+                      FilterChip(
+                        label: Text(tag),
+                        selected: selected.contains(tag),
+                        onSelected: (_) => ref
+                            .read(prayersFilterProvider.notifier)
+                            .toggleTag(tag),
+                      ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: onReset,
-                child: const Text('Скінуць фільтры'),
-              ),
-            ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: selected.isEmpty
+                      ? null
+                      : ref.read(prayersFilterProvider.notifier).clearTags,
+                  child: const Text('Ачысціць'),
+                ),
+                const Spacer(),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Гатова'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title, this.action});
+  final String title;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Text(
+          title,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+      ),
+      ?action,
+    ],
+  );
+}
+
+class _CategoryRow extends StatelessWidget {
+  const _CategoryRow({required this.category});
+  final PrayerMenuCategory category;
+
+  @override
+  Widget build(BuildContext context) => _DestinationRow(
+    key: ValueKey('category-${category.id}'),
+    title: category.name,
+    icon: PhosphorIconsRegular.folder,
+    onTap: () => context.push('/prayers/category/${category.id}'),
+  );
+}
+
+class _DestinationRow extends StatelessWidget {
+  const _DestinationRow({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.onTap,
+    this.subtitle,
+    this.trailing,
+  });
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    minTileHeight: 58,
+    leading: Icon(icon),
+    title: Text(title),
+    subtitle: subtitle == null ? null : Text(subtitle!),
+    trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
+    onTap: onTap,
+  );
+}
+
+class _ManageCategoryRow extends StatelessWidget {
+  const _ManageCategoryRow({
+    super.key,
+    required this.category,
+    this.hidden = false,
+    this.onVisibility,
+    this.onEdit,
+    this.onDelete,
+  });
+  final PrayerMenuCategory category;
+  final bool hidden;
+  final VoidCallback? onVisibility;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    title: Text(category.name),
+    subtitle: Text(
+      category.isGlobal ? 'Стандартная катэгорыя' : 'Ваша катэгорыя',
+    ),
+    trailing: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (onVisibility != null)
+          IconButton(
+            key: ValueKey('category-visibility-${category.id}'),
+            tooltip: hidden ? 'Паказаць' : 'Схаваць',
+            onPressed: onVisibility,
+            icon: Icon(
+              hidden
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+            ),
+          ),
+        if (onEdit != null)
+          IconButton(
+            tooltip: 'Рэдагаваць',
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit_outlined),
+          ),
+        if (onDelete != null)
+          IconButton(
+            tooltip: 'Выдаліць',
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline_rounded),
+          ),
+      ],
+    ),
+  );
+}
+
+class _CategoryDraft {
+  const _CategoryDraft(this.name, this.tags, this.memberIds);
+  final String name;
+  final List<String> tags;
+  final Set<String> memberIds;
+}
+
+class _CategoryEditorDialog extends StatefulWidget {
+  const _CategoryEditorDialog({
+    required this.existing,
+    required this.prayers,
+    required this.memberIds,
+  });
+  final UserCategory? existing;
+  final List<Prayer> prayers;
+  final Set<String> memberIds;
+
+  @override
+  State<_CategoryEditorDialog> createState() => _CategoryEditorDialogState();
+}
+
+class _CategoryEditorDialogState extends State<_CategoryEditorDialog> {
+  late final TextEditingController _name = TextEditingController(
+    text: widget.existing?.name ?? '',
+  );
+  late final TextEditingController _tags = TextEditingController(
+    text: widget.existing?.tags.join(', ') ?? '',
+  );
+  late final Set<String> _members = Set<String>.from(widget.memberIds);
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _tags.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text(
+      widget.existing == null ? 'Новая катэгорыя' : 'Змяніць катэгорыю',
+    ),
+    content: SizedBox(
+      width: 520,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              key: const Key('category-name-field'),
+              controller: _name,
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'Назва'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _tags,
+              decoration: const InputDecoration(
+                labelText: 'Тэгі',
+                helperText: 'Праз коску; катэгорыя застаецца tag-based',
+              ),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Дададзеныя малітвы',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+            for (final prayer in widget.prayers)
+              CheckboxListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                title: Text(prayer.displayTitle),
+                value: _members.contains(prayer.id),
+                onChanged: (selected) => setState(
+                  () => selected == true
+                      ? _members.add(prayer.id)
+                      : _members.remove(prayer.id),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Адмена'),
+      ),
+      FilledButton(
+        key: const Key('save-category-action'),
+        onPressed: () {
+          final name = _name.text.trim();
+          if (name.isEmpty) return;
+          final tags = _tags.text
+              .split(',')
+              .map((tag) => tag.trim())
+              .where((tag) => tag.isNotEmpty)
+              .toSet()
+              .toList();
+          Navigator.pop(context, _CategoryDraft(name, tags, _members));
+        },
+        child: const Text('Захаваць'),
+      ),
+    ],
+  );
+}
+
+class _MissingPrayerbookPage extends StatelessWidget {
+  const _MissingPrayerbookPage({required this.title});
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Малітоўнік')),
+    body: Center(child: Text(title)),
+  );
 }

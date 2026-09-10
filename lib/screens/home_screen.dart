@@ -5,17 +5,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -23,474 +28,757 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final date = ref.watch(selectedDateProvider);
-    final options = ref.watch(dayOptionsProvider);
-    final isLoading = ref.watch(homeDataLoadingProvider);
+    final selection = ref.watch(hoursLiturgicalSelectionProvider);
     final bootstrap = ref.watch(dataBootstrapProvider);
+    final loading = ref.watch(homeDataLoadingProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    final navDir = ref.watch(homeNavDirectionProvider);
-    final tokens = GlassTokens.of(context);
-    final titleColor = tokens.accentOnSurface(seasonColor);
-    final cs = Theme.of(context).colorScheme;
-    final now = DateTime.now();
-    final isToday =
-        date.year == now.year && date.month == now.month && date.day == now.day;
-
-    final dayOfWeekLabel = _sentenceCase(DateFormat('EEEE', 'be').format(date));
-    final dayMonthLabel = DateFormat('d MMMM y', 'be').format(date);
+    final today = DateUtils.dateOnly(DateTime.now());
+    final isToday = DateUtils.isSameDay(date, today);
 
     return Stack(
       children: [
         AmbientWash.hero(seasonColor: seasonColor),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
+        CustomScrollView(
+          key: const PageStorageKey('hours-root-scroll'),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 22),
-                    child: GlassSurface(
-                      style: GlassStyle.card,
-                      seasonColor: seasonColor,
-                      borderRadius: BorderRadius.circular(28),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => _pickDate(context, ref, date),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 260),
-                          transitionBuilder: (child, anim) {
-                            final slide =
-                                Tween<Offset>(
-                                  begin: Offset(navDir * 0.25, 0),
-                                  end: Offset.zero,
-                                ).animate(
-                                  CurvedAnimation(
-                                    parent: anim,
-                                    curve: Curves.easeOut,
-                                  ),
-                                );
-                            return FadeTransition(
-                              opacity: anim,
-                              child: SlideTransition(
-                                position: slide,
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: SizedBox(
-                            key: ValueKey(date.toIso8601String()),
-                            height: 190,
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  top: -30,
-                                  right: -24,
-                                  child: Container(
-                                    width: 116,
-                                    height: 116,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: seasonColor.withValues(
-                                        alpha: tokens.isDark ? 0.20 : 0.13,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(24),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          PhosphorIcon(
-                                            PhosphorIconsRegular.circleHalf,
-                                            size: 14,
-                                            color: titleColor,
-                                          ),
-                                          const SizedBox(width: 7),
-                                          Expanded(
-                                            child: Text(
-                                              isToday
-                                                  ? 'ЛІТУРГІЧНЫ КАЛЯНДАР · СЁННЯ'
-                                                  : 'ЛІТУРГІЧНЫ КАЛЯНДАР · ВЫБРАНАЯ ДАТА',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelSmall
-                                                  ?.copyWith(
-                                                    color: titleColor,
-                                                    fontWeight: FontWeight.w800,
-                                                    letterSpacing: 1.0,
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        dayOfWeekLabel,
-                                        style: ReaderTheme.of(context)
-                                            .displayTitle(38)
-                                            .copyWith(color: cs.onSurface),
-                                      ),
-                                      const SizedBox(height: 14),
-                                      Row(
-                                        children: [
-                                          PhosphorIcon(
-                                            PhosphorIconsRegular.calendarBlank,
-                                            size: 17,
-                                            color: cs.onSurfaceVariant,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            dayMonthLabel,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: cs.onSurfaceVariant,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                          ),
-                                          const Spacer(),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 5,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: seasonColor.withValues(
-                                                alpha: tokens.isDark
-                                                    ? 0.18
-                                                    : 0.10,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(999),
-                                              border: Border.all(
-                                                color: seasonColor.withValues(
-                                                  alpha: 0.20,
-                                                ),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  'Змяніць',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .labelSmall
-                                                      ?.copyWith(
-                                                        color: titleColor,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                      ),
-                                                ),
-                                                const SizedBox(width: 3),
-                                                PhosphorIcon(
-                                                  PhosphorIconsRegular
-                                                      .caretDown,
-                                                  size: 12,
-                                                  color: titleColor,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    padding: EdgeInsets.fromLTRB(
+                      24,
+                      16,
+                      24,
+                      116 + MediaQuery.viewPaddingOf(context).bottom,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Гадзіны',
+                          style: ReaderTheme.of(context).displayTitle(38),
                         ),
-                      ),
+                        const SizedBox(height: 22),
+                        _DateHeader(
+                          date: date,
+                          color: seasonColor,
+                          onTap: () => _showDateActions(context, ref, date),
+                          onToday: isToday
+                              ? null
+                              : () =>
+                                    ref
+                                            .read(selectedDateProvider.notifier)
+                                            .state =
+                                        today,
+                        ),
+                        const SizedBox(height: 28),
+                        if (selection.selected case final selected?) ...[
+                          _Celebration(
+                            option: selected,
+                            day: selection.day,
+                            isManual: selected.key != selection.primary?.key,
+                            color: seasonColor,
+                          ),
+                          if (selection.alternativesCount > 0) ...[
+                            const SizedBox(height: 14),
+                            TextButton.icon(
+                              key: const Key('hours-alternatives-control'),
+                              style: TextButton.styleFrom(
+                                minimumSize: const Size(48, 48),
+                                foregroundColor: _semanticInk(
+                                  context,
+                                  seasonColor,
+                                ),
+                              ),
+                              onPressed: () =>
+                                  _showAlternatives(context, date, seasonColor),
+                              icon: const PhosphorIcon(
+                                PhosphorIconsRegular.stack,
+                                size: 19,
+                              ),
+                              label: Text(
+                                'Іншыя літургічныя варыянты · '
+                                '${selection.alternativesCount}',
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 28),
+                          _HoursList(
+                            date: date,
+                            selection: selection,
+                            color: seasonColor,
+                          ),
+                        ] else if (loading) ...[
+                          const _HoursLoading(),
+                        ] else if (bootstrap.error != null) ...[
+                          const _HoursMessage(
+                            icon: PhosphorIconsRegular.warningCircle,
+                            title: 'Не ўдалося загрузіць дзень',
+                            body:
+                                'Праверце падключэнне або сінхранізацыю ў Наладах.',
+                          ),
+                        ] else ...[
+                          const _HoursMessage(
+                            icon: PhosphorIconsRegular.calendarX,
+                            title: 'Няма даступнага літургічнага дня',
+                            body:
+                                'Для гэтай даты не знойдзена змесціва. Праверце сінхранізацыю ў Наладах.',
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
-                if (options.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                      child: Text(
-                        'ВЫБЕРЫЦЕ ЛІТУРГІЧНЫ ДЗЕНЬ',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.0,
-                        ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _DateHeader extends StatelessWidget {
+  const _DateHeader({
+    required this.date,
+    required this.color,
+    required this.onTap,
+    this.onToday,
+  });
+
+  final DateTime date;
+  final Color color;
+  final VoidCallback onTap;
+  final VoidCallback? onToday;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: 'Дата ${DateFormat('d MMMM y', 'be').format(date)}. Змяніць дату',
+      child: InkWell(
+        key: const Key('hours-date-action'),
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _sentenceCase(DateFormat('EEEE', 'be').format(date)),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
                       ),
                     ),
+                    const SizedBox(height: 3),
+                    Text(
+                      DateFormat('d MMMM y', 'be').format(date),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onToday != null)
+                TextButton(
+                  key: const Key('hours-today-action'),
+                  onPressed: onToday,
+                  child: const Text('Сёння'),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: PhosphorIcon(
+                    PhosphorIconsRegular.caretDown,
+                    size: 18,
+                    color: _semanticInk(context, color),
                   ),
-                if (options.isEmpty && isLoading)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 32,
-                      ),
-                      child: GlassSurface(
-                        style: GlassStyle.card,
-                        seasonColor: seasonColor,
-                        padding: const EdgeInsets.all(28),
-                        child: Column(
-                          children: [
-                            const SizedBox(
-                              width: 36,
-                              height: 36,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              bootstrap.phase == 'static'
-                                  ? 'Загрузка базы дадзеных...'
-                                  : 'Загрузка літургічных дзён...',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: cs.onSurface,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Гэта можа заняць некалькі секунд',
-                              style: TextStyle(
-                                color: cs.onSurfaceVariant,
-                                fontSize: 13,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                else if (options.isEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GlassSurface(
-                        style: GlassStyle.card,
-                        seasonColor: seasonColor,
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            PhosphorIcon(
-                              PhosphorIconsLight.arrowsClockwise,
-                              size: 48,
-                              color: cs.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Няма дадзеных',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: cs.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Сінхранізуйце дадзеныя ў Наладах',
-                              style: TextStyle(
-                                color: cs.onSurfaceVariant,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate((context, i) {
-                      final opt = options[i];
-                      if (kDebugMode) {
-                        debugPrint(
-                          '[Home] DayOptionCard render - key=${opt.key}, source=${opt.source}',
-                        );
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                        child: _DayOptionCard(option: opt, date: date),
-                      );
-                    }, childCount: options.length),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Celebration extends StatelessWidget {
+  const _Celebration({
+    required this.option,
+    required this.day,
+    required this.isManual,
+    required this.color,
+  });
+
+  final DayOption option;
+  final LiturgicalDay? day;
+  final bool isManual;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final semantic = _semanticInk(context, color);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 4,
+          height: 64,
+          margin: const EdgeInsets.only(top: 3),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(99),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (option.subtitle case final subtitle?)
+                Text(
+                  '${isManual ? 'ВЫБРАНЫ ВАРЫЯНТ · ' : ''}$subtitle'
+                      .toUpperCase(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: semantic,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
                   ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 88 + MediaQuery.viewPaddingOf(context).bottom,
+                ),
+              const SizedBox(height: 5),
+              Text(
+                option.title,
+                style: ReaderTheme.of(
+                  context,
+                ).displayTitle(29).copyWith(color: cs.onSurface, height: 1.18),
+              ),
+              if ((day?.feastComment ?? '').trim().isNotEmpty) ...[
+                const SizedBox(height: 7),
+                Text(
+                  _stripHtml(day!.feastComment!),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: cs.onSurfaceVariant,
+                    height: 1.35,
                   ),
                 ),
               ],
-            ),
+            ],
           ),
         ),
       ],
     );
   }
+}
 
-  Future<void> _pickDate(
-    BuildContext context,
-    WidgetRef ref,
-    DateTime date,
-  ) async {
-    final picked = await showAmbientDatePicker(
-      context: context,
-      initialDate: date,
-      seasonColor: ref.read(liturgicalSeasonColorProvider),
-    );
-    if (picked != null && context.mounted) {
-      ref.read(selectedDateProvider.notifier).state = picked;
+class _HoursList extends StatelessWidget {
+  const _HoursList({
+    required this.date,
+    required this.selection,
+    required this.color,
+  });
+
+  final DateTime date;
+  final HoursLiturgicalSelection selection;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final available = kHoraItems
+        .where((hour) => isHourAvailable(selection.day, hour))
+        .toList();
+    if (available.isEmpty) {
+      return const _HoursMessage(
+        icon: PhosphorIconsRegular.clockCountdown,
+        title: 'Няма даступных гадзін',
+        body: 'Для выбранага варыянту няма змесціва Літургіі гадзін.',
+      );
     }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'ЛІТУРГІЯ ГАДЗІН',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
+          ),
+        ),
+        const SizedBox(height: 8),
+        for (var index = 0; index < available.length; index++) ...[
+          _HourRow(
+            hour: available[index],
+            color: color,
+            onTap: () {
+              final dayId = selection.dayId;
+              final option = selection.effectiveOption;
+              if (dayId == null || option == null) return;
+              HapticFeedback.lightImpact();
+              _prefetchDay(date, option);
+              context.push(
+                oraRouteForContext(
+                  date: date,
+                  dayId: dayId,
+                  oraType: available[index].type,
+                ),
+              );
+            },
+          ),
+          if (index != available.length - 1)
+            const Divider(height: 1, indent: 54),
+        ],
+      ],
+    );
   }
 }
 
-class _DayOptionCard extends ConsumerWidget {
-  final DayOption option;
-  final DateTime date;
-  const _DayOptionCard({required this.option, required this.date});
+class _HourRow extends StatelessWidget {
+  const _HourRow({
+    required this.hour,
+    required this.color,
+    required this.onTap,
+  });
+  final HoraItem hour;
+  final Color color;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tokens = GlassTokens.of(context);
+  Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final accentColor = _accentForOption(option);
-    final accentFg = tokens.accentOnSurface(accentColor);
-    final day = option.day;
-    final hasDay = day != null;
-
-    final icon = switch (option.source) {
-      LiturgicalOptionSource.period => PhosphorIconsRegular.calendar,
-      LiturgicalOptionSource.dynamic => PhosphorIconsRegular.star,
-      LiturgicalOptionSource.fixed => PhosphorIconsRegular.cross,
-      LiturgicalOptionSource.officeForDead => PhosphorIconsRegular.flowerLotus,
-    };
-
-    final sourceLabel = switch (option.source) {
-      LiturgicalOptionSource.period => null,
-      LiturgicalOptionSource.dynamic => 'свята',
-      LiturgicalOptionSource.fixed => 'фіксаванае свята',
-      LiturgicalOptionSource.officeForDead => 'памінальны афіцый',
-    };
-
-    final child = GlassSurface(
-      style: GlassStyle.card,
-      seasonColor: accentColor,
-      borderRadius: BorderRadius.circular(22),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: accentFg.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: accentColor.withValues(alpha: 0.18)),
-            ),
-            child: Center(child: PhosphorIcon(icon, size: 24, color: accentFg)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (sourceLabel != null) ...[
-                  Text(
-                    sourceLabel.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: accentFg,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                ],
-                Text(
-                  _stripHtml(option.title),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w600,
-                    height: 1.32,
-                    color: cs.onSurface,
+    return Semantics(
+      button: true,
+      label: '${hour.label}, ${hour.subtitle}',
+      child: InkWell(
+        key: Key('hours-hour-${hour.type}'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 4),
+          child: Row(
+            children: [
+              SizedBox.square(
+                dimension: 44,
+                child: Center(
+                  child: PhosphorIcon(
+                    hour.icon,
+                    size: 23,
+                    color: _semanticInk(context, color),
                   ),
                 ),
-                if (option.source != LiturgicalOptionSource.period &&
-                    option.subtitle != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    option.subtitle!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ],
-                if (!hasDay) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'Сінхранізуйце дадзеныя ў Наладах',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ],
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hour.label,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                    Text(
+                      hour.subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PhosphorIcon(
+                PhosphorIconsRegular.caretRight,
+                size: 17,
+                color: cs.outline,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HoursLoading extends StatelessWidget {
+  const _HoursLoading();
+  @override
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.symmetric(vertical: 44),
+    child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
+  );
+}
+
+class _HoursMessage extends StatelessWidget {
+  const _HoursMessage({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+  final PhosphorIconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 28),
+      child: Center(
+        child: Column(
+          children: [
+            PhosphorIcon(icon, size: 38, color: cs.onSurfaceVariant),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              body,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _DateAction { today, previous, next, calendar, advanced }
+
+Future<void> _showDateActions(
+  BuildContext context,
+  WidgetRef ref,
+  DateTime date,
+) async {
+  final color = ref.read(liturgicalSeasonColorProvider);
+  final action = await showModalBottomSheet<_DateAction>(
+    context: context,
+    useRootNavigator: true,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (sheetContext) => SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        child: AdaptiveChromeSurface(
+          role: ChromeSurfaceRole.group,
+          seasonColor: color,
+          borderRadius: BorderRadius.circular(30),
+          child: const Padding(
+            padding: EdgeInsets.fromLTRB(12, 14, 12, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _DateActionTile(
+                  icon: PhosphorIconsRegular.calendarCheck,
+                  label: 'Сёння',
+                  action: _DateAction.today,
+                ),
+                _DateActionTile(
+                  icon: PhosphorIconsRegular.arrowLeft,
+                  label: 'Папярэдні дзень',
+                  action: _DateAction.previous,
+                ),
+                _DateActionTile(
+                  icon: PhosphorIconsRegular.arrowRight,
+                  label: 'Наступны дзень',
+                  action: _DateAction.next,
+                ),
+                Divider(),
+                _DateActionTile(
+                  icon: PhosphorIconsRegular.calendarBlank,
+                  label: 'Выбраць дату',
+                  action: _DateAction.calendar,
+                ),
+                _DateActionTile(
+                  icon: PhosphorIconsRegular.magnifyingGlass,
+                  label: 'Знайсці літургічны дзень / свята',
+                  action: _DateAction.advanced,
+                ),
               ],
             ),
           ),
-          if (hasDay)
-            PhosphorIcon(
-              PhosphorIconsRegular.caretRight,
-              size: 18,
-              color: cs.outline,
-            ),
-        ],
+        ),
       ),
-    );
+    ),
+  );
+  if (action == null || !context.mounted) return;
+  switch (action) {
+    case _DateAction.today:
+      ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(
+        DateTime.now(),
+      );
+      return;
+    case _DateAction.previous:
+      final target = date.subtract(const Duration(days: 1));
+      if (!target.isBefore(kCalendarFirstDate)) {
+        ref.read(selectedDateProvider.notifier).state = target;
+      }
+      return;
+    case _DateAction.next:
+      final target = date.add(const Duration(days: 1));
+      if (!target.isAfter(kCalendarLastDate)) {
+        ref.read(selectedDateProvider.notifier).state = target;
+      }
+      return;
+    case _DateAction.calendar:
+      final picked = await showAmbientDatePicker(
+        context: context,
+        initialDate: date,
+        seasonColor: color,
+      );
+      if (picked != null) {
+        ref.read(selectedDateProvider.notifier).state = picked;
+      }
+      return;
+    case _DateAction.advanced:
+      context.push('/hours/picker');
+      return;
+  }
+}
 
-    if (!hasDay) return child;
+class _DateActionTile extends StatelessWidget {
+  const _DateActionTile({
+    required this.icon,
+    required this.label,
+    required this.action,
+  });
+  final PhosphorIconData icon;
+  final String label;
+  final _DateAction action;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(22),
-        onTap: () {
-          HapticFeedback.lightImpact();
-          final dayId = day.id;
-          final dateKey = DateFormat('yyyy-MM-dd').format(date);
-          unawaited(
-            DayPrefetchService().prefetch(date, option).catchError((_) {}),
+  @override
+  Widget build(BuildContext context) => ListTile(
+    minTileHeight: 52,
+    leading: PhosphorIcon(icon, size: 21),
+    title: Text(label),
+    onTap: () => Navigator.of(context).pop(action),
+  );
+}
+
+Future<void> _showAlternatives(
+  BuildContext context,
+  DateTime date,
+  Color color,
+) => showModalBottomSheet<void>(
+  context: context,
+  useRootNavigator: true,
+  backgroundColor: Colors.transparent,
+  isScrollControlled: true,
+  useSafeArea: true,
+  builder: (_) => _AlternativesSheet(date: date, color: color),
+);
+
+class _AlternativesSheet extends ConsumerWidget {
+  const _AlternativesSheet({required this.date, required this.color});
+  final DateTime date;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selection = ref.watch(hoursLiturgicalSelectionProvider);
+    final selected = selection.selected;
+    final selectedColor = selected == null
+        ? color
+        : liturgicalColorForDay(
+            selection.day,
+            fallbackPeriodType: selected.contextPeriodType,
           );
-          context.push('/hora/$dateKey/$dayId');
-        },
-        child: child,
+    final groups = <String, List<DayOption>>{};
+    for (final option in selection.sortedOptions) {
+      if (!option.disabled && option.day != null) {
+        groups.putIfAbsent(_groupKey(option), () => []).add(option);
+      }
+    }
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 640, maxHeight: 720),
+        child: AdaptiveChromeSurface(
+          role: ChromeSurfaceRole.group,
+          seasonColor: selectedColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 8, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Іншыя літургічныя варыянты',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Вярнуцца да гадзін',
+                      onPressed: () => Navigator.pop(context),
+                      icon: const PhosphorIcon(PhosphorIconsRegular.x),
+                    ),
+                  ],
+                ),
+              ),
+              if (selected != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+                  child: _Celebration(
+                    option: selected,
+                    day: selection.day,
+                    isManual: selected.key != selection.primary?.key,
+                    color: selectedColor,
+                  ),
+                ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 18),
+                  children: [
+                    for (final entry in groups.entries) ...[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 14, 8, 6),
+                        child: Text(
+                          _groupLabel(entry.key),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                              ),
+                        ),
+                      ),
+                      RadioGroup<String>(
+                        groupValue: selected?.key,
+                        onChanged: (key) {
+                          final option = entry.value
+                              .where((candidate) => candidate.key == key)
+                              .firstOrNull;
+                          if (option?.dayId case final dayId?) {
+                            ref
+                                .read(hoursLiturgicalOverridesProvider.notifier)
+                                .select(date, dayId);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            for (final option in entry.value)
+                              RadioListTile<String>(
+                                value: option.key,
+                                title: Text(option.title),
+                                subtitle: option.subtitle == null
+                                    ? null
+                                    : Text(option.subtitle!),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if ((selected?.templates.length ?? 0) > 1) ...[
+                      const Divider(height: 28),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'ШАБЛОН СВЯТКАВАННЯ',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final template in selected!.templates)
+                              ChoiceChip(
+                                label: Text(template.label),
+                                selected: template.id == selection.dayId,
+                                onSelected: (_) => ref
+                                    .read(
+                                      hoursLiturgicalOverridesProvider.notifier,
+                                    )
+                                    .select(date, template.id),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Вярнуцца да гадзін'),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-String _stripHtml(String html) => html
-    .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
-    .replaceAll(RegExp(r'<[^>]+>'), '');
-
-String _sentenceCase(String value) {
-  if (value.isEmpty) return value;
-  return '${value[0].toUpperCase()}${value.substring(1)}';
+String _groupKey(DayOption option) {
+  if (option.source == LiturgicalOptionSource.officeForDead) return 'office';
+  if ((option.day?.field('_place') ?? '').trim().isNotEmpty) return 'local';
+  return 'celebrations';
 }
 
-Color _accentForOption(DayOption option) {
-  return liturgicalColorForDay(
-    option.day,
-    fallbackPeriodType: option.contextPeriodType,
-  );
+String _groupLabel(String group) => switch (group) {
+  'local' => 'МЯСЦОВЫ КАЛЯНДАР',
+  'office' => 'ІНШЫ АФІЦЫЙ',
+  _ => 'СВЯТКАВАННІ ДНЯ',
+};
+
+Color _semanticInk(BuildContext context, Color source) {
+  final ink = Theme.of(context).colorScheme.onSurface;
+  return Color.lerp(source, ink, 0.28)!;
+}
+
+String _stripHtml(String value) => value
+    .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+    .replaceAll(RegExp(r'<[^>]+>'), '')
+    .trim();
+
+String _sentenceCase(String value) =>
+    value.isEmpty ? value : '${value[0].toUpperCase()}${value.substring(1)}';
+
+void _prefetchDay(DateTime date, DayOption option) {
+  try {
+    unawaited(DayPrefetchService().prefetch(date, option).catchError((_) {}));
+  } catch (_) {
+    // Navigation remains available when optional warmup cannot be constructed.
+  }
 }

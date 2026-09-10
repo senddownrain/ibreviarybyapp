@@ -6,9 +6,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart' as lit_calendar;
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 
 class LiturgicalPickerScreen extends ConsumerStatefulWidget {
   const LiturgicalPickerScreen({super.key, this.mode = 'hours'});
@@ -29,7 +31,9 @@ class _LiturgicalPickerScreenState
   @override
   void initState() {
     super.initState();
-    _year = ref.read(selectedDateProvider).year;
+    _year = widget.isReadingsMode
+        ? ref.read(readingsBranchStateProvider).date.year
+        : ref.read(selectedDateProvider).year;
     _ensureCalendarYear();
   }
 
@@ -52,6 +56,18 @@ class _LiturgicalPickerScreenState
         seasonColor: seasonColor,
         child: Column(
           children: [
+            SafeArea(
+              bottom: false,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  key: const Key('liturgical-picker-back'),
+                  tooltip: 'Назад',
+                  onPressed: () => Navigator.maybePop(context),
+                  icon: const Icon(Icons.arrow_back_rounded),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
               child: Column(
@@ -263,11 +279,12 @@ class _PeriodPicker extends StatelessWidget {
 
   void _openDate(BuildContext context, DateTime date) {
     if (readingsMode) {
-      context.push('/readings/${_dateKey(date)}');
+      AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
+      context.go('/readings?date=${_dateKey(date)}');
       return;
     }
     ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(date);
-    context.go('/');
+    context.go('/hours');
   }
 
   static String _dateKey(DateTime date) =>
@@ -617,13 +634,18 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                             : () {
                                 final date = feast.date!;
                                 if (widget.readingsMode) {
-                                  context.go('/readings/${_dateKey(date)}');
+                                  AppNavigationScope.maybeOf(
+                                    context,
+                                  )?.shellState.clearOraReturn();
+                                  context.go(
+                                    '/readings?date=${_dateKey(date)}',
+                                  );
                                 } else {
                                   ref
                                           .read(selectedDateProvider.notifier)
                                           .state =
                                       date;
-                                  context.go('/');
+                                  context.go('/hours');
                                 }
                               },
                       ),

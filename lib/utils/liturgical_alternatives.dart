@@ -418,5 +418,13 @@ String formatIntercessions(String html) {
       );
     }
   }
-  return parsed.nodes.map(_nodeHtml).join();
+  final result = parsed.nodes.map(_nodeHtml).join();
+  return result.replaceAllMapped(
+    RegExp(
+      r'(<p\b[^>]*\bintercessions__response\b[^>]*>\s*)([-–—])',
+      caseSensitive: false,
+    ),
+    (match) =>
+        '${match.group(1)}<span class="intercessions__marker">${match.group(2)}</span>',
+  );
 }

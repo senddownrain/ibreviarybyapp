@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 
 const _kLocalPrefix = 'local_';
 
@@ -52,6 +53,7 @@ class LocalPrayersNotifier extends Notifier<List<Prayer>> {
 
   Future<void> delete(String id) async {
     await HiveService.localPrayersBox.delete(id);
+    ref.read(settingsProvider.notifier).clearPrayerReferences(id);
     state = _loadAll();
   }
 }

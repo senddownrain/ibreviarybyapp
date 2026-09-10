@@ -17,6 +17,23 @@ const kMaxReaderFontScale = 1.8;
 const kReaderFontScaleStep = 0.1;
 const kMinReaderFontSize = kDefaultReaderFontSize * kMinReaderFontScale;
 const kMaxReaderFontSize = kDefaultReaderFontSize * kMaxReaderFontScale;
+const kStartSections = <String>[
+  'last',
+  'hours',
+  'readings',
+  'prayerbook',
+  'bible',
+];
+
+String startSectionLocation(String preference, String lastSection) {
+  final section = preference == 'last' ? lastSection : preference;
+  return switch (section) {
+    'readings' => '/readings',
+    'prayerbook' => '/prayers',
+    'bible' => '/bible',
+    _ => '/hours',
+  };
+}
 
 double normalizeReaderFontSize(double size) =>
     size.clamp(kMinReaderFontSize, kMaxReaderFontSize).toDouble();
@@ -53,6 +70,8 @@ class SettingsState {
   final List<String> hiddenGlobalPrayerCategoryIds;
   final List<String> favoriteIds;
   final String bibleVersionId;
+  final String startSection;
+  final String lastSection;
 
   /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
@@ -66,6 +85,8 @@ class SettingsState {
     this.hiddenGlobalPrayerCategoryIds = const [],
     this.favoriteIds = const [],
     this.bibleVersionId = 'bel',
+    this.startSection = 'hours',
+    this.lastSection = 'hours',
     this.prayerCategoryMap = const {},
   });
 
@@ -82,6 +103,8 @@ class SettingsState {
     List<String>? hiddenGlobalPrayerCategoryIds,
     List<String>? favoriteIds,
     String? bibleVersionId,
+    String? startSection,
+    String? lastSection,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
     themeMode: themeMode ?? this.themeMode,
@@ -93,6 +116,8 @@ class SettingsState {
         hiddenGlobalPrayerCategoryIds ?? this.hiddenGlobalPrayerCategoryIds,
     favoriteIds: favoriteIds ?? this.favoriteIds,
     bibleVersionId: bibleVersionId ?? this.bibleVersionId,
+    startSection: startSection ?? this.startSection,
+    lastSection: lastSection ?? this.lastSection,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
   );
 }
@@ -136,6 +161,12 @@ class SettingsNotifier extends Notifier<SettingsState> {
       ),
       favoriteIds: List<String>.from(jsonDecode(favs) as List),
       bibleVersionId: _box.get('bibleVersionId', defaultValue: 'bel') as String,
+      startSection: _validStartSection(
+        _box.get('startSection', defaultValue: 'hours') as String,
+      ),
+      lastSection: _validLastSection(
+        _box.get('lastSection', defaultValue: 'hours') as String,
+      ),
       prayerCategoryMap: prayerCategoryMap,
     );
   }
@@ -155,6 +186,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
     );
     await _box.put('favoriteIds', jsonEncode(state.favoriteIds));
     await _box.put('bibleVersionId', state.bibleVersionId);
+    await _box.put('startSection', state.startSection);
+    await _box.put('lastSection', state.lastSection);
     await _box.put(
       'prayerCategoryMap',
       jsonEncode({
@@ -209,7 +242,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
-  void addCategory(String name, List<String> tags) {
+  String addCategory(String name, List<String> tags) {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
     final cats = [
       ...state.userCategories,
@@ -217,6 +250,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     ];
     state = state.copyWith(userCategories: cats);
     _save();
+    return id;
   }
 
   void updateCategory(String id, String name, List<String> tags) {
@@ -231,7 +265,17 @@ class SettingsNotifier extends Notifier<SettingsState> {
 
   void deleteCategory(String id) {
     final cats = state.userCategories.where((c) => c.id != id).toList();
-    state = state.copyWith(userCategories: cats);
+    final memberships = <String, Set<String>>{
+      for (final entry in state.prayerCategoryMap.entries)
+        if (entry.value.where((categoryId) => categoryId != id).isNotEmpty)
+          entry.key: entry.value
+              .where((categoryId) => categoryId != id)
+              .toSet(),
+    };
+    state = state.copyWith(
+      userCategories: cats,
+      prayerCategoryMap: memberships,
+    );
     _save();
   }
 
@@ -241,8 +285,41 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
+  void showGlobalPrayerCategory(String id) {
+    final hidden = state.hiddenGlobalPrayerCategoryIds
+        .where((categoryId) => categoryId != id)
+        .toList();
+    state = state.copyWith(hiddenGlobalPrayerCategoryIds: hidden);
+    _save();
+  }
+
+  void clearPrayerReferences(String prayerId) {
+    final favorites = state.favoriteIds
+        .where((favoriteId) => favoriteId != prayerId)
+        .toList();
+    final memberships = Map<String, Set<String>>.from(state.prayerCategoryMap)
+      ..remove(prayerId);
+    state = state.copyWith(
+      favoriteIds: favorites,
+      prayerCategoryMap: memberships,
+    );
+    _save();
+  }
+
   void setBibleVersion(String versionId) {
     state = state.copyWith(bibleVersionId: versionId);
+    _save();
+  }
+
+  void setStartSection(String section) {
+    state = state.copyWith(startSection: _validStartSection(section));
+    _save();
+  }
+
+  void rememberLastSection(String section) {
+    final valid = _validLastSection(section);
+    if (state.lastSection == valid) return;
+    state = state.copyWith(lastSection: valid);
     _save();
   }
 
@@ -281,6 +358,14 @@ class SettingsNotifier extends Notifier<SettingsState> {
     ThemeMode.dark => 'dark',
     _ => 'system',
   };
+
+  String _validStartSection(String value) =>
+      kStartSections.contains(value) ? value : 'hours';
+
+  String _validLastSection(String value) =>
+      const {'hours', 'readings', 'prayerbook', 'bible'}.contains(value)
+      ? value
+      : 'hours';
 }
 
 final settingsProvider = NotifierProvider<SettingsNotifier, SettingsState>(

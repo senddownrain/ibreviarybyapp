@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
+import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 
 // ── Filter state ──────────────────────────────────────────────────────────────
@@ -87,8 +89,54 @@ final allPrayersProvider = Provider<List<Prayer>>((ref) {
   return prayers;
 });
 
+/// The full Prayerbook catalog. Built-in and local prayers deliberately share
+/// one source so favorite state and list actions cannot drift between screens.
+final prayerCatalogProvider = Provider<List<Prayer>>((ref) {
+  final prayers = [
+    ...ref.watch(allPrayersProvider),
+    ...ref.watch(localPrayersProvider),
+  ];
+  prayers.sort((a, b) => _comparePrayerTitles(a.displayTitle, b.displayTitle));
+  return prayers;
+});
+
+final favoritePrayersProvider = Provider<List<Prayer>>((ref) {
+  final byId = {
+    for (final prayer in ref.watch(prayerCatalogProvider)) prayer.id: prayer,
+  };
+  final ids = ref.watch(
+    settingsProvider.select((settings) => settings.favoriteIds),
+  );
+  return ids.map((id) => byId[id]).whereType<Prayer>().toList();
+});
+
+bool prayerBelongsToCategory(
+  Prayer prayer,
+  PrayerMenuCategory category,
+  SettingsState settings,
+) {
+  if (settings.prayerCategoryMap[prayer.id]?.contains(category.id) == true) {
+    return true;
+  }
+  final categoryTags = category.tags
+      .map((tag) => tag.trim().toLowerCase())
+      .where((tag) => tag.isNotEmpty)
+      .toSet();
+  return prayer.tags.any(
+    (tag) => categoryTags.contains(tag.trim().toLowerCase()),
+  );
+}
+
+List<Prayer> prayersForCategory(
+  List<Prayer> prayers,
+  PrayerMenuCategory category,
+  SettingsState settings,
+) => prayers
+    .where((prayer) => prayerBelongsToCategory(prayer, category, settings))
+    .toList(growable: false);
+
 final allTagsProvider = Provider<List<String>>((ref) {
-  final prayers = ref.watch(allPrayersProvider);
+  final prayers = ref.watch(prayerCatalogProvider);
   final tags = <String>{};
   for (final p in prayers) {
     tags.addAll(p.tags);
@@ -103,7 +151,7 @@ final prayersFilterProvider =
     );
 
 final filteredPrayersProvider = Provider<List<Prayer>>((ref) {
-  final prayers = ref.watch(allPrayersProvider);
+  final prayers = ref.watch(prayerCatalogProvider);
   final filter = ref.watch(prayersFilterProvider);
   final favoriteIds = ref.watch(
     settingsProvider.select((settings) => settings.favoriteIds),

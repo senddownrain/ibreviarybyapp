@@ -129,126 +129,95 @@ class _AlternativePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final reader = ReaderTheme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(13),
-      decoration: BoxDecoration(
-        color: cs.onSurface.withValues(alpha: 0.025),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: reader.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(3, 0, 3, 9),
-            child: Text(
-              label.toUpperCase(),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: cs.onSurface,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.05,
-                height: 1.3,
-              ),
+    final base = ReaderTheme.of(context).body(16);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        key: const Key('alternative-picker-trigger'),
+        onPressed: () async {
+          final selected = await showModalBottomSheet<int>(
+            context: context,
+            useSafeArea: true,
+            isScrollControlled: true,
+            showDragHandle: true,
+            builder: (sheetContext) => _AlternativeSheet(
+              label: label,
+              options: options,
+              activeIndex: activeIndex,
             ),
+          );
+          if (selected != null) onSelect(selected);
+        },
+        icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 19),
+        label: Text('Варыянт ${activeIndex + 1} з ${options.length}'),
+        style: TextButton.styleFrom(
+          foregroundColor: reader.rubric,
+          minimumSize: const Size(48, 48),
+          textStyle: base.copyWith(
+            fontSize: 14,
+            height: 1.35,
+            fontWeight: FontWeight.w600,
           ),
-          for (var index = 0; index < options.length; index++) ...[
-            _AlternativeOption(
-              index: index,
-              title: options[index].title,
-              selected: index == activeIndex,
-              onTap: () => onSelect(index),
-            ),
-            if (index != options.length - 1) const SizedBox(height: 7),
-          ],
-        ],
+        ),
       ),
     );
   }
 }
 
-class _AlternativeOption extends StatelessWidget {
-  const _AlternativeOption({
-    required this.index,
-    required this.title,
-    required this.selected,
-    required this.onTap,
+class _AlternativeSheet extends StatelessWidget {
+  const _AlternativeSheet({
+    required this.label,
+    required this.options,
+    required this.activeIndex,
   });
 
-  final int index;
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
+  final String label;
+  final List<LiturgicalAlternative> options;
+  final int activeIndex;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final reader = ReaderTheme.of(context);
-    return Material(
-      color: selected
-          ? cs.primary.withValues(alpha: 0.10)
-          : cs.surface.withValues(alpha: 0.72),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(13),
-        side: BorderSide(
-          color: selected ? cs.primary.withValues(alpha: 0.28) : reader.border,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? cs.primary
-                        : cs.onSurface.withValues(alpha: 0.07),
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: Text(
-                    '${index + 1}',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: selected ? cs.onPrimary : cs.onSurfaceVariant,
-                      fontWeight: FontWeight.w800,
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * .78,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 4, 24, 12),
+            child: Text(label, style: Theme.of(context).textTheme.titleLarge),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: 16 + MediaQuery.viewPaddingOf(context).bottom,
+              ),
+              child: Column(
+                children: [
+                  for (var index = 0; index < options.length; index++)
+                    ListTile(
+                      key: ValueKey('alternative-option-$index'),
+                      minTileHeight: 56,
+                      selected: index == activeIndex,
+                      title: Text(options[index].title),
+                      subtitle: Text(
+                        'Варыянт ${index + 1} з ${options.length}',
+                      ),
+                      trailing: index == activeIndex
+                          ? PhosphorIcon(
+                              PhosphorIconsBold.check,
+                              color: cs.primary,
+                            )
+                          : null,
+                      onTap: () => Navigator.pop(context, index),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 9),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: selected ? cs.primary : cs.onSurface,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 20,
-                  child: selected
-                      ? PhosphorIcon(
-                          PhosphorIconsBold.check,
-                          size: 17,
-                          color: cs.primary,
-                        )
-                      : null,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

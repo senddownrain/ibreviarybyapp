@@ -17,7 +17,7 @@ class ReaderTheme {
   Color get rubricSoft =>
       isDark ? const Color(0x17EF9188) : const Color(0x139B302A);
   Color get surface =>
-      isDark ? const Color(0xE6151515) : const Color(0xE6FAFAFA);
+      isDark ? const Color(0xFF171A18) : const Color(0xFFFCFBF8);
   Color get border =>
       isDark ? const Color(0x21FFFFFF) : const Color(0x1F000000);
 
@@ -56,4 +56,26 @@ class ReaderTheme {
     size,
     family: family,
   ).copyWith(color: muted, fontWeight: FontWeight.w600, letterSpacing: 0.02);
+
+  TextStyle majorHeading(double bodySize) => body(
+    (bodySize * .98).clamp(15, double.infinity),
+  ).copyWith(height: 1.3, fontWeight: FontWeight.w600);
+
+  TextStyle blockHeading(double bodySize) => body(
+    (bodySize * .90).clamp(14, double.infinity),
+  ).copyWith(height: 1.3, color: rubric, fontWeight: FontWeight.w600);
+
+  TextStyle metadata(double bodySize, {bool italic = false}) =>
+      body((bodySize * .88).clamp(14, double.infinity)).copyWith(
+        height: 1.45,
+        color: muted,
+        fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+      );
+
+  TextStyle rubricBlock(double bodySize, {bool italic = false}) =>
+      body((bodySize * .90).clamp(14, double.infinity)).copyWith(
+        height: 1.45,
+        color: rubric,
+        fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+      );
 }

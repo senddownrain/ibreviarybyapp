@@ -13,16 +13,23 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
+import 'package:mybrev_flutter/services/static_liturgical_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
-/// Screen showing list of available liturgical hours for a day.
+/// Compatibility/fallback screen showing liturgical hours for a day.
+///
+/// Stage 3 keeps this route for old links and transitional navigation. The
+/// normal daily flow now opens an hour directly from the Hours root.
+/// Status: KEEP / DEPRECATE / REMOVE LATER.
 class HoraPickerScreen extends ConsumerStatefulWidget {
   final String dayId;
   final DateTime date;
@@ -64,6 +71,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
       calendar.ensureYearOptions(widget.date.year),
       calendar.ensureYearOptions(widget.date.year + 1),
       calendar.ensureDynamicDates(widget.date.year),
+      StaticLiturgicalService().getCompletoriums(),
     ]);
     final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
     final context = computeLiturgicalContext(
@@ -143,9 +151,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
   }
 
   bool _isHoraAvailable(HoraItem hora) {
-    final day = _day;
-    if (day == null) return false;
-    return hora.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
+    return isHourAvailable(_day, hora);
   }
 
   @override
@@ -216,8 +222,12 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
           IconButton(
             tooltip: 'Чытанні',
             icon: const PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 22),
-            onPressed: () =>
-                context.push('/readings/$dateKey?dayId=${widget.dayId}'),
+            onPressed: () => context.go(
+              Uri(
+                path: '/readings',
+                queryParameters: {'date': dateKey, 'dayId': widget.dayId},
+              ).toString(),
+            ),
           ),
         ],
       ),
@@ -335,7 +345,10 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                                     label: Text(template.label),
                                     selected: template.id == widget.dayId,
                                     onSelected: (_) => context.replace(
-                                      '/hora/$dateKey/${template.id}',
+                                      horaRouteForContext(
+                                        date: widget.date,
+                                        dayId: template.id,
+                                      ),
                                     ),
                                   ),
                               ],
@@ -356,8 +369,14 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                       subtitle: _readingSubtitle,
                       onTap: () {
                         HapticFeedback.lightImpact();
-                        context.push(
-                          '/readings/$dateKey?dayId=${widget.dayId}',
+                        context.go(
+                          Uri(
+                            path: '/readings',
+                            queryParameters: {
+                              'date': dateKey,
+                              'dayId': widget.dayId,
+                            },
+                          ).toString(),
                         );
                       },
                     ),
@@ -375,7 +394,11 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                         onTap: () {
                           HapticFeedback.lightImpact();
                           context.push(
-                            '/ora/$dateKey/${widget.dayId}/${hora.type}',
+                            oraRouteForContext(
+                              date: widget.date,
+                              dayId: widget.dayId,
+                              oraType: hora.type,
+                            ),
                           );
                         },
                       ),

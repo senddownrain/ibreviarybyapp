@@ -16,12 +16,14 @@ class AdaptiveSegmentedControl<T extends Object> extends StatelessWidget {
   final T value;
   final List<AdaptiveSegment<T>> segments;
   final ValueChanged<T> onChanged;
+  final bool showSelectedIcon;
 
   const AdaptiveSegmentedControl({
     super.key,
     required this.value,
     required this.segments,
     required this.onChanged,
+    this.showSelectedIcon = true,
   });
 
   @override
@@ -53,6 +55,7 @@ class AdaptiveSegmentedControl<T extends Object> extends StatelessWidget {
     }
 
     return SegmentedButton<T>(
+      showSelectedIcon: showSelectedIcon,
       segments: [
         for (final segment in segments)
           ButtonSegment<T>(

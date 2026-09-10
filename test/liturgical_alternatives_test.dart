@@ -71,5 +71,7 @@ void main() {
     expect(html, contains('intercessions__refrain'));
     expect(html, contains('intercessions__petition'));
     expect(html, contains('intercessions__response'));
+    expect(html, contains('intercessions__marker'));
+    expect(html.replaceAll(RegExp(r'<[^>]+>'), ''), contains('– Пане'));
   });
 }

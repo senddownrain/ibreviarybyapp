@@ -53,6 +53,7 @@ Future<void> _showTextScalePanel(BuildContext context) {
   }
   return showModalBottomSheet<void>(
     context: context,
+    useRootNavigator: true,
     useSafeArea: true,
     enableDrag: true,
     backgroundColor: Colors.transparent,
