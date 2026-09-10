@@ -323,3 +323,49 @@ Stage 10: согласовать root/hour-navigation availability с existing C
 - В implementation report явно разделить подтверждённые device checks и оставшиеся gaps. Этот Stage 9 не даёт безусловный native visual PASS.
 
 **Остановка Stage 9:** подготовлена только спецификация; production implementation и commits не выполнялись.
+
+# Stage 10 implementation resolution
+
+Дата реализации: 2026-09-10. Ветка: `feature/mobile-ux-migration`.
+
+## Must Fix
+
+| Пункт | Статус | Resolution |
+| --- | --- | --- |
+| S1 mixed red paragraph | FIXED | Leading metadata определяется по всему видимому styled content; inline `К./Н./С.` больше не уменьшает произносимый абзац. |
+| N1 cadence markers | FIXED | Literal/named/decimal/hex `*` и `†` нормализуются; удаляется только legacy break сразу после marker. |
+| N2 embedded antiphon | FIXED | Trailing copy удаляется только при точном известном external antiphon; без внешнего контекста сохраняется. |
+| N3 duplicate R1/R2 heading | FIXED | Legacy structural label снимается до native label без удаления source/reference/body. |
+| S2 structured psalm alternatives | FIXED | `.ora-ant/.ora-psalm` package остаётся цельным; внешний antiphon для такого package подавляется. |
+| N4 intercession marker | FIXED | Сохранена grouping semantics, leading dash получает отдельную inline role без изменения текста. |
+| S3 inline reading reference | FIXED | Parenthesized reference размечается только внутри known reading heading context. |
+| Readings fallbacks | FIXED | Acclamation использует `verse || text`; lone `altChorus` остаётся видимым. |
+| Closing/acclamation | FIXED | HTML не разрезается при поиске closing formula; fallback не добавляется при формуле в visible HTML. |
+| Compline availability | FIXED | Hours root, compatibility picker и Ora sheet используют один adapter поверх `completoriumId` и отдельного Hive cache. Direct reader различает загрузку и missing content. |
+
+## Recommended final polish
+
+| Пункт | Статус | Resolution |
+| --- | --- | --- |
+| Native semantic roles | FIXED | ReaderTheme получил reusable major/block/metadata/rubric roles и readable minima для Aa 70%. |
+| Headings/rubrics | FIXED | Управляемые headings спокойного регистра; inline rubric не меняет body size. |
+| Psalms/antiphons/refrains/intercessions/prayer | FIXED | Card decoration убрана; hierarchy строится typography, spacing, weight и rubric markers. |
+| Source presentation normalization | FIXED | Legacy justify/margin-left/font-size снимаются после semantic detection; emphasis/content сохраняются. |
+| Alternatives UX | FIXED | Compact `Варыянт X з N` trigger открывает scrollable adaptive sheet; shared controllers и local selection сохранены. |
+| Combined Morning controller isolation | FIXED | Controller keys включают section scope, поэтому Office/Laudes psalmody не связываются случайно. |
+| Secondary menu | FIXED | Full Drawer удалён из ordinary AppShell flow; roots используют menu/sheet только с Settings, Sync и Information. |
+| Settings | FIXED | Sync остаётся единым center; diagnostics свёрнуты, about сокращён до version/link. |
+| Holy Mass shortcut | FIXED | Системная строка использует entity `eMmCtxwyJ75ogmL5rwye`, поддерживает available/loading/missing и sync action. |
+| Fullscreen | NOT APPLICABLE | Existing reader overflow → Hidden → restore сохранён без концептуальных изменений. |
+| Native accessibility/device comparison | DEFERRED DEVICE QA | Требуются реальные iOS/Android Light/Dark, VoiceOver/TalkBack, safe-area и gesture checks. |
+
+## Verification resolution
+
+- `dart analyze`: PASS, 0 issues.
+- `flutter analyze`: PASS, 0 issues.
+- `flutter test`: PASS, 129 tests.
+- Android-defined web build: PASS.
+- iOS-defined web build: PASS.
+- Native device verification: DEFERRED DEVICE QA; web builds не считаются device evidence.
+
+Implementation status: **ready for final native/device QA and final diff review**. Merge в `main` не выполнялся.
