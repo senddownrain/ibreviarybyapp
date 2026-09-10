@@ -74,12 +74,16 @@ class FloatingTopActions extends ConsumerWidget {
 
             if (actions.isNotEmpty)
               AdaptiveChromeSurface(
-                role: ChromeSurfaceRole.group,
+                key: const Key('floating-top-actions-surface'),
+                role: actions.length == 1
+                    ? ChromeSurfaceRole.control
+                    : ChromeSurfaceRole.group,
                 seasonColor: resolvedSeasonColor,
                 borderRadius: BorderRadius.circular(28),
                 child: Material(
                   color: Colors.transparent,
                   child: SizedBox(
+                    width: actions.length == 1 ? 52 : null,
                     height: 52,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

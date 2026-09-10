@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -177,7 +175,6 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
   late final TextEditingController _query;
   late final FocusNode _focus;
   final ScrollController _scrollController = ScrollController();
-  Timer? _debounce;
   late bool _searching;
 
   @override
@@ -196,19 +193,10 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
     _query.dispose();
     _focus.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _setQuery(String value) {
-    _debounce?.cancel();
-    _debounce = Timer(
-      const Duration(milliseconds: 250),
-      () => ref.read(prayersFilterProvider.notifier).setSearch(value),
-    );
   }
 
   void _showSearch() {
@@ -246,10 +234,7 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
               controller: _query,
               focusNode: _focus,
               textInputAction: TextInputAction.search,
-              onSubmitted: (value) {
-                _debounce?.cancel();
-                ref.read(prayersFilterProvider.notifier).setSearch(value);
-              },
+              onSubmitted: ref.read(prayersFilterProvider.notifier).setSearch,
               decoration: InputDecoration(
                 hintText: 'Знайсці малітву',
                 prefixIcon: const Icon(Icons.search_rounded),
@@ -258,7 +243,6 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
                     : IconButton(
                         tooltip: 'Ачысціць пошук',
                         onPressed: () {
-                          _debounce?.cancel();
                           _query.clear();
                           ref
                               .read(prayersFilterProvider.notifier)
@@ -270,7 +254,7 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
                       ),
               ),
               onChanged: (value) {
-                _setQuery(value);
+                ref.read(prayersFilterProvider.notifier).setSearch(value);
                 setState(() {});
               },
             )

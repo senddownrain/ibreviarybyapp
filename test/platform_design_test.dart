@@ -168,4 +168,27 @@ void main() {
     expect(find.byIcon(Icons.arrow_back_ios_new), findsOneWidget);
     expect(find.byIcon(Icons.arrow_back_rounded), findsNothing);
   });
+
+  testWidgets('a single floating top action stays perfectly round', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(
+            body: FloatingTopActions(
+              seasonColor: Colors.indigo,
+              actions: [IconButton(onPressed: null, icon: Icon(Icons.search))],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final size = tester.getSize(
+      find.byKey(const Key('floating-top-actions-surface')),
+    );
+    expect(size.width, size.height);
+    expect(size.width, closeTo(53.6, 0.01));
+  });
 }

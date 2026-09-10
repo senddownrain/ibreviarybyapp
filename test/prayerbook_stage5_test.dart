@@ -194,7 +194,7 @@ void main() {
     expect(tester.testTextInput.isVisible, isTrue);
 
     await tester.enterText(field, 'дзякуй');
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump();
     expect(find.byKey(const ValueKey('prayer-row-evening')), findsOneWidget);
     expect(find.byKey(const ValueKey('prayer-row-morning')), findsNothing);
     expect(tester.widget<TextField>(field).controller!.text, 'дзякуй');
