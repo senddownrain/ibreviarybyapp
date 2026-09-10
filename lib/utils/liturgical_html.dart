@@ -88,7 +88,7 @@ String formatPsalmHtml(String html) {
 
   return markLiturgicalCadenceSigns(
     _normalizeLegacyPresentation(
-      _normalizeRubricColors(_markLeadingMetadata(value)),
+      _normalizeRubricColors(_markLeadingMetadata(value, limit: null)),
     ),
   );
 }
@@ -161,13 +161,20 @@ String _normalizeRubricColors(String html) {
   );
 }
 
-String _markLeadingMetadata(String html) {
-  var remaining = 2;
+String _markLeadingMetadata(String html, {int? limit = 2}) {
+  var remaining = limit;
   var canMark = true;
   return html.replaceAllMapped(_paragraphPattern, (match) {
     final attributes = match.group(1) ?? '';
     final content = match.group(2) ?? '';
     final visible = _visibleText(content);
+
+    // Explicit document roles own their typography. In particular, opening
+    // rubrics must not be reclassified as smaller leading metadata merely
+    // because all of their source text is red or emphasized.
+    if (_hasClass(attributes, 'liturgical-rubric')) {
+      return match.group(0)!;
+    }
 
     if (RegExp(
       r'^(?:ПЕРШАЕ|ДРУГОЕ)\s+ЧЫТАННЕ\s*$',
@@ -189,8 +196,11 @@ String _markLeadingMetadata(String html) {
     );
     final red = _allVisibleTextIsRubric(content, visible);
 
-    if (centered || (canMark && remaining > 0 && (emphasized || red))) {
-      if (remaining > 0) remaining -= 1;
+    final hasRoom = remaining == null || remaining! > 0;
+    if (centered || (canMark && hasRoom && (emphasized || red))) {
+      if (remaining != null && remaining! > 0) {
+        remaining = remaining! - 1;
+      }
       return '<p${_withClass(attributes, 'liturgical-subheading')}>$content</p>';
     }
 
@@ -202,6 +212,18 @@ String _markLeadingMetadata(String html) {
     }
     return match.group(0)!;
   });
+}
+
+bool _hasClass(String attributes, String className) {
+  final match = RegExp(
+    r'''\bclass\s*=\s*(["'])(.*?)\1''',
+    caseSensitive: false,
+  ).firstMatch(attributes);
+  if (match == null) return false;
+  return match
+      .group(2)!
+      .split(RegExp(r'\s+'))
+      .any((value) => value.toLowerCase() == className.toLowerCase());
 }
 
 bool _allVisibleTextIsRubric(String content, String visible) {

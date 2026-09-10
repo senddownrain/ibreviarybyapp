@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -15,12 +16,29 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
+
+const _highlightColors = <String, Color>{
+  'amber': Color(0xFFE2AE34),
+  'rose': Color(0xFFD37074),
+  'sky': Color(0xFF4F9FC1),
+  'leaf': Color(0xFF59A46B),
+};
+
+const _highlightColorLabels = <String, String>{
+  'amber': 'Бурштынавы колер',
+  'rose': 'Ружовы колер',
+  'sky': 'Блакітны колер',
+  'leaf': 'Зялёны колер',
+};
 
 class ReadingsScreen extends ConsumerStatefulWidget {
   /// Calendar date string, e.g. "2026-03-21" (date-based loading).
@@ -60,6 +78,10 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   int _loadGeneration = 0;
   final ScrollController _scrollController = ScrollController();
   String? _manualCycle;
+  final Map<String, String> _highlights = {};
+  String? _highlightReadingId;
+  String? _selectedSentenceId;
+  AppRouteEntryScope? _routeScope;
 
   @override
   void initState() {
@@ -77,6 +99,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       _manualCycle = null;
       _activeGroupKey = null;
       _automaticGroupKey = null;
+      _clearSentenceSelection();
       ReaderChromeModeScope.maybeControllerOf(context)?.value =
           ReaderChromeMode.full;
       _load();
@@ -138,9 +161,71 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeScope = AppRouteEntryScope.maybeOf(context);
+  }
+
+  @override
   void dispose() {
+    _routeScope?.showContextualBottomBar(false);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  String _highlightStorageKey(String readingId) =>
+      'readingsHighlight:$readingId';
+
+  void _loadHighlights(String readingId) {
+    if (_highlightReadingId == readingId) return;
+    _highlightReadingId = readingId;
+    _selectedSentenceId = null;
+    _highlights.clear();
+    final raw = HiveService.isSettingsReady
+        ? HiveService.settingsBox.get(_highlightStorageKey(readingId))
+        : null;
+    if (raw is Map) {
+      raw.forEach((key, value) {
+        final color = value.toString();
+        if (_highlightColors.containsKey(color)) {
+          _highlights[key.toString()] = color;
+        }
+      });
+    }
+  }
+
+  void _toggleSentence(String sentenceId) {
+    setState(() {
+      _selectedSentenceId = _selectedSentenceId == sentenceId
+          ? null
+          : sentenceId;
+    });
+    _routeScope?.showContextualBottomBar(_selectedSentenceId != null);
+  }
+
+  void _clearSentenceSelection({bool notify = true}) {
+    _selectedSentenceId = null;
+    if (notify) _routeScope?.showContextualBottomBar(false);
+  }
+
+  Future<void> _applySentenceColor(String? color) async {
+    final sentenceId = _selectedSentenceId;
+    final readingId = _highlightReadingId;
+    if (sentenceId == null || readingId == null) return;
+    setState(() {
+      if (color == null) {
+        _highlights.remove(sentenceId);
+      } else {
+        _highlights[sentenceId] = color;
+      }
+      _clearSentenceSelection(notify: false);
+    });
+    _routeScope?.showContextualBottomBar(false);
+    if (HiveService.isSettingsReady) {
+      await HiveService.settingsBox.put(_highlightStorageKey(readingId), {
+        for (final item in _highlights.entries) item.key: item.value,
+      });
+    }
   }
 
   List<ParsedReading> _activeGroupDocuments() {
@@ -154,6 +239,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   void _selectCelebrationGroup(String key) {
     if (key == _activeGroupKey) return;
+    _clearSentenceSelection();
+    String? selectedDayId;
     setState(() {
       _activeGroupKey = key;
       final group = _groups.where((group) => group.key == key).firstOrNull;
@@ -162,15 +249,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           !availableCyclesForGroup(group.documents).contains(_manualCycle)) {
         _manualCycle = null;
       }
+      selectedDayId = group == null ? null : readingCelebrationDayId(group);
     });
-    _resetDocumentScroll();
-  }
-
-  void _selectAutomatic() {
-    setState(() {
-      _activeGroupKey = _automaticGroupKey;
-      _manualCycle = null;
-    });
+    if (selectedDayId != null) {
+      final branch = ref.read(readingsBranchStateProvider);
+      ref.read(readingsBranchStateProvider.notifier).state = branch.copyWith(
+        dayId: selectedDayId,
+      );
+    }
     _resetDocumentScroll();
   }
 
@@ -192,6 +278,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   void _selectManualCycle(String? cycle) {
     if (_manualCycle == cycle) return;
+    _clearSentenceSelection();
     setState(() => _manualCycle = cycle);
     _resetDocumentScroll();
   }
@@ -272,6 +359,20 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     return '$period, тыд. $week – $dayLabel';
   }
 
+  String _contextTitleFor(
+    ReadingCelebrationGroup group,
+    ParsedReading? reading,
+  ) {
+    if (reading != null && group.key.startsWith('period:')) {
+      final periodTitle = liturgicalReadingPeriodTitle(
+        reading,
+        DateTime.tryParse(widget.dateStr ?? '') ?? DateTime(2000, 2, 2),
+      );
+      if (periodTitle.isNotEmpty) return periodTitle;
+    }
+    return group.label;
+  }
+
   bool _onScroll(ScrollNotification notification) {
     if (!_didRequestCompact &&
         notification.metrics.axis == Axis.vertical &&
@@ -300,6 +401,15 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         .read(readingsBranchStateProvider)
         .copyWith(date: normalized, clearLiturgicalKey: true, clearDayId: true);
     context.go(readingsRouteForContext(date: normalized));
+  }
+
+  void _openRelativeDate(int direction) {
+    final target = _currentDate.add(Duration(days: direction));
+    if (target.isBefore(kCalendarFirstDate) ||
+        target.isAfter(kCalendarLastDate)) {
+      return;
+    }
+    _openDate(target);
   }
 
   Future<void> _showDateActions() async {
@@ -359,14 +469,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       builder: (sheetContext) => _ReadingsOptionsSheet(
         groups: selection.groups,
         activeGroupKey: selection.activeGroupKey,
-        automaticGroupKey: _automaticGroupKey,
         cycles: cycles,
         automaticCycle: selection.automaticCycle,
         manualCycle: _manualCycle,
-        onAutomaticSelected: () {
-          Navigator.pop(sheetContext);
-          _selectAutomatic();
-        },
         onGroupSelected: (key) {
           Navigator.pop(sheetContext);
           _selectCelebrationGroup(key);
@@ -409,25 +514,18 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     } else {
       final selection = _selection;
       final reading = selection.reading;
-      contextTitle =
-          selection.groups
-              .where((group) => group.key == selection.activeGroupKey)
-              .firstOrNull
-              ?.label ??
-          reading?.title ??
-          _title;
+      final activeGroup = selection.groups
+          .where((group) => group.key == selection.activeGroupKey)
+          .firstOrNull;
+      contextTitle = activeGroup != null
+          ? _contextTitleFor(activeGroup, reading)
+          : reading?.title ?? _title;
       document = reading == null
           ? const _ReadingsStatus(
               icon: PhosphorIconsLight.bookOpen,
               title: 'Тэкст чытання не знойдзены',
             )
-          : _ReadingBody(
-              key: ValueKey(
-                'reading-document-${reading.id}-${_manualCycle ?? 'auto'}',
-              ),
-              reading: reading,
-              onRefresh: () => _load(forceRefresh: true),
-            );
+          : _buildReadingBody(reading);
     }
 
     final manualGroup = _activeGroupKey != _automaticGroupKey;
@@ -441,8 +539,24 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     final hasOraReturn =
         AppNavigationScope.maybeOf(context)?.shellState.canReturnToOra() ??
         false;
-    return _trackScroll(
+
+    if (_selectedSentenceId != null) {
+      document = Padding(
+        padding: EdgeInsets.only(
+          bottom: 80 + MediaQuery.viewPaddingOf(context).bottom,
+        ),
+        child: document,
+      );
+    }
+
+    final reader = _trackScroll(
       ReaderScaffold(
+        onSwipePrevious: _currentDate.isAfter(kCalendarFirstDate)
+            ? () => _openRelativeDate(-1)
+            : null,
+        onSwipeNext: _currentDate.isBefore(kCalendarLastDate)
+            ? () => _openRelativeDate(1)
+            : null,
         scrollController: _scrollController,
         scrollKey: const PageStorageKey('readings-root-scroll'),
         semanticLabel: 'Чытанні дня',
@@ -450,15 +564,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         chromeMode: ReaderChromeMode.full,
         leading: _menuLeading(),
         actions: const [TextScaleControl()],
-        secondaryActions: [
-          ReaderSecondaryAction(
-            label: 'Рэжым чытання',
-            icon: Icons.fullscreen_rounded,
-            onSelected: () =>
-                ReaderChromeModeScope.maybeControllerOf(context)?.value =
-                    ReaderChromeMode.hidden,
-          ),
-        ],
         onBack: hasOraReturn
             ? AppNavigationScope.maybeOf(context)?.returnToOra
             : null,
@@ -476,7 +581,89 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         content: document,
       ),
     );
+    return Stack(
+      children: [
+        reader,
+        if (_selectedSentenceId != null)
+          Positioned(
+            left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
+            right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
+            bottom: 8 + MediaQuery.viewPaddingOf(context).bottom,
+            child: _highlightPalette(),
+          ),
+      ],
+    );
   }
+
+  Widget _buildReadingBody(ParsedReading reading) {
+    _loadHighlights(reading.id);
+    return _ReadingBody(
+      key: ValueKey('reading-document-${reading.id}-${_manualCycle ?? 'auto'}'),
+      reading: reading,
+      onRefresh: () => _load(forceRefresh: true),
+      highlights: Map.unmodifiable(_highlights),
+      selectedSentenceId: _selectedSentenceId,
+      onSentenceTap: _toggleSentence,
+    );
+  }
+
+  Widget _highlightPalette() => AdaptiveChromeSurface(
+    role: ChromeSurfaceRole.group,
+    borderRadius: BorderRadius.circular(22),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+    child: Material(
+      color: Colors.transparent,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          for (final color in _highlightColors.entries)
+            Semantics(
+              button: true,
+              label: _highlightColorLabels[color.key],
+              selected: _highlights[_selectedSentenceId] == color.key,
+              child: InkWell(
+                key: Key('readings-highlight-${color.key}'),
+                customBorder: const CircleBorder(),
+                onTap: () => _applySentenceColor(color.key),
+                child: SizedBox.square(
+                  dimension: 48,
+                  child: Center(
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color.value,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          IconButton(
+            key: const Key('readings-highlight-clear'),
+            constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+            tooltip: 'Прыбраць вылучэнне',
+            onPressed: () => _applySentenceColor(null),
+            icon: const PhosphorIcon(PhosphorIconsRegular.eraser, size: 20),
+          ),
+          IconButton(
+            key: const Key('readings-highlight-cancel'),
+            constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+            tooltip: 'Скасаваць выбар',
+            onPressed: () {
+              setState(() => _clearSentenceSelection(notify: false));
+              _routeScope?.showContextualBottomBar(false);
+            },
+            icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 19),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 enum _ReadingsDateAction { today, previous, next, calendar, advanced }
@@ -535,90 +722,98 @@ class _ReadingsContextHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 8, 22, 22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Чытанні', style: ReaderTheme.of(context).displayTitle(36)),
-          const SizedBox(height: 10),
-          Semantics(
-            button: true,
-            label: 'Змяніць дату: $dateLabel',
-            child: InkWell(
-              key: const Key('readings-date-action'),
-              borderRadius: BorderRadius.circular(12),
-              onTap: onDateTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 7),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.calendar_today_rounded,
-                      size: 18,
-                      color: seasonColor,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        dateLabel,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: seasonColor,
-                          fontWeight: FontWeight.w700,
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        key: const Key('readings-context-header'),
+        padding: const EdgeInsets.fromLTRB(22, 8, 22, 22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Чытанні', style: ReaderTheme.of(context).displayTitle(36)),
+            const SizedBox(height: 10),
+            Semantics(
+              button: true,
+              label: 'Змяніць дату: $dateLabel',
+              child: InkWell(
+                key: const Key('readings-date-action'),
+                borderRadius: BorderRadius.circular(12),
+                onTap: onDateTap,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 7),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 18,
+                        color: seasonColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          dateLabel,
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                color: seasonColor,
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.keyboard_arrow_down_rounded, color: seasonColor),
-                  ],
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: seasonColor,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-            ),
-          ),
-          if (manualCycleLabel != null) ...[
             const SizedBox(height: 7),
             Text(
-              manualCycleLabel!,
-              key: const Key('readings-manual-cycle-marker'),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
+              title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.2,
               ),
             ),
+            if (manualCycleLabel != null) ...[
+              const SizedBox(height: 7),
+              Text(
+                manualCycleLabel!,
+                key: const Key('readings-manual-cycle-marker'),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: cs.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+            if (showToday || showOptions) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (showToday)
+                    TextButton.icon(
+                      key: const Key('readings-today-action'),
+                      onPressed: onToday,
+                      icon: const Icon(Icons.today_rounded, size: 18),
+                      label: const Text('Сёння'),
+                    ),
+                  if (showOptions)
+                    OutlinedButton.icon(
+                      key: const Key('readings-options-action'),
+                      onPressed: onOptions,
+                      icon: const Icon(Icons.tune_rounded, size: 18),
+                      label: const Text('Варыянты'),
+                    ),
+                ],
+              ),
+            ],
           ],
-          if (showToday || showOptions) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (showToday)
-                  TextButton.icon(
-                    key: const Key('readings-today-action'),
-                    onPressed: onToday,
-                    icon: const Icon(Icons.today_rounded, size: 18),
-                    label: const Text('Сёння'),
-                  ),
-                if (showOptions)
-                  OutlinedButton.icon(
-                    key: const Key('readings-options-action'),
-                    onPressed: onOptions,
-                    icon: const Icon(Icons.tune_rounded, size: 18),
-                    label: const Text('Варыянты'),
-                  ),
-              ],
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -632,7 +827,12 @@ class _ReadingsDateSheet extends StatelessWidget {
     constraints: const BoxConstraints(maxWidth: 620, maxHeight: 620),
     child: ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+      padding: EdgeInsets.fromLTRB(
+        12,
+        0,
+        12,
+        20 + MediaQuery.viewPaddingOf(context).bottom,
+      ),
       children: const [
         _ReadingsDateTile(
           Icons.today_rounded,
@@ -684,22 +884,18 @@ class _ReadingsOptionsSheet extends StatelessWidget {
   const _ReadingsOptionsSheet({
     required this.groups,
     required this.activeGroupKey,
-    required this.automaticGroupKey,
     required this.cycles,
     required this.automaticCycle,
     required this.manualCycle,
-    required this.onAutomaticSelected,
     required this.onGroupSelected,
     required this.onCycleSelected,
   });
 
   final List<ReadingCelebrationGroup> groups;
   final String? activeGroupKey;
-  final String? automaticGroupKey;
   final List<String> cycles;
   final String automaticCycle;
   final String? manualCycle;
-  final VoidCallback onAutomaticSelected;
   final ValueChanged<String> onGroupSelected;
   final ValueChanged<String?> onCycleSelected;
 
@@ -716,22 +912,12 @@ class _ReadingsOptionsSheet extends StatelessWidget {
             context,
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
-        if (activeGroupKey != automaticGroupKey || manualCycle != null) ...[
-          const SizedBox(height: 12),
-          ListTile(
-            key: const Key('readings-selection-auto'),
-            selected: false,
-            leading: const Icon(Icons.auto_awesome_rounded),
-            title: const Text('Па календары'),
-            subtitle: const Text('Вярнуць аўтаматычны набор і цыкл'),
-            onTap: onAutomaticSelected,
-          ),
-        ],
         if (groups.length > 1) ...[
           const SizedBox(height: 18),
           const _OptionsHeading('Святкаванне / набор чытанняў'),
           for (final group in groups)
             ListTile(
+              key: ValueKey('readings-group-${group.key}'),
               selected: group.key == activeGroupKey,
               title: Text(group.label),
               subtitle: Text(_groupCycles(group.documents)),
@@ -743,27 +929,32 @@ class _ReadingsOptionsSheet extends StatelessWidget {
         ],
         if (cycles.length > 1) ...[
           const SizedBox(height: 18),
-          const _OptionsHeading('Цыкл'),
-          ListTile(
-            key: const Key('readings-cycle-auto'),
-            selected: manualCycle == null,
-            title: const Text('Па календары'),
-            subtitle: Text('Цыкл ${_readingsCycleLabel(automaticCycle)}'),
-            trailing: manualCycle == null
-                ? const Icon(Icons.check_rounded)
-                : null,
-            onTap: () => onCycleSelected(null),
-          ),
-          for (final cycle in cycles)
-            ListTile(
-              key: ValueKey('readings-cycle-$cycle'),
-              selected: cycle == manualCycle,
-              title: Text('Цыкл ${_readingsCycleLabel(cycle)}'),
-              trailing: cycle == manualCycle
-                  ? const Icon(Icons.check_rounded)
-                  : null,
-              onTap: () => onCycleSelected(cycle),
+          const _OptionsHeading('Выбар чытанняў'),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<String>(
+                showSelectedIcon: true,
+                expandedInsets: EdgeInsets.zero,
+                segments: [
+                  for (final cycle in cycles)
+                    ButtonSegment<String>(
+                      value: cycle,
+                      label: Text(
+                        _readingsCycleLabel(cycle),
+                        key: ValueKey('readings-cycle-$cycle'),
+                      ),
+                    ),
+                ],
+                selected: {manualCycle ?? automaticCycle},
+                onSelectionChanged: (selection) {
+                  final cycle = selection.first;
+                  onCycleSelected(cycle == automaticCycle ? null : cycle);
+                },
+              ),
             ),
+          ),
         ],
       ],
     ),
@@ -850,7 +1041,17 @@ class _ReadingsStatus extends StatelessWidget {
 class _ReadingBody extends ConsumerWidget {
   final ParsedReading reading;
   final VoidCallback? onRefresh;
-  const _ReadingBody({super.key, required this.reading, this.onRefresh});
+  final Map<String, String> highlights;
+  final String? selectedSentenceId;
+  final ValueChanged<String> onSentenceTap;
+  const _ReadingBody({
+    super.key,
+    required this.reading,
+    required this.highlights,
+    required this.selectedSentenceId,
+    required this.onSentenceTap,
+    this.onRefresh,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -939,9 +1140,13 @@ class _ReadingBody extends ConsumerWidget {
           if (reading.firstReading != null)
             _ReadingSection(
               label: reading.hasTwoReadings ? 'ПЕРШАЕ ЧЫТАННЕ' : 'ЧЫТАННЕ',
+              highlightNamespace: 'reading-1',
               section: reading.firstReading!,
               textStyle: textStyle,
               reader: reader,
+              highlights: highlights,
+              selectedSentenceId: selectedSentenceId,
+              onSentenceTap: onSentenceTap,
             ),
           if (reading.psalm != null)
             _PsalmSection(
@@ -952,9 +1157,13 @@ class _ReadingBody extends ConsumerWidget {
           if (reading.reading2 != null)
             _ReadingSection(
               label: 'ДРУГОЕ ЧЫТАННЕ',
+              highlightNamespace: 'reading-2',
               section: reading.reading2!,
               textStyle: textStyle,
               reader: reader,
+              highlights: highlights,
+              selectedSentenceId: selectedSentenceId,
+              onSentenceTap: onSentenceTap,
             ),
           if (reading.alleluia != null)
             _AlleluiaSection(
@@ -965,9 +1174,13 @@ class _ReadingBody extends ConsumerWidget {
           if (reading.gospel != null)
             _ReadingSection(
               label: 'ЕВАНГЕЛЛЕ',
+              highlightNamespace: 'gospel',
               section: reading.gospel!,
               textStyle: textStyle,
               reader: reader,
+              highlights: highlights,
+              selectedSentenceId: selectedSentenceId,
+              onSentenceTap: onSentenceTap,
             ),
           const SizedBox(height: 32),
         ],
@@ -1037,101 +1250,193 @@ class _BibleRef extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 
-class _ReadingText extends StatelessWidget {
+class _ReadingText extends StatefulWidget {
   final String text;
   final TextStyle textStyle;
   final bool isPsalm;
-  final double leftInset;
+  final String? highlightNamespace;
+  final Map<String, String> highlights;
+  final String? selectedSentenceId;
+  final ValueChanged<String>? onSentenceTap;
 
   const _ReadingText({
     required this.text,
     required this.textStyle,
     this.isPsalm = false,
-    this.leftInset = 0,
+    this.highlightNamespace,
+    this.highlights = const {},
+    this.selectedSentenceId,
+    this.onSentenceTap,
   });
 
   @override
+  State<_ReadingText> createState() => _ReadingTextState();
+}
+
+class _ReadingTextState extends State<_ReadingText> {
+  final Map<String, TapGestureRecognizer> _recognizers = {};
+
+  TapGestureRecognizer _recognizerFor(String sentenceId) =>
+      _recognizers.putIfAbsent(
+        sentenceId,
+        () =>
+            TapGestureRecognizer()
+              ..onTap = () => widget.onSentenceTap?.call(sentenceId),
+      );
+
+  @override
+  void dispose() {
+    for (final recognizer in _recognizers.values) {
+      recognizer.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(text)) {
+    if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
-      final base = textStyle.fontSize ?? 16;
-      return Padding(
-        padding: EdgeInsets.only(left: leftInset),
-        child: Html(
-          data: isPsalm ? formatPsalmHtml(text) : formatLiturgicalHtml(text),
-          style: {
-            'body': Style(
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              color: textStyle.color ?? reader.ink,
-              fontFamily: textStyle.fontFamily,
-              fontSize: FontSize(base),
-              fontWeight: textStyle.fontWeight,
-              lineHeight: LineHeight(1.78),
-              textAlign: TextAlign.left,
-            ),
-            'p': Style(margin: Margins.only(bottom: 14)),
-            '.liturgical-subheading': Style(
-              fontSize: FontSize((base * 0.88).clamp(14, double.infinity)),
-              lineHeight: LineHeight(1.45),
-              color: reader.muted,
-              margin: Margins.only(bottom: 7),
-            ),
-            '.liturgical-heading': Style(
-              fontSize: FontSize((base * 0.98).clamp(15, double.infinity)),
-              lineHeight: LineHeight(1.3),
-              color: reader.rubric,
-              fontWeight: FontWeight.w700,
-            ),
-            '.psalm-strophe-even': Style(
-              margin: Margins.only(left: 16, bottom: 14),
-            ),
-            '.psalm-marker': Style(
-              color: reader.rubric,
-              fontWeight: FontWeight.w600,
-            ),
-            '.liturgical-rubric-inline': Style(color: reader.rubric),
-          },
-        ),
+      final base = widget.textStyle.fontSize ?? 16;
+      return Html(
+        data: widget.isPsalm
+            ? formatPsalmHtml(widget.text)
+            : formatLiturgicalHtml(widget.text),
+        style: {
+          'body': Style(
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+            color: widget.textStyle.color ?? reader.ink,
+            fontFamily: widget.textStyle.fontFamily,
+            fontSize: FontSize(base),
+            fontWeight: widget.textStyle.fontWeight,
+            lineHeight: LineHeight(1.78),
+            textAlign: TextAlign.left,
+          ),
+          'p': Style(margin: Margins.only(bottom: 14)),
+          '.liturgical-subheading': Style(
+            fontSize: FontSize((base * 0.88).clamp(14, double.infinity)),
+            lineHeight: LineHeight(1.45),
+            color: reader.muted,
+            margin: Margins.only(bottom: 7),
+          ),
+          '.liturgical-heading': Style(
+            fontSize: FontSize((base * 0.98).clamp(15, double.infinity)),
+            lineHeight: LineHeight(1.3),
+            color: reader.rubric,
+            fontWeight: FontWeight.w700,
+          ),
+          '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
+          '.psalm-marker': Style(
+            color: reader.rubric,
+            fontWeight: FontWeight.w600,
+          ),
+          '.liturgical-rubric-inline': Style(color: reader.rubric),
+        },
       );
     }
     final reader = ReaderTheme.of(context);
-    final pieces = text.split(RegExp(r'(?=[*†])|(?<=[*†])'));
-    return Padding(
-      padding: EdgeInsets.only(left: leftInset),
-      child: SelectableText.rich(
-        TextSpan(
-          children: [
-            for (final piece in pieces)
-              TextSpan(
-                text: piece,
-                style: piece == '*' || piece == '†'
-                    ? textStyle.copyWith(
-                        height: 1.78,
-                        color: reader.rubric,
-                        fontWeight: FontWeight.w600,
-                      )
-                    : textStyle.copyWith(height: 1.78),
-              ),
-          ],
-        ),
+    final namespace = widget.highlightNamespace;
+    final sentences = namespace == null
+        ? <_SentencePart>[_SentencePart(widget.text, 0)]
+        : _splitReadingSentences(widget.text);
+    return Text.rich(
+      TextSpan(
+        children: [
+          for (final sentence in sentences)
+            TextSpan(
+              style: _sentenceStyle(context, '$namespace:${sentence.index}'),
+              children: [
+                for (final piece in sentence.text.split(
+                  RegExp(r'(?=[*†])|(?<=[*†])'),
+                ))
+                  TextSpan(
+                    text: piece,
+                    recognizer: namespace == null
+                        ? null
+                        : _recognizerFor('$namespace:${sentence.index}'),
+                    style: piece == '*' || piece == '†'
+                        ? widget.textStyle.copyWith(
+                            height: 1.78,
+                            color: reader.rubric,
+                            fontWeight: FontWeight.w600,
+                          )
+                        : null,
+                  ),
+              ],
+            ),
+        ],
       ),
     );
   }
+
+  TextStyle _sentenceStyle(BuildContext context, String sentenceId) {
+    final color = _highlightColors[widget.highlights[sentenceId]];
+    final selected = widget.selectedSentenceId == sentenceId;
+    final brightness = Theme.of(context).brightness;
+    return widget.textStyle.copyWith(
+      height: 1.78,
+      backgroundColor: selected
+          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18)
+          : color?.withValues(
+              alpha: brightness == Brightness.dark ? 0.32 : 0.30,
+            ),
+      decoration: selected ? TextDecoration.underline : null,
+      decorationColor: selected ? Theme.of(context).colorScheme.primary : null,
+      decorationThickness: selected ? 1.5 : null,
+    );
+  }
+}
+
+class _SentencePart {
+  const _SentencePart(this.text, this.index);
+  final String text;
+  final int index;
+}
+
+List<_SentencePart> _splitReadingSentences(String text) {
+  if (text.isEmpty) return const [];
+  final result = <_SentencePart>[];
+  final boundary = RegExp(r'[.!?…]+[»”’\)\]]*\s+');
+  var start = 0;
+  var index = 0;
+  for (final match in boundary.allMatches(text)) {
+    final before = text.substring(start, match.end).trimRight();
+    final lastWord = RegExp(r'([А-ЯЁІЎа-яёіўA-Za-z]+)\.$').firstMatch(before);
+    final abbreviation = lastWord?.group(1)?.toLowerCase();
+    if (abbreviation != null &&
+        (abbreviation.length == 1 ||
+            const {'св', 'ст', 'гл', 'пар', 'напр'}.contains(abbreviation))) {
+      continue;
+    }
+    result.add(_SentencePart(text.substring(start, match.end), index++));
+    start = match.end;
+  }
+  if (start < text.length) {
+    result.add(_SentencePart(text.substring(start), index));
+  }
+  return result.isEmpty ? [_SentencePart(text, 0)] : result;
 }
 
 // ---------------------------------------------------------------------------
 
 class _ReadingSection extends StatefulWidget {
   final String label;
+  final String highlightNamespace;
   final ParsedSection section;
   final TextStyle textStyle;
   final ReaderTheme reader;
+  final Map<String, String> highlights;
+  final String? selectedSentenceId;
+  final ValueChanged<String> onSentenceTap;
   const _ReadingSection({
     required this.label,
+    required this.highlightNamespace,
     required this.section,
     required this.textStyle,
     required this.reader,
+    required this.highlights,
+    required this.selectedSentenceId,
+    required this.onSentenceTap,
   });
 
   @override
@@ -1227,7 +1532,14 @@ class _ReadingSectionState extends State<_ReadingSection> {
           ),
         if (display.isNotEmpty) ...[
           const SizedBox(height: 6),
-          _ReadingText(text: display, textStyle: widget.textStyle),
+          _ReadingText(
+            text: display,
+            textStyle: widget.textStyle,
+            highlightNamespace: widget.highlightNamespace,
+            highlights: widget.highlights,
+            selectedSentenceId: widget.selectedSentenceId,
+            onSentenceTap: widget.onSentenceTap,
+          ),
         ],
         // Closing phrase bold + separated
         if (closingPhrase != null) ...[
@@ -1326,7 +1638,6 @@ class _PsalmSection extends StatelessWidget {
                 text: psalm.verses[i],
                 textStyle: textStyle,
                 isPsalm: true,
-                leftInset: i.isOdd ? 16 : 0,
               ),
             ),
             if (hasChorus && i < psalm.verses.length - 1)
@@ -1396,7 +1707,6 @@ class _ChorusBox extends StatelessWidget {
       ),
       width: double.infinity,
       margin: EdgeInsets.fromLTRB(0, compact ? 5 : 2, 0, compact ? 9 : 13),
-      padding: EdgeInsets.only(left: compact ? 12 : 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -224,7 +224,14 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
         builder: (context, textStyle) => Stack(
           children: [
             ReaderScaffold(
+              onSwipePrevious: _selected.isEmpty && _relative(-1) != null
+                  ? () => _goRelative(-1)
+                  : null,
+              onSwipeNext: _selected.isEmpty && _relative(1) != null
+                  ? () => _goRelative(1)
+                  : null,
               showAmbient: false,
+              enableDoubleTapFullscreen: false,
               scrollController: _scrollController,
               scrollKey: PageStorageKey(
                 'bible-${_location.documentKey}-scroll',
@@ -241,22 +248,16 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 ),
                 const TextScaleControl(),
               ],
-              secondaryActions: [
-                ReaderSecondaryAction(
-                  label: 'Поўнаэкраннае чытанне',
-                  icon: Icons.fullscreen_rounded,
-                  onSelected: () =>
-                      ReaderChromeModeScope.maybeControllerOf(context)?.value =
-                          ReaderChromeMode.hidden,
-                ),
-              ],
               contextHeader: ReaderContextHeader(
                 eyebrow: book.isNewTestament ? 'НОВЫ ЗАПАВЕТ' : 'СТАРЫ ЗАПАВЕТ',
                 title: book.name,
                 titleActionLabel:
                     'Выбраць кнігу або раздзел. Зараз ${book.name} ${widget.chapter}',
                 subtitle: 'Раздзел ${widget.chapter}',
-                metadata: kBibleVersionMeta[widget.versionId]?.attribution,
+                metadata: bibleAttribution(
+                  versionId: widget.versionId,
+                  isNewTestament: book.isNewTestament,
+                ),
                 onTitleTap: () => _openPicker(book),
                 actions: [_translationControl(book)],
               ),
@@ -305,8 +306,11 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               Positioned(
                 left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
                 right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
-                bottom: 8,
-                child: SafeArea(top: false, child: _colorBar()),
+                // The shell hides its navigation dock while the palette is
+                // open. In that transition SafeArea can inherit an already
+                // consumed inset, so anchor explicitly above system gestures.
+                bottom: 8 + MediaQuery.viewPaddingOf(context).bottom,
+                child: _colorBar(),
               ),
           ],
         ),
@@ -376,66 +380,68 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     child: Material(
       color: Colors.transparent,
-      child: Row(
-        children: [
-          if (MediaQuery.sizeOf(context).width >= 390)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Text(
-                '${_selected.length} ${_selected.length == 1 ? 'верш' : 'вершы'}',
-                style: Theme.of(context).textTheme.labelMedium,
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          children: [
+            if (constraints.maxWidth >= 390)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text(
+                  '${_selected.length} ${_selected.length == 1 ? 'верш' : 'вершы'}',
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
               ),
-            ),
-          const Spacer(),
-          for (final color in _colors.entries)
-            Semantics(
-              button: true,
-              label: _colorLabels[color.key],
-              selected:
-                  _selected.isNotEmpty &&
-                  _selected.every((verse) => _highlights[verse] == color.key),
-              child: InkWell(
-                key: Key('bible-highlight-${color.key}'),
-                customBorder: const CircleBorder(),
-                onTap: () => _applyColor(color.key),
-                child: SizedBox.square(
-                  dimension: 48,
-                  child: Center(
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color.value,
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outlineVariant,
+            const Spacer(),
+            for (final color in _colors.entries)
+              Semantics(
+                button: true,
+                label: _colorLabels[color.key],
+                selected:
+                    _selected.isNotEmpty &&
+                    _selected.every((verse) => _highlights[verse] == color.key),
+                child: InkWell(
+                  key: Key('bible-highlight-${color.key}'),
+                  customBorder: const CircleBorder(),
+                  onTap: () => _applyColor(color.key),
+                  child: SizedBox.square(
+                    dimension: 48,
+                    child: Center(
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color.value,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
+            IconButton(
+              key: const Key('bible-highlight-clear'),
+              constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+              tooltip: 'Прыбраць вылучэнне',
+              onPressed: () => _applyColor(null),
+              icon: const PhosphorIcon(PhosphorIconsRegular.eraser, size: 20),
             ),
-          IconButton(
-            key: const Key('bible-highlight-clear'),
-            constraints: const BoxConstraints.tightFor(width: 48, height: 48),
-            tooltip: 'Прыбраць вылучэнне',
-            onPressed: () => _applyColor(null),
-            icon: const PhosphorIcon(PhosphorIconsRegular.eraser, size: 20),
-          ),
-          IconButton(
-            key: const Key('bible-highlight-cancel'),
-            constraints: const BoxConstraints.tightFor(width: 48, height: 48),
-            tooltip: 'Скасаваць выбар',
-            onPressed: () {
-              setState(_selected.clear);
-              AppRouteEntryScope.maybeOf(
-                context,
-              )?.showContextualBottomBar(false);
-            },
-            icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 19),
-          ),
-        ],
+            IconButton(
+              key: const Key('bible-highlight-cancel'),
+              constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+              tooltip: 'Скасаваць выбар',
+              onPressed: () {
+                setState(_selected.clear);
+                AppRouteEntryScope.maybeOf(
+                  context,
+                )?.showContextualBottomBar(false);
+              },
+              icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 19),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -696,6 +702,7 @@ class _VerseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final chromeController = ReaderChromeModeScope.maybeControllerOf(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 3),
       child: Material(
@@ -710,6 +717,7 @@ class _VerseRow extends StatelessWidget {
           key: Key('bible-verse-$verseNum'),
           borderRadius: BorderRadius.circular(10),
           onTap: onTap,
+          onDoubleTap: chromeController?.toggleFullscreen,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
             child: RichText(

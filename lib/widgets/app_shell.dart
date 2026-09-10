@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -31,15 +32,10 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
-  late final RestorableDateTime _hoursDate = RestorableDateTime(
+  late final RestorableDateTime _liturgicalDate = RestorableDateTime(
     DateUtils.dateOnly(ref.read(selectedDateProvider)),
   );
-  late final RestorableDateTime _readingsDate = RestorableDateTime(
-    ref.read(readingsBranchStateProvider).date,
-  );
-  late final ProviderSubscription<DateTime> _hoursDateSubscription;
-  late final ProviderSubscription<ReadingsBranchState>
-  _readingsDateSubscription;
+  late final ProviderSubscription<DateTime> _liturgicalDateSubscription;
 
   @override
   String? get restorationId => 'production-app-shell';
@@ -47,25 +43,17 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
   @override
   void initState() {
     super.initState();
+    ref.read(liturgicalNavigationSyncProvider);
     widget.shellState.setActiveBranch(widget.activeBranch);
     ref
         .read(settingsProvider.notifier)
         .rememberLastSection(widget.activeBranch.name);
-    _hoursDateSubscription = ref.listenManual<DateTime>(selectedDateProvider, (
-      previous,
-      next,
-    ) {
-      final date = DateUtils.dateOnly(next);
-      if (!DateUtils.isSameDay(_hoursDate.value, date)) {
-        _hoursDate.value = date;
-      }
-    });
-    _readingsDateSubscription = ref.listenManual<ReadingsBranchState>(
-      readingsBranchStateProvider,
+    _liturgicalDateSubscription = ref.listenManual<DateTime>(
+      selectedDateProvider,
       (previous, next) {
-        final date = DateUtils.dateOnly(next.date);
-        if (!DateUtils.isSameDay(_readingsDate.value, date)) {
-          _readingsDate.value = date;
+        final date = DateUtils.dateOnly(next);
+        if (!DateUtils.isSameDay(_liturgicalDate.value, date)) {
+          _liturgicalDate.value = date;
         }
       },
     );
@@ -73,14 +61,14 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_hoursDate, 'hours-date');
-    registerForRestoration(_readingsDate, 'readings-date');
+    registerForRestoration(_liturgicalDate, 'hours-date');
     ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(
-      _hoursDate.value,
+      _liturgicalDate.value,
     );
     final readings = ref.read(readingsBranchStateProvider);
     ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
-      date: _readingsDate.value,
+      date: _liturgicalDate.value,
+      clearLiturgicalKey: true,
     );
   }
 
@@ -104,10 +92,8 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
 
   @override
   void dispose() {
-    _hoursDateSubscription.close();
-    _readingsDateSubscription.close();
-    _hoursDate.dispose();
-    _readingsDate.dispose();
+    _liturgicalDateSubscription.close();
+    _liturgicalDate.dispose();
     super.dispose();
   }
 
@@ -137,6 +123,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
               child: Scaffold(
                 key: const Key('production-app-shell'),
                 backgroundColor: Colors.transparent,
+                extendBody: true,
                 body: Stack(
                   children: [
                     Positioned.fill(

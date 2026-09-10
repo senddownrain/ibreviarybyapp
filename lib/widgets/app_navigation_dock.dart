@@ -24,7 +24,7 @@ class AppNavigationDock extends StatelessWidget {
   static const _items =
       <({String label, PhosphorIconData icon, PhosphorIconData selected})>[
         (
-          label: 'Гадзіны',
+          label: 'Літургія',
           icon: PhosphorIconsRegular.sunHorizon,
           selected: PhosphorIconsFill.sunHorizon,
         ),

@@ -81,6 +81,9 @@ String _dateKey(DateTime date) =>
     '${date.month.toString().padLeft(2, '0')}-'
     '${date.day.toString().padLeft(2, '0')}';
 
+/// Stable date key shared by the synchronized Hours/Readings navigation.
+String liturgicalDateKey(DateTime date) => _dateKey(date);
+
 YearOptions? _loadYearOptions(int year) {
   final box = HiveService.yearOptionsBox;
   final raw = box.get('$year') ?? box.get(year);

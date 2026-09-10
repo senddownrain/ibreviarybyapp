@@ -60,7 +60,7 @@ const kBibleVersionMeta = {
     shortName: 'ББ',
     langLabel: 'Беларуская',
     shortLabel: 'БЕЛ',
-    attribution: 'А. Бокун · catholic.by',
+    attribution: 'Беларускі пераклад',
   ),
   'ru': BibleVersionMeta(
     id: 'ru',
@@ -71,6 +71,18 @@ const kBibleVersionMeta = {
     attribution: 'Синодальный перевод',
   ),
 };
+
+String bibleAttribution({
+  required String versionId,
+  required bool isNewTestament,
+}) {
+  if (versionId == 'bel') {
+    return isNewTestament
+        ? 'Афіцыйны пераклад · catholic.by'
+        : 'Пераклад Антонія Бокуна · bible.by';
+  }
+  return kBibleVersionMeta[versionId]?.attribution ?? '';
+}
 
 class BibleRepository {
   static Map<String, dynamic>? _data;

@@ -1,5 +1,6 @@
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 
@@ -76,6 +77,19 @@ String formatLiturgicalPeriodTitle({
       ? ''
       : '${dayName[0].toLowerCase()}${dayName.substring(1)}';
   return [periodName, inlineDay].where((part) => part.isNotEmpty).join(', ');
+}
+
+/// Uses the same period/week/weekday title as the Liturgy of the Hours for a
+/// lectionary document that carries liturgical coordinates.
+String liturgicalReadingPeriodTitle(ParsedReading reading, DateTime date) {
+  final periodType = reading.periodType ?? '';
+  if (periodType.isEmpty) return '';
+  return formatLiturgicalPeriodTitle(
+    periodType: periodType,
+    periodWeek: reading.periodWeekNumber,
+    dayOfWeek: reading.dayOfWeek,
+    date: date,
+  );
 }
 
 String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {

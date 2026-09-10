@@ -274,6 +274,7 @@ void main() {
       find.byKey(const Key('category-name-field')),
       'Новая',
     );
+    await tester.pump();
     await tester.tap(find.byKey(const Key('save-category-action')));
     await tester.pumpAndSettle();
     expect(notifier.current.userCategories.single.name, 'Новая');
@@ -284,6 +285,7 @@ void main() {
       find.byKey(const Key('category-name-field')),
       'Змененая',
     );
+    await tester.pump();
     await tester.tap(find.byKey(const Key('save-category-action')));
     await tester.pumpAndSettle();
     expect(notifier.current.userCategories.single.name, 'Змененая');
@@ -293,6 +295,47 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Выдаліць'));
     await tester.pumpAndSettle();
     expect(notifier.current.userCategories, isEmpty);
+  });
+
+  testWidgets('category editor supports quick tags and searchable prayers', (
+    tester,
+  ) async {
+    final notifier = _TestSettingsNotifier();
+    await tester.pumpWidget(
+      _app(const PrayerCategoriesScreen(), settingsOverride: notifier),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('create-category-action')));
+    await tester.pumpAndSettle();
+    expect(find.text('Хуткі выбар тэгаў'), findsOneWidget);
+    expect(find.byKey(const Key('pick-category-prayers')), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const Key('category-name-field')),
+      'На кожны дзень',
+    );
+    await tester.tap(find.byKey(const ValueKey('category-tag-ранішнія')));
+    await tester.tap(find.byKey(const Key('pick-category-prayers')));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('category-prayer-search')),
+      'Вячэрняя',
+    );
+    await tester.pump();
+    expect(find.text('Вячэрняя малітва'), findsOneWidget);
+    expect(find.text('Ранішняя малітва'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('category-prayer-evening')));
+    await tester.tap(find.byKey(const Key('confirm-category-prayers')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Выбрана: 1'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('save-category-action')));
+    await tester.pumpAndSettle();
+
+    expect(notifier.current.userCategories.single.tags, ['ранішнія']);
+    expect(notifier.current.prayerCategoryMap['evening'], {'created-category'});
   });
 
   testWidgets('Prayer Detail uses shared reader and only local has edit', (
@@ -313,12 +356,90 @@ void main() {
     expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
     expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
     expect(controller.value, ReaderChromeMode.compact);
-    await tester.tap(find.byKey(const Key('reader-chrome-overflow')));
-    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('reader-chrome-overflow')), findsNothing);
+    expect(find.text('Падзяліцца'), findsNothing);
     expect(find.text('Рэдагаваць'), findsNothing);
-    await tester.tap(find.text('Поўнаэкраннае чытанне'));
+    expect(find.text('Поўнаэкраннае чытанне'), findsNothing);
+    await tester.tap(find.byKey(const Key('reader-double-tap-surface')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.tap(find.byKey(const Key('reader-double-tap-surface')));
     await tester.pump();
     expect(controller.value, ReaderChromeMode.hidden);
+  });
+
+  testWidgets('prayer reader shows scroll-to-top only outside fullscreen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = ReaderChromeModeController(ReaderChromeMode.compact);
+    addTearDown(controller.dispose);
+    final longPrayer = Prayer(
+      id: 'long',
+      title: 'Доўгая малітва',
+      body: List.filled(80, '<p>Радок доўгай малітвы</p>').join(),
+    );
+    await tester.pumpWidget(
+      _app(
+        ReaderChromeModeScope(
+          controller: controller,
+          child: const PrayerDetailScreen(prayerId: 'long'),
+        ),
+        prayers: [longPrayer],
+      ),
+    );
+    await tester.pump();
+    expect(find.byKey(const Key('reader-scroll-to-top')), findsNothing);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -900));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('reader-scroll-to-top')), findsOneWidget);
+
+    controller.value = ReaderChromeMode.hidden;
+    await tester.pump();
+    expect(find.byKey(const Key('reader-scroll-to-top')), findsNothing);
+
+    controller.value = ReaderChromeMode.compact;
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('reader-scroll-to-top')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('reader-scroll-to-top')), findsNothing);
+  });
+
+  testWidgets('Holy Mass exposes heading navigation without sharing', (
+    tester,
+  ) async {
+    const mass = Prayer(
+      id: 'eMmCtxwyJ75ogmL5rwye',
+      title: 'Парадак святой Імшы',
+      body: '''### Уступныя абрады
+
+Тэкст.
+
+### Літургія слова
+
+Тэкст.
+
+### Эўхарыстычная літургія
+
+Тэкст.''',
+      textFormat: 'mybrev-markdown',
+    );
+    await tester.pumpWidget(
+      _app(
+        const PrayerDetailScreen(prayerId: 'eMmCtxwyJ75ogmL5rwye'),
+        prayers: const [mass],
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Перайсці да раздзела'), findsOneWidget);
+    expect(find.byKey(const ValueKey('mass-section-link-0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mass-section-link-1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mass-section-link-2')), findsOneWidget);
+    expect(find.text('Падзяліцца'), findsNothing);
   });
 
   testWidgets('built-in prayer cannot be opened as a destructive edit', (
@@ -371,13 +492,14 @@ Widget _app(
   Widget child, {
   SettingsState settings = const SettingsState(),
   _TestSettingsNotifier? settingsOverride,
+  List<Prayer> prayers = _builtIn,
 }) {
   final notifier = settingsOverride ?? _TestSettingsNotifier(settings);
   return ProviderScope(
     overrides: [
       settingsProvider.overrideWith(() => notifier),
       liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
-      allPrayersProvider.overrideWithValue(_builtIn),
+      allPrayersProvider.overrideWithValue(prayers),
       localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
       prayerMenuCategoriesProvider.overrideWithValue(_categories),
       globalPrayerCategoriesProvider.overrideWith(

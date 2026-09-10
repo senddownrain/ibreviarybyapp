@@ -101,6 +101,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ],
                   value: settings.themeMode,
+                  // The selected fill already communicates the active theme.
+                  // Omitting a second icon leaves room for translated labels.
+                  showSelectedIcon: false,
                   onChanged: (mode) =>
                       ref.read(settingsProvider.notifier).setThemeMode(mode),
                 ),
@@ -143,7 +146,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       value: 'last',
                       child: Text('Апошні адкрыты'),
                     ),
-                    DropdownMenuItem(value: 'hours', child: Text('Гадзіны')),
+                    DropdownMenuItem(value: 'hours', child: Text('Літургія')),
                     DropdownMenuItem(value: 'readings', child: Text('Чытанні')),
                     DropdownMenuItem(
                       value: 'prayerbook',

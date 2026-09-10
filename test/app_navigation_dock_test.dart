@@ -43,7 +43,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      for (final label in ['Гадзіны', 'Чытанні', 'Малітоўнік', 'Біблія']) {
+      for (final label in ['Літургія', 'Чытанні', 'Малітоўнік', 'Біблія']) {
         expect(find.text(label), findsOneWidget);
       }
       expect(tester.takeException(), isNull);
@@ -79,6 +79,6 @@ void main() {
       app(TargetPlatform.android, ReaderChromeMode.hidden),
     );
     expect(find.byKey(const Key('app-dock-hidden')), findsOneWidget);
-    expect(find.text('Гадзіны'), findsNothing);
+    expect(find.text('Літургія'), findsNothing);
   });
 }

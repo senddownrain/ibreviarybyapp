@@ -28,7 +28,6 @@ const hoursRootRoute = AppRouteDescriptor(
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.shell,
   isBranchRoot: true,
-  reserveShellTopInset: true,
 );
 const readingsRootRoute = AppRouteDescriptor(
   id: 'readings.root',

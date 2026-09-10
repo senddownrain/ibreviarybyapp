@@ -25,16 +25,26 @@ void main() {
     controller.value = ReaderChromeMode.hidden;
     await tester.pump();
     expect(find.byKey(const Key('reader-chrome-back')), findsNothing);
-    expect(find.byKey(const Key('reader-chrome-restore')), findsOneWidget);
+    expect(find.byKey(const Key('reader-chrome-hidden')), findsOneWidget);
+    expect(find.byKey(const Key('reader-chrome-restore')), findsNothing);
 
-    await tester.tap(find.byKey(const Key('reader-chrome-restore')));
+    await tester.tap(find.byKey(const Key('reader-double-tap-surface')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.tap(find.byKey(const Key('reader-double-tap-surface')));
     await tester.pump();
     expect(controller.value, ReaderChromeMode.compact);
     expect(find.byKey(const Key('reader-chrome-back')), findsOneWidget);
 
+    await tester.tap(find.byKey(const Key('reader-double-tap-surface')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.tap(find.byKey(const Key('reader-double-tap-surface')));
+    await tester.pump();
+    expect(controller.value, ReaderChromeMode.hidden);
+
     controller.value = ReaderChromeMode.full;
     await tester.pump();
     expect(find.byKey(const Key('reader-chrome-back')), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 500));
   });
 
   testWidgets('reader document uses opaque neutral light and dark surfaces', (
@@ -55,6 +65,30 @@ void main() {
 
     expect(await surfaceFor(Brightness.light), const Color(0xFFFCFBF8));
     expect(await surfaceFor(Brightness.dark), const Color(0xFF171A18));
+  });
+
+  testWidgets('reader reserves space for floating bottom navigation', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          extendBody: true,
+          body: const ReaderScaffold(content: Text('Document end')),
+          bottomNavigationBar: const SizedBox(height: 94),
+        ),
+      ),
+    );
+
+    final contentPadding = tester.widget<Padding>(
+      find
+          .descendant(
+            of: find.byKey(const Key('reader-content-surface')),
+            matching: find.byType(Padding),
+          )
+          .first,
+    );
+    expect(contentPadding.padding, const EdgeInsets.fromLTRB(22, 25, 22, 136));
   });
 
   testWidgets('reader reserves the safe area above floating chrome', (

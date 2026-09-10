@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -105,6 +106,38 @@ void main() {
       expect(notifier.state['2026-09-08'], 'alternative');
       expect(notifier.state['2026-09-09'], 'other-day');
     });
+
+    test('Hours and Readings share date and selected celebration', () async {
+      final firstDate = DateTime(2026, 9, 8);
+      final secondDate = DateTime(2026, 9, 9);
+      final options = [_option('primary'), _option('alternative')];
+      final container = ProviderContainer(
+        overrides: [
+          selectedDateProvider.overrideWith((ref) => firstDate),
+          dayOptionsProvider.overrideWithValue(options),
+          readingsBranchStateProvider.overrideWith(
+            (ref) => ReadingsBranchState(date: firstDate),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.read(liturgicalNavigationSyncProvider);
+
+      container
+          .read(hoursLiturgicalOverridesProvider.notifier)
+          .select(firstDate, 'alternative');
+      await container.pump();
+      expect(container.read(readingsBranchStateProvider).dayId, 'alternative');
+
+      container.read(readingsBranchStateProvider.notifier).state =
+          ReadingsBranchState(date: secondDate, dayId: 'primary');
+      await container.pump();
+      expect(container.read(selectedDateProvider), secondDate);
+      expect(
+        container.read(hoursLiturgicalOverridesProvider)['2026-09-09'],
+        'primary',
+      );
+    });
   });
 
   testWidgets('single option hides alternatives and hour opens correct Ora', (
@@ -159,7 +192,7 @@ void main() {
       'alternative',
     );
     expect(find.text('Celebration alternative'), findsWidgets);
-    expect(find.text('Вярнуцца да гадзін'), findsWidgets);
+    expect(find.text('Літургія'), findsWidgets);
   });
 
   testWidgets('other date exposes Today without changing Readings date', (
@@ -207,7 +240,10 @@ void main() {
       'primary',
       title:
           'Вельмі доўгая назва літургічнага святкавання для праверкі маштабу',
-      fields: {'vesperAnt1': 'available'},
+      fields: {
+        'vesperAnt1': 'available',
+        'feastComment': 'Гэты каментар павінен быць толькі ўнутры гадзіны.',
+      },
     );
     final router = _hoursRouter(date: date, options: [option]);
     addTearDown(router.dispose);
@@ -222,6 +258,16 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text(option.title), findsOneWidget);
+    expect(
+      find.text('Гэты каментар павінен быць толькі ўнутры гадзіны.'),
+      findsNothing,
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('hours-celebration-accent'))).height,
+      greaterThan(
+        tester.getSize(find.byKey(const Key('hours-celebration-title'))).height,
+      ),
+    );
   });
 }
 

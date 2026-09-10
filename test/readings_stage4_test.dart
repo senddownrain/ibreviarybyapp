@@ -1,7 +1,13 @@
+import 'dart:async';
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -44,6 +50,21 @@ ReadingsLoader _loader(List<ParsedReading> readings) =>
     );
 
 void main() {
+  late Directory hiveDirectory;
+
+  setUpAll(() async {
+    hiveDirectory = await Directory.systemTemp.createTemp(
+      'readings-stage4-test-',
+    );
+    Hive.init(hiveDirectory.path);
+    await Hive.openBox('settings');
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    await hiveDirectory.delete(recursive: true);
+  });
+
   group('current production default adapter', () {
     test('keeps first sorted group and calendar cycle fallback', () {
       final readings = [
@@ -150,6 +171,78 @@ void main() {
     expect(controller.value, ReaderChromeMode.compact);
   });
 
+  testWidgets('context header keeps its left edge while readings load', (
+    tester,
+  ) async {
+    final result = Completer<ReadingsLoadResult>();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_TestSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(
+            ({
+              required dateStr,
+              required liturgicalKey,
+              required dayId,
+              required forceRefresh,
+            }) => result.future,
+          ),
+        ],
+        child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+
+    final header = find.byKey(const Key('readings-context-header'));
+    final loadingLeft = tester.getTopLeft(header).dx;
+    await tester.pump(const Duration(milliseconds: 40));
+    result.complete(
+      ReadingsLoadResult(
+        readings: [
+          _reading('short', title: 'Кароткая назва'),
+          _reading(
+            'long',
+            title: 'Значна даўжэйшая назва іншага набору чытанняў',
+          ),
+        ],
+        sundayCycle: 'B',
+        weekdayCycle: '2',
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('readings-options-action')), findsOneWidget);
+    expect(tester.getTopLeft(header).dx, loadingLeft);
+  });
+
+  testWidgets('period reading uses the Liturgy of the Hours title', (
+    tester,
+  ) async {
+    const reading = ParsedReading(
+      id: 'ordinary-w23-d4-cycle2',
+      title: 'Сырая назва набору',
+      year: '2',
+      periodType: 'ordinary',
+      periodWeekNumber: 23,
+      dayOfWeek: 4,
+      reading1: ParsedSection(text: 'Тэкст чытання'),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_TestSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(_loader([reading])),
+        ],
+        child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('XXIII звычайны тыдзень, серада'), findsOneWidget);
+    expect(find.text('Сырая назва набору'), findsNothing);
+  });
+
   testWidgets('synthetic fallback keeps alleluia text and lone alt chorus', (
     tester,
   ) async {
@@ -180,83 +273,125 @@ void main() {
     expect(find.text('Альтэрнатыўны рэфрэн.'), findsOneWidget);
   });
 
-  testWidgets(
-    'options separate groups and cycles with manual and auto states',
-    (tester) async {
-      final readings = [
-        _reading(
-          'a',
-          title: 'Нядзельныя чытанні',
-          year: 'A',
-          dayId: 'sunday',
-          text: 'Тэкст A',
-        ),
-        _reading(
-          'b',
-          title: 'Нядзельныя чытанні',
-          year: 'B',
-          dayId: 'sunday',
-          text: 'Тэкст B',
-        ),
-        _reading('other', title: 'Іншае святкаванне'),
-      ];
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            settingsProvider.overrideWith(_TestSettingsNotifier.new),
-            liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
-            readingsLoaderProvider.overrideWithValue(_loader(readings)),
-          ],
-          child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
-        ),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('a reading sentence opens an accessible color palette', (
+    tester,
+  ) async {
+    const reading = ParsedReading(
+      id: 'sentence-highlight-fixture',
+      title: 'Вылучэнне сказаў',
+      reading: ParsedSection(text: 'Першы сказ. Другі сказ.'),
+    );
+    Widget app() => ProviderScope(
+      overrides: [
+        settingsProvider.overrideWith(_TestSettingsNotifier.new),
+        liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+        readingsLoaderProvider.overrideWithValue(_loader([reading])),
+      ],
+      child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+    );
 
-      expect(find.textContaining('Тэкст B'), findsWidgets);
-      await tester.tap(find.byKey(const Key('readings-options-action')));
-      await tester.pumpAndSettle();
-      expect(find.text('СВЯТКАВАННЕ / НАБОР ЧЫТАННЯЎ'), findsOneWidget);
-      expect(find.text('ЦЫКЛ'), findsOneWidget);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+    Finder selectableFinder() => find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          (widget.textSpan?.toPlainText() ?? widget.data ?? '').contains(
+            'Першы сказ. Другі сказ.',
+          ),
+    );
+    final paragraphFinder = find.descendant(
+      of: selectableFinder(),
+      matching: find.byType(RichText),
+    );
+    final paragraph = tester.renderObject<RenderParagraph>(paragraphFinder);
+    final firstGlyph = paragraph.getBoxesForSelection(
+      const TextSelection(baseOffset: 0, extentOffset: 5),
+    );
+    await tester.tapAt(
+      paragraph.localToGlobal(firstGlyph.first.toRect().center),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const ValueKey('readings-cycle-A')));
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('readings-manual-cycle-marker')),
-        findsOneWidget,
-      );
-      expect(find.textContaining('Тэкст A'), findsWidgets);
+    expect(find.byKey(const Key('readings-highlight-amber')), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const Key('readings-highlight-amber'))).width,
+      greaterThanOrEqualTo(48),
+    );
+    expect(find.byKey(const Key('readings-highlight-clear')), findsOneWidget);
+    expect(find.byKey(const Key('readings-highlight-cancel')), findsOneWidget);
+  });
 
-      await tester.tap(find.byKey(const Key('readings-options-action')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('readings-cycle-auto')));
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('readings-manual-cycle-marker')),
-        findsNothing,
-      );
-      expect(find.textContaining('Тэкст B'), findsWidgets);
+  testWidgets('options separate groups and expose only selectable cycles', (
+    tester,
+  ) async {
+    final readings = [
+      _reading(
+        'a',
+        title: 'Нядзельныя чытанні',
+        year: 'A',
+        dayId: 'sunday',
+        text: 'Тэкст A',
+      ),
+      _reading(
+        'b',
+        title: 'Нядзельныя чытанні',
+        year: 'B',
+        dayId: 'sunday',
+        text: 'Тэкст B',
+      ),
+      _reading('other', title: 'Іншае святкаванне'),
+    ];
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_TestSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(_loader(readings)),
+        ],
+        child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('readings-options-action')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Іншае святкаванне'));
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('readings-manual-cycle-marker')),
-        findsOneWidget,
-      );
-      expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
+    expect(find.textContaining('Тэкст B'), findsWidgets);
+    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.pumpAndSettle();
+    expect(find.text('СВЯТКАВАННЕ / НАБОР ЧЫТАННЯЎ'), findsOneWidget);
+    expect(find.text('ВЫБАР ЧЫТАННЯЎ'), findsOneWidget);
+    expect(find.text('Па календары'), findsNothing);
 
-      await tester.tap(find.byKey(const Key('readings-options-action')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('readings-selection-auto')));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('Тэкст B'), findsWidgets);
-      expect(
-        find.byKey(const Key('readings-manual-cycle-marker')),
-        findsNothing,
-      );
-    },
-  );
+    await tester.tap(find.byKey(const ValueKey('readings-cycle-A')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('readings-manual-cycle-marker')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Тэкст A'), findsWidgets);
+
+    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('readings-cycle-B')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-manual-cycle-marker')), findsNothing);
+    expect(find.textContaining('Тэкст B'), findsWidgets);
+
+    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Іншае святкаванне'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('readings-manual-cycle-marker')),
+      findsOneWidget,
+    );
+    expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Нядзельныя чытанні').last);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Тэкст B'), findsWidgets);
+    expect(find.byKey(const Key('readings-manual-cycle-marker')), findsNothing);
+  });
 
   testWidgets('Today changes only Readings branch date', (tester) async {
     final container = ProviderContainer(

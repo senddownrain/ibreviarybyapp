@@ -36,6 +36,19 @@ void main() {
       expect(result, contains('liturgical-subheading'));
       expect(result, contains('psalm-strophe'));
     });
+
+    test('marks every styled paragraph in a psalm introduction as metadata', () {
+      final result = formatPsalmHtml(
+        '<p><span style="color: #ff0000;">Псальм 89 (88), 39–53</span></p>'
+        '<p><span style="color: #ff0000;">Плач над падзеннем дому Давіда</span></p>'
+        '<p><em>Узнаў моц збаўлення для нас у доме Давіда</em></p>'
+        '<p><span style="color: #ff0000;">IV (39–46)</span></p>'
+        '<p>Ты адкінуў і адрокся, *<br>разгневаўся на памазаніка.</p>',
+      );
+
+      expect(RegExp('liturgical-subheading').allMatches(result), hasLength(4));
+      expect(result, contains('class="psalm-strophe"'));
+    });
   });
 
   test('formatLiturgicalHtml marks stars and crosses', () {
@@ -61,6 +74,17 @@ void main() {
       '<p><span style="color:red">Усе разам</span></p><p>Асноўны тэкст</p>',
     );
     expect(result, contains('liturgical-subheading'));
+  });
+
+  test('explicit opening rubric keeps rubric typography', () {
+    final result = formatLiturgicalHtml(
+      '<p class="liturgical-rubric"><span style="color:red"><em>'
+      'Заклік з’яўляецца пачаткам малітвы.</em></span></p>',
+    );
+
+    expect(result, contains('class="liturgical-rubric"'));
+    expect(result, contains('liturgical-rubric-inline'));
+    expect(result, isNot(contains('liturgical-subheading')));
   });
 
   test('mixed emphasis and ordinary body remains body', () {

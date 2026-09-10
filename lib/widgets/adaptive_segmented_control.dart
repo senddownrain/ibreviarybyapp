@@ -13,6 +13,8 @@ class AdaptiveSegment<T extends Object> {
 
 /// A compact choice control that follows the active platform design language.
 class AdaptiveSegmentedControl<T extends Object> extends StatelessWidget {
+  static const _minimumWidthPerSegmentWithIcons = 112.0;
+
   final T value;
   final List<AdaptiveSegment<T>> segments;
   final ValueChanged<T> onChanged;
@@ -54,18 +56,34 @@ class AdaptiveSegmentedControl<T extends Object> extends StatelessWidget {
       );
     }
 
-    return SegmentedButton<T>(
-      showSelectedIcon: showSelectedIcon,
-      segments: [
-        for (final segment in segments)
-          ButtonSegment<T>(
-            value: segment.value,
-            label: segment.label,
-            icon: segment.icon,
-          ),
-      ],
-      selected: {value},
-      onSelectionChanged: (selection) => onChanged(selection.first),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textScale = MediaQuery.textScalerOf(context).scale(1);
+        final widthPerSegment = constraints.maxWidth / segments.length;
+        final hideIcons =
+            constraints.hasBoundedWidth &&
+            widthPerSegment <
+                _minimumWidthPerSegmentWithIcons * textScale.clamp(1, 1.3);
+
+        return SegmentedButton<T>(
+          showSelectedIcon: showSelectedIcon && !hideIcons,
+          segments: [
+            for (final segment in segments)
+              ButtonSegment<T>(
+                value: segment.value,
+                label: DefaultTextStyle.merge(
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  child: segment.label,
+                ),
+                icon: hideIcons ? null : segment.icon,
+              ),
+          ],
+          selected: {value},
+          onSelectionChanged: (selection) => onChanged(selection.first),
+        );
+      },
     );
   }
 }

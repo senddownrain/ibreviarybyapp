@@ -48,6 +48,23 @@ void main() {
         'Год B',
         'Год C',
       ]);
+      expect(options.first.html, contains('Антыфона A.'));
+      expect(options.first.html, isNot(contains('Год A:')));
+    });
+
+    test('keeps antiphon text outside a paragraph after a cycle marker', () {
+      final options = getLiturgicalAlternatives(
+        '<p><span style="color:red">Год А:</span></p>'
+        'Антыфона нядзелі.'
+        '<p><span style="color:red">Год В:</span></p>'
+        'Другая антыфона.',
+        kind: 'gospel-antiphon',
+      );
+
+      expect(options, hasLength(2));
+      expect(options.first.html, contains('Антыфона нядзелі.'));
+      expect(options.last.html, contains('Другая антыфона.'));
+      expect(options.first.html, isNot(contains('Год А:')));
     });
 
     test('does not split narrative “У тыя дні” as a category', () {

@@ -46,6 +46,30 @@ void main() {
     expect(byText.map((prayer) => prayer.id), ['a']);
   });
 
+  test('search normalizes whitespace, HTML boundaries, and apostrophes', () {
+    final acrossParagraphs = filterAndSortPrayers(
+      const [
+        Prayer(
+          id: 'e',
+          title: 'Апостальская малітва',
+          body: '<p>Праз Езуса</p><p>Хрыста&nbsp;— нашага Пана.</p>',
+        ),
+      ],
+      const PrayersFilter(searchQuery: 'езуса   хрыста'),
+      const [],
+    );
+    final straightApostrophe = filterAndSortPrayers(
+      const [
+        Prayer(id: 'g', title: 'Марыя — Маці вернікаў', body: 'З’яднай нас'),
+      ],
+      const PrayersFilter(searchQuery: "з'яднай"),
+      const [],
+    );
+
+    expect(acrossParagraphs.map((prayer) => prayer.id), ['e']);
+    expect(straightApostrophe.map((prayer) => prayer.id), ['g']);
+  });
+
   test('favorites are sorted first and titles ignore leading spaces', () {
     final result = filterAndSortPrayers(prayers, const PrayersFilter(), const [
       'b',

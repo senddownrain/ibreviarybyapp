@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
+import 'package:html/parser.dart' show parseFragment;
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
@@ -49,7 +50,7 @@ const _kInvitIntro =
     '<p><span style="color:red">Н.</span> І вусны мае будуць абвяшчаць Тваю хвалу.</p>';
 
 const _kInvitRubric =
-    '<p><span style="color:red"><em>Заклік з’яўляецца пачаткам штодзённай '
+    '<p class="liturgical-rubric"><span style="color:red"><em>Заклік з’яўляецца пачаткам штодзённай '
     'літургічнай малітвы. Ён папярэднічае Гадзіне чытанняў або Ютрані, '
     'у залежнасці ад таго, якая з гэтых літургічных гадзінаў распачынае '
     'малітву дня.</em></span></p>';
@@ -59,18 +60,18 @@ const _kEndOfSext =
     '<p><span style="color:red">Н.</span> Дзякуем Пану Богу.</p>';
 
 const _kEndOfVesper =
-    '<p><span style="color:red"><em>Потым, калі прысутнічае святар або дыякан, '
+    '<p class="liturgical-rubric"><span style="color:red"><em>Потым, калі прысутнічае святар або дыякан, '
     'ён рассылае народ, кажучы:</em></span></p>'
     '<p><span style="color:red">С.</span> Пан з вамі.<br>'
     '<span style="color:red">Н.</span> І з духам тваім.<br>'
     '<span style="color:red">С.</span> Няхай благаславіць вас Бог усемагутны, '
     'Айцец і Сын, і Дух Святы.<br>'
     '<span style="color:red">Н.</span> Амэн.</p>'
-    '<p><span style="color:red"><em>Калі адбываецца рассыланне народу, '
+    '<p class="liturgical-rubric"><span style="color:red"><em>Калі адбываецца рассыланне народу, '
     'дадаецца заклік:</em></span></p>'
     '<p><span style="color:red">С.</span> Ідзіце ў супакоі Хрыста.<br>'
     '<span style="color:red">Н.</span> Дзякуем Пану Богу.</p>'
-    '<p><span style="color:red"><em>Калі святар або дыякан адсутнічаюць ці '
+    '<p class="liturgical-rubric"><span style="color:red"><em>Калі святар або дыякан адсутнічаюць ці '
     'калі Гадзіна чытаецца індывідуальна, то яна завяршаецца наступным '
     'чынам:</em></span></p>'
     '<p><span style="color:red">К.</span> Няхай Пан благаславіць нас, абароніць '
@@ -366,14 +367,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           ),
           semanticLabel: 'Тэкст Ora',
           actions: const [TextScaleControl()],
-          secondaryActions: [
-            ReaderSecondaryAction(
-              label: 'Поўнаэкраннае чытанне',
-              icon: Icons.fullscreen_rounded,
-              onSelected: () =>
-                  _requestChromeMode(context, ReaderChromeMode.hidden),
-            ),
-          ],
           contextHeader: _buildReaderContext(context, day),
           content: _buildContent(context, day, allInvit, comp, textStyle),
         ),
@@ -490,6 +483,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   }
 
   Widget _buildReaderContext(BuildContext context, LiturgicalDay day) {
+    final theme = Theme.of(context);
+    final accent = liturgicalColorForDay(day);
     final dayTitle = liturgicalDayDisplayTitle(day, widget.date)
         .replaceAll(RegExp(r'\\?<br\s*/?>', caseSensitive: false), '\n')
         .replaceAll(RegExp(r'<[^>]+>'), '')
@@ -503,15 +498,24 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       if (psalterLabel.isNotEmpty) psalterLabel,
       if (rankLabel.isNotEmpty) rankLabel,
     ].join(' · ');
-    return ReaderContextHeader(
-      accentColor: liturgicalColorForDay(day),
+    final header = ReaderContextHeader(
+      accentColor: accent,
       eyebrow: '${DateFormat('d MMMM y', 'be').format(widget.date)} г.',
       subtitle: dayTitle,
+      eyebrowStyle: theme.textTheme.titleSmall?.copyWith(
+        color: accent,
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        height: 1.3,
+      ),
+      subtitleStyle: theme.textTheme.titleMedium?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        height: 1.4,
+      ),
       title: _oraTitle(widget.oraType),
       metadata: contextSummary,
-      details: feastComment.isEmpty
-          ? null
-          : _ExpandableFeastComment(feastComment),
       onTitleTap: () => _changeHour(day),
       actions: [
         TextButton.icon(
@@ -526,15 +530,17 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
       ],
     );
-  }
-
-  void _requestChromeMode(BuildContext context, ReaderChromeMode mode) {
-    final scoped = ReaderChromeModeScope.maybeControllerOf(context);
-    if (scoped != null) {
-      scoped.value = mode;
-    } else {
-      setState(() => _chromeMode = mode);
-    }
+    if (feastComment.isEmpty) return header;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        header,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
+          child: _ExpandableFeastComment(feastComment),
+        ),
+      ],
+    );
   }
 
   Future<void> _changeHour(LiturgicalDay day) async {
@@ -646,8 +652,35 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   }
 
   String _invitName(Map<String, dynamic> m) {
-    final t = (m['title'] as String? ?? m['name'] as String? ?? '').trim();
-    return t.isNotEmpty ? t : 'Псальм запрашэння';
+    final explicit = (m['title'] as String? ?? m['name'] as String? ?? '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (explicit.isNotEmpty && explicit.toLowerCase() != 'псальм запрашэння') {
+      return explicit;
+    }
+
+    final source = [
+      for (var i = 1; i <= 6; i++) m['invitatoriumPs$i'],
+    ].whereType<Object>().join(' ');
+    final plain = (parseFragment(source).text ?? '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    final psalm = RegExp(
+      r'Псал(?:ьм|ом)\s+\d+(?:\s*\(\d+\))?',
+      caseSensitive: false,
+    ).firstMatch(plain);
+    if (psalm == null) {
+      return explicit.isNotEmpty ? explicit : 'Псальм запрашэння';
+    }
+
+    final number = psalm.group(0)!;
+    var subtitle = plain.substring(psalm.end).trim();
+    subtitle = subtitle.replaceFirst(RegExp(r'^[—–:.,\s]+'), '');
+    if (subtitle.isEmpty) return number;
+    final sentenceEnd = subtitle.indexOf(RegExp(r'[.!?]'));
+    if (sentenceEnd > 12) subtitle = subtitle.substring(0, sentenceEnd + 1);
+    if (subtitle.length > 64) subtitle = '${subtitle.substring(0, 61).trim()}…';
+    return '$number — $subtitle';
   }
 
   int _defaultInvitatoriumIndex(
@@ -699,28 +732,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final antBen = (day.field('laudesAntBen') ?? '').trim();
     if (antBen.isNotEmpty) {
-      final antController = _alternativeController('laudes-ant-ben');
-      items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
-      items.add(
-        _OraItem.html(
-          '<p><em>Песня Захарыі (Лк 1, 68–79) — Месія і Яго папярэднік</em></p>',
-        ),
-      );
-      items.add(
-        _OraItem.antiphon(
-          antBen,
-          kind: 'gospel-antiphon',
-          controller: antController,
-        ),
-      );
-      items.add(_OraItem.psalm(_kBenedictus));
-      items.add(
-        _OraItem.antiphon(
-          antBen,
-          kind: 'gospel-antiphon',
-          controller: antController,
-          showPicker: false,
-        ),
+      _addGospelCanticle(
+        items,
+        antiphon: antBen,
+        controllerScope: 'laudes-ant-ben',
+        caption:
+            '<p><em>Песня Захарыі (Лк 1, 68–79) — Месія і Яго папярэднік</em></p>',
+        psalm: _kBenedictus,
       );
     }
 
@@ -801,28 +819,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final antMag = (day.field('vesperAntMag') ?? '').trim();
     if (antMag.isNotEmpty) {
-      final antController = _alternativeController('vespers-ant-mag');
-      items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
-      items.add(
-        _OraItem.html(
-          '<p><em>Песня Марыі (Лк 1, 46–55) — Радасць душы ў Пану</em></p>',
-        ),
-      );
-      items.add(
-        _OraItem.antiphon(
-          antMag,
-          kind: 'gospel-antiphon',
-          controller: antController,
-        ),
-      );
-      items.add(_OraItem.psalm(_kMagnificat));
-      items.add(
-        _OraItem.antiphon(
-          antMag,
-          kind: 'gospel-antiphon',
-          controller: antController,
-          showPicker: false,
-        ),
+      _addGospelCanticle(
+        items,
+        antiphon: antMag,
+        controllerScope: 'vespers-ant-mag',
+        caption:
+            '<p><em>Песня Марыі (Лк 1, 46–55) — Радасць душы ў Пану</em></p>',
+        psalm: _kMagnificat,
       );
     }
 
@@ -966,28 +969,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'laudesR', '');
     final antBen = (day.field('laudesAntBen') ?? '').trim();
     if (antBen.isNotEmpty) {
-      final antController = _alternativeController('morning-ant-ben');
-      items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
-      items.add(
-        _OraItem.html(
-          '<p><em>Песня Захарыі (Лк 1, 68–79)<br>Месія і Яго папярэднік</em></p>',
-        ),
-      );
-      items.add(
-        _OraItem.antiphon(
-          antBen,
-          kind: 'gospel-antiphon',
-          controller: antController,
-        ),
-      );
-      items.add(_OraItem.psalm(_kBenedictus));
-      items.add(
-        _OraItem.antiphon(
-          antBen,
-          kind: 'gospel-antiphon',
-          controller: antController,
-          showPicker: false,
-        ),
+      _addGospelCanticle(
+        items,
+        antiphon: antBen,
+        controllerScope: 'morning-ant-ben',
+        caption:
+            '<p><em>Песня Захарыі (Лк 1, 68–79)<br>Месія і Яго папярэднік</em></p>',
+        psalm: _kBenedictus,
       );
     }
     _addField(items, day, 'laudesInter', 'Просьбы');
@@ -1001,6 +989,34 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   void _addIntro(List<_OraItem> items) {
     items.add(_OraItem.html(_kStandardIntro));
+  }
+
+  void _addGospelCanticle(
+    List<_OraItem> items, {
+    required String antiphon,
+    required String controllerScope,
+    required String caption,
+    required String psalm,
+  }) {
+    final antController = _alternativeController(controllerScope);
+    items.add(
+      _OraItem.antiphon(
+        antiphon,
+        kind: 'gospel-antiphon',
+        controller: antController,
+      ),
+    );
+    items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
+    items.add(_OraItem.html(caption));
+    items.add(_OraItem.psalm(psalm));
+    items.add(
+      _OraItem.antiphon(
+        antiphon,
+        kind: 'gospel-antiphon',
+        controller: antController,
+        showPicker: false,
+      ),
+    );
   }
 
   void _addHymn(List<_OraItem> items, LiturgicalDay day, String fieldName) {
@@ -1177,43 +1193,72 @@ class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
     return Semantics(
       button: true,
       expanded: _expanded,
-      child: InkWell(
+      label: _expanded
+          ? 'Згарнуць апісанне святкавання'
+          : 'Паказаць поўнае апісанне святкавання',
+      child: Material(
         key: const Key('ora-feast-comment-toggle'),
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => setState(() => _expanded = !_expanded),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AnimatedCrossFade(
-                duration: const Duration(milliseconds: 180),
-                crossFadeState: _expanded
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
-                firstChild: Text(
-                  widget.text,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+        color: cs.surface.withValues(alpha: 0.72),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.7)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Пра святкаванне',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: cs.onSurface,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: _expanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 180),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: cs.primary,
+                      ),
+                    ),
+                  ],
                 ),
-                secondChild: Text(
-                  widget.text,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                const SizedBox(height: 8),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 180),
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    widget.text,
+                    key: const Key('ora-feast-comment-text'),
+                    maxLines: _expanded ? null : 3,
+                    overflow: _expanded ? null : TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontSize: 16,
+                      height: 1.45,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                _expanded ? 'Згарнуць' : 'Чытаць цалкам',
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(color: cs.primary),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  _expanded ? 'Згарнуць' : 'Чытаць цалкам',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: cs.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1315,24 +1360,15 @@ class _OraItem {
         );
 
       case _OraItemType.antiphon:
-        final reader = ReaderTheme.of(context);
-        final base = textStyle.fontSize ?? 16;
         return Padding(
-          padding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Ант.', style: reader.rubricBlock(base)),
-              const SizedBox(height: 3),
-              _HtmlOrText(
-                content: content,
-                textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
-                alternativeKind: alternativeKind,
-                alternativeController: alternativeController,
-                showPicker: showPicker,
-                pickerLabel: 'Выбар антыфоны',
-              ),
-            ],
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: _HtmlOrText(
+            content: content,
+            textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
+            alternativeKind: alternativeKind,
+            alternativeController: alternativeController,
+            showPicker: showPicker,
+            pickerLabel: 'Выбар антыфоны',
           ),
         );
 
@@ -1497,6 +1533,7 @@ class _HtmlOrText extends StatelessWidget {
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
     final baseSize = textStyle.fontSize ?? 16;
+    final paragraphSpacing = alternativeKind == 'hymn' ? 15.0 : 8.0;
     return Html(
       data: isPsalm
           ? formatPsalmHtml(
@@ -1514,7 +1551,10 @@ class _HtmlOrText extends StatelessWidget {
           padding: HtmlPaddings.zero,
           textAlign: TextAlign.left,
         ),
-        'p': Style(color: textColor, margin: Margins.only(bottom: 8)),
+        'p': Style(
+          color: textColor,
+          margin: Margins.only(bottom: paragraphSpacing),
+        ),
         '.liturgical-subheading': Style(
           fontSize: FontSize((baseSize * 0.88).clamp(14, double.infinity)),
           lineHeight: LineHeight(1.45),
@@ -1619,33 +1659,45 @@ class _InvitSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final reader = ReaderTheme.of(context);
+    final activeIndex = selectedIndex.clamp(0, names.length - 1);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'ВАРЫЯНТ',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
-              color: cs.onSurface.withValues(alpha: 0.45),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (var i = 0; i < names.length; i++)
-                ChoiceChip(
-                  label: Text(names[i]),
-                  selected: selectedIndex == i,
-                  onSelected: (_) => onSelect(i),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          key: const Key('invitatorium-psalm-picker'),
+          onPressed: () async {
+            final selected = await showReaderChoiceSheet<int>(
+              context: context,
+              title: 'Псальм закліку',
+              selectedValue: activeIndex,
+              choices: [
+                for (var i = 0; i < names.length; i++)
+                  ReaderChoice(
+                    value: i,
+                    label: names[i],
+                    subtitle: 'Варыянт ${i + 1} з ${names.length}',
+                    icon: Icons.menu_book_rounded,
+                  ),
+              ],
+            );
+            if (selected != null) onSelect(selected);
+          },
+          icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 19),
+          label: Text(names[activeIndex]),
+          style: TextButton.styleFrom(
+            foregroundColor: reader.rubric,
+            minimumSize: const Size(48, 48),
+            textStyle: reader
+                .body(16)
+                .copyWith(
+                  fontSize: 14,
+                  height: 1.35,
+                  fontWeight: FontWeight.w600,
                 ),
-            ],
           ),
-        ],
+        ),
       ),
     );
   }

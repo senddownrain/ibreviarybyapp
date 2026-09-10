@@ -13,6 +13,27 @@ class ReadingCelebrationGroup {
   });
 }
 
+/// Returns the Hours day identity when every document in a celebration group
+/// points to the same liturgical day.
+String? readingCelebrationDayId(ReadingCelebrationGroup group) {
+  final directIds = <String>{};
+  for (final reading in group.documents) {
+    final direct = reading.dayId?.trim();
+    if (direct != null && direct.isNotEmpty) directIds.add(direct);
+  }
+  if (directIds.isNotEmpty) {
+    return directIds.length == 1 ? directIds.single : null;
+  }
+
+  final linkedIds = <String>{};
+  for (final reading in group.documents) {
+    linkedIds.addAll(
+      reading.dayIds.map((id) => id.trim()).where((id) => id.isNotEmpty),
+    );
+  }
+  return linkedIds.length == 1 ? linkedIds.single : null;
+}
+
 String readingCelebrationKey(ParsedReading reading) {
   final variant = (reading.variant ?? '').trim().toLowerCase();
   final variantSuffix = variant.isEmpty ? '' : '|variant:$variant';

@@ -96,6 +96,9 @@ class _AlternativeTextState extends State<AlternativeText> {
             label: widget.label,
             options: _options,
             activeIndex: _activeIndex,
+            compactTitle: widget.kind == 'gospel-antiphon'
+                ? active.title
+                : null,
             onSelect: _select,
           ),
           const SizedBox(height: 18),
@@ -119,12 +122,14 @@ class _AlternativePicker extends StatelessWidget {
     required this.label,
     required this.options,
     required this.activeIndex,
+    this.compactTitle,
     required this.onSelect,
   });
 
   final String label;
   final List<LiturgicalAlternative> options;
   final int activeIndex;
+  final String? compactTitle;
   final ValueChanged<int> onSelect;
 
   @override
@@ -150,7 +155,9 @@ class _AlternativePicker extends StatelessWidget {
           if (selected != null) onSelect(selected);
         },
         icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 19),
-        label: Text('Варыянт ${activeIndex + 1} з ${options.length}'),
+        label: Text(
+          compactTitle ?? 'Варыянт ${activeIndex + 1} з ${options.length}',
+        ),
         style: TextButton.styleFrom(
           foregroundColor: reader.rubric,
           minimumSize: const Size(48, 48),

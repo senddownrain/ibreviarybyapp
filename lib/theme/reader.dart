@@ -62,7 +62,7 @@ class ReaderTheme {
   ).copyWith(height: 1.3, fontWeight: FontWeight.w600);
 
   TextStyle blockHeading(double bodySize) => body(
-    (bodySize * .90).clamp(14, double.infinity),
+    (bodySize * 1.10).clamp(18, double.infinity),
   ).copyWith(height: 1.3, color: rubric, fontWeight: FontWeight.w600);
 
   TextStyle metadata(double bodySize, {bool italic = false}) =>

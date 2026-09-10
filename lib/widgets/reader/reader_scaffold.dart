@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 
 /// Navigation/chrome density requested by the application shell.
 ///
@@ -12,7 +13,24 @@ import 'package:mybrev_flutter/theme/reader.dart';
 enum ReaderChromeMode { full, compact, hidden }
 
 class ReaderChromeModeController extends ValueNotifier<ReaderChromeMode> {
-  ReaderChromeModeController([super.value = ReaderChromeMode.full]);
+  ReaderChromeModeController([super.value = ReaderChromeMode.full])
+    : _lastVisibleMode = value == ReaderChromeMode.hidden
+          ? ReaderChromeMode.compact
+          : value;
+
+  ReaderChromeMode _lastVisibleMode;
+
+  @override
+  set value(ReaderChromeMode newValue) {
+    if (newValue != ReaderChromeMode.hidden) _lastVisibleMode = newValue;
+    super.value = newValue;
+  }
+
+  void toggleFullscreen() {
+    value = value == ReaderChromeMode.hidden
+        ? _lastVisibleMode
+        : ReaderChromeMode.hidden;
+  }
 }
 
 class ReaderChromeModeScope
@@ -63,6 +81,10 @@ class ReaderScaffold extends StatelessWidget {
     this.maxContentWidth = 760,
     this.semanticLabel,
     this.showAmbient = true,
+    this.enableDoubleTapFullscreen = true,
+    this.showScrollToTop = false,
+    this.onSwipePrevious,
+    this.onSwipeNext,
   });
 
   final Widget content;
@@ -83,6 +105,10 @@ class ReaderScaffold extends StatelessWidget {
   final double maxContentWidth;
   final String? semanticLabel;
   final bool showAmbient;
+  final bool enableDoubleTapFullscreen;
+  final bool showScrollToTop;
+  final VoidCallback? onSwipePrevious;
+  final VoidCallback? onSwipeNext;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +126,57 @@ class ReaderScaffold extends StatelessWidget {
       }
     }
 
+    void toggleFullscreen() {
+      if (scopedController != null) {
+        scopedController.toggleFullscreen();
+      } else {
+        setMode(
+          resolvedMode == ReaderChromeMode.hidden
+              ? ReaderChromeMode.compact
+              : ReaderChromeMode.hidden,
+        );
+      }
+    }
+
+    Widget scrollView = CustomScrollView(
+      key: scrollKey,
+      controller: scrollController,
+      slivers: [
+        SliverToBoxAdapter(
+          child: SizedBox(key: const Key('reader-top-inset'), height: topInset),
+        ),
+        if (contextHeader case final header?)
+          SliverToBoxAdapter(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxContentWidth),
+                child: header,
+              ),
+            ),
+          ),
+        SliverToBoxAdapter(
+          child: ReaderContentSurface(
+            maxContentWidth: maxContentWidth,
+            semanticLabel: semanticLabel,
+            child: content,
+          ),
+        ),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: ColoredBox(color: ReaderTheme.of(context).surface),
+        ),
+      ],
+    );
+
+    if (onSwipePrevious != null || onSwipeNext != null) {
+      scrollView = HorizontalSwipeNavigation(
+        onPrevious: onSwipePrevious,
+        onNext: onSwipeNext,
+        child: scrollView,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: drawer,
@@ -109,39 +186,20 @@ class ReaderScaffold extends StatelessWidget {
             AmbientWash.hero(
               seasonColor: seasonColor ?? Theme.of(context).colorScheme.primary,
             ),
-          CustomScrollView(
-            key: scrollKey,
-            controller: scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  key: const Key('reader-top-inset'),
-                  height: topInset,
-                ),
-              ),
-              if (contextHeader case final header?)
-                SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxContentWidth),
-                      child: header,
-                    ),
-                  ),
-                ),
-              SliverToBoxAdapter(
-                child: ReaderContentSurface(
-                  maxContentWidth: maxContentWidth,
-                  semanticLabel: semanticLabel,
-                  child: content,
-                ),
-              ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: ColoredBox(color: ReaderTheme.of(context).surface),
-              ),
-            ],
-          ),
+          if (enableDoubleTapFullscreen)
+            _ReaderFullscreenGestureSurface(
+              key: const Key('reader-double-tap-surface'),
+              onToggle: toggleFullscreen,
+              child: scrollView,
+            )
+          else
+            scrollView,
+          if (showScrollToTop && scrollController != null)
+            _ReaderScrollToTopControl(
+              controller: scrollController!,
+              mode: resolvedMode,
+              seasonColor: seasonColor,
+            ),
           Positioned(
             top: 0,
             left: 0,
@@ -162,6 +220,150 @@ class ReaderScaffold extends StatelessWidget {
   }
 }
 
+class _ReaderScrollToTopControl extends StatefulWidget {
+  const _ReaderScrollToTopControl({
+    required this.controller,
+    required this.mode,
+    required this.seasonColor,
+  });
+
+  final ScrollController controller;
+  final ReaderChromeMode mode;
+  final Color? seasonColor;
+
+  @override
+  State<_ReaderScrollToTopControl> createState() =>
+      _ReaderScrollToTopControlState();
+}
+
+class _ReaderScrollToTopControlState extends State<_ReaderScrollToTopControl> {
+  static const _showAfter = 560.0;
+  bool _visible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_handleScroll);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ReaderScrollToTopControl oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_handleScroll);
+      widget.controller.addListener(_handleScroll);
+      _handleScroll();
+    }
+  }
+
+  void _handleScroll() {
+    final visible =
+        widget.controller.hasClients && widget.controller.offset > _showAfter;
+    if (visible != _visible && mounted) setState(() => _visible = visible);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleScroll);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final shown = _visible && widget.mode != ReaderChromeMode.hidden;
+    if (!shown) return const SizedBox.shrink();
+    return Positioned(
+      right: 16,
+      bottom: MediaQuery.paddingOf(context).bottom + 16,
+      child: AdaptiveChromeSurface(
+        role: ChromeSurfaceRole.control,
+        seasonColor: widget.seasonColor,
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox.square(
+          dimension: 48,
+          child: IconButton(
+            key: const Key('reader-scroll-to-top'),
+            tooltip: 'Вярнуцца ўверх',
+            onPressed: () => widget.controller.animateTo(
+              0,
+              duration: const Duration(milliseconds: 360),
+              curve: Curves.easeOutCubic,
+            ),
+            icon: const Icon(Icons.keyboard_arrow_up_rounded, size: 28),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReaderFullscreenGestureSurface extends StatefulWidget {
+  const _ReaderFullscreenGestureSurface({
+    super.key,
+    required this.onToggle,
+    required this.child,
+  });
+
+  final VoidCallback onToggle;
+  final Widget child;
+
+  @override
+  State<_ReaderFullscreenGestureSurface> createState() =>
+      _ReaderFullscreenGestureSurfaceState();
+}
+
+class _ReaderFullscreenGestureSurfaceState
+    extends State<_ReaderFullscreenGestureSurface> {
+  DateTime? _lastTapAt;
+  Offset? _lastTapPosition;
+  Offset? _pointerDownPosition;
+  bool _pointerMoved = false;
+
+  void _onPointerDown(PointerDownEvent event) {
+    _pointerDownPosition = event.position;
+    _pointerMoved = false;
+  }
+
+  void _onPointerMove(PointerMoveEvent event) {
+    final origin = _pointerDownPosition;
+    if (origin != null && (event.position - origin).distance > 18) {
+      _pointerMoved = true;
+    }
+  }
+
+  void _onPointerUp(PointerUpEvent event) {
+    if (_pointerMoved) {
+      _lastTapAt = null;
+      _lastTapPosition = null;
+      return;
+    }
+    final now = DateTime.now();
+    final previousAt = _lastTapAt;
+    final previousPosition = _lastTapPosition;
+    if (previousAt != null &&
+        previousPosition != null &&
+        now.difference(previousAt) <= const Duration(milliseconds: 280) &&
+        (event.position - previousPosition).distance <= 48) {
+      _lastTapAt = null;
+      _lastTapPosition = null;
+      widget.onToggle();
+      return;
+    }
+    _lastTapAt = now;
+    _lastTapPosition = event.position;
+  }
+
+  @override
+  Widget build(BuildContext context) => Listener(
+    behavior: HitTestBehavior.translucent,
+    onPointerDown: _onPointerDown,
+    onPointerMove: _onPointerMove,
+    onPointerUp: _onPointerUp,
+    onPointerCancel: (_) => _pointerMoved = true,
+    child: widget.child,
+  );
+}
+
 class ReaderContentSurface extends StatelessWidget {
   const ReaderContentSurface({
     super.key,
@@ -176,7 +378,11 @@ class ReaderContentSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.viewPaddingOf(context).bottom;
+    // With Scaffold.extendBody enabled, MediaQuery.padding includes the
+    // floating app dock while viewPadding only includes the system inset.
+    // Reserve the full padded area so the end of a document can scroll clear
+    // of both the dock and the system navigation bar.
+    final bottom = MediaQuery.paddingOf(context).bottom;
     Widget result = ColoredBox(
       key: const Key('reader-content-surface'),
       color: ReaderTheme.of(context).surface,
@@ -221,22 +427,7 @@ class ReaderChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (mode == ReaderChromeMode.hidden) {
-      return SafeArea(
-        bottom: false,
-        child: Align(
-          alignment: Alignment.topRight,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-            child: _ReaderChromeButton(
-              key: const Key('reader-chrome-restore'),
-              tooltip: 'Вярнуць кіраванне',
-              icon: Icons.fullscreen_exit_rounded,
-              seasonColor: seasonColor,
-              onPressed: () => onModeChanged(ReaderChromeMode.compact),
-            ),
-          ),
-        ),
-      );
+      return const SizedBox.shrink(key: Key('reader-chrome-hidden'));
     }
 
     final cupertino = usesCupertinoGlass(context);
@@ -346,6 +537,8 @@ class ReaderContextHeader extends StatelessWidget {
     this.details,
     this.onTitleTap,
     this.titleActionLabel,
+    this.eyebrowStyle,
+    this.subtitleStyle,
     this.actions = const [],
   });
 
@@ -357,6 +550,8 @@ class ReaderContextHeader extends StatelessWidget {
   final Widget? details;
   final VoidCallback? onTitleTap;
   final String? titleActionLabel;
+  final TextStyle? eyebrowStyle;
+  final TextStyle? subtitleStyle;
   final List<Widget> actions;
 
   @override
@@ -384,19 +579,23 @@ class ReaderContextHeader extends StatelessWidget {
             if ((eyebrow ?? '').isNotEmpty)
               Text(
                 eyebrow!,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: accent,
-                  fontWeight: FontWeight.w700,
-                ),
+                style:
+                    eyebrowStyle ??
+                    Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: accent,
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
             if ((subtitle ?? '').isNotEmpty) ...[
               const SizedBox(height: 7),
               Text(
                 subtitle!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: cs.onSurfaceVariant,
-                  height: 1.45,
-                ),
+                style:
+                    subtitleStyle ??
+                    Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      height: 1.45,
+                    ),
               ),
             ],
             const SizedBox(height: 9),

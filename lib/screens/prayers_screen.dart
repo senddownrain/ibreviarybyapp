@@ -246,6 +246,10 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
               controller: _query,
               focusNode: _focus,
               textInputAction: TextInputAction.search,
+              onSubmitted: (value) {
+                _debounce?.cancel();
+                ref.read(prayersFilterProvider.notifier).setSearch(value);
+              },
               decoration: InputDecoration(
                 hintText: 'Знайсці малітву',
                 prefixIcon: const Icon(Icons.search_rounded),
@@ -370,7 +374,7 @@ class PrayerCategoriesScreen extends ConsumerWidget {
                 20,
                 MediaQuery.paddingOf(context).top + 90,
                 20,
-                120 + MediaQuery.viewPaddingOf(context).bottom,
+                152 + MediaQuery.viewPaddingOf(context).bottom,
               ),
               children: [
                 Text(
@@ -444,21 +448,23 @@ class PrayerCategoriesScreen extends ConsumerWidget {
   ) async {
     final catalog = ref.read(prayerCatalogProvider);
     final settings = ref.read(settingsProvider);
-    final result = await showDialog<_CategoryDraft>(
-      context: context,
-      builder: (_) => _CategoryEditorDialog(
-        existing: existing,
-        prayers: catalog,
-        memberIds: existing == null
-            ? const {}
-            : {
-                for (final prayer in catalog)
-                  if (settings.prayerCategoryMap[prayer.id]?.contains(
-                        existing.id,
-                      ) ==
-                      true)
-                    prayer.id,
-              },
+    final result = await Navigator.of(context).push<_CategoryDraft>(
+      MaterialPageRoute(
+        builder: (_) => _CategoryEditorScreen(
+          existing: existing,
+          prayers: catalog,
+          availableTags: ref.read(allTagsProvider),
+          memberIds: existing == null
+              ? const {}
+              : {
+                  for (final prayer in catalog)
+                    if (settings.prayerCategoryMap[prayer.id]?.contains(
+                          existing.id,
+                        ) ==
+                        true)
+                      prayer.id,
+                },
+        ),
       ),
     );
     if (result == null || !context.mounted) return;
@@ -834,107 +840,335 @@ class _CategoryDraft {
   final Set<String> memberIds;
 }
 
-class _CategoryEditorDialog extends StatefulWidget {
-  const _CategoryEditorDialog({
+class _CategoryEditorScreen extends StatefulWidget {
+  const _CategoryEditorScreen({
     required this.existing,
     required this.prayers,
+    required this.availableTags,
     required this.memberIds,
   });
   final UserCategory? existing;
   final List<Prayer> prayers;
+  final List<String> availableTags;
   final Set<String> memberIds;
 
   @override
-  State<_CategoryEditorDialog> createState() => _CategoryEditorDialogState();
+  State<_CategoryEditorScreen> createState() => _CategoryEditorScreenState();
 }
 
-class _CategoryEditorDialogState extends State<_CategoryEditorDialog> {
+class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
   late final TextEditingController _name = TextEditingController(
     text: widget.existing?.name ?? '',
   );
-  late final TextEditingController _tags = TextEditingController(
-    text: widget.existing?.tags.join(', ') ?? '',
-  );
+  late final Set<String> _tags = {...?widget.existing?.tags};
   late final Set<String> _members = Set<String>.from(widget.memberIds);
+
+  List<String> get _visibleTags => ({...widget.availableTags, ..._tags}.toList()
+    ..sort((left, right) => left.toLowerCase().compareTo(right.toLowerCase())));
 
   @override
   void dispose() {
     _name.dispose();
-    _tags.dispose();
     super.dispose();
   }
 
+  Future<void> _pickPrayers() async {
+    final selected = await Navigator.of(context).push<Set<String>>(
+      MaterialPageRoute(
+        builder: (_) => _CategoryPrayerPickerScreen(
+          prayers: widget.prayers,
+          selectedIds: _members,
+        ),
+      ),
+    );
+    if (selected != null && mounted) {
+      setState(() {
+        _members
+          ..clear()
+          ..addAll(selected);
+      });
+    }
+  }
+
+  void _save() {
+    final name = _name.text.trim();
+    if (name.isEmpty) return;
+    Navigator.pop(
+      context,
+      _CategoryDraft(name, _tags.toList(growable: false), _members),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(
-      widget.existing == null ? 'Новая катэгорыя' : 'Змяніць катэгорыю',
-    ),
-    content: SizedBox(
-      width: 520,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final canSave = _name.text.trim().isNotEmpty;
+    final title = widget.existing == null
+        ? 'Новая катэгорыя'
+        : 'Змяніць катэгорыю';
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        actions: [
+          TextButton(
+            key: const Key('save-category-action'),
+            onPressed: canSave ? _save : null,
+            child: const Text('Захаваць'),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.fromLTRB(
+            20,
+            18,
+            20,
+            28 + MediaQuery.viewInsetsOf(context).bottom,
+          ),
           children: [
             TextField(
               key: const Key('category-name-field'),
               controller: _name,
-              autofocus: true,
-              decoration: const InputDecoration(labelText: 'Назва'),
+              autofocus: widget.existing == null,
+              textCapitalization: TextCapitalization.sentences,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _save(),
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                labelText: 'Назва катэгорыі',
+                hintText: 'Напрыклад, Малітвы на кожны дзень',
+              ),
+            ),
+            const SizedBox(height: 28),
+            Text(
+              'Хуткі выбар тэгаў',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'У катэгорыю аўтаматычна трапяць усе малітвы з выбранымі тэгамі.',
+              style: TextStyle(color: cs.onSurfaceVariant),
             ),
             const SizedBox(height: 12),
-            TextField(
-              controller: _tags,
-              decoration: const InputDecoration(
-                labelText: 'Тэгі',
-                helperText: 'Праз коску; катэгорыя застаецца tag-based',
+            if (_visibleTags.isEmpty)
+              Text(
+                'Тэгі з’явяцца пасля сінхранізацыі малітоўніка.',
+                style: TextStyle(color: cs.onSurfaceVariant),
+              )
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final tag in _visibleTags)
+                    FilterChip(
+                      key: ValueKey('category-tag-$tag'),
+                      label: Text(tag),
+                      selected: _tags.contains(tag),
+                      showCheckmark: true,
+                      onSelected: (selected) => setState(
+                        () => selected ? _tags.add(tag) : _tags.remove(tag),
+                      ),
+                    ),
+                ],
               ),
+            const SizedBox(height: 32),
+            Text(
+              'Асобныя малітвы',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Дададзеныя малітвы',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
+            const SizedBox(height: 6),
+            Text(
+              'Дадайце малітвы, якія не падыходзяць пад выбраныя тэгі.',
+              style: TextStyle(color: cs.onSurfaceVariant),
             ),
-            for (final prayer in widget.prayers)
-              CheckboxListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                title: Text(prayer.displayTitle),
-                value: _members.contains(prayer.id),
-                onChanged: (selected) => setState(
-                  () => selected == true
-                      ? _members.add(prayer.id)
-                      : _members.remove(prayer.id),
+            const SizedBox(height: 12),
+            Card(
+              margin: EdgeInsets.zero,
+              color: cs.surfaceContainerLow,
+              child: ListTile(
+                key: const Key('pick-category-prayers'),
+                minTileHeight: 64,
+                leading: const Icon(Icons.playlist_add_rounded),
+                title: const Text('Выбраць малітвы'),
+                subtitle: Text(
+                  _members.isEmpty
+                      ? 'Пошук па назве'
+                      : 'Выбрана: ${_members.length}',
                 ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _pickPrayers,
               ),
+            ),
+            if (_members.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final prayer in widget.prayers)
+                    if (_members.contains(prayer.id))
+                      InputChip(
+                        label: Text(prayer.displayTitle),
+                        onDeleted: () =>
+                            setState(() => _members.remove(prayer.id)),
+                      ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 32),
+            FilledButton(
+              onPressed: canSave ? _save : null,
+              child: const Text('Захаваць катэгорыю'),
+            ),
           ],
         ),
       ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Адмена'),
+    );
+  }
+}
+
+class _CategoryPrayerPickerScreen extends StatefulWidget {
+  const _CategoryPrayerPickerScreen({
+    required this.prayers,
+    required this.selectedIds,
+  });
+
+  final List<Prayer> prayers;
+  final Set<String> selectedIds;
+
+  @override
+  State<_CategoryPrayerPickerScreen> createState() =>
+      _CategoryPrayerPickerScreenState();
+}
+
+class _CategoryPrayerPickerScreenState
+    extends State<_CategoryPrayerPickerScreen> {
+  final TextEditingController _query = TextEditingController();
+  late final Set<String> _selected = Set<String>.from(widget.selectedIds);
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  void _finish() => Navigator.pop(context, _selected);
+
+  @override
+  Widget build(BuildContext context) {
+    final normalizedQuery = _query.text.trim().toLowerCase();
+    final visible = widget.prayers
+        .where(
+          (prayer) =>
+              normalizedQuery.isEmpty ||
+              prayer.displayTitle.toLowerCase().contains(normalizedQuery) ||
+              prayer.displayText.toLowerCase().contains(normalizedQuery),
+        )
+        .toList(growable: false);
+    final cs = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Выбар малітваў'),
+        actions: [
+          TextButton(onPressed: _finish, child: const Text('Гатова')),
+          const SizedBox(width: 8),
+        ],
       ),
-      FilledButton(
-        key: const Key('save-category-action'),
-        onPressed: () {
-          final name = _name.text.trim();
-          if (name.isEmpty) return;
-          final tags = _tags.text
-              .split(',')
-              .map((tag) => tag.trim())
-              .where((tag) => tag.isNotEmpty)
-              .toSet()
-              .toList();
-          Navigator.pop(context, _CategoryDraft(name, tags, _members));
-        },
-        child: const Text('Захаваць'),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
+              child: TextField(
+                key: const Key('category-prayer-search'),
+                controller: _query,
+                autofocus: true,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: 'Знайсці малітву',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _query.text.isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: 'Ачысціць пошук',
+                          onPressed: () => setState(_query.clear),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text(
+                    _selected.isEmpty
+                        ? 'Нічога не выбрана'
+                        : 'Выбрана: ${_selected.length}',
+                    style: TextStyle(color: cs.onSurfaceVariant),
+                  ),
+                  const Spacer(),
+                  if (_selected.isNotEmpty)
+                    TextButton(
+                      onPressed: () => setState(_selected.clear),
+                      child: const Text('Ачысціць'),
+                    ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: visible.isEmpty
+                  ? const Center(child: Text('Малітваў не знойдзена'))
+                  : ListView.builder(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: EdgeInsets.only(
+                        bottom: 20 + MediaQuery.viewPaddingOf(context).bottom,
+                      ),
+                      itemCount: visible.length,
+                      itemBuilder: (context, index) {
+                        final prayer = visible[index];
+                        final selected = _selected.contains(prayer.id);
+                        return CheckboxListTile(
+                          key: ValueKey('category-prayer-${prayer.id}'),
+                          value: selected,
+                          title: Text(prayer.displayTitle),
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          onChanged: (value) => setState(
+                            () => value == true
+                                ? _selected.add(prayer.id)
+                                : _selected.remove(prayer.id),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
-    ],
-  );
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+        child: FilledButton(
+          key: const Key('confirm-category-prayers'),
+          onPressed: _finish,
+          child: Text(
+            _selected.isEmpty ? 'Гатова' : 'Дадаць (${_selected.length})',
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _MissingPrayerbookPage extends StatelessWidget {

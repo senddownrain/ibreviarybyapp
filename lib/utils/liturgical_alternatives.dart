@@ -190,7 +190,13 @@ List<_RawAlternative>? _gospelCycleAlternatives(DocumentFragment root) {
   final shared = <String>[];
   final options = <({String title, List<String> parts})>[];
   ({String title, List<String> parts})? current;
-  for (final element in _directElements(root)) {
+  for (final node in _directNodes(root)) {
+    if (node is! Element) {
+      final html = _nodeHtml(node);
+      if (_textOf(html).isNotEmpty) (current?.parts ?? shared).add(html);
+      continue;
+    }
+    final element = node;
     if (element.localName != 'p') {
       (current?.parts ?? shared).add(element.outerHtml);
       continue;
@@ -204,14 +210,17 @@ List<_RawAlternative>? _gospelCycleAlternatives(DocumentFragment root) {
         .where((line) => _textOf(line).isNotEmpty);
     for (final line in lines) {
       final match = _gospelCycleMarker.firstMatch(_textOf(line));
-      final lineHtml = '<p$prefix>${line.trim()}</p>';
       if (match != null) {
+        final content = _removeGospelCycleMarker(line);
         current = (
           title: 'Год ${match.group(1)!.toUpperCase()}',
-          parts: <String>[lineHtml],
+          parts: <String>[
+            if (_textOf(content).isNotEmpty) '<p$prefix>$content</p>',
+          ],
         );
         options.add(current);
       } else {
+        final lineHtml = '<p$prefix>${line.trim()}</p>';
         (current?.parts ?? shared).add(lineHtml);
       }
     }
@@ -226,6 +235,25 @@ List<_RawAlternative>? _gospelCycleAlternatives(DocumentFragment root) {
         ),
       )
       .toList();
+}
+
+String _removeGospelCycleMarker(String html) {
+  // Legacy records use both plain markers and red <span>-wrapped markers.
+  // Keep everything after the marker so the selected antiphon itself is not
+  // lost, but do not render the large redundant "Год A" inside the prayer.
+  final marker = RegExp(
+    r'^\s*(?:(?:<[^>]+>)|&nbsp;|\s)*Год(?:(?:<[^>]+>)|&nbsp;|\s)+'
+    r'[АAВBСC](?:(?:<[^>]+>)|&nbsp;|\s)*:'
+    r'(?:(?:<\/[^>]+>)|&nbsp;|\s)*',
+    caseSensitive: false,
+  );
+  final stripped = html.replaceFirst(marker, '').trim();
+  if (_textOf(stripped).isNotEmpty) return stripped;
+
+  // A malformed inline wrapper may prevent the HTML-aware expression from
+  // matching. Falling back to text is preferable to showing an empty option.
+  final plain = _textOf(html).replaceFirst(_gospelCycleMarker, '').trim();
+  return plain;
 }
 
 String _substantiveText(String html) {

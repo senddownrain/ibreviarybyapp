@@ -54,79 +54,90 @@ class _LiturgicalPickerScreenState
       length: 2,
       child: AmbientWash(
         seasonColor: seasonColor,
-        child: Column(
-          children: [
-            SafeArea(
-              bottom: false,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  key: const Key('liturgical-picker-back'),
-                  tooltip: 'Назад',
-                  onPressed: () => Navigator.maybePop(context),
-                  icon: const Icon(Icons.arrow_back_rounded),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverToBoxAdapter(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                key: const Key('liturgical-picker-heading'),
                 children: [
-                  Text(
-                    'ЛІТУРГІЧНЫ КАЛЯНДАР',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: seasonColor,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.3,
+                  SafeArea(
+                    bottom: false,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        key: const Key('liturgical-picker-back'),
+                        tooltip: 'Назад',
+                        onPressed: () => Navigator.maybePop(context),
+                        icon: const Icon(Icons.arrow_back_rounded),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 5),
-                  Text(
-                    widget.isReadingsMode ? 'Знайсці чытанні' : 'Знайсці дзень',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  GlassSurface(
-                    style: GlassStyle.soft,
-                    borderRadius: BorderRadius.circular(20),
-                    padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
-                    child: Row(
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        PhosphorIcon(
+                        Text(
+                          'ЛІТУРГІЧНЫ КАЛЯНДАР',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: seasonColor,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.3,
+                              ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
                           widget.isReadingsMode
-                              ? PhosphorIconsRegular.bookOpenText
-                              : PhosphorIconsRegular.handsPraying,
-                          color: seasonColor,
-                          size: 20,
+                              ? 'Знайсці чытанні'
+                              : 'Знайсці дзень',
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
                         ),
-                        const SizedBox(width: 9),
-                        Expanded(
-                          child: Text(
-                            widget.isReadingsMode
-                                ? 'Рэжым чытанняў'
-                                : 'Рэжым літургічных гадзін',
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: _year,
-                            borderRadius: BorderRadius.circular(18),
-                            items: [
-                              for (var year = 2030; year >= 2019; year--)
-                                DropdownMenuItem(
-                                  value: year,
-                                  child: Text('$year'),
+                        const SizedBox(height: 12),
+                        GlassSurface(
+                          style: GlassStyle.soft,
+                          borderRadius: BorderRadius.circular(20),
+                          padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
+                          child: Row(
+                            children: [
+                              PhosphorIcon(
+                                widget.isReadingsMode
+                                    ? PhosphorIconsRegular.bookOpenText
+                                    : PhosphorIconsRegular.handsPraying,
+                                color: seasonColor,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 9),
+                              Expanded(
+                                child: Text(
+                                  widget.isReadingsMode
+                                      ? 'Рэжым чытанняў'
+                                      : 'Рэжым літургічных гадзін',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
+                              ),
+                              DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  value: _year,
+                                  borderRadius: BorderRadius.circular(18),
+                                  items: [
+                                    for (var year = 2030; year >= 2019; year--)
+                                      DropdownMenuItem(
+                                        value: year,
+                                        child: Text('$year'),
+                                      ),
+                                  ],
+                                  onChanged: (year) {
+                                    if (year == null || year == _year) return;
+                                    setState(() => _year = year);
+                                    _ensureCalendarYear();
+                                  },
+                                ),
+                              ),
                             ],
-                            onChanged: (year) {
-                              if (year == null || year == _year) return;
-                              setState(() => _year = year);
-                              _ensureCalendarYear();
-                            },
                           ),
                         ),
                       ],
@@ -135,35 +146,28 @@ class _LiturgicalPickerScreenState
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-              child: GlassSurface(
-                style: GlassStyle.soft,
-                borderRadius: BorderRadius.circular(22),
-                child: const TabBar(
-                  tabs: [
-                    Tab(text: 'Перыяды'),
-                    Tab(text: 'Святы'),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _PeriodPicker(
-                    ref: ref,
-                    year: _year,
-                    readingsMode: widget.isReadingsMode,
-                  ),
-                  _FeastsPickerCombined(
-                    year: _year,
-                    readingsMode: widget.isReadingsMode,
-                  ),
-                ],
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _PickerTabsHeaderDelegate(
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerLowest,
               ),
             ),
           ],
+          body: TabBarView(
+            children: [
+              _PeriodPicker(
+                ref: ref,
+                year: _year,
+                readingsMode: widget.isReadingsMode,
+              ),
+              _FeastsPickerCombined(
+                year: _year,
+                readingsMode: widget.isReadingsMode,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -171,6 +175,50 @@ class _LiturgicalPickerScreenState
 }
 
 // ─── Period picker ─────────────────────────────────────────────────────────────
+
+class _PickerTabsHeaderDelegate extends SliverPersistentHeaderDelegate {
+  const _PickerTabsHeaderDelegate({required this.backgroundColor});
+
+  final Color backgroundColor;
+
+  static const double _extent = 56;
+
+  @override
+  double get minExtent => _extent;
+
+  @override
+  double get maxExtent => _extent;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return ColoredBox(
+      key: const Key('liturgical-picker-tabs-header'),
+      color: backgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+        child: GlassSurface(
+          style: GlassStyle.soft,
+          borderRadius: BorderRadius.circular(22),
+          child: const TabBar(
+            tabs: [
+              Tab(text: 'Перыяды'),
+              Tab(text: 'Святы'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _PickerTabsHeaderDelegate oldDelegate) {
+    return oldDelegate.backgroundColor != backgroundColor;
+  }
+}
 
 class _PeriodPicker extends StatelessWidget {
   final WidgetRef ref;
@@ -238,41 +286,35 @@ class _PeriodPicker extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (ctx) => SafeArea(
-        top: false,
-        minimum: const EdgeInsets.only(bottom: 8),
-        child: _WeekDaySheet(
-          periodLabel: periodLabel,
-          maxWeeks: maxWeeks,
-          startDay: startDay,
-          exactDates: exactDates,
-          exactDatesFirst: period == 'lent',
-          onExactDateSelected: (date) {
-            Navigator.of(ctx).pop();
-            _openDate(context, date);
-          },
-          onSelected: (week, day) {
-            Navigator.of(ctx).pop();
-            final calendar = ref.read(calendarServiceProvider);
-            final date = lit_calendar.calculateDateForContext(
-              year,
-              period,
-              week,
-              day,
-              calendar.getYearOptionsCached(year),
-              calendar.getYearOptionsCached(year + 1),
+      builder: (ctx) => _WeekDaySheet(
+        periodLabel: periodLabel,
+        maxWeeks: maxWeeks,
+        startDay: startDay,
+        exactDates: exactDates,
+        exactDatesFirst: period == 'lent',
+        onExactDateSelected: (date) {
+          Navigator.of(ctx).pop();
+          _openDate(context, date);
+        },
+        onSelected: (week, day) {
+          Navigator.of(ctx).pop();
+          final calendar = ref.read(calendarServiceProvider);
+          final date = lit_calendar.calculateDateForContext(
+            year,
+            period,
+            week,
+            day,
+            calendar.getYearOptionsCached(year),
+            calendar.getYearOptionsCached(year + 1),
+          );
+          if (date == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Дата для гэтага дня не знойдзена')),
             );
-            if (date == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Дата для гэтага дня не знойдзена'),
-                ),
-              );
-              return;
-            }
-            _openDate(context, date);
-          },
-        ),
+            return;
+          }
+          _openDate(context, date);
+        },
       ),
     );
   }
@@ -369,7 +411,10 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
           left: 16,
           right: 16,
           top: 20,
-          bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+          bottom:
+              MediaQuery.viewInsetsOf(context).bottom +
+              MediaQuery.viewPaddingOf(context).bottom +
+              24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -461,22 +506,17 @@ class _ExactDateChoices extends StatelessWidget {
       children: [
         Text('Каляндарная дата', style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 150),
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: dates
-                  .map(
-                    (date) => OutlinedButton(
-                      onPressed: () => onSelected(date),
-                      child: Text(DateFormat('d MMM', 'be').format(date)),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: dates
+              .map(
+                (date) => OutlinedButton(
+                  onPressed: () => onSelected(date),
+                  child: Text(DateFormat('d MMM', 'be').format(date)),
+                ),
+              )
+              .toList(),
         ),
       ],
     );

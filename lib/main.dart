@@ -61,9 +61,8 @@ class MyBrevApp extends ConsumerWidget {
 
     // Content stays consistent with the PWA. Navigation and system controls
     // adapt inside the shared theme and the platform-chrome widgets.
-    final light = AppPalette.scheme(Brightness.light);
-    final dark = AppPalette.scheme(Brightness.dark);
-    return _buildApp(settings, light, dark);
+    final schemes = AppPalette.schemesFor(settings.themeMode);
+    return _buildApp(settings, schemes.theme, schemes.darkTheme);
   }
 
   Widget _buildApp(
@@ -258,11 +257,15 @@ class MyBrevApp extends ConsumerWidget {
     }
 
     return MaterialApp.router(
+      // Recreate MaterialApp's inherited theme boundary when the user switches
+      // modes. The router configuration is stable, so navigation is preserved.
+      key: ValueKey(settings.themeMode),
       title: 'Mybrev',
       restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       themeMode: settings.themeMode,
+      themeAnimationDuration: Duration.zero,
       theme: makeTheme(light),
       darkTheme: makeTheme(dark),
       localizationsDelegates: const [

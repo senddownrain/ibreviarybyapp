@@ -17,6 +17,17 @@ void main() {
     expect(BibleRepository.getBook('bel', 'mt')?.isNewTestament, isTrue);
   });
 
+  test('Belarusian attribution follows the opened testament', () {
+    expect(
+      bibleAttribution(versionId: 'bel', isNewTestament: false),
+      'Пераклад Антонія Бокуна · bible.by',
+    );
+    expect(
+      bibleAttribution(versionId: 'bel', isNewTestament: true),
+      'Афіцыйны пераклад · catholic.by',
+    );
+  });
+
   test('parallel translation keeps the canonical book', () {
     expect(BibleRepository.getParallelBook('bel', 'jn', 'ru')?.id, 'jo');
     expect(BibleRepository.getParallelBook('ru', 'jn', 'bel')?.id, 'jon');

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -168,18 +169,16 @@ List<Prayer> filterAndSortPrayers(
   List<String> favoriteIds,
 ) {
   final favorites = favoriteIds.toSet();
+  final query = _normalizeSearchText(filter.searchQuery);
 
   final filtered = prayers.where((p) {
     if (filter.selectedTags.isNotEmpty) {
       final hasTag = p.tags.any((t) => filter.selectedTags.contains(t));
       if (!hasTag) return false;
     }
-    final query = filter.searchQuery.trim().toLowerCase();
     if (query.isNotEmpty) {
-      final title = p.displayTitle.toLowerCase();
-      final text = p.displayText
-          .replaceAll(RegExp(r'<[^>]*>'), '')
-          .toLowerCase();
+      final title = _normalizeSearchText(p.displayTitle);
+      final text = _normalizeSearchText(p.displayText, stripMarkup: true);
       if (!title.contains(query) && !text.contains(query)) return false;
     }
     return true;
@@ -193,6 +192,21 @@ List<Prayer> filterAndSortPrayers(
   });
 
   return filtered;
+}
+
+String _normalizeSearchText(String value, {bool stripMarkup = false}) {
+  var normalized = value;
+  if (stripMarkup) {
+    // Keep word boundaries where HTML elements split a sentence, then decode
+    // entities such as &nbsp; through the existing HTML parser.
+    normalized = normalized.replaceAll(RegExp(r'<[^>]*>'), ' ');
+    normalized = parseFragment(normalized).text ?? normalized;
+  }
+  return normalized
+      .replaceAll(RegExp('[\u2018\u2019\u02bc\u0060]'), "'")
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim()
+      .toLowerCase();
 }
 
 int _comparePrayerTitles(String a, String b) {

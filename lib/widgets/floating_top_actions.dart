@@ -45,6 +45,7 @@ class FloatingTopActions extends ConsumerWidget {
         Colors.transparent;
 
     final cs = Theme.of(context).colorScheme;
+    final cupertino = usesCupertinoGlass(context);
 
     return SafeArea(
       bottom: false,
@@ -61,8 +62,10 @@ class FloatingTopActions extends ConsumerWidget {
                 tooltip: 'Назад',
                 onTap: onBack ?? () => Navigator.maybePop(context),
                 child: Icon(
-                  Icons.arrow_back_ios_new,
-                  size: 18,
+                  cupertino
+                      ? Icons.arrow_back_ios_new
+                      : Icons.arrow_back_rounded,
+                  size: cupertino ? 18 : 22,
                   color: cs.onSurface,
                 ),
               ),

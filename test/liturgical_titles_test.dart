@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 
 void main() {
@@ -53,5 +54,20 @@ void main() {
       'Святы Казімір',
     );
     expect(liturgicalDayRankLabel(celebration), 'Успамін');
+  });
+
+  test('formats a readings title like the Liturgy of the Hours', () {
+    const reading = ParsedReading(
+      id: 'ordinary-w12-d3-cycle2',
+      periodType: 'ordinary',
+      periodWeekNumber: 12,
+      dayOfWeek: 3,
+      title: 'Сырая назва з базы',
+    );
+
+    expect(
+      liturgicalReadingPeriodTitle(reading, DateTime(2026, 6, 23)),
+      'XII звычайны тыдзень, аўторак',
+    );
   });
 }

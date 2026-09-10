@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 
 void main() {
   testWidgets('chrome uses Liquid Glass only on Apple platforms', (
@@ -87,5 +89,83 @@ void main() {
     await tester.pumpWidget(app(TargetPlatform.android));
     expect(find.byType(SegmentedButton<bool>), findsOneWidget);
     expect(find.byType(CupertinoSlidingSegmentedControl<bool>), findsNothing);
+  });
+
+  testWidgets('segmented labels stay on one line on narrow Android screens', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.android),
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(360, 800),
+            textScaler: TextScaler.linear(1.3),
+          ),
+          child: Scaffold(
+            body: SizedBox(
+              width: 320,
+              child: AdaptiveSegmentedControl<int>(
+                value: 1,
+                showSelectedIcon: false,
+                segments: const [
+                  AdaptiveSegment(
+                    value: 0,
+                    icon: Icon(Icons.settings),
+                    label: Text('Сістэма'),
+                  ),
+                  AdaptiveSegment(
+                    value: 1,
+                    icon: Icon(Icons.light_mode),
+                    label: Text('Светлая'),
+                  ),
+                  AdaptiveSegment(
+                    value: 2,
+                    icon: Icon(Icons.dark_mode),
+                    label: Text('Цёмная'),
+                  ),
+                ],
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Icon), findsNothing);
+    for (final label in ['Сістэма', 'Светлая', 'Цёмная']) {
+      final paragraph = find.descendant(
+        of: find.text(label),
+        matching: find.byType(RichText),
+      );
+      expect(tester.getSize(paragraph).height, lessThan(30));
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('floating back icon follows the target platform', (tester) async {
+    Widget app(TargetPlatform platform) => ProviderScope(
+      child: MaterialApp(
+        key: ValueKey(platform),
+        theme: ThemeData(platform: platform),
+        home: const Scaffold(
+          body: FloatingTopActions(showBack: true, seasonColor: Colors.indigo),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(TargetPlatform.android));
+    expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back_ios_new), findsNothing);
+
+    await tester.pumpWidget(app(TargetPlatform.iOS));
+    expect(find.byIcon(Icons.arrow_back_ios_new), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back_rounded), findsNothing);
   });
 }

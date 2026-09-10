@@ -31,6 +31,23 @@ abstract final class AppPalette {
   static const darkRubric = Color(0xFFEF9188);
   static const darkAmbient = Color(0xFF3A3A3A);
 
+  /// Returns the schemes placed into MaterialApp's light and dark slots.
+  ///
+  /// For an explicit user choice both slots intentionally use the same
+  /// brightness. This makes the in-app preference authoritative even when an
+  /// Android device reports a stale platform brightness during an activity.
+  static ({ColorScheme theme, ColorScheme darkTheme}) schemesFor(
+    ThemeMode mode,
+  ) {
+    final light = scheme(Brightness.light);
+    final dark = scheme(Brightness.dark);
+    return switch (mode) {
+      ThemeMode.light => (theme: light, darkTheme: light),
+      ThemeMode.dark => (theme: dark, darkTheme: dark),
+      ThemeMode.system => (theme: light, darkTheme: dark),
+    };
+  }
+
   static ColorScheme scheme(Brightness brightness) {
     final dark = brightness == Brightness.dark;
     final primary = dark ? darkPrimary : lightPrimary;

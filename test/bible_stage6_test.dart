@@ -283,6 +283,24 @@ void main() {
       );
     });
 
+    testWidgets('double tap enters fullscreen without selecting a verse', (
+      tester,
+    ) async {
+      final controller = ReaderChromeModeController(ReaderChromeMode.compact);
+      addTearDown(controller.dispose);
+      await _pumpBible(tester, chromeController: controller);
+
+      final verse = find.byKey(const Key('bible-verse-1'));
+      await tester.tap(verse);
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.tap(verse);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('reader-chrome-hidden')), findsOneWidget);
+      expect(find.byKey(const Key('bible-highlight-cancel')), findsNothing);
+      await tester.pump(const Duration(milliseconds: 500));
+    });
+
     testWidgets('verse palette exposes names, state, and 48dp targets', (
       tester,
     ) async {
@@ -313,6 +331,24 @@ void main() {
         ui.Tristate.isTrue,
       );
       semantics.dispose();
+    });
+
+    testWidgets('verse palette stays above the system navigation inset', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await _pumpBible(tester, bottomViewPadding: 72);
+      await tester.tap(find.byKey(const Key('bible-verse-1')));
+      await tester.pumpAndSettle();
+
+      final paletteBottom = tester
+          .getBottomRight(find.byKey(const Key('bible-highlight-cancel')))
+          .dy;
+      expect(paletteBottom, lessThanOrEqualTo(800 - 72 - 8));
     });
 
     testWidgets('system TextScaler increases rendered verse body', (
@@ -413,7 +449,8 @@ void main() {
       expect(find.byKey(const Key('reader-chrome-restore')), findsNothing);
       controller.value = ReaderChromeMode.hidden;
       await tester.pump();
-      expect(find.byKey(const Key('reader-chrome-restore')), findsOneWidget);
+      expect(find.byKey(const Key('reader-chrome-hidden')), findsOneWidget);
+      expect(find.byKey(const Key('reader-chrome-restore')), findsNothing);
     });
 
     testWidgets('iOS and Android use their native chrome interpretations', (
@@ -461,6 +498,7 @@ Future<_TestBibleApp> _pumpBible(
   double textScale = 1,
   ReaderChromeModeController? chromeController,
   double initialScrollOffset = 0,
+  double bottomViewPadding = 0,
 }) async {
   final book = BibleRepository.getBooks('bel').first;
   final location = BibleLocation(versionId: 'bel', bookId: book.id, chapter: 1);
@@ -498,9 +536,11 @@ Future<_TestBibleApp> _pumpBible(
     routerConfig: router,
     theme: ThemeData(platform: platform),
     builder: (context, child) => MediaQuery(
-      data: MediaQuery.of(
-        context,
-      ).copyWith(textScaler: TextScaler.linear(textScale)),
+      data: MediaQuery.of(context).copyWith(
+        textScaler: TextScaler.linear(textScale),
+        viewPadding: EdgeInsets.only(bottom: bottomViewPadding),
+        padding: EdgeInsets.only(bottom: bottomViewPadding),
+      ),
       child: child!,
     ),
   );

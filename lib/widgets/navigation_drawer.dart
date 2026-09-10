@@ -5,9 +5,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 Future<void> showSecondaryMenu(BuildContext context) =>
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (sheetContext) => const _SecondaryMenuContent(),
+      builder: (sheetContext) =>
+          const _SecondaryMenuContent(includeBottomSystemInset: true),
     );
 
 class AppNavigationDrawer extends StatelessWidget {
@@ -19,11 +21,21 @@ class AppNavigationDrawer extends StatelessWidget {
 }
 
 class _SecondaryMenuContent extends StatelessWidget {
-  const _SecondaryMenuContent();
+  const _SecondaryMenuContent({this.includeBottomSystemInset = false});
+
+  final bool includeBottomSystemInset;
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+    padding: EdgeInsets.fromLTRB(
+      16,
+      4,
+      16,
+      24 +
+          (includeBottomSystemInset
+              ? MediaQuery.viewPaddingOf(context).bottom
+              : 0),
+    ),
     child: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
