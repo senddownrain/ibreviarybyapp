@@ -27,6 +27,7 @@ import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
@@ -1534,83 +1535,84 @@ class _HtmlOrText extends StatelessWidget {
     final reader = ReaderTheme.of(context);
     final baseSize = textStyle.fontSize ?? 16;
     final paragraphSpacing = alternativeKind == 'hymn' ? 15.0 : 8.0;
-    return Html(
-      data: isPsalm
-          ? formatPsalmHtml(
-              stripEmbeddedAntiphon(html, externalAntiphon: externalAntiphon),
-            )
-          : formatLiturgicalHtml(html),
-      style: {
-        'body': Style(
-          fontSize: FontSize(textStyle.fontSize ?? 16),
-          fontFamily: textStyle.fontFamily,
-          fontWeight: textStyle.fontWeight,
-          color: textColor,
-          lineHeight: LineHeight(1.75),
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          textAlign: TextAlign.left,
+    final styles = <String, Style>{
+      'body': Style(
+        fontSize: FontSize(textStyle.fontSize ?? 16),
+        fontFamily: textStyle.fontFamily,
+        fontWeight: textStyle.fontWeight,
+        color: textColor,
+        lineHeight: LineHeight(1.75),
+        margin: Margins.zero,
+        padding: HtmlPaddings.zero,
+        textAlign: TextAlign.left,
+      ),
+      'p': Style(
+        color: textColor,
+        margin: Margins.only(bottom: paragraphSpacing),
+      ),
+      '.liturgical-subheading': Style(
+        fontSize: FontSize((baseSize * 0.88).clamp(14, double.infinity)),
+        lineHeight: LineHeight(1.45),
+        color: reader.muted,
+        margin: Margins.only(bottom: 7),
+      ),
+      '.liturgical-heading': Style(
+        fontSize: FontSize((baseSize * 0.98).clamp(15, double.infinity)),
+        lineHeight: LineHeight(1.3),
+        color: reader.rubric,
+        fontWeight: FontWeight.w700,
+        margin: Margins.only(bottom: 12),
+      ),
+      '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
+      '.psalm-strophe-even': Style(margin: Margins.only(left: 16, bottom: 8)),
+      '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
+      '.liturgical-rubric': Style(
+        color: reader.rubric,
+        fontSize: FontSize((baseSize * 0.90).clamp(14, double.infinity)),
+        lineHeight: LineHeight(1.45),
+      ),
+      '.liturgical-rubric-inline': Style(color: reader.rubric),
+      '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),
+      '.intercessions__refrain': Style(
+        margin: Margins.only(top: 4, bottom: 22),
+        color: reader.ink,
+        fontWeight: FontWeight.w700,
+      ),
+      '.intercessions__petition': Style(
+        margin: Margins.only(top: 18, bottom: 5),
+      ),
+      '.intercessions__response': Style(
+        margin: Margins.only(left: 12, bottom: 15),
+        color: reader.ink,
+      ),
+      '.intercessions__marker': Style(color: reader.rubric),
+      '.ora-ant': Style(color: reader.ink, fontWeight: FontWeight.w600),
+      '.ora-sub': Style(
+        color: reader.muted,
+        fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
+      ),
+      '.liturgical-reading-reference': Style(
+        color: reader.muted,
+        fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
+        fontWeight: FontWeight.w500,
+      ),
+      '.intercessions__conclusion': Style(
+        margin: Margins.only(top: 22),
+        color: reader.muted,
+        fontStyle: FontStyle.italic,
+      ),
+    };
+    if (isPsalm) {
+      return PsalmChoirHtml(
+        html: formatPsalmHtml(
+          stripEmbeddedAntiphon(html, externalAntiphon: externalAntiphon),
         ),
-        'p': Style(
-          color: textColor,
-          margin: Margins.only(bottom: paragraphSpacing),
-        ),
-        '.liturgical-subheading': Style(
-          fontSize: FontSize((baseSize * 0.88).clamp(14, double.infinity)),
-          lineHeight: LineHeight(1.45),
-          color: reader.muted,
-          margin: Margins.only(bottom: 7),
-        ),
-        '.liturgical-heading': Style(
-          fontSize: FontSize((baseSize * 0.98).clamp(15, double.infinity)),
-          lineHeight: LineHeight(1.3),
-          color: reader.rubric,
-          fontWeight: FontWeight.w700,
-          margin: Margins.only(bottom: 12),
-        ),
-        '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
-        '.psalm-strophe-even': Style(margin: Margins.only(left: 16, bottom: 8)),
-        '.psalm-marker': Style(
-          color: reader.rubric,
-          fontWeight: FontWeight.w600,
-        ),
-        '.liturgical-rubric': Style(
-          color: reader.rubric,
-          fontSize: FontSize((baseSize * 0.90).clamp(14, double.infinity)),
-          lineHeight: LineHeight(1.45),
-        ),
-        '.liturgical-rubric-inline': Style(color: reader.rubric),
-        '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),
-        '.intercessions__refrain': Style(
-          margin: Margins.only(top: 4, bottom: 22),
-          color: reader.ink,
-          fontWeight: FontWeight.w700,
-        ),
-        '.intercessions__petition': Style(
-          margin: Margins.only(top: 18, bottom: 5),
-        ),
-        '.intercessions__response': Style(
-          margin: Margins.only(left: 12, bottom: 15),
-          color: reader.ink,
-        ),
-        '.intercessions__marker': Style(color: reader.rubric),
-        '.ora-ant': Style(color: reader.ink, fontWeight: FontWeight.w600),
-        '.ora-sub': Style(
-          color: reader.muted,
-          fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
-        ),
-        '.liturgical-reading-reference': Style(
-          color: reader.muted,
-          fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
-          fontWeight: FontWeight.w500,
-        ),
-        '.intercessions__conclusion': Style(
-          margin: Margins.only(top: 22),
-          color: reader.muted,
-          fontStyle: FontStyle.italic,
-        ),
-      },
-    );
+        style: styles,
+        textColor: textColor,
+        rubricColor: reader.rubric,
+      );
+    }
+    return Html(data: formatLiturgicalHtml(html), style: styles);
   }
 }
 

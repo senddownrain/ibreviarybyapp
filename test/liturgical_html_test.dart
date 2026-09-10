@@ -15,6 +15,31 @@ void main() {
       expect(result, contains('<span class="psalm-marker">†</span>'));
     });
 
+    test('prepares alternating choirs and dims only the opposite choir', () {
+      final formatted = formatPsalmHtml(
+        '<p>Першы радок *<br>другі радок</p>'
+        '<p>Трэці радок *<br>чацвёрты радок</p>',
+      );
+
+      final neutral = preparePsalmChoirHtml(formatted);
+      expect(neutral, contains('href="psalm-choir:1"'));
+      expect(neutral, contains('href="psalm-choir:2"'));
+      expect(neutral, isNot(contains('psalm-choir-muted')));
+
+      final firstSelected = preparePsalmChoirHtml(formatted, selectedChoir: 1);
+      expect(
+        RegExp('psalm-choir-muted').allMatches(firstSelected),
+        hasLength(1),
+      );
+      expect(
+        firstSelected,
+        contains(
+          'href="psalm-choir:2" class="psalm-choir-strophe '
+          'psalm-choir-muted"',
+        ),
+      );
+    });
+
     test('normalizes literal, named, decimal and hex cadence breaks', () {
       final result = formatPsalmHtml(
         '<p>a *<br>b &ast;<br>c &#42;<br>d &#x2a;<br>'

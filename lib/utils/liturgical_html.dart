@@ -93,6 +93,37 @@ String formatPsalmHtml(String html) {
   );
 }
 
+/// Adds tap targets to the already formatted strophes of a psalm.
+///
+/// Odd and even strophes represent the two choirs. When [selectedChoir] is
+/// set, strophes belonging to the other choir receive a muted style hook.
+String preparePsalmChoirHtml(String html, {int? selectedChoir}) {
+  return html.replaceAllMapped(_paragraphPattern, (match) {
+    final attributes = match.group(1) ?? '';
+    final content = match.group(2) ?? '';
+    if (!RegExp(
+      r'''\bclass\s*=\s*["'][^"']*\bpsalm-strophe\b''',
+      caseSensitive: false,
+    ).hasMatch(attributes)) {
+      return match.group(0)!;
+    }
+
+    final choir =
+        RegExp(
+          r'\bpsalm-strophe-even\b',
+          caseSensitive: false,
+        ).hasMatch(attributes)
+        ? 2
+        : 1;
+    final mutedClass = selectedChoir != null && selectedChoir != choir
+        ? ' psalm-choir-muted'
+        : '';
+
+    return '<p$attributes><a href="psalm-choir:$choir" '
+        'class="psalm-choir-strophe$mutedClass">$content</a></p>';
+  });
+}
+
 String _markInlineReadingReference(String html) => html.replaceAllMapped(
   _paragraphPattern,
   (paragraph) {
