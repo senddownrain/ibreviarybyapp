@@ -126,7 +126,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
-    expect(find.text('ЧЫТАННЕ'), findsOneWidget);
+    expect(find.text('Чытанне'), findsOneWidget);
     expect(find.textContaining('Тэкст чытання'), findsWidgets);
     expect(find.byKey(const Key('readings-options-action')), findsNothing);
 
@@ -148,6 +148,36 @@ void main() {
     ).dispatch(tester.element(find.byType(CustomScrollView)));
     await tester.pump();
     expect(controller.value, ReaderChromeMode.compact);
+  });
+
+  testWidgets('synthetic fallback keeps alleluia text and lone alt chorus', (
+    tester,
+  ) async {
+    const reading = ParsedReading(
+      id: 'synthetic-fallback-fixture',
+      title: 'Synthetic fixture',
+      reading: ParsedSection(text: 'Асноўнае чытанне.'),
+      psalm: ParsedSection(
+        verses: ['Першы верш.'],
+        altChorus: 'Альтэрнатыўны рэфрэн.',
+      ),
+      alleluia: ParsedSection(text: 'Верш з поля text.'),
+      gospel: ParsedSection(text: 'Евангелле.'),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_TestSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(_loader([reading])),
+        ],
+        child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Верш з поля text.'), findsOneWidget);
+    expect(find.text('Альтэрнатыўны рэфрэн.'), findsOneWidget);
   });
 
   testWidgets(

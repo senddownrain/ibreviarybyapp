@@ -56,4 +56,26 @@ class ReaderTheme {
     size,
     family: family,
   ).copyWith(color: muted, fontWeight: FontWeight.w600, letterSpacing: 0.02);
+
+  TextStyle majorHeading(double bodySize) => body(
+    (bodySize * .98).clamp(15, double.infinity),
+  ).copyWith(height: 1.3, fontWeight: FontWeight.w600);
+
+  TextStyle blockHeading(double bodySize) => body(
+    (bodySize * .90).clamp(14, double.infinity),
+  ).copyWith(height: 1.3, color: rubric, fontWeight: FontWeight.w600);
+
+  TextStyle metadata(double bodySize, {bool italic = false}) =>
+      body((bodySize * .88).clamp(14, double.infinity)).copyWith(
+        height: 1.45,
+        color: muted,
+        fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+      );
+
+  TextStyle rubricBlock(double bodySize, {bool italic = false}) =>
+      body((bodySize * .90).clamp(14, double.infinity)).copyWith(
+        height: 1.45,
+        color: rubric,
+        fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+      );
 }

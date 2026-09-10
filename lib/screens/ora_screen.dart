@@ -30,6 +30,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
 
@@ -548,9 +549,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             label: hora.label,
             subtitle: hora.subtitle,
             icon: hora.icon,
-            enabled: hora.checkFields.any(
-              (field) => (day.field(field) ?? '').isNotEmpty,
-            ),
+            enabled: isHourAvailable(day, hora),
           ),
       ],
     );
@@ -569,11 +568,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   // Solemnities/feasts → d1; holyweek → lent
 
   String _completoriumId(LiturgicalDay day) {
-    final period = (day.periodType ?? day.field('_periodType') ?? 'ordinary')
-        .trim();
-    final dow =
-        day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 2;
-    return completoriumId(period, dow, day);
+    return completoriumRecordIdForDay(day);
   }
 
   // ─── Invitatorium ─────────────────────────────────────────────────────────────
@@ -764,7 +759,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       (_sextF(day, 'Ant1', num), _sextF(day, 'Ps1', num)),
       (_sextF(day, 'Ant2', num), _sextF(day, 'Ps2', num)),
       (_sextF(day, 'Ant3', num), _sextF(day, 'Ps3', num)),
-    ]);
+    ], controllerScope: 'sext$num');
 
     final r = daytimeHourField(day, num, 'R');
     if (r.isNotEmpty) items.add(_OraItem.html(r, kind: 'reading'));
@@ -886,7 +881,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final ps1 = cf('compPs1');
     final ant2 = cf('compAnt2');
     final ps2 = cf('compPs2');
-    _addPsalmBlockResolved(items, [(ant1, ps1), (ant2, ps2)]);
+    _addPsalmBlockResolved(items, [
+      (ant1, ps1),
+      (ant2, ps2),
+    ], controllerScope: 'completorium');
 
     final r = cf('compR');
     if (r.isNotEmpty) items.add(_OraItem.html(r, kind: 'reading'));
@@ -1021,7 +1019,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final v = (day.field(fieldName) ?? '').trim();
     if (v.isEmpty) return;
     if (label.isNotEmpty) {
-      items.add(_OraItem.labeled(label, v, kind: _alternativeKind(fieldName)));
+      final content =
+          fieldName == 'officeOfReadingsR1' || fieldName == 'officeOfReadingsR2'
+          ? stripLeadingReadingHeading(v, label)
+          : v;
+      items.add(
+        _OraItem.labeled(label, content, kind: _alternativeKind(fieldName)),
+      );
     } else {
       items.add(_OraItem.html(v, kind: _alternativeKind(fieldName)));
     }
@@ -1048,7 +1052,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           (day.field('$antPrefix$i') ?? '').trim(),
           (day.field('$psPrefix$i') ?? '').trim(),
         ),
-    ]);
+    ], controllerScope: antPrefix);
   }
 
   // Universal psalmody algorithm (spec §4):
@@ -1056,8 +1060,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   // Single-ant mode (ant1 + all 3 psalms, ant2/3 empty): ant1→ps1→ps2→ps3→ant1
   void _addPsalmBlockResolved(
     List<_OraItem> items,
-    List<(String ant, String ps)> pairs,
-  ) {
+    List<(String ant, String ps)> pairs, {
+    String controllerScope = 'psalmody',
+  }) {
     final hasSomething = pairs.any((p) => p.$1.isNotEmpty || p.$2.isNotEmpty);
     if (!hasSomething) return;
 
@@ -1075,30 +1080,49 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     if (isSingleAnt) {
       final controller = _alternativeController(
-        '${widget.oraType}-psalmody-ant-0',
+        '${widget.oraType}-$controllerScope-ant-0',
       );
-      items.add(_OraItem.antiphon(pairs[0].$1, controller: controller));
-      for (final (_, ps) in pairs) {
-        if (ps.isNotEmpty) items.add(_OraItem.psalm(ps));
+      final structured = pairs.any(
+        (pair) => ownsStructuredPsalmPackage(pair.$2),
+      );
+      if (!structured) {
+        items.add(_OraItem.antiphon(pairs[0].$1, controller: controller));
       }
-      items.add(
-        _OraItem.antiphon(
-          pairs[0].$1,
-          controller: controller,
-          showPicker: false,
-        ),
-      );
+      for (final (_, ps) in pairs) {
+        if (ps.isNotEmpty) {
+          items.add(
+            _OraItem.psalm(
+              ps,
+              externalAntiphon: structured ? null : pairs[0].$1,
+            ),
+          );
+        }
+      }
+      if (!structured) {
+        items.add(
+          _OraItem.antiphon(
+            pairs[0].$1,
+            controller: controller,
+            showPicker: false,
+          ),
+        );
+      }
     } else {
       for (var index = 0; index < pairs.length; index++) {
         final (ant, ps) = pairs[index];
         final controller = _alternativeController(
-          '${widget.oraType}-psalmody-ant-$index',
+          '${widget.oraType}-$controllerScope-ant-$index',
         );
-        if (ant.isNotEmpty) {
+        final structured = ownsStructuredPsalmPackage(ps);
+        if (ant.isNotEmpty && !structured) {
           items.add(_OraItem.antiphon(ant, controller: controller));
         }
-        if (ps.isNotEmpty) items.add(_OraItem.psalm(ps));
-        if (ant.isNotEmpty && ps.isNotEmpty) {
+        if (ps.isNotEmpty) {
+          items.add(
+            _OraItem.psalm(ps, externalAntiphon: structured ? null : ant),
+          );
+        }
+        if (ant.isNotEmpty && ps.isNotEmpty && !structured) {
           items.add(
             _OraItem.antiphon(ant, controller: controller, showPicker: false),
           );
@@ -1204,6 +1228,7 @@ class _OraItem {
   final String alternativeKind;
   final ValueNotifier<int>? alternativeController;
   final bool showPicker;
+  final String? externalAntiphon;
   final Widget Function(BuildContext, TextStyle)? _customWidget;
 
   const _OraItem._(
@@ -1213,6 +1238,7 @@ class _OraItem {
     this.alternativeKind = 'generic',
     this.alternativeController,
     this.showPicker = true,
+    this.externalAntiphon,
     Widget Function(BuildContext, TextStyle)? customWidget,
   }) : _customWidget = customWidget;
 
@@ -1249,7 +1275,12 @@ class _OraItem {
   factory _OraItem.html(String html, {String kind = 'generic'}) =>
       _OraItem._(_OraItemType.html, html, alternativeKind: kind);
 
-  factory _OraItem.psalm(String html) => _OraItem._(_OraItemType.psalm, html);
+  factory _OraItem.psalm(String html, {String? externalAntiphon}) => _OraItem._(
+    _OraItemType.psalm,
+    html,
+    alternativeKind: 'psalm',
+    externalAntiphon: externalAntiphon,
+  );
 
   factory _OraItem.plain(String text, {String? label}) =>
       _OraItem._(_OraItemType.plain, text, label: label);
@@ -1263,54 +1294,45 @@ class _OraItem {
     switch (type) {
       case _OraItemType.sectionTitle:
         final reader = ReaderTheme.of(context);
+        final base = textStyle.fontSize ?? 16;
         return Padding(
           padding: const EdgeInsets.fromLTRB(8, 12, 8, 18),
           child: Text(
-            content,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: reader.rubric,
-              letterSpacing: 0.9,
-            ),
+            _managedHeading(content),
+            style: reader.majorHeading(base),
           ),
         );
 
       case _OraItemType.blockHeader:
         final reader = ReaderTheme.of(context);
+        final base = textStyle.fontSize ?? 16;
         return Padding(
           padding: const EdgeInsets.only(top: 24, bottom: 9),
           child: Text(
-            content.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.9,
-              color: reader.rubric,
-            ),
+            _managedHeading(content),
+            style: reader.blockHeading(base),
           ),
         );
 
       case _OraItemType.antiphon:
         final reader = ReaderTheme.of(context);
-        return Container(
-          width: double.infinity,
-          margin: const EdgeInsets.fromLTRB(0, 12, 0, 18),
-          padding: const EdgeInsets.fromLTRB(14, 11, 14, 11),
-          decoration: BoxDecoration(
-            color: reader.rubricSoft,
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(13),
-              bottomRight: Radius.circular(13),
-            ),
-            border: Border(left: BorderSide(color: reader.rubric, width: 3)),
-          ),
-          child: _HtmlOrText(
-            content: content,
-            textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
-            alternativeKind: alternativeKind,
-            alternativeController: alternativeController,
-            showPicker: showPicker,
-            pickerLabel: 'Выбар антыфоны',
+        final base = textStyle.fontSize ?? 16;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Ант.', style: reader.rubricBlock(base)),
+              const SizedBox(height: 3),
+              _HtmlOrText(
+                content: content,
+                textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
+                alternativeKind: alternativeKind,
+                alternativeController: alternativeController,
+                showPicker: showPicker,
+                pickerLabel: 'Выбар антыфоны',
+              ),
+            ],
           ),
         );
 
@@ -1340,6 +1362,7 @@ class _OraItem {
             content: content,
             textStyle: textStyle,
             isPsalm: true,
+            externalAntiphon: externalAntiphon,
           ),
         );
 
@@ -1373,10 +1396,24 @@ class _OraItem {
     'reading' => 'Выбар чытання або рэспансорыя',
     'prayer' => 'Выбар малітвы',
     'intercession' => 'Выбар просьбаў',
+    'psalm' => 'Выбар псальма',
     'marian-antiphon' => 'Выбар антыфоны да Найсвяцейшай Панны Марыі',
     _ => 'Выбар варыянта',
   };
 }
+
+String _managedHeading(String value) => switch (value.toUpperCase()) {
+  'ЗАКЛІК' => 'Заклік',
+  'ГАДЗІНА ЧЫТАННЯЎ' => 'Гадзіна чытанняў',
+  'ЮТРАНЬ' => 'Ютрань',
+  'НЕШПАРЫ' => 'Нешпары',
+  'КАМПЛЕТА' => 'Камплета',
+  'АГУЛЬНАЯ ГАДЗІНА' => 'Агульная гадзіна',
+  'ГІМН' => 'Гімн',
+  'ПСАЛМОДЫЯ' => 'Псалмодыя',
+  'ПЕСНЯ З ЕВАНГЕЛЛЯ' => 'Песня з Евангелля',
+  _ => value,
+};
 
 // ─── Section widgets ──────────────────────────────────────────────────────────
 
@@ -1395,18 +1432,12 @@ class _LabeledSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final reader = ReaderTheme.of(context);
+    final base = textStyle.fontSize ?? 16;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.2,
-            color: cs.onSurface.withValues(alpha: 0.45),
-          ),
-        ),
+        Text(label, style: reader.blockHeading(base)),
         const SizedBox(height: 6),
         _HtmlOrText(
           content: content,
@@ -1428,6 +1459,7 @@ class _HtmlOrText extends StatelessWidget {
   final ValueNotifier<int>? alternativeController;
   final bool showPicker;
   final String pickerLabel;
+  final String? externalAntiphon;
 
   const _HtmlOrText({
     required this.content,
@@ -1437,6 +1469,7 @@ class _HtmlOrText extends StatelessWidget {
     this.alternativeController,
     this.showPicker = true,
     this.pickerLabel = 'Выбар варыянта',
+    this.externalAntiphon,
   });
 
   @override
@@ -1465,7 +1498,11 @@ class _HtmlOrText extends StatelessWidget {
     final reader = ReaderTheme.of(context);
     final baseSize = textStyle.fontSize ?? 16;
     return Html(
-      data: isPsalm ? formatPsalmHtml(html) : formatLiturgicalHtml(html),
+      data: isPsalm
+          ? formatPsalmHtml(
+              stripEmbeddedAntiphon(html, externalAntiphon: externalAntiphon),
+            )
+          : formatLiturgicalHtml(html),
       style: {
         'body': Style(
           fontSize: FontSize(textStyle.fontSize ?? 16),
@@ -1479,17 +1516,16 @@ class _HtmlOrText extends StatelessWidget {
         ),
         'p': Style(color: textColor, margin: Margins.only(bottom: 8)),
         '.liturgical-subheading': Style(
-          fontSize: FontSize(baseSize * 0.84),
+          fontSize: FontSize((baseSize * 0.88).clamp(14, double.infinity)),
           lineHeight: LineHeight(1.45),
           color: reader.muted,
           margin: Margins.only(bottom: 7),
         ),
         '.liturgical-heading': Style(
-          fontSize: FontSize(baseSize * 0.94),
+          fontSize: FontSize((baseSize * 0.98).clamp(15, double.infinity)),
           lineHeight: LineHeight(1.3),
           color: reader.rubric,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.7,
           margin: Margins.only(bottom: 12),
         ),
         '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
@@ -1500,16 +1536,13 @@ class _HtmlOrText extends StatelessWidget {
         ),
         '.liturgical-rubric': Style(
           color: reader.rubric,
-          fontSize: FontSize(baseSize * 0.84),
+          fontSize: FontSize((baseSize * 0.90).clamp(14, double.infinity)),
           lineHeight: LineHeight(1.45),
         ),
         '.liturgical-rubric-inline': Style(color: reader.rubric),
         '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),
         '.intercessions__refrain': Style(
           margin: Margins.only(top: 4, bottom: 22),
-          padding: HtmlPaddings.symmetric(horizontal: 15, vertical: 11),
-          border: Border(left: BorderSide(color: reader.rubric, width: 3)),
-          backgroundColor: reader.rubricSoft,
           color: reader.ink,
           fontWeight: FontWeight.w700,
         ),
@@ -1517,8 +1550,19 @@ class _HtmlOrText extends StatelessWidget {
           margin: Margins.only(top: 18, bottom: 5),
         ),
         '.intercessions__response': Style(
-          margin: Margins.only(left: 22, bottom: 15),
+          margin: Margins.only(left: 12, bottom: 15),
+          color: reader.ink,
+        ),
+        '.intercessions__marker': Style(color: reader.rubric),
+        '.ora-ant': Style(color: reader.ink, fontWeight: FontWeight.w600),
+        '.ora-sub': Style(
           color: reader.muted,
+          fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
+        ),
+        '.liturgical-reading-reference': Style(
+          color: reader.muted,
+          fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
+          fontWeight: FontWeight.w500,
         ),
         '.intercessions__conclusion': Style(
           margin: Margins.only(top: 22),

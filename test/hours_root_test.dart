@@ -72,6 +72,26 @@ void main() {
       expect(isHourAvailable(null, lauds), isFalse);
     });
 
+    test('Compline availability uses its separate record source', () {
+      final day = _day(
+        'day',
+        fields: {'_periodType': 'ordinary', '_dayOfWeek': '4'},
+      );
+      final compline = kHoraItems.singleWhere(
+        (hour) => hour.type == 'completorium',
+      );
+
+      expect(completoriumRecordIdForDay(day), 'ordinary-d4');
+      expect(
+        isHourAvailable(day, compline, completoriumAvailable: true),
+        isTrue,
+      );
+      expect(
+        isHourAvailable(day, compline, completoriumAvailable: false),
+        isFalse,
+      );
+    });
+
     test('manual overrides are session-scoped per date', () {
       final notifier = HoursLiturgicalOverrideNotifier();
       addTearDown(notifier.dispose);

@@ -1,6 +1,8 @@
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/utils/liturgical_office.dart';
 
 /// The temporary Stage 3 primary contract.
 ///
@@ -85,7 +87,32 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
   );
 }
 
-bool isHourAvailable(LiturgicalDay? day, HoraItem hour) {
+String completoriumRecordIdForDay(LiturgicalDay? day) {
+  if (day == null) return '';
+  final period = (day.periodType ?? day.field('_periodType') ?? '').trim();
+  final weekday =
+      day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 0;
+  return completoriumId(period, weekday, day);
+}
+
+bool cachedCompletoriumAvailable(LiturgicalDay? day) {
+  final id = completoriumRecordIdForDay(day);
+  if (id.isEmpty) return false;
+  try {
+    return HiveService.completoriumsBox.containsKey(id);
+  } catch (_) {
+    return false;
+  }
+}
+
+bool isHourAvailable(
+  LiturgicalDay? day,
+  HoraItem hour, {
+  bool? completoriumAvailable,
+}) {
   if (day == null) return false;
+  if (hour.type == 'completorium') {
+    return completoriumAvailable ?? cachedCompletoriumAvailable(day);
+  }
   return hour.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
 }

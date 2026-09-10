@@ -13,11 +13,13 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
+import 'package:mybrev_flutter/services/static_liturgical_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
@@ -69,6 +71,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
       calendar.ensureYearOptions(widget.date.year),
       calendar.ensureYearOptions(widget.date.year + 1),
       calendar.ensureDynamicDates(widget.date.year),
+      StaticLiturgicalService().getCompletoriums(),
     ]);
     final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
     final context = computeLiturgicalContext(
@@ -148,9 +151,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
   }
 
   bool _isHoraAvailable(HoraItem hora) {
-    final day = _day;
-    if (day == null) return false;
-    return hora.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
+    return isHourAvailable(_day, hora);
   }
 
   @override

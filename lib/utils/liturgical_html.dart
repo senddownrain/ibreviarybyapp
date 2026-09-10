@@ -7,16 +7,26 @@ final _paragraphPattern = RegExp(
   caseSensitive: false,
 );
 final _breakPattern = RegExp(r'<br\s*/?>', caseSensitive: false);
-final _cadencePattern = RegExp(r'(?:\*|&#0*42;|&ast;|†|&#0*8224;|&dagger;)');
-final _asteriskPattern = RegExp(r'(?:\*|&#0*42;|&ast;)');
+final _cadencePattern = RegExp(
+  r'(?:\*|&#0*42;|&#x0*2a;|&ast;|†|&#0*8224;|&#x0*2020;|&dagger;)',
+  caseSensitive: false,
+);
+final _asteriskPattern = RegExp(
+  r'(?:\*|&#0*42;|&#x0*2a;|&ast;)',
+  caseSensitive: false,
+);
 
-String removeBreakAfterAsterisk(String html) => html.replaceAllMapped(
+String removeBreakAfterCadenceMarker(String html) => html.replaceAllMapped(
   RegExp(
-    r'((?:\*|&#0*42;|&ast;)(?:\s|&nbsp;)*(?:</(?:span|font|strong|b|em|i)>\s*)*)(?:<br\s*/?>\s*)+',
+    r'((?:\*|&#0*42;|&#x0*2a;|&ast;|†|&#0*8224;|&#x0*2020;|&dagger;)(?:\s|&nbsp;)*(?:</(?:span|font|strong|b|em|i)>\s*)*)(?:<br\s*/?>\s*)+',
     caseSensitive: false,
   ),
   (match) => '${match.group(1)} ',
 );
+
+@Deprecated('Use removeBreakAfterCadenceMarker')
+String removeBreakAfterAsterisk(String html) =>
+    removeBreakAfterCadenceMarker(html);
 
 String markLiturgicalCadenceSigns(String html) {
   final out = StringBuffer();
@@ -37,11 +47,15 @@ String _markCadenceInText(String text) => text.replaceAllMapped(
 );
 
 String formatLiturgicalHtml(String html) => markLiturgicalCadenceSigns(
-  _normalizeRubricColors(_markLeadingMetadata(html)),
+  _normalizeLegacyPresentation(
+    _normalizeRubricColors(
+      _markInlineReadingReference(_markLeadingMetadata(html)),
+    ),
+  ),
 );
 
 String formatPsalmHtml(String html) {
-  var value = removeBreakAfterAsterisk(html);
+  var value = removeBreakAfterCadenceMarker(html);
 
   var stropheIndex = 0;
   value = value.replaceAllMapped(_paragraphPattern, (match) {
@@ -73,9 +87,50 @@ String formatPsalmHtml(String html) {
   });
 
   return markLiturgicalCadenceSigns(
-    _normalizeRubricColors(_markLeadingMetadata(value)),
+    _normalizeLegacyPresentation(
+      _normalizeRubricColors(_markLeadingMetadata(value)),
+    ),
   );
 }
+
+String _markInlineReadingReference(String html) => html.replaceAllMapped(
+  _paragraphPattern,
+  (paragraph) {
+    final content = paragraph.group(2) ?? '';
+    final visible = _visibleText(content);
+    if (!RegExp(
+      r'^(?:ПЕРШАЕ|ДРУГОЕ|КАРОТКАЕ)?\s*ЧЫТАННЕ(?:\s|$)',
+      caseSensitive: false,
+    ).hasMatch(visible)) {
+      return paragraph.group(0)!;
+    }
+    final marked = content.replaceFirstMapped(
+      RegExp(r'\(([^<>]{1,80})\)'),
+      (match) =>
+          '<span class="liturgical-reading-reference">${match.group(0)}</span>',
+    );
+    return '<p${paragraph.group(1) ?? ''}>$marked</p>';
+  },
+);
+
+String _normalizeLegacyPresentation(String html) => html.replaceAllMapped(
+  RegExp(r'''\sstyle\s*=\s*(["'])(.*?)\1''', caseSensitive: false),
+  (match) {
+    var style = match.group(2) ?? '';
+    style = style
+        .replaceAll(
+          RegExp(
+            r'''(?:text-align|margin-left|font-size)\s*:[^;"']*;?''',
+            caseSensitive: false,
+          ),
+          '',
+        )
+        .trim();
+    return style.isEmpty
+        ? ''
+        : ' style=${match.group(1)}$style${match.group(1)}';
+  },
+);
 
 String _normalizeRubricColors(String html) {
   return html.replaceAllMapped(
@@ -132,10 +187,7 @@ String _markLeadingMetadata(String html) {
         caseSensitive: false,
       ),
     );
-    final red = RegExp(
-      r'''(?:color\s*:\s*(?:#ff0000|red)|color\s*=\s*["']?red)''',
-      caseSensitive: false,
-    ).hasMatch(content);
+    final red = _allVisibleTextIsRubric(content, visible);
 
     if (centered || (canMark && remaining > 0 && (emphasized || red))) {
       if (remaining > 0) remaining -= 1;
@@ -150,6 +202,65 @@ String _markLeadingMetadata(String html) {
     }
     return match.group(0)!;
   });
+}
+
+bool _allVisibleTextIsRubric(String content, String visible) {
+  if (visible.isEmpty) return false;
+  final styled = RegExp(
+    r'''<(span|font)\b(?=[^>]*(?:color\s*:\s*(?:#ff0000|red)|color\s*=\s*["']?(?:#ff0000|red)))[^>]*>([\s\S]*?)</\1>''',
+    caseSensitive: false,
+  ).allMatches(content);
+  if (styled.isEmpty) return false;
+  final styledText = styled
+      .map((match) => _visibleText(match.group(2)!))
+      .join(' ');
+  return _normalizeVisible(styledText) == _normalizeVisible(visible);
+}
+
+String _normalizeVisible(String value) =>
+    value.replaceAll(RegExp(r'\s+'), ' ').trim().toLowerCase();
+
+/// Removes a trailing antiphon only when composition already owns the exact
+/// external antiphon. Generic psalm HTML is otherwise left untouched.
+String stripEmbeddedAntiphon(String html, {String? externalAntiphon}) {
+  final expected = _normalizeVisible(_visibleText(externalAntiphon ?? ''));
+  if (expected.isEmpty) return html;
+  final matches = _paragraphPattern.allMatches(html).toList();
+  if (matches.isEmpty) return html;
+  final last = matches.last;
+  var actual = _normalizeVisible(_visibleText(last.group(2) ?? ''));
+  actual = actual.replaceFirst(RegExp(r'^ант\.?\s*', caseSensitive: false), '');
+  final normalizedExpected = expected.replaceFirst(
+    RegExp(r'^ант\.?\s*', caseSensitive: false),
+    '',
+  );
+  if (actual != normalizedExpected) return html;
+  return html.replaceRange(last.start, last.end, '');
+}
+
+bool ownsStructuredPsalmPackage(String html) =>
+    RegExp(
+      r'''class\s*=\s*["'][^"']*\bora-ant\b''',
+      caseSensitive: false,
+    ).hasMatch(html) &&
+    RegExp(
+      r'''class\s*=\s*["'][^"']*\bora-psalm\b''',
+      caseSensitive: false,
+    ).hasMatch(html);
+
+/// Removes only the legacy structural label already supplied by composition.
+/// Source/reference/body content following a break remains intact.
+String stripLeadingReadingHeading(String html, String structuralLabel) {
+  final canonical = structuralLabel.toLowerCase().contains('другое')
+      ? 'ДРУГОЕ ЧЫТАННЕ'
+      : 'ПЕРШАЕ ЧЫТАННЕ';
+  return html.replaceFirst(
+    RegExp(
+      '^\\s*(?:<[^>]+>\\s*)*${RegExp.escape(canonical)}\\s*(?:<br\\s*/?>|</p>)\\s*',
+      caseSensitive: false,
+    ),
+    '',
+  );
 }
 
 bool _fullyWrapped(String content, RegExp pattern) {

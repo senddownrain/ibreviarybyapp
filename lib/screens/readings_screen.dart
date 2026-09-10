@@ -205,12 +205,10 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         icon: const Icon(Icons.arrow_back_rounded),
       );
     }
-    return Builder(
-      builder: (scaffoldContext) => IconButton(
-        tooltip: 'Меню',
-        icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
-        onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
-      ),
+    return IconButton(
+      tooltip: 'Меню',
+      icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
+      onPressed: () => showSecondaryMenu(context),
     );
   }
 
@@ -450,7 +448,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         semanticLabel: 'Чытанні дня',
         seasonColor: seasonColor,
         chromeMode: ReaderChromeMode.full,
-        drawer: const AppNavigationDrawer(),
         leading: _menuLeading(),
         actions: const [TextScaleControl()],
         secondaryActions: [
@@ -994,11 +991,10 @@ class _SectionLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 24, bottom: 8),
       child: Text(
-        text.toUpperCase(),
+        _readingLabel(text),
         style: TextStyle(
-          fontSize: base * 0.80,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.5,
+          fontSize: (base * 0.90).clamp(14, double.infinity),
+          fontWeight: FontWeight.w600,
           fontFamily: textStyle?.fontFamily,
           color: rubric.rubric,
         ),
@@ -1006,6 +1002,16 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
+
+String _readingLabel(String text) => switch (text.toUpperCase()) {
+  'ПЕРШАЕ ЧЫТАННЕ' => 'Першае чытанне',
+  'ДРУГОЕ ЧЫТАННЕ' => 'Другое чытанне',
+  'ЧЫТАННЕ' => 'Чытанне',
+  'ЕВАНГЕЛЛЕ' => 'Евангелле',
+  'РЭСПАНСАРЫЙНЫ ПСАЛЬМ' => 'Рэспансарыйны псальм',
+  'СПЕЎ ПЕРАД ЕВАНГЕЛЛЕМ' => 'Спеў перад Евангеллем',
+  _ => text,
+};
 
 class _BibleRef extends StatelessWidget {
   final String text;
@@ -1020,7 +1026,7 @@ class _BibleRef extends StatelessWidget {
     return Text(
       text,
       style: (textStyle ?? theme.body(base)).copyWith(
-        fontSize: base * 0.85,
+        fontSize: (base * 0.88).clamp(14, double.infinity),
         color: theme.muted,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.02,
@@ -1066,17 +1072,16 @@ class _ReadingText extends StatelessWidget {
             ),
             'p': Style(margin: Margins.only(bottom: 14)),
             '.liturgical-subheading': Style(
-              fontSize: FontSize(base * 0.84),
+              fontSize: FontSize((base * 0.88).clamp(14, double.infinity)),
               lineHeight: LineHeight(1.45),
               color: reader.muted,
               margin: Margins.only(bottom: 7),
             ),
             '.liturgical-heading': Style(
-              fontSize: FontSize(base * 0.94),
+              fontSize: FontSize((base * 0.98).clamp(15, double.infinity)),
               lineHeight: LineHeight(1.3),
               color: reader.rubric,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.7,
             ),
             '.psalm-strophe-even': Style(
               margin: Margins.only(left: 16, bottom: 14),
@@ -1163,11 +1168,16 @@ class _ReadingSectionState extends State<_ReadingSection> {
     final rawText = s.text ?? '';
     final text = _cleanText(rawText, s.bible);
     final base = widget.textStyle.fontSize ?? 16.0;
+    final isHtml = RegExp(
+      r'<[a-z][\s\S]*>',
+      caseSensitive: false,
+    ).hasMatch(text);
+    final visibleText = text.replaceAll(RegExp(r'<[^>]+>'), ' ');
 
     // Split off closing phrase if found
     String bodyText = text;
     String? closingPhrase;
-    final match = _closingPhraseRe.firstMatch(text);
+    final match = isHtml ? null : _closingPhraseRe.firstMatch(text);
     if (match != null) {
       closingPhrase = match.group(0)!.trim();
       bodyText = text.substring(0, match.start).trimRight();
@@ -1178,7 +1188,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
     final hasAcclamation = RegExp(
       r'Гэта\s+слова\s+(Пана|Бога|Божае|Пана\s+Бога)',
       caseSensitive: false,
-    ).hasMatch(text);
+    ).hasMatch(visibleText);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1262,7 +1272,6 @@ class _PsalmSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final rawChorus = psalm.chorus ?? '';
     final chorus = rawChorus.isNotEmpty ? _cleanChorus(rawChorus) : '';
     final hasChorus = chorus.isNotEmpty;
@@ -1283,11 +1292,14 @@ class _PsalmSection extends StatelessWidget {
         if (!hasVerses) ...[
           if (hasChorus) ...[
             const SizedBox(height: 8),
+            _ChorusBox(label: 'Рэфрэн', chorus: chorus, textStyle: textStyle),
+          ] else if (psalm.altChorus?.isNotEmpty == true) ...[
+            const SizedBox(height: 8),
             _ChorusBox(
-              label: 'Рэфрэн',
-              chorus: chorus,
-              cs: cs,
+              label: 'Або',
+              chorus: psalm.altChorus!,
               textStyle: textStyle,
+              alternate: true,
             ),
           ],
           if (psalm.text?.isNotEmpty == true) ...[
@@ -1305,12 +1317,7 @@ class _PsalmSection extends StatelessWidget {
         if (hasVerses) ...[
           if (hasChorus) ...[
             const SizedBox(height: 10),
-            _ChorusBox(
-              label: 'Рэфрэн',
-              chorus: chorus,
-              cs: cs,
-              textStyle: textStyle,
-            ),
+            _ChorusBox(label: 'Рэфрэн', chorus: chorus, textStyle: textStyle),
           ],
           for (var i = 0; i < psalm.verses.length; i++) ...[
             Padding(
@@ -1326,19 +1333,17 @@ class _PsalmSection extends StatelessWidget {
               _ChorusBox(
                 label: 'Рэфрэн',
                 chorus: chorus,
-                cs: cs,
                 textStyle: textStyle,
                 compact: true,
               ),
           ],
           // After last verse: altChorus or chorus again
-          if (hasChorus) ...[
+          if (hasChorus || psalm.altChorus?.isNotEmpty == true) ...[
             const SizedBox(height: 8),
             if (psalm.altChorus?.isNotEmpty == true)
               _ChorusBox(
                 label: 'Або',
                 chorus: psalm.altChorus!,
-                cs: cs,
                 textStyle: textStyle,
                 alternate: true,
               )
@@ -1346,7 +1351,6 @@ class _PsalmSection extends StatelessWidget {
               _ChorusBox(
                 label: 'Рэфрэн',
                 chorus: chorus,
-                cs: cs,
                 textStyle: textStyle,
                 isFinal: true,
               ),
@@ -1360,7 +1364,6 @@ class _PsalmSection extends StatelessWidget {
 class _ChorusBox extends StatelessWidget {
   final String label;
   final String chorus;
-  final ColorScheme cs;
   final TextStyle textStyle;
   final bool compact;
   final bool alternate;
@@ -1369,7 +1372,6 @@ class _ChorusBox extends StatelessWidget {
   const _ChorusBox({
     required this.label,
     required this.chorus,
-    required this.cs,
     required this.textStyle,
     this.compact = false,
     this.alternate = false,
@@ -1380,11 +1382,6 @@ class _ChorusBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final reader = ReaderTheme.of(context);
     final accent = alternate ? reader.muted : reader.rubric;
-    final fill = alternate
-        ? cs.onSurface.withValues(alpha: 0.035)
-        : compact
-        ? Colors.transparent
-        : reader.rubricSoft.withValues(alpha: 0.95);
     final base = textStyle.fontSize ?? 16;
 
     return Container(
@@ -1399,50 +1396,24 @@ class _ChorusBox extends StatelessWidget {
       ),
       width: double.infinity,
       margin: EdgeInsets.fromLTRB(0, compact ? 5 : 2, 0, compact ? 9 : 13),
-      padding: EdgeInsets.fromLTRB(
-        compact ? 11 : 14,
-        compact ? 7 : 11,
-        compact ? 10 : 14,
-        compact ? 7 : 12,
-      ),
-      decoration: BoxDecoration(
-        color: fill,
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(13),
-          bottomRight: Radius.circular(13),
-        ),
-        border: Border(
-          left: BorderSide(color: accent, width: compact ? 3 : 4),
-        ),
-        boxShadow: compact || alternate
-            ? null
-            : [
-                BoxShadow(
-                  color: reader.rubric.withValues(alpha: 0.07),
-                  blurRadius: 16,
-                  spreadRadius: -8,
-                  offset: const Offset(0, 7),
-                ),
-              ],
-      ),
+      padding: EdgeInsets.only(left: compact ? 12 : 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label.toUpperCase(),
+            label,
             style: textStyle.copyWith(
-              fontSize: base * (compact ? 0.67 : 0.70),
+              fontSize: (base * .88).clamp(14, double.infinity),
               height: 1.2,
               color: accent,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.05,
             ),
           ),
           SizedBox(height: compact ? 3 : 5),
           SelectableText(
             chorus,
             style: textStyle.copyWith(
-              fontSize: base * (compact ? 0.96 : 1.04),
+              fontSize: base,
               height: compact ? 1.48 : 1.5,
               color: reader.ink,
               fontWeight: compact ? FontWeight.w600 : FontWeight.w700,
@@ -1487,6 +1458,9 @@ class _AlleluiaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final verse = (alleluia.verse ?? '').trim().isNotEmpty
+        ? alleluia.verse!.trim()
+        : (alleluia.text ?? '').trim();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1501,9 +1475,9 @@ class _AlleluiaSection extends StatelessWidget {
         ],
         const SizedBox(height: 8),
         _acclamationLine(context),
-        if (alleluia.verse != null) ...[
+        if (verse.isNotEmpty) ...[
           const SizedBox(height: 4),
-          _ReadingText(text: alleluia.verse!, textStyle: textStyle),
+          _ReadingText(text: verse, textStyle: textStyle),
         ],
         _acclamationLine(context),
       ],
