@@ -6,12 +6,14 @@ import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/navigation/bible_navigation.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/screens/bible_chapter_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 
 class HoursDateContext extends ConsumerStatefulWidget {
   const HoursDateContext({super.key, required this.date, required this.child});
@@ -93,12 +95,9 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
       return;
     }
     if (widget.date != null) {
-      ref.read(readingsBranchStateProvider.notifier).state = current.copyWith(
-        date: widget.date,
-        dayId: widget.dayId,
-        clearLiturgicalKey: true,
-        clearDayId: widget.dayId == null,
-      );
+      ref
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(widget.date!, dayId: widget.dayId);
     }
   }
 
@@ -108,6 +107,9 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
       return _BranchError(message: message);
     }
     final state = ref.watch(readingsBranchStateProvider);
+    final sharedDate = DateUtils.dateOnly(ref.watch(selectedDateProvider));
+    final sharedDayId = ref.watch(hoursLiturgicalSelectionProvider).dayId;
+    final direction = ref.watch(homeNavDirectionProvider);
     final content = state.liturgicalKey != null
         ? ReadingsScreen(
             key: ValueKey('readings-liturgical-${state.liturgicalKey}'),
@@ -116,10 +118,10 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
           )
         : ReadingsScreen(
             key: ValueKey(
-              'readings-${state.date.toIso8601String()}-${state.dayId ?? ''}',
+              'readings-${sharedDate.toIso8601String()}-${sharedDayId ?? ''}',
             ),
-            dateStr: _dateKey(state.date),
-            dayId: state.dayId,
+            dateStr: _dateKey(sharedDate),
+            dayId: sharedDayId,
           );
 
     final navigation = AppNavigationScope.of(context);
@@ -137,7 +139,9 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
               navigation.returnToOra();
             }
           },
-          child: child!,
+          child: state.liturgicalKey == null
+              ? LiturgicalDayTransition(direction: direction, child: child!)
+              : child!,
         );
       },
     );
@@ -165,6 +169,18 @@ class BibleBranchHost extends ConsumerStatefulWidget {
 class _BibleBranchHostState extends ConsumerState<BibleBranchHost> {
   bool _retrying = false;
   String? _retryError;
+  BibleLocation? _lastLocation;
+  int _navigationDirection = 0;
+
+  int _locationIndex(BibleLocation location) {
+    final books = BibleRepository.getBooks(location.versionId);
+    var index = 0;
+    for (final book in books) {
+      if (book.id == location.bookId) return index + location.chapter;
+      index += book.chapterCount;
+    }
+    return index;
+  }
 
   Future<void> _retry() async {
     setState(() {
@@ -214,11 +230,25 @@ class _BibleBranchHostState extends ConsumerState<BibleBranchHost> {
       return const _BranchError(message: 'Даныя Бібліі недаступныя.');
     }
 
-    return BibleChapterScreen(
-      key: ValueKey('bible-${location.documentKey}'),
-      versionId: location.versionId,
-      bookId: location.bookId,
-      chapter: location.chapter,
+    final previousLocation = _lastLocation;
+    if (previousLocation != null &&
+        previousLocation.documentKey != location.documentKey) {
+      _navigationDirection = previousLocation.versionId == location.versionId
+          ? (_locationIndex(location) > _locationIndex(previousLocation)
+                ? 1
+                : -1)
+          : 0;
+    }
+    _lastLocation = location;
+
+    return LiturgicalDayTransition(
+      direction: _navigationDirection,
+      child: BibleChapterScreen(
+        key: ValueKey('bible-${location.documentKey}'),
+        versionId: location.versionId,
+        bookId: location.bookId,
+        chapter: location.chapter,
+      ),
     );
   }
 }

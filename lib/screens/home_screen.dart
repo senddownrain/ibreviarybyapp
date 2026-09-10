@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -33,6 +34,8 @@ class HomeScreen extends ConsumerWidget {
     final bootstrap = ref.watch(dataBootstrapProvider);
     final loading = ref.watch(homeDataLoadingProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
+    final navigationDirection = ref.watch(homeNavDirectionProvider);
+    final dayNavigation = ref.read(liturgicalNavigationControllerProvider);
     final today = DateUtils.dateOnly(DateTime.now());
     final isToday = DateUtils.isSameDay(date, today);
     final top = MediaQuery.paddingOf(context).top + 78;
@@ -42,113 +45,108 @@ class HomeScreen extends ConsumerWidget {
         AmbientWash.hero(seasonColor: seasonColor),
         HorizontalSwipeNavigation(
           onPrevious: date.isAfter(kCalendarFirstDate)
-              ? () => ref.read(selectedDateProvider.notifier).state = date
-                    .subtract(const Duration(days: 1))
+              ? () => dayNavigation.moveBy(-1)
               : null,
           onNext: date.isBefore(kCalendarLastDate)
-              ? () => ref.read(selectedDateProvider.notifier).state = date.add(
-                  const Duration(days: 1),
-                )
+              ? () => dayNavigation.moveBy(1)
               : null,
-          child: CustomScrollView(
-            key: const PageStorageKey('hours-root-scroll'),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 720),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        24,
-                        top + 16,
-                        24,
-                        116 + MediaQuery.viewPaddingOf(context).bottom,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Літургія гадзін',
-                            style: ReaderTheme.of(context).displayTitle(38),
-                          ),
-                          const SizedBox(height: 22),
-                          _DateHeader(
-                            date: date,
-                            color: seasonColor,
-                            onTap: () => _showDateActions(context, ref, date),
-                            onToday: isToday
-                                ? null
-                                : () =>
-                                      ref
-                                              .read(
-                                                selectedDateProvider.notifier,
-                                              )
-                                              .state =
-                                          today,
-                          ),
-                          const SizedBox(height: 28),
-                          if (selection.selected case final selected?) ...[
-                            _Celebration(
-                              option: selected,
-                              isManual: selected.key != selection.primary?.key,
-                              color: seasonColor,
+          child: LiturgicalDayTransition(
+            direction: navigationDirection,
+            child: CustomScrollView(
+              key: ValueKey('hours-root-${DateUtils.dateOnly(date)}'),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 720),
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          24,
+                          top + 16,
+                          24,
+                          116 + MediaQuery.viewPaddingOf(context).bottom,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Літургія гадзін',
+                              style: ReaderTheme.of(context).displayTitle(38),
                             ),
-                            if (selection.alternativesCount > 0) ...[
-                              const SizedBox(height: 14),
-                              TextButton.icon(
-                                key: const Key('hours-alternatives-control'),
-                                style: TextButton.styleFrom(
-                                  minimumSize: const Size(48, 48),
-                                  foregroundColor: _semanticInk(
+                            const SizedBox(height: 22),
+                            _DateHeader(
+                              date: date,
+                              color: seasonColor,
+                              onTap: () => _showDateActions(context, ref, date),
+                              onToday: isToday
+                                  ? null
+                                  : () => dayNavigation.openDate(today),
+                            ),
+                            const SizedBox(height: 28),
+                            if (selection.selected case final selected?) ...[
+                              _Celebration(
+                                option: selected,
+                                isManual:
+                                    selected.key != selection.primary?.key,
+                                color: seasonColor,
+                              ),
+                              if (selection.alternativesCount > 0) ...[
+                                const SizedBox(height: 14),
+                                TextButton.icon(
+                                  key: const Key('hours-alternatives-control'),
+                                  style: TextButton.styleFrom(
+                                    minimumSize: const Size(48, 48),
+                                    foregroundColor: _semanticInk(
+                                      context,
+                                      seasonColor,
+                                    ),
+                                  ),
+                                  onPressed: () => _showAlternatives(
                                     context,
+                                    date,
                                     seasonColor,
                                   ),
+                                  icon: const PhosphorIcon(
+                                    PhosphorIconsRegular.stack,
+                                    size: 19,
+                                  ),
+                                  label: Text(
+                                    'Іншыя літургічныя варыянты · '
+                                    '${selection.alternativesCount}',
+                                  ),
                                 ),
-                                onPressed: () => _showAlternatives(
-                                  context,
-                                  date,
-                                  seasonColor,
-                                ),
-                                icon: const PhosphorIcon(
-                                  PhosphorIconsRegular.stack,
-                                  size: 19,
-                                ),
-                                label: Text(
-                                  'Іншыя літургічныя варыянты · '
-                                  '${selection.alternativesCount}',
-                                ),
+                              ],
+                              const SizedBox(height: 28),
+                              _HoursList(
+                                date: date,
+                                selection: selection,
+                                color: seasonColor,
+                              ),
+                            ] else if (loading) ...[
+                              const _HoursLoading(),
+                            ] else if (bootstrap.error != null) ...[
+                              const _HoursMessage(
+                                icon: PhosphorIconsRegular.warningCircle,
+                                title: 'Не ўдалося загрузіць дзень',
+                                body:
+                                    'Праверце падключэнне або сінхранізацыю ў Наладах.',
+                              ),
+                            ] else ...[
+                              const _HoursMessage(
+                                icon: PhosphorIconsRegular.calendarX,
+                                title: 'Няма даступнага літургічнага дня',
+                                body:
+                                    'Для гэтай даты не знойдзена змесціва. Праверце сінхранізацыю ў Наладах.',
                               ),
                             ],
-                            const SizedBox(height: 28),
-                            _HoursList(
-                              date: date,
-                              selection: selection,
-                              color: seasonColor,
-                            ),
-                          ] else if (loading) ...[
-                            const _HoursLoading(),
-                          ] else if (bootstrap.error != null) ...[
-                            const _HoursMessage(
-                              icon: PhosphorIconsRegular.warningCircle,
-                              title: 'Не ўдалося загрузіць дзень',
-                              body:
-                                  'Праверце падключэнне або сінхранізацыю ў Наладах.',
-                            ),
-                          ] else ...[
-                            const _HoursMessage(
-                              icon: PhosphorIconsRegular.calendarX,
-                              title: 'Няма даступнага літургічнага дня',
-                              body:
-                                  'Для гэтай даты не знойдзена змесціва. Праверце сінхранізацыю ў Наладах.',
-                            ),
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -477,6 +475,7 @@ Future<void> _showDateActions(
   DateTime date,
 ) async {
   final color = ref.read(liturgicalSeasonColorProvider);
+  final dayNavigation = ref.read(liturgicalNavigationControllerProvider);
   final action = await showModalBottomSheet<_DateAction>(
     context: context,
     useRootNavigator: true,
@@ -533,20 +532,18 @@ Future<void> _showDateActions(
   if (action == null || !context.mounted) return;
   switch (action) {
     case _DateAction.today:
-      ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(
-        DateTime.now(),
-      );
+      dayNavigation.openDate(DateTime.now());
       return;
     case _DateAction.previous:
       final target = date.subtract(const Duration(days: 1));
       if (!target.isBefore(kCalendarFirstDate)) {
-        ref.read(selectedDateProvider.notifier).state = target;
+        dayNavigation.openDate(target);
       }
       return;
     case _DateAction.next:
       final target = date.add(const Duration(days: 1));
       if (!target.isAfter(kCalendarLastDate)) {
-        ref.read(selectedDateProvider.notifier).state = target;
+        dayNavigation.openDate(target);
       }
       return;
     case _DateAction.calendar:
@@ -556,7 +553,7 @@ Future<void> _showDateActions(
         seasonColor: color,
       );
       if (picked != null) {
-        ref.read(selectedDateProvider.notifier).state = picked;
+        dayNavigation.openDate(picked);
       }
       return;
     case _DateAction.advanced:
@@ -681,8 +678,8 @@ class _AlternativesSheet extends ConsumerWidget {
                               .firstOrNull;
                           if (option?.dayId case final dayId?) {
                             ref
-                                .read(hoursLiturgicalOverridesProvider.notifier)
-                                .select(date, dayId);
+                                .read(liturgicalNavigationControllerProvider)
+                                .selectDay(date, dayId);
                           }
                         },
                         child: Column(
@@ -743,10 +740,9 @@ class _AlternativesSheet extends ConsumerWidget {
                                   selected: template.id == selection.dayId,
                                   onTap: () => ref
                                       .read(
-                                        hoursLiturgicalOverridesProvider
-                                            .notifier,
+                                        liturgicalNavigationControllerProvider,
                                       )
-                                      .select(date, template.id),
+                                      .selectDay(date, template.id),
                                 ),
                               ),
                           ],

@@ -72,6 +72,7 @@ void main() {
       );
 
       expect(RegExp('liturgical-subheading').allMatches(result), hasLength(4));
+      expect(RegExp('psalm-metadata').allMatches(result), hasLength(4));
       expect(result, contains('class="psalm-strophe"'));
     });
   });

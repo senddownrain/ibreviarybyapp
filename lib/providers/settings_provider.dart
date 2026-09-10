@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 
 const kAvailableFonts = [
   'Сістэмны',
@@ -129,7 +130,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
   @override
   SettingsState build() {
     _box = Hive.box(_boxName);
-    return _load();
+    final loaded = _load();
+    setActiveThemeMode(loaded.themeMode);
+    return loaded;
   }
 
   SettingsState _load() {
@@ -199,6 +202,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
 
   void setThemeMode(ThemeMode mode) {
     state = state.copyWith(themeMode: mode);
+    setActiveThemeMode(mode);
     _save();
   }
 

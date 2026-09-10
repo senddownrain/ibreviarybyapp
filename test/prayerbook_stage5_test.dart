@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
@@ -52,6 +53,27 @@ const _categories = [
 ];
 
 void main() {
+  testWidgets('My Prayers add button stays above the app dock', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        Scaffold(
+          extendBody: true,
+          body: const MyPrayersScreen(),
+          bottomNavigationBar: const SizedBox(
+            key: Key('test-app-dock'),
+            height: 100,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final button = tester.getRect(find.byType(FloatingActionButton));
+    final dock = tester.getRect(find.byKey(const Key('test-app-dock')));
+
+    expect(button.bottom, lessThan(dock.top));
+  });
+
   test('category grouping uses tags and explicit persisted membership', () {
     const settings = SettingsState(
       prayerCategoryMap: {

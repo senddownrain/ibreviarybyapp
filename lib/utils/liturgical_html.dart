@@ -88,7 +88,9 @@ String formatPsalmHtml(String html) {
 
   return markLiturgicalCadenceSigns(
     _normalizeLegacyPresentation(
-      _normalizeRubricColors(_markLeadingMetadata(value, limit: null)),
+      _normalizeRubricColors(
+        _markLeadingMetadata(value, limit: null, psalmMetadata: true),
+      ),
     ),
   );
 }
@@ -192,7 +194,11 @@ String _normalizeRubricColors(String html) {
   );
 }
 
-String _markLeadingMetadata(String html, {int? limit = 2}) {
+String _markLeadingMetadata(
+  String html, {
+  int? limit = 2,
+  bool psalmMetadata = false,
+}) {
   var remaining = limit;
   var canMark = true;
   return html.replaceAllMapped(_paragraphPattern, (match) {
@@ -232,7 +238,10 @@ String _markLeadingMetadata(String html, {int? limit = 2}) {
       if (remaining != null && remaining! > 0) {
         remaining = remaining! - 1;
       }
-      return '<p${_withClass(attributes, 'liturgical-subheading')}>$content</p>';
+      final className = psalmMetadata
+          ? 'liturgical-subheading psalm-metadata'
+          : 'liturgical-subheading';
+      return '<p${_withClass(attributes, className)}>$content</p>';
     }
 
     if (!RegExp(

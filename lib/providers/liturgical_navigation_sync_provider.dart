@@ -4,6 +4,56 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 
+final liturgicalNavigationControllerProvider = Provider(
+  LiturgicalNavigationController.new,
+);
+
+/// One navigation command for both daily branches. UI actions use this
+/// controller so the Hours and Readings trees move in the same frame.
+class LiturgicalNavigationController {
+  LiturgicalNavigationController(this.ref);
+
+  final Ref ref;
+
+  void openDate(DateTime value, {String? dayId}) {
+    final date = DateUtils.dateOnly(value);
+    final current = DateUtils.dateOnly(ref.read(selectedDateProvider));
+    if (!DateUtils.isSameDay(date, current)) {
+      ref.read(homeNavDirectionProvider.notifier).state = date.isAfter(current)
+          ? 1
+          : -1;
+    }
+
+    if (dayId != null) {
+      ref.read(hoursLiturgicalOverridesProvider.notifier).select(date, dayId);
+    }
+    ref.read(selectedDateProvider.notifier).state = date;
+
+    final readings = ref.read(readingsBranchStateProvider);
+    ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
+      date: date,
+      dayId: dayId,
+      clearLiturgicalKey: true,
+      clearDayId: dayId == null,
+    );
+  }
+
+  void moveBy(int days) {
+    openDate(ref.read(selectedDateProvider).add(Duration(days: days)));
+  }
+
+  void selectDay(DateTime value, String dayId) {
+    final date = DateUtils.dateOnly(value);
+    ref.read(hoursLiturgicalOverridesProvider.notifier).select(date, dayId);
+    final readings = ref.read(readingsBranchStateProvider);
+    ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
+      date: date,
+      dayId: dayId,
+      clearLiturgicalKey: true,
+    );
+  }
+}
+
 /// Keeps the daily context shared by the Hours and Readings branches.
 ///
 /// The guard is needed because every propagated update is observed by the

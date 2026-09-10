@@ -23,6 +23,50 @@ class HorizontalSwipeNavigation extends StatefulWidget {
       _HorizontalSwipeNavigationState();
 }
 
+/// Shared transition for dated liturgical content and Bible chapters.
+class LiturgicalDayTransition extends StatelessWidget {
+  const LiturgicalDayTransition({
+    super.key,
+    required this.direction,
+    required this.child,
+  });
+
+  final int direction;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentChild = child;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      reverseDuration: const Duration(milliseconds: 240),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      layoutBuilder: (currentChild, previousChildren) => Stack(
+        alignment: Alignment.topCenter,
+        children: [...previousChildren, ?currentChild],
+      ),
+      transitionBuilder: (transitionChild, animation) {
+        final isIncoming = transitionChild.key == currentChild.key;
+        final horizontalOffset = direction == 0
+            ? 0.0
+            : direction * (isIncoming ? 0.12 : -0.08);
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(horizontalOffset, 0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: transitionChild,
+          ),
+        );
+      },
+      child: currentChild,
+    );
+  }
+}
+
 class _HorizontalSwipeNavigationState extends State<HorizontalSwipeNavigation> {
   static const _minimumDistance = 72.0;
   static const _minimumVelocity = 500.0;

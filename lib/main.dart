@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
+import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -61,12 +62,18 @@ class MyBrevApp extends ConsumerWidget {
 
     // Content stays consistent with the PWA. Navigation and system controls
     // adapt inside the shared theme and the platform-chrome widgets.
-    final schemes = AppPalette.schemesFor(settings.themeMode);
-    return _buildApp(settings, schemes.theme, schemes.darkTheme);
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: appThemeModeController,
+      builder: (context, themeMode, _) {
+        final schemes = AppPalette.schemesFor(themeMode);
+        return _buildApp(settings, themeMode, schemes.theme, schemes.darkTheme);
+      },
+    );
   }
 
   Widget _buildApp(
     SettingsState settings,
+    ThemeMode themeMode,
     ColorScheme light,
     ColorScheme dark,
   ) {
@@ -259,12 +266,12 @@ class MyBrevApp extends ConsumerWidget {
     return MaterialApp.router(
       // Recreate MaterialApp's inherited theme boundary when the user switches
       // modes. The router configuration is stable, so navigation is preserved.
-      key: ValueKey(settings.themeMode),
+      key: ValueKey(themeMode),
       title: 'Mybrev',
       restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      themeMode: settings.themeMode,
+      themeMode: themeMode,
       themeAnimationDuration: Duration.zero,
       theme: makeTheme(light),
       darkTheme: makeTheme(dark),

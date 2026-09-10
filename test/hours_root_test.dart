@@ -123,6 +123,16 @@ void main() {
       addTearDown(container.dispose);
       container.read(liturgicalNavigationSyncProvider);
 
+      container.read(liturgicalNavigationControllerProvider).moveBy(1);
+      expect(container.read(selectedDateProvider), secondDate);
+      expect(container.read(readingsBranchStateProvider).date, secondDate);
+      expect(container.read(homeNavDirectionProvider), 1);
+
+      container.read(liturgicalNavigationControllerProvider).moveBy(-1);
+      expect(container.read(selectedDateProvider), firstDate);
+      expect(container.read(readingsBranchStateProvider).date, firstDate);
+      expect(container.read(homeNavDirectionProvider), -1);
+
       container
           .read(hoursLiturgicalOverridesProvider.notifier)
           .select(firstDate, 'alternative');
@@ -195,7 +205,7 @@ void main() {
     expect(find.text('Літургія'), findsWidgets);
   });
 
-  testWidgets('other date exposes Today without changing Readings date', (
+  testWidgets('Today moves Hours and Readings to the same date', (
     tester,
   ) async {
     final otherDate = DateTime(2026, 9, 8);
@@ -225,7 +235,13 @@ void main() {
       DateUtils.isSameDay(container.read(selectedDateProvider), DateTime.now()),
       isTrue,
     );
-    expect(container.read(readingsBranchStateProvider).date, readingsDate);
+    expect(
+      DateUtils.isSameDay(
+        container.read(readingsBranchStateProvider).date,
+        DateTime.now(),
+      ),
+      isTrue,
+    );
   });
 
   testWidgets('Hours layout supports 200 percent text on a narrow surface', (

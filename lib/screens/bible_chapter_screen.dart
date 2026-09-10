@@ -15,6 +15,7 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/utils/system_insets.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -309,7 +310,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 // The shell hides its navigation dock while the palette is
                 // open. In that transition SafeArea can inherit an already
                 // consumed inset, so anchor explicitly above system gestures.
-                bottom: 8 + MediaQuery.viewPaddingOf(context).bottom,
+                bottom: 8 + readerSystemBottomClearance(context),
                 child: _colorBar(),
               ),
           ],

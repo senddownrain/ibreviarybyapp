@@ -67,7 +67,7 @@ void main() {
 
     expect(
       liturgicalReadingPeriodTitle(reading, DateTime(2026, 6, 23)),
-      'XII звычайны тыдзень, аўторак',
+      '12 звычайны тыдзень, аўторак',
     );
   });
 }

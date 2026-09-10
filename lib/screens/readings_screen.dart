@@ -7,7 +7,7 @@ import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
-import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
@@ -15,6 +15,7 @@ import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -25,6 +26,7 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/utils/system_insets.dart';
 
 const _highlightColors = <String, Color>{
   'amber': Color(0xFFE2AE34),
@@ -252,10 +254,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       selectedDayId = group == null ? null : readingCelebrationDayId(group);
     });
     if (selectedDayId != null) {
-      final branch = ref.read(readingsBranchStateProvider);
-      ref.read(readingsBranchStateProvider.notifier).state = branch.copyWith(
-        dayId: selectedDayId,
-      );
+      ref
+          .read(liturgicalNavigationControllerProvider)
+          .selectDay(_currentDate, selectedDayId!);
     }
     _resetDocumentScroll();
   }
@@ -328,35 +329,23 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     return 'Чытанні';
   }
 
-  static const _periodLabels = {
-    'ordinary': 'Звычайны перыяд',
-    'lent': 'Вялікі пост',
-    'holyweek': 'Вялікі тыдзень',
-    'easter': 'Велікодны перыяд',
-    'advent': 'Адвэнт',
-    'christmas': 'Перыяд Нараджэння',
-  };
-
-  static const _dayLabels = {
-    1: 'Нядзеля',
-    2: 'Панядзелак',
-    3: 'Аўторак',
-    4: 'Серада',
-    5: 'Чацвер',
-    6: 'Пятніца',
-    7: 'Субота',
-  };
-
   String _formatLiturgicalKey(String key) {
     final parts = key.split('/');
     if (parts.isEmpty) return key;
-    final period = _periodLabels[parts[0]] ?? parts[0];
+    final periodType = parts[0];
+    final period = periodLabelMap[periodType] ?? periodType;
     if (parts.length < 2) return period;
-    final week = parts[1];
-    if (parts.length < 3) return '$period, тыд. $week';
+    final week = int.tryParse(parts[1]);
+    if (parts.length < 3 || week == null) return period;
     final day = int.tryParse(parts[2]);
-    final dayLabel = day != null ? (_dayLabels[day] ?? parts[2]) : parts[2];
-    return '$period, тыд. $week – $dayLabel';
+    if (day == null) return period;
+    return formatLiturgicalPeriodTitle(
+      periodType: periodType,
+      periodWeek: week,
+      dayOfWeek: day,
+      date: DateTime(2000, 2, 2),
+      useArabicWeekNumber: true,
+    );
   }
 
   String _contextTitleFor(
@@ -397,9 +386,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   void _openDate(DateTime date) {
     final normalized = DateUtils.dateOnly(date);
     AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
-    ref.read(readingsBranchStateProvider.notifier).state = ref
-        .read(readingsBranchStateProvider)
-        .copyWith(date: normalized, clearLiturgicalKey: true, clearDayId: true);
+    ref.read(liturgicalNavigationControllerProvider).openDate(normalized);
     context.go(readingsRouteForContext(date: normalized));
   }
 
@@ -467,6 +454,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       builder: (sheetContext) => _ReadingsOptionsSheet(
+        accentColor: _readingColor(),
         groups: selection.groups,
         activeGroupKey: selection.activeGroupKey,
         cycles: cycles,
@@ -543,7 +531,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     if (_selectedSentenceId != null) {
       document = Padding(
         padding: EdgeInsets.only(
-          bottom: 80 + MediaQuery.viewPaddingOf(context).bottom,
+          bottom: 80 + readerSystemBottomClearance(context),
         ),
         child: document,
       );
@@ -588,7 +576,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           Positioned(
             left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
             right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
-            bottom: 8 + MediaQuery.viewPaddingOf(context).bottom,
+            bottom: 8 + readerSystemBottomClearance(context),
             child: _highlightPalette(),
           ),
       ],
@@ -882,6 +870,7 @@ class _ReadingsDateTile extends StatelessWidget {
 
 class _ReadingsOptionsSheet extends StatelessWidget {
   const _ReadingsOptionsSheet({
+    required this.accentColor,
     required this.groups,
     required this.activeGroupKey,
     required this.cycles,
@@ -891,6 +880,7 @@ class _ReadingsOptionsSheet extends StatelessWidget {
     required this.onCycleSelected,
   });
 
+  final Color accentColor;
   final List<ReadingCelebrationGroup> groups;
   final String? activeGroupKey;
   final List<String> cycles;
@@ -904,7 +894,12 @@ class _ReadingsOptionsSheet extends StatelessWidget {
     constraints: const BoxConstraints(maxWidth: 620, maxHeight: 680),
     child: ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        24 + readerSystemBottomClearance(context),
+      ),
       children: [
         Text(
           'Варыянты чытанняў',
@@ -930,31 +925,20 @@ class _ReadingsOptionsSheet extends StatelessWidget {
         if (cycles.length > 1) ...[
           const SizedBox(height: 18),
           const _OptionsHeading('Выбар чытанняў'),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-            child: SizedBox(
-              width: double.infinity,
-              child: SegmentedButton<String>(
-                showSelectedIcon: true,
-                expandedInsets: EdgeInsets.zero,
-                segments: [
-                  for (final cycle in cycles)
-                    ButtonSegment<String>(
-                      value: cycle,
-                      label: Text(
-                        _readingsCycleLabel(cycle),
-                        key: ValueKey('readings-cycle-$cycle'),
-                      ),
-                    ),
-                ],
-                selected: {manualCycle ?? automaticCycle},
-                onSelectionChanged: (selection) {
-                  final cycle = selection.first;
-                  onCycleSelected(cycle == automaticCycle ? null : cycle);
-                },
+          const SizedBox(height: 6),
+          for (final cycle in cycles)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: SelectionOptionCard(
+                key: ValueKey('readings-cycle-$cycle'),
+                title: 'Цыкл ${_readingsCycleLabel(cycle)}',
+                leading: const Icon(Icons.auto_stories_outlined),
+                accentColor: accentColor,
+                selected: cycle == (manualCycle ?? automaticCycle),
+                onTap: () =>
+                    onCycleSelected(cycle == automaticCycle ? null : cycle),
               ),
             ),
-          ),
         ],
       ],
     ),
@@ -1319,6 +1303,7 @@ class _ReadingTextState extends State<_ReadingText> {
             color: reader.muted,
             margin: Margins.only(bottom: 7),
           ),
+          '.psalm-metadata': Style(textAlign: TextAlign.center),
           '.liturgical-heading': Style(
             fontSize: FontSize((base * 0.98).clamp(15, double.infinity)),
             lineHeight: LineHeight(1.3),

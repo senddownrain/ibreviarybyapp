@@ -333,7 +333,7 @@ void main() {
       semantics.dispose();
     });
 
-    testWidgets('verse palette stays above the system navigation inset', (
+    testWidgets('verse palette clears Android navigation with zero inset', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(390, 800);
@@ -341,14 +341,14 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await _pumpBible(tester, bottomViewPadding: 72);
+      await _pumpBible(tester);
       await tester.tap(find.byKey(const Key('bible-verse-1')));
       await tester.pumpAndSettle();
 
       final paletteBottom = tester
           .getBottomRight(find.byKey(const Key('bible-highlight-cancel')))
           .dy;
-      expect(paletteBottom, lessThanOrEqualTo(800 - 72 - 8));
+      expect(paletteBottom, lessThanOrEqualTo(800 - 56 - 8));
     });
 
     testWidgets('system TextScaler increases rendered verse body', (
@@ -498,7 +498,6 @@ Future<_TestBibleApp> _pumpBible(
   double textScale = 1,
   ReaderChromeModeController? chromeController,
   double initialScrollOffset = 0,
-  double bottomViewPadding = 0,
 }) async {
   final book = BibleRepository.getBooks('bel').first;
   final location = BibleLocation(versionId: 'bel', bookId: book.id, chapter: 1);
@@ -536,11 +535,9 @@ Future<_TestBibleApp> _pumpBible(
     routerConfig: router,
     theme: ThemeData(platform: platform),
     builder: (context, child) => MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: TextScaler.linear(textScale),
-        viewPadding: EdgeInsets.only(bottom: bottomViewPadding),
-        padding: EdgeInsets.only(bottom: bottomViewPadding),
-      ),
+      data: MediaQuery.of(
+        context,
+      ).copyWith(textScaler: TextScaler.linear(textScale)),
       child: child!,
     ),
   );

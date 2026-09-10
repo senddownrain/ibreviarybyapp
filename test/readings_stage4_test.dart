@@ -239,8 +239,29 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('XXIII звычайны тыдзень, серада'), findsOneWidget);
+    expect(find.text('23 звычайны тыдзень, серада'), findsOneWidget);
     expect(find.text('Сырая назва набору'), findsNothing);
+  });
+
+  testWidgets('liturgical route formats its title with an Arabic week number', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_TestSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(_loader(const [])),
+        ],
+        child: const MaterialApp(
+          home: ReadingsScreen(liturgicalKey: 'ordinary/23/4'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('23 звычайны тыдзень, серада'), findsOneWidget);
+    expect(find.textContaining('тыд. 23'), findsNothing);
   });
 
   testWidgets('synthetic fallback keeps alleluia text and lone alt chorus', (
@@ -276,6 +297,11 @@ void main() {
   testWidgets('a reading sentence opens an accessible color palette', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     const reading = ParsedReading(
       id: 'sentence-highlight-fixture',
       title: 'Вылучэнне сказаў',
@@ -319,6 +345,10 @@ void main() {
     );
     expect(find.byKey(const Key('readings-highlight-clear')), findsOneWidget);
     expect(find.byKey(const Key('readings-highlight-cancel')), findsOneWidget);
+    final paletteBottom = tester
+        .getBottomRight(find.byKey(const Key('readings-highlight-cancel')))
+        .dy;
+    expect(paletteBottom, lessThanOrEqualTo(800 - 56 - 8));
   });
 
   testWidgets('options separate groups and expose only selectable cycles', (
@@ -393,7 +423,9 @@ void main() {
     expect(find.byKey(const Key('readings-manual-cycle-marker')), findsNothing);
   });
 
-  testWidgets('Today changes only Readings branch date', (tester) async {
+  testWidgets('Today moves Readings and Hours to the same date', (
+    tester,
+  ) async {
     final container = ProviderContainer(
       overrides: [
         settingsProvider.overrideWith(_TestSettingsNotifier.new),
@@ -438,7 +470,10 @@ void main() {
       ),
       isTrue,
     );
-    expect(container.read(selectedDateProvider), DateTime(2026, 9, 17));
+    expect(
+      DateUtils.isSameDay(container.read(selectedDateProvider), DateTime.now()),
+      isTrue,
+    );
   });
 }
 

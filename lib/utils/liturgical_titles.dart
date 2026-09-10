@@ -42,9 +42,14 @@ String formatLiturgicalPeriodTitle({
   required int? periodWeek,
   required int? dayOfWeek,
   required DateTime date,
+  bool useArabicWeekNumber = false,
 }) {
   final dayName = weekdayLabelMap[dayOfWeek] ?? '';
-  final week = toRomanNumeral(periodWeek);
+  final week = periodWeek == null || periodWeek < 1
+      ? ''
+      : useArabicWeekNumber
+      ? periodWeek.toString()
+      : toRomanNumeral(periodWeek);
 
   if (periodType == 'christmas' && isChristmasOctaveDate(date)) {
     return '$dayName у Актаве Нараджэння Пана'.trim();
@@ -89,6 +94,7 @@ String liturgicalReadingPeriodTitle(ParsedReading reading, DateTime date) {
     periodWeek: reading.periodWeekNumber,
     dayOfWeek: reading.dayOfWeek,
     date: date,
+    useArabicWeekNumber: true,
   );
 }
 

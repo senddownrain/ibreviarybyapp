@@ -22,10 +22,17 @@ class MyPrayersScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar.text('Мае малітвы'),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/prayers/prayer/add'),
-        tooltip: 'Новая малітва',
-        child: const PhosphorIcon(PhosphorIconsRegular.plus, size: 24),
+      // The app dock belongs to the parent Scaffold. With extendBody enabled,
+      // its height is exposed here as MediaQuery.padding.bottom, but a nested
+      // Scaffold does not apply that padding to its FAB automatically.
+      floatingActionButton: Padding(
+        key: const Key('my-prayers-add-button-inset'),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+        child: FloatingActionButton(
+          onPressed: () => context.push('/prayers/prayer/add'),
+          tooltip: 'Новая малітва',
+          child: const PhosphorIcon(PhosphorIconsRegular.plus, size: 24),
+        ),
       ),
       body: AmbientWash(
         seasonColor: seasonColor,

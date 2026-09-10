@@ -1556,6 +1556,7 @@ class _HtmlOrText extends StatelessWidget {
         color: reader.muted,
         margin: Margins.only(bottom: 7),
       ),
+      '.psalm-metadata': Style(textAlign: TextAlign.center),
       '.liturgical-heading': Style(
         fontSize: FontSize((baseSize * 0.98).clamp(15, double.infinity)),
         lineHeight: LineHeight(1.3),
