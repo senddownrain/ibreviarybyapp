@@ -284,13 +284,19 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         if (isMass)
           'em': Style(color: reader.rubric, fontStyle: FontStyle.italic),
         '.prayer-rubric': Style(
-          color: reader.rubric,
+          color: textColor,
           fontStyle: FontStyle.italic,
-          fontSize: FontSize((textStyle.fontSize ?? 16) * 0.86),
+          fontSize: FontSize((textStyle.fontSize ?? 16) * 0.90),
           lineHeight: LineHeight(1.45),
           margin: Margins.symmetric(vertical: 14),
           padding: HtmlPaddings.only(left: 13, top: 1, bottom: 1),
           border: Border(left: BorderSide(color: reader.rubric, width: 3)),
+        ),
+        '.prayer-rubric p': Style(
+          color: textColor,
+          fontStyle: FontStyle.italic,
+          fontSize: FontSize((textStyle.fontSize ?? 16) * 0.90),
+          lineHeight: LineHeight(1.45),
         ),
         '.psalm-marker': Style(
           color: reader.rubric,

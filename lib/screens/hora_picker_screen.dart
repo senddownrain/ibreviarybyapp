@@ -211,6 +211,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     final periodLabel = liturgicalDayPeriodLabel(day);
     final psalterLabel = liturgicalDayPsalterLabel(day, widget.date);
     final rankLabel = liturgicalDayRankLabel(day);
+    final placeLabel = liturgicalDayPlaceLabel(day);
     final dayColor = liturgicalColorForDay(day);
     final dateKey = _readingsDateKey();
 
@@ -321,6 +322,12 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                                           fontWeight: FontWeight.w700,
                                         ),
                                   ),
+                                ),
+                              if (placeLabel.isNotEmpty)
+                                Text(
+                                  placeLabel,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: cs.onSurfaceVariant),
                                 ),
                             ],
                           ),

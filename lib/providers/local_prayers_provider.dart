@@ -4,6 +4,7 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 
 const _kLocalPrefix = 'local_';
+const localPrayerTextFormat = 'mybrev-markdown';
 
 class LocalPrayersNotifier extends Notifier<List<Prayer>> {
   @override
@@ -32,12 +33,14 @@ class LocalPrayersNotifier extends Notifier<List<Prayer>> {
     required String title,
     String? body,
     List<String> tags = const [],
+    String? textFormat = localPrayerTextFormat,
   }) async {
     final id = '$_kLocalPrefix${DateTime.now().millisecondsSinceEpoch}';
     final prayer = Prayer(
       id: id,
       title: title,
       body: body,
+      textFormat: textFormat,
       tags: tags,
       isLocal: true,
     );

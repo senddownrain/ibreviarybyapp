@@ -6,6 +6,7 @@ String prayerMarkdownToHtml(String source) {
   final out = StringBuffer();
   var inRubric = false;
   var paragraph = <String>[];
+  String? activeList;
 
   void flushParagraph() {
     if (paragraph.isEmpty) return;
@@ -14,18 +15,26 @@ String prayerMarkdownToHtml(String source) {
     paragraph = [];
   }
 
+  void flushList() {
+    if (activeList == null) return;
+    out.writeln('</$activeList>');
+    activeList = null;
+  }
+
   for (final rawLine in lines) {
     final line = rawLine.trimRight();
     final trimmed = line.trim();
 
     if (trimmed == ':::rubric') {
       flushParagraph();
+      flushList();
       inRubric = true;
       out.writeln('<div class="prayer-rubric">');
       continue;
     }
     if (trimmed == ':::' && inRubric) {
       flushParagraph();
+      flushList();
       inRubric = false;
       out.writeln('</div>');
       continue;
@@ -34,6 +43,7 @@ String prayerMarkdownToHtml(String source) {
     final heading = RegExp(r'^(#{2,6})\s+(.+)$').firstMatch(trimmed);
     if (heading != null) {
       flushParagraph();
+      flushList();
       final level = heading.group(1)!.length;
       out.writeln('<h$level>${_inlineMd(heading.group(2)!)}</h$level>');
       continue;
@@ -42,19 +52,28 @@ String prayerMarkdownToHtml(String source) {
     final list = RegExp(r'^([-+*]|\d+[.)])\s+(.+)$').firstMatch(trimmed);
     if (list != null) {
       flushParagraph();
-      out.writeln('<p>• ${_inlineMd(list.group(2)!)}</p>');
+      final listType = RegExp(r'^\d').hasMatch(list.group(1)!) ? 'ol' : 'ul';
+      if (activeList != listType) {
+        flushList();
+        activeList = listType;
+        out.writeln('<$listType>');
+      }
+      out.writeln('<li>${_inlineMd(list.group(2)!)}</li>');
       continue;
     }
 
     if (trimmed.isEmpty) {
       flushParagraph();
+      flushList();
       continue;
     }
 
+    flushList();
     paragraph.add(_inlineMd(line));
   }
 
   flushParagraph();
+  flushList();
   if (inRubric) out.writeln('</div>');
   return out.toString();
 }

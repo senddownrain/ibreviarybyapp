@@ -146,6 +146,36 @@ String liturgicalDayRankLabel(LiturgicalDay day) {
   return feastTypeLabelMap[rank] ?? rank;
 }
 
+List<String> liturgicalDayPlaces(LiturgicalDay day) {
+  final raw = day.data['_place'];
+  final values = raw is Iterable && raw is! String ? raw : [raw];
+  final places = <String>[];
+  final seen = <String>{};
+  for (final value in values) {
+    final place = (value?.toString() ?? '')
+        .replaceAll(RegExp(r'<[^>]+>'), '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (place.isEmpty || !seen.add(place.toLowerCase())) continue;
+    places.add(place);
+  }
+  return places;
+}
+
+String liturgicalDayPlaceLabel(LiturgicalDay day) =>
+    liturgicalDayPlaces(day).join(', ');
+
+List<String> mergedLiturgicalDayPlaces(Iterable<LiturgicalDay> days) {
+  final places = <String>[];
+  final seen = <String>{};
+  for (final day in days) {
+    for (final place in liturgicalDayPlaces(day)) {
+      if (seen.add(place.toLowerCase())) places.add(place);
+    }
+  }
+  return places;
+}
+
 String liturgicalDayPsalterLabel(LiturgicalDay day, DateTime date) {
   final periodType = day.periodType ?? day.field('_periodType') ?? '';
   final periodWeek =

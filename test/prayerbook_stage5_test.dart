@@ -495,6 +495,29 @@ void main() {
     expect(find.text('Захаваць змены'), findsOneWidget);
   });
 
+  testWidgets('local prayer editor formats text and shows preview', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(const PrayerFormScreen(prayerId: 'local_one')),
+    );
+    await tester.pump();
+
+    final bodyField = find.byKey(const Key('prayer-body-field'));
+    final controller = tester.widget<TextFormField>(bodyField).controller!;
+    controller.selection = const TextSelection(baseOffset: 0, extentOffset: 8);
+    await tester.tap(find.byKey(const Key('prayer-format-bold')));
+    await tester.pump();
+
+    expect(controller.text, startsWith('**Асабісты**'));
+
+    await tester.tap(find.byKey(const Key('prayer-markdown-preview-toggle')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('prayer-markdown-preview')), findsOneWidget);
+    expect(find.byKey(const Key('prayer-body-field')), findsNothing);
+  });
+
   testWidgets('Prayerbook remains usable at 200 percent system text', (
     tester,
   ) async {

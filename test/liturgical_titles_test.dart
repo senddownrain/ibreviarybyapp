@@ -70,4 +70,35 @@ void main() {
       '12 звычайны тыдзень, аўторак',
     );
   });
+
+  test('formats one or several liturgical places without duplicates', () {
+    final day = LiturgicalDay.fromMap({
+      'id': 'local-celebration',
+      '_place': ['Мінск', 'Гродна', ' мінск '],
+    });
+
+    expect(liturgicalDayPlaces(day), ['Мінск', 'Гродна']);
+    expect(liturgicalDayPlaceLabel(day), 'Мінск, Гродна');
+  });
+
+  test('formats a scalar liturgical place', () {
+    final day = LiturgicalDay.fromMap({
+      'id': 'local-celebration',
+      '_place': 'Пінская дыяцэзія',
+    });
+
+    expect(liturgicalDayPlaceLabel(day), 'Пінская дыяцэзія');
+  });
+
+  test('combines places from grouped celebrations of the same rank', () {
+    final variants = [
+      LiturgicalDay.fromMap({'id': 'one', '_place': 'Мінск'}),
+      LiturgicalDay.fromMap({
+        'id': 'two',
+        '_place': ['Гродна', 'МІНСК'],
+      }),
+    ];
+
+    expect(mergedLiturgicalDayPlaces(variants), ['Мінск', 'Гродна']);
+  });
 }

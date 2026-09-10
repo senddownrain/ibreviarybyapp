@@ -1,7 +1,7 @@
 name: mybrev_flutter
 description: "Малітоўнік — беларускі каталіцкі малітвоўнік"
 publish_to: 'none'
-version: 1.0.0+3
+version: 1.0.0+5
 
 environment:
   sdk: ^3.10.8

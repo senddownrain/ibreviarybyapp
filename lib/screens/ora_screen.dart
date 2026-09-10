@@ -493,11 +493,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final periodLabel = liturgicalDayPeriodLabel(day);
     final psalterLabel = liturgicalDayPsalterLabel(day, widget.date);
     final rankLabel = liturgicalDayRankLabel(day);
+    final placeLabel = liturgicalDayPlaceLabel(day);
     final feastComment = (day.feastComment ?? '').trim();
     final contextSummary = [
       if (periodLabel.isNotEmpty) periodLabel,
       if (psalterLabel.isNotEmpty) psalterLabel,
       if (rankLabel.isNotEmpty) rankLabel,
+      if (placeLabel.isNotEmpty) placeLabel,
     ].join(' · ');
     final header = ReaderContextHeader(
       accentColor: accent,

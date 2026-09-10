@@ -150,7 +150,13 @@ class LiturgicalContentService {
       fixedGroups.putIfAbsent(_fixedKey(day), () => []).add(day);
     }
     for (final variants in fixedGroups.values) {
-      final day = variants.first;
+      final places = mergedLiturgicalDayPlaces(variants);
+      LiturgicalDay withGroupPlaces(LiturgicalDay value) {
+        if (places.isEmpty) return value;
+        return LiturgicalDay.fromMap(value.toMap()..['_place'] = places);
+      }
+
+      final day = withGroupPlaces(variants.first);
       final templateGroups = <String, List<LiturgicalDay>>{};
       for (final variant in variants) {
         templateGroups
@@ -158,7 +164,7 @@ class LiturgicalContentService {
             .add(variant);
       }
       final templates = templateGroups.values.map((group) {
-        final templateDay = group.first;
+        final templateDay = withGroupPlaces(group.first);
         return DayTemplate(
           id: templateDay.id,
           label: _templateLabel(templateDay),
@@ -213,7 +219,10 @@ class LiturgicalContentService {
   }) => DayOption(
     source: source,
     title: _stripHtml(title),
-    subtitle: subtitle,
+    subtitle: [
+      subtitle,
+      liturgicalDayPlaceLabel(day),
+    ].where((part) => part.trim().isNotEmpty).join(' · '),
     day: day,
     key: '${source.name}-${day.id}',
     order: order,
