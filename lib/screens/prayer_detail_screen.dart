@@ -16,6 +16,7 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
@@ -309,7 +310,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
       }
       return Html(data: formattedHtml, style: styles);
     }
-    return SelectableText(raw, style: textStyle);
+    return SelectableText(hyphenateReaderText(raw), style: textStyle);
   }
 }
 

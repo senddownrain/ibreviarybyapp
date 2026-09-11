@@ -20,6 +20,14 @@ const _romanDigits = <(int, String)>[
   (1, 'I'),
 ];
 
+const _liturgicalPlaceLabels = <String, String>{
+  'grodno': 'Гродзенская дыяцэзія',
+  'hrodna': 'Гродзенская дыяцэзія',
+  'pinsk': 'Пінская дыяцэзія',
+  'vitebsk': 'Віцебская дыяцэзія',
+  'minsk-mohilev': 'Мінска-Магілёўская архідыяцэзія',
+};
+
 String toRomanNumeral(int? value) {
   if (value == null || value < 1) return '';
   var remaining = value;
@@ -152,10 +160,11 @@ List<String> liturgicalDayPlaces(LiturgicalDay day) {
   final places = <String>[];
   final seen = <String>{};
   for (final value in values) {
-    final place = (value?.toString() ?? '')
+    final rawPlace = (value?.toString() ?? '')
         .replaceAll(RegExp(r'<[^>]+>'), '')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
+    final place = _liturgicalPlaceLabels[rawPlace.toLowerCase()] ?? rawPlace;
     if (place.isEmpty || !seen.add(place.toLowerCase())) continue;
     places.add(place);
   }

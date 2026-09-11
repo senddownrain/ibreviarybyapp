@@ -9,6 +9,7 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 String _stripHtml(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -165,6 +166,6 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
         },
       );
     }
-    return SelectableText(text, style: textStyle);
+    return SelectableText(hyphenateReaderText(text), style: textStyle);
   }
 }

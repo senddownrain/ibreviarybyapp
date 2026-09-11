@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
@@ -176,6 +177,37 @@ void main() {
     expect(find.byKey(const ValueKey('prayer-row-morning')), findsOneWidget);
     expect(find.byKey(const ValueKey('prayer-row-evening')), findsOneWidget);
     expect(find.byKey(const ValueKey('prayer-row-local_one')), findsOneWidget);
+  });
+
+  testWidgets('prayer catalog owns the contextual bottom slot', (tester) async {
+    const descriptor = AppRouteDescriptor(
+      id: 'prayer-list-test',
+      branch: AppBranch.prayerbook,
+      defaultChromeMode: ReaderChromeMode.full,
+      topChromeOwner: TopChromeOwner.reader,
+    );
+    const entry = AppRouteEntry(
+      id: 'prayer-list-entry',
+      descriptor: descriptor,
+    );
+    final controller = BranchShellController(AppBranch.prayerbook, descriptor)
+      ..activate(entry);
+
+    await tester.pumpWidget(
+      _app(
+        AppRouteEntryScope(
+          entry: entry,
+          controller: controller,
+          child: const PrayerCatalogScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(controller.navigationDockSuppressed, isTrue);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    expect(controller.navigationDockSuppressed, isFalse);
+    controller.dispose();
   });
 
   testWidgets('search focuses, filters title/body, and keeps query state', (

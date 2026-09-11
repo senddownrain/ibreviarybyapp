@@ -56,25 +56,35 @@ class AppNavigationDock extends StatelessWidget {
     return SizedBox(
       key: platformKey,
       height: (mode == ReaderChromeMode.full ? 78 : 70) + bottom,
-      child: SafeArea(
-        top: false,
-        minimum: const EdgeInsets.fromLTRB(12, 6, 12, 8),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: mode == ReaderChromeMode.full
-              ? _FullDock(
-                  activeBranch: activeBranch,
-                  items: _items,
-                  seasonColor: seasonColor,
-                  onSelect: onSelect,
-                )
-              : _CompactDock(
-                  branch: activeBranch,
-                  item: _items[activeBranch.index],
-                  seasonColor: seasonColor,
-                  onExpand: onExpand,
-                ),
-        ),
+      child: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: mode == ReaderChromeMode.full
+                    ? _FullDock(
+                        activeBranch: activeBranch,
+                        items: _items,
+                        seasonColor: seasonColor,
+                        onSelect: onSelect,
+                      )
+                    : _CompactDock(
+                        branch: activeBranch,
+                        item: _items[activeBranch.index],
+                        seasonColor: seasonColor,
+                        onExpand: onExpand,
+                      ),
+              ),
+            ),
+          ),
+          SizedBox(
+            key: const Key('app-dock-system-navigation-strip'),
+            height: bottom,
+            child: const ColoredBox(color: Colors.transparent),
+          ),
+        ],
       ),
     );
   }

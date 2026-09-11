@@ -24,6 +24,7 @@ class DayOption {
   final LiturgicalOptionSource source;
   final String title;
   final String? subtitle;
+  final String? placeLabel;
   final LiturgicalDay? day;
   final int order;
   final bool disabled;
@@ -37,6 +38,7 @@ class DayOption {
     required this.key,
     required this.contextPeriodType,
     this.subtitle,
+    this.placeLabel,
     this.day,
     this.order = 0,
     this.disabled = false,
@@ -45,6 +47,13 @@ class DayOption {
 
   String? get dayId => day?.id;
   bool get hasLiturgicalDay => day != null;
+  String? get displaySubtitle {
+    final value = [
+      subtitle,
+      placeLabel,
+    ].whereType<String>().where((part) => part.trim().isNotEmpty).join(' · ');
+    return value.isEmpty ? null : value;
+  }
 }
 
 class LiturgicalContentService {
@@ -219,10 +228,8 @@ class LiturgicalContentService {
   }) => DayOption(
     source: source,
     title: _stripHtml(title),
-    subtitle: [
-      subtitle,
-      liturgicalDayPlaceLabel(day),
-    ].where((part) => part.trim().isNotEmpty).join(' · '),
+    subtitle: subtitle,
+    placeLabel: liturgicalDayPlaceLabel(day),
     day: day,
     key: '${source.name}-${day.id}',
     order: order,

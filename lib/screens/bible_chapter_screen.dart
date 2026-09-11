@@ -16,6 +16,7 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
+import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -741,7 +742,7 @@ class _VerseRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                  TextSpan(text: text),
+                  TextSpan(text: hyphenateReaderText(text)),
                 ],
               ),
             ),

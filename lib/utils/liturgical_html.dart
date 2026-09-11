@@ -1,3 +1,7 @@
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' show parseFragment;
+import 'package:mybrev_flutter/utils/text_hyphenation.dart';
+
 /// Semantic preparation for legacy liturgical HTML.
 ///
 /// The web application styles psalm metadata, strophes and cadence signs
@@ -46,10 +50,12 @@ String _markCadenceInText(String text) => text.replaceAllMapped(
   (match) => '<span class="psalm-marker">${match.group(0)}</span>',
 );
 
-String formatLiturgicalHtml(String html) => markLiturgicalCadenceSigns(
-  _normalizeLegacyPresentation(
-    _normalizeRubricColors(
-      _markInlineReadingReference(_markLeadingMetadata(html)),
+String formatLiturgicalHtml(String html) => hyphenateReaderHtml(
+  markLiturgicalCadenceSigns(
+    _normalizeLegacyPresentation(
+      _normalizeRubricColors(
+        _markInlineReadingReference(_markLeadingMetadata(html)),
+      ),
     ),
   ),
 );
@@ -86,10 +92,12 @@ String formatPsalmHtml(String html) {
     }).join();
   });
 
-  return markLiturgicalCadenceSigns(
-    _normalizeLegacyPresentation(
-      _normalizeRubricColors(
-        _markLeadingMetadata(value, limit: null, psalmMetadata: true),
+  return hyphenateReaderHtml(
+    markLiturgicalCadenceSigns(
+      _normalizeLegacyPresentation(
+        _normalizeRubricColors(
+          _markLeadingMetadata(value, limit: null, psalmMetadata: true),
+        ),
       ),
     ),
   );
@@ -313,16 +321,83 @@ bool ownsStructuredPsalmPackage(String html) =>
 /// Removes only the legacy structural label already supplied by composition.
 /// Source/reference/body content following a break remains intact.
 String stripLeadingReadingHeading(String html, String structuralLabel) {
-  final canonical = structuralLabel.toLowerCase().contains('другое')
-      ? 'ДРУГОЕ ЧЫТАННЕ'
-      : 'ПЕРШАЕ ЧЫТАННЕ';
-  return html.replaceFirst(
-    RegExp(
-      '^\\s*(?:<[^>]+>\\s*)*${RegExp.escape(canonical)}\\s*(?:<br\\s*/?>|</p>)\\s*',
-      caseSensitive: false,
-    ),
-    '',
+  final expected = _normalizeVisible(structuralLabel);
+  final fragment = parseFragment(html);
+
+  // The legacy heading is sometimes its own paragraph and sometimes the
+  // first line of a styled paragraph. Parsing first makes encoded spaces
+  // (&#x20;, &#32; and &nbsp;) ordinary whitespace and keeps nested spans valid.
+  final standalone = fragment
+      .querySelectorAll('p, h1, h2, h3, h4, h5, h6')
+      .where((element) => _normalizeVisible(element.text) == expected)
+      .firstOrNull;
+  if (standalone != null && _hasNoVisibleTextBefore(fragment, standalone)) {
+    standalone.remove();
+    return fragment.outerHtml;
+  }
+
+  final firstBreak = fragment.querySelector('br');
+  if (firstBreak == null) return html;
+  dom.Node lineRoot = fragment;
+  var ancestor = firstBreak.parentNode;
+  while (ancestor != null && ancestor != fragment) {
+    if (ancestor is dom.Element &&
+        const {'p', 'div', 'li'}.contains(ancestor.localName)) {
+      lineRoot = ancestor;
+      break;
+    }
+    ancestor = ancestor.parentNode;
+  }
+
+  final beforeBreak = <dom.Text>[];
+  var reachedBreak = false;
+  void collect(dom.Node node) {
+    if (reachedBreak) return;
+    if (identical(node, firstBreak)) {
+      reachedBreak = true;
+      return;
+    }
+    if (node is dom.Text) beforeBreak.add(node);
+    for (final child in node.nodes.toList()) {
+      collect(child);
+      if (reachedBreak) return;
+    }
+  }
+
+  collect(lineRoot);
+  final firstLine = _normalizeVisible(
+    beforeBreak.map((node) => node.data).join(' '),
   );
+  if (firstLine != expected || !_hasNoVisibleTextBefore(fragment, lineRoot)) {
+    return html;
+  }
+
+  for (final node in beforeBreak) {
+    node.remove();
+  }
+  firstBreak.remove();
+  return fragment.outerHtml;
+}
+
+bool _hasNoVisibleTextBefore(dom.Node root, dom.Node target) {
+  var reachedTarget = false;
+  final text = StringBuffer();
+
+  void visit(dom.Node node) {
+    if (reachedTarget) return;
+    if (identical(node, target)) {
+      reachedTarget = true;
+      return;
+    }
+    if (node is dom.Text) text.write(node.data);
+    for (final child in node.nodes) {
+      visit(child);
+      if (reachedTarget) return;
+    }
+  }
+
+  visit(root);
+  return reachedTarget && _normalizeVisible(text.toString()).isEmpty;
 }
 
 bool _fullyWrapped(String content, RegExp pattern) {

@@ -19,6 +19,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
@@ -241,6 +242,9 @@ class _Celebration extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final semantic = _semanticInk(context, color);
+    final placeLabel = option.day == null
+        ? ''
+        : liturgicalDayPlaceLabel(option.day!);
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -277,6 +281,26 @@ class _Celebration extends StatelessWidget {
                       .displayTitle(29)
                       .copyWith(color: cs.onSurface, height: 1.18),
                 ),
+                if (placeLabel.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
+                        color: cs.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          placeLabel,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: cs.onSurfaceVariant),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -688,9 +712,9 @@ class _AlternativesSheet extends ConsumerWidget {
                               RadioListTile<String>(
                                 value: option.key,
                                 title: Text(option.title),
-                                subtitle: option.subtitle == null
+                                subtitle: option.displaySubtitle == null
                                     ? null
-                                    : Text(option.subtitle!),
+                                    : Text(option.displaySubtitle!),
                               ),
                           ],
                         ),

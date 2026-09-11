@@ -199,7 +199,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   'Малітвы і статычныя зборнікі загружаюцца цалкам. '
                   'Дні і чытанні — толькі на бліжэйшыя даты (каля 2 месяцаў), '
-                  'каб не цягнуць усю базу.',
+                  'каб не цягнуць усю базу. Ручная сінхранізацыя заўсёды '
+                  'абнаўляе лакальныя копіі з сервера.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),

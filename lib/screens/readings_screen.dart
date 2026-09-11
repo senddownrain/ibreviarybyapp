@@ -27,6 +27,7 @@ import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
+import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 const _highlightColors = <String, Color>{
   'amber': Color(0xFFE2AE34),
@@ -1189,12 +1190,9 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(top: 24, bottom: 8),
       child: Text(
         _readingLabel(text),
-        style: TextStyle(
-          fontSize: (base * 0.90).clamp(14, double.infinity),
-          fontWeight: FontWeight.w600,
-          fontFamily: textStyle?.fontFamily,
-          color: rubric.rubric,
-        ),
+        style: rubric
+            .blockHeading(base)
+            .copyWith(fontFamily: textStyle?.fontFamily),
       ),
     );
   }
@@ -1296,7 +1294,7 @@ class _ReadingTextState extends State<_ReadingText> {
             lineHeight: LineHeight(1.78),
             textAlign: TextAlign.left,
           ),
-          'p': Style(margin: Margins.only(bottom: 14)),
+          'p': Style(margin: Margins.only(bottom: 8)),
           '.liturgical-subheading': Style(
             fontSize: FontSize((base * 0.88).clamp(14, double.infinity)),
             lineHeight: LineHeight(1.45),
@@ -1335,7 +1333,9 @@ class _ReadingTextState extends State<_ReadingText> {
                   RegExp(r'(?=[*†])|(?<=[*†])'),
                 ))
                   TextSpan(
-                    text: piece,
+                    text: piece == '*' || piece == '†'
+                        ? piece
+                        : hyphenateReaderText(piece),
                     recognizer: namespace == null
                         ? null
                         : _recognizerFor('$namespace:${sentence.index}'),

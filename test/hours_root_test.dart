@@ -170,6 +170,24 @@ void main() {
     expect(find.text('2026-09-08 / primary / laudes'), findsOneWidget);
   });
 
+  testWidgets('local celebration shows its Belarusian diocese name', (
+    tester,
+  ) async {
+    final date = DateTime(2026, 9, 8);
+    final option = _option(
+      'local',
+      fields: {'_place': 'grodno', 'laudesAnt1': 'available'},
+    );
+    final router = _hoursRouter(date: date, options: [option]);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_testApp(router, date, [option]));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Гродзенская дыяцэзія'), findsOneWidget);
+    expect(find.text('grodno'), findsNothing);
+  });
+
   testWidgets('alternatives sheet updates the selected celebration in place', (
     tester,
   ) async {

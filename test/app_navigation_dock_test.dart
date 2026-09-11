@@ -46,6 +46,12 @@ void main() {
       for (final label in ['Літургія', 'Чытанні', 'Малітоўнік', 'Біблія']) {
         expect(find.text(label), findsOneWidget);
       }
+      expect(
+        tester
+            .getSize(find.byKey(const Key('app-dock-system-navigation-strip')))
+            .height,
+        24,
+      );
       expect(tester.takeException(), isNull);
     }
   });

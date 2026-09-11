@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,7 +128,9 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
     );
 
     try {
-      await CacheWarmupService().warmup();
+      // An explicit user sync must bypass both Hive and Firestore's local
+      // persistence so already-cached documents are actually replaced.
+      await CacheWarmupService().warmupExtended(forceRefresh: true);
       await HiveService.setLastSync('days', DateTime.now());
       await HiveService.setLastSync('readings', DateTime.now());
       ref.read(cacheEpochProvider.notifier).state++;
@@ -154,15 +154,6 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
       currentDocCount: null,
       error: null,
     );
-
-    unawaited(() async {
-      try {
-        await CacheWarmupService().warmupExtended();
-        ref.read(cacheEpochProvider.notifier).state++;
-      } catch (e) {
-        if (kDebugMode) debugPrint('[Sync] extended warmup failed: $e');
-      }
-    }());
   }
 
   Future<void> _syncCollections(

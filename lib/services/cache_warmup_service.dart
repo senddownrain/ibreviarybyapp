@@ -42,7 +42,7 @@ class CacheWarmupService {
     return offsets.map((o) => start.add(Duration(days: o))).toList();
   }
 
-  Future<void> warmup({DateTime? baseDate}) async {
+  Future<void> warmup({DateTime? baseDate, bool forceRefresh = false}) async {
     final base = baseDate ?? DateTime.now();
     await ReadingsIndex.ensureBuilt();
 
@@ -60,10 +60,16 @@ class CacheWarmupService {
     for (var index = 0; index < dates.length; index += kDateBatchSize) {
       final batch = dates.skip(index).take(kDateBatchSize).toList();
       final results = await Future.wait(
-        batch.map(warmupDate),
+        batch.map((date) => warmupDate(date, forceRefresh: forceRefresh)),
         eagerError: false,
       );
       loaded += results.where((ok) => ok).length;
+    }
+
+    if (forceRefresh && loaded != dates.length) {
+      throw StateError(
+        'Server refresh incomplete: $loaded/${dates.length} dates',
+      );
     }
 
     if (dates.isNotEmpty) {
@@ -77,7 +83,10 @@ class CacheWarmupService {
   }
 
   /// Wider background prefetch (month ahead) — does not block UI.
-  Future<void> warmupExtended({DateTime? baseDate}) async {
+  Future<void> warmupExtended({
+    DateTime? baseDate,
+    bool forceRefresh = false,
+  }) async {
     final base = baseDate ?? DateTime.now();
     await ReadingsIndex.ensureBuilt();
 
@@ -98,10 +107,16 @@ class CacheWarmupService {
     for (var index = 0; index < dates.length; index += kDateBatchSize) {
       final batch = dates.skip(index).take(kDateBatchSize).toList();
       final results = await Future.wait(
-        batch.map(warmupDate),
+        batch.map((date) => warmupDate(date, forceRefresh: forceRefresh)),
         eagerError: false,
       );
       loaded += results.where((ok) => ok).length;
+    }
+
+    if (forceRefresh && loaded != dates.length) {
+      throw StateError(
+        'Extended server refresh incomplete: $loaded/${dates.length} dates',
+      );
     }
 
     if (dates.isNotEmpty) {
@@ -116,7 +131,7 @@ class CacheWarmupService {
     }
   }
 
-  Future<bool> warmupDate(DateTime date) async {
+  Future<bool> warmupDate(DateTime date, {bool forceRefresh = false}) async {
     try {
       final opts = _calendar.getYearOptionsCached(date.year);
       final nextOpts = _calendar.getYearOptionsCached(date.year + 1);
@@ -135,6 +150,7 @@ class CacheWarmupService {
           opts,
           nextOpts,
           dynamicDates,
+          forceRefresh: forceRefresh,
           includeAlternatives: true,
         ),
         _days.prefetchForDate(
@@ -143,6 +159,7 @@ class CacheWarmupService {
           periodWeek: context.periodWeek,
           dayOfWeek: context.dayOfWeek,
           feastCodes: feastCodes,
+          forceRefresh: forceRefresh,
         ),
       ];
       if (context.periodType == 'christmas') {
@@ -153,7 +170,12 @@ class CacheWarmupService {
         );
         if (psalterWeek != null) {
           requests.add(
-            _days.findDayByPeriod('advent', psalterWeek, context.dayOfWeek),
+            _days.findDayByPeriod(
+              'advent',
+              psalterWeek,
+              context.dayOfWeek,
+              forceRefresh: forceRefresh,
+            ),
           );
         }
       }

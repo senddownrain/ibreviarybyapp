@@ -158,6 +158,28 @@ void main() {
     expect(result, contains('Браты.'));
   });
 
+  test('encoded reading labels are removed from styled first lines', () {
+    const first =
+        '<p style="text-align: justify;"><span style="color: #ff0000;">'
+        'Першае чытанне&#x20;<br />Кніга Прарока</span></p>';
+    const second =
+        '<p><span>Другое&nbsp;чытанне&#32;</span><br>'
+        '<span>Ліст святога</span></p>';
+
+    final firstResult = stripLeadingReadingHeading(first, 'Першае чытанне');
+    final secondResult = stripLeadingReadingHeading(second, 'Другое чытанне');
+
+    expect(firstResult, isNot(contains('Першае чытанне')));
+    expect(firstResult, contains('Кніга Прарока'));
+    expect(secondResult, isNot(contains('Другое')));
+    expect(secondResult, contains('Ліст святога'));
+  });
+
+  test('reading label elsewhere in the body is preserved', () {
+    const html = '<p>Уводзіны</p><p>Першае чытанне</p>';
+    expect(stripLeadingReadingHeading(html, 'Першае чытанне'), html);
+  });
+
   test('inline reference is marked only in a reading heading context', () {
     final reading = formatLiturgicalHtml(
       '<p>КАРОТКАЕ ЧЫТАННЕ (Рым 8, 1–2) Тэкст.</p>',

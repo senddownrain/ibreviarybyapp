@@ -13,7 +13,6 @@ import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:mybrev_flutter/utils/retry.dart';
 
 const _kReadingsCollection = 'readings';
-const _kLegacyReadingsCollection = 'parsedData';
 
 /// Fetches `readings` collection from Hive cache or Firestore on demand.
 class ParsedReadingsService {
@@ -27,24 +26,29 @@ class ParsedReadingsService {
   CollectionReference<Map<String, dynamic>> _col(String name) =>
       _db.collection(name);
 
-  Future<Map<String, dynamic>?> getReading(String docId) async {
+  Future<Map<String, dynamic>?> getReading(
+    String docId, {
+    bool forceRefresh = false,
+  }) async {
     final cached = HiveService.readingsBox.get(docId);
-    if (cached != null) {
+    if (!forceRefresh && cached != null) {
       return Map<String, dynamic>.from(cached);
     }
-    for (final collection in [
-      _kReadingsCollection,
-      _kLegacyReadingsCollection,
-    ]) {
-      final snap = await retryFirestore(
-        () => _col(collection).doc(docId).get(),
-      );
-      if (!snap.exists) continue;
+    final snap = await retryFirestore(
+      () => _col(_kReadingsCollection)
+          .doc(docId)
+          .get(
+            forceRefresh
+                ? const GetOptions(source: Source.server)
+                : const GetOptions(),
+          ),
+    );
+    if (snap.exists) {
       final data = snap.data()!;
       await cacheReadingDoc(docId, data);
       return data;
     }
-    return null;
+    return cached == null ? null : Map<String, dynamic>.from(cached);
   }
 
   Future<List<ParsedReading>> fetchByLiturgicalKey(
@@ -59,16 +63,16 @@ class ParsedReadingsService {
     }
 
     final merged = <String, ParsedReading>{};
-    for (final collection in [
-      _kReadingsCollection,
-      _kLegacyReadingsCollection,
-    ]) {
-      await _mergeFromQueries(
-        _periodQueries(collection, period, week, day),
-        merged,
-      );
-      if (merged.isNotEmpty) break;
-    }
+    await _mergeFromQueries(
+      _periodQueries(
+        _kReadingsCollection,
+        period,
+        week,
+        day,
+        forceRefresh: forceRefresh,
+      ),
+      merged,
+    );
     return merged.values.toList();
   }
 
@@ -112,46 +116,60 @@ class ParsedReadingsService {
       context,
       feastCodes,
       explicitDayId: dayId,
+      forceRefresh: forceRefresh,
     );
 
     final merged = <String, ParsedReading>{};
-    for (final collection in [
-      _kReadingsCollection,
-      _kLegacyReadingsCollection,
-    ]) {
-      final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[];
+    final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[];
 
-      for (final id in dayIds) {
-        queries.add(_col(collection).where('_dayId', isEqualTo: id).get());
-        queries.add(_col(collection).where('_dayIds', arrayContains: id).get());
-      }
+    for (final id in dayIds) {
+      queries.add(
+        _getQuery(
+          _col(_kReadingsCollection).where('_dayId', isEqualTo: id),
+          forceRefresh: forceRefresh,
+        ),
+      );
+      queries.add(
+        _getQuery(
+          _col(_kReadingsCollection).where('_dayIds', arrayContains: id),
+          forceRefresh: forceRefresh,
+        ),
+      );
+    }
 
-      for (final code in feastCodes) {
-        for (final variant in _feastVariants(code)) {
-          queries.add(
-            _col(collection).where('_feast', isEqualTo: variant).get(),
-          );
-        }
-      }
-
-      queries.add(_col(collection).where('_date', isEqualTo: ddmm).get());
-      final fixedDateOnly =
-          isSeasonalDateException(date, context.periodType) ||
-          isChristmasDateExceptionExclusion(date);
-      if (!fixedDateOnly) {
-        queries.addAll(
-          _periodQueries(
-            collection,
-            context.periodType,
-            context.periodWeek,
-            context.dayOfWeek,
+    for (final code in feastCodes) {
+      for (final variant in _feastVariants(code)) {
+        queries.add(
+          _getQuery(
+            _col(_kReadingsCollection).where('_feast', isEqualTo: variant),
+            forceRefresh: forceRefresh,
           ),
         );
       }
-
-      await _mergeFromQueries(queries, merged);
-      if (merged.isNotEmpty) break;
     }
+
+    queries.add(
+      _getQuery(
+        _col(_kReadingsCollection).where('_date', isEqualTo: ddmm),
+        forceRefresh: forceRefresh,
+      ),
+    );
+    final fixedDateOnly =
+        isSeasonalDateException(date, context.periodType) ||
+        isChristmasDateExceptionExclusion(date);
+    if (!fixedDateOnly) {
+      queries.addAll(
+        _periodQueries(
+          _kReadingsCollection,
+          context.periodType,
+          context.periodWeek,
+          context.dayOfWeek,
+          forceRefresh: forceRefresh,
+        ),
+      );
+    }
+
+    await _mergeFromQueries(queries, merged);
 
     final all = _filterWithContent(merged.values.toList());
     return includeAlternatives
@@ -178,6 +196,7 @@ class ParsedReadingsService {
     LiturgicalContext context,
     List<String> feastCodes, {
     String? explicitDayId,
+    bool forceRefresh = false,
   }) async {
     final ids = <String>{};
     if (explicitDayId != null && explicitDayId.trim().isNotEmpty) {
@@ -195,18 +214,25 @@ class ParsedReadingsService {
       context.periodType,
       context.periodWeek,
       context.dayOfWeek,
+      forceRefresh: forceRefresh,
     );
     if (periodDay != null && periodDay.id.isNotEmpty) {
       ids.add(periodDay.id);
     }
 
     for (final code in feastCodes) {
-      final feastDays = await _days.findDaysByFeast(code);
+      final feastDays = await _days.findDaysByFeast(
+        code,
+        forceRefresh: forceRefresh,
+      );
       ids.addAll(feastDays.map((d) => d.id).where((id) => id.isNotEmpty));
     }
 
-    final fixedDays = await _days.findDaysByFixedDate(date);
-    ids.addAll(fixedDays.map((d) => d.id).where((id) => id.isNotEmpty));
+    final calendarDays = await _days.findDaysByFixedDate(
+      date,
+      forceRefresh: forceRefresh,
+    );
+    ids.addAll(calendarDays.map((d) => d.id).where((id) => id.isNotEmpty));
 
     return ids.toList();
   }
@@ -464,8 +490,9 @@ class ParsedReadingsService {
     String collection,
     String periodType,
     int week,
-    int day,
-  ) {
+    int day, {
+    bool forceRefresh = false,
+  }) {
     final weekValues = week == 0
         ? <Object?>[0, '0', null]
         : <Object?>[week, '$week'];
@@ -474,40 +501,55 @@ class ParsedReadingsService {
     for (final weekValue in weekValues) {
       if (weekValue == null) {
         queries.add(
-          _col(collection)
-              .where('_periodType', isEqualTo: periodType)
-              .where('_periodWeekNumber', isNull: true)
-              .where('_dayOfWeek', isEqualTo: '$day')
-              .get(),
+          _getQuery(
+            _col(collection)
+                .where('_periodType', isEqualTo: periodType)
+                .where('_periodWeekNumber', isNull: true)
+                .where('_dayOfWeek', isEqualTo: '$day'),
+            forceRefresh: forceRefresh,
+          ),
         );
         queries.add(
-          _col(collection)
-              .where('_periodType', isEqualTo: periodType)
-              .where('_periodWeekNumber', isNull: true)
-              .where('_dayOfWeek', isEqualTo: day)
-              .get(),
+          _getQuery(
+            _col(collection)
+                .where('_periodType', isEqualTo: periodType)
+                .where('_periodWeekNumber', isNull: true)
+                .where('_dayOfWeek', isEqualTo: day),
+            forceRefresh: forceRefresh,
+          ),
         );
         continue;
       }
 
       queries.add(
-        _col(collection)
-            .where('_periodType', isEqualTo: periodType)
-            .where('_periodWeekNumber', isEqualTo: '$weekValue')
-            .where('_dayOfWeek', isEqualTo: '$day')
-            .get(),
+        _getQuery(
+          _col(collection)
+              .where('_periodType', isEqualTo: periodType)
+              .where('_periodWeekNumber', isEqualTo: '$weekValue')
+              .where('_dayOfWeek', isEqualTo: '$day'),
+          forceRefresh: forceRefresh,
+        ),
       );
       queries.add(
-        _col(collection)
-            .where('_periodType', isEqualTo: periodType)
-            .where('_periodWeekNumber', isEqualTo: weekValue)
-            .where('_dayOfWeek', isEqualTo: day)
-            .get(),
+        _getQuery(
+          _col(collection)
+              .where('_periodType', isEqualTo: periodType)
+              .where('_periodWeekNumber', isEqualTo: weekValue)
+              .where('_dayOfWeek', isEqualTo: day),
+          forceRefresh: forceRefresh,
+        ),
       );
     }
 
     return queries;
   }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> _getQuery(
+    Query<Map<String, dynamic>> query, {
+    required bool forceRefresh,
+  }) => query.get(
+    forceRefresh ? const GetOptions(source: Source.server) : const GetOptions(),
+  );
 
   static int? _toInt(dynamic v) {
     if (v is int) return v;

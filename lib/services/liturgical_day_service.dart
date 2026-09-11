@@ -9,7 +9,6 @@ import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 import 'package:mybrev_flutter/utils/retry.dart';
 
 const kDaysCollection = 'days';
-const kLegacyDaysCollection = 'fixedDays';
 
 /// Canonical period day ID (mirrors web `getPeriodDayDocumentId`).
 List<String> feastCodeVariants(String code) {
@@ -19,7 +18,7 @@ List<String> feastCodeVariants(String code) {
   ];
 }
 
-/// Firestore access for canonical `days` collection (with `fixedDays` fallback).
+/// Firestore access for the canonical `days` collection.
 class LiturgicalDayService {
   final FirebaseFirestore _db;
 
@@ -29,15 +28,26 @@ class LiturgicalDayService {
   CollectionReference<Map<String, dynamic>> _col(String name) =>
       _db.collection(name);
 
-  Future<LiturgicalDay?> getDayById(String id) async {
+  Future<LiturgicalDay?> getDayById(
+    String id, {
+    bool forceRefresh = false,
+  }) async {
     final cached = HiveService.daysBox.get(id);
-    if (cached != null) {
+    if (!forceRefresh && cached != null) {
       return LiturgicalDay.fromMap(Map<String, dynamic>.from(cached));
     }
 
-    for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
+    for (final collection in [kDaysCollection]) {
       try {
-        final snap = await retryFirestore(() => _col(collection).doc(id).get());
+        final snap = await retryFirestore(
+          () => _col(collection)
+              .doc(id)
+              .get(
+                forceRefresh
+                    ? const GetOptions(source: Source.server)
+                    : const GetOptions(),
+              ),
+        );
         if (!snap.exists) continue;
         final data = {...snap.data()!, 'id': snap.id};
         await cacheDayDoc(snap.id, data);
@@ -50,39 +60,46 @@ class LiturgicalDayService {
         }
       }
     }
-    return null;
+    return cached == null
+        ? null
+        : LiturgicalDay.fromMap(Map<String, dynamic>.from(cached));
   }
 
   /// Prefer canonical doc id, then string/number field queries (web parity).
   Future<LiturgicalDay?> findDayByPeriod(
     String periodType,
     int periodWeek,
-    int dayOfWeek,
-  ) async {
-    final fromHive = _hiveFindPeriod(periodType, periodWeek, dayOfWeek);
+    int dayOfWeek, {
+    bool forceRefresh = false,
+  }) async {
+    final fromHive = forceRefresh
+        ? null
+        : _hiveFindPeriod(periodType, periodWeek, dayOfWeek);
     if (fromHive != null) {
       return _withPeriodPsalterFallback(
         fromHive,
         periodType,
         periodWeek,
         dayOfWeek,
+        forceRefresh: forceRefresh,
       );
     }
 
     final canonicalId = periodDayDocumentId(periodType, periodWeek, dayOfWeek);
     if (canonicalId.isNotEmpty) {
-      final byId = await getDayById(canonicalId);
+      final byId = await getDayById(canonicalId, forceRefresh: forceRefresh);
       if (byId != null) {
         return _withPeriodPsalterFallback(
           byId,
           periodType,
           periodWeek,
           dayOfWeek,
+          forceRefresh: forceRefresh,
         );
       }
     }
 
-    for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
+    for (final collection in [kDaysCollection]) {
       try {
         final results = await retryFirestore(
           () => Future.wait([
@@ -91,13 +108,21 @@ class LiturgicalDayService {
                 .where('_dayOfWeek', isEqualTo: '$dayOfWeek')
                 .where('_periodWeekNumber', isEqualTo: '$periodWeek')
                 .limit(1)
-                .get(),
+                .get(
+                  forceRefresh
+                      ? const GetOptions(source: Source.server)
+                      : const GetOptions(),
+                ),
             _col(collection)
                 .where('_periodType', isEqualTo: periodType)
                 .where('_dayOfWeek', isEqualTo: dayOfWeek)
                 .where('_periodWeekNumber', isEqualTo: periodWeek)
                 .limit(1)
-                .get(),
+                .get(
+                  forceRefresh
+                      ? const GetOptions(source: Source.server)
+                      : const GetOptions(),
+                ),
           ]),
         );
 
@@ -111,6 +136,7 @@ class LiturgicalDayService {
             periodType,
             periodWeek,
             dayOfWeek,
+            forceRefresh: forceRefresh,
           );
         }
       } catch (e, st) {
@@ -124,27 +150,38 @@ class LiturgicalDayService {
     return null;
   }
 
-  Future<List<LiturgicalDay>> findDaysByFeast(String feastCode) async {
+  Future<List<LiturgicalDay>> findDaysByFeast(
+    String feastCode, {
+    bool forceRefresh = false,
+  }) async {
     final results = <String, LiturgicalDay>{};
-    for (final variant in feastCodeVariants(feastCode)) {
-      for (final key in HiveService.daysBox.keys) {
-        final raw = HiveService.daysBox.get(key);
-        if (raw == null) continue;
-        final data = Map<String, dynamic>.from(raw);
-        if (data['_feast']?.toString() == variant) {
-          results[data['id']?.toString() ?? key.toString()] =
-              LiturgicalDay.fromMap(data);
+    if (!forceRefresh) {
+      for (final variant in feastCodeVariants(feastCode)) {
+        for (final key in HiveService.daysBox.keys) {
+          final raw = HiveService.daysBox.get(key);
+          if (raw == null) continue;
+          final data = Map<String, dynamic>.from(raw);
+          if (data['_feast']?.toString() == variant) {
+            results[data['id']?.toString() ?? key.toString()] =
+                LiturgicalDay.fromMap(data);
+          }
         }
       }
     }
     if (results.isNotEmpty) return results.values.toList();
 
-    for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
+    for (final collection in [kDaysCollection]) {
       try {
         final snaps = await retryFirestore(
           () => Future.wait([
             for (final variant in feastCodeVariants(feastCode))
-              _col(collection).where('_feast', isEqualTo: variant).get(),
+              _col(collection)
+                  .where('_feast', isEqualTo: variant)
+                  .get(
+                    forceRefresh
+                        ? const GetOptions(source: Source.server)
+                        : const GetOptions(),
+                  ),
           ]),
         );
         for (final snap in snaps) {
@@ -166,7 +203,10 @@ class LiturgicalDayService {
     return results.values.toList();
   }
 
-  Future<List<LiturgicalDay>> findDaysByFixedDate(DateTime date) async {
+  Future<List<LiturgicalDay>> findDaysByFixedDate(
+    DateTime date, {
+    bool forceRefresh = false,
+  }) async {
     final dM = '${date.day}.${date.month}';
     final ddMm =
         '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
@@ -175,24 +215,32 @@ class LiturgicalDayService {
     };
 
     final results = <String, LiturgicalDay>{};
-    for (final key in HiveService.daysBox.keys) {
-      final raw = HiveService.daysBox.get(key);
-      if (raw == null) continue;
-      final data = Map<String, dynamic>.from(raw);
-      final stored = data['_date']?.toString();
-      if (stored != null && variants.contains(stored)) {
-        results[data['id']?.toString() ?? key.toString()] =
-            LiturgicalDay.fromMap(data);
+    if (!forceRefresh) {
+      for (final key in HiveService.daysBox.keys) {
+        final raw = HiveService.daysBox.get(key);
+        if (raw == null) continue;
+        final data = Map<String, dynamic>.from(raw);
+        final stored = data['_date']?.toString();
+        if (stored != null && variants.contains(stored)) {
+          results[data['id']?.toString() ?? key.toString()] =
+              LiturgicalDay.fromMap(data);
+        }
       }
     }
     if (results.isNotEmpty) return results.values.toList();
 
-    for (final collection in [kDaysCollection, kLegacyDaysCollection]) {
+    for (final collection in [kDaysCollection]) {
       try {
         final snaps = await retryFirestore(
           () => Future.wait([
             for (final v in variants)
-              _col(collection).where('_date', isEqualTo: v).get(),
+              _col(collection)
+                  .where('_date', isEqualTo: v)
+                  .get(
+                    forceRefresh
+                        ? const GetOptions(source: Source.server)
+                        : const GetOptions(),
+                  ),
           ]),
         );
         for (final snap in snaps) {
@@ -221,14 +269,21 @@ class LiturgicalDayService {
     required int periodWeek,
     required int dayOfWeek,
     required List<String> feastCodes,
+    bool forceRefresh = false,
   }) async {
     await Future.wait([
-      findDayByPeriod(periodType, periodWeek, dayOfWeek),
-      findDaysByFixedDate(date),
-      for (final code in feastCodes) findDaysByFeast(code),
-      getDayById('office-for-dead'),
+      findDayByPeriod(
+        periodType,
+        periodWeek,
+        dayOfWeek,
+        forceRefresh: forceRefresh,
+      ),
+      findDaysByFixedDate(date, forceRefresh: forceRefresh),
+      for (final code in feastCodes)
+        findDaysByFeast(code, forceRefresh: forceRefresh),
+      getDayById('office-for-dead', forceRefresh: forceRefresh),
       if (seasonalDateExceptionId(date, periodType) case final id?)
-        getDayById(id),
+        getDayById(id, forceRefresh: forceRefresh),
     ]);
   }
 
@@ -294,8 +349,9 @@ class LiturgicalDayService {
     LiturgicalDay day,
     String periodType,
     int periodWeek,
-    int dayOfWeek,
-  ) async {
+    int dayOfWeek, {
+    bool forceRefresh = false,
+  }) async {
     var resolved = resolveDayAgainstPeriod(day, null)!;
     if (periodType == 'christmas') return resolved;
     if (periodType != 'advent' && !hasMissingDaytimeFields(resolved)) {
@@ -305,7 +361,7 @@ class LiturgicalDayService {
         ? periodPsalterDayDocumentId(periodType, periodWeek, dayOfWeek)
         : ordinaryPsalterDayDocumentId(periodWeek, dayOfWeek);
     if (fallbackId.isEmpty || fallbackId == resolved.id) return resolved;
-    final fallback = await getDayById(fallbackId);
+    final fallback = await getDayById(fallbackId, forceRefresh: forceRefresh);
     if (fallback == null) return resolved;
     if (periodType == 'advent') {
       return resolveDayAgainstPeriod(resolved, fallback, fillMissing: true)!;

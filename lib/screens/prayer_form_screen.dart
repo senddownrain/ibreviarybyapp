@@ -229,7 +229,9 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
               12,
               topPad + kFloatingAppBarContentInset,
               12,
-              40,
+              // Leave the save button above the floating app navigation dock,
+              // with a small gap once the form is scrolled to its end.
+              MediaQuery.paddingOf(context).bottom + 24,
             ),
             children: [
               GlassSurface(

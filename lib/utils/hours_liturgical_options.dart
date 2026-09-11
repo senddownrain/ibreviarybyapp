@@ -42,6 +42,7 @@ class HoursLiturgicalSelection {
       key: option.key,
       contextPeriodType: option.contextPeriodType,
       subtitle: option.subtitle,
+      placeLabel: option.placeLabel,
       day: effectiveDay,
       order: option.order,
       disabled: option.disabled,

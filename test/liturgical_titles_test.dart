@@ -74,17 +74,23 @@ void main() {
   test('formats one or several liturgical places without duplicates', () {
     final day = LiturgicalDay.fromMap({
       'id': 'local-celebration',
-      '_place': ['Мінск', 'Гродна', ' мінск '],
+      '_place': ['grodno', 'vitebsk', ' GRODNO '],
     });
 
-    expect(liturgicalDayPlaces(day), ['Мінск', 'Гродна']);
-    expect(liturgicalDayPlaceLabel(day), 'Мінск, Гродна');
+    expect(liturgicalDayPlaces(day), [
+      'Гродзенская дыяцэзія',
+      'Віцебская дыяцэзія',
+    ]);
+    expect(
+      liturgicalDayPlaceLabel(day),
+      'Гродзенская дыяцэзія, Віцебская дыяцэзія',
+    );
   });
 
   test('formats a scalar liturgical place', () {
     final day = LiturgicalDay.fromMap({
       'id': 'local-celebration',
-      '_place': 'Пінская дыяцэзія',
+      '_place': 'pinsk',
     });
 
     expect(liturgicalDayPlaceLabel(day), 'Пінская дыяцэзія');
@@ -95,10 +101,27 @@ void main() {
       LiturgicalDay.fromMap({'id': 'one', '_place': 'Мінск'}),
       LiturgicalDay.fromMap({
         'id': 'two',
-        '_place': ['Гродна', 'МІНСК'],
+        '_place': ['grodno', 'МІНСК'],
       }),
     ];
 
-    expect(mergedLiturgicalDayPlaces(variants), ['Мінск', 'Гродна']);
+    expect(mergedLiturgicalDayPlaces(variants), [
+      'Мінск',
+      'Гродзенская дыяцэзія',
+    ]);
+  });
+
+  test('uses Belarusian names for every place code stored in days', () {
+    const expected = {
+      'grodno': 'Гродзенская дыяцэзія',
+      'pinsk': 'Пінская дыяцэзія',
+      'vitebsk': 'Віцебская дыяцэзія',
+      'minsk-mohilev': 'Мінска-Магілёўская архідыяцэзія',
+    };
+
+    for (final entry in expected.entries) {
+      final day = LiturgicalDay.fromMap({'id': entry.key, '_place': entry.key});
+      expect(liturgicalDayPlaceLabel(day), entry.value);
+    }
   });
 }

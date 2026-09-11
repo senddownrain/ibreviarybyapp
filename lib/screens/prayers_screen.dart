@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -41,7 +42,10 @@ class PrayersScreen extends ConsumerWidget {
                 20,
                 top + 16,
                 20,
-                120 + MediaQuery.viewPaddingOf(context).bottom,
+                // The app shell's floating dock is included in padding when
+                // extendBody is enabled. Keep the final row clear of it with
+                // a small visual gap.
+                MediaQuery.paddingOf(context).bottom + 24,
               ),
               children: [
                 Text(
@@ -175,7 +179,8 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
   late final TextEditingController _query;
   late final FocusNode _focus;
   final ScrollController _scrollController = ScrollController();
-  late bool _searching;
+  AppRouteEntryScope? _routeScope;
+  bool _bottomSlotInitialized = false;
 
   @override
   void initState() {
@@ -183,7 +188,6 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
     final filter = ref.read(prayersFilterProvider);
     _query = TextEditingController(text: filter.searchQuery);
     _focus = FocusNode();
-    _searching = widget.searchInitially || filter.searchQuery.isNotEmpty;
     if (widget.searchInitially) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => _focus.requestFocus(),
@@ -192,16 +196,25 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeScope = AppRouteEntryScope.maybeOf(context);
+    if (_bottomSlotInitialized) return;
+    _bottomSlotInitialized = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(true);
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _routeScope?.showContextualBottomBar(false);
     _query.dispose();
     _focus.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _showSearch() {
-    setState(() => _searching = true);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focus.requestFocus());
   }
 
   @override
@@ -222,55 +235,23 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
       scrollKey: widget.searchInitially
           ? const PageStorageKey('prayer-search-scroll')
           : const PageStorageKey('all-prayers-scroll'),
-      topAction: IconButton(
-        key: const Key('catalog-search-action'),
-        tooltip: 'Пошук малітваў',
-        onPressed: _showSearch,
-        icon: const PhosphorIcon(PhosphorIconsRegular.magnifyingGlass),
+      searchDock: _PrayerSearchDock(
+        controller: _query,
+        focusNode: _focus,
+        selectedFilterCount: filter.selectedTags.length,
+        onChanged: (value) {
+          ref.read(prayersFilterProvider.notifier).setSearch(value);
+          setState(() {});
+        },
+        onSubmitted: ref.read(prayersFilterProvider.notifier).setSearch,
+        onClear: () {
+          _query.clear();
+          ref.read(prayersFilterProvider.notifier).setSearch('');
+          setState(() {});
+          _focus.requestFocus();
+        },
+        onFilter: () => _showTagFilter(context),
       ),
-      searchField: _searching
-          ? TextField(
-              key: const Key('prayer-search-field'),
-              controller: _query,
-              focusNode: _focus,
-              textInputAction: TextInputAction.search,
-              onSubmitted: ref.read(prayersFilterProvider.notifier).setSearch,
-              decoration: InputDecoration(
-                hintText: 'Знайсці малітву',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _query.text.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: 'Ачысціць пошук',
-                        onPressed: () {
-                          _query.clear();
-                          ref
-                              .read(prayersFilterProvider.notifier)
-                              .setSearch('');
-                          setState(() {});
-                          _focus.requestFocus();
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-              ),
-              onChanged: (value) {
-                ref.read(prayersFilterProvider.notifier).setSearch(value);
-                setState(() {});
-              },
-            )
-          : null,
-      filterAction: _searching
-          ? TextButton.icon(
-              key: const Key('prayer-filter-action'),
-              onPressed: () => _showTagFilter(context),
-              icon: const Icon(Icons.tune_rounded),
-              label: Text(
-                filter.selectedTags.isEmpty
-                    ? 'Фільтры'
-                    : 'Фільтры · ${filter.selectedTags.length}',
-              ),
-            )
-          : null,
       prayers: visible,
       emptyTitle: filter.isActive
           ? 'Малітваў не знойдзена'
@@ -573,8 +554,7 @@ class _PrayerListPage extends StatelessWidget {
     required this.scrollController,
     required this.scrollKey,
     this.topAction,
-    this.searchField,
-    this.filterAction,
+    this.searchDock,
   });
 
   final String title;
@@ -584,8 +564,7 @@ class _PrayerListPage extends StatelessWidget {
   final ScrollController scrollController;
   final PageStorageKey<String> scrollKey;
   final Widget? topAction;
-  final Widget? searchField;
-  final Widget? filterAction;
+  final Widget? searchDock;
 
   @override
   Widget build(BuildContext context) {
@@ -603,7 +582,8 @@ class _PrayerListPage extends StatelessWidget {
                 20,
                 MediaQuery.paddingOf(context).top + 90,
                 20,
-                120 + MediaQuery.viewPaddingOf(context).bottom,
+                (searchDock == null ? 120 : 104) +
+                    MediaQuery.viewPaddingOf(context).bottom,
               ),
               children: [
                 Text(
@@ -614,12 +594,7 @@ class _PrayerListPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
-                if (searchField != null) ...[
-                  const SizedBox(height: 20),
-                  searchField!,
-                  Align(alignment: Alignment.centerRight, child: filterAction),
-                ] else
-                  const SizedBox(height: 18),
+                const SizedBox(height: 18),
                 if (prayers.isEmpty)
                   Padding(
                     key: const Key('prayer-list-empty'),
@@ -636,7 +611,121 @@ class _PrayerListPage extends StatelessWidget {
             seasonColor: cs.tertiary,
             actions: topAction == null ? const [] : [topAction!],
           ),
+          if (searchDock != null)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.viewPaddingOf(context).bottom + 12,
+              child: Center(child: searchDock!),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class _PrayerSearchDock extends StatelessWidget {
+  const _PrayerSearchDock({
+    required this.controller,
+    required this.focusNode,
+    required this.selectedFilterCount,
+    required this.onChanged,
+    required this.onSubmitted,
+    required this.onClear,
+    required this.onFilter,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final int selectedFilterCount;
+  final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
+  final VoidCallback onClear;
+  final VoidCallback onFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480),
+      child: GlassSurface(
+        style: GlassStyle.pill,
+        borderRadius: BorderRadius.circular(30),
+        child: SizedBox(
+          height: 58,
+          child: Row(
+            children: [
+              const SizedBox(width: 17),
+              Icon(Icons.search_rounded, size: 23, color: cs.primary),
+              const SizedBox(width: 4),
+              Expanded(
+                child: TextField(
+                  key: const Key('prayer-search-field'),
+                  controller: controller,
+                  focusNode: focusNode,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: onSubmitted,
+                  onChanged: onChanged,
+                  decoration: const InputDecoration(
+                    hintText: 'Пошук малітваў',
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                    isCollapsed: true,
+                  ),
+                ),
+              ),
+              if (controller.text.isNotEmpty)
+                IconButton(
+                  tooltip: 'Ачысціць пошук',
+                  onPressed: onClear,
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    key: const Key('prayer-filter-action'),
+                    tooltip: selectedFilterCount == 0
+                        ? 'Адкрыць фільтр'
+                        : 'Фільтр: выбрана $selectedFilterCount',
+                    color: selectedFilterCount == 0
+                        ? cs.onSurfaceVariant
+                        : cs.primary,
+                    onPressed: onFilter,
+                    icon: const Icon(Icons.tune_rounded, size: 22),
+                  ),
+                  if (selectedFilterCount > 0)
+                    Positioned(
+                      top: 2,
+                      right: 1,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: cs.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: SizedBox.square(
+                          dimension: 18,
+                          child: Center(
+                            child: Text(
+                              '$selectedFilterCount',
+                              style: TextStyle(
+                                color: cs.onPrimary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 6),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -33,6 +33,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
 
@@ -499,7 +500,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       if (periodLabel.isNotEmpty) periodLabel,
       if (psalterLabel.isNotEmpty) psalterLabel,
       if (rankLabel.isNotEmpty) rankLabel,
-      if (placeLabel.isNotEmpty) placeLabel,
     ].join(' · ');
     final header = ReaderContextHeader(
       accentColor: accent,
@@ -519,6 +519,26 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       ),
       title: _oraTitle(widget.oraType),
       metadata: contextSummary,
+      details: placeLabel.isEmpty
+          ? null
+          : Row(
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    placeLabel,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
       onTitleTap: () => _changeHour(day),
       actions: [
         TextButton.icon(
@@ -591,7 +611,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final ant = (day.field('invitatoriumAnt') ?? '').trim();
     final items = <_OraItem>[];
 
-    items.add(_OraItem.sectionTitle('ЗАКЛІК'));
     _addInvitatoriumContent(items, day, allInvit, ant);
 
     return items;
@@ -707,7 +726,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildLectionis(LiturgicalDay day, {bool skipEnding = false}) {
     final items = <_OraItem>[];
-    items.add(_OraItem.sectionTitle('ГАДЗІНА ЧЫТАННЯЎ'));
     _addIntro(items);
     _addHymn(items, day, 'officeOfReadingsHymn');
     _addPsalmBlock(items, day, 'officeOfReadingsAnt', 'officeOfReadingsPs', 3);
@@ -727,7 +745,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildLaudes(LiturgicalDay day) {
     final items = <_OraItem>[];
-    items.add(_OraItem.sectionTitle('ЮТРАНЬ'));
     _addIntro(items);
     _addHymn(items, day, 'laudesHymn');
     _addPsalmBlock(items, day, 'laudesAnt', 'laudesPs', 3);
@@ -760,14 +777,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   }
 
   List<_OraItem> _buildSextHour(LiturgicalDay day, {required int num}) {
-    final title = switch (num) {
-      1 => 'МАЛІТВА ПЕРАД ПОЎДНЕМ',
-      2 => 'МАЛІТВА АПОЎДНІ',
-      _ => 'МАЛІТВА ПАСЛЯ ПОЎДНЯ',
-    };
-
     final items = <_OraItem>[];
-    items.add(_OraItem.sectionTitle(title));
     _addIntro(items);
 
     final hymn = _sextF(day, 'Hymn', num);
@@ -798,7 +808,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildVespers(LiturgicalDay day) {
     final items = <_OraItem>[];
-    items.add(_OraItem.sectionTitle('НЕШПАРЫ'));
     _addIntro(items);
     if (_vespersRubric case final rubric?) {
       items.add(
@@ -853,7 +862,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildCompline(Map<String, dynamic>? comp) {
     final items = <_OraItem>[];
-    items.add(_OraItem.sectionTitle('КАМПЛЕТА'));
     _addIntro(items);
 
     if (comp == null) {
@@ -946,7 +954,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     LiturgicalDay day,
     List<Map<String, dynamic>> allInvit,
   ) {
-    final items = <_OraItem>[_OraItem.sectionTitle('АГУЛЬНАЯ ГАДЗІНА')];
+    final items = <_OraItem>[];
 
     _addInvitatoriumContent(
       items,
@@ -1167,7 +1175,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 // ─── _OraItem ─────────────────────────────────────────────────────────────────
 
 enum _OraItemType {
-  sectionTitle,
   blockHeader,
   antiphon,
   labeled,
@@ -1290,9 +1297,6 @@ class _OraItem {
     Widget Function(BuildContext, TextStyle)? customWidget,
   }) : _customWidget = customWidget;
 
-  factory _OraItem.sectionTitle(String title) =>
-      _OraItem._(_OraItemType.sectionTitle, title);
-
   factory _OraItem.blockHeader(String title) =>
       _OraItem._(_OraItemType.blockHeader, title);
 
@@ -1340,17 +1344,6 @@ class _OraItem {
     final cs = Theme.of(context).colorScheme;
 
     switch (type) {
-      case _OraItemType.sectionTitle:
-        final reader = ReaderTheme.of(context);
-        final base = textStyle.fontSize ?? 16;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(8, 12, 8, 18),
-          child: Text(
-            _managedHeading(content),
-            style: reader.majorHeading(base),
-          ),
-        );
-
       case _OraItemType.blockHeader:
         final reader = ReaderTheme.of(context);
         final base = textStyle.fontSize ?? 16;
@@ -1364,7 +1357,9 @@ class _OraItem {
 
       case _OraItemType.antiphon:
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+          // Paragraph spacing already separates the antiphon from its psalm.
+          // Avoid adding a second gap around the paired reader blocks.
+          padding: EdgeInsets.zero,
           child: _HtmlOrText(
             content: content,
             textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
@@ -1396,7 +1391,7 @@ class _OraItem {
 
       case _OraItemType.psalm:
         return Padding(
-          padding: const EdgeInsets.only(top: 2, bottom: 6),
+          padding: EdgeInsets.zero,
           child: _HtmlOrText(
             content: content,
             textStyle: textStyle,
@@ -1442,12 +1437,6 @@ class _OraItem {
 }
 
 String _managedHeading(String value) => switch (value.toUpperCase()) {
-  'ЗАКЛІК' => 'Заклік',
-  'ГАДЗІНА ЧЫТАННЯЎ' => 'Гадзіна чытанняў',
-  'ЮТРАНЬ' => 'Ютрань',
-  'НЕШПАРЫ' => 'Нешпары',
-  'КАМПЛЕТА' => 'Камплета',
-  'АГУЛЬНАЯ ГАДЗІНА' => 'Агульная гадзіна',
   'ГІМН' => 'Гімн',
   'ПСАЛМОДЫЯ' => 'Псалмодыя',
   'ПЕСНЯ З ЕВАНГЕЛЛЯ' => 'Песня з Евангелля',
@@ -1637,7 +1626,9 @@ class _LiturgicalSelectableText extends StatelessWidget {
         children: [
           for (final piece in pieces)
             TextSpan(
-              text: piece,
+              text: piece == '*' || piece == '†'
+                  ? piece
+                  : hyphenateReaderText(piece),
               style: piece == '*' || piece == '†'
                   ? textStyle.copyWith(
                       color: rubric,
