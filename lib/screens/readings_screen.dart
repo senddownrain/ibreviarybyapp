@@ -16,6 +16,7 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_html.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -1279,10 +1280,11 @@ class _ReadingTextState extends State<_ReadingText> {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
       final base = widget.textStyle.fontSize ?? 16;
-      return Html(
+      return HyphenatedHtml(
         data: widget.isPsalm
             ? formatPsalmHtml(widget.text)
             : formatLiturgicalHtml(widget.text),
+        textStyle: widget.textStyle.copyWith(height: 1.78),
         style: {
           'body': Style(
             margin: Margins.zero,
@@ -1323,38 +1325,50 @@ class _ReadingTextState extends State<_ReadingText> {
       RegExp(r'\r?\n[ \t]*\r?\n+'),
       '\n',
     );
-    final sentences = namespace == null
-        ? <_SentencePart>[_SentencePart(plainText, 0)]
-        : _splitReadingSentences(plainText);
-    return Text.rich(
-      TextSpan(
-        children: [
-          for (final sentence in sentences)
-            TextSpan(
-              style: _sentenceStyle(context, '$namespace:${sentence.index}'),
-              children: [
-                for (final piece in sentence.text.split(
-                  RegExp(r'(?=[*†])|(?<=[*†])'),
-                ))
-                  TextSpan(
-                    text: piece == '*' || piece == '†'
-                        ? piece
-                        : hyphenateReaderText(piece),
-                    recognizer: namespace == null
-                        ? null
-                        : _recognizerFor('$namespace:${sentence.index}'),
-                    style: piece == '*' || piece == '†'
-                        ? widget.textStyle.copyWith(
-                            height: 1.78,
-                            color: reader.rubric,
-                            fontWeight: FontWeight.w600,
-                          )
-                        : null,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wrappedText = wrapReaderText(
+          plainText,
+          style: widget.textStyle.copyWith(height: 1.78),
+          maxWidth: constraints.maxWidth,
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+        );
+        final sentences = namespace == null
+            ? <_SentencePart>[_SentencePart(wrappedText, 0)]
+            : _splitReadingSentences(wrappedText);
+        return Text.rich(
+          TextSpan(
+            children: [
+              for (final sentence in sentences)
+                TextSpan(
+                  style: _sentenceStyle(
+                    context,
+                    '$namespace:${sentence.index}',
                   ),
-              ],
-            ),
-        ],
-      ),
+                  children: [
+                    for (final piece in sentence.text.split(
+                      RegExp(r'(?=[*†])|(?<=[*†])'),
+                    ))
+                      TextSpan(
+                        text: piece,
+                        recognizer: namespace == null
+                            ? null
+                            : _recognizerFor('$namespace:${sentence.index}'),
+                        style: piece == '*' || piece == '†'
+                            ? widget.textStyle.copyWith(
+                                height: 1.78,
+                                color: reader.rubric,
+                                fontWeight: FontWeight.w600,
+                              )
+                            : null,
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 

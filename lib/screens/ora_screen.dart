@@ -28,6 +28,7 @@ import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_html.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
@@ -1174,15 +1175,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
 // ─── _OraItem ─────────────────────────────────────────────────────────────────
 
-enum _OraItemType {
-  blockHeader,
-  antiphon,
-  labeled,
-  html,
-  psalm,
-  plain,
-  custom,
-}
+enum _OraItemType { blockHeader, antiphon, labeled, html, psalm, plain, custom }
 
 class _ExpandableFeastComment extends StatefulWidget {
   const _ExpandableFeastComment(this.text);
@@ -1600,11 +1593,16 @@ class _HtmlOrText extends StatelessWidget {
           stripEmbeddedAntiphon(html, externalAntiphon: externalAntiphon),
         ),
         style: styles,
+        textStyle: textStyle.copyWith(height: 1.75),
         textColor: textColor,
         rubricColor: reader.rubric,
       );
     }
-    return Html(data: formatLiturgicalHtml(html), style: styles);
+    return HyphenatedHtml(
+      data: formatLiturgicalHtml(html),
+      style: styles,
+      textStyle: textStyle.copyWith(height: 1.75),
+    );
   }
 }
 
@@ -1620,24 +1618,33 @@ class _LiturgicalSelectableText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rubric = ReaderTheme.of(context).rubric;
-    final pieces = content.split(RegExp(r'(?=[*†])|(?<=[*†])'));
-    return SelectableText.rich(
-      TextSpan(
-        children: [
-          for (final piece in pieces)
-            TextSpan(
-              text: piece == '*' || piece == '†'
-                  ? piece
-                  : hyphenateReaderText(piece),
-              style: piece == '*' || piece == '†'
-                  ? textStyle.copyWith(
-                      color: rubric,
-                      fontWeight: FontWeight.w600,
-                    )
-                  : textStyle,
-            ),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wrapped = wrapReaderText(
+          content,
+          style: textStyle,
+          maxWidth: constraints.maxWidth,
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+        );
+        final wrappedPieces = wrapped.split(RegExp(r'(?=[*†])|(?<=[*†])'));
+        return SelectableText.rich(
+          TextSpan(
+            children: [
+              for (final piece in wrappedPieces)
+                TextSpan(
+                  text: piece,
+                  style: piece == '*' || piece == '†'
+                      ? textStyle.copyWith(
+                          color: rubric,
+                          fontWeight: FontWeight.w600,
+                        )
+                      : textStyle,
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

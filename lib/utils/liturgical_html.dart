@@ -1,6 +1,5 @@
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parseFragment;
-import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 /// Semantic preparation for legacy liturgical HTML.
 ///
@@ -50,12 +49,10 @@ String _markCadenceInText(String text) => text.replaceAllMapped(
   (match) => '<span class="psalm-marker">${match.group(0)}</span>',
 );
 
-String formatLiturgicalHtml(String html) => hyphenateReaderHtml(
-  markLiturgicalCadenceSigns(
-    _normalizeLegacyPresentation(
-      _normalizeRubricColors(
-        _markInlineReadingReference(_markLeadingMetadata(html)),
-      ),
+String formatLiturgicalHtml(String html) => markLiturgicalCadenceSigns(
+  _normalizeLegacyPresentation(
+    _normalizeRubricColors(
+      _markInlineReadingReference(_markLeadingMetadata(html)),
     ),
   ),
 );
@@ -92,12 +89,10 @@ String formatPsalmHtml(String html) {
     }).join();
   });
 
-  return hyphenateReaderHtml(
-    markLiturgicalCadenceSigns(
-      _normalizeLegacyPresentation(
-        _normalizeRubricColors(
-          _markLeadingMetadata(value, limit: null, psalmMetadata: true),
-        ),
+  return markLiturgicalCadenceSigns(
+    _normalizeLegacyPresentation(
+      _normalizeRubricColors(
+        _markLeadingMetadata(value, limit: null, psalmMetadata: true),
       ),
     ),
   );
