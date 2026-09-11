@@ -210,6 +210,25 @@ void main() {
     controller.dispose();
   });
 
+  testWidgets('search and filter actions clear Android system navigation', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app(const PrayerCatalogScreen()));
+    await tester.pump();
+    final screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+
+    final searchDock = tester.getRect(
+      find.byKey(const Key('prayer-search-dock')),
+    );
+    expect(searchDock.bottom, lessThanOrEqualTo(screenHeight - 60));
+
+    await tester.tap(find.byKey(const Key('prayer-filter-action')));
+    await tester.pumpAndSettle();
+    final doneButton = tester.getRect(find.text('Гатова'));
+    expect(doneButton.bottom, lessThanOrEqualTo(screenHeight - 72));
+  });
+
   testWidgets('search focuses, filters title/body, and keeps query state', (
     tester,
   ) async {

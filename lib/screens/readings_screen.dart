@@ -1319,9 +1319,13 @@ class _ReadingTextState extends State<_ReadingText> {
     }
     final reader = ReaderTheme.of(context);
     final namespace = widget.highlightNamespace;
+    final plainText = widget.text.replaceAll(
+      RegExp(r'\r?\n[ \t]*\r?\n+'),
+      '\n',
+    );
     final sentences = namespace == null
-        ? <_SentencePart>[_SentencePart(widget.text, 0)]
-        : _splitReadingSentences(widget.text);
+        ? <_SentencePart>[_SentencePart(plainText, 0)]
+        : _splitReadingSentences(plainText);
     return Text.rich(
       TextSpan(
         children: [

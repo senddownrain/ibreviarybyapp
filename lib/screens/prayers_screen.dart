@@ -259,15 +259,17 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
     );
   }
 
-  Future<void> _showTagFilter(BuildContext context) =>
-      showModalBottomSheet<void>(
-        context: context,
-        useSafeArea: true,
-        showDragHandle: true,
-        isScrollControlled: true,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-        builder: (_) => const _PrayerTagsSheet(),
-      );
+  Future<void> _showTagFilter(BuildContext context) {
+    final bottomSystemInset = _bottomSystemInset(context);
+    return showModalBottomSheet<void>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      builder: (_) => _PrayerTagsSheet(bottomSystemInset: bottomSystemInset),
+    );
+  }
 }
 
 class PrayerCategoryScreen extends ConsumerStatefulWidget {
@@ -615,7 +617,11 @@ class _PrayerListPage extends StatelessWidget {
             Positioned(
               left: 16,
               right: 16,
-              bottom: MediaQuery.viewPaddingOf(context).bottom + 12,
+              bottom:
+                  (MediaQuery.viewInsetsOf(context).bottom > 0
+                      ? 0
+                      : _bottomSystemInset(context)) +
+                  12,
               child: Center(child: searchDock!),
             ),
         ],
@@ -647,6 +653,7 @@ class _PrayerSearchDock extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return ConstrainedBox(
+      key: const Key('prayer-search-dock'),
       constraints: const BoxConstraints(maxWidth: 480),
       child: GlassSurface(
         style: GlassStyle.pill,
@@ -732,7 +739,9 @@ class _PrayerSearchDock extends StatelessWidget {
 }
 
 class _PrayerTagsSheet extends ConsumerWidget {
-  const _PrayerTagsSheet();
+  const _PrayerTagsSheet({required this.bottomSystemInset});
+
+  final double bottomSystemInset;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -740,8 +749,9 @@ class _PrayerTagsSheet extends ConsumerWidget {
     final selected = ref.watch(prayersFilterProvider).selectedTags;
     return SafeArea(
       top: false,
+      bottom: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        padding: EdgeInsets.fromLTRB(20, 8, 20, bottomSystemInset + 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -790,6 +800,20 @@ class _PrayerTagsSheet extends ConsumerWidget {
       ),
     );
   }
+}
+
+double _bottomSystemInset(BuildContext context) {
+  final mediaQuery = MediaQuery.of(context);
+  final reported = mediaQuery.viewPadding.bottom > mediaQuery.padding.bottom
+      ? mediaQuery.viewPadding.bottom
+      : mediaQuery.padding.bottom;
+  // Some Android edge-to-edge configurations report zero even while the
+  // three-button navigation bar overlays the app. Reserve its standard height
+  // so bottom controls never sit behind system actions.
+  if (Theme.of(context).platform == TargetPlatform.android && reported < 48) {
+    return 48;
+  }
+  return reported;
 }
 
 class _SectionTitle extends StatelessWidget {

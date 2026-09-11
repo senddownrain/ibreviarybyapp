@@ -319,7 +319,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             0,
             MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
             0,
-            24,
+            MediaQuery.paddingOf(context).bottom + 24,
           ),
           children: const [
             TileShimmer(),

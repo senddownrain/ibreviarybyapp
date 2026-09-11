@@ -53,6 +53,9 @@ class AppNavigationDock extends StatelessWidget {
     final ios = usesCupertinoGlass(context);
     final platformKey = Key(ios ? 'app-dock-ios' : 'app-dock-android');
     final bottom = MediaQuery.viewPaddingOf(context).bottom;
+    final systemNavigationStripColor = Theme.of(
+      context,
+    ).colorScheme.surface.withValues(alpha: 0.72);
     return SizedBox(
       key: platformKey,
       height: (mode == ReaderChromeMode.full ? 78 : 70) + bottom,
@@ -82,7 +85,7 @@ class AppNavigationDock extends StatelessWidget {
           SizedBox(
             key: const Key('app-dock-system-navigation-strip'),
             height: bottom,
-            child: const ColoredBox(color: Colors.transparent),
+            child: ColoredBox(color: systemNavigationStripColor),
           ),
         ],
       ),

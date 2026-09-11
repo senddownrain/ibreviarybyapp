@@ -52,6 +52,13 @@ void main() {
             .height,
         24,
       );
+      final strip = tester.widget<ColoredBox>(
+        find.descendant(
+          of: find.byKey(const Key('app-dock-system-navigation-strip')),
+          matching: find.byType(ColoredBox),
+        ),
+      );
+      expect(strip.color.a, closeTo(0.72, 0.01));
       expect(tester.takeException(), isNull);
     }
   });
