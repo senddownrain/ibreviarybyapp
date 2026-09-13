@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 
@@ -61,6 +59,14 @@ const kBibleVersionMeta = {
     shortLabel: 'БЕЛ',
     attribution: 'Беларускі пераклад',
   ),
+  'bel_charniauski': BibleVersionMeta(
+    id: 'bel_charniauski',
+    name: 'Пераклад Чарняўскага',
+    shortName: 'ЧБ',
+    langLabel: 'Беларуская (Чарняўскі)',
+    shortLabel: 'Ч17',
+    attribution: 'Пераклад Ўладзіслава Чарняўскага · bible.by',
+  ),
   'ru': BibleVersionMeta(
     id: 'ru',
     name: 'Сінадальны пераклад',
@@ -84,29 +90,20 @@ String bibleAttribution({
 }
 
 class BibleRepository {
-  static Map<String, dynamic>? _data;
-  static Map<String, dynamic>? _dataBel;
+  static final Map<String, Map<String, dynamic>> _data = {};
 
   static void setData(String versionId, Map<String, dynamic> data) {
-    if (versionId == 'bel') {
-      _dataBel = data;
-    } else {
-      _data = data;
-    }
+    _data[versionId] = data;
   }
 
-  static Map<String, dynamic>? _versionData(String versionId) {
-    return switch (versionId) {
-      'bel' => _dataBel,
-      'ru' => _data,
-      _ => null,
-    };
-  }
+  static Map<String, dynamic>? _versionData(String versionId) =>
+      _data[versionId];
 
   static List<BibleVersionMeta> getAvailableVersions() {
     final result = <BibleVersionMeta>[];
-    if (_dataBel != null) result.add(kBibleVersionMeta['bel']!);
-    if (_data != null) result.add(kBibleVersionMeta['ru']!);
+    for (final version in kBibleVersionMeta.values) {
+      if (_data.containsKey(version.id)) result.add(version);
+    }
     if (result.isEmpty) result.add(kBibleVersionMeta['bel']!);
     return result;
   }
@@ -130,7 +127,7 @@ class BibleRepository {
         chapterCount: _chapterCount(b),
         versionId: versionId,
         order: order,
-        isVerseTextRussian: versionId != 'bel',
+        isVerseTextRussian: versionId == 'ru',
         isNewTestament:
             newTestamentIndex >= 0 && entry.key >= newTestamentIndex,
       );
@@ -141,23 +138,47 @@ class BibleRepository {
     return getBooks(versionId).where((b) => b.id == bookId).firstOrNull;
   }
 
-  /// Finds the same canonical book in another translation. The Russian seed
-  /// has seven additional Old Testament books, so raw order is insufficient.
+  /// Translates a Russian-seed book id into the shared Belarusian id scheme
+  /// (used by the `bel` and `bel_charniauski` seeds). The Russian seed uses
+  /// different ids for several books (jn = Иона, jo = Иоанн, rm, act, …).
+  static String _canonicalKey(String versionId, String bookId) {
+    if (versionId != 'ru') return bookId;
+    const ruToBel = {
+      'jn': 'jon', // ru: Иона
+      'jo': 'jn', // ru: Иоанн
+      'act': 'acts',
+      'rm': 'rom',
+      'gl': 'gal',
+      'ph': 'php',
+      'cl': 'col',
+      '1ts': '1th',
+      '2ts': '2th',
+      '1tm': '1ti',
+      '2tm': '2ti',
+      'tt': 'tit',
+      'hb': 'heb',
+      'jm': 'jas',
+      'jd': 'jud', // ru: Иуды (bel 'jud' is also Иуды; ru 'jud' is Судьи)
+      'jud': 'jdg', // ru: Судьи
+      're': 'rev',
+    };
+    return ruToBel[bookId] ?? bookId;
+  }
+
+  /// Finds the same canonical book in another translation. Book ids differ
+  /// between the Russian and Belarusian id schemes, so ids are matched via
+  /// [_canonicalKey]. Returns null when the target translation lacks the book
+  /// (e.g. deuterocanonical books absent from the `bel` translation).
   static BibleBookInfo? getParallelBook(
     String fromVersionId,
     String bookId,
     String toVersionId,
   ) {
-    const russianOnlyIds = {'tob', 'jdt', '1mac', '2mac', 'wis', 'sir', 'bar'};
-    List<BibleBookInfo> canonicalBooks(String versionId) => getBooks(versionId)
-        .where((book) => versionId != 'ru' || !russianOnlyIds.contains(book.id))
-        .toList(growable: false);
-
-    final source = canonicalBooks(fromVersionId);
-    final sourceIndex = source.indexWhere((book) => book.id == bookId);
-    if (sourceIndex < 0) return null;
-    final target = canonicalBooks(toVersionId);
-    return sourceIndex < target.length ? target[sourceIndex] : null;
+    final key = _canonicalKey(fromVersionId, bookId);
+    for (final book in getBooks(toVersionId)) {
+      if (_canonicalKey(toVersionId, book.id) == key) return book;
+    }
+    return null;
   }
 
   static List<({int chapter, BibleVerse verse})> searchBook(
@@ -271,11 +292,18 @@ class BibleRepository {
   }
 
   /// Offline data is decoded lazily, after the first frame.
-  static Future<void> preload() =>
-      Future.wait([ensureVersion('bel'), ensureVersion('ru')]);
+  static Future<void> preload() => Future.wait([
+    ensureVersion('bel'),
+    ensureVersion('bel_charniauski'),
+    ensureVersion('ru'),
+  ]);
 
+  /// Replaces missing or corrupt in-memory corpora from bundled offline data.
   static Future<void> reloadBundled() async {
-    _dataBel = await BibleSeedLoader.load(lang: 'bel');
-    _data = await BibleSeedLoader.load(lang: 'ru');
+    _data['bel'] = await BibleSeedLoader.load(lang: 'bel');
+    _data['bel_charniauski'] = await BibleSeedLoader.load(
+      lang: 'bel_charniauski',
+    );
+    _data['ru'] = await BibleSeedLoader.load(lang: 'ru');
   }
 }

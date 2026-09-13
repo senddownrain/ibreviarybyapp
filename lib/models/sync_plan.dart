@@ -3,6 +3,7 @@ enum SyncTarget {
   readings('readings', 'Чытанні'),
   prayers('prayers', 'Малітвы'),
   bibleBel('bible_bel', 'Біблія · беларуская'),
+  bibleBelCharniauski('bible_bel_charniauski', 'Біблія · Чарняўскі'),
   bibleRu('bible_ru', 'Біблія · руская'),
   years('yearOptions', 'Параметры літургічных гадоў'),
   invitatoriums('invitatoriums', 'Заклік'),

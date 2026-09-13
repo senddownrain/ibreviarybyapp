@@ -128,6 +128,7 @@ class HiveService {
     _invitatoriums = await Hive.openBox(_invitatoriumsBoxName);
     _completoriums = await Hive.openBox(_completoriumsBoxName);
     await Hive.openBox('bible_bel');
+    await Hive.openBox('bible_bel_charniauski');
     await Hive.openBox('bible_ru');
     await Hive.openBox('prayerCategories');
   }
