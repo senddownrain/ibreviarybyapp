@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
-import 'package:mybrev_flutter/widgets/hyphenated_html.dart';
 
 /// Renders psalm strophes as two alternating choirs.
 ///
@@ -10,7 +9,6 @@ import 'package:mybrev_flutter/widgets/hyphenated_html.dart';
 class PsalmChoirHtml extends StatefulWidget {
   final String html;
   final Map<String, Style> style;
-  final TextStyle textStyle;
   final Color textColor;
   final Color rubricColor;
 
@@ -18,7 +16,6 @@ class PsalmChoirHtml extends StatefulWidget {
     super.key,
     required this.html,
     required this.style,
-    required this.textStyle,
     required this.textColor,
     required this.rubricColor,
   });
@@ -43,10 +40,9 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
     final dimmedText = widget.textColor.withValues(alpha: 0.60);
     final dimmedRubric = widget.rubricColor.withValues(alpha: 0.60);
 
-    return HyphenatedHtml(
+    return Html(
       key: ValueKey(_selectedChoir),
       data: preparePsalmChoirHtml(widget.html, selectedChoir: _selectedChoir),
-      textStyle: widget.textStyle,
       onLinkTap: (url, attributes, element) {
         final choir = switch (url) {
           'psalm-choir:1' => 1,

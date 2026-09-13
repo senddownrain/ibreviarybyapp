@@ -16,7 +16,6 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
-import 'package:mybrev_flutter/utils/text_hyphenation.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -722,47 +721,29 @@ class _VerseRow extends StatelessWidget {
           onDoubleTap: chromeController?.toggleFullscreen,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final verseStyle = textStyle.copyWith(
-                  color: cs.onSurface,
-                  height: 1.72,
-                );
-                final wrapped = wrapReaderText(
-                  text,
-                  style: verseStyle,
-                  maxWidth: (constraints.maxWidth - 28).clamp(
-                    1,
-                    double.infinity,
-                  ),
-                  textDirection: Directionality.of(context),
-                  textScaler: MediaQuery.textScalerOf(context),
-                );
-                return RichText(
-                  key: Key('bible-verse-body-$verseNum'),
-                  textScaler: MediaQuery.textScalerOf(context),
-                  text: TextSpan(
-                    style: verseStyle,
-                    children: [
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.top,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 6, top: 1),
-                          child: Text(
-                            '$verseNum',
-                            style: TextStyle(
-                              color: cs.tertiary,
-                              fontSize: (textStyle.fontSize ?? 16) * 0.64,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+            child: RichText(
+              key: Key('bible-verse-body-$verseNum'),
+              textScaler: MediaQuery.textScalerOf(context),
+              text: TextSpan(
+                style: textStyle.copyWith(color: cs.onSurface, height: 1.72),
+                children: [
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.top,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 6, top: 1),
+                      child: Text(
+                        '$verseNum',
+                        style: TextStyle(
+                          color: cs.tertiary,
+                          fontSize: (textStyle.fontSize ?? 16) * 0.64,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      TextSpan(text: wrapped),
-                    ],
+                    ),
                   ),
-                );
-              },
+                  TextSpan(text: text),
+                ],
+              ),
             ),
           ),
         ),

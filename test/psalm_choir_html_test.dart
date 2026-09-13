@@ -18,7 +18,6 @@ void main() {
           body: PsalmChoirHtml(
             html: html,
             style: const {},
-            textStyle: const TextStyle(fontSize: 16),
             textColor: Colors.black,
             rubricColor: Colors.red,
           ),

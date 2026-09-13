@@ -18,6 +18,7 @@ enum SyncPeriod {
   week('1 тыдзень', 7),
   fortnight('2 тыдні', 14),
   month('1 месяц', 30),
+  twoMonths('2 месяцы', 60),
   quarter('3 месяцы', 90),
   halfYear('6 месяцаў', 180),
   year('Увесь каляндарны год', null),
@@ -33,6 +34,7 @@ enum SyncPeriod {
         : DateTime(base.year, base.month, base.day);
     final months = switch (this) {
       month => 1,
+      twoMonths => 2,
       quarter => 3,
       halfYear => 6,
       _ => 0,

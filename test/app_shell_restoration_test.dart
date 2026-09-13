@@ -70,16 +70,27 @@ void main() {
               for (final branch in AppBranch.values)
                 StatefulShellBranch(
                   restorationScopeId: '${branch.name}-branch',
+                  observers: [
+                    BranchRouteObserver(shellState.branches[branch]!),
+                  ],
                   routes: [
                     GoRoute(
                       path: '/${branch.name}',
-                      builder: (context, state) => Consumer(
-                        builder: (context, ref, child) {
-                          ref.watch(selectedDateProvider);
-                          ref.watch(readingsBranchStateProvider);
-                          ref.watch(settingsProvider);
-                          return Text(branch.name);
-                        },
+                      pageBuilder: (context, state) => MaterialPage<void>(
+                        key: state.pageKey,
+                        arguments: AppRouteEntry(
+                          id: state.pageKey.value,
+                          descriptor:
+                              shellState.branches[branch]!.rootDescriptor,
+                        ),
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            ref.watch(selectedDateProvider);
+                            ref.watch(readingsBranchStateProvider);
+                            ref.watch(settingsProvider);
+                            return Text(branch.name);
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -110,6 +121,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(container.read(settingsProvider).lastSection, 'readings');
+      expect(shellState.activeController.activeEntryId, isNotNull);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

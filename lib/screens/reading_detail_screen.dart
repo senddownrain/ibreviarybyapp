@@ -9,8 +9,6 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
-import 'package:mybrev_flutter/utils/text_hyphenation.dart';
-import 'package:mybrev_flutter/widgets/hyphenated_html.dart';
 
 String _stripHtml(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -134,9 +132,8 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
       final base = textStyle.fontSize ?? 16;
       final textColor =
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
-      return HyphenatedHtml(
+      return Html(
         data: formatLiturgicalHtml(text),
-        textStyle: textStyle.copyWith(height: 1.78),
         style: {
           'body': Style(
             fontSize: FontSize(base),
@@ -168,17 +165,6 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
         },
       );
     }
-    return LayoutBuilder(
-      builder: (context, constraints) => SelectableText(
-        wrapReaderText(
-          text,
-          style: textStyle,
-          maxWidth: constraints.maxWidth,
-          textDirection: Directionality.of(context),
-          textScaler: MediaQuery.textScalerOf(context),
-        ),
-        style: textStyle,
-      ),
-    );
+    return SelectableText(text, style: textStyle);
   }
 }

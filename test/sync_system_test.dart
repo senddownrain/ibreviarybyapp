@@ -41,44 +41,109 @@ void main() {
     await directory.delete(recursive: true);
   });
 
-  testWidgets(
-    'settings dispatch selected and complete downloads on a narrow screen',
-    (tester) async {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      final recorder = _RecordingSync();
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [syncStatusProvider.overrideWith(() => recorder)],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: CacheSyncSettings(),
-                ),
+  testWidgets('each settings button syncs only its group on a narrow screen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final recorder = _RecordingSync();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [syncStatusProvider.overrideWith(() => recorder)],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CacheSyncSettings(),
               ),
             ),
           ),
         ),
-      );
-      expect(tester.takeException(), isNull);
-      await tester.ensureVisible(find.byKey(const Key('sync-selected')));
-      await tester.tap(find.byKey(const Key('sync-selected')));
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.byType(CheckboxListTile), findsNothing);
+    final groups = <String, Set<SyncTarget>>{
+      'sync-liturgy': {SyncTarget.days, SyncTarget.readings},
+      'sync-prayers': {SyncTarget.prayers},
+      'sync-bible': {SyncTarget.bibleBel, SyncTarget.bibleRu},
+      'sync-other': {
+        SyncTarget.years,
+        SyncTarget.invitatoriums,
+        SyncTarget.completoriums,
+        SyncTarget.prayerCategories,
+      },
+    };
+    for (final entry in groups.entries) {
+      await tester.ensureVisible(find.byKey(Key(entry.key)));
+      await tester.tap(find.byKey(Key(entry.key)));
       await tester.pump();
-      expect(recorder.plans.single.targets, {...SyncTarget.values});
-      expect(recorder.plans.single.period, SyncPeriod.fortnight);
-      expect(recorder.plans.single.baseDate, isNotNull);
-      await tester.ensureVisible(find.byKey(const Key('sync-entire-database')));
-      await tester.tap(find.byKey(const Key('sync-entire-database')));
+      expect(recorder.plans.last.targets, entry.value);
+      expect(recorder.plans.last.forceRefresh, isTrue);
+    }
+    expect(recorder.plans.first.dates!.length, 15);
+    await tester.ensureVisible(find.byKey(const Key('sync-entire-database')));
+    await tester.tap(find.byKey(const Key('sync-entire-database')));
+    await tester.pump();
+    expect(recorder.plans.last.period, SyncPeriod.all);
+    expect(recorder.plans.last.targets, {...SyncTarget.values});
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('liturgy offers default, two weeks, two months and all', (
+    tester,
+  ) async {
+    final recorder = _RecordingSync();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [syncStatusProvider.overrideWith(() => recorder)],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CacheSyncSettings(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    for (final entry in {
+      '2 тыдні': SyncPeriod.fortnight,
+      '2 месяцы': SyncPeriod.twoMonths,
+      'Усё': SyncPeriod.all,
+    }.entries) {
+      await tester.ensureVisible(find.byKey(const Key('sync-liturgy-period')));
+      await tester.tap(find.byKey(const Key('sync-liturgy-period')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(entry.key).last);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(const Key('sync-liturgy')));
+      await tester.tap(find.byKey(const Key('sync-liturgy')));
       await tester.pump();
-      expect(recorder.plans.last.period, SyncPeriod.all);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox.shrink());
-    },
-  );
+      expect(recorder.plans.last.targets, {
+        SyncTarget.days,
+        SyncTarget.readings,
+      });
+      expect(recorder.plans.last.period, entry.value);
+      expect(recorder.plans.last.dates, isNull);
+    }
+    await tester.ensureVisible(find.byKey(const Key('sync-liturgy-period')));
+    await tester.tap(find.byKey(const Key('sync-liturgy-period')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Па змаўчанні').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sync-liturgy')));
+    await tester.pump();
+    expect(recorder.plans.last.dates!.length, 15);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 
   test('default date window is today plus seven days each way', () {
     final dates = CacheWarmupService.buildDateOrder(DateTime(2026, 1, 2));
@@ -106,6 +171,16 @@ void main() {
     expect(dates.last, DateTime(2024, 2, 28));
     expect(dates.length, 29);
   });
+
+  test(
+    'two month period spans two calendar months including year rollover',
+    () {
+      final dates = SyncPeriod.twoMonths.dates(DateTime(2025, 12, 31));
+      expect(dates.first, DateTime(2025, 12, 31));
+      expect(dates.last, DateTime(2026, 2, 27));
+      expect(dates.length, 59);
+    },
+  );
 
   test(
     'first bootstrap releases today before starting background window',

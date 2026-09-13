@@ -17,8 +17,6 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
-import 'package:mybrev_flutter/utils/text_hyphenation.dart';
-import 'package:mybrev_flutter/widgets/hyphenated_html.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
@@ -328,28 +326,11 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           onLinkTap: _onLinkTap,
           html: formattedHtml,
           styles: styles,
-          textStyle: textStyle.copyWith(height: 1.7),
         );
       }
-      return HyphenatedHtml(
-        onLinkTap: _onLinkTap,
-        data: formattedHtml,
-        style: styles,
-        textStyle: textStyle.copyWith(height: 1.7),
-      );
+      return Html(onLinkTap: _onLinkTap, data: formattedHtml, style: styles);
     }
-    return LayoutBuilder(
-      builder: (context, constraints) => SelectableText(
-        wrapReaderText(
-          raw,
-          style: textStyle,
-          maxWidth: constraints.maxWidth,
-          textDirection: Directionality.of(context),
-          textScaler: MediaQuery.textScalerOf(context),
-        ),
-        style: textStyle,
-      ),
-    );
+    return SelectableText(raw, style: textStyle);
   }
 }
 
@@ -364,13 +345,11 @@ class _MassDocument extends StatefulWidget {
   const _MassDocument({
     required this.html,
     required this.styles,
-    required this.textStyle,
     required this.onLinkTap,
   });
 
   final String html;
   final Map<String, Style> styles;
-  final TextStyle textStyle;
   final OnTap onLinkTap;
 
   @override
@@ -448,11 +427,10 @@ class _MassDocumentState extends State<_MassDocument> {
   @override
   Widget build(BuildContext context) {
     if (_sections.isEmpty) {
-      return HyphenatedHtml(
+      return Html(
         onLinkTap: widget.onLinkTap,
         data: widget.html,
         style: widget.styles,
-        textStyle: widget.textStyle,
       );
     }
     final cs = Theme.of(context).colorScheme;
@@ -500,20 +478,18 @@ class _MassDocumentState extends State<_MassDocument> {
         ),
         const SizedBox(height: 18),
         if (_preamble.trim().isNotEmpty)
-          HyphenatedHtml(
+          Html(
             onLinkTap: widget.onLinkTap,
             data: _preamble,
             style: widget.styles,
-            textStyle: widget.textStyle,
           ),
         for (var i = 0; i < _sections.length; i++)
           KeyedSubtree(
             key: _sectionKeys[i],
-            child: HyphenatedHtml(
+            child: Html(
               onLinkTap: widget.onLinkTap,
               data: _sections[i].html,
               style: widget.styles,
-              textStyle: widget.textStyle,
             ),
           ),
       ],

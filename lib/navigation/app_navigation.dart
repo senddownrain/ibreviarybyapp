@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -138,6 +139,20 @@ class BranchRouteObserver extends NavigatorObserver {
 
   final BranchShellController controller;
 
+  void _updateController(VoidCallback update) {
+    final binding = SchedulerBinding.instance;
+    if (binding.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+      // Navigator observers also run while branch Navigators are mounting.
+      // Their shell listeners must not rebuild ancestors during that build.
+      binding.addPostFrameCallback((_) {
+        if (navigator?.mounted != true) return;
+        update();
+      });
+    } else {
+      update();
+    }
+  }
+
   AppRouteEntry? _entry(Route<dynamic>? route) =>
       route?.settings.arguments is AppRouteEntry
       ? route!.settings.arguments! as AppRouteEntry
@@ -147,7 +162,7 @@ class BranchRouteObserver extends NavigatorObserver {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     final entry = _entry(route);
-    if (entry != null) controller.activate(entry);
+    if (entry != null) _updateController(() => controller.activate(entry));
   }
 
   @override
@@ -155,7 +170,8 @@ class BranchRouteObserver extends NavigatorObserver {
     super.didPop(route, previousRoute);
     final entry = _entry(route);
     if (entry != null) {
-      controller.remove(entry, revealed: _entry(previousRoute));
+      final revealed = _entry(previousRoute);
+      _updateController(() => controller.remove(entry, revealed: revealed));
     }
   }
 
@@ -164,7 +180,8 @@ class BranchRouteObserver extends NavigatorObserver {
     super.didRemove(route, previousRoute);
     final entry = _entry(route);
     if (entry != null) {
-      controller.remove(entry, revealed: _entry(previousRoute));
+      final revealed = _entry(previousRoute);
+      _updateController(() => controller.remove(entry, revealed: revealed));
     }
   }
 
@@ -173,8 +190,10 @@ class BranchRouteObserver extends NavigatorObserver {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     final oldEntry = _entry(oldRoute);
     final newEntry = _entry(newRoute);
-    if (oldEntry != null) controller.remove(oldEntry);
-    if (newEntry != null) controller.activate(newEntry);
+    _updateController(() {
+      if (oldEntry != null) controller.remove(oldEntry);
+      if (newEntry != null) controller.activate(newEntry);
+    });
   }
 }
 
