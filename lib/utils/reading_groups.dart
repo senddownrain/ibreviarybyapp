@@ -90,6 +90,27 @@ String normalizeReadingCycle(String? value) {
   return const {'A', 'B', 'C', '1', '2'}.contains(cycle) ? cycle : '';
 }
 
+final RegExp _readingYearSuffixPattern = RegExp(
+  r'(?:,\s*)?Год\s+(?:[АAВBБCС]|I{1,3}|[12])\s*:?\s*$',
+  caseSensitive: false,
+);
+
+/// The stored reading titles often end with a hardcoded "Год A" suffix that
+/// does not necessarily match the document's actual lectionary year.
+String stripReadingYearSuffix(String title) =>
+    title.replaceFirst(_readingYearSuffixPattern, '').trim();
+
+/// "Год A" / "Год I" label for a lectionary cycle ('A'|'B'|'C'|'1'|'2').
+String readingCycleLabel(String cycle) {
+  final normalized = normalizeReadingCycle(cycle);
+  return switch (normalized) {
+    'A' || 'B' || 'C' => 'Год $normalized',
+    '1' => 'Год I',
+    '2' => 'Год II',
+    _ => '',
+  };
+}
+
 String _stripHtml(String s) =>
     s.replaceAll(RegExp(r'<[^>]+>'), '').replaceAll(RegExp(r'\s+'), ' ').trim();
 

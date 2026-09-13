@@ -55,6 +55,8 @@ class BranchShellController extends ReaderChromeModeController {
 
   String? get activeEntryId => _activeEntryId;
   AppRouteDescriptor get activeDescriptor => _activeDescriptor;
+  bool get isDisposed => _disposed;
+  bool _disposed = false;
   bool get isAtRoot => _activeDescriptor.isBranchRoot;
   bool get navigationDockSuppressed =>
       _activeEntryId != null && _contextualBottomSlots.contains(_activeEntryId);
@@ -62,6 +64,7 @@ class BranchShellController extends ReaderChromeModeController {
   bool containsEntry(String entryId) => _entries.containsKey(entryId);
 
   void activate(AppRouteEntry entry) {
+    if (_disposed) return;
     final routeChanged =
         _activeEntryId != entry.id || _activeDescriptor != entry.descriptor;
     _entries[entry.id] = entry.descriptor;
@@ -71,6 +74,7 @@ class BranchShellController extends ReaderChromeModeController {
   }
 
   void reveal(AppRouteEntry entry) {
+    if (_disposed) return;
     final routeChanged =
         _activeEntryId != entry.id || _activeDescriptor != entry.descriptor;
     _entries[entry.id] = entry.descriptor;
@@ -80,6 +84,7 @@ class BranchShellController extends ReaderChromeModeController {
   }
 
   void remove(AppRouteEntry entry, {AppRouteEntry? revealed}) {
+    if (_disposed) return;
     _entries.remove(entry.id);
     _overrides.remove(entry.id);
     _contextualBottomSlots.remove(entry.id);
@@ -93,18 +98,21 @@ class BranchShellController extends ReaderChromeModeController {
   }
 
   void request(String entryId, ReaderChromeMode mode) {
+    if (_disposed) return;
     if (_activeEntryId != entryId || !_entries.containsKey(entryId)) return;
     _overrides[entryId] = mode;
     _publishResolvedMode();
   }
 
   void resetActiveOverride() {
+    if (_disposed) return;
     final entryId = _activeEntryId;
     if (entryId != null) _overrides.remove(entryId);
     _publishResolvedMode();
   }
 
   void resetEntry(AppRouteEntry entry) {
+    if (_disposed) return;
     if (_activeEntryId != entry.id) return;
     _overrides.remove(entry.id);
     _contextualBottomSlots.remove(entry.id);
@@ -112,6 +120,7 @@ class BranchShellController extends ReaderChromeModeController {
   }
 
   void requestContextualBottomSlot(String entryId, {required bool visible}) {
+    if (_disposed) return;
     if (_activeEntryId != entryId || !_entries.containsKey(entryId)) return;
     final changed = visible
         ? _contextualBottomSlots.add(entryId)
@@ -120,17 +129,21 @@ class BranchShellController extends ReaderChromeModeController {
   }
 
   void _publishResolvedMode({bool routeChanged = false}) {
+    if (_disposed) return;
     final resolved = _activeEntryId == null
         ? _activeDescriptor.defaultChromeMode
         : _overrides[_activeEntryId] ?? _activeDescriptor.defaultChromeMode;
     if (value != resolved) {
       value = resolved;
     } else if (routeChanged) {
-      // Shell chrome depends on the active descriptor and owner as well as on
-      // the coarse Full/Compact/Hidden value. Publish Full -> Full route
-      // changes so local Back controls cannot be covered by stale shell chrome.
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 }
 
@@ -141,11 +154,11 @@ class BranchRouteObserver extends NavigatorObserver {
 
   void _updateController(VoidCallback update) {
     final binding = SchedulerBinding.instance;
-    if (binding.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+    if (binding.schedulerPhase != SchedulerPhase.idle) {
       // Navigator observers also run while branch Navigators are mounting.
       // Their shell listeners must not rebuild ancestors during that build.
       binding.addPostFrameCallback((_) {
-        if (navigator?.mounted != true) return;
+        if (controller.isDisposed || navigator?.mounted != true) return;
         update();
       });
     } else {
@@ -208,8 +221,15 @@ class AppShellState extends ChangeNotifier {
           ),
       } {
     for (final controller in branches.values) {
-      controller.addListener(notifyListeners);
+      controller.addListener(_onBranchChanged);
     }
+  }
+
+  bool _disposed = false;
+
+  void _onBranchChanged() {
+    if (_disposed) return;
+    notifyListeners();
   }
 
   final Map<AppBranch, BranchShellController> branches;
@@ -248,9 +268,10 @@ class AppShellState extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     for (final controller in branches.values) {
       controller
-        ..removeListener(notifyListeners)
+        ..removeListener(_onBranchChanged)
         ..dispose();
     }
     super.dispose();
@@ -295,7 +316,13 @@ class _AppRouteEntryAdapterState extends State<AppRouteEntryAdapter> {
     if (oldWidget.entry.id == widget.entry.id &&
         oldWidget.controller == widget.controller) {
       if (oldWidget.entry.documentKey != widget.entry.documentKey) {
-        widget.controller.resetEntry(widget.entry);
+        final controller = widget.controller;
+        final entry = widget.entry;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!controller.isDisposed && controller.activeEntryId == entry.id) {
+            controller.resetEntry(entry);
+          }
+        });
       }
       return;
     }
@@ -374,7 +401,16 @@ class _RouteChromeController extends ReaderChromeModeController {
       super.value = newValue;
       return;
     }
-    branchController.request(entry.id, newValue);
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      branchController.request(entry.id, newValue);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!branchController.isDisposed &&
+            branchController.activeEntryId == entry.id) {
+          branchController.request(entry.id, newValue);
+        }
+      });
+    }
   }
 
   void _syncFromBranch() {

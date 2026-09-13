@@ -244,6 +244,34 @@ void main() {
     expect(find.text('Сырая назва набору'), findsNothing);
   });
 
+  testWidgets('celebration titles do not get a lectionary year suffix', (
+    tester,
+  ) async {
+    const memorial = ParsedReading(
+      id: 'memoria-doc',
+      title: 'Святы Ян, Год A',
+      year: '2',
+      rank: 'memoria',
+      dayOfWeek: 4,
+      reading1: ParsedSection(text: 'Тэкст чытання'),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_TestSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(_loader([memorial])),
+        ],
+        child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Святы Ян'), findsOneWidget);
+    expect(find.text('Святы Ян, Год A'), findsNothing);
+    expect(find.text('Святы Ян, Год II'), findsNothing);
+  });
+
   testWidgets('liturgical route formats its title with a Roman week number', (
     tester,
   ) async {

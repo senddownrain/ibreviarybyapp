@@ -56,4 +56,20 @@ void main() {
     expect(parsed.toMap()['_variant'], 'vigil');
     expect(parsed.calendarDayOfWeek, 7);
   });
+
+  test('strips the hardcoded year suffix from stored titles', () {
+    expect(stripReadingYearSuffix('XXIV Звычайная нядзеля, Год A'), 'XXIV Звычайная нядзеля');
+    expect(stripReadingYearSuffix('Нядзеля, год Б:'), 'Нядзеля');
+    expect(stripReadingYearSuffix('Серада, Год II'), 'Серада');
+    expect(stripReadingYearSuffix('Святая Сям’я'), 'Святая Сям’я');
+  });
+
+  test('builds a year label for sunday and weekday cycles', () {
+    expect(readingCycleLabel('A'), 'Год A');
+    expect(readingCycleLabel('b'), 'Год B');
+    expect(readingCycleLabel('1'), 'Год I');
+    expect(readingCycleLabel('2'), 'Год II');
+    expect(readingCycleLabel(''), isEmpty);
+    expect(readingCycleLabel('x'), isEmpty);
+  });
 }
