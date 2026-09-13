@@ -40,19 +40,16 @@ class LiturgicalDayService {
     for (final collection in [kDaysCollection]) {
       try {
         final snap = await retryFirestore(
-          () => _col(collection)
-              .doc(id)
-              .get(
-                forceRefresh
-                    ? const GetOptions(source: Source.server)
-                    : const GetOptions(),
-              ),
+          () => _col(
+            collection,
+          ).doc(id).get(const GetOptions(source: Source.server)),
         );
         if (!snap.exists) continue;
         final data = {...snap.data()!, 'id': snap.id};
         await cacheDayDoc(snap.id, data);
         return LiturgicalDay.fromMap(data);
       } catch (e, st) {
+        if (forceRefresh) rethrow;
         if (kDebugMode) {
           debugPrint(
             '[LiturgicalDayService] getDayById($id) in $collection: $e\n$st',
@@ -108,21 +105,13 @@ class LiturgicalDayService {
                 .where('_dayOfWeek', isEqualTo: '$dayOfWeek')
                 .where('_periodWeekNumber', isEqualTo: '$periodWeek')
                 .limit(1)
-                .get(
-                  forceRefresh
-                      ? const GetOptions(source: Source.server)
-                      : const GetOptions(),
-                ),
+                .get(const GetOptions(source: Source.server)),
             _col(collection)
                 .where('_periodType', isEqualTo: periodType)
                 .where('_dayOfWeek', isEqualTo: dayOfWeek)
                 .where('_periodWeekNumber', isEqualTo: periodWeek)
                 .limit(1)
-                .get(
-                  forceRefresh
-                      ? const GetOptions(source: Source.server)
-                      : const GetOptions(),
-                ),
+                .get(const GetOptions(source: Source.server)),
           ]),
         );
 
@@ -140,6 +129,7 @@ class LiturgicalDayService {
           );
         }
       } catch (e, st) {
+        if (forceRefresh) rethrow;
         if (kDebugMode) {
           debugPrint(
             '[LiturgicalDayService] findDayByPeriod in $collection: $e\n$st',
@@ -177,11 +167,7 @@ class LiturgicalDayService {
             for (final variant in feastCodeVariants(feastCode))
               _col(collection)
                   .where('_feast', isEqualTo: variant)
-                  .get(
-                    forceRefresh
-                        ? const GetOptions(source: Source.server)
-                        : const GetOptions(),
-                  ),
+                  .get(const GetOptions(source: Source.server)),
           ]),
         );
         for (final snap in snaps) {
@@ -193,6 +179,7 @@ class LiturgicalDayService {
         }
         if (results.isNotEmpty) return results.values.toList();
       } catch (e, st) {
+        if (forceRefresh) rethrow;
         if (kDebugMode) {
           debugPrint(
             '[LiturgicalDayService] findDaysByFeast in $collection: $e\n$st',
@@ -236,11 +223,7 @@ class LiturgicalDayService {
             for (final v in variants)
               _col(collection)
                   .where('_date', isEqualTo: v)
-                  .get(
-                    forceRefresh
-                        ? const GetOptions(source: Source.server)
-                        : const GetOptions(),
-                  ),
+                  .get(const GetOptions(source: Source.server)),
           ]),
         );
         for (final snap in snaps) {
@@ -252,6 +235,7 @@ class LiturgicalDayService {
         }
         if (results.isNotEmpty) return results.values.toList();
       } catch (e, st) {
+        if (forceRefresh) rethrow;
         if (kDebugMode) {
           debugPrint(
             '[LiturgicalDayService] findDaysByFixedDate in $collection: $e\n$st',
@@ -271,6 +255,7 @@ class LiturgicalDayService {
     required List<String> feastCodes,
     bool forceRefresh = false,
   }) async {
+    if (!forceRefresh && HiveService.isDateCached('days', date)) return;
     await Future.wait([
       findDayByPeriod(
         periodType,

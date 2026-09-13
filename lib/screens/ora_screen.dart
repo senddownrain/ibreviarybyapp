@@ -23,6 +23,7 @@ import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/alternative_text.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
+import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
@@ -323,7 +324,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             MediaQuery.paddingOf(context).bottom + 24,
           ),
           children: const [
-            TileShimmer(),
+            DataLoadingNotice(label: 'Загружаем тэкст літургічнай гадзіны'),
             TileShimmer(),
             TileShimmer(),
             TileShimmer(),

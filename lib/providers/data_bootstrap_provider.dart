@@ -1,160 +1,111 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
-import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/models/sync_plan.dart';
+import 'package:mybrev_flutter/providers/cache_policy_provider.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/cache_warmup_service.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
 
 class DataBootstrapState {
-  final bool isRunning;
-  final bool initialComplete;
-  final String? phase;
-  final String? error;
-
   const DataBootstrapState({
     this.isRunning = false,
     this.initialComplete = false,
     this.phase,
     this.error,
   });
-
-  DataBootstrapState copyWith({
-    bool? isRunning,
-    bool? initialComplete,
-    Object? phase = _unset,
-    Object? error = _unset,
-  }) => DataBootstrapState(
-    isRunning: isRunning ?? this.isRunning,
-    initialComplete: initialComplete ?? this.initialComplete,
-    phase: identical(phase, _unset) ? this.phase : phase as String?,
-    error: identical(error, _unset) ? this.error : error as String?,
-  );
-}
-
-const Object _unset = Object();
-
-bool _sameDay(DateTime? a, DateTime? b) {
-  if (a == null || b == null) return false;
-  return a.year == b.year && a.month == b.month && a.day == b.day;
+  final bool isRunning;
+  final bool initialComplete;
+  final String? phase;
+  final String? error;
 }
 
 class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
-  Timer? _dateDebounce;
-  bool _pendingRetry = false;
-  bool _warmupInFlight = false;
-  DateTime? _pendingWarmupDate;
+  bool _disposed = false;
+  bool _backgroundRunning = false;
+  bool _backgroundAgain = false;
 
   @override
   DataBootstrapState build() {
+    ref.onDispose(() => _disposed = true);
     ref.listen(connectivityProvider, (prev, next) {
-      final wasOffline = prev?.value == false;
-      final isOnline = next.value == true;
-      if (wasOffline && isOnline && (_pendingRetry || !state.initialComplete)) {
-        _pendingRetry = false;
-        unawaited(_runInitialBootstrap());
+      if (prev?.value == false && next.value == true) {
+        if (!state.initialComplete) {
+          ref.invalidate(selectedDateReadyProvider);
+          unawaited(_runInitialBootstrap());
+        } else {
+          unawaited(_background());
+        }
       }
     });
-
-    ref.listen(selectedDateProvider, (prev, next) {
-      if (state.initialComplete && !_sameDay(prev, next)) {
-        scheduleWarmupForDate(next);
+    ref.listen(cachePolicyProvider, (prev, next) {
+      if (!next.enabled) {
+        ref.read(syncStatusProvider.notifier).cancelBackground();
       }
+      if (state.initialComplete && next.enabled) unawaited(_background());
     });
-
     Future.microtask(_runInitialBootstrap);
     return const DataBootstrapState();
   }
 
-  void scheduleWarmupForDate(DateTime date) {
-    _dateDebounce?.cancel();
-    _dateDebounce = Timer(const Duration(milliseconds: 350), () {
-      unawaited(_warmupAround(date));
-    });
+  Future<void> resume() async {
+    if (_disposed) return;
+    if (state.initialComplete) {
+      await _background();
+    } else {
+      ref.invalidate(selectedDateReadyProvider);
+      await _runInitialBootstrap();
+    }
   }
 
   Future<void> _runInitialBootstrap() async {
     if (state.isRunning) return;
-
-    state = state.copyWith(
-      isRunning: true,
-      phase: HiveService.needsBootstrap() ? 'static' : 'warmup',
-      error: null,
-    );
-
+    state = const DataBootstrapState(isRunning: true, phase: 'today');
     try {
-      if (HiveService.needsBootstrap()) {
-        await ref.read(syncStatusProvider.notifier).syncEssentialsIfEmpty();
-      }
-
-      state = state.copyWith(phase: 'warmup');
-      await _warmupAround(ref.read(selectedDateProvider));
-
-      state = state.copyWith(
-        isRunning: false,
-        initialComplete: true,
-        phase: null,
-        error: null,
-      );
-      _pendingRetry = false;
-
-      // Month-ahead prefetch in background after first screen is usable.
-      unawaited(_warmupExtended());
-    } catch (e, st) {
-      if (kDebugMode) debugPrint('[DataBootstrap] initial failed: $e\n$st');
-      _pendingRetry = true;
-      state = state.copyWith(
-        isRunning: false,
-        error: e.toString(),
-        phase: null,
-      );
+      await ref.read(selectedDateReadyProvider.future);
+      if (_disposed) return;
+      state = const DataBootstrapState(initialComplete: true);
+      unawaited(_background());
+    } catch (e) {
+      if (!_disposed) state = DataBootstrapState(error: e.toString());
     }
   }
 
-  /// Warm date window; coalesce rapid date changes — last date wins.
-  Future<void> _warmupAround(DateTime date) async {
-    if (_warmupInFlight) {
-      _pendingWarmupDate = date;
+  /// Date changes are loaded by selectedDateReadyProvider immediately.
+  void scheduleWarmupForDate(DateTime date) {
+    ref.invalidate(selectedDateReadyProvider);
+  }
+
+  Future<void> _background() async {
+    if (_backgroundRunning) {
+      _backgroundAgain = true;
       return;
     }
-
-    var target = date;
-    _warmupInFlight = true;
+    _backgroundRunning = true;
     try {
-      while (true) {
-        _pendingWarmupDate = null;
-        await CacheWarmupService().warmup(baseDate: target);
-        ref.read(cacheEpochProvider.notifier).state++;
-
-        final pending = _pendingWarmupDate;
-        if (pending == null || _sameDay(pending, target)) break;
-        target = pending;
-      }
-    } catch (e, st) {
-      if (kDebugMode) debugPrint('[DataBootstrap] warmup failed: $e\n$st');
-      _pendingRetry = true;
-      rethrow;
+      do {
+        _backgroundAgain = false;
+        if (_disposed) return;
+        final policy = ref.read(cachePolicyProvider);
+        if (!policy.enabled) return;
+        await ref
+            .read(syncStatusProvider.notifier)
+            .synchronize(
+              SyncPlan(
+                targets: {...SyncTarget.values},
+                dates: CacheWarmupService.buildDateOrder(
+                  DateTime.now(),
+                  behind: policy.behind,
+                  ahead: policy.ahead,
+                ),
+                forceRefresh: false,
+                background: true,
+              ),
+            );
+      } while (_backgroundAgain && !_disposed);
     } finally {
-      _warmupInFlight = false;
-      final pending = _pendingWarmupDate;
-      if (pending != null && !_sameDay(pending, target)) {
-        unawaited(_warmupAround(pending));
-      }
-    }
-  }
-
-  Future<void> _warmupExtended() async {
-    try {
-      await CacheWarmupService().warmupExtended(
-        baseDate: ref.read(selectedDateProvider),
-      );
-      ref.read(cacheEpochProvider.notifier).state++;
-    } catch (e, st) {
-      if (kDebugMode) debugPrint('[DataBootstrap] extended warmup: $e\n$st');
+      _backgroundRunning = false;
     }
   }
 }
@@ -164,12 +115,7 @@ final dataBootstrapProvider =
       DataBootstrapNotifier.new,
     );
 
-/// True while first-load bootstrap or calendar prerequisites are pending.
 final homeDataLoadingProvider = Provider<bool>((ref) {
-  final bootstrap = ref.watch(dataBootstrapProvider);
-  final calendar = ref.watch(calendarReadyProvider);
-  if (!bootstrap.initialComplete) {
-    return bootstrap.isRunning || calendar.isLoading;
-  }
-  return calendar.isLoading;
+  ref.watch(dataBootstrapProvider);
+  return ref.watch(selectedDateReadyProvider).isLoading;
 });

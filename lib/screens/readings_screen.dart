@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
@@ -346,22 +347,24 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       periodWeek: week,
       dayOfWeek: day,
       date: DateTime(2000, 2, 2),
-      useArabicWeekNumber: true,
+      useArabicWeekNumber: false,
     );
   }
 
   String _contextTitleFor(
-    ReadingCelebrationGroup group,
+    ReadingCelebrationGroup? group,
     ParsedReading? reading,
   ) {
-    if (reading != null && group.key.startsWith('period:')) {
-      final periodTitle = liturgicalReadingPeriodTitle(
-        reading,
-        DateTime.tryParse(widget.dateStr ?? '') ?? DateTime(2000, 2, 2),
+    if (reading != null && (reading.periodType ?? '').isNotEmpty) {
+      final periodTitle = formatLiturgicalPeriodTitle(
+        periodType: reading.periodType!,
+        periodWeek: reading.periodWeekNumber,
+        dayOfWeek: reading.dayOfWeek,
+        date: DateTime.tryParse(widget.dateStr ?? '') ?? DateTime(2000, 2, 2),
       );
       if (periodTitle.isNotEmpty) return periodTitle;
     }
-    return group.label;
+    return group?.label ?? reading?.title ?? _title;
   }
 
   bool _onScroll(ScrollNotification notification) {
@@ -479,6 +482,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     final seasonColor = _readingColor();
     Widget document;
     String contextTitle = _title;
+    String? cycleLabel;
     if (_loading) {
       document = const _ReadingsStatus(
         icon: null,
@@ -507,9 +511,18 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       final activeGroup = selection.groups
           .where((group) => group.key == selection.activeGroupKey)
           .firstOrNull;
-      contextTitle = activeGroup != null
-          ? _contextTitleFor(activeGroup, reading)
-          : reading?.title ?? _title;
+      contextTitle = _contextTitleFor(activeGroup, reading);
+      final cycle = normalizeReadingCycle(reading?.year);
+      if (cycle.isNotEmpty) cycleLabel = 'Цыкл ${_cycleLabel(cycle)}';
+      contextTitle = contextTitle
+          .replaceAll(
+            RegExp(
+              r'\s*[,·:—–-]?\s*[([]?\s*(?:год|цыкл|цикл)\s+[ABCАВСІI12]+\s*[)\]]?\s*\.?$',
+              caseSensitive: false,
+            ),
+            '',
+          )
+          .trim();
       document = reading == null
           ? const _ReadingsStatus(
               icon: PhosphorIconsLight.bookOpen,
@@ -562,6 +575,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           dateLabel: _formatReadingsDate(widget.dateStr, widget.liturgicalKey),
           seasonColor: seasonColor,
           manualCycleLabel: manualLabel,
+          cycleLabel: cycleLabel,
           showToday: widget.dateStr != null && !today,
           showOptions: !_loading && _error == null && _hasOptions,
           onDateTap: _showDateActions,
@@ -697,12 +711,14 @@ class _ReadingsContextHeader extends StatelessWidget {
     required this.onToday,
     required this.onOptions,
     this.manualCycleLabel,
+    this.cycleLabel,
   });
 
   final String title;
   final String dateLabel;
   final Color seasonColor;
   final String? manualCycleLabel;
+  final String? cycleLabel;
   final bool showToday;
   final bool showOptions;
   final VoidCallback onDateTap;
@@ -768,6 +784,27 @@ class _ReadingsContextHeader extends StatelessWidget {
                 height: 1.2,
               ),
             ),
+            if (cycleLabel != null) ...[
+              const SizedBox(height: 10),
+              Container(
+                key: const Key('readings-cycle-badge'),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: seasonColor.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  cycleLabel!,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: seasonColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
             if (manualCycleLabel != null) ...[
               const SizedBox(height: 7),
               Text(
@@ -993,7 +1030,7 @@ class _ReadingsStatus extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (loading)
-            const CircularProgressIndicator()
+            const DataLoadingNotice(label: 'Загружаем чытанні выбранага дня')
           else if (icon != null)
             PhosphorIcon(
               icon!,
@@ -1282,7 +1319,7 @@ class _ReadingTextState extends State<_ReadingText> {
       final base = widget.textStyle.fontSize ?? 16;
       return HyphenatedHtml(
         data: widget.isPsalm
-            ? formatPsalmHtml(widget.text)
+            ? formatReadingPsalmHtml(widget.text)
             : formatLiturgicalHtml(widget.text),
         textStyle: widget.textStyle.copyWith(height: 1.78),
         style: {
@@ -1321,10 +1358,9 @@ class _ReadingTextState extends State<_ReadingText> {
     }
     final reader = ReaderTheme.of(context);
     final namespace = widget.highlightNamespace;
-    final plainText = widget.text.replaceAll(
-      RegExp(r'\r?\n[ \t]*\r?\n+'),
-      '\n',
-    );
+    final plainText =
+        (widget.isPsalm ? formatReadingPsalmText(widget.text) : widget.text)
+            .replaceAll(RegExp(r'\r?\n[ \t]*\r?\n+'), '\n');
     return LayoutBuilder(
       builder: (context, constraints) {
         final wrappedText = wrapReaderText(

@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
 
 class BibleVerse {
   final int verse;
@@ -239,53 +238,44 @@ class BibleRepository {
     return [];
   }
 
-  /// Load bundled assets then try Firestore in background.
-  static Future<void> preload() async {
-    _dataBel ??= await BibleSeedLoader.load(lang: 'bel');
-    _data ??= await BibleSeedLoader.load(lang: 'ru');
-    // Background: refresh both versions from Firestore when online.
-    unawaited(_loadFromFirestore('bel'));
-    unawaited(_loadFromFirestore('ru'));
+  static final Map<String, Future<void>> _loading = {};
+
+  static Future<void> ensureVersion(String versionId) {
+    if (_versionData(versionId) != null) return Future.value();
+    return _loading.putIfAbsent(versionId, () async {
+      try {
+        if (HiveService.isSettingsReady &&
+            HiveService.getLastSync('bible_$versionId') != null &&
+            HiveService.boxFor('bible_$versionId').isNotEmpty) {
+          loadCachedVersion(versionId);
+        } else {
+          setData(versionId, await BibleSeedLoader.load(lang: versionId));
+        }
+      } finally {
+        _loading.remove(versionId);
+      }
+    });
   }
 
-  /// Replaces missing or corrupt in-memory corpora from bundled offline data.
-  static Future<void> reloadBundled() async {
-    _dataBel = await BibleSeedLoader.load(lang: 'bel');
-    _data = await BibleSeedLoader.load(lang: 'ru');
-  }
-
-  static Future<void> _loadFromFirestore(String versionId) async {
-    try {
-      final collection = 'bible_$versionId';
-      final snap = await FirebaseFirestore.instance
-          .collection(collection)
-          .get(const GetOptions(source: Source.serverAndCache));
-      if (snap.docs.isEmpty) return;
-
-      final books =
-          snap.docs.map((doc) {
-            final d = doc.data();
-            return {
-              'id': doc.id,
-              'name': d['name'] ?? '',
-              'order': d['order'] ?? 0,
-              'chapterCount': d['chapterCount'] ?? 0,
-              'chapters': d['chapters'] ?? {},
-            };
-          }).toList()..sort(
+  static void loadCachedVersion(String versionId) {
+    final books =
+        HiveService.boxFor(
+            'bible_$versionId',
+          ).values.map((raw) => Map<String, dynamic>.from(raw as Map)).toList()
+          ..sort(
             (a, b) => ((a['order'] as num?)?.toInt() ?? 0).compareTo(
               (b['order'] as num?)?.toInt() ?? 0,
             ),
           );
+    if (books.isNotEmpty) setData(versionId, {'books': books});
+  }
 
-      setData(versionId, {'books': books});
-      if (kDebugMode) {
-        debugPrint(
-          '[BibleRepository] Loaded ${books.length} books from Firestore ($versionId)',
-        );
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('[BibleRepository] Firestore load failed: $e');
-    }
+  /// Offline data is decoded lazily, after the first frame.
+  static Future<void> preload() =>
+      Future.wait([ensureVersion('bel'), ensureVersion('ru')]);
+
+  static Future<void> reloadBundled() async {
+    _dataBel = await BibleSeedLoader.load(lang: 'bel');
+    _data = await BibleSeedLoader.load(lang: 'ru');
   }
 }

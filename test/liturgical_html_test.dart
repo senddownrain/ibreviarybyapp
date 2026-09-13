@@ -2,6 +2,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 void main() {
+  test('reading psalm verses break after stars and before verse numbers', () {
+    const source =
+        '2. Я цвёрда спадзяваўся на Пана, * і Ён схіліўся '
+        'нада мною, і пачуў мой крык. 4. І паклаў у мае вусны новую '
+        'песню, * спеў хвалы нашаму Богу.';
+    expect(
+      formatReadingPsalmText(source),
+      '2. Я цвёрда спадзяваўся на Пана, *\nі Ён схіліўся '
+      'нада мною, і пачуў мой крык.\n4. І паклаў у мае вусны новую '
+      'песню, *\nспеў хвалы нашаму Богу.',
+    );
+    final html = formatReadingPsalmHtml('<p>$source</p>');
+    expect(html, contains('*</span><br>і Ён'));
+    expect(html, contains('мой крык.<br>4.'));
+    expect(html, contains('*</span><br>спеў'));
+  });
+
+  test(
+    'reading psalm HTML removes encoded spaces and keeps existing breaks',
+    () {
+      final html = formatReadingPsalmHtml(
+        '<p>2. Першы <b>&ast;</b>&nbsp;&#x20;<br>другі. '
+        '&#32;14. Трэці *&#x20;чацвёрты.</p>',
+      );
+      expect(html, contains('*</span></b><br>другі.'));
+      expect(html, contains('другі.<br>14.'));
+      expect(html, contains('*</span><br>чацвёрты.'));
+      expect(html, isNot(contains('<br><br>')));
+    },
+  );
+
   group('formatPsalmHtml', () {
     test('marks cadence signs and alternating strophes', () {
       final result = formatPsalmHtml(

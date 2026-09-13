@@ -6,6 +6,19 @@ class ReadingsIndex {
   static const _periodPrefix = 'period:';
   static const _feastPrefix = 'feast:';
 
+  static Future<void> removeDoc(String docId, Map<String, dynamic> data) async {
+    final box = HiveService.readingsIndexBox;
+    for (final key in _keysFor(data)) {
+      final ids = (box.get(key) as List?)?.cast<String>() ?? <String>[];
+      final remaining = ids.where((id) => id != docId).toList();
+      if (remaining.isEmpty) {
+        await box.delete(key);
+      } else {
+        await box.put(key, remaining);
+      }
+    }
+  }
+
   static Future<void> indexDoc(String docId, Map<String, dynamic> data) async {
     final box = HiveService.readingsIndexBox;
     for (final key in _keysFor(data)) {

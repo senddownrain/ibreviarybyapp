@@ -8,9 +8,9 @@ import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 
 const kCacheDaysBehind = 7;
-const kCacheDaysAhead = 30;
-const kExtendedDaysBehind = 14;
-const kExtendedDaysAhead = 60;
+const kCacheDaysAhead = 7;
+const kExtendedDaysBehind = 7;
+const kExtendedDaysAhead = 7;
 const kDateBatchSize = 3;
 
 /// Prefetch calendar + liturgical data around today (mirrors web cacheWarmup).
@@ -42,97 +42,68 @@ class CacheWarmupService {
     return offsets.map((o) => start.add(Duration(days: o))).toList();
   }
 
-  Future<void> warmup({DateTime? baseDate, bool forceRefresh = false}) async {
-    final base = baseDate ?? DateTime.now();
+  Future<void> prepareDate(DateTime date) async {
     await ReadingsIndex.ensureBuilt();
-
-    final year = base.year;
     await Future.wait([
-      _calendar.ensureYearOptions(year),
-      _calendar.ensureYearOptions(year + 1),
-      _calendar.ensureDynamicDates(year),
-      _calendar.ensureDynamicDates(year + 1),
+      _calendar.ensureYearOptions(date.year),
+      _calendar.ensureYearOptions(date.year + 1),
     ]);
-
-    final dates = buildDateOrder(base);
-    var loaded = 0;
-
-    for (var index = 0; index < dates.length; index += kDateBatchSize) {
-      final batch = dates.skip(index).take(kDateBatchSize).toList();
-      final results = await Future.wait(
-        batch.map((date) => warmupDate(date, forceRefresh: forceRefresh)),
-        eagerError: false,
-      );
-      loaded += results.where((ok) => ok).length;
-    }
-
-    if (forceRefresh && loaded != dates.length) {
-      throw StateError(
-        'Server refresh incomplete: $loaded/${dates.length} dates',
-      );
-    }
-
-    if (dates.isNotEmpty) {
-      final sorted = [...dates]..sort((a, b) => a.compareTo(b));
-      await HiveService.setWarmupCoverage(sorted.first, sorted.last);
-    }
-
-    if (kDebugMode) {
-      debugPrint('[CacheWarmup] date window ready: $loaded/${dates.length}');
-    }
+    await _calendar.ensureDynamicDates(date.year);
   }
 
-  /// Wider background prefetch (month ahead) — does not block UI.
+  Future<void> warmup({DateTime? baseDate, bool forceRefresh = false}) =>
+      syncDates(
+        buildDateOrder(baseDate ?? DateTime.now()),
+        forceRefresh: forceRefresh,
+      );
+
   Future<void> warmupExtended({
     DateTime? baseDate,
     bool forceRefresh = false,
+  }) => warmup(baseDate: baseDate, forceRefresh: forceRefresh);
+
+  Future<void> syncDates(
+    List<DateTime> dates, {
+    bool includeDays = true,
+    bool includeReadings = true,
+    bool forceRefresh = false,
+    bool Function()? shouldCancel,
+    void Function(int completed, int total)? onProgress,
   }) async {
-    final base = baseDate ?? DateTime.now();
-    await ReadingsIndex.ensureBuilt();
-
-    final year = base.year;
-    await Future.wait([
-      _calendar.ensureYearOptions(year),
-      _calendar.ensureYearOptions(year + 1),
-      _calendar.ensureDynamicDates(year),
-    ]);
-
-    final dates = buildDateOrder(
-      base,
-      behind: kExtendedDaysBehind,
-      ahead: kExtendedDaysAhead,
-    );
-    var loaded = 0;
-
-    for (var index = 0; index < dates.length; index += kDateBatchSize) {
-      final batch = dates.skip(index).take(kDateBatchSize).toList();
-      final results = await Future.wait(
-        batch.map((date) => warmupDate(date, forceRefresh: forceRefresh)),
-        eagerError: false,
+    var completed = 0;
+    for (final date in dates) {
+      if (shouldCancel?.call() == true) return;
+      await prepareDate(date);
+      final ok = await warmupDate(
+        date,
+        forceRefresh: forceRefresh,
+        includeDays: includeDays,
+        includeReadings: includeReadings,
       );
-      loaded += results.where((ok) => ok).length;
+      if (!ok) {
+        throw StateError(
+          'Не ўдалося загрузіць ${date.day}.${date.month}.${date.year}',
+        );
+      }
+      onProgress?.call(++completed, dates.length);
+      // Yield between dates so calendar navigation and foreground reads run first.
+      await Future<void>.delayed(Duration.zero);
     }
-
-    if (forceRefresh && loaded != dates.length) {
-      throw StateError(
-        'Extended server refresh incomplete: $loaded/${dates.length} dates',
-      );
-    }
-
-    if (dates.isNotEmpty) {
-      final sorted = [...dates]..sort((a, b) => a.compareTo(b));
+    // Coverage is a successfully loaded window, never an optimistic range.
+    if (dates.isNotEmpty && includeDays && includeReadings) {
+      final sorted = [...dates]..sort();
       await HiveService.setWarmupCoverage(sorted.first, sorted.last);
-    }
-
-    if (kDebugMode) {
-      debugPrint(
-        '[CacheWarmup] extended window ready: $loaded/${dates.length}',
-      );
     }
   }
 
-  Future<bool> warmupDate(DateTime date, {bool forceRefresh = false}) async {
+  Future<bool> warmupDate(
+    DateTime date, {
+    bool forceRefresh = false,
+    bool includeDays = true,
+    bool includeReadings = true,
+  }) async {
     try {
+      await prepareDate(date);
       final opts = _calendar.getYearOptionsCached(date.year);
       final nextOpts = _calendar.getYearOptionsCached(date.year + 1);
       final dynamicDates = _calendar.getDynamicDatesCached(date.year);
@@ -145,24 +116,29 @@ class CacheWarmupService {
       final feastCodes = getDynamicFeastCodesForDate(date, dynamicDates);
 
       final requests = <Future<dynamic>>[
-        _readings.fetchForDate(
-          date,
-          opts,
-          nextOpts,
-          dynamicDates,
-          forceRefresh: forceRefresh,
-          includeAlternatives: true,
-        ),
-        _days.prefetchForDate(
-          date,
-          periodType: context.periodType,
-          periodWeek: context.periodWeek,
-          dayOfWeek: context.dayOfWeek,
-          feastCodes: feastCodes,
-          forceRefresh: forceRefresh,
-        ),
+        if (includeReadings &&
+            (forceRefresh || !HiveService.isDateCached('readings', date)))
+          _readings.fetchForDate(
+            date,
+            opts,
+            nextOpts,
+            dynamicDates,
+            forceRefresh: forceRefresh,
+            includeAlternatives: true,
+          ),
+        if (includeDays &&
+            (forceRefresh || !HiveService.isDateCached('days', date)))
+          _days.prefetchForDate(
+            date,
+            periodType: context.periodType,
+            periodWeek: context.periodWeek,
+            dayOfWeek: context.dayOfWeek,
+            feastCodes: feastCodes,
+            forceRefresh:
+                forceRefresh || !HiveService.isDateCached('days', date),
+          ),
       ];
-      if (context.periodType == 'christmas') {
+      if (includeDays && context.periodType == 'christmas') {
         final psalterWeek = calculatePsalterWeek(
           date: date,
           periodType: context.periodType,
@@ -180,6 +156,8 @@ class CacheWarmupService {
         }
       }
       await Future.wait(requests);
+      if (includeDays) await HiveService.markDateCached('days', date);
+      if (includeReadings) await HiveService.markDateCached('readings', date);
       return true;
     } catch (e, st) {
       if (kDebugMode) {

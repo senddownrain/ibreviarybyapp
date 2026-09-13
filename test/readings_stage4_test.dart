@@ -220,6 +220,7 @@ void main() {
   ) async {
     const reading = ParsedReading(
       id: 'ordinary-w23-d4-cycle2',
+      dayId: 'weekday',
       title: 'Сырая назва набору',
       year: '2',
       periodType: 'ordinary',
@@ -239,11 +240,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('23 звычайны тыдзень, серада'), findsOneWidget);
+    expect(find.text('XXIII звычайны тыдзень, серада'), findsOneWidget);
     expect(find.text('Сырая назва набору'), findsNothing);
   });
 
-  testWidgets('liturgical route formats its title with an Arabic week number', (
+  testWidgets('liturgical route formats its title with a Roman week number', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -260,7 +261,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('23 звычайны тыдзень, серада'), findsOneWidget);
+    expect(find.text('XXIII звычайны тыдзень, серада'), findsOneWidget);
     expect(find.textContaining('тыд. 23'), findsNothing);
   });
 
@@ -357,14 +358,14 @@ void main() {
     final readings = [
       _reading(
         'a',
-        title: 'Нядзельныя чытанні',
+        title: 'Нядзельныя чытанні, Год B',
         year: 'A',
         dayId: 'sunday',
         text: 'Тэкст A',
       ),
       _reading(
         'b',
-        title: 'Нядзельныя чытанні',
+        title: 'Нядзельныя чытанні, Год B',
         year: 'B',
         dayId: 'sunday',
         text: 'Тэкст B',
@@ -383,6 +384,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('Нядзельныя чытанні'), findsOneWidget);
+    expect(find.text('Цыкл B'), findsOneWidget);
     expect(find.textContaining('Тэкст B'), findsWidgets);
     await tester.tap(find.byKey(const Key('readings-options-action')));
     await tester.pumpAndSettle();
@@ -396,12 +399,17 @@ void main() {
       find.byKey(const Key('readings-manual-cycle-marker')),
       findsOneWidget,
     );
+    expect(find.text('Цыкл A'), findsOneWidget);
+    expect(find.text('Цыкл B'), findsNothing);
+    expect(find.text('Нядзельныя чытанні'), findsOneWidget);
     expect(find.textContaining('Тэкст A'), findsWidgets);
 
     await tester.tap(find.byKey(const Key('readings-options-action')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('readings-cycle-B')));
     await tester.pumpAndSettle();
+    expect(find.text('Цыкл B'), findsOneWidget);
+    expect(find.text('Цыкл A'), findsNothing);
     expect(find.byKey(const Key('readings-manual-cycle-marker')), findsNothing);
     expect(find.textContaining('Тэкст B'), findsWidgets);
 
@@ -414,10 +422,11 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
+    expect(find.byKey(const Key('readings-cycle-badge')), findsNothing);
 
     await tester.tap(find.byKey(const Key('readings-options-action')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Нядзельныя чытанні').last);
+    await tester.tap(find.text('Нядзельныя чытанні, Год B').last);
     await tester.pumpAndSettle();
     expect(find.textContaining('Тэкст B'), findsWidgets);
     expect(find.byKey(const Key('readings-manual-cycle-marker')), findsNothing);

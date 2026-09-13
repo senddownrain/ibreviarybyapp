@@ -31,6 +31,7 @@ class Prayer {
       (displayText.isNotEmpty &&
           !displayText.contains('<') &&
           (displayText.contains('**') ||
+              RegExp(r'\[(?:\\.|[^\]])+\]\([^\s)]+\)').hasMatch(displayText) ||
               displayText.contains(':::rubric') ||
               RegExp(r'^#{1,6}\s', multiLine: true).hasMatch(displayText)));
 

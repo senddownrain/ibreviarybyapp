@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 /// Loads bundled bible seed data from assets (one cache entry per language).
 class BibleSeedLoader {
@@ -15,9 +16,7 @@ class BibleSeedLoader {
       bytes.offsetInBytes,
       bytes.lengthInBytes,
     );
-    final decompressed = GZipDecoder().decodeBytes(rawBytes);
-    final json = utf8.decode(decompressed);
-    _cache[lang] = jsonDecode(json) as Map<String, dynamic>;
+    _cache[lang] = await compute(_decodeSeed, rawBytes);
     return _cache[lang]!;
   }
 
@@ -29,3 +28,7 @@ class BibleSeedLoader {
     }
   }
 }
+
+Map<String, dynamic> _decodeSeed(Uint8List bytes) =>
+    jsonDecode(utf8.decode(GZipDecoder().decodeBytes(bytes)))
+        as Map<String, dynamic>;

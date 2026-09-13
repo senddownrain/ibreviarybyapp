@@ -1,13 +1,31 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/models/sync_plan.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
+import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/cache_warmup_service.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
+import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:mybrev_flutter/utils/retry.dart';
 
 class SyncStatus {
+  const SyncStatus({
+    this.isSyncing = false,
+    this.progress = 0,
+    this.currentLabel,
+    this.currentCollection,
+    this.completedCollections = 0,
+    this.totalCollections = 0,
+    this.currentDocCount,
+    this.error,
+    this.downloadedBytes = 0,
+    this.background = false,
+    this.cancelled = false,
+  });
   final bool isSyncing;
   final double progress;
   final String? currentLabel;
@@ -16,204 +34,259 @@ class SyncStatus {
   final int totalCollections;
   final int? currentDocCount;
   final String? error;
-
-  const SyncStatus({
-    this.isSyncing = false,
-    this.progress = 0.0,
-    this.currentLabel,
-    this.currentCollection,
-    this.completedCollections = 0,
-    this.totalCollections = 0,
-    this.currentDocCount,
-    this.error,
-  });
-
-  SyncStatus copyWith({
-    bool? isSyncing,
-    double? progress,
-    Object? currentLabel = _unset,
-    Object? currentCollection = _unset,
-    int? completedCollections,
-    int? totalCollections,
-    Object? currentDocCount = _unset,
-    Object? error = _unset,
-  }) => SyncStatus(
-    isSyncing: isSyncing ?? this.isSyncing,
-    progress: progress ?? this.progress,
-    currentLabel: identical(currentLabel, _unset)
-        ? this.currentLabel
-        : currentLabel as String?,
-    currentCollection: identical(currentCollection, _unset)
-        ? this.currentCollection
-        : currentCollection as String?,
-    completedCollections: completedCollections ?? this.completedCollections,
-    totalCollections: totalCollections ?? this.totalCollections,
-    currentDocCount: identical(currentDocCount, _unset)
-        ? this.currentDocCount
-        : currentDocCount as int?,
-    error: identical(error, _unset) ? this.error : error as String?,
-  );
+  final int downloadedBytes;
+  final bool background;
+  final bool cancelled;
 }
 
-const Object _unset = Object();
-
-/// Small collections safe to download in full (same approach as web static sync).
-/// `days` and `readings` are huge — loaded on demand via [CacheWarmupService].
 const kEssentialSyncCollections = [
   ('prayers', 'Малітвы'),
   ('yearOptions', 'Гады'),
-  ('invitatoriums', 'Закліц'),
+  ('invitatoriums', 'Заклік'),
   ('completoriums', 'Камплета'),
+  ('prayerCategories', 'Катэгорыі малітваў'),
 ];
 
 class SyncStatusNotifier extends Notifier<SyncStatus> {
+  Future<void> _queue = Future.value();
+  bool _cancel = false;
+
   @override
   SyncStatus build() => const SyncStatus();
 
-  /// Auto-bootstrap: sync static collections only when Hive is empty.
-  Future<void> syncEssentialsIfEmpty() async {
-    final missing = kEssentialSyncCollections.where((entry) {
-      return _boxFor(entry.$1).isEmpty;
-    }).toList();
-    if (missing.isEmpty) return;
-    await _syncCollections(missing);
-    ref.read(cacheEpochProvider.notifier).state++;
+  void cancel() {
+    _cancel = true;
   }
 
-  Future<void> forceSyncAll() async {
-    if (state.isSyncing) return;
+  void cancelBackground() {
+    if (state.background) cancel();
+  }
 
-    const warmupStep = 1;
-    final totalSteps = kEssentialSyncCollections.length + warmupStep;
+  Future<void> forceSyncAll() => synchronize(
+    const SyncPlan(targets: {...SyncTarget.values}, period: SyncPeriod.all),
+  );
 
-    state = SyncStatus(
-      isSyncing: true,
-      totalCollections: totalSteps,
-      error: null,
-      currentDocCount: null,
-    );
+  Future<void> syncEssentialsIfEmpty() => synchronize(
+    const SyncPlan(
+      targets: {
+        SyncTarget.prayers,
+        SyncTarget.years,
+        SyncTarget.invitatoriums,
+        SyncTarget.completoriums,
+        SyncTarget.prayerCategories,
+      },
+      forceRefresh: false,
+      background: true,
+    ),
+  );
 
+  /// Serialize writes. A user request is queued, never silently discarded.
+  Future<void> synchronize(SyncPlan plan) {
+    final next = _queue.then((_) => _run(plan));
+    _queue = next.catchError((Object _) {});
+    return next;
+  }
+
+  Future<void> _run(SyncPlan plan) async {
+    _cancel = false;
+    final targets = SyncTarget.values.where(plan.targets.contains).toList();
+    final collections = <(String, String)>[];
+    final ranged = plan.period != SyncPeriod.all;
+    for (final target in targets) {
+      if (ranged &&
+          (target == SyncTarget.days || target == SyncTarget.readings)) {
+        continue;
+      }
+      collections.add((target.collection, target.label));
+    }
+    final includeDays = ranged && targets.contains(SyncTarget.days);
+    final includeReadings = ranged && targets.contains(SyncTarget.readings);
+    final total =
+        collections.length + (includeDays ? 1 : 0) + (includeReadings ? 1 : 0);
+    var completed = 0;
+    var docs = 0;
+    final bytesAtStart = HiveService.receivedBytes;
+    final docsAtStart = HiveService.receivedDocuments;
+    final errors = <String>[];
+    final rangeSucceeded = <SyncTarget>{};
+    void report(String collection, String label, {double fraction = 0}) {
+      docs = HiveService.receivedDocuments - docsAtStart;
+      state = SyncStatus(
+        isSyncing: true,
+        background: plan.background,
+        currentCollection: collection,
+        currentLabel: label,
+        completedCollections: completed,
+        totalCollections: total,
+        progress: total == 0 ? 0 : (completed + fraction) / total,
+        currentDocCount: docs,
+        downloadedBytes: HiveService.receivedBytes - bytesAtStart,
+      );
+    }
+
+    report('', 'Падрыхтоўка загрузкі');
     try {
-      await _syncCollections(
-        kEssentialSyncCollections,
-        onProgress: (i, collection, label, docCount) {
-          state = state.copyWith(
-            currentCollection: collection,
-            currentLabel: label,
-            completedCollections: i,
-            progress: i / totalSteps,
-            currentDocCount: docCount,
-            error: null,
+      final dates =
+          plan.dates ?? plan.period.dates(plan.baseDate ?? DateTime.now());
+      final warmup = includeDays || includeReadings
+          ? ref.read(syncWarmupServiceProvider)
+          : null;
+      for (final target in [
+        if (includeDays) SyncTarget.days,
+        if (includeReadings) SyncTarget.readings,
+      ]) {
+        try {
+          report(target.collection, target.label);
+          await warmup!.syncDates(
+            dates,
+            includeDays: target == SyncTarget.days,
+            includeReadings: target == SyncTarget.readings,
+            forceRefresh: plan.forceRefresh,
+            shouldCancel: () => _cancel,
+            onProgress: (done, dateCount) => report(
+              target.collection,
+              '${target.label} · $done / $dateCount дзён',
+              fraction: done / dateCount,
+            ),
           );
-        },
-      );
-      ref.read(cacheEpochProvider.notifier).state++;
-    } catch (e) {
-      state = state.copyWith(
-        isSyncing: false,
-        error: e.toString(),
-        currentLabel: null,
-        currentCollection: null,
-      );
-      return;
-    }
-
-    state = state.copyWith(
-      currentCollection: 'warmup',
-      currentLabel: 'Дні і чытанні (актуальныя)',
-      completedCollections: kEssentialSyncCollections.length,
-      progress: kEssentialSyncCollections.length / totalSteps,
-      currentDocCount: null,
-      error: null,
-    );
-
-    try {
-      // An explicit user sync must bypass both Hive and Firestore's local
-      // persistence so already-cached documents are actually replaced.
-      await CacheWarmupService().warmupExtended(forceRefresh: true);
-      await HiveService.setLastSync('days', DateTime.now());
-      await HiveService.setLastSync('readings', DateTime.now());
-      ref.read(cacheEpochProvider.notifier).state++;
-    } catch (e) {
-      if (kDebugMode) debugPrint('[Sync] warmup failed: $e');
-      state = state.copyWith(
-        isSyncing: false,
-        error: 'Дні і чытанні: $e',
-        currentLabel: null,
-        currentCollection: null,
-      );
-      return;
-    }
-
-    state = state.copyWith(
-      isSyncing: false,
-      progress: 1.0,
-      completedCollections: totalSteps,
-      currentLabel: null,
-      currentCollection: null,
-      currentDocCount: null,
-      error: null,
-    );
-  }
-
-  Future<void> _syncCollections(
-    List<(String, String)> collections, {
-    void Function(int index, String collection, String label, int count)?
-    onProgress,
-  }) async {
-    final db = FirebaseFirestore.instance;
-
-    for (var i = 0; i < collections.length; i++) {
-      final (collection, label) = collections[i];
-      try {
-        final count = await _syncCollection(db, collection);
-        await HiveService.setLastSync(collection, DateTime.now());
-        onProgress?.call(i + 1, collection, label, count);
-      } catch (e) {
-        throw '$label: $e';
+          if (_cancel) break;
+          await HiveService.setLastSync(target.collection, DateTime.now());
+          rangeSucceeded.add(target);
+          completed++;
+          ref.read(cacheEpochProvider.notifier).state++;
+        } catch (e) {
+          errors.add("${target.label}: $e");
+        }
       }
+      if (!_cancel && rangeSucceeded.length == 2 && dates.isNotEmpty) {
+        final sorted = [...dates]..sort();
+        await HiveService.setWarmupCoverage(sorted.first, sorted.last);
+      }
+      for (final (collection, label) in collections) {
+        if (_cancel) break;
+        try {
+          report(collection, label);
+          final box = HiveService.boxFor(collection);
+          final last = HiveService.getLastSync(collection);
+          final fresh =
+              last != null &&
+              DateTime.now().difference(last) < const Duration(days: 1);
+          if (!plan.forceRefresh && fresh && box.isNotEmpty) {
+            completed++;
+            continue;
+          }
+          await _syncCollection(collection, (documentCount) {
+            report(collection, label);
+          });
+          if (_cancel) break;
+          await HiveService.setLastSync(collection, DateTime.now());
+          if (collection.startsWith('bible_')) {
+            BibleRepository.loadCachedVersion(collection.substring(6));
+          }
+          if (collection == 'yearOptions') {
+            ref.invalidate(calendarServiceProvider);
+            ref.invalidate(calendarReadyProvider);
+          }
+          completed++;
+          ref.read(cacheEpochProvider.notifier).state++;
+        } catch (e) {
+          errors.add("$label: $e");
+        }
+      }
+      state = SyncStatus(
+        error: errors.isEmpty ? null : errors.join('\n'),
+        progress: _cancel || errors.isNotEmpty ? state.progress : 1,
+        completedCollections: completed,
+        totalCollections: total,
+        currentDocCount: docs,
+        background: plan.background,
+        cancelled: _cancel,
+        downloadedBytes: HiveService.receivedBytes - bytesAtStart,
+      );
+    } catch (e) {
+      state = SyncStatus(
+        error: '${state.currentLabel}: $e',
+        progress: state.progress,
+        completedCollections: completed,
+        totalCollections: total,
+        currentDocCount: docs,
+        background: plan.background,
+        downloadedBytes: HiveService.receivedBytes - bytesAtStart,
+      );
+    } finally {
+      // Also expose any successfully saved pages after cancellation or failure.
+      ref.read(cacheEpochProvider.notifier).state++;
     }
   }
 
-  /// Download collection into memory first, then replace Hive — never leave
-  /// an empty box if the network call fails mid-way.
-  Future<int> _syncCollection(FirebaseFirestore db, String collection) async {
-    final box = _boxFor(collection);
-    final snap = await retryFirestore(
-      () => db
+  /// Persist pages as they arrive. Remove obsolete entries only after the last
+  /// page succeeds, preserving usable offline content after interruption.
+  Future<void> _syncCollection(
+    String collection,
+    void Function(int) onPage,
+  ) async {
+    final box = HiveService.boxFor(collection);
+    final seen = <String>{};
+    final originalKeys = box.keys.toList();
+    QueryDocumentSnapshot<Map<String, dynamic>>? cursor;
+    var count = 0;
+    while (!_cancel) {
+      Query<Map<String, dynamic>> query = ref
+          .read(syncFirestoreProvider)
           .collection(collection)
-          .get(const GetOptions(source: Source.server)),
-    );
-
-    final entries = <MapEntry<dynamic, Map<String, dynamic>>>[];
-    for (final doc in snap.docs) {
-      final data = firestoreToStorable({...doc.data(), 'id': doc.id});
-      if (collection == 'yearOptions') {
-        final year = data['year'];
-        entries.add(MapEntry(year?.toString() ?? doc.id, data));
-      } else {
-        entries.add(MapEntry(doc.id, data));
+          .orderBy(FieldPath.documentId)
+          .limit(50);
+      if (cursor != null) query = query.startAfterDocument(cursor);
+      final page = await retryFirestore(
+        () => query.get(const GetOptions(source: Source.server)),
+      );
+      if (_cancel) return;
+      for (final doc in page.docs) {
+        final data = firestoreToStorable({...doc.data(), 'id': doc.id});
+        final key = collection == 'yearOptions'
+            ? data['year']?.toString() ?? doc.id
+            : doc.id;
+        seen.add(key);
+        if (collection == 'readings') {
+          await cacheReadingDoc(doc.id, data);
+        } else {
+          await HiveService.putCached(collection, key, data);
+        }
+        count++;
+      }
+      onPage(count);
+      if (page.docs.length < 50) break;
+      cursor = page.docs.last;
+      await Future<void>.delayed(Duration.zero);
+    }
+    if (_cancel) return;
+    for (final key in originalKeys) {
+      if (!seen.contains(key.toString())) {
+        if (collection == 'readings') {
+          final raw = box.get(key);
+          if (raw is Map) {
+            await ReadingsIndex.removeDoc(
+              key.toString(),
+              Map<String, dynamic>.from(raw),
+            );
+          }
+        }
+        await HiveService.removeCached(collection, key);
       }
     }
-
-    await box.clear();
-    for (final e in entries) {
-      await box.put(e.key, e.value);
+    if (collection == 'days' || collection == 'readings') {
+      await HiveService.setMetaFlag('fullCache_$collection', true);
     }
-    return entries.length;
   }
-
-  dynamic _boxFor(String collection) => switch (collection) {
-    'prayers' => HiveService.prayersBox,
-    'days' => HiveService.daysBox,
-    'yearOptions' => HiveService.yearOptionsBox,
-    'readings' => HiveService.readingsBox,
-    'invitatoriums' => HiveService.invitatoriumsBox,
-    'completoriums' => HiveService.completoriumsBox,
-    _ => throw ArgumentError('Unknown collection: $collection'),
-  };
 }
 
 final syncStatusProvider = NotifierProvider<SyncStatusNotifier, SyncStatus>(
   SyncStatusNotifier.new,
+);
+
+final syncFirestoreProvider = Provider<FirebaseFirestore>(
+  (ref) => FirebaseFirestore.instance,
+);
+final syncWarmupServiceProvider = Provider<CacheWarmupService>(
+  (ref) => CacheWarmupService(),
 );

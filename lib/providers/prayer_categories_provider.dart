@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:hive/hive.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/utils/firestore_cache.dart';
 
 const kPrayerCategoriesCollection = 'prayerCategories';
 
@@ -48,11 +51,35 @@ List<String> _cleanTags(dynamic value) {
 }
 
 final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
-  (ref) {
-    return FirebaseFirestore.instance
+  (ref) async* {
+    if (Hive.isBoxOpen(kPrayerCategoriesCollection)) {
+      final cached = HiveService.boxFor(kPrayerCategoriesCollection).values
+          .whereType<Map>()
+          .map(
+            (data) => PrayerMenuCategory(
+              id: data['id'].toString(),
+              name: data['name']?.toString().trim() ?? '',
+              tags: _cleanTags(data['tags']),
+              isGlobal: true,
+            ),
+          )
+          .where((c) => c.name.isNotEmpty)
+          .toList();
+      if (cached.isNotEmpty) yield cached;
+    }
+    yield* FirebaseFirestore.instance
         .collection(kPrayerCategoriesCollection)
         .snapshots()
-        .map((snapshot) {
+        .asyncMap((snapshot) async {
+          if (Hive.isBoxOpen(kPrayerCategoriesCollection)) {
+            for (final doc in snapshot.docs) {
+              await HiveService.putCached(
+                kPrayerCategoriesCollection,
+                doc.id,
+                firestoreToStorable({...doc.data(), 'id': doc.id}),
+              );
+            }
+          }
           final documents = snapshot.docs.toList()
             ..sort((left, right) {
               final leftRawOrder = left.data()['order'];

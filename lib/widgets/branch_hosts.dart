@@ -9,6 +9,8 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
+import 'package:mybrev_flutter/providers/bible_data_provider.dart';
+import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/screens/bible_chapter_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -197,6 +199,19 @@ class _BibleBranchHostState extends ConsumerState<BibleBranchHost> {
 
   @override
   Widget build(BuildContext context) {
+    final data = ref.watch(bibleDataProvider);
+    if (data.isLoading &&
+        BibleRepository.getBooks(widget.version ?? 'bel').isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: DataLoadingNotice(
+            label: 'Адкрываем пераклад Бібліі з лакальных даных',
+            collections: ['bible_bel', 'bible_ru'],
+          ),
+        ),
+      );
+    }
+
     if (widget.invalidContext case final message?) {
       return _BranchError(message: message);
     }

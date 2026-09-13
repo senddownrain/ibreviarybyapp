@@ -10,8 +10,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
-import 'package:mybrev_flutter/providers/sync_provider.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/widgets/cache_sync_settings.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/utils/cache_stats.dart';
@@ -51,19 +50,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
-    final syncStatus = ref.watch(syncStatusProvider);
     final bootstrap = ref.watch(dataBootstrapProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     ref.watch(cacheEpochProvider); // refresh Hive stats after warmup
     final stats = CacheStats.collect();
-
-    final lastSync = _latestSync([
-      HiveService.getLastSync('prayers'),
-      HiveService.getLastSync('days'),
-      HiveService.getLastSync('yearOptions'),
-      HiveService.getLastSync('invitatoriums'),
-      HiveService.getLastSync('completoriums'),
-    ]);
 
     return AmbientWash(
       seasonColor: seasonColor,
@@ -182,91 +172,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Sync
-                SizedBox(
-                  key: _syncKey,
-                  child: Text(
-                    'Сінхранізацыя',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                if (lastSync != null)
-                  Text(
-                    'Апошняя сінхранізацыя: ${_formatDate(lastSync)}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                Text(
-                  'Малітвы і статычныя зборнікі загружаюцца цалкам. '
-                  'Дні і чытанні — толькі на бліжэйшыя даты (каля 2 месяцаў), '
-                  'каб не цягнуць усю базу. Ручная сінхранізацыя заўсёды '
-                  'абнаўляе лакальныя копіі з сервера.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (syncStatus.isSyncing) ...[
-                  LinearProgressIndicator(value: syncStatus.progress),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${syncStatus.currentLabel ?? syncStatus.currentCollection ?? "..."}  '
-                    '(${syncStatus.completedCollections + 1} з ${syncStatus.totalCollections})',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  if (syncStatus.currentDocCount != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      '${syncStatus.currentDocCount} дакументаў',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                ],
-                if (syncStatus.error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Card(
-                      color: Theme.of(context).colorScheme.errorContainer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            PhosphorIcon(
-                              PhosphorIconsRegular.warning,
-                              size: 20,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                syncStatus.error!,
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onErrorContainer,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                FilledButton.icon(
-                  onPressed: syncStatus.isSyncing
-                      ? null
-                      : () => ref
-                            .read(syncStatusProvider.notifier)
-                            .forceSyncAll(),
-                  icon: const PhosphorIcon(
-                    PhosphorIconsRegular.arrowsClockwise,
-                    size: 18,
-                  ),
-                  label: const Text('Сінхранізаваць'),
-                ),
+                CacheSyncSettings(key: _syncKey),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -332,20 +238,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}.${date.month.toString().padLeft(2, '0')}.${date.year} '
-        '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  DateTime? _latestSync(List<DateTime?> times) {
-    DateTime? best;
-    for (final t in times) {
-      if (t == null) continue;
-      if (best == null || t.isAfter(best)) best = t;
-    }
-    return best;
   }
 }
 

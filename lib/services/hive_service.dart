@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class HiveService {
   static const _metaBox = 'meta';
@@ -23,6 +26,11 @@ class HiveService {
   static late Box _invitatoriums;
   static late Box _completoriums;
 
+  static bool get isCacheReady =>
+      Hive.isBoxOpen(_metaBox) &&
+      Hive.isBoxOpen(_daysBoxName) &&
+      Hive.isBoxOpen(_readingsBoxName);
+
   static Box get prayersBox => _prayers;
   static Box get daysBox => _days;
   static Box get yearOptionsBox => _yearOptions;
@@ -35,8 +43,80 @@ class HiveService {
   static Box get invitatoriumsBox => _invitatoriums;
   static Box get completoriumsBox => _completoriums;
 
-  static Future<void> init() async {
-    await Hive.initFlutter();
+  static Box boxFor(String collection) => Hive.box(collection);
+
+  static final cacheRevision = ValueNotifier<int>(0);
+  static int receivedBytes = 0;
+  static int receivedDocuments = 0;
+
+  static int cachedBytes(String collection) {
+    final value = _meta.get('bytes_$collection');
+    if (value is num) return value.toInt();
+    final bytes = boxFor(
+      collection,
+    ).values.fold<int>(0, (sum, value) => sum + payloadBytes(value));
+    _meta.put('bytes_$collection', bytes);
+    return bytes;
+  }
+
+  /// Serialized content size; excludes Firestore/network protocol overhead.
+  static int payloadBytes(Object? value) =>
+      utf8.encode(jsonEncode(value)).length;
+
+  static final Map<String, Future<void>> _writes = {};
+
+  static Future<void> putCached(String collection, dynamic key, Object data) {
+    final next = (_writes[collection] ?? Future<void>.value()).then(
+      (_) => _putCached(collection, key, data),
+    );
+    _writes[collection] = next.catchError((Object _) {});
+    return next;
+  }
+
+  static Future<void> _putCached(
+    String collection,
+    dynamic key,
+    Object data,
+  ) async {
+    final box = boxFor(collection);
+    final previous = box.get(key);
+    final oldTotal = cachedBytes(collection);
+    receivedBytes += payloadBytes(data);
+    receivedDocuments++;
+    final delta =
+        payloadBytes(data) - (previous == null ? 0 : payloadBytes(previous));
+    await box.put(key, data);
+    await _meta.put('bytes_$collection', (oldTotal + delta).clamp(0, 1 << 53));
+    cacheRevision.value++;
+  }
+
+  static Future<void> removeCached(String collection, dynamic key) async {
+    final box = boxFor(collection);
+    final old = box.get(key);
+    if (old == null) return;
+    await box.delete(key);
+    await _meta.put(
+      'bytes_$collection',
+      (cachedBytes(collection) - payloadBytes(old)).clamp(0, 1 << 53),
+    );
+  }
+
+  static String dateCacheKey(String collection, DateTime date) =>
+      'ready_${collection}_${date.year}-${date.month}-${date.day}';
+
+  static bool isDateCached(String collection, DateTime date) =>
+      getMetaFlag('fullCache_$collection') == true ||
+      getMetaFlag(dateCacheKey(collection, date)) == true;
+
+  static Future<void> markDateCached(String collection, DateTime date) =>
+      setMetaFlag(dateCacheKey(collection, date), true);
+
+  static Future<void> init({String? path}) async {
+    if (path == null) {
+      await Hive.initFlutter();
+    } else {
+      Hive.init(path);
+    }
     _meta = await Hive.openBox(_metaBox);
     _prayers = await Hive.openBox(_prayersBoxName);
     _days = await Hive.openBox(_daysBoxName);
@@ -47,6 +127,9 @@ class HiveService {
     _settings = await Hive.openBox(_settingsBoxName);
     _invitatoriums = await Hive.openBox(_invitatoriumsBoxName);
     _completoriums = await Hive.openBox(_completoriumsBoxName);
+    await Hive.openBox('bible_bel');
+    await Hive.openBox('bible_ru');
+    await Hive.openBox('prayerCategories');
   }
 
   static DateTime? getLastSync(String collection) {

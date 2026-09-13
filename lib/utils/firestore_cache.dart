@@ -19,18 +19,35 @@ dynamic _convertValue(dynamic v) {
 }
 
 Future<void> cacheDayDoc(String id, Map<String, dynamic> data) async {
-  await HiveService.daysBox.put(id, firestoreToStorable({...data, 'id': id}));
+  await HiveService.putCached(
+    'days',
+    id,
+    firestoreToStorable({...data, 'id': id}),
+  );
 }
 
-Future<void> cacheReadingDoc(String id, Map<String, dynamic> data) async {
+Future<void> _readingWrites = Future.value();
+
+Future<void> cacheReadingDoc(String id, Map<String, dynamic> data) {
+  final next = _readingWrites.then((_) => _cacheReadingDoc(id, data));
+  _readingWrites = next.catchError((Object _) {});
+  return next;
+}
+
+Future<void> _cacheReadingDoc(String id, Map<String, dynamic> data) async {
   final storable = firestoreToStorable({...data, 'id': id});
-  await HiveService.readingsBox.put(id, storable);
+  final previous = HiveService.readingsBox.get(id);
+  if (previous is Map) {
+    await ReadingsIndex.removeDoc(id, Map<String, dynamic>.from(previous));
+  }
+  await HiveService.putCached('readings', id, storable);
   await ReadingsIndex.indexDoc(id, storable);
 }
 
 Future<void> cacheYearOptionsDoc(String id, Map<String, dynamic> data) async {
   final year = data['year'];
-  await HiveService.yearOptionsBox.put(
+  await HiveService.putCached(
+    'yearOptions',
     year?.toString() ?? id,
     firestoreToStorable({...data, 'id': id}),
   );

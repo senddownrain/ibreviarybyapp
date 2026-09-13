@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/providers/bible_data_provider.dart';
+import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -8,7 +11,7 @@ import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 
 /// Preserves the production Bible search scope: book names across the current
 /// translation and verse text inside the current book only.
-class BibleSearchScreen extends StatefulWidget {
+class BibleSearchScreen extends ConsumerStatefulWidget {
   const BibleSearchScreen({
     super.key,
     required this.versionId,
@@ -19,10 +22,10 @@ class BibleSearchScreen extends StatefulWidget {
   final String bookId;
 
   @override
-  State<BibleSearchScreen> createState() => _BibleSearchScreenState();
+  ConsumerState<BibleSearchScreen> createState() => _BibleSearchScreenState();
 }
 
-class _BibleSearchScreenState extends State<BibleSearchScreen> {
+class _BibleSearchScreenState extends ConsumerState<BibleSearchScreen> {
   final _controller = TextEditingController();
 
   @override
@@ -33,6 +36,14 @@ class _BibleSearchScreenState extends State<BibleSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final data = ref.watch(bibleDataProvider);
+    if (data.isLoading && BibleRepository.getBooks(widget.versionId).isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: DataLoadingNotice(label: 'Адкрываем Біблію для пошуку'),
+        ),
+      );
+    }
     final currentBook = BibleRepository.getBook(
       widget.versionId,
       widget.bookId,

@@ -21,6 +21,7 @@ import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
@@ -445,7 +446,9 @@ class _HoursLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Padding(
     padding: EdgeInsets.symmetric(vertical: 44),
-    child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
+    child: DataLoadingNotice(
+      label: 'Загружаем літургію і чытанні выбранага дня',
+    ),
   );
 }
 

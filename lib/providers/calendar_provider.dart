@@ -45,7 +45,7 @@ class CalendarService {
             .collection('yearOptions')
             .where('year', isEqualTo: year)
             .limit(1)
-            .get(),
+            .get(const GetOptions(source: Source.server)),
       );
       if (snap.docs.isEmpty) return null;
       final doc = snap.docs.first;

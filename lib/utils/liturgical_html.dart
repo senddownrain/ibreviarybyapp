@@ -98,6 +98,62 @@ String formatPsalmHtml(String html) {
   );
 }
 
+/// Singing layout for responsorial psalm verses on the readings page.
+String formatReadingPsalmText(String text) => text
+    .replaceAll(RegExp(r'\*[\s\u00a0]*'), '*\n')
+    .replaceAll(RegExp(r'[\s\u00a0]+(?=\d+\.[\s\u00a0])'), '\n')
+    .trim();
+
+String formatReadingPsalmHtml(String html) {
+  // Decode source entities before cadence normalization so encoded spaces
+  // do not make an existing half-verse break look like a new strophe.
+  final fragment = parseFragment(
+    formatPsalmHtml(parseFragment(html).outerHtml.replaceAll('&nbsp;', ' ')),
+  );
+  for (final paragraph in fragment.querySelectorAll('.psalm-strophe')) {
+    var needsBreak = false;
+    var lineStart = true;
+    void visit(dom.Node node) {
+      if (node is dom.Element && node.localName == 'br') {
+        needsBreak = false;
+        lineStart = true;
+        return;
+      }
+      if (node is dom.Text) {
+        var text = node.data;
+        if (needsBreak || lineStart) {
+          text = text.replaceFirst(RegExp(r'^[\s\u00a0]+'), '');
+        }
+        if (text.isEmpty) {
+          node.data = '';
+          return;
+        }
+        text = text.replaceAll(RegExp(r'[\s\u00a0]+(?=\d+\.[\s\u00a0])'), '\n');
+        final parts = text.split('\n');
+        final replacement = <dom.Node>[];
+        if (needsBreak) replacement.add(dom.Element.tag('br'));
+        for (var i = 0; i < parts.length; i++) {
+          if (i > 0) replacement.add(dom.Element.tag('br'));
+          replacement.add(dom.Text(parts[i]));
+        }
+        final parent = node.parentNode!;
+        final index = parent.nodes.indexOf(node);
+        node.remove();
+        parent.nodes.insertAll(index, replacement);
+        needsBreak = text.trimRight().endsWith('*');
+        lineStart = text.endsWith('\n');
+        return;
+      }
+      for (final child in node.nodes.toList()) {
+        visit(child);
+      }
+    }
+
+    visit(paragraph);
+  }
+  return fragment.outerHtml;
+}
+
 /// Adds tap targets to the already formatted strophes of a psalm.
 ///
 /// Odd and even strophes represent the two choirs. When [selectedChoir] is

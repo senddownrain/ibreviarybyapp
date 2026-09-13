@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
+import 'package:mybrev_flutter/utils/prayer_link.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -130,6 +131,18 @@ class PrayerDetailScreen extends ConsumerStatefulWidget {
 class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
   final ScrollController _scrollController = ScrollController();
 
+  void _onLinkTap(
+    String? url,
+    Map<String, String> attributes,
+    dom.Element? element,
+  ) {
+    final location = prayerLinkLocation(url);
+    if (location != null &&
+        location != '/prayers/prayer/${Uri.encodeComponent(widget.prayerId)}') {
+      context.push(location);
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -247,6 +260,10 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       final formattedHtml = formatLiturgicalHtml(html);
       final styles = <String, Style>{
+        'a': Style(
+          color: Theme.of(context).colorScheme.primary,
+          textDecoration: TextDecoration.underline,
+        ),
         'body': Style(
           fontSize: FontSize(textStyle.fontSize ?? 16),
           fontFamily: textStyle.fontFamily,
@@ -308,12 +325,14 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
       };
       if (isMass) {
         return _MassDocument(
+          onLinkTap: _onLinkTap,
           html: formattedHtml,
           styles: styles,
           textStyle: textStyle.copyWith(height: 1.7),
         );
       }
       return HyphenatedHtml(
+        onLinkTap: _onLinkTap,
         data: formattedHtml,
         style: styles,
         textStyle: textStyle.copyWith(height: 1.7),
@@ -346,11 +365,13 @@ class _MassDocument extends StatefulWidget {
     required this.html,
     required this.styles,
     required this.textStyle,
+    required this.onLinkTap,
   });
 
   final String html;
   final Map<String, Style> styles;
   final TextStyle textStyle;
+  final OnTap onLinkTap;
 
   @override
   State<_MassDocument> createState() => _MassDocumentState();
@@ -428,6 +449,7 @@ class _MassDocumentState extends State<_MassDocument> {
   Widget build(BuildContext context) {
     if (_sections.isEmpty) {
       return HyphenatedHtml(
+        onLinkTap: widget.onLinkTap,
         data: widget.html,
         style: widget.styles,
         textStyle: widget.textStyle,
@@ -479,6 +501,7 @@ class _MassDocumentState extends State<_MassDocument> {
         const SizedBox(height: 18),
         if (_preamble.trim().isNotEmpty)
           HyphenatedHtml(
+            onLinkTap: widget.onLinkTap,
             data: _preamble,
             style: widget.styles,
             textStyle: widget.textStyle,
@@ -487,6 +510,7 @@ class _MassDocumentState extends State<_MassDocument> {
           KeyedSubtree(
             key: _sectionKeys[i],
             child: HyphenatedHtml(
+              onLinkTap: widget.onLinkTap,
               data: _sections[i].html,
               style: widget.styles,
               textStyle: widget.textStyle,

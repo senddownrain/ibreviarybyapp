@@ -37,7 +37,8 @@ class StaticLiturgicalService {
         () => _db.collection(name).get(const GetOptions(source: Source.server)),
       );
       for (final doc in snapshot.docs) {
-        await box.put(
+        await HiveService.putCached(
+          name,
           doc.id,
           firestoreToStorable({...doc.data(), 'id': doc.id}),
         );

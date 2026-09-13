@@ -79,6 +79,26 @@ String prayerMarkdownToHtml(String source) {
 }
 
 String _inlineMd(String input) {
+  final tokens = RegExp(
+    r'\\([!"#$%&\x27()*+,\-./:;<=>?@\[\]\\^_`{|}~])|\[((?:\\.|[^\]\\])+)\]\(([^\s)]+)\)',
+  );
+  final out = StringBuffer();
+  var offset = 0;
+  for (final match in tokens.allMatches(input)) {
+    out.write(_inlineFormatting(input.substring(offset, match.start)));
+    if (match.group(1) != null) {
+      out.write(_escapeHtml(match.group(1)!));
+    } else {
+      final href = _escapeHtml(match.group(3)!).replaceAll('"', '&quot;');
+      out.write('<a href="$href">${_inlineMd(match.group(2)!)}</a>');
+    }
+    offset = match.end;
+  }
+  out.write(_inlineFormatting(input.substring(offset)));
+  return out.toString();
+}
+
+String _inlineFormatting(String input) {
   var s = _escapeHtml(input);
   s = s.replaceAllMapped(
     RegExp(r'\*\*(.+?)\*\*'),
@@ -91,10 +111,6 @@ String _inlineMd(String input) {
   s = s.replaceAllMapped(
     RegExp(r'(?<![A-Za-zА-Яа-яЁёІіЎў])_(.+?)_(?![A-Za-zА-Яа-яЁёІіЎ])'),
     (m) => '<em>${m.group(1)}</em>',
-  );
-  s = s.replaceAllMapped(
-    RegExp(r'\[([^\]]+)\]\(([^)]+)\)'),
-    (m) => '<a href="${m.group(2)}">${m.group(1)}</a>',
   );
   return s;
 }

@@ -9,13 +9,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
-import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
-import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
@@ -27,8 +25,6 @@ void main() async {
     );
   }
   await HiveService.init();
-  await ReadingsIndex.ensureBuilt();
-  await BibleRepository.preload();
 
   // Both designs are edge-to-edge. Platform chrome floats above the content;
   // only iOS uses blur while Android uses tonal Material surfaces.

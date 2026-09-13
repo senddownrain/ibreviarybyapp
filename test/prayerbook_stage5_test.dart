@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
@@ -54,6 +56,49 @@ const _categories = [
 ];
 
 void main() {
+  for (final sourceId in ['linked', 'eMmCtxwyJ75ogmL5rwye']) {
+    testWidgets('prayer links navigate and return from $sourceId', (
+      tester,
+    ) async {
+      final prayers = [
+        Prayer(
+          id: sourceId,
+          title: 'Пачатак',
+          textFormat: 'mybrev-markdown',
+          body:
+              'Уступ\n\n[Вечар](/prayer/evening)\n\n## Раздзел\n\n[Вечар](/prayer/evening)',
+        ),
+        _builtIn.last,
+      ];
+      final router = GoRouter(
+        initialLocation: '/prayers/prayer/$sourceId',
+        routes: [
+          GoRoute(
+            path: '/prayers/prayer/:id',
+            builder: (context, state) =>
+                PrayerDetailScreen(prayerId: state.pathParameters['id']!),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        _app(const SizedBox(), prayers: prayers, router: router),
+      );
+      await tester.pumpAndSettle();
+      final html = tester.widgetList<Html>(find.byType(Html));
+      expect(html.every((widget) => widget.onLinkTap != null), isTrue);
+      await tester.tapAt(
+        tester.getTopLeft(find.text('Вечар', findRichText: true).first) +
+            const Offset(20, 10),
+      );
+      await tester.pumpAndSettle();
+      expect(router.canPop(), isTrue);
+      expect(find.text('Вячэрняя малітва'), findsOneWidget);
+      router.pop();
+      await tester.pumpAndSettle();
+      expect(find.text('Пачатак'), findsOneWidget);
+    });
+  }
   testWidgets('My Prayers add button stays above the app dock', (tester) async {
     await tester.pumpWidget(
       _app(
@@ -589,6 +634,7 @@ Widget _app(
   SettingsState settings = const SettingsState(),
   _TestSettingsNotifier? settingsOverride,
   List<Prayer> prayers = _builtIn,
+  GoRouter? router,
 }) {
   final notifier = settingsOverride ?? _TestSettingsNotifier(settings);
   return ProviderScope(
@@ -602,7 +648,9 @@ Widget _app(
         (ref) => Stream.value([_categories.first]),
       ),
     ],
-    child: MaterialApp(home: child),
+    child: router == null
+        ? MaterialApp(home: child)
+        : MaterialApp.router(routerConfig: router),
   );
 }
 

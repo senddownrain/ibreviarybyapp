@@ -35,13 +35,9 @@ class ParsedReadingsService {
       return Map<String, dynamic>.from(cached);
     }
     final snap = await retryFirestore(
-      () => _col(_kReadingsCollection)
-          .doc(docId)
-          .get(
-            forceRefresh
-                ? const GetOptions(source: Source.server)
-                : const GetOptions(),
-          ),
+      () => _col(
+        _kReadingsCollection,
+      ).doc(docId).get(const GetOptions(source: Source.server)),
     );
     if (snap.exists) {
       final data = snap.data()!;
@@ -85,6 +81,7 @@ class ParsedReadingsService {
     bool includeAlternatives = false,
     String? dayId,
   }) async {
+    forceRefresh = forceRefresh || !HiveService.isDateCached('readings', date);
     final context = computeLiturgicalContext(
       date,
       opts,
@@ -170,6 +167,7 @@ class ParsedReadingsService {
     }
 
     await _mergeFromQueries(queries, merged);
+    await HiveService.markDateCached('readings', date);
 
     final all = _filterWithContent(merged.values.toList());
     return includeAlternatives
@@ -547,9 +545,7 @@ class ParsedReadingsService {
   Future<QuerySnapshot<Map<String, dynamic>>> _getQuery(
     Query<Map<String, dynamic>> query, {
     required bool forceRefresh,
-  }) => query.get(
-    forceRefresh ? const GetOptions(source: Source.server) : const GetOptions(),
-  );
+  }) => query.get(const GetOptions(source: Source.server));
 
   static int? _toInt(dynamic v) {
     if (v is int) return v;
