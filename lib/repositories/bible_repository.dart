@@ -53,18 +53,10 @@ class BibleVersionMeta {
 const kBibleVersionMeta = {
   'bel': BibleVersionMeta(
     id: 'bel',
-    name: 'Беларуская Біблія',
-    shortName: 'ББ',
-    langLabel: 'Беларуская',
-    shortLabel: 'БЕЛ',
-    attribution: 'Беларускі пераклад',
-  ),
-  'bel_charniauski': BibleVersionMeta(
-    id: 'bel_charniauski',
     name: 'Пераклад Чарняўскага',
     shortName: 'ЧБ',
-    langLabel: 'Беларуская (Чарняўскі)',
-    shortLabel: 'Ч17',
+    langLabel: 'Беларуская',
+    shortLabel: 'БЕЛ',
     attribution: 'Пераклад Ўладзіслава Чарняўскага · bible.by',
   ),
   'ru': BibleVersionMeta(
@@ -81,11 +73,6 @@ String bibleAttribution({
   required String versionId,
   required bool isNewTestament,
 }) {
-  if (versionId == 'bel') {
-    return isNewTestament
-        ? 'Афіцыйны пераклад · catholic.by'
-        : 'Пераклад Антонія Бокуна · bible.by';
-  }
   return kBibleVersionMeta[versionId]?.attribution ?? '';
 }
 
@@ -139,7 +126,7 @@ class BibleRepository {
   }
 
   /// Translates a Russian-seed book id into the shared Belarusian id scheme
-  /// (used by the `bel` and `bel_charniauski` seeds). The Russian seed uses
+  /// (used by the `bel` seed). The Russian seed uses
   /// different ids for several books (jn = Иона, jo = Иоанн, rm, act, …).
   static String _canonicalKey(String versionId, String bookId) {
     if (versionId != 'ru') return bookId;
@@ -292,18 +279,12 @@ class BibleRepository {
   }
 
   /// Offline data is decoded lazily, after the first frame.
-  static Future<void> preload() => Future.wait([
-    ensureVersion('bel'),
-    ensureVersion('bel_charniauski'),
-    ensureVersion('ru'),
-  ]);
+  static Future<void> preload() =>
+      Future.wait([ensureVersion('bel'), ensureVersion('ru')]);
 
   /// Replaces missing or corrupt in-memory corpora from bundled offline data.
   static Future<void> reloadBundled() async {
     _data['bel'] = await BibleSeedLoader.load(lang: 'bel');
-    _data['bel_charniauski'] = await BibleSeedLoader.load(
-      lang: 'bel_charniauski',
-    );
     _data['ru'] = await BibleSeedLoader.load(lang: 'ru');
   }
 }

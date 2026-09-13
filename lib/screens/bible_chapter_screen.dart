@@ -327,7 +327,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   );
 
   Widget _translationControl(BibleBookInfo book) => SizedBox(
-    width: 172,
+    width: 136,
     child: AdaptiveSegmentedControl<String>(
       showSelectedIcon: false,
       segments: [
