@@ -45,9 +45,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     super.initState();
     ref.read(liturgicalNavigationSyncProvider);
     widget.shellState.setActiveBranch(widget.activeBranch);
-    ref
-        .read(settingsProvider.notifier)
-        .rememberLastSection(widget.activeBranch.name);
+    _rememberActiveBranch();
     _liturgicalDateSubscription = ref.listenManual<DateTime>(
       selectedDateProvider,
       (previous, next) {
@@ -62,14 +60,18 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
     registerForRestoration(_liturgicalDate, 'hours-date');
-    ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(
-      _liturgicalDate.value,
-    );
-    final readings = ref.read(readingsBranchStateProvider);
-    ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
-      date: _liturgicalDate.value,
-      clearLiturgicalKey: true,
-    );
+    final restoredDate = DateUtils.dateOnly(_liturgicalDate.value);
+    // Restoration runs during didChangeDependencies, when provider writes
+    // would notify widgets that are still building.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(selectedDateProvider.notifier).state = restoredDate;
+      final readings = ref.read(readingsBranchStateProvider);
+      ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
+        date: restoredDate,
+        clearLiturgicalKey: true,
+      );
+    });
   }
 
   @override
@@ -78,10 +80,17 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     if (oldWidget.activeBranch != widget.activeBranch ||
         oldWidget.shellState != widget.shellState) {
       widget.shellState.setActiveBranch(widget.activeBranch);
+      _rememberActiveBranch();
+    }
+  }
+
+  void _rememberActiveBranch() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       ref
           .read(settingsProvider.notifier)
           .rememberLastSection(widget.activeBranch.name);
-    }
+    });
   }
 
   void _requestActiveMode(ReaderChromeMode mode) {
