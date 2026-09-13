@@ -1,0 +1,5 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/docs/audit-evidence/regression_probes_test.dart
+00:00 +0: AUDIT: a Readings date update overwrites the Hours context
+00:00 +1: AUDIT: double tapping a child action also hides reader chrome
+00:01 +2: AUDIT: stable GoRouter retains route state across MaterialApp theme keys
+00:01 +3: All tests passed!
