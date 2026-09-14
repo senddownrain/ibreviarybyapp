@@ -1,0 +1,22 @@
+  mCurrentFocus=Window{25ae77 u0 Application Not Responding: com.android.systemui}
+        InsetsSource id=39530005 type=mandatorySystemGestures frame=[0,0][780,48] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0001 type=navigationBars frame=[0,1584][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0004 type=systemGestures frame=[0,0][0,0] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0005 type=mandatorySystemGestures frame=[0,1584][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0024 type=systemGestures frame=[0,0][0,0] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0024 type=systemGestures frame=[0,0][0,0] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0005 type=mandatorySystemGestures frame=[0,1584][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0004 type=systemGestures frame=[0,0][0,0] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0001 type=navigationBars frame=[0,1584][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=39530005 type=mandatorySystemGestures frame=[0,0][780,48] visible=true flags= insetsRoundedCornerFrame=false
+  mCurrentFocus=Window{bb784af u0 Application Not Responding: com.android.systemui}
+        InsetsSource id=39530005 type=mandatorySystemGestures frame=[0,0][780,48] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0001 type=navigationBars frame=[0,1632][780,1680] visible=true flags=SUPPRESS_SCRIM insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0004 type=systemGestures frame=[0,0][60,1680] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0005 type=mandatorySystemGestures frame=[0,1616][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        InsetsSource id=78ce0024 type=systemGestures frame=[720,0][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0024 type=systemGestures frame=[720,0][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0005 type=mandatorySystemGestures frame=[0,1616][780,1680] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0004 type=systemGestures frame=[0,0][60,1680] visible=true flags= insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=78ce0001 type=navigationBars frame=[0,1632][780,1680] visible=true flags=SUPPRESS_SCRIM insetsRoundedCornerFrame=false
+        mSource=InsetsSource id=39530005 type=mandatorySystemGestures frame=[0,0][780,48] visible=true flags= insetsRoundedCornerFrame=false
