@@ -1,0 +1,97 @@
+Android audit AVD recreation: 2026-09-15T13:04:01.6511883+03:00
+SDK: C:\Users\User\AppData\Local\Android\Sdk
+C:\Users\User\AppData\Local\Android\Sdk\emulator\emulator.exe -version
+Android emulator version 36.4.10.0 (build_id 15004761) (CL:N/A)
+Copyright (C) 2006-2024 The Android Open Source Project and many others.
+This program is a derivative of the QEMU CPU emulator (www.qemu.org).
+
+  This software is licensed under the terms of the GNU General Public
+  License version 2, as published by the Free Software Foundation, and
+  may be copied, distributed, and modified under those terms.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+INFO         | Android emulator version 36.4.10.0 (build_id 15004761) (CL:N/A)
+INFO         | Graphics backend: gfxstream
+
+Emulator version: Android emulator version 36.4.10.0 (build_id 15004761) (CL:N/A)
+Copyright (C) 2006-2024 The Android Open Source Project and many others.
+This program is a derivative of the QEMU CPU emulator (www.qemu.org).
+
+  This software is licensed under the terms of the GNU General Public
+  License version 2, as published by the Free Software Foundation, and
+  may be copied, distributed, and modified under those terms.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+INFO         | Android emulator version 36.4.10.0 (build_id 15004761) (CL:N/A)
+INFO         | Graphics backend: gfxstream
+
+C:\Users\User\AppData\Local\Android\Sdk\emulator\emulator.exe -accel-check
+accel:
+0
+WHPX(10.0.26200) is installed and usable.
+accel
+
+Acceleration PASS: accel:
+0
+WHPX(10.0.26200) is installed and usable.
+accel
+
+C:\Users\User\AppData\Local\Android\Sdk\cmdline-tools\latest\bin\avdmanager.bat list avd
+Available Android Virtual Devices:
+    Name: Pixel7_API34_Audit
+  Device: pixel_7 (Google)
+    Path: C:\Users\User\.android\avd\Pixel7_API34_Audit.avd
+  Target: Google APIs (Google Inc.)
+          Based on: Android 14.0 ("UpsideDownCake") Tag/ABI: google_apis/x86_64
+  Sdcard: 512 MB
+Snapshot: false
+---------
+    Name: Pixel_5_API_34
+  Device: pixel_5 (Google)
+    Path: C:\Users\User\.android\avd\Pixel_5_API_34.avd
+  Target: Google APIs (Google Inc.)
+          Based on: Android 14.0 ("UpsideDownCake") Tag/ABI: google_apis/x86_64
+    Skin: pixel_5
+  Sdcard: 512M
+
+C:\Users\User\AppData\Local\Android\Sdk\cmdline-tools\latest\bin\avdmanager.bat delete avd -n Pixel7_API34_Audit
+
+AVD 'Pixel7_API34_Audit' deleted.
+
+Removed only stale artifacts for Pixel7_API34_Audit
+C:\Users\User\AppData\Local\Android\Sdk\cmdline-tools\latest\bin\avdmanager.bat create avd -n Pixel7_API34_Audit -k system-images;android-34;google_apis;x86_64 -d pixel_7 --force
+Auto-selecting single ABI x86_64
+
+AVD created: Pixel7_API34_Audit; image=system-images;android-34;google_apis;x86_64; profile=pixel_7; host cores=4; AVD cores=2
+Config: hw.cpu.ncore=2 hw.keyboard=yes hw.lcd.density=420 hw.lcd.height=2400 hw.lcd.width=1080 hw.ramSize=4096 snapshot.present=false
+Launching Pixel7_API34_Audit with -no-snapshot -wipe-data -gpu auto
+Boot PASS: emulator-5554, sys.boot_completed=1
+C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 logcat -c
+
+C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 shell am start -a android.settings.SETTINGS
+Starting: Intent { act=android.settings.SETTINGS }
+
+C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 get-state
+device
+
+C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 get-state
+device
+
+Android Settings/System UI ANR: 
+09-15 10:06:53.105   540  1792 I am_anr  : [0,1138,com.android.settings,952745541,Input dispatching timed out (d5af47f com.android.settings/com.android.settings.FallbackHome (server) is not responding. Waited 5001ms for FocusEvent(hasFocus=false))]
+
+
+C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 shell screencap -p /sdcard/settings-clean-boot.png
+Error opening file: /sdcard/settings-clean-boot.png (Operation not permitted)
+
+BLOCKER: Command failed (1): C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 shell screencap -p /sdcard/settings-clean-boot.png
+Error opening file: /sdcard/settings-clean-boot.png (Operation not permitted)
+

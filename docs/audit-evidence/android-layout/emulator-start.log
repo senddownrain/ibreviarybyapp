@@ -190,3 +190,7 @@ INFO         | Ignore IPv6 address: 4874:3dbc:f02:0:5040:3dbc:f02:0
 INFO         | Ignore IPv6 address: 4874:3dbc:f02:0:5040:3dbc:f02:0
 INFO         | Ignore IPv6 address: 4874:3dbc:f02:0:5040:3dbc:f02:0
 INFO         | Critical: UpdateLayeredWindowIndirect failed for ptDst=(623, -1046), size=(450x32), dirty=(450x33 0, 0) (Присоединенное к системе устройство не работает.) (:0, )
+INFO         | Wait for emulator (pid 16904) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+
+WARNING      | Not saving state: RAM not mapped as shared
+INFO         | Saving snapshot 'default_boot' using 9 ms

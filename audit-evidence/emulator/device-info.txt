@@ -1,0 +1,11 @@
+serial=emulator-5554
+android=14
+api=34
+size=Physical size: 1080x2400
+density=Physical density: 420
+gpu=software
+boot=PASS
+settings=FAIL
+system-ui=FAIL
+flutter=NOT_TESTED
+app=NOT_TESTED

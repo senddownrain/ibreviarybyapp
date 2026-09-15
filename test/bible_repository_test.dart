@@ -20,11 +20,11 @@ void main() {
   test('Belarusian version is attributed to the Chernyavski translation', () {
     expect(
       bibleAttribution(versionId: 'bel', isNewTestament: false),
-      'Пераклад Ўладзіслава Чарняўскага · bible.by',
+      'Пераклад кс. Ўладзіслава Чарняўскага MIC · bible.by',
     );
     expect(
       bibleAttribution(versionId: 'bel', isNewTestament: true),
-      'Пераклад Ўладзіслава Чарняўскага · bible.by',
+      'Пераклад кс. Ўладзіслава Чарняўскага MIC · bible.by',
     );
   });
 
