@@ -40,9 +40,9 @@ workflows:
         notify:
           success: true
           failure: true
-      artifacts:
-        - build/ios/iphonesimulator/*.app
-        - flutter_drive.log
+    artifacts:
+      - build/ios/iphonesimulator/*.app
+      - flutter_drive.log
 
   android-debug:
     name: Android Debug APK
@@ -70,5 +70,5 @@ workflows:
         notify:
           success: true
           failure: true
-      artifacts:
-        - build/app/outputs/flutter-apk/*.apk
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
