@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,9 +42,18 @@ class _HoursDateContextState extends ConsumerState<HoursDateContext> {
   }
 
   void _applyDate() {
-    ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(
-      widget.date,
-    );
+    final date = DateUtils.dateOnly(widget.date);
+    // initState/didUpdateWidget run while the widget tree is building; writing
+    // the provider here would notify sync listeners mid-build.
+    final binding = WidgetsBinding.instance;
+    if (binding.schedulerPhase == SchedulerPhase.idle) {
+      ref.read(selectedDateProvider.notifier).state = date;
+    } else {
+      binding.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(selectedDateProvider.notifier).state = date;
+      });
+    }
   }
 
   @override
