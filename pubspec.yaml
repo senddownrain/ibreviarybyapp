@@ -50,3 +50,4 @@ flutter:
     - assets/bible_seed_ru.json.gz
     - assets/mass/order-of-mass-en.md
     - assets/mass/order-of-mass.ritual.json
+    - assets/songs_seed.json
