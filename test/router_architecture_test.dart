@@ -63,6 +63,10 @@ void main() {
         'prayer/add',
         'prayer/:id/edit',
         'prayer/:id',
+        'songs',
+        ':id',
+        'catechism',
+        'sacraments',
       }),
     );
     expect(
@@ -77,6 +81,10 @@ void main() {
       ('/hours/ora/2026-09-09/day-id/lauds', hoursNavigatorKey),
       ('/readings?date=2026-09-09&dayId=day-id', readingsNavigatorKey),
       ('/prayers/prayer/prayer-id', prayerbookNavigatorKey),
+      ('/prayers/songs', prayerbookNavigatorKey),
+      ('/prayers/songs/song-id', prayerbookNavigatorKey),
+      ('/prayers/catechism', prayerbookNavigatorKey),
+      ('/prayers/sacraments', prayerbookNavigatorKey),
       ('/bible?version=bel&book=genesis&chapter=1', bibleNavigatorKey),
     ];
 
