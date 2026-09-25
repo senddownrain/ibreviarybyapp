@@ -5,7 +5,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 
 /// Minimal stand-in for Prayerbook sections that are not implemented yet
-/// (`/prayers/catechism`, `/prayers/sacraments`). The route stays stable, so a
+/// (`/prayers/sacraments`). The route stays stable, so a
 /// real module can replace this widget without touching navigation.
 class PrayerbookPlaceholderScreen extends StatelessWidget {
   const PrayerbookPlaceholderScreen({
@@ -60,16 +60,6 @@ class PrayerbookPlaceholderScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class CatechismPlaceholderScreen extends StatelessWidget {
-  const CatechismPlaceholderScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) => const PrayerbookPlaceholderScreen(
-    title: 'Катэхізіс',
-    icon: PhosphorIconsLight.bookOpenText,
-  );
 }
 
 class SacramentsPlaceholderScreen extends StatelessWidget {

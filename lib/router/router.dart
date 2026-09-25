@@ -6,6 +6,8 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
 import 'package:mybrev_flutter/screens/bible_search_screen.dart';
+import 'package:mybrev_flutter/screens/compendium_reader_screens.dart';
+import 'package:mybrev_flutter/screens/compendium_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -128,6 +130,24 @@ const _songbookRoute = AppRouteDescriptor(
 );
 const _songDetailRoute = AppRouteDescriptor(
   id: 'prayerbook.song',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.compact,
+  topChromeOwner: TopChromeOwner.reader,
+);
+const _compendiumRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _compendiumPartRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium.part',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _compendiumReaderRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium.reader',
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
@@ -400,15 +420,52 @@ final router = GoRouter(
                     ),
                   ],
                 ),
-                // Stable placeholders; replace the screen, keep the route.
                 GoRoute(
-                  path: 'catechism',
+                  path: 'compendium',
                   pageBuilder: (context, state) => _branchPage(
                     state,
-                    _prayerbookSectionRoute,
-                    const CatechismPlaceholderScreen(),
+                    _compendiumRoute,
+                    const CompendiumScreen(),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'part/:partId',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumPartRoute,
+                        CompendiumPartScreen(
+                          partId: state.pathParameters['partId']!,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'topic/:topicId',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumReaderRoute,
+                        CompendiumTopicScreen(
+                          topicId: state.pathParameters['topicId']!,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'question/:number',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumReaderRoute,
+                        CompendiumQuestionScreen(
+                          number: state.pathParameters['number']!,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                // The former Катэхізіс placeholder route opens the Compendium.
+                GoRoute(
+                  path: 'catechism',
+                  redirect: (_, _) => '/prayers/compendium',
+                ),
+                // Stable placeholder; replace the screen, keep the route.
                 GoRoute(
                   path: 'sacraments',
                   pageBuilder: (context, state) => _branchPage(
