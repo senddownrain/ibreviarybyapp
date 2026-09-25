@@ -93,7 +93,7 @@ class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
             .read(syncStatusProvider.notifier)
             .synchronize(
               SyncPlan(
-                targets: {...SyncTarget.values},
+                targets: kAutomaticSyncTargets,
                 dates: CacheWarmupService.buildDateOrder(
                   DateTime.now(),
                   behind: policy.behind,

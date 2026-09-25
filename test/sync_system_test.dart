@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/cache_sync_settings.dart';
+import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
@@ -22,6 +23,8 @@ import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
+import 'package:mybrev_flutter/providers/songs_provider.dart';
+import 'package:mybrev_flutter/services/song_repository.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
 
@@ -76,6 +79,7 @@ void main() {
         SyncTarget.completoriums,
         SyncTarget.prayerCategories,
       },
+      'sync-songs': {SyncTarget.songs},
     };
     for (final entry in groups.entries) {
       await tester.ensureVisible(find.byKey(Key(entry.key)));
@@ -90,6 +94,7 @@ void main() {
     await tester.pump();
     expect(recorder.plans.last.period, SyncPeriod.all);
     expect(recorder.plans.last.targets, {...SyncTarget.values});
+    expect(recorder.plans.last.targets, contains(SyncTarget.songs));
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -203,7 +208,12 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(container.read(dataBootstrapProvider).initialComplete, isTrue);
       expect(background.plans.single.dates!.length, 15);
-      expect(background.plans.single.targets, {...SyncTarget.values});
+      expect(background.plans.single.targets, kAutomaticSyncTargets);
+      expect(
+        background.plans.single.targets,
+        isNot(contains(SyncTarget.songs)),
+        reason: 'the songbook is never part of the automatic startup window',
+      );
       expect(background.plans.single.forceRefresh, isFalse);
     },
   );
@@ -437,6 +447,212 @@ void main() {
         (s, v) => s + HiveService.payloadBytes(v),
       ),
     );
+  });
+
+  group('songbook sync', () {
+    test('songs are an independent, manual-only SyncTarget', () {
+      expect(SyncTarget.songs.collection, 'songs');
+      expect(SyncTarget.songs.automatic, isFalse);
+      expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.songs)));
+      expect(
+        kAutomaticSyncTargets,
+        containsAll(SyncTarget.values.where((t) => t != SyncTarget.songs)),
+      );
+      expect(Hive.isBoxOpen('songs'), isTrue);
+    });
+
+    test('manual song sync persists pages, size and last sync', () async {
+      await HiveService.putCached('songs', 'removed', {'title': 'Стары'});
+      final db = _Db(
+        List.generate(
+          60,
+          (i) => _Doc('s$i', {
+            'title': 'Спеў $i',
+            'text': 'Радок\r\nДругі',
+            'chord': 'C\nG',
+            'tag': [2],
+          }),
+        ),
+      );
+      final container = ProviderContainer(
+        overrides: [syncFirestoreProvider.overrideWithValue(db)],
+      );
+      addTearDown(container.dispose);
+      await container
+          .read(syncStatusProvider.notifier)
+          .synchronize(const SyncPlan(targets: {SyncTarget.songs}));
+      expect(db.pageOffsets, [0, 50]);
+      expect(db.sources, everyElement(Source.server));
+      final box = HiveService.boxFor('songs');
+      expect(box.length, 60);
+      expect(box.containsKey('removed'), isFalse);
+      expect(HiveService.getLastSync('songs'), isNotNull);
+      expect(HiveService.getLastSync('prayers'), isNull);
+      expect(HiveService.prayersBox, isEmpty);
+      expect(container.read(syncStatusProvider).error, isNull);
+      expect(
+        HiveService.cachedBytes('songs'),
+        box.values.fold<int>(0, (s, v) => s + HiveService.payloadBytes(v)),
+      );
+      expect(HiveService.cachedBytes('songs'), greaterThan(0));
+    });
+
+    test('synced songs are readable offline and override the seed', () async {
+      await HiveService.putCached('songs', 'seed-a', {
+        'title': 'Абноўлены',
+        'text': 'Новы\r\nтэкст',
+      });
+      await HiveService.putCached('songs', 'server-only', {
+        'title': 'Новы спеў',
+        'text': 'З сервера',
+      });
+      final container = ProviderContainer(
+        overrides: [
+          songSeedProvider.overrideWith(
+            (ref) async => [
+              {'id': 'seed-a', 'title': 'Стары', 'text': 'Т', 'chord': 'C'},
+              {'id': 'seed-b', 'title': 'Другі', 'text': 'Т'},
+            ],
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(songSeedProvider.future);
+      final songs = container.read(songsProvider).requireValue;
+      final byId = {for (final song in songs) song.id: song};
+      expect(byId.keys, containsAll(['seed-a', 'seed-b', 'server-only']));
+      expect(byId['seed-a']!.title, 'Абноўлены');
+      expect(byId['seed-a']!.text, 'Новы\nтэкст');
+      expect(byId['seed-a']!.chord, 'C');
+      expect(SongRepository.readCached(), hasLength(2));
+    });
+
+    test('failed song page keeps saved songs and records an error', () async {
+      await HiveService.putCached('songs', 'offline', {'title': 'Захаваны'});
+      final db = _Db(
+        List.generate(80, (i) => _Doc('s$i', {'title': 'С', 'text': 'Т'})),
+        failAt: 50,
+      );
+      final container = ProviderContainer(
+        overrides: [syncFirestoreProvider.overrideWithValue(db)],
+      );
+      addTearDown(container.dispose);
+      await container
+          .read(syncStatusProvider.notifier)
+          .synchronize(const SyncPlan(targets: {SyncTarget.songs}));
+      final box = HiveService.boxFor('songs');
+      expect(box.length, 51);
+      expect(box.containsKey('offline'), isTrue);
+      expect(HiveService.getLastSync('songs'), isNull);
+      expect(container.read(syncStatusProvider).error, contains('Спеўнік'));
+    });
+
+    test(
+      'cancelled song sync keeps saved pages without success mark',
+      () async {
+        final db = _Db(
+          List.generate(80, (i) => _Doc('s$i', {'title': 'С', 'text': 'Т'})),
+        );
+        final container = ProviderContainer(
+          overrides: [syncFirestoreProvider.overrideWithValue(db)],
+        );
+        addTearDown(container.dispose);
+        final sync = container.read(syncStatusProvider.notifier);
+        db.onPage = (offset) {
+          if (offset == 50) sync.cancel();
+        };
+        await sync.synchronize(const SyncPlan(targets: {SyncTarget.songs}));
+        expect(HiveService.boxFor('songs').length, 50);
+        expect(HiveService.getLastSync('songs'), isNull);
+        expect(container.read(syncStatusProvider).cancelled, isTrue);
+      },
+    );
+
+    test(
+      'opening the songbook queues a background songs-only refresh',
+      () async {
+        final recorder = _RecordingSync();
+        final container = ProviderContainer(
+          overrides: [
+            syncStatusProvider.overrideWith(() => recorder),
+            isOfflineProvider.overrideWithValue(false),
+          ],
+        );
+        addTearDown(container.dispose);
+        container.read(songbookRefreshProvider)();
+        expect(recorder.plans.single.targets, {SyncTarget.songs});
+        expect(recorder.plans.single.background, isTrue);
+        expect(recorder.plans.single.forceRefresh, isFalse);
+
+        await HiveService.setLastSync('songs', DateTime.now());
+        container.read(songbookRefreshProvider)();
+        expect(recorder.plans, hasLength(1), reason: 'fresh cache is reused');
+      },
+    );
+
+    test('offline songbook opening does not start a download', () {
+      final recorder = _RecordingSync();
+      final container = ProviderContainer(
+        overrides: [
+          syncStatusProvider.overrideWith(() => recorder),
+          isOfflineProvider.overrideWithValue(true),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.read(songbookRefreshProvider)();
+      expect(recorder.plans, isEmpty);
+    });
+
+    testWidgets('settings show the songbook group count, size and sync date', (
+      tester,
+    ) async {
+      await tester.runAsync(() async {
+        await HiveService.putCached('songs', 'a', {'title': 'А', 'text': 'Т'});
+        await HiveService.putCached('songs', 'b', {'title': 'Б', 'text': 'Т'});
+        await HiveService.setLastSync('songs', DateTime(2026, 9, 20));
+      });
+      final recorder = _RecordingSync();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [syncStatusProvider.overrideWith(() => recorder)],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(child: CacheSyncSettings()),
+            ),
+          ),
+        ),
+      );
+      final button = find.byKey(const Key('sync-songs'));
+      await tester.ensureVisible(button);
+      final group = find.ancestor(
+        of: button,
+        matching: find.byType(DecoratedBox),
+      );
+      expect(
+        find.descendant(of: group.first, matching: find.text('Спеўнік')),
+        findsOneWidget,
+      );
+      final size = formatCacheBytes(HiveService.cachedBytes('songs'));
+      expect(
+        find.descendant(
+          of: group.first,
+          matching: find.text('2 дакументаў · $size'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: group.first,
+          matching: find.text('Сінхранізавана: 20.9.2026'),
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(button);
+      await tester.pump();
+      expect(recorder.plans.single.targets, {SyncTarget.songs});
+      expect(recorder.plans.single.forceRefresh, isTrue);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
   });
 
   test('updating reading removes its obsolete index keys', () async {
