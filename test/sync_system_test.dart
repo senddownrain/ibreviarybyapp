@@ -80,6 +80,7 @@ void main() {
         SyncTarget.prayerCategories,
       },
       'sync-songs': {SyncTarget.songs},
+      'sync-compendium': {SyncTarget.compendium},
     };
     for (final entry in groups.entries) {
       await tester.ensureVisible(find.byKey(Key(entry.key)));
@@ -95,6 +96,7 @@ void main() {
     expect(recorder.plans.last.period, SyncPeriod.all);
     expect(recorder.plans.last.targets, {...SyncTarget.values});
     expect(recorder.plans.last.targets, contains(SyncTarget.songs));
+    expect(recorder.plans.last.targets, contains(SyncTarget.compendium));
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -213,6 +215,11 @@ void main() {
         background.plans.single.targets,
         isNot(contains(SyncTarget.songs)),
         reason: 'the songbook is never part of the automatic startup window',
+      );
+      expect(
+        background.plans.single.targets,
+        isNot(contains(SyncTarget.compendium)),
+        reason: 'the Compendium is never part of the automatic window',
       );
       expect(background.plans.single.forceRefresh, isFalse);
     },
@@ -456,7 +463,11 @@ void main() {
       expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.songs)));
       expect(
         kAutomaticSyncTargets,
-        containsAll(SyncTarget.values.where((t) => t != SyncTarget.songs)),
+        containsAll(
+          SyncTarget.values.where(
+            (t) => t != SyncTarget.songs && t != SyncTarget.compendium,
+          ),
+        ),
       );
       expect(Hive.isBoxOpen('songs'), isTrue);
     });
@@ -653,6 +664,60 @@ void main() {
       expect(recorder.plans.single.forceRefresh, isTrue);
       await tester.pumpWidget(const SizedBox.shrink());
     });
+  });
+
+  testWidgets('settings show the Compendium group and sync it alone', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      await HiveService.putCached('compendium', 'p1-s1-ch1', {'id': 'u'});
+      await HiveService.putCached('compendium', 'meta', {'id': 'm'});
+      await HiveService.setLastSync('compendium', DateTime(2026, 9, 21));
+    });
+    final recorder = _RecordingSync();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [syncStatusProvider.overrideWith(() => recorder)],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(child: CacheSyncSettings()),
+          ),
+        ),
+      ),
+    );
+    final button = find.byKey(const Key('sync-compendium'));
+    await tester.ensureVisible(button);
+    final group = find.ancestor(
+      of: button,
+      matching: find.byType(DecoratedBox),
+    );
+    expect(
+      find.descendant(
+        of: group.first,
+        matching: find.text('Кампендый Катэхізіса'),
+      ),
+      findsOneWidget,
+    );
+    final size = formatCacheBytes(HiveService.cachedBytes('compendium'));
+    expect(
+      find.descendant(
+        of: group.first,
+        matching: find.text('2 дакументаў · $size'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: group.first,
+        matching: find.text('Сінхранізавана: 21.9.2026'),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(button);
+    await tester.pump();
+    expect(recorder.plans.single.targets, {SyncTarget.compendium});
+    expect(recorder.plans.single.forceRefresh, isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   test('updating reading removes its obsolete index keys', () async {

@@ -33,6 +33,7 @@ class _CacheSyncSettingsState extends ConsumerState<CacheSyncSettings> {
   static const _prayers = {SyncTarget.prayers};
   static const _bible = {SyncTarget.bibleBel, SyncTarget.bibleRu};
   static const _songs = {SyncTarget.songs};
+  static const _compendium = {SyncTarget.compendium};
   static const _other = {
     SyncTarget.years,
     SyncTarget.invitatoriums,
@@ -202,6 +203,18 @@ class _CacheSyncSettingsState extends ConsumerState<CacheSyncSettings> {
           buttonKey: 'sync-songs',
           busy: busy,
           onPressed: () => _sync('Спеўнік', const SyncPlan(targets: _songs)),
+        ),
+        _group(
+          title: 'Кампендый Катэхізіса',
+          description:
+              'Пытанні і адказы. Убудаваны тэкст даступны і без загрузкі.',
+          targets: _compendium,
+          buttonKey: 'sync-compendium',
+          busy: busy,
+          onPressed: () => _sync(
+            'Кампендый Катэхізіса',
+            const SyncPlan(targets: _compendium),
+          ),
         ),
         _group(
           title: 'Астатняе',
