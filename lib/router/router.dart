@@ -382,7 +382,10 @@ final router = GoRouter(
                   pageBuilder: (context, state) => _branchPage(
                     state,
                     _prayerDetailRoute,
-                    PrayerDetailScreen(prayerId: state.pathParameters['id']!),
+                    PrayerDetailScreen(
+                      prayerId: state.pathParameters['id']!,
+                      massLanguage: state.uri.queryParameters['lang'],
+                    ),
                   ),
                 ),
               ],
