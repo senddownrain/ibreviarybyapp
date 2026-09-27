@@ -76,7 +76,7 @@ Visual verdicts:
 ## Verification
 
 - Layout Lab: 17 tests passed.
-- Full Flutter suite: 219 tests passed.
+- Full Flutter suite after merging `origin/main`: 220 tests passed.
 - `dart analyze`: completed with one pre-existing info-level `avoid_print` in
   `docs/audit-evidence/cache_bound_probe.dart`.
 - `flutter analyze --no-pub`: same single pre-existing info; command exits 1
