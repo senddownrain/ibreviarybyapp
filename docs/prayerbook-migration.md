@@ -88,3 +88,19 @@ Legacy `FavoritesScreen`, `MyPrayersScreen` и `PrayerFormScreen`:
 daily root, но нужны старым ссылкам, drawer shortcuts и безопасному сохранению
 полной user-prayer функциональности. Следующий рекомендуемый этап — отдельная
 миграция **Bible branch**. Она не входит в Stage 5 и автоматически не начата.
+
+## Святая Імша: моўныя варыянты
+
+Імша — адзін рытуал з варыянтамі `be` (існуючая малітва `eMmCtxwyJ75ogmL5rwye`),
+`la` (існуючая «Ordo Missae» `zdro66KYVuQ9p2KbqizD`) і `en` (`MCFL.pdf`, убудаваны
+`assets/mass/order-of-mass-en.md`, або дакумент `prayers/order-of-mass-en` пасля
+сінхранізацыі). Агульныя метаданыя — `assets/mass/order-of-mass.ritual.json` (тая ж
+копія, што ў MyBrev); `lib/models/mass_ritual_data.dart` згенераваны з яго, тэст
+`test/mass_ritual_test.dart` правярае супадзенне.
+
+- Спасылка `/prayers/prayer/eMmCtxwyJ75ogmL5rwye?lang=la`; ID лацінскай/англійскай
+  малітвы адкрывае той жа чытач з адпаведнай мовай.
+- Апошняя мова захоўваецца ў Hive `settings` (`massRitualLanguage`).
+- Навігацыя: плаваючая панэль «бягучы раздзел ▾ · BE/LA/EN» (Glass на iOS, tonal
+  на Android) і ніжні ліст з галоўнымі раздзеламі і падраздзеламі. Пры змене мовы
+  чытач пераходзіць да таго ж семантычнага раздзела (або бацькоўскага/суседняга).

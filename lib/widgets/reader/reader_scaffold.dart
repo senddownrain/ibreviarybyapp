@@ -85,6 +85,7 @@ class ReaderScaffold extends StatelessWidget {
     this.showScrollToTop = false,
     this.onSwipePrevious,
     this.onSwipeNext,
+    this.overlay,
   });
 
   final Widget content;
@@ -109,6 +110,10 @@ class ReaderScaffold extends StatelessWidget {
   final bool showScrollToTop;
   final VoidCallback? onSwipePrevious;
   final VoidCallback? onSwipeNext;
+
+  /// Reader-specific floating control layered above the text (for example the
+  /// Holy Mass section navigator). Hidden together with the chrome.
+  final Widget? overlay;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +199,7 @@ class ReaderScaffold extends StatelessWidget {
             )
           else
             scrollView,
+          if (resolvedMode != ReaderChromeMode.hidden) ?overlay,
           if (showScrollToTop && scrollController != null)
             _ReaderScrollToTopControl(
               controller: scrollController!,
