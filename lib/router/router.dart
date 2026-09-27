@@ -15,9 +15,12 @@ import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
+import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
+import 'package:mybrev_flutter/screens/song_detail_screen.dart';
+import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -116,6 +119,24 @@ const _prayerDetailRoute = AppRouteDescriptor(
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
+);
+const _songbookRoute = AppRouteDescriptor(
+  id: 'prayerbook.songs',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _songDetailRoute = AppRouteDescriptor(
+  id: 'prayerbook.song',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.compact,
+  topChromeOwner: TopChromeOwner.reader,
+);
+const _prayerbookSectionRoute = AppRouteDescriptor(
+  id: 'prayerbook.section',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
 );
 const _prayerFormRoute = AppRouteDescriptor(
   id: 'prayerbook.form',
@@ -359,6 +380,41 @@ final router = GoRouter(
                     state,
                     _prayerListRoute,
                     const MyPrayersScreen(),
+                  ),
+                ),
+                GoRoute(
+                  path: 'songs',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _songbookRoute,
+                    const SongbookScreen(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: ':id',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _songDetailRoute,
+                        SongDetailScreen(songId: state.pathParameters['id']!),
+                      ),
+                    ),
+                  ],
+                ),
+                // Stable placeholders; replace the screen, keep the route.
+                GoRoute(
+                  path: 'catechism',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerbookSectionRoute,
+                    const CatechismPlaceholderScreen(),
+                  ),
+                ),
+                GoRoute(
+                  path: 'sacraments',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerbookSectionRoute,
+                    const SacramentsPlaceholderScreen(),
                   ),
                 ),
                 GoRoute(
