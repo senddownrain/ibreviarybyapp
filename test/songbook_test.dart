@@ -515,8 +515,17 @@ void main() {
       container.read(settingsProvider.notifier).toggleFavorite('prayer');
       expect(container.read(settingsProvider).favoriteIds, ['prayer']);
       expect(container.read(songPreferencesProvider).favoriteSongIds, ['song']);
-      // Let the unawaited settings writes finish before the box closes.
-      await pumpEventQueue();
+      // Let the unawaited settings writes finish before the box closes; under
+      // load a single event-queue flush is not always enough for disk I/O.
+      for (
+        var i = 0;
+        i < 50 &&
+            (HiveService.settingsBox.get('favoriteIds') != '["prayer"]' ||
+                HiveService.settingsBox.get('favoriteSongIds') != '["song"]');
+        i++
+      ) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
       expect(HiveService.settingsBox.get('favoriteIds'), '["prayer"]');
       expect(HiveService.settingsBox.get('favoriteSongIds'), '["song"]');
     });
