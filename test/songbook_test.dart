@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/songs_provider.dart';
+import 'package:mybrev_flutter/screens/compendium_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
@@ -21,7 +22,10 @@ import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
+import 'support/compendium_fixture.dart';
+
 const _massId = 'eMmCtxwyJ75ogmL5rwye';
+final _compendium = readBundledCompendium();
 
 const _seed = <Map<String, dynamic>>[
   {
@@ -94,7 +98,7 @@ void main() {
       expect(categoriesY, lessThan(allY));
     });
 
-    testWidgets('section tiles open Mass, Songbook and placeholders', (
+    testWidgets('section tiles open Mass, Songbook, Compendium, placeholder', (
       tester,
     ) async {
       final router = _router();
@@ -113,8 +117,18 @@ void main() {
       router.pop();
       await tester.pumpAndSettle();
 
+      await tester.tap(find.byKey(const Key('catechism-destination')));
+      await tester.pumpAndSettle();
+      expect(
+        _location(router),
+        '/prayers/compendium',
+        reason: 'the Катэхізіс tile opens the Compendium',
+      );
+      expect(find.byKey(const Key('compendium-title')), findsOneWidget);
+      await tester.tap(find.byTooltip('Назад'));
+      await tester.pumpAndSettle();
+
       for (final (key, path, title) in [
-        ('catechism-destination', '/prayers/catechism', 'Катэхізіс'),
         ('sacraments-destination', '/prayers/sacraments', 'Сакрамэнты'),
       ]) {
         await tester.tap(find.byKey(Key(key)));
@@ -574,8 +588,8 @@ GoRouter _router({String initialLocation = '/prayers'}) => GoRouter(
           ],
         ),
         GoRoute(
-          path: 'catechism',
-          builder: (context, state) => const CatechismPlaceholderScreen(),
+          path: 'compendium',
+          builder: (context, state) => const CompendiumScreen(),
         ),
         GoRoute(
           path: 'sacraments',
@@ -617,6 +631,7 @@ Widget _app(
       cachedSongDocsProvider.overrideWithValue(const []),
       songPreferencesProvider.overrideWith(() => _TestSongPrefs(prefs)),
       songbookRefreshProvider.overrideWithValue(onRefresh ?? () {}),
+      ...compendiumOverrides(_compendium),
     ],
     child: Consumer(
       builder: (context, ref, _) {

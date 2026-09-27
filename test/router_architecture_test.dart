@@ -67,6 +67,10 @@ void main() {
         ':id',
         'catechism',
         'sacraments',
+        'compendium',
+        'part/:partId',
+        'topic/:topicId',
+        'question/:number',
       }),
     );
     expect(
@@ -85,6 +89,10 @@ void main() {
       ('/prayers/songs/song-id', prayerbookNavigatorKey),
       ('/prayers/catechism', prayerbookNavigatorKey),
       ('/prayers/sacraments', prayerbookNavigatorKey),
+      ('/prayers/compendium', prayerbookNavigatorKey),
+      ('/prayers/compendium/part/p2', prayerbookNavigatorKey),
+      ('/prayers/compendium/topic/p1-s1-ch3-t1', prayerbookNavigatorKey),
+      ('/prayers/compendium/question/42', prayerbookNavigatorKey),
       ('/bible?version=bel&book=genesis&chapter=1', bibleNavigatorKey),
     ];
 
@@ -95,6 +103,36 @@ void main() {
       final shell = match.matches.single as ShellRouteMatch;
       expect(shell.navigatorKey, same(expectedNavigator), reason: location);
     }
+  });
+
+  testWidgets('the former Катэхізіс route redirects to the Compendium', (
+    tester,
+  ) async {
+    final shell = router.configuration.routes
+        .whereType<StatefulShellRoute>()
+        .single;
+    final prayerbook = shell.branches[2].routes.single as GoRoute;
+    final catechism = prayerbook.routes.whereType<GoRoute>().singleWhere(
+      (route) => route.path == 'catechism',
+    );
+    late BuildContext context;
+    await tester.pumpWidget(
+      Builder(
+        builder: (value) {
+          context = value;
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+    final state = GoRouterState(
+      router.configuration,
+      uri: Uri.parse('/prayers/catechism'),
+      matchedLocation: '/prayers/catechism',
+      fullPath: '/prayers/catechism',
+      pathParameters: const {},
+      pageKey: const ValueKey('catechism'),
+    );
+    expect(await catechism.redirect!(context, state), '/prayers/compendium');
   });
 
   test('legacy compatibility aliases remain registered', () {

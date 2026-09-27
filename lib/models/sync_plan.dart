@@ -12,7 +12,13 @@ enum SyncTarget {
   /// Optional songbook content. The app ships a bundled seed, so songs are
   /// synced only on request, from «Загрузіць усю базу» or when the songbook
   /// is opened — never as part of the automatic startup/background window.
-  songs('songs', 'Спеўнік', automatic: false);
+  songs('songs', 'Спеўнік', automatic: false),
+
+  /// Optional Compendium of the Catechism. A validated dataset ships with the
+  /// app; `compendiumMeta/current` is compared first and the `compendium`
+  /// units are downloaded only when Firestore has a strictly newer, valid
+  /// version. Never part of the automatic startup/background window.
+  compendium('compendium', 'Кампендый Катэхізіса', automatic: false);
 
   const SyncTarget(this.collection, this.label, {this.automatic = true});
   final String collection;

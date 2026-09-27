@@ -18,11 +18,12 @@ Android — tonal Material surface, одинаковая структура (и�
 | --- | --- | --- |
 | Святая Імша | прежний `/prayers/prayer/<_kMassOrderPrayerId>` + прежний snackbar синхронизации | `church` |
 | Спеўнік | `/prayers/songs` | `playlist` (строки текста с нотой — сборник песен, а не «воспроизведение») |
-| Катэхізіс | `/prayers/catechism` — заглушка | `bookOpenText` |
+| Катэхізіс | `/prayers/compendium` — Кампендый (см. `docs/compendium.md`); `/prayers/catechism` — redirect | `bookOpenText` |
 | Сакрамэнты | `/prayers/sacraments` — заглушка | `cross` |
 
-Заглушки — `PrayerbookPlaceholderScreen` («Раздзел у распрацоўцы»). Route
-стабилен: будущий модуль заменяет только widget в `router.dart`.
+Заглушка Сакрамэнтаў — `PrayerbookPlaceholderScreen` («Раздзел у
+распрацоўцы»). Route стабилен: будущий модуль заменяет только widget в
+`router.dart`.
 
 ## Модель и Firestore
 

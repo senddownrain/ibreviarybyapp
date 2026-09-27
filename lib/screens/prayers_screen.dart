@@ -109,9 +109,9 @@ class PrayersScreen extends ConsumerWidget {
                     PrayerbookSectionTile(
                       key: const Key('catechism-destination'),
                       title: 'Катэхізіс',
-                      subtitle: 'Хутка',
+                      subtitle: 'Кампендый',
                       icon: PhosphorIconsRegular.bookOpenText,
-                      onTap: () => context.push('/prayers/catechism'),
+                      onTap: () => context.push('/prayers/compendium'),
                     ),
                     PrayerbookSectionTile(
                       key: const Key('sacraments-destination'),
@@ -667,7 +667,7 @@ class PrayerSearchDock extends StatelessWidget {
     required this.onChanged,
     required this.onSubmitted,
     required this.onClear,
-    required this.onFilter,
+    this.onFilter,
   });
 
   final String hintText;
@@ -680,7 +680,9 @@ class PrayerSearchDock extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final ValueChanged<String> onSubmitted;
   final VoidCallback onClear;
-  final VoidCallback onFilter;
+
+  /// Hidden when `null` (a search-only dock, for example the Compendium).
+  final VoidCallback? onFilter;
 
   @override
   Widget build(BuildContext context) {
@@ -722,46 +724,47 @@ class PrayerSearchDock extends StatelessWidget {
                   onPressed: onClear,
                   icon: const Icon(Icons.close_rounded, size: 20),
                 ),
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IconButton(
-                    key: filterKey,
-                    tooltip: selectedFilterCount == 0
-                        ? 'Адкрыць фільтр'
-                        : 'Фільтр: выбрана $selectedFilterCount',
-                    color: selectedFilterCount == 0
-                        ? cs.onSurfaceVariant
-                        : cs.primary,
-                    onPressed: onFilter,
-                    icon: const Icon(Icons.tune_rounded, size: 22),
-                  ),
-                  if (selectedFilterCount > 0)
-                    Positioned(
-                      top: 2,
-                      right: 1,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: cs.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: SizedBox.square(
-                          dimension: 18,
-                          child: Center(
-                            child: Text(
-                              '$selectedFilterCount',
-                              style: TextStyle(
-                                color: cs.onPrimary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
+              if (onFilter != null)
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      key: filterKey,
+                      tooltip: selectedFilterCount == 0
+                          ? 'Адкрыць фільтр'
+                          : 'Фільтр: выбрана $selectedFilterCount',
+                      color: selectedFilterCount == 0
+                          ? cs.onSurfaceVariant
+                          : cs.primary,
+                      onPressed: onFilter,
+                      icon: const Icon(Icons.tune_rounded, size: 22),
+                    ),
+                    if (selectedFilterCount > 0)
+                      Positioned(
+                        top: 2,
+                        right: 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: cs.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: SizedBox.square(
+                            dimension: 18,
+                            child: Center(
+                              child: Text(
+                                '$selectedFilterCount',
+                                style: TextStyle(
+                                  color: cs.onPrimary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(width: 6),
             ],
           ),

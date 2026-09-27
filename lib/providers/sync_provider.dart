@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/cache_warmup_service.dart';
+import 'package:mybrev_flutter/services/compendium_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
@@ -171,13 +172,23 @@ class SyncStatusNotifier extends Notifier<SyncStatus> {
           final fresh =
               last != null &&
               DateTime.now().difference(last) < const Duration(days: 1);
-          if (!plan.forceRefresh && fresh && box.isNotEmpty) {
+          final compendium = collection == SyncTarget.compendium.collection;
+          // An empty Compendium box is normal: the bundled dataset is used
+          // until Firestore has a newer version.
+          if (!plan.forceRefresh && fresh && (box.isNotEmpty || compendium)) {
             completed++;
             continue;
           }
-          await _syncCollection(collection, (documentCount) {
+          if (compendium) {
+            await ref
+                .read(compendiumSyncProvider)
+                .run(shouldCancel: () => _cancel);
             report(collection, label);
-          });
+          } else {
+            await _syncCollection(collection, (documentCount) {
+              report(collection, label);
+            });
+          }
           if (_cancel) break;
           await HiveService.setLastSync(collection, DateTime.now());
           if (collection.startsWith('bible_')) {
@@ -286,6 +297,14 @@ final syncStatusProvider = NotifierProvider<SyncStatusNotifier, SyncStatus>(
 
 final syncFirestoreProvider = Provider<FirebaseFirestore>(
   (ref) => FirebaseFirestore.instance,
+);
+
+/// Compendium refresh (meta check, then units only when newer and valid).
+final compendiumSyncProvider = Provider<CompendiumSync>(
+  (ref) => CompendiumSync(
+    remote: FirestoreCompendiumRemote(ref.read(syncFirestoreProvider)),
+    bundledVersion: CompendiumRepository.bundledContentVersion,
+  ),
 );
 final syncWarmupServiceProvider = Provider<CacheWarmupService>(
   (ref) => CacheWarmupService(),
