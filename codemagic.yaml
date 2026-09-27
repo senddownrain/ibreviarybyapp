@@ -1,0 +1,75 @@
+# Codemagic CI/CD configuration for iBreviaryBy.
+# Docs: https://docs.codemagic.io/yaml/yaml-getting-started/
+#
+# Workflows:
+#   ios-simulator  — debug build for the iOS Simulator, no codesigning needed.
+#   android-debug  — debug APK build.
+
+workflows:
+  ios-simulator:
+    name: iOS Simulator
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      # Pinned to the version the app is developed against; newer Flutter
+      # stable marks IconData final, which breaks phosphor_flutter 2.x.
+      flutter: 3.38.9
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    scripts:
+      - name: Resolve Flutter dependencies
+        script: flutter pub get
+      - name: Install iOS dependencies
+        script: |
+          cd ios
+          pod install
+      - name: Run Flutter tests
+        script: flutter test
+      - name: Build for iOS Simulator
+        script: flutter build ios --simulator --debug
+    publishing:
+      email:
+        recipients:
+          - gleb2000405@outlook.com
+        notify:
+          success: true
+          failure: true
+    artifacts:
+      - build/ios/iphonesimulator/*.app
+      - flutter_drive.log
+
+  android-debug:
+    name: Android Debug APK
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: 3.38.9
+      java: 17
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    scripts:
+      - name: Resolve Flutter dependencies
+        script: flutter pub get
+      - name: Build debug APK
+        script: flutter build apk --debug
+    publishing:
+      email:
+        recipients:
+          - gleb2000405@outlook.com
+        notify:
+          success: true
+          failure: true
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
