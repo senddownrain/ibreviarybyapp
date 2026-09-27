@@ -543,6 +543,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
     if (_selectedSentenceId != null) {
       document = Padding(
+        key: const Key('readings-selection-content-reserve'),
         padding: EdgeInsets.only(
           bottom: 80 + readerSystemBottomClearance(context),
         ),
@@ -610,6 +611,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   Widget _highlightPalette() => AdaptiveChromeSurface(
+    key: const Key('readings-highlight-palette'),
     role: ChromeSurfaceRole.group,
     borderRadius: BorderRadius.circular(22),
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),

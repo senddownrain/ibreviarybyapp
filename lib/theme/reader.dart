@@ -1,14 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Allows deterministic widget harnesses to use Flutter's bundled test font.
+/// Production does not install this scope, so its typography is unchanged.
+class ReaderTypographyScope extends InheritedWidget {
+  const ReaderTypographyScope({
+    super.key,
+    required this.useSystemFonts,
+    required super.child,
+  });
+
+  final bool useSystemFonts;
+
+  static bool useSystemFontsOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<ReaderTypographyScope>()
+          ?.useSystemFonts ??
+      false;
+
+  @override
+  bool updateShouldNotify(ReaderTypographyScope oldWidget) =>
+      useSystemFonts != oldWidget.useSystemFonts;
+}
+
 /// Reader typography and surfaces (mirrors web `--reader-*` tokens).
 class ReaderTheme {
-  const ReaderTheme._(this.isDark);
+  const ReaderTheme._(this.isDark, this.useSystemFonts);
 
-  factory ReaderTheme.of(BuildContext context) =>
-      ReaderTheme._(Theme.of(context).brightness == Brightness.dark);
+  factory ReaderTheme.of(BuildContext context) => ReaderTheme._(
+    Theme.of(context).brightness == Brightness.dark,
+    ReaderTypographyScope.useSystemFontsOf(context),
+  );
 
   final bool isDark;
+  final bool useSystemFonts;
 
   Color get ink => isDark ? const Color(0xFFF1F1F1) : const Color(0xFF1C1C1C);
   Color get muted => isDark ? const Color(0xFFB0B0B0) : const Color(0xFF686868);
@@ -21,16 +46,22 @@ class ReaderTheme {
   Color get border =>
       isDark ? const Color(0x21FFFFFF) : const Color(0x1F000000);
 
-  TextStyle displayTitle(double size) => GoogleFonts.cormorantGaramond(
-    fontSize: size,
-    fontWeight: FontWeight.w700,
-    height: 1.05,
-    letterSpacing: -0.02,
-    color: ink,
-  );
+  TextStyle displayTitle(double size) {
+    final base = TextStyle(
+      fontSize: size,
+      fontWeight: FontWeight.w700,
+      height: 1.05,
+      letterSpacing: -0.02,
+      color: ink,
+    );
+    return useSystemFonts
+        ? base
+        : GoogleFonts.cormorantGaramond(textStyle: base);
+  }
 
   TextStyle body(double size, {String? family}) {
     final base = TextStyle(fontSize: size, height: 1.65, color: ink);
+    if (useSystemFonts) return base;
     if (family == null || family == 'Сістэмны') {
       try {
         return GoogleFonts.literata(textStyle: base);
