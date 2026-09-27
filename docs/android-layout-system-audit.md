@@ -1,14 +1,78 @@
 # Executive verdict
 
-Аудируемый source HEAD: `b1537419add43e21ab83cd8559eca9130585d049`, ветка `main`, 2026-09-14. Аудит read-only: implementation не выполнялся.
+Исходный source audit выполнен на `b1537419add43e21ab83cd8559eca9130585d049`. Детерминированная проверка ниже начата на актуальном `main`, HEAD `8ed5b75`, 2026-09-27. Production layout refactor не выполнялся; добавлены только test infrastructure, testability scope для шрифтов и стабильные Keys без visual behavior change.
 
-**Статус: аудит исходников завершён, обязательная visual matrix пока не подтверждена.** Не считать этот документ разрешением на implementation без парных Android прогонов. Наблюдения, расчёты из кода и непроверенные гипотезы явно разделены ниже.
+**Статус: source audit и deterministic Flutter layout matrix завершены; Android Emulator остаётся отдельным infrastructure blocker.** Результаты Layout Lab ниже заменяют прежние расчётные гипотезы там, где указаны `CONFIRMED`, `REJECTED` или `PARTIAL`.
 
 Нынешняя система имеет три разных источника geometry: shell dock использует `viewPadding`; Prayer search использует максимум локальных `padding/viewPadding` с Android floor 48 dp; Bible/Readings helper использует максимум четырёх показателей с floor 56 dp. Локальный `padding` может уже включать app dock. Поэтому имя «system clearance» не гарантирует системный характер значения.
 
-P1 overlap не подтверждён. P2: независимые floors 48/56 dp и смешение dock reserve с system inset. Величина реального пользовательского gap требует визуального прогона.
+P1 overlap не обнаружен в измеренной матрице. P2 подтверждён: независимые floors 48/56 dp дают лишний gesture gap; Readings складывает shared reader padding и selection reserve; Bible использует другую reserve policy. Prayerbook baseline и Full/Compact/Hidden dock reserve работают корректно.
+
+# Deterministic Layout Lab
+
+Harness: `test/layout/android_layout_lab_test.dart`. Он использует `TargetPlatform.android`, production `PrayersScreen`, `PrayerCatalogScreen`, `ReadingsScreen`, `BibleChapterScreen`, `ReaderScaffold`, `ReaderContentSurface` и `AppNavigationDock`. Данные подаются локальными Riverpod/Hive fixtures; Firebase, сеть, Android SDK runtime, Emulator и ADB не используются. `ReaderTypographyScope` заменяет только загружаемые Google Fonts на bundled Flutter test font; production без этого scope не меняется.
+
+Матрица задаёт через Flutter test view `physicalSize`, DPR 1, `padding`, `viewPadding`, `systemGestureInsets` и `viewInsets`: 390×840 и 320×720 dp, system visual inset 48 dp для измеренной 3-button конфигурации и 24 dp для измеренной gesture конфигурации. Эти значения — audit fixtures, не универсальные Android constants.
+
+## Window inset и app dock reserve
+
+| Viewport | Mode | Root View inset | Descendant viewPadding | Descendant padding | Dock top | Last item bottom | Gap | Scroll extent | Verdict |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---|
+| 390×840 | 3-button | 48 | 0 | 126 | 720 | 690 | 30 | 134 | CORRECT |
+| 390×840 | gesture | 24 | 0 | 102 | 744 | 714 | 30 | 110 | CORRECT |
+| 320×720 | 3-button | 48 | 0 | 126 | 600 | 570 | 30 | 346 | CORRECT |
+| 320×720 | gesture | 24 | 0 | 102 | 624 | 594 | 30 | 322 | CORRECT |
+
+30 dp = 24 dp intentional list breathing room + 6 dp top inset контейнера dock. `CONFIRMED`: внутри `Scaffold.extendBody` descendant `MediaQuery.padding.bottom` действительно равен app dock reserve (78 + system inset), а descendant `viewPadding.bottom` уже равен нулю. Прямой root `View.viewPadding` продолжает сообщать 24/48 dp. Поэтому эти величины нельзя использовать как взаимозаменяемые.
+
+## Prayer search
+
+| Mode | Keyboard closed gap | Keyboard open gap to IME | Classification |
+|---|---:|---:|---|
+| 3-button | 12 | 12 | CORRECT |
+| gesture | 36 | 12 | TOO LOOSE closed; CORRECT with IME |
+
+Результаты одинаковы на 390×840 и 320×720, dock остаётся внутри viewport. `CONFIRMED`: Android floor 48 создаёт лишние 24 dp в измеренной gesture конфигурации. `REJECTED` для tested tree: при открытой клавиатуре surface не поднимается дважды; `Scaffold` resize и bottom 12 дают ровно 12 dp над IME в обоих modes.
+
+## Readings и Bible palettes
+
+| Surface, 390×840 | Mode | Gap над system-safe top | Selection reserve | Gap от last meaningful content до palette top | Scroll extent | Classification |
+|---|---|---:|---:|---:|---:|---|
+| Readings | 3-button | 16 | 136 (`80 + 56`) | 96.4 | 1092 | DOUBLE RESERVE |
+| Readings | gesture | 40 | 136 (`80 + 56`) | 72.4 | 1068 | DOUBLE RESERVE |
+| Bible | 3-button | 16 | 72 | 32.4 | 4202.6 | INCONSISTENT |
+| Bible | gesture | 40 | 72 | 8.4 | 4154.6 | INCONSISTENT |
+
+Обе production palettes помещаются на 320×720 без horizontal overflow и сохраняют те же 16/40 dp safe gaps. `CONFIRMED`: общий floor 56 не различает navigation modes, поэтому gesture получает лишние 24 dp. `CONFIRMED`: Readings добавляет 136 dp selection reserve поверх shared `ReaderContentSurface` padding и создаёт измеримый двойной хвост. `CONFIRMED`: Bible не повторяет эту сумму, но fixed 72 даёт разные фактические хвосты 32.4/8.4 dp; policy между экранами и modes непоследовательна.
+
+## Reader dock modes
+
+| Mode | Descendant content padding | Last item bottom | Scroll extent | Verdict |
+|---|---:|---:|---:|---|
+| Full | 102 | 696 | 1105 | CORRECT |
+| Compact | 94 | 704 | 1097 | CORRECT |
+| Hidden | 0 | 798 | 943 | CORRECT |
+
+`REJECTED`: Hidden не сохраняет reserve Full/Compact dock. Root View по-прежнему содержит 24 dp system inset, но nested reader body получает нулевой app dock padding, что и требуется для разделения понятий.
+
+## Visual verdicts
+
+Evidence хранится в `audit-evidence/layout-lab/`: paired search/readings/bible palette PNG, `dock-light.png`, `dock-dark.png`, `cycle-current.png` и `cycle-dark.png`.
+
+- Dock: **SUBTLE SUPPORTING SURFACE**. Light и Dark подтверждают, что окрашена только system navigation strip; непосредственно за floating composition остаётся page background. Добавлять тяжёлый NavigationBar не нужно; cosmetic surface должен быть независим от geometry reserve.
+- Cycle: **TEXTUALIZE**. В Light и Dark pill fill, radius и padding придают `Цыкл B` control-like вес, хотя это passive editorial metadata. Production appearance в этой задаче не изменялся.
+
+## Доказанный production implementation plan
+
+1. Ввести root-derived `systemBottomInset` (root `View` + gesture exclusion по `max`, без Android floors 48/56 и без descendant dock padding) и regression equivalence для старых production inputs.
+2. Ввести единый `floatingControlAnchor`: 8–12 dp intentional gap над system/IME obstruction; Prayer search, Readings и Bible должны использовать один coordinate boundary без double lift.
+3. Отделить `dockContentReserve` от system inset и сохранить уже доказанные значения/переходы Full, Compact и Hidden.
+4. Заменить Readings `80 + helper` и Bible fixed `72` на reserve от реальной высоты active overlay за вычетом уже consumed viewport reserve; проверить последний meaningful element и scroll extent.
+5. Отдельным cosmetic pass добавить subtle supporting surface за dock и textualize cycle metadata; geometry в этом шаге не менять.
 
 # Android navigation modes tested
+
+Этот раздел сохраняет историю hardware/emulator попытки. Таблица «не проверено визуально» ниже относится только к AVD runtime; deterministic Flutter evidence теперь приведён выше и не должно интерпретироваться как успешный emulator run.
 
 Среда: AVD `Pixel_5_API_34`, `sdk_gphone64_x86_64`, Android API 34, x86_64. Flutter 3.41.4 / Dart 3.11.1. Собран debug APK текущих исходников и установлен через `adb install -r`, пользовательские данные не очищались.
 
@@ -38,11 +102,11 @@ SDK при сборке использовал локально разрешён
 
 **Наблюдение ОС:** system bar 48 dp в выбранной конфигурации. Оно не доказывает, что nested Flutter context сообщает тот же inset.
 
-**Расчёт, не screenshot measurement:** при full-window overlay anchor и reported inset 48 dp Prayer search bottom offset = 60 dp, gap над bar = 12 dp. Палитры при reported максимум 48 dp имеют bottom offset 64 dp, gap = 16 dp (8 dp intentional + 8 dp floor). Если body уже заканчивается над system bar, такой расчёт неприменим: manual inset повторно поднимет control.
+**Deterministic measurement:** Prayer search gap = 12 dp, Readings/Bible palette gap = 16 dp. Prayerbook final item gap до dock surface = 30 dp. Overlap отсутствует в обеих ширинах. `CONFIRMED` для текущего widget tree.
 
 # Gesture-navigation findings
 
-Визуального verdict controls нет. **Измеренное различие ОС:** visual nav region 24 dp в gesture против 48 dp в 3-button. При full-window body Prayer search и локальном reported ≤48 сохраняет gap `60 − S`; палитры при всех reported значениях ниже 56 сохраняют gap `64 − S`. Для измеренного visual `S = 24 dp` это даёт **расчётные**, не наблюдённые gaps 36 и 40 dp. Root Flutter gesture input exclusion может отличаться от visual bar и не измерен. Floor не различает navigation modes, поэтому overcompensation присутствует в формуле независимо от модели устройства.
+**Deterministic measurement:** Prayer search gap = 36 dp, Readings/Bible palette gap = 40 dp при fixture system inset 24. Это `TOO LOOSE` и подтверждает overcompensation floors 48/56. Keyboard-open Prayer search остаётся на 12 dp над IME и не получает двойной подъём.
 
 # Why current inset behavior diverges
 
@@ -60,13 +124,13 @@ SDK при сборке использовал локально разрешён
 
 | Экран | Текущая формула | Verdict по коду |
 |---|---|---|
-| Prayerbook root | `padding.bottom + 24` | Согласуется с shell reserve; CORRECT требует visual QA |
+| Prayerbook root | `padding.bottom + 24` | CORRECT: 30 dp до dock surface на 320/390 и в обоих modes (24 content + 6 dock inset) |
 | Hours root | `116 + viewPadding.bottom` | INCONSISTENT: fixed reserve независимо от dock mode |
 | All Prayers/search | `104 + viewPadding.bottom` | INCONSISTENT: reserve не связан с measured search height |
 | Category list без search dock | `120 + viewPadding.bottom` | INCONSISTENT: другой fixed reserve |
 | Shared reader, Prayer detail, Ora, normal Bible/Readings | `ReaderContentSurface`: `42 + padding.bottom` | Использует shell reserve, но nested Scaffold boundary требует проверки |
-| Readings selected | Дополнительно `80 + helper` внутри общего content padding | TOO MUCH SPACE — риск cumulative reserve; не называть доказанным DOUBLE INSET |
-| Bible selected | Дополнительно 72 внутри общего content padding | INCONSISTENT с Readings и реальной высотой palette |
+| Readings selected | Дополнительно `80 + helper` внутри общего content padding | DOUBLE RESERVE подтверждён: 136 dp selection reserve, tail 96.4/72.4 dp |
+| Bible selected | Дополнительно 72 внутри общего content padding | INCONSISTENT подтверждён: tail 32.4/8.4 dp |
 | My Prayers list | `padding.bottom + 88`; FAB `padding.bottom` + Scaffold placement | Возможный повторный reserve; проверить последний row и FAB вместе |
 | Settings | ListView padding 12, root `SecondaryPageScaffold` | Нет shell dock; system clearance требует runtime проверки |
 
@@ -84,7 +148,7 @@ Palettes имеют horizontal margins 4 dp при width ≤340, иначе 12. 
 
 Keyboard closed: `max(local padding, local viewPadding, Android floor 48) + 12`. Keyboard open: bottom offset 12, manual system inset выключен; обычный Scaffold resize остаётся ответственным за IME. Search initially requests focus, поэтому закрытую клавиатуру нужно проверить отдельно.
 
-Verdict по коду: **hardcoded overcompensation + отдельная formula**. Double inset возможен только при уже consumed body geometry; пока не воспроизведён. Старый overlap до фикса не проверен: audit текущего HEAD не даёт evidence прежнего состояния.
+Verdict: **hardcoded overcompensation + отдельная formula — CONFIRMED**. Closed gaps 12/36 dp. Keyboard-open double lift — `REJECTED` в tested tree: оба modes дают 12 dp над IME. Старый overlap до фикса по-прежнему не проверен.
 
 Для парных screenshots записать system-nav top Y, search surface bottom Y, gap=(navTop−overlayBottom)/DPR, IME top Y, body bottom Y и root/local metrics. Сейчас фактический gap control не измерен ни в одном режиме.
 
@@ -92,13 +156,13 @@ Verdict по коду: **hardcoded overcompensation + отдельная formula
 
 Bottom = helper + 8. Selection suppresses dock через `showContextualBottomBar`. После стабилизации должен остаться system anchor, но helper может видеть старый dock padding в переходе; transient jump — гипотеза, не finding runtime.
 
-Selected content добавляет `80 + helper` поверх shared `42 + padding.bottom`. Это главный case проверки чрезмерного хвоста в gesture. Options sheet использует `24 + helper` и требует отдельного route-boundary анализа.
+Selected content добавляет `80 + helper` поверх shared `42 + padding.bottom`. `DOUBLE RESERVE CONFIRMED`: selection reserve 136 dp и measured tail 96.4/72.4 dp. Options sheet не входил в этот Layout Lab и остаётся `PARTIAL`.
 
 # Bible palette
 
 Bottom = helper + 8; policy совпадает с Readings, content reserve отличается: 72 без system inset против `80 + helper`. Одинаковый visual anchor не означает одинаковый доступ к последнему meaningful element.
 
-Проверить normal/search-result route, selection open/close, bottom chapter navigation и предыдущий/следующий chapter. Ни один control не считать accessible только по наличию padding в коде.
+Production chapter fixture подтверждает доступность palette и bottom chapter navigation на 320/390. Fixed 72 создаёт tail 32.4 dp в 3-button и 8.4 dp в gesture: `INCONSISTENT`. Search-result route и cross-chapter transition не входили в этот Layout Lab и остаются `PARTIAL`.
 
 # Dock supporting background
 
@@ -106,11 +170,11 @@ Widget tree **содержит strip**: `app-dock-system-navigation-strip`, вы
 
 Поэтому обещание «background returned» не доказывает наличие supporting surface за dock. Отсутствие отдельной подложки непосредственно за ним объясняется текущим tree; родительский content Scaffold не является доказанной причиной невидимости strip, поскольку dock — отдельный bottomNavigationBar shell.
 
-**Предварительный design verdict: SUBTLE SUPPORTING SURFACE.** Слабое основание за нижним floating composition допустимо отдельно от system-safe geometry. Runtime Light/Dark не получен, поэтому verdict нельзя выдавать за визуально подтверждённый. BUG не установлен: strip предусмотрен и может быть похож на content либо иметь нулевую высоту. Не вводить тяжёлый Material NavigationBar и не компенсировать background большим padding.
+**Visual verdict: SUBTLE SUPPORTING SURFACE.** Light/Dark golden подтверждают: strip существует только в system inset, а непосредственно за floating composition остаётся page background. BUG geometry не установлен. Не вводить тяжёлый Material NavigationBar и не компенсировать background большим padding.
 
 # Chips / cycle / metadata language
 
-- `readings-cycle-badge` (Readings header): **TEXTUALIZE**, предварительно по tree. Pill radius 20, tinted fill alpha 0.10, padding 12/6 придаёт вторичной информации самостоятельный control-like вес. Сохранить `Цыкл A/B/C/I/II` спокойной строкой metadata.
+- `readings-cycle-badge` (Readings header): **TEXTUALIZE**, подтверждено Light/Dark evidence. Pill radius 20, tinted fill alpha 0.10, padding 12/6 придаёт вторичной информации самостоятельный control-like вес. Сохранить `Цыкл A/B/C/I/II` спокойной строкой metadata.
 - `readings-manual-cycle-marker`: **KEEP**; уже текст, muted labelMedium. Визуально проверить вес w700 и повтор cycle в двух строках; смысл ручного выбора сохранять.
 - Legacy `reading_detail_screen.dart:108` Material `Chip`: **TEXTUALIZE**, если route достижим; не объявлять его увиденным на основном reader.
 - Bible attribution: **KEEP**, текстовая metadata; translation action остаётся interactive.
@@ -120,13 +184,13 @@ Psalm choir: только consistency/semantics/spacing; новые visible butt
 
 # Visual paradigm inconsistencies
 
-Максимум пять кандидатов, **не screenshot-confirmed findings**:
+Максимум пять evidence-backed кандидатов:
 
-1. Tinted cycle pill внутри editorial Readings header — TEXTUALIZE, P3.
+1. Tinted cycle pill внутри editorial Readings header — TEXTUALIZE, P3, visual-confirmed.
 2. Legacy Material cycle Chip — TEXTUALIZE при достижимости, P3.
 3. Prayer search minimum 48 против palette minimum 56 — geometry inconsistency, P2.
 4. Selected Readings content reserve против Bible 72 — geometry inconsistency, P2.
-5. Ожидаемая supporting surface за dock против strip только в system inset — проверить визуально; предварительно SUBTLE SUPPORTING SURFACE, P3.
+5. Supporting surface за dock против strip только в system inset — SUBTLE SUPPORTING SURFACE, P3, visual-confirmed.
 
 # Proposed unified layout rules
 
@@ -156,14 +220,10 @@ Bible, Readings и Prayer search используют один safe anchor из 
 
 # Exact screens to fix
 
-**Кандидаты для Sol после завершения paired QA:** helper `system_insets.dart`; Prayer search `_bottomSystemInset`/`_PrayerListPage`; Readings selected document и options sheet; Bible selected document; shared ReaderContentSurface и scroll-to-top; Hours root fixed 116; My Prayers FAB/list. Prayerbook root служит baseline shell reserve. Settings — root-boundary verification, не автоматически подтверждённая ошибка.
+**Подтверждённый batch:** helper `system_insets.dart`; Prayer search `_bottomSystemInset`/`_PrayerListPage`; Readings selected document; Bible selected document; shared ReaderContentSurface coordinate boundary. Prayerbook root служит baseline shell reserve. Options sheet, Hours, My Prayers и Settings остаются отдельными `PARTIAL` cases и не должны автоматически входить в первый refactor.
 
-Косметика отдельно: Readings cycle treatment и dock supporting composition, после Light/Dark evidence. Manual marker, interactive tag filters и choir semantics сохранить.
+Косметика отдельно: Readings cycle treatment и dock supporting composition. Manual marker, interactive tag filters и choir semantics сохранить.
 
-# Recommended Sol implementation batch
+# Acceptance для следующего production batch
 
-1. Завершить обе системные navigation-mode матрицы на 320/390 dp, сохранить paired screenshots для Prayer search keyboard closed/open, обеих palettes, Prayerbook root bottom и dock area Light/Dark. Записать raw/local metrics и consumed body bounds без изменения production logic.
-2. Зафиксировать inherited root metrics и coordinate boundary; заменить независимые floors/локальные system helpers единым rule, проверить contextual slot transition и IME.
-3. Подвязать content reserve к измеренной активной нижней surface, проверить последние elements и Full/Compact/Hidden. Cosmetic supporting surface/cycle — отдельная часть после geometry.
-
-Acceptance: оба режима фактически включены; controls доступны, единый gap над safe anchor, нет fixed three-button floor в gesture, нет лишнего selection tail, background решён независимо от padding. Пока нет runtime evidence, не повышать severity до P1 и не отмечать audit complete.
+Deterministic acceptance: controls доступны на 320/390, единый gap над safe anchor, нет fixed three-button floor в gesture, нет лишнего Readings selection tail, Full/Compact/Hidden сохраняют измеренное разделение reserve, а background решается независимо от padding. Физический Android smoke test остаётся желательным после устранения infrastructure blocker, но больше не блокирует geometry implementation plan.

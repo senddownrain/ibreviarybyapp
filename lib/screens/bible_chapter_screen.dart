@@ -263,6 +263,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 actions: [_translationControl(book)],
               ),
               content: Padding(
+                key: const Key('bible-selection-content-reserve'),
                 padding: EdgeInsets.only(bottom: _selected.isEmpty ? 0 : 72),
                 child: Column(
                   children: [
@@ -376,6 +377,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   }
 
   Widget _colorBar() => AdaptiveChromeSurface(
+    key: const Key('bible-highlight-palette'),
     role: ChromeSurfaceRole.group,
     borderRadius: BorderRadius.circular(22),
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -773,6 +775,7 @@ class _ChapterNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SafeArea(
+    key: const Key('bible-chapter-navigation'),
     top: false,
     child: AdaptiveChromeSurface(
       role: ChromeSurfaceRole.group,
