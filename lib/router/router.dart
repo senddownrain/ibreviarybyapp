@@ -6,6 +6,8 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
 import 'package:mybrev_flutter/screens/bible_search_screen.dart';
+import 'package:mybrev_flutter/screens/compendium_reader_screens.dart';
+import 'package:mybrev_flutter/screens/compendium_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -15,9 +17,12 @@ import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
+import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
+import 'package:mybrev_flutter/screens/song_detail_screen.dart';
+import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -116,6 +121,42 @@ const _prayerDetailRoute = AppRouteDescriptor(
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
+);
+const _songbookRoute = AppRouteDescriptor(
+  id: 'prayerbook.songs',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _songDetailRoute = AppRouteDescriptor(
+  id: 'prayerbook.song',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.compact,
+  topChromeOwner: TopChromeOwner.reader,
+);
+const _compendiumRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _compendiumPartRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium.part',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _compendiumReaderRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium.reader',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.compact,
+  topChromeOwner: TopChromeOwner.reader,
+);
+const _prayerbookSectionRoute = AppRouteDescriptor(
+  id: 'prayerbook.section',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
 );
 const _prayerFormRoute = AppRouteDescriptor(
   id: 'prayerbook.form',
@@ -362,6 +403,78 @@ final router = GoRouter(
                   ),
                 ),
                 GoRoute(
+                  path: 'songs',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _songbookRoute,
+                    const SongbookScreen(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: ':id',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _songDetailRoute,
+                        SongDetailScreen(songId: state.pathParameters['id']!),
+                      ),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'compendium',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _compendiumRoute,
+                    const CompendiumScreen(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: 'part/:partId',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumPartRoute,
+                        CompendiumPartScreen(
+                          partId: state.pathParameters['partId']!,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'topic/:topicId',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumReaderRoute,
+                        CompendiumTopicScreen(
+                          topicId: state.pathParameters['topicId']!,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'question/:number',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumReaderRoute,
+                        CompendiumQuestionScreen(
+                          number: state.pathParameters['number']!,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // The former Катэхізіс placeholder route opens the Compendium.
+                GoRoute(
+                  path: 'catechism',
+                  redirect: (_, _) => '/prayers/compendium',
+                ),
+                // Stable placeholder; replace the screen, keep the route.
+                GoRoute(
+                  path: 'sacraments',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _prayerbookSectionRoute,
+                    const SacramentsPlaceholderScreen(),
+                  ),
+                ),
+                GoRoute(
                   path: 'prayer/add',
                   pageBuilder: (context, state) => _branchPage(
                     state,
@@ -382,7 +495,10 @@ final router = GoRouter(
                   pageBuilder: (context, state) => _branchPage(
                     state,
                     _prayerDetailRoute,
-                    PrayerDetailScreen(prayerId: state.pathParameters['id']!),
+                    PrayerDetailScreen(
+                      prayerId: state.pathParameters['id']!,
+                      massLanguage: state.uri.queryParameters['lang'],
+                    ),
                   ),
                 ),
               ],

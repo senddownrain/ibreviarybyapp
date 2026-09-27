@@ -526,7 +526,7 @@ void main() {
     expect(find.byKey(const Key('reader-scroll-to-top')), findsNothing);
   });
 
-  testWidgets('Holy Mass exposes heading navigation without sharing', (
+  testWidgets('Holy Mass exposes section navigation without sharing', (
     tester,
   ) async {
     const mass = Prayer(
@@ -553,10 +553,16 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Перайсці да раздзела'), findsOneWidget);
-    expect(find.byKey(const ValueKey('mass-section-link-0')), findsOneWidget);
-    expect(find.byKey(const ValueKey('mass-section-link-1')), findsOneWidget);
-    expect(find.byKey(const ValueKey('mass-section-link-2')), findsOneWidget);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('mass-section-selector')));
+    await tester.pumpAndSettle();
+    for (final id in [
+      'introductory-rites',
+      'liturgy-of-the-word',
+      'liturgy-of-the-eucharist',
+    ]) {
+      expect(find.byKey(ValueKey('mass-section-$id')), findsOneWidget);
+    }
     expect(find.text('Падзяліцца'), findsNothing);
   });
 

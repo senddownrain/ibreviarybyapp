@@ -7,12 +7,32 @@ enum SyncTarget {
   years('yearOptions', 'Параметры літургічных гадоў'),
   invitatoriums('invitatoriums', 'Заклік'),
   completoriums('completoriums', 'Камплета'),
-  prayerCategories('prayerCategories', 'Катэгорыі малітваў');
+  prayerCategories('prayerCategories', 'Катэгорыі малітваў'),
 
-  const SyncTarget(this.collection, this.label);
+  /// Optional songbook content. The app ships a bundled seed, so songs are
+  /// synced only on request, from «Загрузіць усю базу» or when the songbook
+  /// is opened — never as part of the automatic startup/background window.
+  songs('songs', 'Спеўнік', automatic: false),
+
+  /// Optional Compendium of the Catechism. A validated dataset ships with the
+  /// app; `compendiumMeta/current` is compared first and the `compendium`
+  /// units are downloaded only when Firestore has a strictly newer, valid
+  /// version. Never part of the automatic startup/background window.
+  compendium('compendium', 'Кампендый Катэхізіса', automatic: false);
+
+  const SyncTarget(this.collection, this.label, {this.automatic = true});
   final String collection;
   final String label;
+
+  /// Whether the automatic background window downloads this collection.
+  final bool automatic;
 }
+
+/// Targets refreshed by the automatic background synchronization.
+final Set<SyncTarget> kAutomaticSyncTargets = {
+  for (final target in SyncTarget.values)
+    if (target.automatic) target,
+};
 
 enum SyncPeriod {
   week('1 тыдзень', 7),

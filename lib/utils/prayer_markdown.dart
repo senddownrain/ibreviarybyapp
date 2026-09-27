@@ -40,6 +40,13 @@ String prayerMarkdownToHtml(String source) {
       continue;
     }
 
+    if (RegExp(r'^(?:-{3,}|\*{3,}|_{3,})$').hasMatch(trimmed) &&
+        paragraph.isEmpty) {
+      flushList();
+      out.writeln('<hr>');
+      continue;
+    }
+
     final heading = RegExp(r'^(#{2,6})\s+(.+)$').firstMatch(trimmed);
     if (heading != null) {
       flushParagraph();

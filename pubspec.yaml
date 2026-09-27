@@ -48,3 +48,8 @@ flutter:
     - assets/mary.png
     - assets/bible_seed_bel.json.gz
     - assets/bible_seed_ru.json.gz
+    - assets/mass/order-of-mass-en.md
+    - assets/mass/order-of-mass.ritual.json
+    - assets/songs_seed.json
+    - assets/compendium/compendium.json.gz
+    - assets/compendium/compendium_search_aliases.json

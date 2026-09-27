@@ -130,6 +130,12 @@ class HiveService {
     await Hive.openBox('bible_bel');
     await Hive.openBox('bible_ru');
     await Hive.openBox('prayerCategories');
+    // Opening an empty or small box is cheap; the bundled songbook seed is
+    // parsed lazily when the songbook is first opened.
+    await Hive.openBox('songs');
+    // Synced Compendium copy; the bundled dataset is decoded lazily when the
+    // Compendium is first opened.
+    await Hive.openBox('compendium');
   }
 
   static DateTime? getLastSync(String collection) {

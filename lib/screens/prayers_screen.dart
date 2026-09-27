@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
+import 'package:mybrev_flutter/widgets/prayerbook_section_tiles.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
@@ -69,37 +70,58 @@ class PrayersScreen extends ConsumerWidget {
                   for (final prayer in favorites)
                     PrayerListRow(prayer: prayer, showFavorite: true),
                 const SizedBox(height: 24),
-                const _SectionTitle(title: 'Святая Імша'),
-                _DestinationRow(
-                  key: const Key('holy-mass-destination'),
-                  title: 'Святая Імша',
-                  subtitle: massLoading && !massAvailable
-                      ? 'Загрузка тэксту…'
-                      : 'Парадак святой Імшы',
-                  icon: PhosphorIconsRegular.church,
-                  trailing: massLoading && !massAvailable
-                      ? const SizedBox.square(
-                          dimension: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : null,
-                  onTap: () {
-                    if (massAvailable) {
-                      context.push('/prayers/prayer/$_kMassOrderPrayerId');
-                      return;
-                    }
-                    if (massLoading) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Тэкст пакуль недаступны'),
-                        action: SnackBarAction(
-                          label: 'Сінхранізацыя',
-                          onPressed: () =>
-                              context.push('/settings?section=sync'),
-                        ),
-                      ),
-                    );
-                  },
+                const _SectionTitle(title: 'Раздзелы'),
+                const SizedBox(height: 12),
+                PrayerbookSectionGrid(
+                  tiles: [
+                    PrayerbookSectionTile(
+                      key: const Key('holy-mass-destination'),
+                      title: 'Святая Імша',
+                      subtitle: massLoading && !massAvailable
+                          ? 'Загрузка тэксту…'
+                          : 'Парадак Імшы',
+                      icon: PhosphorIconsRegular.church,
+                      busy: massLoading && !massAvailable,
+                      onTap: () {
+                        if (massAvailable) {
+                          context.push('/prayers/prayer/$_kMassOrderPrayerId');
+                          return;
+                        }
+                        if (massLoading) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Тэкст пакуль недаступны'),
+                            action: SnackBarAction(
+                              label: 'Сінхранізацыя',
+                              onPressed: () =>
+                                  context.push('/settings?section=sync'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    PrayerbookSectionTile(
+                      key: const Key('songbook-destination'),
+                      title: 'Спеўнік',
+                      subtitle: 'Спевы і акорды',
+                      icon: PhosphorIconsRegular.playlist,
+                      onTap: () => context.push('/prayers/songs'),
+                    ),
+                    PrayerbookSectionTile(
+                      key: const Key('catechism-destination'),
+                      title: 'Катэхізіс',
+                      subtitle: 'Кампендый',
+                      icon: PhosphorIconsRegular.bookOpenText,
+                      onTap: () => context.push('/prayers/compendium'),
+                    ),
+                    PrayerbookSectionTile(
+                      key: const Key('sacraments-destination'),
+                      title: 'Сакрамэнты',
+                      subtitle: 'Хутка',
+                      icon: PhosphorIconsRegular.cross,
+                      onTap: () => context.push('/prayers/sacraments'),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 _SectionTitle(
@@ -236,7 +258,7 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
       scrollKey: widget.searchInitially
           ? const PageStorageKey('prayer-search-scroll')
           : const PageStorageKey('all-prayers-scroll'),
-      searchDock: _PrayerSearchDock(
+      searchDock: PrayerSearchDock(
         controller: _query,
         focusNode: _focus,
         selectedFilterCount: filter.selectedTags.length,
@@ -627,30 +649,43 @@ class _PrayerListPage extends StatelessWidget {
   }
 }
 
-class _PrayerSearchDock extends StatelessWidget {
-  const _PrayerSearchDock({
+/// Floating search field with a filter action, shared by the prayer catalog
+/// and the songbook list.
+class PrayerSearchDock extends StatelessWidget {
+  const PrayerSearchDock({
+    super.key,
+    this.hintText = 'Пошук малітваў',
+    this.dockKey = const Key('prayer-search-dock'),
+    this.fieldKey = const Key('prayer-search-field'),
+    this.filterKey = const Key('prayer-filter-action'),
     required this.controller,
     required this.focusNode,
     required this.selectedFilterCount,
     required this.onChanged,
     required this.onSubmitted,
     required this.onClear,
-    required this.onFilter,
+    this.onFilter,
   });
 
+  final String hintText;
+  final Key dockKey;
+  final Key fieldKey;
+  final Key filterKey;
   final TextEditingController controller;
   final FocusNode focusNode;
   final int selectedFilterCount;
   final ValueChanged<String> onChanged;
   final ValueChanged<String> onSubmitted;
   final VoidCallback onClear;
-  final VoidCallback onFilter;
+
+  /// Hidden when `null` (a search-only dock, for example the Compendium).
+  final VoidCallback? onFilter;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return ConstrainedBox(
-      key: const Key('prayer-search-dock'),
+      key: dockKey,
       constraints: const BoxConstraints(maxWidth: 480),
       child: GlassSurface(
         style: GlassStyle.pill,
@@ -664,14 +699,14 @@ class _PrayerSearchDock extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: TextField(
-                  key: const Key('prayer-search-field'),
+                  key: fieldKey,
                   controller: controller,
                   focusNode: focusNode,
                   textInputAction: TextInputAction.search,
                   onSubmitted: onSubmitted,
                   onChanged: onChanged,
-                  decoration: const InputDecoration(
-                    hintText: 'Пошук малітваў',
+                  decoration: InputDecoration(
+                    hintText: hintText,
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -686,46 +721,47 @@ class _PrayerSearchDock extends StatelessWidget {
                   onPressed: onClear,
                   icon: const Icon(Icons.close_rounded, size: 20),
                 ),
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IconButton(
-                    key: const Key('prayer-filter-action'),
-                    tooltip: selectedFilterCount == 0
-                        ? 'Адкрыць фільтр'
-                        : 'Фільтр: выбрана $selectedFilterCount',
-                    color: selectedFilterCount == 0
-                        ? cs.onSurfaceVariant
-                        : cs.primary,
-                    onPressed: onFilter,
-                    icon: const Icon(Icons.tune_rounded, size: 22),
-                  ),
-                  if (selectedFilterCount > 0)
-                    Positioned(
-                      top: 2,
-                      right: 1,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: cs.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: SizedBox.square(
-                          dimension: 18,
-                          child: Center(
-                            child: Text(
-                              '$selectedFilterCount',
-                              style: TextStyle(
-                                color: cs.onPrimary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
+              if (onFilter != null)
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      key: filterKey,
+                      tooltip: selectedFilterCount == 0
+                          ? 'Адкрыць фільтр'
+                          : 'Фільтр: выбрана $selectedFilterCount',
+                      color: selectedFilterCount == 0
+                          ? cs.onSurfaceVariant
+                          : cs.primary,
+                      onPressed: onFilter,
+                      icon: const Icon(Icons.tune_rounded, size: 22),
+                    ),
+                    if (selectedFilterCount > 0)
+                      Positioned(
+                        top: 2,
+                        right: 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: cs.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: SizedBox.square(
+                            dimension: 18,
+                            child: Center(
+                              child: Text(
+                                '$selectedFilterCount',
+                                style: TextStyle(
+                                  color: cs.onPrimary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(width: 6),
             ],
           ),
@@ -840,13 +876,11 @@ class _DestinationRow extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.subtitle,
-    this.trailing,
   });
   final String title;
   final String? subtitle;
   final IconData icon;
   final VoidCallback onTap;
-  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) => ListTile(
@@ -855,7 +889,7 @@ class _DestinationRow extends StatelessWidget {
     leading: Icon(icon),
     title: Text(title),
     subtitle: subtitle == null ? null : Text(subtitle!),
-    trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
+    trailing: const Icon(Icons.chevron_right_rounded),
     onTap: onTap,
   );
 }
