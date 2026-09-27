@@ -175,7 +175,7 @@ void main() {
             ),
           );
           await tester.pump();
-          _jumpToEnd(tester);
+          await _jumpToEnd(tester);
           await tester.pump();
 
           final last = tester.getRect(
@@ -264,7 +264,7 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
         await _selectReadingSentence(tester);
-        _jumpToEnd(tester);
+        await _jumpToEnd(tester);
         await tester.pump();
 
         final palette = tester.getRect(
@@ -309,7 +309,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 500));
         await tester.tap(find.byKey(const Key('bible-verse-1')));
         await tester.pumpAndSettle();
-        _jumpToEnd(tester);
+        await _jumpToEnd(tester);
         await tester.pump();
 
         final palette = tester.getRect(
@@ -414,7 +414,7 @@ void main() {
       _configureView(tester, viewport, _NavigationMode.gesture);
       await tester.pumpWidget(_readerDockApp(mode));
       await tester.pumpAndSettle();
-      _jumpToEnd(tester);
+      await _jumpToEnd(tester);
       await tester.pump();
 
       final marker = tester.getRect(find.byKey(const Key('reader-last-item')));
@@ -673,14 +673,16 @@ Future<void> _selectReadingSentence(WidgetTester tester) async {
   expect(find.byKey(const Key('readings-highlight-cancel')), findsOneWidget);
 }
 
-void _jumpToEnd(WidgetTester tester) {
+/// Lazy lists refine their estimated extent once the end is laid out, so a
+/// single jump can land short (or past) the real end; repeat until stable.
+Future<void> _jumpToEnd(WidgetTester tester) async {
   final scrollable = find.byType(Scrollable).first;
-  tester
-      .state<ScrollableState>(scrollable)
-      .position
-      .jumpTo(
-        tester.state<ScrollableState>(scrollable).position.maxScrollExtent,
-      );
+  for (var i = 0; i < 5; i++) {
+    final position = tester.state<ScrollableState>(scrollable).position;
+    if (position.pixels == position.maxScrollExtent && i > 0) break;
+    position.jumpTo(position.maxScrollExtent);
+    await tester.pump();
+  }
 }
 
 double _maxScrollExtent(WidgetTester tester) => tester
