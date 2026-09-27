@@ -333,7 +333,7 @@ void main() {
       semantics.dispose();
     });
 
-    testWidgets('verse palette clears Android navigation with zero inset', (
+    testWidgets('verse palette uses reported zero system inset', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(390, 800);
@@ -346,9 +346,9 @@ void main() {
       await tester.pumpAndSettle();
 
       final paletteBottom = tester
-          .getBottomRight(find.byKey(const Key('bible-highlight-cancel')))
+          .getBottomRight(find.byKey(const Key('bible-highlight-palette')))
           .dy;
-      expect(paletteBottom, lessThanOrEqualTo(800 - 56 - 8));
+      expect(800 - paletteBottom, closeTo(16, 0.01));
     });
 
     testWidgets('system TextScaler increases rendered verse body', (

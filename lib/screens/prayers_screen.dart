@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
@@ -260,7 +261,7 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
   }
 
   Future<void> _showTagFilter(BuildContext context) {
-    final bottomSystemInset = _bottomSystemInset(context);
+    final bottomSystemInset = systemBottomInset(context);
     return showModalBottomSheet<void>(
       context: context,
       useSafeArea: true,
@@ -617,11 +618,7 @@ class _PrayerListPage extends StatelessWidget {
             Positioned(
               left: 16,
               right: 16,
-              bottom:
-                  (MediaQuery.viewInsetsOf(context).bottom > 0
-                      ? 0
-                      : _bottomSystemInset(context)) +
-                  12,
+              bottom: floatingOverlayBottom(context, gap: 12),
               child: Center(child: searchDock!),
             ),
         ],
@@ -800,20 +797,6 @@ class _PrayerTagsSheet extends ConsumerWidget {
       ),
     );
   }
-}
-
-double _bottomSystemInset(BuildContext context) {
-  final mediaQuery = MediaQuery.of(context);
-  final reported = mediaQuery.viewPadding.bottom > mediaQuery.padding.bottom
-      ? mediaQuery.viewPadding.bottom
-      : mediaQuery.padding.bottom;
-  // Some Android edge-to-edge configurations report zero even while the
-  // three-button navigation bar overlays the app. Reserve its standard height
-  // so bottom controls never sit behind system actions.
-  if (Theme.of(context).platform == TargetPlatform.android && reported < 48) {
-    return 48;
-  }
-  return reported;
 }
 
 class _SectionTitle extends StatelessWidget {

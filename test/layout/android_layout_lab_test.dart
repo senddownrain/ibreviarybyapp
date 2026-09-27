@@ -24,6 +24,7 @@ import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
@@ -128,6 +129,84 @@ ReadingsLoader get _readingsLoader =>
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  group('bottom geometry', () {
+    test('system and gesture insets use max, not sum', () {
+      expect(systemBottomObstruction(visualInset: 48, gestureInset: 0), 48);
+      expect(systemBottomObstruction(visualInset: 24, gestureInset: 24), 24);
+      expect(systemBottomObstruction(visualInset: 24, gestureInset: 32), 32);
+    });
+
+    test('overlay reserve subtracts existing reader or dock space', () {
+      double reserve(double consumed) => floatingOverlayContentReserve(
+        overlayHeight: 65.6,
+        overlayBottom: 64,
+        readerBottomPadding: consumed,
+        contentGap: 24,
+      );
+      expect(reserve(90), closeTo(63.6, 0.01)); // no dock, 48 system + 42
+      expect(reserve(126), closeTo(27.6, 0.01)); // Full dock
+      expect(reserve(0), closeTo(153.6, 0.01)); // Hidden dock
+      expect(reserve(200), 0); // already fully consumed
+    });
+
+    testWidgets('root inset ignores descendant dock padding', (tester) async {
+      _configureView(
+        tester,
+        const _Viewport(390, 840),
+        _NavigationMode.gesture,
+      );
+      double? measured;
+      await tester.pumpWidget(
+        _themedApp(
+          home: Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(padding: const EdgeInsets.only(bottom: 102)),
+              child: Builder(
+                builder: (nested) {
+                  measured = systemBottomInset(nested);
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(measured, 24);
+    });
+
+    testWidgets('iOS keeps its existing local safe inset', (tester) async {
+      _configureView(
+        tester,
+        const _Viewport(390, 840),
+        _NavigationMode.gesture,
+      );
+      double? measured;
+      await tester.pumpWidget(
+        _themedApp(
+          home: Theme(
+            data: ThemeData(platform: TargetPlatform.iOS),
+            child: Builder(
+              builder: (context) => MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(padding: const EdgeInsets.only(bottom: 30)),
+                child: Builder(
+                  builder: (nested) {
+                    measured = systemBottomInset(nested);
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(measured, 30);
+    });
+  });
+
   setUpAll(() async {
     GoogleFonts.config.allowRuntimeFetching = false;
     final hiveDirectory = await Directory.systemTemp.createTemp(
@@ -224,7 +303,7 @@ void main() {
           find.byKey(const Key('prayer-search-dock')),
         );
         final closedGap = viewport.height - mode.systemInset - closed.bottom;
-        expect(closedGap, mode == _NavigationMode.threeButton ? 12 : 36);
+        expect(closedGap, closeTo(12, 0.01));
 
         tester.view.viewInsets = const FakeViewPadding(bottom: 300);
         await tester.pump();
@@ -283,13 +362,13 @@ void main() {
         );
         final reserveBottom = (reserve.padding as EdgeInsets).bottom;
 
-        expect(safeGap, mode == _NavigationMode.threeButton ? 16 : 40);
-        expect(reserveBottom, 136);
-        expect(tail, greaterThan(70));
+        expect(safeGap, closeTo(16, 0.01));
+        expect(reserveBottom, lessThan(72));
+        expect(tail, closeTo(24, 0.01));
         debugPrint(
           'LAYOUT_LAB readings ${mode.label}: safeGap=$safeGap, '
           'selectionReserve=$reserveBottom, tail=$tail, '
-          'scroll=${_maxScrollExtent(tester)} DOUBLE RESERVE',
+          'scroll=${_maxScrollExtent(tester)} CORRECT',
         );
         await expectLater(
           find.byKey(_captureKey),
@@ -326,13 +405,13 @@ void main() {
         );
         final reserveBottom = (reserve.padding as EdgeInsets).bottom;
 
-        expect(safeGap, mode == _NavigationMode.threeButton ? 16 : 40);
-        expect(reserveBottom, 72);
-        expect(tail, greaterThan(8));
+        expect(safeGap, closeTo(16, 0.01));
+        expect(reserveBottom, lessThan(72));
+        expect(tail, closeTo(24, 0.01));
         debugPrint(
           'LAYOUT_LAB bible ${mode.label}: safeGap=$safeGap, '
           'selectionReserve=$reserveBottom, tail=$tail, '
-          'scroll=${_maxScrollExtent(tester)} INCONSISTENT',
+          'scroll=${_maxScrollExtent(tester)} CORRECT',
         );
         await expectLater(
           find.byKey(_captureKey),
@@ -361,7 +440,7 @@ void main() {
         );
         expect(
           viewport.height - mode.systemInset - search.bottom,
-          mode == _NavigationMode.threeButton ? 12 : 36,
+          closeTo(12, 0.01),
         );
         expect(search.left, greaterThanOrEqualTo(0));
         expect(search.right, lessThanOrEqualTo(viewport.width));
@@ -379,8 +458,16 @@ void main() {
         expect(readingsPalette.right, lessThanOrEqualTo(viewport.width));
         expect(
           viewport.height - mode.systemInset - readingsPalette.bottom,
-          mode == _NavigationMode.threeButton ? 16 : 40,
+          closeTo(16, 0.01),
         );
+        _jumpToEnd(tester);
+        await tester.pump();
+        final readingDocument = tester.getRect(
+          find.byKey(
+            const ValueKey('reading-document-layout-lab-reading-auto'),
+          ),
+        );
+        expect(readingsPalette.top - readingDocument.bottom, closeTo(24, 0.01));
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pump();
 
@@ -397,8 +484,14 @@ void main() {
         expect(biblePalette.right, lessThanOrEqualTo(viewport.width));
         expect(
           viewport.height - mode.systemInset - biblePalette.bottom,
-          mode == _NavigationMode.threeButton ? 16 : 40,
+          closeTo(16, 0.01),
         );
+        _jumpToEnd(tester);
+        await tester.pump();
+        final chapterNavigation = tester.getRect(
+          find.byKey(const Key('bible-chapter-navigation')),
+        );
+        expect(biblePalette.top - chapterNavigation.bottom, closeTo(24, 0.01));
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         bible.router.dispose();

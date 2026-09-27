@@ -84,6 +84,19 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   final Map<String, String> _highlights = {};
   String? _highlightReadingId;
   String? _selectedSentenceId;
+  final GlobalKey _paletteMeasureKey = GlobalKey();
+  double _paletteHeight = 0;
+
+  void _measurePalette() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _selectedSentenceId == null) return;
+      final height = _paletteMeasureKey.currentContext?.size?.height;
+      if (height != null && height != _paletteHeight) {
+        setState(() => _paletteHeight = height);
+      }
+    });
+  }
+
   AppRouteEntryScope? _routeScope;
 
   @override
@@ -542,10 +555,23 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         false;
 
     if (_selectedSentenceId != null) {
+      _measurePalette();
       document = Padding(
         key: const Key('readings-selection-content-reserve'),
         padding: EdgeInsets.only(
-          bottom: 80 + readerSystemBottomClearance(context),
+          bottom: Theme.of(context).platform == TargetPlatform.android
+              ? floatingOverlayContentReserve(
+                  overlayHeight: _paletteHeight,
+                  overlayBottom: floatingOverlayBottom(
+                    context,
+                    gap: floatingPaletteGap(context),
+                  ),
+                  readerBottomPadding:
+                      ReaderContentSurface.bottomSpacing +
+                      MediaQuery.paddingOf(context).bottom,
+                  contentGap: 24,
+                )
+              : 80 + systemBottomInset(context),
         ),
         child: document,
       );
@@ -591,8 +617,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           Positioned(
             left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
             right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
-            bottom: 8 + readerSystemBottomClearance(context),
-            child: _highlightPalette(),
+            bottom: floatingOverlayBottom(
+              context,
+              gap: floatingPaletteGap(context),
+            ),
+            child: KeyedSubtree(
+              key: _paletteMeasureKey,
+              child: _highlightPalette(),
+            ),
           ),
       ],
     );
@@ -933,12 +965,7 @@ class _ReadingsOptionsSheet extends StatelessWidget {
     constraints: const BoxConstraints(maxWidth: 620, maxHeight: 680),
     child: ListView(
       shrinkWrap: true,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        0,
-        16,
-        24 + readerSystemBottomClearance(context),
-      ),
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + systemBottomInset(context)),
       children: [
         Text(
           'Варыянты чытанняў',

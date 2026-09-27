@@ -255,7 +255,7 @@ void main() {
     controller.dispose();
   });
 
-  testWidgets('search and filter actions clear Android system navigation', (
+  testWidgets('search and filter use reported system navigation inset', (
     tester,
   ) async {
     await tester.pumpWidget(_app(const PrayerCatalogScreen()));
@@ -266,12 +266,12 @@ void main() {
     final searchDock = tester.getRect(
       find.byKey(const Key('prayer-search-dock')),
     );
-    expect(searchDock.bottom, lessThanOrEqualTo(screenHeight - 60));
+    expect(screenHeight - searchDock.bottom, closeTo(12, 0.01));
 
     await tester.tap(find.byKey(const Key('prayer-filter-action')));
     await tester.pumpAndSettle();
     final doneButton = tester.getRect(find.text('Гатова'));
-    expect(doneButton.bottom, lessThanOrEqualTo(screenHeight - 72));
+    expect(doneButton.bottom, lessThanOrEqualTo(screenHeight - 24));
   });
 
   testWidgets('search focuses, filters title/body, and keeps query state', (

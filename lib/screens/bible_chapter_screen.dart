@@ -48,6 +48,19 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   };
   final Map<int, String> _highlights = {};
   final Set<int> _selected = {};
+  final GlobalKey _paletteMeasureKey = GlobalKey();
+  double _paletteHeight = 0;
+
+  void _measurePalette() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _selected.isEmpty) return;
+      final height = _paletteMeasureKey.currentContext?.size?.height;
+      if (height != null && height != _paletteHeight) {
+        setState(() => _paletteHeight = height);
+      }
+    });
+  }
+
   final Map<int, GlobalKey> _verseKeys = {};
   int? _requestedVerse;
   bool _bottomSlotInitialized = false;
@@ -183,6 +196,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_selected.isNotEmpty) _measurePalette();
     final book = BibleRepository.getBook(widget.versionId, widget.bookId);
     if (book == null ||
         widget.chapter < 1 ||
@@ -264,7 +278,23 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
               ),
               content: Padding(
                 key: const Key('bible-selection-content-reserve'),
-                padding: EdgeInsets.only(bottom: _selected.isEmpty ? 0 : 72),
+                padding: EdgeInsets.only(
+                  bottom: _selected.isEmpty
+                      ? 0
+                      : Theme.of(context).platform == TargetPlatform.android
+                      ? floatingOverlayContentReserve(
+                          overlayHeight: _paletteHeight,
+                          overlayBottom: floatingOverlayBottom(
+                            context,
+                            gap: floatingPaletteGap(context),
+                          ),
+                          readerBottomPadding:
+                              ReaderContentSurface.bottomSpacing +
+                              MediaQuery.paddingOf(context).bottom,
+                          contentGap: 24,
+                        )
+                      : 72,
+                ),
                 child: Column(
                   children: [
                     if (verses.isEmpty)
@@ -311,8 +341,14 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 // The shell hides its navigation dock while the palette is
                 // open. In that transition SafeArea can inherit an already
                 // consumed inset, so anchor explicitly above system gestures.
-                bottom: 8 + readerSystemBottomClearance(context),
-                child: _colorBar(),
+                bottom: floatingOverlayBottom(
+                  context,
+                  gap: floatingPaletteGap(context),
+                ),
+                child: KeyedSubtree(
+                  key: _paletteMeasureKey,
+                  child: _colorBar(),
+                ),
               ),
           ],
         ),

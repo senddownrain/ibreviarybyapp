@@ -375,9 +375,9 @@ void main() {
     expect(find.byKey(const Key('readings-highlight-clear')), findsOneWidget);
     expect(find.byKey(const Key('readings-highlight-cancel')), findsOneWidget);
     final paletteBottom = tester
-        .getBottomRight(find.byKey(const Key('readings-highlight-cancel')))
+        .getBottomRight(find.byKey(const Key('readings-highlight-palette')))
         .dy;
-    expect(paletteBottom, lessThanOrEqualTo(800 - 56 - 8));
+    expect(800 - paletteBottom, closeTo(16, 0.01));
   });
 
   testWidgets('options separate groups and expose only selectable cycles', (

@@ -274,6 +274,7 @@ class _ReaderScrollToTopControlState extends State<_ReaderScrollToTopControl> {
     if (!shown) return const SizedBox.shrink();
     return Positioned(
       right: 16,
+      // This local padding is the shell dock reserve in extendBody mode.
       bottom: MediaQuery.paddingOf(context).bottom + 16,
       child: AdaptiveChromeSurface(
         role: ChromeSurfaceRole.control,
@@ -365,6 +366,7 @@ class _ReaderFullscreenGestureSurfaceState
 }
 
 class ReaderContentSurface extends StatelessWidget {
+  static const double bottomSpacing = 42;
   const ReaderContentSurface({
     super.key,
     required this.child,
@@ -391,7 +393,7 @@ class ReaderContentSurface extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(22, 25, 22, 42 + bottom),
+            padding: EdgeInsets.fromLTRB(22, 25, 22, bottomSpacing + bottom),
             child: child,
           ),
         ),
