@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -518,6 +520,265 @@ void main() {
       expect(topic.metadata, 'Пытанні 6–10');
       await tester.pumpWidget(const SizedBox.shrink());
       router.dispose();
+    });
+  });
+
+  group('persistent search', () {
+    testWidgets('the search dock is on every Compendium screen', (
+      tester,
+    ) async {
+      for (final location in [
+        '/prayers/compendium',
+        '/prayers/compendium/part/p1',
+        '/prayers/compendium/topic/p1-s1-ch2-t1',
+        '/prayers/compendium/topic/p1-s1-intro',
+        '/prayers/compendium/question/1',
+        '/prayers/compendium/question/999',
+      ]) {
+        final router = _router(initialLocation: location);
+        await tester.pumpWidget(_app(router));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('compendium-search-dock')),
+          findsOneWidget,
+          reason: location,
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+        router.dispose();
+      }
+    });
+
+    testWidgets('search from a reader: global results, query kept, Back '
+        'restores the reader', (tester) async {
+      final router = _router(
+        initialLocation: '/prayers/compendium/question/42',
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final field = find.byKey(const Key('compendium-search-field'));
+
+      // A hidden Russian alias matches; only Belarusian text is rendered.
+      await tester.enterText(field, 'исповедь');
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('compendium-search-overlay')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('compendium-results-count')), findsOneWidget);
+      expect(find.text('ПЫТАННЕ 42'), findsNothing, reason: 'reader offstage');
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        expect(
+          (text.data ?? text.textSpan?.toPlainText() ?? '').toLowerCase(),
+          isNot(contains('исповед')),
+        );
+      }
+      final result = find.byKey(const ValueKey('compendium-result-296'));
+      await tester.scrollUntilVisible(
+        result,
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('compendium-search-overlay')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(
+        find.descendant(
+          of: result,
+          matching: find.text('ЧАСТКА ДРУГАЯ · САКРАМЭНТ ПАКАЯННЯ I ПАЯДНАННЯ'),
+        ),
+        findsOneWidget,
+        reason: 'context uses real source headings',
+      );
+      await tester.tap(result);
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/296');
+      expect(find.text('ПЫТАННЕ 296'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(field).controller!.text,
+        'исповедь',
+        reason: 'the query is kept on the next screen',
+      );
+
+      // Back → the results of the reader the search started from.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/42');
+      expect(result, findsOneWidget);
+
+      // Back again closes the search and restores the reader itself.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/42');
+      expect(find.byKey(const Key('compendium-search-overlay')), findsNothing);
+      expect(find.text('ПЫТАННЕ 42'), findsOneWidget);
+      expect(tester.widget<TextField>(field).controller!.text, 'исповедь');
+
+      // Focusing the dock shows the kept results again; clearing restores
+      // the reader.
+      await tester.tap(field);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('compendium-search-overlay')),
+        findsOneWidget,
+      );
+      await tester.tap(find.byTooltip('Ачысціць пошук'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('compendium-search-overlay')), findsNothing);
+      expect(find.text('ПЫТАННЕ 42'), findsOneWidget);
+      expect(tester.widget<TextField>(field).controller!.text, isEmpty);
+    });
+
+    testWidgets('search from a part: number and Belarusian words', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/compendium/part/p4');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final field = find.byKey(const Key('compendium-search-field'));
+
+      await tester.enterText(field, 'хрост');
+      await tester.pumpAndSettle();
+      expect(find.text('Знойдзена: 0'), findsNothing);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('compendium-result-252')),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('compendium-search-overlay')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(
+        find.byKey(const ValueKey('compendium-result-252')),
+        findsOneWidget,
+        reason: 'search is global, not limited to Part IV',
+      );
+
+      await tester.enterText(field, '42');
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('compendium-result-42')),
+        findsOneWidget,
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/42');
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/part/p4');
+      expect(
+        find.byKey(const ValueKey('compendium-result-42')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the reader footer scrolls fully above the search dock', (
+      tester,
+    ) async {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      addTearDown(tester.view.reset);
+      for (final (name, platform, size, bottom, gesture, scale, dark) in [
+        (
+          'narrow Android',
+          TargetPlatform.android,
+          const Size(320, 640),
+          0.0,
+          0.0,
+          1.0,
+          false,
+        ),
+        (
+          'Android 3-button',
+          TargetPlatform.android,
+          const Size(412, 800),
+          48.0,
+          0.0,
+          1.0,
+          true,
+        ),
+        (
+          'Android gestures',
+          TargetPlatform.android,
+          const Size(412, 800),
+          24.0,
+          32.0,
+          1.0,
+          false,
+        ),
+        (
+          'iPhone safe area',
+          TargetPlatform.iOS,
+          const Size(390, 844),
+          34.0,
+          0.0,
+          1.0,
+          true,
+        ),
+        (
+          'large text',
+          TargetPlatform.iOS,
+          const Size(375, 667),
+          34.0,
+          0.0,
+          2.0,
+          false,
+        ),
+      ]) {
+        debugDefaultTargetPlatformOverride = platform;
+        tester.view
+          ..devicePixelRatio = 1
+          ..physicalSize = size
+          ..padding = FakeViewPadding(bottom: bottom)
+          ..viewPadding = FakeViewPadding(bottom: bottom)
+          ..systemGestureInsets = FakeViewPadding(bottom: gesture);
+        for (final location in [
+          '/prayers/compendium/question/598',
+          '/prayers/compendium/topic/p4-s1-ch3-t2',
+        ]) {
+          final router = _router(initialLocation: location);
+          await tester.pumpWidget(
+            MediaQuery(
+              data: MediaQueryData.fromView(
+                tester.view,
+              ).copyWith(textScaler: TextScaler.linear(scale)),
+              child: _app(router, dark: dark),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.fling(
+            find.byType(CustomScrollView),
+            const Offset(0, -20000),
+            4000,
+          );
+          await tester.pumpAndSettle();
+          final source = tester.getRect(
+            find.byKey(const Key('compendium-source')),
+          );
+          final dock = tester.getRect(
+            find.byKey(const Key('compendium-search-dock')),
+          );
+          expect(
+            source.bottom,
+            lessThanOrEqualTo(dock.top),
+            reason: '$name $location',
+          );
+          expect(
+            dock.bottom,
+            lessThanOrEqualTo(size.height - math.max(bottom, gesture)),
+            reason: '$name: the dock clears the system inset',
+          );
+          expect(tester.takeException(), isNull, reason: '$name $location');
+          await tester.pumpWidget(const SizedBox.shrink());
+          router.dispose();
+        }
+      }
+      debugDefaultTargetPlatformOverride = null;
     });
   });
 
