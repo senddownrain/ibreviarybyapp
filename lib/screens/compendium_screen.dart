@@ -115,7 +115,7 @@ class _CompendiumScreenState extends ConsumerState<CompendiumScreen> {
     final List<Widget> body;
     if (index.hasError && !index.hasValue) {
       body = [
-        _CompendiumMessage(
+        CompendiumMessage(
           key: const Key('compendium-error'),
           icon: PhosphorIconsLight.cloudSlash,
           title: 'Не атрымалася адкрыць Кампендый',
@@ -226,7 +226,7 @@ class _CompendiumScreenState extends ConsumerState<CompendiumScreen> {
         ),
       ),
       if (results.isEmpty)
-        const _CompendiumMessage(
+        const CompendiumMessage(
           key: Key('compendium-empty'),
           icon: PhosphorIconsLight.magnifyingGlass,
           title: 'Нічога не знойдзена',
@@ -244,7 +244,12 @@ class _CompendiumScreenState extends ConsumerState<CompendiumScreen> {
   }
 }
 
-/// `/prayers/compendium/part/:partId`: sections → chapters → reading groups.
+/// `/prayers/compendium/part/:partId`: the source outline of a part.
+///
+/// Only real source headings are shown (РАЗДЗЕЛ, ГЛАВА, named topics). Questions
+/// printed directly under a section or chapter (question 1 under «ВЕРУ» —
+/// «ВЕРЫМ») are question rows that open the question reader; untitled reading
+/// groups never appear as headings.
 class CompendiumPartScreen extends ConsumerWidget {
   const CompendiumPartScreen({super.key, required this.partId});
 
@@ -259,6 +264,96 @@ class CompendiumPartScreen extends ConsumerWidget {
     final outline = state.valueOrNull;
 
     final children = <Widget>[];
+
+    Widget levelLabel(String label) => Text(
+      label,
+      style: textTheme.labelSmall?.copyWith(
+        color: accent,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.1,
+      ),
+    );
+
+    void addQuestions(CompendiumNavNode node) {
+      for (final question in node.directQuestions) {
+        children.add(
+          CompendiumListRow(
+            key: ValueKey('compendium-question-row-${question.number}'),
+            leading: CompendiumBadge(label: '${question.number}'),
+            title: question.question,
+            onTap: () => openCompendiumQuestion(context, question.number),
+          ),
+        );
+      }
+    }
+
+    void addTopic(CompendiumNavNode topic) {
+      if (topic.heading case final heading?) {
+        children.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text(
+              heading,
+              style: textTheme.labelSmall?.copyWith(
+                color: cs.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+              ),
+            ),
+          ),
+        );
+      }
+      children.add(
+        CompendiumListRow(
+          key: ValueKey('compendium-group-${topic.id}'),
+          title: topic.title,
+          subtitle: topic.rangeLabel,
+          onTap: () => context.push(compendiumTopicLocation(topic.id)),
+        ),
+      );
+    }
+
+    void addChildren(CompendiumNavNode node) {
+      for (final child in node.children) {
+        switch (child.kind) {
+          case CompendiumNodeKind.topic:
+            addTopic(child);
+          case CompendiumNodeKind.chapter:
+            children.addAll([
+              const SizedBox(height: 16),
+              if ((child.label ?? '').isNotEmpty) levelLabel(child.label!),
+              if (child.title.isNotEmpty)
+                Text(
+                  child.title,
+                  key: ValueKey('compendium-chapter-${child.id}'),
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+            ]);
+            addQuestions(child);
+            addChildren(child);
+          case CompendiumNodeKind.section || CompendiumNodeKind.part:
+            children.addAll([
+              const SizedBox(height: 22),
+              if ((child.label ?? '').isNotEmpty) levelLabel(child.label!),
+              if (child.title.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  child.title,
+                  key: ValueKey('compendium-section-${child.id}'),
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ]);
+            addQuestions(child);
+            addChildren(child);
+        }
+      }
+    }
+
     if (outline == null) {
       children.add(
         state.isLoading
@@ -266,7 +361,7 @@ class CompendiumPartScreen extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: LinearProgressIndicator(key: Key('compendium-loading')),
               )
-            : _CompendiumMessage(
+            : CompendiumMessage(
                 key: const Key('compendium-part-not-found'),
                 icon: PhosphorIconsLight.bookOpenText,
                 title: 'Частка не знойдзена',
@@ -279,92 +374,24 @@ class CompendiumPartScreen extends ConsumerWidget {
       );
     } else {
       children.addAll([
-        Text(
-          outline.part.label,
-          style: textTheme.labelMedium?.copyWith(
-            color: accent,
-            fontWeight: FontWeight.w700,
+        if ((outline.label ?? '').isNotEmpty)
+          Text(
+            outline.label!,
+            style: textTheme.labelMedium?.copyWith(
+              color: accent,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
         const SizedBox(height: 4),
         Text(
-          outline.part.title,
+          outline.title,
           key: const Key('compendium-part-title'),
           style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
       ]);
-      for (final section in outline.sections) {
-        children.addAll([
-          const SizedBox(height: 22),
-          if (section.label.isNotEmpty)
-            Text(
-              section.label,
-              style: textTheme.labelSmall?.copyWith(
-                color: accent,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.1,
-              ),
-            ),
-          if (section.title.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              section.title,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ]);
-        for (final chapter in section.chapters) {
-          if ((chapter.title ?? '').isNotEmpty) {
-            children.addAll([
-              const SizedBox(height: 16),
-              if ((chapter.label ?? '').isNotEmpty)
-                Text(
-                  chapter.label!,
-                  style: textTheme.labelSmall?.copyWith(
-                    color: accent,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-              Text(
-                chapter.title!,
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ]);
-          }
-          for (final group in chapter.groups) {
-            if (group.parentTitle != null) {
-              children.add(
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    group.parentTitle!,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                ),
-              );
-            }
-            final topic = group.kind == CompendiumGroupKind.topic;
-            children.add(
-              CompendiumListRow(
-                key: ValueKey('compendium-group-${group.id}'),
-                title: topic ? group.title : group.rangeLabel,
-                subtitle: topic ? group.rangeLabel : null,
-                onTap: () => context.push(compendiumTopicLocation(group.id)),
-              ),
-            );
-          }
-        }
-      }
+      addQuestions(outline);
+      addChildren(outline);
       children.add(const CompendiumSourceAttribution());
     }
 
@@ -386,47 +413,6 @@ class CompendiumPartScreen extends ConsumerWidget {
             ),
           ),
           FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
-        ],
-      ),
-    );
-  }
-}
-
-class _CompendiumMessage extends StatelessWidget {
-  const _CompendiumMessage({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.message,
-    this.action,
-  });
-
-  final IconData icon;
-  final String title;
-  final String message;
-  final Widget? action;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 36),
-      child: Column(
-        children: [
-          PhosphorIcon(icon, size: 40, color: cs.onSurfaceVariant),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: cs.onSurfaceVariant),
-          ),
-          ?action,
         ],
       ),
     );

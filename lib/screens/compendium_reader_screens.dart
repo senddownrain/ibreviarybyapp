@@ -31,8 +31,27 @@ Widget _readerMessage({
   ),
 );
 
+/// Pager label of a neighbouring group: its question range («6–10», «1»).
+String _pagerLabel(CompendiumGroup group) =>
+    group.firstQuestion == group.lastQuestion
+    ? '${group.firstQuestion}'
+    : '${group.firstQuestion}–${group.lastQuestion}';
+
+/// Location of a reading group; an untitled one-question lead-in opens as
+/// its question (it is not a source heading).
+String _groupLocation(CompendiumGroup group) =>
+    switch (compendiumGroupQuestionRedirect(group)) {
+      final number? => compendiumQuestionLocation(number),
+      null => compendiumTopicLocation(group.id),
+    };
+
 /// `/prayers/compendium/topic/:topicId`: one reading group with expandable
 /// questions, on the shared Reader foundation.
+///
+/// Named topics are source headings. An untitled lead-in (legacy links such
+/// as `p1-s1-intro`) is not: a one-question lead-in shows the question
+/// reader, a longer one is titled by the nearest real heading (chapter or
+/// section) with its question range as metadata only.
 class CompendiumTopicScreen extends ConsumerStatefulWidget {
   const CompendiumTopicScreen({super.key, required this.topicId});
 
@@ -65,23 +84,24 @@ class _CompendiumTopicScreenState extends ConsumerState<CompendiumTopicScreen> {
         semanticLabel: 'Кампендый',
       );
     }
+    if (compendiumGroupQuestionRedirect(group) case final number?) {
+      return CompendiumQuestionScreen(number: '$number');
+    }
     final index = ref.watch(compendiumIndexProvider).requireValue;
     final (previous, next) = index.neighbours(group.id);
     final expanded = ref.watch(compendiumExpandedProvider)[group.id] ?? {};
     final cs = Theme.of(context).colorScheme;
-    final unit = group.unit;
-    final topic = group.kind == CompendiumGroupKind.topic;
+    // Real headings only: the title is the topic, or for an untitled lead-in
+    // the nearest heading above it; the eyebrow is the part and the heading
+    // just above the title (no duplicated fallbacks).
+    final trail = groupContextTrail(group);
+    final title = trail.last;
     final eyebrow = [
-      unit.partLabel,
-      topic ? unit.chapterTitle ?? unit.sectionTitle : unit.sectionTitle,
-    ].whereType<String>().where((label) => label.isNotEmpty).join(' · ');
-    final title = topic
-        ? group.title
-        : (unit.chapterTitle ?? '').isNotEmpty
-        ? unit.chapterTitle!
-        : unit.sectionTitle;
+      trail.first,
+      if (trail.length > 2) trail[trail.length - 2],
+    ].join(' · ');
     void open(CompendiumGroup target) =>
-        context.pushReplacement(compendiumTopicLocation(target.id));
+        context.pushReplacement(_groupLocation(target));
 
     return ReadingScaffold(
       builder: (context, textStyle) => ReaderScaffold(
@@ -130,13 +150,9 @@ class _CompendiumTopicScreenState extends ConsumerState<CompendiumTopicScreen> {
               ),
             ],
             CompendiumPager(
-              previousLabel: previous == null
-                  ? null
-                  : '${previous.firstQuestion}–${previous.lastQuestion}',
+              previousLabel: previous == null ? null : _pagerLabel(previous),
               onPrevious: previous == null ? null : () => open(previous),
-              nextLabel: next == null
-                  ? null
-                  : '${next.firstQuestion}–${next.lastQuestion}',
+              nextLabel: next == null ? null : _pagerLabel(next),
               onNext: next == null ? null : () => open(next),
             ),
             const CompendiumSourceAttribution(onReader: true),
@@ -290,6 +306,16 @@ class _CompendiumQuestionScreenState
     final previous = index.getQuestion(question.number - 1);
     final next = index.getQuestion(question.number + 1);
     final cs = Theme.of(context).colorScheme;
+    final group = index.groupOf(question);
+    // «Уся тэма» only for a real topic; an untitled lead-in with several
+    // questions is offered by its range, a one-question lead-in not at all.
+    final String? centerLabel = group == null
+        ? null
+        : group.hasSourceHeading
+        ? 'Уся тэма'
+        : group.questions.length > 1
+        ? group.rangeLabel
+        : null;
     void open(CompendiumQuestion target) =>
         context.pushReplacement(compendiumQuestionLocation(target.number));
 
@@ -318,9 +344,10 @@ class _CompendiumQuestionScreenState
             CompendiumPager(
               previousLabel: previous == null ? null : '${previous.number}',
               onPrevious: previous == null ? null : () => open(previous),
-              centerLabel: 'Уся тэма',
-              onCenter: () =>
-                  context.push(compendiumTopicLocation(question.groupId)),
+              centerLabel: centerLabel,
+              onCenter: centerLabel == null
+                  ? null
+                  : () => context.push(compendiumTopicLocation(group!.id)),
               nextLabel: next == null ? null : '${next.number}',
               onNext: next == null ? null : () => open(next),
             ),

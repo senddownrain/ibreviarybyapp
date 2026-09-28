@@ -351,6 +351,176 @@ void main() {
     });
   });
 
+  group('source hierarchy', () {
+    testWidgets('Part I starts with question 1 directly under its section', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/compendium/part/p1');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ЧАСТКА ПЕРШАЯ'), findsOneWidget);
+      expect(find.text('ВЫЗНАННЕ ВЕРЫ'), findsOneWidget);
+      final section = find.byKey(const ValueKey('compendium-section-p1-s1'));
+      final row = find.byKey(const ValueKey('compendium-question-row-1'));
+      final chapter = find.byKey(
+        const ValueKey('compendium-chapter-p1-s1-ch1'),
+      );
+      expect(find.text('РАЗДЗЕЛ ПЕРШЫ'), findsOneWidget);
+      expect(tester.widget<Text>(section).data, '«ВЕРУ» — «ВЕРЫМ»');
+      expect(
+        find.descendant(
+          of: row,
+          matching: find.text('Які Божы намер адносна чалавека?'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: row, matching: find.text('1')),
+        findsOneWidget,
+      );
+      expect(find.text('ГЛАВА ПЕРШАЯ'), findsOneWidget);
+      expect(
+        tester.getTopLeft(section).dy,
+        lessThan(tester.getTopLeft(row).dy),
+      );
+      expect(
+        tester.getTopLeft(row).dy,
+        lessThan(tester.getTopLeft(chapter).dy),
+      );
+      // No fake container for the untitled lead-in.
+      expect(
+        find.byKey(const ValueKey('compendium-group-p1-s1-intro')),
+        findsNothing,
+      );
+      expect(find.text('Пытанне 1'), findsNothing);
+
+      // A real named topic keeps its title, with the range as metadata.
+      final topic = find.byKey(const ValueKey('compendium-group-p1-s1-ch2-t1'));
+      await tester.scrollUntilVisible(
+        topic,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(
+        find.descendant(of: topic, matching: find.text('БОЖАЕ АБ’ЯЎЛЕННЕ')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: topic, matching: find.text('Пытанні 6–10')),
+        findsOneWidget,
+      );
+
+      await tester.scrollUntilVisible(
+        row,
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/1');
+      expect(find.byType(CompendiumQuestionScreen), findsOneWidget);
+      expect(find.text('ПЫТАННЕ 1'), findsOneWidget);
+      expect(find.text('ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»'), findsOneWidget);
+      expect(
+        find.byKey(const Key('compendium-center')),
+        findsNothing,
+        reason: 'question 1 has no topic to open',
+      );
+    });
+
+    testWidgets('no untitled group is rendered as a heading in any part', (
+      tester,
+    ) async {
+      final untitled = [
+        for (final group in _index().groups.values)
+          if (!group.hasSourceHeading) group.id,
+      ];
+      for (final part in ['p1', 'p2', 'p3', 'p4']) {
+        final router = _router(
+          initialLocation: '/prayers/compendium/part/$part',
+        );
+        await tester.pumpWidget(_app(router));
+        await tester.pumpAndSettle();
+        final list = tester.widget<ListView>(find.byType(ListView).first);
+        final delegate = list.childrenDelegate as SliverChildBuilderDelegate;
+        final context = tester.element(find.byType(ListView).first);
+        final items = [
+          for (var i = 0; i < delegate.childCount!; i++)
+            delegate.builder(context, i),
+        ];
+        final keys = [
+          for (final item in items)
+            if (item?.key case ValueKey<String>(:final value)) value,
+        ];
+        for (final id in untitled) {
+          expect(keys, isNot(contains('compendium-group-$id')), reason: id);
+        }
+        for (final item in items) {
+          if (item is Text) {
+            expect(item.data, isNot(startsWith('Пытан')), reason: part);
+          }
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+        router.dispose();
+      }
+    });
+
+    testWidgets('legacy untitled topic links resolve without fake titles', (
+      tester,
+    ) async {
+      // One-question lead-in → the question reader.
+      var router = _router(
+        initialLocation: '/prayers/compendium/topic/p1-s1-intro',
+      );
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      expect(find.byType(CompendiumQuestionScreen), findsOneWidget);
+      expect(find.text('ПЫТАННЕ 1'), findsOneWidget);
+      expect(find.byKey(const ValueKey('compendium-answer-1')), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+
+      // Several lead-in questions → titled by the real chapter heading.
+      router = _router(initialLocation: '/prayers/compendium/topic/p1-s1-ch1');
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final header = find.byType(ReaderContextHeader);
+      final widget = tester.widget<ReaderContextHeader>(header);
+      expect(widget.title, 'ЧАЛАВЕК — «СВЯТЫНЯ» БОГА');
+      expect(widget.eyebrow, 'ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»');
+      expect(widget.metadata, 'Пытанні 2–5');
+      final previous = find.byKey(const Key('compendium-previous'));
+      await tester.ensureVisible(previous);
+      await tester.pumpAndSettle();
+      await tester.tap(previous);
+      await tester.pumpAndSettle();
+      expect(
+        _location(router),
+        '/prayers/compendium/question/1',
+        reason: 'the untitled lead-in neighbour opens as its question',
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+
+      // A real named topic keeps working.
+      router = _router(
+        initialLocation: '/prayers/compendium/topic/p1-s1-ch2-t1',
+      );
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final topic = tester.widget<ReaderContextHeader>(
+        find.byType(ReaderContextHeader),
+      );
+      expect(topic.title, 'БОЖАЕ АБ’ЯЎЛЕННЕ');
+      expect(topic.eyebrow, 'ЧАСТКА ПЕРШАЯ · БОГ ВЫХОДЗІЦЬ НАСУСТРАЧ ЧАЛАВЕКУ');
+      expect(topic.metadata, 'Пытанні 6–10');
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+    });
+  });
+
   test('the Compendium stays independent from prayers', () {
     for (final path in [
       'lib/models/compendium.dart',
@@ -421,6 +591,7 @@ Widget _app(
   bool bundleFails = false,
   double? fontSize,
   Future<bool> Function(Uri)? launcher,
+  bool dark = false,
 }) => ProviderScope(
   overrides: [
     settingsProvider.overrideWith(() => _TestSettingsNotifier(fontSize)),
@@ -435,7 +606,11 @@ Widget _app(
       launcher ?? (uri) async => true,
     ),
   ],
-  child: MaterialApp.router(routerConfig: router),
+  child: MaterialApp.router(
+    routerConfig: router,
+    themeMode: dark ? ThemeMode.dark : ThemeMode.light,
+    darkTheme: ThemeData(brightness: Brightness.dark),
+  ),
 );
 
 class _TestSettingsNotifier extends SettingsNotifier {

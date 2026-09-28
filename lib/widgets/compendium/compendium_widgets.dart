@@ -398,11 +398,55 @@ class CompendiumPager extends StatelessWidget {
   }
 }
 
-/// Short context line under a question in lists: part and topic/chapter.
-String compendiumQuestionContext(CompendiumQuestion question) => [
-  question.partLabel,
-  question.topicTitle ?? question.chapterTitle,
-].whereType<String>().where((label) => label.isNotEmpty).join(' · ');
+/// Short context line under a question in lists: the part and the nearest
+/// real source heading (topic, chapter or section), for example
+/// «ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»» for question 1.
+String compendiumQuestionContext(CompendiumQuestion question) {
+  final trail = questionContextTrail(question);
+  return [trail.first, if (trail.length > 1) trail.last].join(' · ');
+}
+
+/// Empty, error and not-found message on the Compendium list screens.
+class CompendiumMessage extends StatelessWidget {
+  const CompendiumMessage({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.action,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 36),
+      child: Column(
+        children: [
+          PhosphorIcon(icon, size: 40, color: cs.onSurfaceVariant),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: cs.onSurfaceVariant),
+          ),
+          ?action,
+        ],
+      ),
+    );
+  }
+}
 
 /// Opens a question reader.
 void openCompendiumQuestion(BuildContext context, int number) =>

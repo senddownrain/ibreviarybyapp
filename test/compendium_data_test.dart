@@ -128,24 +128,163 @@ void main() {
       expect(index.partRange('p4'), (534, 598));
     });
 
-    test('part outline: sections → chapters → groups', () {
-      final outline = buildPartOutline(index, 'p2')!;
-      expect(outline.sections, hasLength(2));
-      expect(
-        outline.sections[1].chapters.any(
-          (chapter) => chapter.groups.any(
-            (group) => group.title == 'САКРАМЭНТ ЭЎХАРЫСТЫI',
-          ),
-        ),
-        isTrue,
-      );
-      expect(buildPartOutline(index, 'p9'), isNull);
-      final all = [
-        for (final part in dataset.parts)
-          for (final section in buildPartOutline(index, part.id)!.sections)
-            for (final chapter in section.chapters) ...chapter.groups,
+    test('navigation: every question once, in canonical order', () {
+      final navigation = index.navigation;
+      expect(navigation.map((node) => node.id), ['p1', 'p2', 'p3', 'p4']);
+      final ordered = [
+        for (final part in navigation)
+          for (final question in part.questions) question.number,
       ];
-      expect(all.map((group) => group.id), index.groupOrder);
+      expect(ordered, [for (final q in index.questions) q.number]);
+      expect(index.partOutline('2')!.id, 'p2');
+      expect(index.partOutline('p9'), isNull);
+      expect(buildCompendiumPartOutline(index, 'p9'), isNull);
+      expect(
+        identical(index.partOutline('p1'), index.partOutline('p1')),
+        isTrue,
+        reason: 'built once per index',
+      );
+    });
+
+    test('navigation: only real source headings are nodes', () {
+      Iterable<CompendiumNavNode> walk(CompendiumNavNode node) sync* {
+        yield node;
+        for (final child in node.children) {
+          yield* walk(child);
+        }
+      }
+
+      final nodes = [for (final part in index.navigation) ...walk(part)];
+      final untitled = [
+        for (final group in index.groups.values)
+          if (!group.hasSourceHeading) group.id,
+      ];
+      expect(untitled, contains('p1-s1-intro'));
+      for (final node in nodes) {
+        // Chapter nodes share their unit's id (`p1-s1-ch1`); only a topic
+        // stands for a reading group.
+        if (node.kind == CompendiumNodeKind.topic) {
+          expect(untitled, isNot(contains(node.id)), reason: node.id);
+        }
+        expect(node.id, isNot(endsWith('-intro')), reason: node.id);
+        expect(node.title, isNotEmpty, reason: node.id);
+        expect(
+          node.title,
+          isNot(startsWith('Пытан')),
+          reason: 'a question range is never a heading (${node.id})',
+        );
+        if (node.kind == CompendiumNodeKind.topic) {
+          expect(node.group!.hasSourceHeading, isTrue);
+          expect(node.children, isEmpty);
+          expect(node.directQuestions, isEmpty);
+        } else {
+          expect(node.label, isNotNull, reason: node.id);
+        }
+      }
+      final topics = nodes.where(
+        (node) => node.kind == CompendiumNodeKind.topic,
+      );
+      expect(
+        topics.map((node) => node.id).toSet(),
+        {
+          for (final group in index.groups.values)
+            if (group.hasSourceHeading) group.id,
+        },
+        reason: 'every named topic stays visible',
+      );
+    });
+
+    test('navigation: question 1 is a direct child of section p1-s1', () {
+      final part = index.partOutline('p1')!;
+      expect(part.label, 'ЧАСТКА ПЕРШАЯ');
+      expect(part.title, 'ВЫЗНАННЕ ВЕРЫ');
+      expect(part.directQuestions, isEmpty);
+      final section = part.children.first;
+      expect(section.id, 'p1-s1');
+      expect(section.kind, CompendiumNodeKind.section);
+      expect(section.label, 'РАЗДЗЕЛ ПЕРШЫ');
+      expect(section.title, '«ВЕРУ» — «ВЕРЫМ»');
+      expect(section.directQuestions.map((q) => q.number), [1]);
+      expect(
+        section.directQuestions.single.question,
+        'Які Божы намер адносна чалавека?',
+      );
+
+      // РАЗДЗЕЛ and ГЛАВА stay distinct levels.
+      expect(section.children.map((node) => node.kind).toSet(), {
+        CompendiumNodeKind.chapter,
+      });
+      expect(section.children.map((node) => node.label), [
+        'ГЛАВА ПЕРШАЯ',
+        'ГЛАВА ДРУГАЯ',
+        'ГЛАВА ТРЭЦЯЯ',
+      ]);
+      final chapter = section.children.first;
+      expect(chapter.id, 'p1-s1-ch1');
+      expect(chapter.title, 'ЧАЛАВЕК — «СВЯТЫНЯ» БОГА');
+      expect(chapter.directQuestions.map((q) => q.number), [2, 3, 4, 5]);
+      expect(chapter.children, isEmpty);
+
+      // A real named topic keeps its title; the range is metadata.
+      final revelation = section.children[1].children.first;
+      expect(revelation.kind, CompendiumNodeKind.topic);
+      expect(revelation.title, 'БОЖАЕ АБ’ЯЎЛЕННЕ');
+      expect(revelation.rangeLabel, 'Пытанні 6–10');
+    });
+
+    test('navigation: lead-in questions precede named topics', () {
+      final chapter = index
+          .partOutline('p1')!
+          .children[1]
+          .children
+          .firstWhere((node) => node.id == 'p1-s2-ch2');
+      expect(chapter.directQuestions.map((q) => q.number), [79, 80]);
+      expect(chapter.children.first.firstQuestion, 81);
+
+      // A section without chapters holds its named topics directly.
+      final lordsPrayer = index.partOutline('p4')!.children[1];
+      expect(lordsPrayer.label, 'РАЗДЗЕЛ ДРУГІ');
+      expect(lordsPrayer.directQuestions, isEmpty);
+      expect(lordsPrayer.children.first.kind, CompendiumNodeKind.topic);
+      expect(lordsPrayer.children.first.title, 'ОЙЧА НАШ');
+
+      // A source heading above several topics is kept as the topic heading.
+      final celebration = index
+          .partOutline('p2')!
+          .children
+          .first
+          .children[1]
+          .children
+          .first;
+      expect(celebration.title, 'Хто цэлебруе?');
+      expect(celebration.heading, 'ЦЭЛЕБРАЦЫЯ ЛIТУРГII КАСЦЁЛА');
+    });
+
+    test('untitled lead-ins are reading chunks, not headings', () {
+      final intro = index.getGroup('p1-s1-intro')!;
+      expect(intro.hasSourceHeading, isFalse);
+      expect(compendiumGroupQuestionRedirect(intro), 1);
+      expect(
+        compendiumGroupQuestionRedirect(index.getGroup('p1-s1-ch1')!),
+        isNull,
+        reason: 'several questions stay a reading page',
+      );
+      expect(
+        compendiumGroupQuestionRedirect(index.getGroup('p2-s2-intro-t1')!),
+        isNull,
+        reason: 'a named one-question topic is a real heading',
+      );
+      expect(groupContextTrail(intro), ['ЧАСТКА ПЕРШАЯ', '«ВЕРУ» — «ВЕРЫМ»']);
+      expect(questionContextTrail(index.getQuestion(1)!), [
+        'ЧАСТКА ПЕРШАЯ',
+        '«ВЕРУ» — «ВЕРЫМ»',
+      ]);
+      expect(questionContextTrail(index.getQuestion(7)!), [
+        'ЧАСТКА ПЕРШАЯ',
+        '«ВЕРУ» — «ВЕРЫМ»',
+        'БОГ ВЫХОДЗІЦЬ НАСУСТРАЧ ЧАЛАВЕКУ',
+        'БОЖАЕ АБ’ЯЎЛЕННЕ',
+      ]);
     });
 
     test('answer paragraphs keep source text and emphasis', () {

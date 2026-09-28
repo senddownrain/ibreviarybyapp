@@ -271,6 +271,10 @@ String romanNumeral(int? value) =>
 enum CompendiumGroupKind { unit, topic }
 
 /// A reading group: a topic, or a unit's questions before its first topic.
+///
+/// Groups are internal reading chunks (reader pages, previous/next, expansion
+/// state, legacy deep links). Visible navigation comes from
+/// [buildCompendiumPartOutline], not from groups.
 class CompendiumGroup {
   CompendiumGroup._({
     required this.id,
@@ -295,10 +299,13 @@ class CompendiumGroup {
   int get firstQuestion => questions.first.number;
   int get lastQuestion => questions.last.number;
 
-  /// «Пытанне 5» or «Пытанні 5–12».
-  String get rangeLabel => firstQuestion == lastQuestion
-      ? 'Пытанне $firstQuestion'
-      : 'Пытанні $firstQuestion–$lastQuestion';
+  /// Whether this group is a real source heading (a named topic). An
+  /// untitled lead-in is only a reading chunk: it is never shown as a
+  /// navigation node, and its [title] is the nearest real heading above it.
+  bool get hasSourceHeading => kind == CompendiumGroupKind.topic;
+
+  /// «Пытанне 5» or «Пытанні 5–12» (secondary metadata, never a heading).
+  String get rangeLabel => compendiumRangeLabel(firstQuestion, lastQuestion);
 }
 
 String? _nonEmpty(String? value) =>
@@ -378,6 +385,19 @@ class CompendiumIndex {
 
   final CompendiumDataset dataset;
 
+  /// Visible source navigation, built once per index.
+  late final List<CompendiumNavNode> navigation = buildCompendiumNavigation(
+    this,
+  );
+
+  /// Source outline of a part, by id (`p2`) or number (`2`).
+  CompendiumNavNode? partOutline(String? id) {
+    final part = getPart(id);
+    return part == null
+        ? null
+        : navigation.where((node) => node.id == part.id).firstOrNull;
+  }
+
   /// Every question in canonical order.
   final List<CompendiumQuestion> questions;
   final Map<String, CompendiumGroup> groups;
@@ -432,84 +452,161 @@ class CompendiumIndex {
   }
 }
 
-class CompendiumOutlineChapter {
-  CompendiumOutlineChapter._({
+/// Level of a visible source heading. Model names stay close to the data
+/// (`section` is a РАЗДЗЕЛ, `chapter` a ГЛАВА); the UI always shows the
+/// source-provided `label`/`title`, never a guessed translation.
+enum CompendiumNodeKind { part, section, chapter, topic }
+
+/// A visible node of the source hierarchy (ЧАСТКА → РАЗДЗЕЛ → ГЛАВА → named
+/// topic), derived from the canonical dataset without copying its content.
+///
+/// Source hierarchy and reading groups are separate concepts: only headings
+/// that exist in the Catholic.by text become nodes. A unit's untitled lead-in
+/// ([CompendiumGroupKind.unit], for example `p1-s1-intro`) never becomes a
+/// node; its questions are [directQuestions] of the nearest real heading.
+/// Within a node the direct questions always precede [children] (the source
+/// prints them before the first sub-heading), so rendering `directQuestions`
+/// then `children` keeps canonical order.
+class CompendiumNavNode {
+  CompendiumNavNode._({
     required this.id,
-    required this.number,
-    required this.label,
+    required this.kind,
     required this.title,
+    this.label,
+    this.heading,
+    this.group,
   });
 
+  /// Part/section/chapter id from the dataset (`p1`, `p1-s1`, `p1-s1-ch1`)
+  /// or the topic id.
   final String id;
-  final int? number;
+  final CompendiumNodeKind kind;
+
+  /// «ЧАСТКА ПЕРШАЯ», «РАЗДЗЕЛ ПЕРШЫ», «ГЛАВА ПЕРШАЯ»; `null` for topics.
   final String? label;
-  final String? title;
-  final List<CompendiumGroup> groups = [];
-}
-
-class CompendiumOutlineSection {
-  CompendiumOutlineSection._({
-    required this.id,
-    required this.number,
-    required this.label,
-    required this.title,
-  });
-
-  final String id;
-  final int number;
-  final String label;
   final String title;
-  final List<CompendiumOutlineChapter> chapters = [];
+
+  /// A source heading printed above this topic that groups it with the next
+  /// topics (`CompendiumTopic.parentTitle`).
+  final String? heading;
+
+  /// The reading group behind a topic node.
+  final CompendiumGroup? group;
+
+  final List<CompendiumQuestion> directQuestions = [];
+  final List<CompendiumNavNode> children = [];
+
+  /// Every question below this node, in canonical order.
+  Iterable<CompendiumQuestion> get questions sync* {
+    if (group case final group?) {
+      yield* group.questions;
+      return;
+    }
+    yield* directQuestions;
+    for (final child in children) {
+      yield* child.questions;
+    }
+  }
+
+  int get firstQuestion => questions.first.number;
+  int get lastQuestion => questions.last.number;
+
+  /// Secondary metadata only («Пытанні 6–10»), never a heading.
+  String get rangeLabel => compendiumRangeLabel(firstQuestion, lastQuestion);
 }
 
-class CompendiumPartOutline {
-  const CompendiumPartOutline({required this.part, required this.sections});
+/// «Пытанне 5» or «Пытанні 5–12».
+String compendiumRangeLabel(int first, int last) =>
+    first == last ? 'Пытанне $first' : 'Пытанні $first–$last';
 
-  final CompendiumPart part;
-  final List<CompendiumOutlineSection> sections;
-}
+/// Source navigation for every part, in canonical order.
+List<CompendiumNavNode> buildCompendiumNavigation(CompendiumIndex index) => [
+  for (final part in index.parts) ?buildCompendiumPartOutline(index, part.id),
+];
 
-/// Part outline for navigation: sections → chapters → reading groups
-/// (MyBrev `buildPartOutline`). Chapter levels without a heading have a
-/// `null` title.
-CompendiumPartOutline? buildPartOutline(CompendiumIndex index, String partId) {
+/// Source outline of one part: part → sections → chapters → named topics,
+/// with untitled lead-in questions attached directly to the nearest real
+/// heading (MyBrev `buildPartOutline`, refined). Returns `null` for an
+/// unknown part.
+CompendiumNavNode? buildCompendiumPartOutline(
+  CompendiumIndex index,
+  String partId,
+) {
   final part = index.getPart(partId);
   if (part == null) return null;
-  final sections = <CompendiumOutlineSection>[];
-  for (final groupId in index.groupOrder) {
-    final group = index.groups[groupId]!;
-    final unit = group.unit;
+  final root = CompendiumNavNode._(
+    id: part.id,
+    kind: CompendiumNodeKind.part,
+    label: _nonEmpty(part.label),
+    title: part.title,
+  );
+  final sections = <int, CompendiumNavNode>{};
+  final chapters = <String, CompendiumNavNode>{};
+  for (final unit in index.units) {
     if (unit.partId != part.id) continue;
-    var section = sections
-        .where((item) => item.number == unit.sectionNumber)
+    final sectionInfo = part.sections
+        .where((section) => section.number == unit.sectionNumber)
         .firstOrNull;
-    if (section == null) {
-      section = CompendiumOutlineSection._(
-        id: '${part.id}-s${unit.sectionNumber}',
-        number: unit.sectionNumber,
-        label: unit.sectionLabel,
-        title: unit.sectionTitle,
+    final section = sections.putIfAbsent(unit.sectionNumber, () {
+      final node = CompendiumNavNode._(
+        id: sectionInfo?.id ?? '${part.id}-s${unit.sectionNumber}',
+        kind: CompendiumNodeKind.section,
+        label: _nonEmpty(unit.sectionLabel) ?? _nonEmpty(sectionInfo?.label),
+        title: _nonEmpty(unit.sectionTitle) ?? sectionInfo?.title ?? '',
       );
-      sections.add(section);
+      root.children.add(node);
+      return node;
+    });
+    var target = section;
+    if (unit.chapterNumber case final number?) {
+      final chapterInfo = sectionInfo?.chapters
+          .where((chapter) => chapter.number == number)
+          .firstOrNull;
+      final id = chapterInfo?.id ?? '${section.id}-ch$number';
+      target = chapters.putIfAbsent(id, () {
+        final node = CompendiumNavNode._(
+          id: id,
+          kind: CompendiumNodeKind.chapter,
+          label: _nonEmpty(unit.chapterLabel) ?? _nonEmpty(chapterInfo?.label),
+          title: _nonEmpty(unit.chapterTitle) ?? chapterInfo?.title ?? '',
+        );
+        section.children.add(node);
+        return node;
+      });
     }
-    var chapter = section.chapters
-        .where((item) => item.number == unit.chapterNumber)
-        .firstOrNull;
-    if (chapter == null) {
-      chapter = CompendiumOutlineChapter._(
-        id: unit.id,
-        number: unit.chapterNumber,
-        label: unit.chapterLabel,
-        title: unit.chapterTitle,
+    // The untitled lead-in (validated to precede every topic of the unit).
+    if (index.groups[unit.id] case final lead?
+        when lead.kind == CompendiumGroupKind.unit) {
+      target.directQuestions.addAll(lead.questions);
+    }
+    for (final topic in unit.topics) {
+      final group = index.groups[topic.id];
+      if (group == null) continue;
+      target.children.add(
+        CompendiumNavNode._(
+          id: topic.id,
+          kind: CompendiumNodeKind.topic,
+          title: topic.title,
+          heading: _nonEmpty(topic.parentTitle),
+          group: group,
+        ),
       );
-      section.chapters.add(chapter);
     }
-    chapter.groups.add(group);
   }
-  return CompendiumPartOutline(part: part, sections: sections);
+  return root;
 }
 
-/// Breadcrumb labels for a question (visible Belarusian titles only).
+/// Question number to open instead of [group]'s reader: an untitled
+/// one-question lead-in (for example the legacy `p1-s1-intro`) is not a
+/// heading, so its only question opens in the individual question reader.
+int? compendiumGroupQuestionRedirect(CompendiumGroup group) =>
+    !group.hasSourceHeading && group.questions.length == 1
+    ? group.firstQuestion
+    : null;
+
+/// Breadcrumb labels for a question: real source headings only (part label,
+/// section, chapter, named topic). Question 1 lies directly under its
+/// section, so its trail is «ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»».
 List<String> questionContextTrail(CompendiumQuestion question) => [
   question.partLabel,
   question.sectionTitle,
@@ -517,7 +614,8 @@ List<String> questionContextTrail(CompendiumQuestion question) => [
   ?question.topicTitle,
 ].where((label) => label.isNotEmpty).toList();
 
-/// Breadcrumb labels for a reading group.
+/// Breadcrumb labels for a reading group; for an untitled lead-in it ends at
+/// the nearest real heading (chapter or section), never at a range.
 List<String> groupContextTrail(CompendiumGroup group) => [
   group.unit.partLabel,
   group.unit.sectionTitle,
