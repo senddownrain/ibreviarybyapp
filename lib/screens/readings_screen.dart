@@ -23,6 +23,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/readings_selection.dart';
+import 'package:mybrev_flutter/utils/readings_cycle_metadata.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
@@ -524,7 +525,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           .firstOrNull;
       contextTitle = _contextTitleFor(activeGroup, reading);
       final cycle = normalizeReadingCycle(reading?.year);
-      if (cycle.isNotEmpty) cycleLabel = 'Цыкл ${_cycleLabel(cycle)}';
+      if (cycle.isNotEmpty) cycleLabel = _cycleLabel(cycle);
       contextTitle = contextTitle
           .replaceAll(
             RegExp(
@@ -543,12 +544,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     }
 
     final manualGroup = _activeGroupKey != _automaticGroupKey;
-    final manualLabel = switch ((manualGroup, _manualCycle)) {
-      (false, null) => null,
-      (true, null) => 'Набор чытанняў · зменены',
-      (false, final cycle?) => 'Цыкл ${_cycleLabel(cycle)} · зменены',
-      (true, final cycle?) => 'Набор і цыкл ${_cycleLabel(cycle)} · зменены',
-    };
+    final cycleMetadata = readingsCycleMetadata(
+      cycle: _manualCycle == null ? cycleLabel : _cycleLabel(_manualCycle!),
+      manualGroup: manualGroup,
+      manualCycle: _manualCycle != null,
+    );
     final today = DateUtils.isSameDay(_currentDate, DateTime.now());
     final hasOraReturn =
         AppNavigationScope.maybeOf(context)?.shellState.canReturnToOra() ??
@@ -599,8 +599,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           title: contextTitle,
           dateLabel: _formatReadingsDate(widget.dateStr, widget.liturgicalKey),
           seasonColor: seasonColor,
-          manualCycleLabel: manualLabel,
-          cycleLabel: cycleLabel,
+          cycleMetadata: cycleMetadata,
           showToday: widget.dateStr != null && !today,
           showOptions: !_loading && _error == null && _hasOptions,
           onDateTap: _showDateActions,
@@ -742,15 +741,13 @@ class _ReadingsContextHeader extends StatelessWidget {
     required this.onDateTap,
     required this.onToday,
     required this.onOptions,
-    this.manualCycleLabel,
-    this.cycleLabel,
+    this.cycleMetadata,
   });
 
   final String title;
   final String dateLabel;
   final Color seasonColor;
-  final String? manualCycleLabel;
-  final String? cycleLabel;
+  final String? cycleMetadata;
   final bool showToday;
   final bool showOptions;
   final VoidCallback onDateTap;
@@ -816,35 +813,14 @@ class _ReadingsContextHeader extends StatelessWidget {
                 height: 1.2,
               ),
             ),
-            if (cycleLabel != null) ...[
+            if (cycleMetadata != null) ...[
               const SizedBox(height: 10),
-              Container(
-                key: const Key('readings-cycle-badge'),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: seasonColor.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  cycleLabel!,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: seasonColor,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-            if (manualCycleLabel != null) ...[
-              const SizedBox(height: 7),
               Text(
-                manualCycleLabel!,
-                key: const Key('readings-manual-cycle-marker'),
+                cycleMetadata!,
+                key: const Key('readings-cycle-metadata'),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: cs.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -862,7 +838,7 @@ class _ReadingsContextHeader extends StatelessWidget {
                       label: const Text('Сёння'),
                     ),
                   if (showOptions)
-                    OutlinedButton.icon(
+                    TextButton.icon(
                       key: const Key('readings-options-action'),
                       onPressed: onOptions,
                       icon: const Icon(Icons.tune_rounded, size: 18),
