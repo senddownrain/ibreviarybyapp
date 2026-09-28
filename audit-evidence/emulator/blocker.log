@@ -1,1 +1,0 @@
-Clean Android 14/API 34 Pixel7_API34_Audit reached sys.boot_completed=1, but com.android.settings.FallbackHome ANR occurred with GPU auto and com.android.systemui/.keyguard.KeyguardService ANR occurred with the single GPU software fallback before application launch. Android test environment is unstable.

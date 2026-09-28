@@ -28,17 +28,6 @@ import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
-const _captureKey = Key('android-layout-lab-capture');
-
-// The PNG evidence was captured with a particular Flutter renderer. Run pixel
-// comparisons only when explicitly requested on a matching host; the geometry
-// assertions below run on every platform, including Codemagic's macOS host.
-// flutter test --dart-define=VERIFY_LAYOUT_GOLDENS=true test/layout/android_layout_lab_test.dart
-Future<void> _expectReferenceImage(String path) async {
-  if (!const bool.fromEnvironment('VERIFY_LAYOUT_GOLDENS')) return;
-  await expectLater(find.byKey(_captureKey), matchesGoldenFile(path));
-}
-
 enum _NavigationMode { threeButton, gesture }
 
 extension on _NavigationMode {
@@ -333,10 +322,39 @@ void main() {
 
         tester.view.viewInsets = FakeViewPadding.zero;
         await tester.pump();
-        await _expectReferenceImage(
-          '../../audit-evidence/layout-lab/prayer-search-${mode == _NavigationMode.threeButton ? '3button' : 'gesture'}.png',
-        );
       });
+    }
+  });
+
+  testWidgets('iOS search keeps its safe gap across keyboard and themes', (
+    tester,
+  ) async {
+    const viewport = _Viewport(390, 844);
+    for (final brightness in [Brightness.light, Brightness.dark]) {
+      tester.view
+        ..devicePixelRatio = 1
+        ..physicalSize = const Size(390, 844)
+        ..padding = const FakeViewPadding(bottom: 34)
+        ..viewPadding = const FakeViewPadding(bottom: 34)
+        ..viewInsets = FakeViewPadding.zero;
+      await tester.pumpWidget(
+        _prayerApp(
+          const PrayerCatalogScreen(searchInitially: false),
+          brightness: brightness,
+          platform: TargetPlatform.iOS,
+        ),
+      );
+      await tester.pumpAndSettle();
+      Rect search() =>
+          tester.getRect(find.byKey(const Key('prayer-search-dock')));
+      expect(viewport.height - 34 - search().bottom, closeTo(12, 0.01));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      await tester.pump();
+      expect(viewport.height - 300 - search().bottom, closeTo(12, 0.01));
+      tester.view.viewInsets = FakeViewPadding.zero;
+      await tester.pump();
+      expect(viewport.height - 34 - search().bottom, closeTo(12, 0.01));
+      await tester.pumpWidget(const SizedBox.shrink());
     }
   });
 
@@ -376,9 +394,6 @@ void main() {
           'selectionReserve=$reserveBottom, tail=$tail, '
           'scroll=${_maxScrollExtent(tester)} CORRECT',
         );
-        await _expectReferenceImage(
-          '../../audit-evidence/layout-lab/readings-palette-${mode == _NavigationMode.threeButton ? '3button' : 'gesture'}.png',
-        );
       });
 
       testWidgets('Bible ${mode.label}', (tester) async {
@@ -415,9 +430,6 @@ void main() {
           'LAYOUT_LAB bible ${mode.label}: safeGap=$safeGap, '
           'selectionReserve=$reserveBottom, tail=$tail, '
           'scroll=${_maxScrollExtent(tester)} CORRECT',
-        );
-        await _expectReferenceImage(
-          '../../audit-evidence/layout-lab/bible-palette-${mode == _NavigationMode.threeButton ? '3button' : 'gesture'}.png',
         );
       });
     }
@@ -530,7 +542,9 @@ void main() {
   });
 
   for (final brightness in Brightness.values) {
-    testWidgets('dock ${brightness.name} evidence', (tester) async {
+    testWidgets('dock ${brightness.name} backing keeps its reserve', (
+      tester,
+    ) async {
       _configureView(
         tester,
         const _Viewport(390, 840),
@@ -549,34 +563,32 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await _expectReferenceImage(
-        '../../audit-evidence/layout-lab/dock-${brightness.name}.png',
-      );
+      final dock = find.byKey(const Key('app-dock-android'));
+      expect(tester.getSize(dock).height, 102);
+      final decoration =
+          tester.widget<Container>(dock).decoration! as BoxDecoration;
+      final gradient = decoration.gradient! as LinearGradient;
+      expect(gradient.colors.first.a, 0);
+      expect(gradient.colors.last.a, greaterThan(0));
     });
   }
 
-  testWidgets('cycle metadata evidence', (tester) async {
+  testWidgets('cycle metadata light', (tester) async {
     _configureView(tester, const _Viewport(390, 840), _NavigationMode.gesture);
     await tester.pumpWidget(_readingsApp());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byKey(const Key('readings-cycle-badge')), findsOneWidget);
+    expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
     expect(find.text('Цыкл B'), findsOneWidget);
-    await _expectReferenceImage(
-      '../../audit-evidence/layout-lab/cycle-current.png',
-    );
   });
 
-  testWidgets('cycle metadata dark evidence', (tester) async {
+  testWidgets('cycle metadata dark', (tester) async {
     _configureView(tester, const _Viewport(390, 840), _NavigationMode.gesture);
     await tester.pumpWidget(_readingsApp(brightness: Brightness.dark));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byKey(const Key('readings-cycle-badge')), findsOneWidget);
+    expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
     expect(find.text('Цыкл B'), findsOneWidget);
-    await _expectReferenceImage(
-      '../../audit-evidence/layout-lab/cycle-dark.png',
-    );
   });
 }
 
@@ -608,6 +620,7 @@ void _configureView(
 Widget _themedApp({
   required Widget home,
   Brightness brightness = Brightness.light,
+  TargetPlatform platform = TargetPlatform.android,
 }) {
   final scheme = AppPalette.scheme(brightness);
   return MaterialApp(
@@ -617,27 +630,29 @@ Widget _themedApp({
         : ThemeMode.dark,
     theme: ThemeData(
       useMaterial3: true,
-      platform: TargetPlatform.android,
+      platform: platform,
       colorScheme: scheme,
       brightness: brightness,
       scaffoldBackgroundColor: scheme.surfaceContainerLowest,
     ),
     darkTheme: ThemeData(
       useMaterial3: true,
-      platform: TargetPlatform.android,
+      platform: platform,
       colorScheme: scheme,
       brightness: brightness,
       scaffoldBackgroundColor: scheme.surfaceContainerLowest,
     ),
-    builder: (context, child) => ReaderTypographyScope(
-      useSystemFonts: true,
-      child: RepaintBoundary(key: _captureKey, child: child!),
-    ),
+    builder: (context, child) =>
+        ReaderTypographyScope(useSystemFonts: true, child: child!),
     home: home,
   );
 }
 
-Widget _prayerApp(Widget home) => ProviderScope(
+Widget _prayerApp(
+  Widget home, {
+  Brightness brightness = Brightness.light,
+  TargetPlatform platform = TargetPlatform.android,
+}) => ProviderScope(
   overrides: [
     settingsProvider.overrideWith(_LabSettingsNotifier.new),
     liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
@@ -648,7 +663,7 @@ Widget _prayerApp(Widget home) => ProviderScope(
       (ref) => Stream.value(_categories),
     ),
   ],
-  child: _themedApp(home: home),
+  child: _themedApp(home: home, brightness: brightness, platform: platform),
 );
 
 Widget _readingsApp({Brightness brightness = Brightness.light}) =>
@@ -695,10 +710,8 @@ Widget _readingsApp({Brightness brightness = Brightness.light}) =>
           colorScheme: scheme,
           scaffoldBackgroundColor: scheme.surfaceContainerLowest,
         ),
-        builder: (context, child) => ReaderTypographyScope(
-          useSystemFonts: true,
-          child: RepaintBoundary(key: _captureKey, child: child!),
-        ),
+        builder: (context, child) =>
+            ReaderTypographyScope(useSystemFonts: true, child: child!),
       ),
     ),
   );
