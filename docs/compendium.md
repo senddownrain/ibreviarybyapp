@@ -20,7 +20,45 @@ Riverpod/Hive/go_router, по образцу Спеўніка.
 - `lib/utils/compendium_data.dart` — порт `validateCompendiumDataset`,
   `compendiumFromDocuments`, `isNewerCompendium`, `indexCompendium`
   (`CompendiumIndex`: порядок, lookup по номеру/`q042`, reading groups),
-  `buildPartOutline`, `answerParagraphs`, `formatCccRefs`.
+  `buildCompendiumPartOutline` / `CompendiumIndex.navigation`,
+  `answerParagraphs`, `formatCccRefs`.
+
+## Иерархия источника и reading groups
+
+**Иерархия источника и внутренние reading groups — разные понятия; видимыми
+узлами навигации становятся только реальные заголовки источника.**
+
+- Источник (Catholic.by) печатает уровни `ЧАСТКА → РАЗДЗЕЛ → ГЛАВА → именованные
+  тэмы → пытанні`. `РАЗДЗЕЛ` и `ГЛАВА` — разные уровни и оба видимы; в Dart
+  они называются `section`/`chapter`, а UI показывает `label`/`title` из
+  данных, без «угаданных» переводов.
+- `CompendiumGroup` — внутренний кусок чтения (reader-страница, prev/next,
+  раскрытые строки, deep links). Группа `CompendiumGroupKind.unit` —
+  безымянный lead-in unit'а (например `p1-s1-intro` = вопрос 1); это **не**
+  заголовок источника (`hasSourceHeading == false`).
+- Навигация строится производным индексом `CompendiumNavNode`
+  (`buildCompendiumPartOutline`, кэш `CompendiumIndex.navigation`) из
+  канонического датасета, без копирования контента и без изменения схемы:
+  узел `part/section/chapter/topic` имеет `directQuestions` и `children`.
+  Вопросы lead-in'а — `directQuestions` ближайшего реального заголовка
+  (раздела или главы); они всегда идут перед `children` (валидатор
+  гарантирует, что вопросы без тэмы предшествуют тэмам). Порядок узлов
+  детерминирован и совпадает с каноническим порядком вопросов.
+- Экран части рисует прямые вопросы строками вопроса (номер + текст →
+  `CompendiumQuestionScreen`), а не контейнерами «Пытанне 1» / «Пытанні
+  25–27». Именованная тэма остаётся строкой с диапазоном как вторичной
+  метаинформацией («БОЖАЕ АБ’ЯЎЛЕННЕ / Пытанні 6–10»); `parentTitle` тэмы —
+  подзаголовок над ней.
+- Контекст (`questionContextTrail`, `groupContextTrail`,
+  `compendiumQuestionContext`, `ReaderContextHeader`) — только реальные
+  заголовки: для вопроса 1 «ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»», без третьего
+  уровня; внутри тэмы — часть · раздел · глава · тэма.
+- Legacy `/prayers/compendium/topic/<unitId>`: lead-in из одного вопроса
+  (`compendiumGroupQuestionRedirect`, например `p1-s1-intro`) открывается как
+  reader этого вопроса; lead-in из нескольких вопросов (`p1-s1-ch1`, 2–5)
+  открывается reader'ом с заголовком ближайшей главы/раздела и диапазоном
+  только в metadata. Prev/next и «Уся тэма» не ведут на фиктивные тэмы
+  (для lead-in кнопка показывает диапазон или скрыта).
 
 ## Offline и синхронизация
 
@@ -70,7 +108,7 @@ AND по словам как префиксам, веса полей (вопро
 | Route | Экран |
 | --- | --- |
 | `/prayers/compendium` | 4 части, поиск в нижнем dock (`PrayerSearchDock` без фильтра), результаты |
-| `/prayers/compendium/part/:partId` | Раздзелы → главы → группы чтения |
+| `/prayers/compendium/part/:partId` | Раздзелы → главы → тэмы; прямые вопросы — строки вопросов |
 | `/prayers/compendium/topic/:topicId` | Reader: раскрываемые вопросы, prev/next группа |
 | `/prayers/compendium/question/:number` | Reader: вопрос, контекст, prev/next, «Уся тэма»; deep link |
 | `/prayers/catechism` | redirect на `/prayers/compendium` |
@@ -82,5 +120,30 @@ AND по словам как префиксам, веса полей (вопро
 - Запрос поиска (`compendiumSearchQueryProvider`) и раскрытые строки
   (`compendiumExpandedProvider`) живут в сессии; скролл — `PageStorageKey`.
   Enter на точном номере открывает вопрос.
+
+### Постоянный поиск
+
+- Каждый экран Кампендыя (корень, часть, reader тэмы, reader вопроса,
+  loading/not-found) обёрнут в `CompendiumSearchHost`
+  (`lib/widgets/compendium/compendium_search_host.dart`): он регистрирует
+  contextual bottom slot маршрута (`AppRouteEntryScope.showContextualBottomBar`,
+  dock приложения скрывается, как в Спеўніку и каталоге малітваў) и ставит
+  общий `PrayerSearchDock` (без фильтра) на `floatingOverlayBottom`.
+- Состояние одно: `compendiumSearchQueryProvider`; каждый dock показывает тот
+  же глобальный запрос, поиск всегда по всему Кампендыю (тот же локальный
+  индекс, номера, алиасы только для matching).
+- Поиск, начатый на вложенном экране, показывает глобальные результаты
+  поверх экрана (контент остаётся смонтированным offstage, скролл
+  сохраняется) в визуальном языке корня (`compendiumSearchResultItems`: номер,
+  белорусский вопрос, контекст из реальных заголовков). Результат открывает
+  обычный reader вопроса; Back возвращает к результатам, следующий Back (или
+  очистка запроса) закрывает поиск и восстанавливает исходный экран. Корень
+  рисует результаты inline, как раньше.
+- Readers: host поднимает `MediaQuery.padding.bottom` до высоты dock'а
+  (эта же padding — резерв app dock'а в `extendBody`), поэтому
+  `ReaderContentSurface` (ответ, pager, «Крыніца») и кнопка «уверх»
+  прокручиваются над dock'ом при home indicator, gesture и 3-button
+  навигации. В полноэкранном режиме reader'а dock скрывается вместе с chrome
+  (если поиск не активен).
 - «Крыніца: Кампендый Катэхізіса Каталіцкага Касцёла, Catholic.by» + copyright
   на всех экранах; ссылка открывается `url_launcher` во внешнем браузере.
