@@ -235,7 +235,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
-  void toggleFavorite(String id) {
+  Future<void> toggleFavorite(String id) {
     final favs = List<String>.from(state.favoriteIds);
     if (favs.contains(id)) {
       favs.remove(id);
@@ -243,7 +243,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
       favs.add(id);
     }
     state = state.copyWith(favoriteIds: favs);
-    _save();
+    return _save();
   }
 
   String addCategory(String name, List<String> tags) {

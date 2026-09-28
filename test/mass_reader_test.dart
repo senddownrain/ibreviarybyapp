@@ -229,7 +229,7 @@ class _TestSettingsNotifier extends SettingsNotifier {
   SettingsState build() => const SettingsState();
 
   @override
-  void toggleFavorite(String id) {}
+  Future<void> toggleFavorite(String id) async {}
 }
 
 class _TestLocalPrayersNotifier extends LocalPrayersNotifier {

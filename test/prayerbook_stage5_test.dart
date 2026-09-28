@@ -670,7 +670,7 @@ class _TestSettingsNotifier extends SettingsNotifier {
   SettingsState build() => initial;
 
   @override
-  void toggleFavorite(String id) {
+  Future<void> toggleFavorite(String id) async {
     final values = [...state.favoriteIds];
     values.contains(id) ? values.remove(id) : values.add(id);
     state = state.copyWith(favoriteIds: values);
