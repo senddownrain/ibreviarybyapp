@@ -2,8 +2,10 @@
 # Docs: https://docs.codemagic.io/yaml/yaml-getting-started/
 #
 # Workflows:
-#   ios-simulator  — debug build for the iOS Simulator, no codesigning needed.
-#   android-debug  — debug APK build.
+#   ios-simulator     — debug build for the iOS Simulator, no codesigning needed.
+#   android-debug     — debug APK build.
+#   ios-visual-audit  — iOS Simulator screenshots for the visual UX audit
+#                       (branches `audit/*` only; never publishes the app).
 
 workflows:
   ios-simulator:
@@ -73,3 +75,49 @@ workflows:
           failure: true
     artifacts:
       - build/app/outputs/flutter-apk/*.apk
+
+  ios-visual-audit:
+    name: iOS Visual Audit (Simulator)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      flutter: 3.38.9
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: audit/*
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+      - name: Resolve Flutter dependencies
+        script: flutter pub get
+      - name: Install iOS dependencies
+        script: |
+          cd ios
+          pod install
+      - name: Environment
+        script: |
+          flutter --version
+          dart --version
+          xcodebuild -version
+          xcrun simctl list devicetypes
+          xcrun simctl list runtimes
+      - name: Build simulator app
+        script: flutter build ios --simulator --debug
+      - name: Visual audit on iOS Simulator
+        script: |
+          AUDIT_OUT=audit-evidence/ios-cloud ./scripts/ios_visual_audit.sh
+      - name: Export audit evidence
+        script: |
+          mkdir -p "$CM_EXPORT_DIR"
+          cd audit-evidence && zip -qr "$CM_EXPORT_DIR/ios-cloud-audit.zip" ios-cloud
+    artifacts:
+      - build/ios/iphonesimulator/*.app
+      - audit-evidence/ios-cloud/**/*.png
+      - audit-evidence/ios-cloud/*.txt
+      - audit-evidence/ios-cloud/*.md
+      - audit-evidence/ios-cloud/logs/*.log
