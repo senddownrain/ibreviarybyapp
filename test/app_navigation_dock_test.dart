@@ -59,6 +59,33 @@ void main() {
         ),
       );
       expect(strip.color.a, closeTo(0.72, 0.01));
+      final backing = tester.widget<Container>(
+        find.byKey(
+          Key(
+            platform == TargetPlatform.iOS
+                ? 'app-dock-ios'
+                : 'app-dock-android',
+          ),
+        ),
+      );
+      final gradient =
+          (backing.decoration! as BoxDecoration).gradient! as LinearGradient;
+      expect(gradient.colors.first.a, 0);
+      expect(gradient.colors[1].a, greaterThan(0));
+      expect(
+        tester
+            .getSize(
+              find.byKey(
+                Key(
+                  platform == TargetPlatform.iOS
+                      ? 'app-dock-ios'
+                      : 'app-dock-android',
+                ),
+              ),
+            )
+            .height,
+        102,
+      );
       expect(tester.takeException(), isNull);
     }
   });
@@ -83,6 +110,7 @@ void main() {
     );
 
     await tester.tap(find.byKey(const Key('app-dock-compact')));
+    expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
     expect(expanded, isTrue);
     expect(selected, isFalse);
   });
@@ -93,5 +121,6 @@ void main() {
     );
     expect(find.byKey(const Key('app-dock-hidden')), findsOneWidget);
     expect(find.text('Літургія'), findsNothing);
+    expect(find.byKey(const Key('app-dock-android')), findsNothing);
   });
 }

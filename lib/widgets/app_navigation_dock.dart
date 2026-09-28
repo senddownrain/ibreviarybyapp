@@ -56,9 +56,21 @@ class AppNavigationDock extends StatelessWidget {
     final systemNavigationStripColor = Theme.of(
       context,
     ).colorScheme.surface.withValues(alpha: 0.72);
-    return SizedBox(
+    return Container(
       key: platformKey,
       height: (mode == ReaderChromeMode.full ? 78 : 70) + bottom,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            systemNavigationStripColor.withValues(alpha: 0),
+            systemNavigationStripColor.withValues(alpha: ios ? 0.42 : 0.50),
+            systemNavigationStripColor.withValues(alpha: 0.72),
+          ],
+          stops: const [0, 0.55, 1],
+        ),
+      ),
       child: Column(
         children: [
           Expanded(

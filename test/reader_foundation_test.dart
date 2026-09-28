@@ -20,10 +20,21 @@ void main() {
     );
 
     expect(find.byKey(const Key('reader-chrome-back')), findsOneWidget);
+    expect(find.byKey(const Key('reader-top-fade')), findsOneWidget);
+    expect(find.byKey(const Key('reader-bottom-fade')), findsOneWidget);
+    expect(
+      tester
+          .widget<IgnorePointer>(
+            find.byKey(const Key('reader-edge-protection')),
+          )
+          .ignoring,
+      isTrue,
+    );
     expect(find.byKey(const Key('reader-chrome-restore')), findsNothing);
 
     controller.value = ReaderChromeMode.hidden;
     await tester.pump();
+    expect(find.byKey(const Key('reader-top-fade')), findsOneWidget);
     expect(find.byKey(const Key('reader-chrome-back')), findsNothing);
     expect(find.byKey(const Key('reader-chrome-hidden')), findsOneWidget);
     expect(find.byKey(const Key('reader-chrome-restore')), findsNothing);

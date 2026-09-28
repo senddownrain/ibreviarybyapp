@@ -199,6 +199,7 @@ class ReaderScaffold extends StatelessWidget {
             )
           else
             scrollView,
+          ReaderEdgeProtection(mode: resolvedMode),
           if (resolvedMode != ReaderChromeMode.hidden) ?overlay,
           if (showScrollToTop && scrollController != null)
             _ReaderScrollToTopControl(
@@ -218,6 +219,66 @@ class ReaderScaffold extends StatelessWidget {
               onBack: onBack,
               leading: leading,
               onModeChanged: setMode,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Soft visual backing at the reader edges. It sits above scrolling text but
+/// never changes scroll geometry or participates in hit testing.
+class ReaderEdgeProtection extends StatelessWidget {
+  const ReaderEdgeProtection({super.key, required this.mode});
+
+  final ReaderChromeMode mode;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = ReaderTheme.of(context).surface;
+    final safeTop = MediaQuery.viewPaddingOf(context).top;
+    final safeBottom = MediaQuery.viewPaddingOf(context).bottom;
+    return IgnorePointer(
+      key: const Key('reader-edge-protection'),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: safeTop + (mode == ReaderChromeMode.hidden ? 18 : 72),
+            child: DecoratedBox(
+              key: const Key('reader-top-fade'),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    surface.withValues(alpha: 0.94),
+                    surface.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: safeBottom + (mode == ReaderChromeMode.hidden ? 24 : 96),
+            child: DecoratedBox(
+              key: const Key('reader-bottom-fade'),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    surface.withValues(alpha: 0),
+                    surface.withValues(alpha: 0.72),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
