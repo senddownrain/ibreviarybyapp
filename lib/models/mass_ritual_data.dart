@@ -1,11 +1,14 @@
-// GENERATED from assets/mass/order-of-mass.ritual.json (shared with MyBrev).
-// Keep both in sync; test/mass_ritual_test.dart verifies they match.
+// GENERATED from assets/mass/order-of-mass.ritual.json (shared with MyBrev)
+// by tool/generate_mass_ritual_data.dart. Do not edit by hand;
+// test/mass_ritual_test.dart verifies that both match.
 part of 'mass_ritual.dart';
 
 const kMassRitual = MassRitual(
+  schemaVersion: 2,
   id: 'order-of-mass',
   primaryPrayerId: 'eMmCtxwyJ75ogmL5rwye',
   defaultLanguage: 'be',
+  aliases: {'liturgy-of-the-eucharist': 'eucharistic-liturgy'},
   sections: [
     MassSectionDef(id: 'introductory-rites', title: 'Уступныя абрады'),
     MassSectionDef(
@@ -62,24 +65,21 @@ const kMassRitual = MassRitual(
       title: 'Малітва вернікаў',
       parent: 'liturgy-of-the-word',
     ),
-    MassSectionDef(
-      id: 'liturgy-of-the-eucharist',
-      title: 'Эўхарыстычная літургія',
-    ),
+    MassSectionDef(id: 'eucharistic-liturgy', title: 'Эўхарыстычная літургія'),
     MassSectionDef(
       id: 'offertory',
       title: 'Прынашэнне дароў',
-      parent: 'liturgy-of-the-eucharist',
+      parent: 'eucharistic-liturgy',
     ),
     MassSectionDef(
       id: 'prayer-over-the-offerings',
       title: 'Малітва над дарамі',
-      parent: 'liturgy-of-the-eucharist',
+      parent: 'eucharistic-liturgy',
     ),
     MassSectionDef(
       id: 'eucharistic-prayer',
       title: 'Эўхарыстычная малітва',
-      parent: 'liturgy-of-the-eucharist',
+      parent: 'eucharistic-liturgy',
     ),
     MassSectionDef(id: 'communion-rite', title: 'Абрад Камуніі'),
     MassSectionDef(
@@ -108,7 +108,7 @@ const kMassRitual = MassRitual(
       title: 'Малітва пасля Камуніі',
       parent: 'communion-rite',
     ),
-    MassSectionDef(id: 'concluding-rites', title: 'Абрад заканчэння'),
+    MassSectionDef(id: 'concluding-rites', title: 'Заключныя абрады'),
     MassSectionDef(
       id: 'blessing',
       title: 'Благаслаўленне',
@@ -134,7 +134,7 @@ const kMassRitual = MassRitual(
         'collect': ['Малітва дня — Калекта'],
         'liturgy-of-the-word': ['Літургія слова'],
         'creed': ['Вызнанне веры'],
-        'liturgy-of-the-eucharist': ['Эўхарыстычная літургія'],
+        'eucharistic-liturgy': ['Эўхарыстычная літургія'],
         'eucharistic-prayer': ['II эўхарыстычная малітва'],
         'communion-rite': ['Абрад Камуніі'],
         'concluding-rites': ['Абрад заканчэння'],
@@ -150,7 +150,7 @@ const kMassRitual = MassRitual(
         'introductory-rites': ['Вступительные обряды'],
         'liturgy-of-the-word': ['Литургия Слова'],
         'creed': ['Исповедание веры'],
-        'liturgy-of-the-eucharist': ['Евхаристическая Литургия'],
+        'eucharistic-liturgy': ['Евхаристическая Литургия'],
         'eucharistic-prayer': ['Вторая Евхаристическая молитва'],
         'communion-rite': ['Обряд причащения'],
         'concluding-rites': ['Заключительный обряд'],
@@ -181,7 +181,7 @@ const kMassRitual = MassRitual(
         'homily': ['The Homily'],
         'creed': ['The Creed'],
         'prayer-of-the-faithful': ['The Prayer of the Faithful'],
-        'liturgy-of-the-eucharist': ['The Liturgy of the Eucharist'],
+        'eucharistic-liturgy': ['The Liturgy of the Eucharist'],
         'eucharistic-prayer': ['The Eucharistic Prayer'],
         'communion-rite': ['The Communion Rite'],
         'lords-prayer': ['The Lord’s Prayer'],

@@ -1,9 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "order-of-mass",
   "title": "Святая Імша",
   "primaryPrayerId": "eMmCtxwyJ75ogmL5rwye",
   "defaultLanguage": "be",
+  "aliases": {
+    "liturgy-of-the-eucharist": "eucharistic-liturgy"
+  },
   "sections": [
     { "id": "introductory-rites", "title": "Уступныя абрады" },
     { "id": "sign-of-the-cross", "parent": "introductory-rites", "title": "Знак крыжа" },
@@ -20,10 +23,10 @@
     { "id": "homily", "parent": "liturgy-of-the-word", "title": "Гамілія" },
     { "id": "creed", "parent": "liturgy-of-the-word", "title": "Вызнанне веры" },
     { "id": "prayer-of-the-faithful", "parent": "liturgy-of-the-word", "title": "Малітва вернікаў" },
-    { "id": "liturgy-of-the-eucharist", "title": "Эўхарыстычная літургія" },
-    { "id": "offertory", "parent": "liturgy-of-the-eucharist", "title": "Прынашэнне дароў" },
-    { "id": "prayer-over-the-offerings", "parent": "liturgy-of-the-eucharist", "title": "Малітва над дарамі" },
-    { "id": "eucharistic-prayer", "parent": "liturgy-of-the-eucharist", "title": "Эўхарыстычная малітва" },
+    { "id": "eucharistic-liturgy", "title": "Эўхарыстычная літургія" },
+    { "id": "offertory", "parent": "eucharistic-liturgy", "title": "Прынашэнне дароў" },
+    { "id": "prayer-over-the-offerings", "parent": "eucharistic-liturgy", "title": "Малітва над дарамі" },
+    { "id": "eucharistic-prayer", "parent": "eucharistic-liturgy", "title": "Эўхарыстычная малітва" },
     { "id": "communion-rite", "title": "Абрад Камуніі" },
     { "id": "lords-prayer", "parent": "communion-rite", "title": "Ойча наш" },
     { "id": "sign-of-peace", "parent": "communion-rite", "title": "Знак супакою" },
@@ -31,7 +34,7 @@
     { "id": "invitation-to-communion", "parent": "communion-rite", "title": "Запрашэнне да Камуніі" },
     { "id": "communion", "parent": "communion-rite", "title": "Камунія" },
     { "id": "prayer-after-communion", "parent": "communion-rite", "title": "Малітва пасля Камуніі" },
-    { "id": "concluding-rites", "title": "Абрад заканчэння" },
+    { "id": "concluding-rites", "title": "Заключныя абрады" },
     { "id": "blessing", "parent": "concluding-rites", "title": "Благаслаўленне" },
     { "id": "dismissal", "parent": "concluding-rites", "title": "Адпраўленне" }
   ],
@@ -49,7 +52,7 @@
         "collect": ["Малітва дня — Калекта"],
         "liturgy-of-the-word": ["Літургія слова"],
         "creed": ["Вызнанне веры"],
-        "liturgy-of-the-eucharist": ["Эўхарыстычная літургія"],
+        "eucharistic-liturgy": ["Эўхарыстычная літургія"],
         "eucharistic-prayer": ["II эўхарыстычная малітва"],
         "communion-rite": ["Абрад Камуніі"],
         "concluding-rites": ["Абрад заканчэння"]
@@ -65,7 +68,7 @@
         "introductory-rites": ["Вступительные обряды"],
         "liturgy-of-the-word": ["Литургия Слова"],
         "creed": ["Исповедание веры"],
-        "liturgy-of-the-eucharist": ["Евхаристическая Литургия"],
+        "eucharistic-liturgy": ["Евхаристическая Литургия"],
         "eucharistic-prayer": ["Вторая Евхаристическая молитва"],
         "communion-rite": ["Обряд причащения"],
         "concluding-rites": ["Заключительный обряд"]
@@ -95,7 +98,7 @@
         "homily": ["The Homily"],
         "creed": ["The Creed"],
         "prayer-of-the-faithful": ["The Prayer of the Faithful"],
-        "liturgy-of-the-eucharist": ["The Liturgy of the Eucharist"],
+        "eucharistic-liturgy": ["The Liturgy of the Eucharist"],
         "eucharistic-prayer": ["The Eucharistic Prayer"],
         "communion-rite": ["The Communion Rite"],
         "lords-prayer": ["The Lord’s Prayer"],

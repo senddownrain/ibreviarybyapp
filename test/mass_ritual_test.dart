@@ -20,7 +20,13 @@ void main() {
               File('assets/mass/order-of-mass.ritual.json').readAsStringSync(),
             )
             as Map<String, dynamic>;
+    expect(kMassRitual.schemaVersion, json['schemaVersion']);
+    expect(kMassRitual.schemaVersion, 2);
     expect(kMassRitual.id, json['id']);
+    expect(
+      kMassRitual.aliases,
+      Map<String, String>.from(json['aliases'] as Map),
+    );
     expect(kMassRitual.primaryPrayerId, json['primaryPrayerId']);
     expect(kMassRitual.defaultLanguage, json['defaultLanguage']);
     expect(
@@ -52,6 +58,48 @@ void main() {
     }
   });
 
+  test('exactly five canonical major sections with Belarusian names', () {
+    expect(kMassRitual.majorSections.map((s) => [s.id, s.title]).toList(), [
+      ['introductory-rites', 'Уступныя абрады'],
+      ['liturgy-of-the-word', 'Літургія слова'],
+      ['eucharistic-liturgy', 'Эўхарыстычная літургія'],
+      ['communion-rite', 'Абрад Камуніі'],
+      ['concluding-rites', 'Заключныя абрады'],
+    ]);
+    // Every other section is a subsection of one of the five.
+    final majorIds = kMassRitual.majorSections.map((s) => s.id).toSet();
+    for (final s in kMassRitual.sections.where((s) => !s.isMajor)) {
+      expect(majorIds, contains(s.parent), reason: s.id);
+    }
+    expect(kMassRitual.section('offertory')!.parent, 'eucharistic-liturgy');
+    expect(kMassRitual.majorPositionOf('eucharistic-prayer'), 3);
+    expect(kMassRitual.majorPositionOf('dismissal'), 5);
+  });
+
+  test('former eucharist section id stays resolvable', () {
+    expect(
+      kMassRitual.canonicalSectionId('liturgy-of-the-eucharist'),
+      'eucharistic-liturgy',
+    );
+    expect(
+      kMassRitual.section('liturgy-of-the-eucharist')!.id,
+      'eucharistic-liturgy',
+    );
+    expect(
+      kMassRitual.resolveSectionTarget('liturgy-of-the-eucharist', [
+        'eucharistic-liturgy',
+      ]),
+      'eucharistic-liturgy',
+    );
+    expect(
+      kMassRitual.resolveSectionTarget('offertory', [
+        'liturgy-of-the-word',
+        'liturgy-of-the-eucharist',
+      ]),
+      'eucharistic-liturgy',
+    );
+  });
+
   test('existing Belarusian and Latin prayers are reused as variants', () {
     expect(kMassRitual.primaryPrayerId, 'eMmCtxwyJ75ogmL5rwye');
     expect(kMassRitual.variant('be')!.prayerId, 'eMmCtxwyJ75ogmL5rwye');
@@ -77,7 +125,7 @@ void main() {
     expect(located.where((s) => s.isMajor).map((s) => s.sectionId).toList(), [
       'introductory-rites',
       'liturgy-of-the-word',
-      'liturgy-of-the-eucharist',
+      'eucharistic-liturgy',
       'communion-rite',
       'concluding-rites',
     ]);
@@ -103,7 +151,7 @@ void main() {
       'introductory-rites',
       'liturgy-of-the-word',
       'creed',
-      'liturgy-of-the-eucharist',
+      'eucharistic-liturgy',
       'communion-rite',
     ];
     expect(kMassRitual.resolveSectionTarget('creed', latin), 'creed');
