@@ -128,15 +128,16 @@ final filteredSongsProvider = Provider<AsyncValue<List<Song>>>((ref) {
 
 enum SongChordLayout {
   above('above', 'Над радкамі'),
-  left('left', 'Злева ад тэксту');
+  right('right', 'Справа ад тэксту');
 
   const SongChordLayout(this.storageValue, this.label);
   final String storageValue;
   final String label;
 
-  /// Legacy MyBrev `right` values are treated as the side layout.
+  /// The side layout used to be stored as `left` (and, in MyBrev, `right`);
+  /// both now mean [right]. Anything else falls back to [above].
   static SongChordLayout parse(Object? value) =>
-      value == 'left' || value == 'right' ? left : above;
+      value == 'right' || value == 'left' ? right : above;
 }
 
 class SongPreferences {
@@ -144,25 +145,24 @@ class SongPreferences {
     this.favoriteSongIds = const [],
     this.showChords = false,
     this.chordLayout = SongChordLayout.above,
-    this.compactList = false,
   });
 
   /// Songbook favorites, independent from prayer `favoriteIds`.
   final List<String> favoriteSongIds;
   final bool showChords;
+
+  /// Preferred layout. [SongChordLayout.right] may render above lines at
+  /// runtime when the width is too small; the preference itself is kept.
   final SongChordLayout chordLayout;
-  final bool compactList;
 
   SongPreferences copyWith({
     List<String>? favoriteSongIds,
     bool? showChords,
     SongChordLayout? chordLayout,
-    bool? compactList,
   }) => SongPreferences(
     favoriteSongIds: favoriteSongIds ?? this.favoriteSongIds,
     showChords: showChords ?? this.showChords,
     chordLayout: chordLayout ?? this.chordLayout,
-    compactList: compactList ?? this.compactList,
   );
 }
 
@@ -172,7 +172,10 @@ class SongPreferencesNotifier extends Notifier<SongPreferences> {
   static const favoritesKey = 'favoriteSongIds';
   static const showChordsKey = 'songShowChords';
   static const chordLayoutKey = 'songChordLayout';
-  static const compactListKey = 'songCompactList';
+
+  /// Removed setting (the list is always compact). A stored value from an
+  /// older version is ignored and deleted on first read.
+  static const legacyCompactListKey = 'songCompactList';
 
   Box? get _box => HiveService.isSettingsReady ? HiveService.settingsBox : null;
 
@@ -188,11 +191,19 @@ class SongPreferencesNotifier extends Notifier<SongPreferences> {
     } catch (_) {
       favorites = const [];
     }
+    final storedLayout = box.get(chordLayoutKey);
+    final layout = SongChordLayout.parse(storedLayout);
+    // One-time migrations: `left` → `right`, drop the compact-list flag.
+    if (storedLayout != null && storedLayout != layout.storageValue) {
+      box.put(chordLayoutKey, layout.storageValue);
+    }
+    if (box.containsKey(legacyCompactListKey)) {
+      box.delete(legacyCompactListKey);
+    }
     return SongPreferences(
       favoriteSongIds: favorites,
       showChords: box.get(showChordsKey, defaultValue: false) == true,
-      chordLayout: SongChordLayout.parse(box.get(chordLayoutKey)),
-      compactList: box.get(compactListKey, defaultValue: false) == true,
+      chordLayout: layout,
     );
   }
 
@@ -213,11 +224,6 @@ class SongPreferencesNotifier extends Notifier<SongPreferences> {
   void setChordLayout(SongChordLayout layout) {
     state = state.copyWith(chordLayout: layout);
     _box?.put(chordLayoutKey, layout.storageValue);
-  }
-
-  void setCompactList(bool value) {
-    state = state.copyWith(compactList: value);
-    _box?.put(compactListKey, value);
   }
 }
 

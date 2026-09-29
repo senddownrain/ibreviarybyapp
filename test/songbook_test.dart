@@ -21,10 +21,17 @@ import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/songs/song_text.dart';
 
 import 'support/compendium_fixture.dart';
 
 const _massId = 'eMmCtxwyJ75ogmL5rwye';
+
+/// Android tonal and iOS Glass chrome.
+final _platforms = TargetPlatformVariant(const {
+  TargetPlatform.android,
+  TargetPlatform.iOS,
+});
 final _compendium = readBundledCompendium();
 
 const _seed = <Map<String, dynamic>>[
@@ -190,7 +197,7 @@ void main() {
   });
 
   group('Songbook list', () {
-    testWidgets('lists songs with tags, favorites first then alphabetical', (
+    testWidgets('lists songs, favorites first then alphabetical', (
       tester,
     ) async {
       final router = _router(initialLocation: '/prayers/songs');
@@ -200,8 +207,6 @@ void main() {
 
       expect(find.text('Спеваў: 3'), findsOneWidget);
       expect(_rowOrder(tester), ['s-ave', 's-bog', 's-kal']);
-      expect(find.byKey(const ValueKey('song-tags-s-bog')), findsOneWidget);
-      expect(find.text('Марыйныя'), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('song-favorite-s-kal')));
       await tester.pump();
@@ -264,30 +269,34 @@ void main() {
       );
     });
 
-    testWidgets('compact list hides tags and keeps favorite action', (
+    testWidgets('list is always compact and has no songbook settings', (
       tester,
     ) async {
       final router = _router(initialLocation: '/prayers/songs');
       addTearDown(router.dispose);
       await tester.pumpWidget(_app(null, router: router));
       await tester.pumpAndSettle();
-      final normalHeight = tester
-          .getSize(find.byKey(const ValueKey('song-row-s-bog')))
-          .height;
 
-      await tester.tap(find.byKey(const Key('songbook-settings-action')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('song-compact-list-switch')));
-      await tester.pumpAndSettle();
-      await tester.tapAt(const Offset(10, 10));
-      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('songbook-settings-action')), findsNothing);
+      expect(find.byTooltip('Налады спеўніка'), findsNothing);
+      expect(find.byKey(const Key('song-compact-list-switch')), findsNothing);
+      for (final id in ['s-ave', 's-bog', 's-kal']) {
+        expect(find.byKey(ValueKey('song-tags-$id')), findsNothing);
+        expect(find.byKey(ValueKey('song-favorite-$id')), findsOneWidget);
+        final height = tester
+            .getSize(find.byKey(ValueKey('song-row-$id')))
+            .height;
+        expect(height, inInclusiveRange(48, 52), reason: 'compact row $id');
+      }
+      expect(find.text('Марыйныя'), findsNothing, reason: 'no tags in rows');
 
-      expect(find.byKey(const ValueKey('song-tags-s-bog')), findsNothing);
-      expect(find.byKey(const ValueKey('song-favorite-s-bog')), findsOneWidget);
-      expect(
-        tester.getSize(find.byKey(const ValueKey('song-row-s-bog'))).height,
-        lessThan(normalHeight),
+      // Tags stay searchable and filterable without being shown in rows.
+      await tester.enterText(
+        find.byKey(const Key('song-search-field')),
+        'марыйныя',
       );
+      await tester.pump();
+      expect(_rowOrder(tester), ['s-bog']);
     });
 
     testWidgets('seed failure without synced songs shows an error state', (
@@ -340,12 +349,31 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
-      expect(find.byKey(const Key('song-transpose-control')), findsNothing);
+      expect(
+        find.byKey(const Key('reader-chrome-overflow')),
+        findsNothing,
+        reason: 'no separate songbook settings entry',
+      );
+      expect(find.byKey(const Key('song-chord-control')), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(ReaderContextHeader),
+          matching: find.byKey(const Key('song-chord-control')),
+        ),
+        findsOneWidget,
+        reason: 'chord control lives in the reader header, before the text',
+      );
+      expect(
+        tester.getRect(find.byKey(const Key('song-chord-control'))).bottom,
+        lessThan(tester.getTopLeft(find.text('Бог наш вялікі')).dy),
+      );
       expect(
         find.text('C G'),
         findsNothing,
         reason: 'chords hidden by default',
       );
+      expect(_iconButton(tester, 'song-transpose-up').onPressed, isNull);
+      expect(_iconButton(tester, 'song-chord-layout-toggle').onPressed, isNull);
 
       await tester.tap(find.byKey(const Key('song-detail-favorite')));
       await tester.pump();
@@ -380,7 +408,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('song-transpose-control')), findsOneWidget);
+      expect(find.byKey(const Key('song-chord-control')), findsOneWidget);
       expect(find.text('C G'), findsOneWidget);
       expect(find.byKey(const Key('song-text-above')), findsOneWidget);
 
@@ -405,12 +433,17 @@ void main() {
       }
       expect(find.text('-12'), findsOneWidget);
       expect(find.text('C G'), findsOneWidget);
-      expect(
-        tester
-            .widget<IconButton>(find.byKey(const Key('song-transpose-down')))
-            .onPressed,
-        isNull,
-      );
+      expect(_iconButton(tester, 'song-transpose-down').onPressed, isNull);
+
+      await tester.tap(find.byKey(const Key('song-transpose-reset')));
+      await tester.pump();
+      for (var i = 0; i < 14; i++) {
+        await tester.tap(find.byKey(const Key('song-transpose-up')));
+        await tester.pump();
+      }
+      expect(find.text('+12'), findsOneWidget);
+      expect(find.text('C G'), findsOneWidget, reason: '+12 is an octave');
+      expect(_iconButton(tester, 'song-transpose-up').onPressed, isNull);
 
       router.go('/prayers/songs/s-kal');
       await tester.pumpAndSettle();
@@ -418,10 +451,8 @@ void main() {
       expect(find.text('D'), findsOneWidget);
     });
 
-    testWidgets('left chord layout falls back above on narrow large text', (
-      tester,
-    ) async {
-      final router = _router(initialLocation: '/prayers/songs/s-bog');
+    testWidgets('song without chords shows no chord control', (tester) async {
+      final router = _router(initialLocation: '/prayers/songs/s-ave');
       addTearDown(router.dispose);
       await tester.pumpWidget(
         _app(
@@ -429,37 +460,282 @@ void main() {
           router: router,
           prefs: const SongPreferences(
             showChords: true,
-            chordLayout: SongChordLayout.left,
+            chordLayout: SongChordLayout.right,
           ),
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('song-text-left')), findsOneWidget);
+      expect(find.text('Радасць нябёсаў'), findsOneWidget);
+      expect(find.byKey(const Key('song-chord-control')), findsNothing);
+      expect(find.byKey(const Key('song-transpose-up')), findsNothing);
+      expect(find.byKey(const Key('song-chords-toggle')), findsNothing);
+    });
 
-      tester.view.physicalSize = const Size(360, 800);
-      tester.view.devicePixelRatio = 1;
+    testWidgets('chord toggle shows and hides chords and persists choice', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/songs/s-bog');
+      addTearDown(router.dispose);
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        _app(null, router: router, onContainer: (value) => container = value),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('C G'), findsNothing);
+
+      await tester.tap(find.byKey(const Key('song-chords-toggle')));
+      await tester.pumpAndSettle();
+      expect(find.text('C G'), findsOneWidget);
+      expect(container.read(songPreferencesProvider).showChords, isTrue);
+      expect(_iconButton(tester, 'song-chords-toggle').isSelected, isTrue);
+      expect(_iconButton(tester, 'song-transpose-up').onPressed, isNotNull);
+
+      await tester.tap(find.byKey(const Key('song-chords-toggle')));
+      await tester.pumpAndSettle();
+      expect(find.text('C G'), findsNothing);
+      expect(container.read(songPreferencesProvider).showChords, isFalse);
+    });
+
+    testWidgets('layout toggle switches between above and right', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/songs/s-bog');
+      addTearDown(router.dispose);
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        _app(
+          null,
+          router: router,
+          prefs: const SongPreferences(showChords: true),
+          onContainer: (value) => container = value,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('song-text-above')), findsOneWidget);
+      final lyricAbove = tester.getRect(find.text('Бог наш вялікі'));
+      final chordAbove = tester.getRect(find.text('C G'));
+      expect(chordAbove.bottom, lessThanOrEqualTo(lyricAbove.top + 0.5));
+
+      await tester.tap(find.byKey(const Key('song-chord-layout-toggle')));
+      await tester.pumpAndSettle();
+      expect(
+        container.read(songPreferencesProvider).chordLayout,
+        SongChordLayout.right,
+      );
+      expect(find.byKey(const Key('song-text-right')), findsOneWidget);
+      final lyric = tester.getRect(find.text('Бог наш вялікі'));
+      final chord = tester.getRect(find.text('C G'));
+      expect(chord.left, greaterThan(lyric.left), reason: 'chords on right');
+      expect(chord.top, lessThan(lyric.bottom), reason: 'same row');
+      expect(chord.bottom, greaterThan(lyric.top), reason: 'same row');
+      final surface = tester.getRect(
+        find.byKey(const Key('reader-content-surface')),
+      );
+      expect(
+        chord.width,
+        lessThan(surface.width * SongText.rightLayoutMaxChordShare),
+        reason: 'the chord column stays secondary',
+      );
+
+      await tester.tap(find.byKey(const Key('song-chord-layout-toggle')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('song-text-above')), findsOneWidget);
+      expect(
+        container.read(songPreferencesProvider).chordLayout,
+        SongChordLayout.above,
+      );
+    });
+
+    testWidgets('right falls back above on narrow width and keeps preference', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/songs/s-bog');
+      addTearDown(router.dispose);
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            size: Size(360, 800),
-            textScaler: TextScaler.linear(2),
-          ),
-          child: _app(
-            null,
-            router: router,
-            prefs: const SongPreferences(
-              showChords: true,
-              chordLayout: SongChordLayout.left,
+      tester.view.devicePixelRatio = 1;
+      late ProviderContainer container;
+      const prefs = SongPreferences(
+        showChords: true,
+        chordLayout: SongChordLayout.right,
+      );
+
+      Future<void> pumpAt(double width, double scale) async {
+        tester.view.physicalSize = Size(width, 900);
+        await tester.pumpWidget(
+          MediaQuery(
+            data: MediaQueryData(
+              size: Size(width, 900),
+              textScaler: TextScaler.linear(scale),
+            ),
+            child: _app(
+              null,
+              router: router,
+              prefs: prefs,
+              onContainer: (value) => container = value,
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: '$width @ $scale');
+      }
+
+      await pumpAt(800, 1);
+      expect(find.byKey(const Key('song-text-right')), findsOneWidget);
+
+      await pumpAt(360, 2);
       expect(find.byKey(const Key('song-text-above')), findsOneWidget);
+      expect(find.text('C G'), findsOneWidget);
+      expect(
+        container.read(songPreferencesProvider).chordLayout,
+        SongChordLayout.right,
+        reason: 'runtime fallback does not change the preference',
+      );
+      final icon = tester.widget<IconButton>(
+        find.byKey(const Key('song-chord-layout-toggle')),
+      );
+      expect(icon.tooltip, 'Акорды справа', reason: 'control shows preference');
+
+      await pumpAt(800, 1);
+      expect(find.byKey(const Key('song-text-right')), findsOneWidget);
     });
+
+    test('right layout rule uses real constraints', () {
+      const scaler = TextScaler.noScaling;
+      SongChordLayout resolve(
+        double width,
+        double chords, {
+        double font = 16,
+      }) => SongText.resolveLayout(
+        preferred: SongChordLayout.right,
+        width: width,
+        fontSize: font,
+        textScaler: scaler,
+        chordColumnWidth: chords,
+      );
+      expect(resolve(700, 60), SongChordLayout.right);
+      expect(resolve(346, 60), SongChordLayout.right);
+      expect(resolve(276, 60), SongChordLayout.above, reason: 'lyrics narrow');
+      expect(resolve(700, 300), SongChordLayout.above, reason: 'long chords');
+      expect(
+        SongText.resolveLayout(
+          preferred: SongChordLayout.right,
+          width: 400,
+          fontSize: 18,
+          textScaler: const TextScaler.linear(2),
+          chordColumnWidth: 60,
+        ),
+        SongChordLayout.above,
+        reason: 'large text',
+      );
+      expect(
+        SongText.resolveLayout(
+          preferred: SongChordLayout.above,
+          width: 2000,
+          fontSize: 18,
+          textScaler: scaler,
+          chordColumnWidth: 10,
+        ),
+        SongChordLayout.above,
+      );
+    });
+
+    testWidgets('chord control geometry is stable across states', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/songs/s-bog');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(null, router: router));
+      await tester.pumpAndSettle();
+
+      Map<String, Rect> geometry() => {
+        for (final key in [
+          'song-chord-control',
+          'song-chords-toggle',
+          'song-chord-layout-toggle',
+          'song-transpose-down',
+          'song-transpose-value-box',
+          'song-transpose-up',
+        ])
+          key: tester.getRect(find.byKey(Key(key))),
+      };
+      final hidden = geometry();
+      for (final rect in [
+        hidden['song-chords-toggle']!,
+        hidden['song-transpose-up']!,
+        hidden['song-transpose-down']!,
+      ]) {
+        expect(rect.width, greaterThanOrEqualTo(48), reason: 'hit target');
+        expect(rect.height, greaterThanOrEqualTo(48), reason: 'hit target');
+      }
+
+      Future<void> tapKey(String key, [int times = 1]) async {
+        for (var i = 0; i < times; i++) {
+          await tester.tap(find.byKey(Key(key)));
+          await tester.pumpAndSettle();
+        }
+      }
+
+      await tapKey('song-chords-toggle');
+      expect(geometry(), hidden, reason: 'show chords');
+      await tapKey('song-transpose-up', 12);
+      expect(find.text('+12'), findsOneWidget);
+      expect(geometry(), hidden, reason: '+12');
+      await tapKey('song-transpose-reset');
+      expect(find.text('0'), findsOneWidget);
+      expect(geometry(), hidden, reason: 'reset');
+      await tapKey('song-transpose-down', 12);
+      expect(find.text('-12'), findsOneWidget);
+      expect(geometry(), hidden, reason: '-12');
+      await tapKey('song-chord-layout-toggle');
+      expect(geometry(), hidden, reason: 'layout right');
+      await tapKey('song-chords-toggle');
+      expect(geometry(), hidden, reason: 'hide chords');
+    }, variant: _platforms);
+
+    testWidgets(
+      'detail with chords does not overflow at 200 percent text',
+      (tester) async {
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        tester.view.devicePixelRatio = 1;
+        for (final layout in SongChordLayout.values) {
+          for (final size in const [
+            Size(320, 640),
+            Size(390, 844),
+            Size(844, 390),
+          ]) {
+            final router = _router(initialLocation: '/prayers/songs/s-bog');
+            tester.view.physicalSize = size;
+            await tester.pumpWidget(
+              MediaQuery(
+                data: MediaQueryData(
+                  size: size,
+                  textScaler: const TextScaler.linear(2),
+                ),
+                child: _app(
+                  null,
+                  router: router,
+                  prefs: SongPreferences(showChords: true, chordLayout: layout),
+                ),
+              ),
+            );
+            await tester.pumpAndSettle();
+            await tester.tap(find.byKey(const Key('song-transpose-down')));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull, reason: '$layout $size');
+            expect(find.text('-1'), findsOneWidget);
+            final control = tester.getRect(
+              find.byKey(const Key('song-chord-control')),
+            );
+            expect(control.right, lessThanOrEqualTo(size.width));
+            await tester.pumpWidget(const SizedBox());
+            router.dispose();
+          }
+        }
+      },
+      variant: _platforms,
+    );
 
     testWidgets('unknown song shows a not found state', (tester) async {
       final router = _router(initialLocation: '/prayers/songs/missing');
@@ -481,7 +757,7 @@ void main() {
       await directory.delete(recursive: true);
     });
 
-    test('favorites, chords, layout and compact list survive restart', () {
+    test('favorites, chords and layout survive restart', () {
       final first = ProviderContainer();
       final notifier = first.read(songPreferencesProvider.notifier);
       expect(first.read(songPreferencesProvider).showChords, isFalse);
@@ -494,8 +770,7 @@ void main() {
         ..toggleFavorite('b')
         ..toggleFavorite('a')
         ..setShowChords(true)
-        ..setChordLayout(SongChordLayout.left)
-        ..setCompactList(true);
+        ..setChordLayout(SongChordLayout.right);
       first.dispose();
 
       final second = ProviderContainer();
@@ -503,9 +778,21 @@ void main() {
       final prefs = second.read(songPreferencesProvider);
       expect(prefs.favoriteSongIds, ['b']);
       expect(prefs.showChords, isTrue);
-      expect(prefs.chordLayout, SongChordLayout.left);
-      expect(prefs.compactList, isTrue);
+      expect(prefs.chordLayout, SongChordLayout.right);
       expect(HiveService.settingsBox.get('favoriteSongIds'), '["b"]');
+      expect(HiveService.settingsBox.get('songChordLayout'), 'right');
+      expect(HiveService.settingsBox.get('songShowChords'), isTrue);
+
+      second.read(songPreferencesProvider.notifier)
+        ..setChordLayout(SongChordLayout.above)
+        ..setShowChords(false);
+      final third = ProviderContainer();
+      addTearDown(third.dispose);
+      expect(
+        third.read(songPreferencesProvider).chordLayout,
+        SongChordLayout.above,
+      );
+      expect(third.read(songPreferencesProvider).showChords, isFalse);
     });
 
     test('song favorites are independent from prayer favorites', () async {
@@ -520,17 +807,54 @@ void main() {
       expect(HiveService.settingsBox.get('favoriteSongIds'), '["song"]');
     });
 
-    test('legacy right layout is read as left', () async {
-      await HiveService.settingsBox.put('songChordLayout', 'right');
+    test('stored left layout migrates to right', () async {
+      await HiveService.settingsBox.put('songChordLayout', 'left');
       final container = ProviderContainer();
       addTearDown(container.dispose);
       expect(
         container.read(songPreferencesProvider).chordLayout,
-        SongChordLayout.left,
+        SongChordLayout.right,
       );
+      expect(HiveService.settingsBox.get('songChordLayout'), 'right');
+    });
+
+    test('stored right and unknown layouts are read safely', () async {
+      await HiveService.settingsBox.put('songChordLayout', 'right');
+      final right = ProviderContainer();
+      expect(
+        right.read(songPreferencesProvider).chordLayout,
+        SongChordLayout.right,
+      );
+      right.dispose();
+
+      await HiveService.settingsBox.put('songChordLayout', 42);
+      final unknown = ProviderContainer();
+      addTearDown(unknown.dispose);
+      expect(
+        unknown.read(songPreferencesProvider).chordLayout,
+        SongChordLayout.above,
+      );
+      expect(SongChordLayout.values, [
+        SongChordLayout.above,
+        SongChordLayout.right,
+      ]);
+    });
+
+    test('old compact list setting is ignored and removed', () async {
+      await HiveService.settingsBox.put('songCompactList', true);
+      await HiveService.settingsBox.put('songShowChords', true);
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final prefs = container.read(songPreferencesProvider);
+      expect(prefs.showChords, isTrue);
+      expect(prefs.chordLayout, SongChordLayout.above);
+      expect(HiveService.settingsBox.containsKey('songCompactList'), isFalse);
     });
   });
 }
+
+IconButton _iconButton(WidgetTester tester, String key) =>
+    tester.widget<IconButton>(find.byKey(Key(key)));
 
 String _location(GoRouter router) {
   final config = router.routerDelegate.currentConfiguration;
@@ -660,9 +984,6 @@ class _TestSongPrefs extends SongPreferencesNotifier {
     if (!values.remove(id)) values.add(id);
     state = state.copyWith(favoriteSongIds: values);
   }
-
-  @override
-  void setCompactList(bool value) => state = state.copyWith(compactList: value);
 
   @override
   void setShowChords(bool value) => state = state.copyWith(showChords: value);
