@@ -9,6 +9,7 @@ import 'package:mybrev_flutter/models/compendium.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
+import 'package:mybrev_flutter/widgets/compendium/compendium_search_host.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
@@ -19,20 +20,42 @@ Widget _readerMessage({
   required bool loading,
   required String message,
   required String semanticLabel,
-}) => ReaderScaffold(
-  semanticLabel: semanticLabel,
-  content: Center(
-    child: loading
-        ? const Padding(
-            padding: EdgeInsets.only(top: 24),
-            child: LinearProgressIndicator(key: Key('compendium-loading')),
-          )
-        : Text(message, key: const Key('compendium-not-found')),
+}) => CompendiumSearchHost(
+  reader: true,
+  child: ReaderScaffold(
+    semanticLabel: semanticLabel,
+    content: Center(
+      child: loading
+          ? const Padding(
+              padding: EdgeInsets.only(top: 24),
+              child: LinearProgressIndicator(key: Key('compendium-loading')),
+            )
+          : Text(message, key: const Key('compendium-not-found')),
+    ),
   ),
 );
 
+/// Pager label of a neighbouring group: its question range («6–10», «1»).
+String _pagerLabel(CompendiumGroup group) =>
+    group.firstQuestion == group.lastQuestion
+    ? '${group.firstQuestion}'
+    : '${group.firstQuestion}–${group.lastQuestion}';
+
+/// Location of a reading group; an untitled one-question lead-in opens as
+/// its question (it is not a source heading).
+String _groupLocation(CompendiumGroup group) =>
+    switch (compendiumGroupQuestionRedirect(group)) {
+      final number? => compendiumQuestionLocation(number),
+      null => compendiumTopicLocation(group.id),
+    };
+
 /// `/prayers/compendium/topic/:topicId`: one reading group with expandable
 /// questions, on the shared Reader foundation.
+///
+/// Named topics are source headings. An untitled lead-in (legacy links such
+/// as `p1-s1-intro`) is not: a one-question lead-in shows the question
+/// reader, a longer one is titled by the nearest real heading (chapter or
+/// section) with its question range as metadata only.
 class CompendiumTopicScreen extends ConsumerStatefulWidget {
   const CompendiumTopicScreen({super.key, required this.topicId});
 
@@ -65,82 +88,85 @@ class _CompendiumTopicScreenState extends ConsumerState<CompendiumTopicScreen> {
         semanticLabel: 'Кампендый',
       );
     }
+    if (compendiumGroupQuestionRedirect(group) case final number?) {
+      return CompendiumQuestionScreen(number: '$number');
+    }
     final index = ref.watch(compendiumIndexProvider).requireValue;
     final (previous, next) = index.neighbours(group.id);
     final expanded = ref.watch(compendiumExpandedProvider)[group.id] ?? {};
     final cs = Theme.of(context).colorScheme;
-    final unit = group.unit;
-    final topic = group.kind == CompendiumGroupKind.topic;
+    // Real headings only: the title is the topic, or for an untitled lead-in
+    // the nearest heading above it; the eyebrow is the part and the heading
+    // just above the title (no duplicated fallbacks).
+    final trail = groupContextTrail(group);
+    final title = trail.last;
     final eyebrow = [
-      unit.partLabel,
-      topic ? unit.chapterTitle ?? unit.sectionTitle : unit.sectionTitle,
-    ].whereType<String>().where((label) => label.isNotEmpty).join(' · ');
-    final title = topic
-        ? group.title
-        : (unit.chapterTitle ?? '').isNotEmpty
-        ? unit.chapterTitle!
-        : unit.sectionTitle;
+      trail.first,
+      if (trail.length > 2) trail[trail.length - 2],
+    ].join(' · ');
     void open(CompendiumGroup target) =>
-        context.pushReplacement(compendiumTopicLocation(target.id));
+        context.pushReplacement(_groupLocation(target));
 
     return ReadingScaffold(
-      builder: (context, textStyle) => ReaderScaffold(
-        key: ValueKey('compendium-topic-${group.id}'),
-        scrollKey: PageStorageKey('compendium-topic-${group.id}-scroll'),
-        semanticLabel: 'Кампендый: $title',
-        seasonColor: cs.tertiary,
-        chromeMode: ReaderChromeMode.compact,
-        scrollController: _scrollController,
-        showScrollToTop: true,
-        actions: const [TextScaleControl()],
-        onSwipePrevious: previous == null ? null : () => open(previous),
-        onSwipeNext: next == null ? null : () => open(next),
-        contextHeader: ReaderContextHeader(
-          eyebrow: eyebrow,
-          subtitle: group.parentTitle,
-          title: title,
-          metadata: group.rangeLabel,
-          accentColor: cs.tertiary,
-        ),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final citation in group.leadCitations)
-              CompendiumCitationBlock(citation: citation, textStyle: textStyle),
-            for (final (i, question) in group.questions.indexed) ...[
-              if (question.subtopicTitle != null &&
-                  question.subtopicTitle !=
-                      (i == 0 ? null : group.questions[i - 1].subtopicTitle))
-                Padding(
-                  padding: const EdgeInsets.only(top: 18, bottom: 4),
-                  child: Text(
-                    question.subtopicTitle!,
-                    style: ReaderTheme.of(
-                      context,
-                    ).blockHeading(textStyle.fontSize ?? 18),
-                  ),
+      builder: (context, textStyle) => CompendiumSearchHost(
+        reader: true,
+        child: ReaderScaffold(
+          key: ValueKey('compendium-topic-${group.id}'),
+          scrollKey: PageStorageKey('compendium-topic-${group.id}-scroll'),
+          semanticLabel: 'Кампендый: $title',
+          seasonColor: cs.tertiary,
+          chromeMode: ReaderChromeMode.compact,
+          scrollController: _scrollController,
+          showScrollToTop: true,
+          actions: const [TextScaleControl()],
+          onSwipePrevious: previous == null ? null : () => open(previous),
+          onSwipeNext: next == null ? null : () => open(next),
+          contextHeader: ReaderContextHeader(
+            eyebrow: eyebrow,
+            subtitle: group.parentTitle,
+            title: title,
+            metadata: group.rangeLabel,
+            accentColor: cs.tertiary,
+          ),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final citation in group.leadCitations)
+                CompendiumCitationBlock(
+                  citation: citation,
+                  textStyle: textStyle,
                 ),
-              _CompendiumQuestionTile(
-                question: question,
-                expanded: expanded.contains(question.number),
-                textStyle: textStyle,
-                onToggle: () => ref
-                    .read(compendiumExpandedProvider.notifier)
-                    .toggle(group.id, question.number),
+              for (final (i, question) in group.questions.indexed) ...[
+                if (question.subtopicTitle != null &&
+                    question.subtopicTitle !=
+                        (i == 0 ? null : group.questions[i - 1].subtopicTitle))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18, bottom: 4),
+                    child: Text(
+                      question.subtopicTitle!,
+                      style: ReaderTheme.of(
+                        context,
+                      ).blockHeading(textStyle.fontSize ?? 18),
+                    ),
+                  ),
+                _CompendiumQuestionTile(
+                  question: question,
+                  expanded: expanded.contains(question.number),
+                  textStyle: textStyle,
+                  onToggle: () => ref
+                      .read(compendiumExpandedProvider.notifier)
+                      .toggle(group.id, question.number),
+                ),
+              ],
+              CompendiumPager(
+                previousLabel: previous == null ? null : _pagerLabel(previous),
+                onPrevious: previous == null ? null : () => open(previous),
+                nextLabel: next == null ? null : _pagerLabel(next),
+                onNext: next == null ? null : () => open(next),
               ),
+              const CompendiumSourceAttribution(onReader: true),
             ],
-            CompendiumPager(
-              previousLabel: previous == null
-                  ? null
-                  : '${previous.firstQuestion}–${previous.lastQuestion}',
-              onPrevious: previous == null ? null : () => open(previous),
-              nextLabel: next == null
-                  ? null
-                  : '${next.firstQuestion}–${next.lastQuestion}',
-              onNext: next == null ? null : () => open(next),
-            ),
-            const CompendiumSourceAttribution(onReader: true),
-          ],
+          ),
         ),
       ),
     );
@@ -290,42 +316,56 @@ class _CompendiumQuestionScreenState
     final previous = index.getQuestion(question.number - 1);
     final next = index.getQuestion(question.number + 1);
     final cs = Theme.of(context).colorScheme;
+    final group = index.groupOf(question);
+    // «Уся тэма» only for a real topic; an untitled lead-in with several
+    // questions is offered by its range, a one-question lead-in not at all.
+    final String? centerLabel = group == null
+        ? null
+        : group.hasSourceHeading
+        ? 'Уся тэма'
+        : group.questions.length > 1
+        ? group.rangeLabel
+        : null;
     void open(CompendiumQuestion target) =>
         context.pushReplacement(compendiumQuestionLocation(target.number));
 
     return ReadingScaffold(
-      builder: (context, textStyle) => ReaderScaffold(
-        key: ValueKey('compendium-question-${question.number}'),
-        scrollKey: PageStorageKey('compendium-question-${question.number}'),
-        semanticLabel: 'Пытанне ${question.number}. ${question.question}',
-        seasonColor: cs.tertiary,
-        chromeMode: ReaderChromeMode.compact,
-        scrollController: _scrollController,
-        showScrollToTop: true,
-        actions: const [TextScaleControl()],
-        onSwipePrevious: previous == null ? null : () => open(previous),
-        onSwipeNext: next == null ? null : () => open(next),
-        contextHeader: ReaderContextHeader(
-          eyebrow: 'ПЫТАННЕ ${question.number}',
-          title: question.question,
-          metadata: questionContextTrail(question).join(' · '),
-          accentColor: cs.tertiary,
-        ),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            CompendiumAnswer(question: question, textStyle: textStyle),
-            CompendiumPager(
-              previousLabel: previous == null ? null : '${previous.number}',
-              onPrevious: previous == null ? null : () => open(previous),
-              centerLabel: 'Уся тэма',
-              onCenter: () =>
-                  context.push(compendiumTopicLocation(question.groupId)),
-              nextLabel: next == null ? null : '${next.number}',
-              onNext: next == null ? null : () => open(next),
-            ),
-            const CompendiumSourceAttribution(onReader: true),
-          ],
+      builder: (context, textStyle) => CompendiumSearchHost(
+        reader: true,
+        child: ReaderScaffold(
+          key: ValueKey('compendium-question-${question.number}'),
+          scrollKey: PageStorageKey('compendium-question-${question.number}'),
+          semanticLabel: 'Пытанне ${question.number}. ${question.question}',
+          seasonColor: cs.tertiary,
+          chromeMode: ReaderChromeMode.compact,
+          scrollController: _scrollController,
+          showScrollToTop: true,
+          actions: const [TextScaleControl()],
+          onSwipePrevious: previous == null ? null : () => open(previous),
+          onSwipeNext: next == null ? null : () => open(next),
+          contextHeader: ReaderContextHeader(
+            eyebrow: 'ПЫТАННЕ ${question.number}',
+            title: question.question,
+            metadata: questionContextTrail(question).join(' · '),
+            accentColor: cs.tertiary,
+          ),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CompendiumAnswer(question: question, textStyle: textStyle),
+              CompendiumPager(
+                previousLabel: previous == null ? null : '${previous.number}',
+                onPrevious: previous == null ? null : () => open(previous),
+                centerLabel: centerLabel,
+                onCenter: centerLabel == null
+                    ? null
+                    : () => context.push(compendiumTopicLocation(group!.id)),
+                nextLabel: next == null ? null : '${next.number}',
+                onNext: next == null ? null : () => open(next),
+              ),
+              const CompendiumSourceAttribution(onReader: true),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -351,6 +353,435 @@ void main() {
     });
   });
 
+  group('source hierarchy', () {
+    testWidgets('Part I starts with question 1 directly under its section', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/compendium/part/p1');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ЧАСТКА ПЕРШАЯ'), findsOneWidget);
+      expect(find.text('ВЫЗНАННЕ ВЕРЫ'), findsOneWidget);
+      final section = find.byKey(const ValueKey('compendium-section-p1-s1'));
+      final row = find.byKey(const ValueKey('compendium-question-row-1'));
+      final chapter = find.byKey(
+        const ValueKey('compendium-chapter-p1-s1-ch1'),
+      );
+      expect(find.text('РАЗДЗЕЛ ПЕРШЫ'), findsOneWidget);
+      expect(tester.widget<Text>(section).data, '«ВЕРУ» — «ВЕРЫМ»');
+      expect(
+        find.descendant(
+          of: row,
+          matching: find.text('Які Божы намер адносна чалавека?'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: row, matching: find.text('1')),
+        findsOneWidget,
+      );
+      expect(find.text('ГЛАВА ПЕРШАЯ'), findsOneWidget);
+      expect(
+        tester.getTopLeft(section).dy,
+        lessThan(tester.getTopLeft(row).dy),
+      );
+      expect(
+        tester.getTopLeft(row).dy,
+        lessThan(tester.getTopLeft(chapter).dy),
+      );
+      // No fake container for the untitled lead-in.
+      expect(
+        find.byKey(const ValueKey('compendium-group-p1-s1-intro')),
+        findsNothing,
+      );
+      expect(find.text('Пытанне 1'), findsNothing);
+
+      // A real named topic keeps its title, with the range as metadata.
+      final topic = find.byKey(const ValueKey('compendium-group-p1-s1-ch2-t1'));
+      await tester.scrollUntilVisible(
+        topic,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(
+        find.descendant(of: topic, matching: find.text('БОЖАЕ АБ’ЯЎЛЕННЕ')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: topic, matching: find.text('Пытанні 6–10')),
+        findsOneWidget,
+      );
+
+      await tester.scrollUntilVisible(
+        row,
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/1');
+      expect(find.byType(CompendiumQuestionScreen), findsOneWidget);
+      expect(find.text('ПЫТАННЕ 1'), findsOneWidget);
+      expect(find.text('ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»'), findsOneWidget);
+      expect(
+        find.byKey(const Key('compendium-center')),
+        findsNothing,
+        reason: 'question 1 has no topic to open',
+      );
+    });
+
+    testWidgets('no untitled group is rendered as a heading in any part', (
+      tester,
+    ) async {
+      final untitled = [
+        for (final group in _index().groups.values)
+          if (!group.hasSourceHeading) group.id,
+      ];
+      for (final part in ['p1', 'p2', 'p3', 'p4']) {
+        final router = _router(
+          initialLocation: '/prayers/compendium/part/$part',
+        );
+        await tester.pumpWidget(_app(router));
+        await tester.pumpAndSettle();
+        final list = tester.widget<ListView>(find.byType(ListView).first);
+        final delegate = list.childrenDelegate as SliverChildBuilderDelegate;
+        final context = tester.element(find.byType(ListView).first);
+        final items = [
+          for (var i = 0; i < delegate.childCount!; i++)
+            delegate.builder(context, i),
+        ];
+        final keys = [
+          for (final item in items)
+            if (item?.key case ValueKey<String>(:final value)) value,
+        ];
+        for (final id in untitled) {
+          expect(keys, isNot(contains('compendium-group-$id')), reason: id);
+        }
+        for (final item in items) {
+          if (item is Text) {
+            expect(item.data, isNot(startsWith('Пытан')), reason: part);
+          }
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+        router.dispose();
+      }
+    });
+
+    testWidgets('legacy untitled topic links resolve without fake titles', (
+      tester,
+    ) async {
+      // One-question lead-in → the question reader.
+      var router = _router(
+        initialLocation: '/prayers/compendium/topic/p1-s1-intro',
+      );
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      expect(find.byType(CompendiumQuestionScreen), findsOneWidget);
+      expect(find.text('ПЫТАННЕ 1'), findsOneWidget);
+      expect(find.byKey(const ValueKey('compendium-answer-1')), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+
+      // Several lead-in questions → titled by the real chapter heading.
+      router = _router(initialLocation: '/prayers/compendium/topic/p1-s1-ch1');
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final header = find.byType(ReaderContextHeader);
+      final widget = tester.widget<ReaderContextHeader>(header);
+      expect(widget.title, 'ЧАЛАВЕК — «СВЯТЫНЯ» БОГА');
+      expect(widget.eyebrow, 'ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»');
+      expect(widget.metadata, 'Пытанні 2–5');
+      final previous = find.byKey(const Key('compendium-previous'));
+      await tester.ensureVisible(previous);
+      await tester.pumpAndSettle();
+      await tester.tap(previous);
+      await tester.pumpAndSettle();
+      expect(
+        _location(router),
+        '/prayers/compendium/question/1',
+        reason: 'the untitled lead-in neighbour opens as its question',
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+
+      // A real named topic keeps working.
+      router = _router(
+        initialLocation: '/prayers/compendium/topic/p1-s1-ch2-t1',
+      );
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final topic = tester.widget<ReaderContextHeader>(
+        find.byType(ReaderContextHeader),
+      );
+      expect(topic.title, 'БОЖАЕ АБ’ЯЎЛЕННЕ');
+      expect(topic.eyebrow, 'ЧАСТКА ПЕРШАЯ · БОГ ВЫХОДЗІЦЬ НАСУСТРАЧ ЧАЛАВЕКУ');
+      expect(topic.metadata, 'Пытанні 6–10');
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+    });
+  });
+
+  group('persistent search', () {
+    testWidgets('the search dock is on every Compendium screen', (
+      tester,
+    ) async {
+      for (final location in [
+        '/prayers/compendium',
+        '/prayers/compendium/part/p1',
+        '/prayers/compendium/topic/p1-s1-ch2-t1',
+        '/prayers/compendium/topic/p1-s1-intro',
+        '/prayers/compendium/question/1',
+        '/prayers/compendium/question/999',
+      ]) {
+        final router = _router(initialLocation: location);
+        await tester.pumpWidget(_app(router));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('compendium-search-dock')),
+          findsOneWidget,
+          reason: location,
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+        router.dispose();
+      }
+    });
+
+    testWidgets('search from a reader: global results, query kept, Back '
+        'restores the reader', (tester) async {
+      final router = _router(
+        initialLocation: '/prayers/compendium/question/42',
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final field = find.byKey(const Key('compendium-search-field'));
+
+      // A hidden Russian alias matches; only Belarusian text is rendered.
+      await tester.enterText(field, 'исповедь');
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('compendium-search-overlay')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('compendium-results-count')), findsOneWidget);
+      expect(find.text('ПЫТАННЕ 42'), findsNothing, reason: 'reader offstage');
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        expect(
+          (text.data ?? text.textSpan?.toPlainText() ?? '').toLowerCase(),
+          isNot(contains('исповед')),
+        );
+      }
+      final result = find.byKey(const ValueKey('compendium-result-296'));
+      await tester.scrollUntilVisible(
+        result,
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('compendium-search-overlay')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(
+        find.descendant(
+          of: result,
+          matching: find.text('ЧАСТКА ДРУГАЯ · САКРАМЭНТ ПАКАЯННЯ I ПАЯДНАННЯ'),
+        ),
+        findsOneWidget,
+        reason: 'context uses real source headings',
+      );
+      await tester.tap(result);
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/296');
+      expect(find.text('ПЫТАННЕ 296'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(field).controller!.text,
+        'исповедь',
+        reason: 'the query is kept on the next screen',
+      );
+
+      // Back → the results of the reader the search started from.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/42');
+      expect(result, findsOneWidget);
+
+      // Back again closes the search and restores the reader itself.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/42');
+      expect(find.byKey(const Key('compendium-search-overlay')), findsNothing);
+      expect(find.text('ПЫТАННЕ 42'), findsOneWidget);
+      expect(tester.widget<TextField>(field).controller!.text, 'исповедь');
+
+      // Focusing the dock shows the kept results again; clearing restores
+      // the reader.
+      await tester.tap(field);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('compendium-search-overlay')),
+        findsOneWidget,
+      );
+      await tester.tap(find.byTooltip('Ачысціць пошук'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('compendium-search-overlay')), findsNothing);
+      expect(find.text('ПЫТАННЕ 42'), findsOneWidget);
+      expect(tester.widget<TextField>(field).controller!.text, isEmpty);
+    });
+
+    testWidgets('search from a part: number and Belarusian words', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/compendium/part/p4');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(router));
+      await tester.pumpAndSettle();
+      final field = find.byKey(const Key('compendium-search-field'));
+
+      await tester.enterText(field, 'хрост');
+      await tester.pumpAndSettle();
+      expect(find.text('Знойдзена: 0'), findsNothing);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('compendium-result-252')),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('compendium-search-overlay')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(
+        find.byKey(const ValueKey('compendium-result-252')),
+        findsOneWidget,
+        reason: 'search is global, not limited to Part IV',
+      );
+
+      await tester.enterText(field, '42');
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('compendium-result-42')),
+        findsOneWidget,
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/question/42');
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_location(router), '/prayers/compendium/part/p4');
+      expect(
+        find.byKey(const ValueKey('compendium-result-42')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the reader footer scrolls fully above the search dock', (
+      tester,
+    ) async {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      addTearDown(tester.view.reset);
+      for (final (name, platform, size, bottom, gesture, scale, dark) in [
+        (
+          'narrow Android',
+          TargetPlatform.android,
+          const Size(320, 640),
+          0.0,
+          0.0,
+          1.0,
+          false,
+        ),
+        (
+          'Android 3-button',
+          TargetPlatform.android,
+          const Size(412, 800),
+          48.0,
+          0.0,
+          1.0,
+          true,
+        ),
+        (
+          'Android gestures',
+          TargetPlatform.android,
+          const Size(412, 800),
+          24.0,
+          32.0,
+          1.0,
+          false,
+        ),
+        (
+          'iPhone safe area',
+          TargetPlatform.iOS,
+          const Size(390, 844),
+          34.0,
+          0.0,
+          1.0,
+          true,
+        ),
+        (
+          'large text',
+          TargetPlatform.iOS,
+          const Size(375, 667),
+          34.0,
+          0.0,
+          2.0,
+          false,
+        ),
+      ]) {
+        debugDefaultTargetPlatformOverride = platform;
+        tester.view
+          ..devicePixelRatio = 1
+          ..physicalSize = size
+          ..padding = FakeViewPadding(bottom: bottom)
+          ..viewPadding = FakeViewPadding(bottom: bottom)
+          ..systemGestureInsets = FakeViewPadding(bottom: gesture);
+        for (final location in [
+          '/prayers/compendium/question/598',
+          '/prayers/compendium/topic/p4-s1-ch3-t2',
+        ]) {
+          final router = _router(initialLocation: location);
+          await tester.pumpWidget(
+            MediaQuery(
+              data: MediaQueryData.fromView(
+                tester.view,
+              ).copyWith(textScaler: TextScaler.linear(scale)),
+              child: _app(router, dark: dark),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.fling(
+            find.byType(CustomScrollView),
+            const Offset(0, -20000),
+            4000,
+          );
+          await tester.pumpAndSettle();
+          final source = tester.getRect(
+            find.byKey(const Key('compendium-source')),
+          );
+          final dock = tester.getRect(
+            find.byKey(const Key('compendium-search-dock')),
+          );
+          expect(
+            source.bottom,
+            lessThanOrEqualTo(dock.top),
+            reason: '$name $location',
+          );
+          expect(
+            dock.bottom,
+            lessThanOrEqualTo(size.height - math.max(bottom, gesture)),
+            reason: '$name: the dock clears the system inset',
+          );
+          expect(tester.takeException(), isNull, reason: '$name $location');
+          await tester.pumpWidget(const SizedBox.shrink());
+          router.dispose();
+        }
+      }
+      debugDefaultTargetPlatformOverride = null;
+    });
+  });
+
   test('the Compendium stays independent from prayers', () {
     for (final path in [
       'lib/models/compendium.dart',
@@ -421,6 +852,7 @@ Widget _app(
   bool bundleFails = false,
   double? fontSize,
   Future<bool> Function(Uri)? launcher,
+  bool dark = false,
 }) => ProviderScope(
   overrides: [
     settingsProvider.overrideWith(() => _TestSettingsNotifier(fontSize)),
@@ -435,7 +867,11 @@ Widget _app(
       launcher ?? (uri) async => true,
     ),
   ],
-  child: MaterialApp.router(routerConfig: router),
+  child: MaterialApp.router(
+    routerConfig: router,
+    themeMode: dark ? ThemeMode.dark : ThemeMode.light,
+    darkTheme: ThemeData(brightness: Brightness.dark),
+  ),
 );
 
 class _TestSettingsNotifier extends SettingsNotifier {

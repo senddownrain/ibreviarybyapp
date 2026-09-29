@@ -91,11 +91,12 @@ final compendiumGroupProvider =
           .whenData((index) => index.getGroup(id)),
     );
 
+/// Visible source outline of a part (only real headings are nodes).
 final compendiumPartOutlineProvider =
-    Provider.family<AsyncValue<CompendiumPartOutline?>, String>(
+    Provider.family<AsyncValue<CompendiumNavNode?>, String>(
       (ref, partId) => ref
           .watch(compendiumIndexProvider)
-          .whenData((index) => buildPartOutline(index, partId)),
+          .whenData((index) => index.partOutline(partId)),
     );
 
 // ── Search ───────────────────────────────────────────────────────────────────
@@ -112,7 +113,8 @@ final compendiumSearchIndexProvider = Provider<CompendiumSearchIndex?>((ref) {
   );
 });
 
-/// Session search query; kept when the user opens a result and comes back.
+/// Session search query, shared by the search dock of every Compendium
+/// screen; kept when the user opens a result and comes back.
 class CompendiumSearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
