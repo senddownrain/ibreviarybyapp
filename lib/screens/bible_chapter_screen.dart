@@ -813,6 +813,7 @@ class _ChapterNavBar extends StatelessWidget {
   Widget build(BuildContext context) => SafeArea(
     key: const Key('bible-chapter-navigation'),
     top: false,
+    bottom: false,
     child: AdaptiveChromeSurface(
       role: ChromeSurfaceRole.group,
       borderRadius: BorderRadius.circular(30),

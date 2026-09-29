@@ -58,7 +58,7 @@ class AppNavigationDock extends StatelessWidget {
     ).colorScheme.surface.withValues(alpha: 0.72);
     return Container(
       key: platformKey,
-      height: (mode == ReaderChromeMode.full ? 78 : 70) + bottom,
+      height: (mode == ReaderChromeMode.full ? 78 : 72) + bottom,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,

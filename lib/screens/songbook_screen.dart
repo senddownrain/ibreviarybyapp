@@ -163,7 +163,7 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
                 20,
                 MediaQuery.paddingOf(context).top + 90,
                 20,
-                104 + MediaQuery.viewPaddingOf(context).bottom,
+                128 + MediaQuery.viewPaddingOf(context).bottom,
               ),
               itemCount: header.length + visible.length,
               itemBuilder: (context, index) => index < header.length
@@ -189,10 +189,8 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
               ),
             ],
           ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: floatingOverlayBottom(context, gap: 12),
+          FloatingOverlayPositioned(
+            gap: 12,
             child: Center(
               child: PrayerSearchDock(
                 hintText: 'Пошук спеваў',

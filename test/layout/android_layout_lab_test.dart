@@ -528,7 +528,7 @@ void main() {
       );
       final expectedPadding = switch (mode) {
         ReaderChromeMode.full => 102.0,
-        ReaderChromeMode.compact => 94.0,
+        ReaderChromeMode.compact => 96.0,
         ReaderChromeMode.hidden => 0.0,
       };
       expect(media.padding.bottom, expectedPadding);
