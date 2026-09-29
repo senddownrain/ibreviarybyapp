@@ -11,7 +11,6 @@ import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
-import 'package:mybrev_flutter/widgets/songs/song_settings_sheet.dart';
 
 String songLocation(String id) =>
     Uri(pathSegments: ['', 'prayers', 'songs', id]).toString();
@@ -78,9 +77,6 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
     final cs = Theme.of(context).colorScheme;
     final songs = ref.watch(filteredSongsProvider);
     final filter = ref.watch(songsFilterProvider);
-    final compact = ref.watch(
-      songPreferencesProvider.select((prefs) => prefs.compactList),
-    );
     final visible = songs.valueOrNull ?? const <Song>[];
 
     final header = <Widget>[
@@ -168,27 +164,10 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
               itemCount: header.length + visible.length,
               itemBuilder: (context, index) => index < header.length
                   ? header[index]
-                  : SongListRow(
-                      song: visible[index - header.length],
-                      compact: compact,
-                    ),
+                  : SongListRow(song: visible[index - header.length]),
             ),
           ),
-          FloatingTopActions(
-            showBack: true,
-            seasonColor: cs.tertiary,
-            actions: [
-              IconButton(
-                key: const Key('songbook-settings-action'),
-                tooltip: 'Налады спеўніка',
-                onPressed: () => showSongSettingsSheet(context),
-                icon: const PhosphorIcon(
-                  PhosphorIconsRegular.slidersHorizontal,
-                  size: 22,
-                ),
-              ),
-            ],
-          ),
+          FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
           FloatingOverlayPositioned(
             gap: 12,
             child: Center(
@@ -229,11 +208,12 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
   }
 }
 
+/// Compact song row: title, favorite and chevron. Tags stay searchable and
+/// filterable but are not repeated in every row.
 class SongListRow extends ConsumerWidget {
-  const SongListRow({super.key, required this.song, this.compact = false});
+  const SongListRow({super.key, required this.song});
 
   final Song song;
-  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -243,7 +223,6 @@ class SongListRow extends ConsumerWidget {
       ),
     );
     final cs = Theme.of(context).colorScheme;
-    final tags = compact ? const <String>[] : song.displayTags;
     return Semantics(
       button: true,
       label: song.title,
@@ -254,40 +233,25 @@ class SongListRow extends ConsumerWidget {
           context.push(songLocation(song.id));
         },
         child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: compact ? 48 : 62),
+          constraints: const BoxConstraints(minHeight: 48),
           child: Row(
             children: [
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: compact ? 7 : 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        song.title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              height: 1.3,
-                              fontSize: compact ? 15 : null,
-                            ),
-                      ),
-                      if (tags.isNotEmpty) ...[
-                        const SizedBox(height: 3),
-                        Text(
-                          tags.join(' · '),
-                          key: ValueKey('song-tags-${song.id}'),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: cs.onSurfaceVariant),
-                        ),
-                      ],
-                    ],
+                  padding: const EdgeInsets.symmetric(vertical: 7),
+                  child: Text(
+                    song.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      height: 1.3,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ),
               IconButton(
                 key: ValueKey('song-favorite-${song.id}'),
                 tooltip: favorite ? 'Выдаліць з абраных' : 'Дадаць у абраныя',
-                visualDensity: compact ? VisualDensity.compact : null,
+                visualDensity: VisualDensity.compact,
                 onPressed: () {
                   HapticFeedback.selectionClick();
                   ref
