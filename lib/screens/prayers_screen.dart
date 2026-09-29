@@ -637,10 +637,8 @@ class _PrayerListPage extends StatelessWidget {
             actions: topAction == null ? const [] : [topAction!],
           ),
           if (searchDock != null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: floatingOverlayBottom(context, gap: 12),
+            FloatingOverlayPositioned(
+              gap: 12,
               child: Center(child: searchDock!),
             ),
         ],

@@ -175,10 +175,8 @@ class _CompendiumScreenState extends ConsumerState<CompendiumScreen> {
             ),
           ),
           FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: floatingOverlayBottom(context, gap: 12),
+          FloatingOverlayPositioned(
+            gap: 12,
             child: Center(
               child: PrayerSearchDock(
                 hintText: 'Пошук: слова або нумар',
