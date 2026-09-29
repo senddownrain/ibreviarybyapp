@@ -10,7 +10,9 @@ String prayerMarkdownToHtml(String source) {
 
   void flushParagraph() {
     if (paragraph.isEmpty) return;
-    final joined = paragraph.join('<br>');
+    // Inline markup may span the lines of one paragraph (as in the web
+    // renderer), e.g. a bold passage over several lines.
+    final joined = _inlineMd(paragraph.join('\n')).replaceAll('\n', '<br>');
     out.writeln('<p>$joined</p>');
     paragraph = [];
   }
@@ -76,7 +78,7 @@ String prayerMarkdownToHtml(String source) {
     }
 
     flushList();
-    paragraph.add(_inlineMd(line));
+    paragraph.add(line);
   }
 
   flushParagraph();
@@ -108,7 +110,7 @@ String _inlineMd(String input) {
 String _inlineFormatting(String input) {
   var s = _escapeHtml(input);
   s = s.replaceAllMapped(
-    RegExp(r'\*\*(.+?)\*\*'),
+    RegExp(r'\*\*([\s\S]+?)\*\*'),
     (m) => '<strong>${m.group(1)}</strong>',
   );
   s = s.replaceAllMapped(

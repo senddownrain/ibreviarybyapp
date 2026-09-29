@@ -559,7 +559,7 @@ void main() {
     for (final id in [
       'introductory-rites',
       'liturgy-of-the-word',
-      'liturgy-of-the-eucharist',
+      'eucharistic-liturgy',
     ]) {
       expect(find.byKey(ValueKey('mass-section-$id')), findsOneWidget);
     }

@@ -59,18 +59,49 @@ class LocatedMassSection {
 
 class MassRitual {
   const MassRitual({
+    required this.schemaVersion,
     required this.id,
     required this.primaryPrayerId,
     required this.defaultLanguage,
     required this.sections,
     required this.variants,
+    this.aliases = const {},
   });
 
+  final int schemaVersion;
   final String id;
   final String primaryPrayerId;
   final String defaultLanguage;
   final List<MassSectionDef> sections;
   final List<MassVariant> variants;
+
+  /// Former section ids (for example `liturgy-of-the-eucharist`) mapped to
+  /// their current canonical id.
+  final Map<String, String> aliases;
+
+  /// The five canonical major sections, in ritual order.
+  List<MassSectionDef> get majorSections => [
+    for (final s in sections)
+      if (s.isMajor) s,
+  ];
+
+  /// Current id for [id], resolving backward-compatible aliases.
+  String? canonicalSectionId(String? id) =>
+      id == null ? null : aliases[id] ?? id;
+
+  /// The major section that [sectionId] belongs to (itself when major).
+  MassSectionDef? majorSectionOf(String? sectionId) {
+    final def = section(sectionId);
+    if (def == null) return null;
+    return def.isMajor ? def : section(def.parent);
+  }
+
+  /// 1-based position of the major section containing [sectionId].
+  int? majorPositionOf(String? sectionId) {
+    final major = majorSectionOf(sectionId);
+    if (major == null) return null;
+    return majorSections.indexWhere((s) => s.id == major.id) + 1;
+  }
 
   MassVariant? variant(String? language) {
     for (final v in variants) {
@@ -87,8 +118,9 @@ class MassRitual {
   }
 
   MassSectionDef? section(String? id) {
+    final canonical = canonicalSectionId(id);
     for (final s in sections) {
-      if (s.id == id) return s;
+      if (s.id == canonical) return s;
     }
     return null;
   }
@@ -105,8 +137,9 @@ class MassRitual {
     List<String> blockTexts,
   ) {
     final index = <String, String>{};
-    variant.markers.forEach((sectionId, markers) {
-      if (section(sectionId) == null) return;
+    variant.markers.forEach((key, markers) {
+      final sectionId = section(key)?.id;
+      if (sectionId == null) return;
       for (final marker in markers) {
         index.putIfAbsent(normalizeMassMarker(marker), () => sectionId);
       }
@@ -130,8 +163,9 @@ class MassRitual {
 
   /// Target after a language switch: same section, its parent, the closest
   /// preceding section in ritual order, then the next one.
-  String? resolveSectionTarget(String? sectionId, Iterable<String> available) {
-    final ids = available.toSet();
+  String? resolveSectionTarget(String? requested, Iterable<String> available) {
+    final ids = available.map(canonicalSectionId).whereType<String>().toSet();
+    final sectionId = canonicalSectionId(requested);
     if (sectionId == null || ids.isEmpty) return null;
     if (ids.contains(sectionId)) return sectionId;
     final order = sections.indexWhere((s) => s.id == sectionId);
