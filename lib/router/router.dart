@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -121,6 +122,15 @@ const _prayerDetailRoute = AppRouteDescriptor(
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
+);
+
+/// Holy Mass reader: its own section/language controls replace the dock.
+const massReaderRoute = AppRouteDescriptor(
+  id: 'prayerbook.mass',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.compact,
+  topChromeOwner: TopChromeOwner.reader,
+  showsNavigationDock: false,
 );
 const _songbookRoute = AppRouteDescriptor(
   id: 'prayerbook.songs',
@@ -494,7 +504,7 @@ final router = GoRouter(
                   path: 'prayer/:id',
                   pageBuilder: (context, state) => _branchPage(
                     state,
-                    _prayerDetailRoute,
+                    prayerDetailDescriptorFor(state.pathParameters['id']!),
                     PrayerDetailScreen(
                       prayerId: state.pathParameters['id']!,
                       massLanguage: state.uri.queryParameters['lang'],
@@ -683,6 +693,13 @@ String _initialLocation() {
     return '/hours';
   }
 }
+
+/// The Mass (any of its language variant ids) opens as the dedicated Mass
+/// reader; every other prayer keeps the ordinary prayer reader route.
+AppRouteDescriptor prayerDetailDescriptorFor(String prayerId) =>
+    kMassRitual.variantForPrayerId(prayerId) != null
+    ? massReaderRoute
+    : _prayerDetailRoute;
 
 Page<void> _branchPage(
   GoRouterState state,

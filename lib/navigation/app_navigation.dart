@@ -17,6 +17,7 @@ class AppRouteDescriptor {
     required this.topChromeOwner,
     this.isBranchRoot = false,
     this.reserveShellTopInset = false,
+    this.showsNavigationDock = true,
   });
 
   final String id;
@@ -25,6 +26,11 @@ class AppRouteDescriptor {
   final TopChromeOwner topChromeOwner;
   final bool isBranchRoot;
   final bool reserveShellTopInset;
+
+  /// False for dedicated readers that bring their own bottom controls (the
+  /// Holy Mass): the app-wide dock is removed while the route is active and
+  /// returns when it is left.
+  final bool showsNavigationDock;
 }
 
 @immutable
@@ -59,7 +65,9 @@ class BranchShellController extends ReaderChromeModeController {
   bool _disposed = false;
   bool get isAtRoot => _activeDescriptor.isBranchRoot;
   bool get navigationDockSuppressed =>
-      _activeEntryId != null && _contextualBottomSlots.contains(_activeEntryId);
+      !_activeDescriptor.showsNavigationDock ||
+      (_activeEntryId != null &&
+          _contextualBottomSlots.contains(_activeEntryId));
 
   bool containsEntry(String entryId) => _entries.containsKey(entryId);
 

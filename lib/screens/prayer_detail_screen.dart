@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/mass_ritual_provider.dart';
@@ -21,6 +20,7 @@ import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/mass_semantics.dart';
 
 String _stripHtmlText(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -171,18 +171,19 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
   Future<void> _openMassSections() async {
     final sections = _massNav.sections;
     if (sections.isEmpty) return;
-    final active = _massNav.active;
-    final activeMajor = kMassRitual.section(active)?.parent ?? active;
+    final cupertino = usesCupertinoGlass(context);
     final selected = await showModalBottomSheet<String>(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
-      showDragHandle: !usesCupertinoGlass(context),
+      showDragHandle: true,
+      backgroundColor: cupertino
+          ? Theme.of(context).colorScheme.surface
+          : Theme.of(context).colorScheme.surfaceContainerLow,
       builder: (sheetContext) => _MassSectionsSheet(
-        sections: sections,
-        activeSectionId: active,
-        activeMajorId: activeMajor,
+        available: {for (final s in sections) s.sectionId},
+        activeSectionId: _massNav.active,
       ),
     );
     if (selected != null) _massNav.jumpTo(selected);
@@ -427,32 +428,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           fontWeight: FontWeight.w600,
         ),
         '.liturgical-rubric-inline': Style(color: reader.rubric),
-        if (isMass) ...{
-          'h4': Style(
-            fontSize: FontSize((textStyle.fontSize ?? 16) * 0.9),
-            fontWeight: FontWeight.w700,
-            color: reader.rubric,
-            margin: Margins.only(top: 12, bottom: 4),
-          ),
-          'hr': Style(
-            margin: Margins.symmetric(vertical: 12),
-            width: Width(42, Unit.percent),
-            border: Border(top: BorderSide(color: reader.rubric, width: 0.6)),
-          ),
-          '.mass-section-anchor': Style(
-            color: reader.rubric,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w700,
-            fontSize: FontSize((textStyle.fontSize ?? 16) * 1.1),
-            margin: Margins.only(top: 16, bottom: 8),
-          ),
-          '.mass-section-anchor p': Style(
-            color: reader.rubric,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w700,
-            fontSize: FontSize((textStyle.fontSize ?? 16) * 1.1),
-          ),
-        },
+        if (isMass) ..._massStyles(reader, textColor, textStyle.fontSize ?? 16),
       };
       if (isMass) {
         return _MassDocument(
@@ -470,7 +446,69 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
   }
 }
 
-/// Shared state between the Mass text, its floating bar and the sections sheet.
+/// One renderer style per semantic Mass element (see [MassBlockClass]), used
+/// for every language variant. Meaning is carried by weight, style, size and
+/// layout, not only by colour.
+Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) => {
+  'hr': Style(
+    margin: Margins.symmetric(vertical: 12),
+    width: Width(42, Unit.percent),
+    border: Border(top: BorderSide(color: reader.rubric, width: 0.6)),
+  ),
+  '.${MassBlockClass.major}': Style(
+    fontSize: FontSize(size * 1.3),
+    fontWeight: FontWeight.w800,
+    color: reader.rubric,
+    lineHeight: LineHeight(1.25),
+    margin: Margins.only(top: 28, bottom: 12),
+  ),
+  '.${MassBlockClass.subsection}': Style(
+    fontSize: FontSize(size * 1.12),
+    fontWeight: FontWeight.w700,
+    color: reader.rubric,
+    lineHeight: LineHeight(1.3),
+    margin: Margins.only(top: 20, bottom: 8),
+  ),
+  '.${MassBlockClass.minorHeading}': Style(
+    fontSize: FontSize(size * 0.98),
+    fontWeight: FontWeight.w700,
+    color: text,
+    margin: Margins.only(top: 14, bottom: 6),
+  ),
+  '.${MassBlockClass.cited}': Style(
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.w600,
+  ),
+  '.${MassBlockClass.inlineRubric}': Style(
+    color: reader.rubric,
+    fontStyle: FontStyle.italic,
+    fontSize: FontSize(size * 0.9),
+  ),
+  '.${MassBlockClass.response}': Style(fontWeight: FontWeight.w700),
+  '.${MassBlockClass.roleLabel}': Style(
+    color: reader.rubric,
+    fontWeight: FontWeight.w800,
+    fontStyle: FontStyle.normal,
+  ),
+  '.${MassBlockClass.alternative}': Style(
+    color: reader.rubric,
+    fontStyle: FontStyle.italic,
+    fontWeight: FontWeight.w700,
+    fontSize: FontSize(size * 0.9),
+    margin: Margins.only(top: 12, bottom: 6),
+  ),
+  '.${MassBlockClass.posture}': Style(
+    color: reader.rubric,
+    fontStyle: FontStyle.italic,
+    fontSize: FontSize(size * 0.85),
+    letterSpacing: 0.4,
+    textAlign: TextAlign.center,
+    margin: Margins.symmetric(vertical: 8),
+  ),
+};
+
+/// Shared state between the Mass text, its bottom controls and the sections
+/// sheet. Section ids are canonical ritual ids.
 class MassNavigatorController extends ChangeNotifier {
   List<LocatedMassSection> _sections = const [];
   String? _active;
@@ -482,12 +520,11 @@ class MassNavigatorController extends ChangeNotifier {
   List<LocatedMassSection> get sections => _sections;
   String? get active => _active;
 
-  String? get activeTitle {
-    for (final section in _sections) {
-      if (section.sectionId == _active) return section.title;
-    }
-    return _sections.isEmpty ? null : _sections.first.title;
-  }
+  /// The canonical major section containing the current position.
+  MassSectionDef? get activeMajor => kMassRitual.majorSectionOf(_active);
+
+  /// 1-based position of [activeMajor] among the five major sections.
+  int? get activePosition => kMassRitual.majorPositionOf(_active);
 
   void _update({List<LocatedMassSection>? sections, String? active}) {
     final changed =
@@ -498,13 +535,6 @@ class MassNavigatorController extends ChangeNotifier {
   }
 
   Future<void> jumpTo(String sectionId) async => _jump?.call(sectionId);
-}
-
-class _MassChunk {
-  const _MassChunk({required this.html, this.section});
-
-  final String html;
-  final LocatedMassSection? section;
 }
 
 class _MassDocument extends StatefulWidget {
@@ -531,7 +561,7 @@ class _MassDocument extends StatefulWidget {
 class _MassDocumentState extends State<_MassDocument> {
   static const _chromeHeight = 76.0;
 
-  late List<_MassChunk> _chunks;
+  late List<MassDocumentChunk> _chunks;
   final Map<String, GlobalKey> _keys = {};
 
   @override
@@ -564,57 +594,9 @@ class _MassDocumentState extends State<_MassDocument> {
   }
 
   void _readSections() {
-    final fragment = parseFragment(widget.html);
-    final nodes = fragment.nodes.toList();
-    final texts = [
-      for (final node in nodes)
-        node is dom.Element &&
-                const {
-                  'h2',
-                  'h3',
-                  'h4',
-                  'h5',
-                  'h6',
-                  'p',
-                  'div',
-                  'aside',
-                }.contains(node.localName)
-            ? node.text
-            : '',
-    ];
-    final located = kMassRitual.locateSections(widget.variant, texts);
-
-    String serialize(dom.Node node) => node is dom.Element
-        ? node.outerHtml
-        : (node.text ?? '')
-              .replaceAll('&', '&amp;')
-              .replaceAll('<', '&lt;')
-              .replaceAll('>', '&gt;');
-
-    final chunks = <_MassChunk>[];
-    var buffer = StringBuffer();
-    LocatedMassSection? current;
-    var next = 0;
-    for (var i = 0; i < nodes.length; i++) {
-      if (next < located.length && located[next].blockIndex == i) {
-        if (buffer.isNotEmpty || current != null) {
-          chunks.add(_MassChunk(html: buffer.toString(), section: current));
-        }
-        buffer = StringBuffer();
-        current = located[next++];
-        final node = nodes[i];
-        // Some sources mark a section with a rubric instead of a heading.
-        if (node is dom.Element &&
-            !const {'h2', 'h3', 'h4', 'h5', 'h6'}.contains(node.localName)) {
-          node.classes.add('mass-section-anchor');
-        }
-      }
-      buffer.write(serialize(nodes[i]));
-    }
-    if (buffer.isNotEmpty || current != null) {
-      chunks.add(_MassChunk(html: buffer.toString(), section: current));
-    }
-    _chunks = chunks;
+    final document = buildMassDocument(widget.html, widget.variant);
+    final located = document.sections;
+    _chunks = document.chunks;
     _keys
       ..clear()
       ..addEntries(
@@ -624,7 +606,7 @@ class _MassDocumentState extends State<_MassDocument> {
       );
     final pending = widget.controller.pendingSection;
     widget.controller.pendingSection = null;
-    // Listeners (the floating bar) rebuild after this frame, not during it.
+    // Listeners (the bottom controls) rebuild after this frame, not during it.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       widget.controller._update(
@@ -750,14 +732,15 @@ class _MassDocumentState extends State<_MassDocument> {
             ),
           ),
         ],
-        // Keeps the last lines clear of the floating section bar.
+        // Keeps the last lines clear of the floating Mass controls.
         SizedBox(height: MediaQuery.paddingOf(context).bottom + 72),
       ],
     );
   }
 }
 
-/// Floating current-section control and ritual language selector.
+/// Compact Mass controls: «Раздзелы» · n/5 · BE|LA|EN. The five long section
+/// names live only in the sections sheet.
 class _MassNavigatorBar extends StatelessWidget {
   const _MassNavigatorBar({
     required this.controller,
@@ -776,6 +759,10 @@ class _MassNavigatorBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final labelStyle = Theme.of(
+      context,
+    ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700);
+    final majorCount = kMassRitual.majorSections.length;
     return Positioned(
       left: 16,
       right: 16,
@@ -789,91 +776,125 @@ class _MassNavigatorBar extends StatelessWidget {
             seasonColor: seasonColor,
             borderRadius: BorderRadius.circular(28),
             padding: const EdgeInsets.all(4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ListenableBuilder(
-                    listenable: controller,
-                    builder: (context, _) {
-                      final title = controller.activeTitle ?? 'Раздзелы';
-                      return Semantics(
-                        button: true,
-                        label: 'Раздзел: $title. Адкрыць спіс раздзелаў',
-                        excludeSemantics: true,
-                        child: InkWell(
-                          key: const Key('mass-section-selector'),
-                          borderRadius: BorderRadius.circular(24),
-                          onTap: controller.sections.isEmpty
-                              ? null
-                              : onOpenSections,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(minHeight: 44),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: Row(
-                                children: [
-                                  PhosphorIcon(
-                                    PhosphorIconsRegular.listBullets,
-                                    size: 18,
-                                    color: cs.tertiary,
+            child: ListenableBuilder(
+              listenable: controller,
+              builder: (context, _) {
+                final major = controller.activeMajor;
+                final position = controller.activePosition;
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      flex: 5,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Semantics(
+                              button: true,
+                              label: major == null
+                                  ? 'Раздзелы'
+                                  : 'Раздзелы. Цяпер: ${major.title}',
+                              excludeSemantics: true,
+                              child: InkWell(
+                                key: const Key('mass-section-selector'),
+                                borderRadius: BorderRadius.circular(24),
+                                onTap: controller.sections.isEmpty
+                                    ? null
+                                    : onOpenSections,
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    minHeight: 44,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w700,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        PhosphorIcon(
+                                          PhosphorIconsRegular.listBullets,
+                                          size: 18,
+                                          color: cs.tertiary,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: Text(
+                                            'Раздзелы',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: labelStyle,
                                           ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(width: 4),
-                                  PhosphorIcon(
-                                    PhosphorIconsRegular.caretUp,
-                                    size: 14,
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Semantics(
-                  label: 'Мова святой Імшы',
-                  container: true,
-                  child: AdaptiveSegmentedControl<String>(
-                    key: const Key('mass-language-selector'),
-                    showSelectedIcon: false,
-                    value: language,
-                    onChanged: onLanguageChanged,
-                    segments: [
-                      for (final variant in kMassRitual.variants)
-                        AdaptiveSegment(
-                          value: variant.language,
-                          label: Semantics(
-                            label: variant.label,
-                            excludeSemantics: true,
-                            child: Text(
-                              variant.shortLabel,
-                              key: Key('mass-language-${variant.language}'),
+                          if (position != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              child: Semantics(
+                                label:
+                                    'Раздзел $position з $majorCount: ${major!.title}',
+                                excludeSemantics: true,
+                                child: Text(
+                                  '$position/$majorCount',
+                                  key: const Key('mass-section-position'),
+                                  maxLines: 1,
+                                  style: labelStyle?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                      flex: 4,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Semantics(
+                          label: 'Мова святой Імшы',
+                          container: true,
+                          child: AdaptiveSegmentedControl<String>(
+                            key: const Key('mass-language-selector'),
+                            showSelectedIcon: false,
+                            value: language,
+                            onChanged: onLanguageChanged,
+                            segments: [
+                              for (final variant in kMassRitual.variants)
+                                AdaptiveSegment(
+                                  value: variant.language,
+                                  label: Semantics(
+                                    label: variant.label,
+                                    excludeSemantics: true,
+                                    child: Text(
+                                      variant.shortLabel,
+                                      key: Key(
+                                        'mass-language-${variant.language}',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                    ],
-                  ),
-                ),
-              ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -882,22 +903,25 @@ class _MassNavigatorBar extends StatelessWidget {
   }
 }
 
-/// Hierarchical in-reading navigator: major sections with nested subsections.
+/// Section navigator: the five canonical major sections by their Belarusian
+/// names (whatever the Mass language), with the subsections of the current
+/// one nested below it.
 class _MassSectionsSheet extends StatelessWidget {
   const _MassSectionsSheet({
-    required this.sections,
+    required this.available,
     required this.activeSectionId,
-    required this.activeMajorId,
   });
 
-  final List<LocatedMassSection> sections;
+  /// Canonical ids of the sections present in the current language variant.
+  final Set<String> available;
   final String? activeSectionId;
-  final String? activeMajorId;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+    final activeMajor = kMassRitual.majorSectionOf(activeSectionId);
+    final majors = kMassRitual.majorSections;
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.sizeOf(context).height * 0.8,
@@ -907,7 +931,7 @@ class _MassSectionsSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 14, 14, 8),
+            padding: const EdgeInsets.fromLTRB(20, 4, 14, 8),
             child: Row(
               children: [
                 Expanded(
@@ -947,14 +971,23 @@ class _MassSectionsSheet extends StatelessWidget {
                 bottom: MediaQuery.paddingOf(context).bottom + 24,
               ),
               children: [
-                for (final section in sections)
+                for (var i = 0; i < majors.length; i++) ...[
                   _MassSectionTile(
-                    section: section,
-                    selected: section.sectionId == activeSectionId,
-                    withinActive:
-                        section.sectionId == activeMajorId ||
-                        section.parent == activeMajorId,
+                    section: majors[i],
+                    position: i + 1,
+                    enabled: available.contains(majors[i].id),
+                    selected: majors[i].id == activeMajor?.id,
                   ),
+                  if (majors[i].id == activeMajor?.id)
+                    for (final sub in kMassRitual.sections)
+                      if (sub.parent == majors[i].id &&
+                          available.contains(sub.id))
+                        _MassSectionTile(
+                          section: sub,
+                          enabled: true,
+                          selected: sub.id == activeSectionId,
+                        ),
+                ],
               ],
             ),
           ),
@@ -967,13 +1000,17 @@ class _MassSectionsSheet extends StatelessWidget {
 class _MassSectionTile extends StatelessWidget {
   const _MassSectionTile({
     required this.section,
+    required this.enabled,
     required this.selected,
-    required this.withinActive,
+    this.position,
   });
 
-  final LocatedMassSection section;
+  final MassSectionDef section;
+  final bool enabled;
   final bool selected;
-  final bool withinActive;
+
+  /// Number shown before a major section (1–5).
+  final int? position;
 
   @override
   Widget build(BuildContext context) {
@@ -983,34 +1020,45 @@ class _MassSectionTile extends StatelessWidget {
     return Semantics(
       selected: selected,
       child: ListTile(
-        key: ValueKey('mass-section-${section.sectionId}'),
+        key: ValueKey('mass-section-${section.id}'),
+        enabled: enabled,
         selected: selected,
         selectedColor: cs.tertiary,
-        selectedTileColor: cs.tertiary.withValues(alpha: 0.10),
-        contentPadding: EdgeInsets.only(left: major ? 20 : 44, right: 16),
-        minTileHeight: major ? 52 : 44,
+        selectedTileColor: major ? cs.tertiary.withValues(alpha: 0.10) : null,
+        contentPadding: EdgeInsets.only(left: major ? 20 : 56, right: 16),
+        minTileHeight: major ? 56 : 44,
         leading: major
-            ? null
+            ? SizedBox(
+                width: 24,
+                child: Text(
+                  '$position',
+                  textAlign: TextAlign.center,
+                  style: text.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: selected ? cs.tertiary : cs.onSurfaceVariant,
+                  ),
+                ),
+              )
             : Container(
                 width: 2,
                 height: 22,
-                color: withinActive ? cs.tertiary : cs.outlineVariant,
+                color: selected ? cs.tertiary : cs.outlineVariant,
               ),
-        minLeadingWidth: 10,
+        minLeadingWidth: major ? 24 : 10,
         title: Text(
           section.title,
           style: (major ? text.titleMedium : text.bodyMedium)?.copyWith(
             fontWeight: major || selected ? FontWeight.w700 : FontWeight.w400,
           ),
         ),
-        trailing: selected
+        trailing: selected && major
             ? PhosphorIcon(
                 PhosphorIconsRegular.bookmarkSimple,
                 size: 18,
                 color: cs.tertiary,
               )
             : null,
-        onTap: () => Navigator.pop(context, section.sectionId),
+        onTap: () => Navigator.pop(context, section.id),
       ),
     );
   }
