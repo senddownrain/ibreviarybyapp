@@ -5,6 +5,9 @@ version: 1.0.0+6
 
 environment:
   sdk: ^3.10.8
+  # Pinned: newer Flutter stable marks IconData final, which breaks
+  # phosphor_flutter 2.x. Codemagic builds with the same version.
+  flutter: ">=3.38.9 <3.39.0"
 
 dependencies:
   flutter:

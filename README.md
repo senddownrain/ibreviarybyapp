@@ -7,7 +7,10 @@
 
 ## Требования
 
-- Flutter 3.41 или новее;
+- **Flutter 3.38.9** (ровно эта ветка 3.38.x). В более новых версиях Flutter класс
+  `IconData` стал `final`, и библиотека иконок `phosphor_flutter 2.x` не компилируется.
+  Ограничение записано в `pubspec.yaml`, на другой версии `flutter pub get` сразу
+  сообщит об ошибке. Codemagic собирает на той же версии;
 - Chrome для web-запуска;
 - Android Studio / Android SDK и эмулятор либо физическое устройство для Android.
 
@@ -17,6 +20,37 @@
 flutter doctor -v
 flutter pub get
 ```
+
+Переключить Flutter на нужную версию (если Flutter установлен через git):
+
+```bash
+cd "$(dirname "$(which flutter)")/.." && git fetch --tags && git checkout 3.38.9 && flutter --version
+```
+
+## Запуск на iOS-симуляторе (macOS)
+
+Нужны Xcode и CocoaPods.
+
+```bash
+flutter pub get
+cd ios && pod install --repo-update && cd ..
+open -a Simulator
+flutter run
+```
+
+Если `pod install` падает с `Unicode Normalization not appropriate for ASCII-8BIT`,
+терминал не в UTF-8. Добавьте в `~/.zshrc` строку `export LANG=en_US.UTF-8` и откройте
+терминал заново.
+
+Если сборка падает на подах или на `phosphor_flutter`, сначала проверьте
+`flutter --version` (должно быть 3.38.9), затем выполните полную очистку:
+
+```bash
+flutter clean && flutter pub get
+cd ios && rm -rf Pods && pod install --repo-update && cd ..
+```
+
+Первая сборка под iOS занимает 10–15 минут.
 
 ## Запуск в Chrome
 
