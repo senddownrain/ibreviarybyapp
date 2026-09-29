@@ -2,9 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
 void main() {
+  test('reader font preferences are compact and legacy-safe', () {
+    expect(kAvailableReaderFonts, hasLength(3));
+    expect(normalizeReaderFontFamily('Сістэмны'), ReaderFontFamily.literata);
+    expect(
+      normalizeReaderFontFamily(ReaderFontFamily.system),
+      ReaderFontFamily.system,
+    );
+    expect(
+      kAvailableReaderFonts.map((option) => option.label),
+      isNot(contains('Playfair Display')),
+    );
+  });
+
   testWidgets('opens the slider panel and respects reader-size limits', (
     tester,
   ) async {
@@ -36,6 +50,14 @@ void main() {
     expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
     expect(find.byKey(const Key('text-scale-value')), findsOneWidget);
     expect(find.text('100%'), findsOneWidget);
+    expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('reader-font-system')));
+    await tester.pump();
+    expect(
+      container.read(settingsProvider).fontFamily,
+      ReaderFontFamily.system,
+    );
 
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pump();
@@ -65,6 +87,46 @@ void main() {
     );
     expect(decreaseButton.onPressed, isNull);
   });
+
+  testWidgets('appearance panel fits 320 px at 200 percent system text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final container = ProviderContainer(
+      overrides: [settingsProvider.overrideWith(_TestSettingsNotifier.new)],
+    );
+    addTearDown(container.dispose);
+
+    for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            key: ValueKey(platform),
+            theme: ThemeData(platform: platform),
+            home: const MediaQuery(
+              data: MediaQueryData(
+                size: Size(320, 640),
+                textScaler: TextScaler.linear(2),
+              ),
+              child: Scaffold(body: TextScaleControl()),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('text-scale-open')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
+      expect(tester.takeException(), isNull, reason: platform.name);
+      await tester.tap(find.byTooltip('Закрыць'));
+      await tester.pumpAndSettle();
+    }
+  });
 }
 
 class _TestSettingsNotifier extends SettingsNotifier {
@@ -81,6 +143,11 @@ class _TestSettingsNotifier extends SettingsNotifier {
 
   @override
   void decreaseFontSize() => _step(-1);
+
+  @override
+  void setFontFamily(String family) {
+    state = state.copyWith(fontFamily: normalizeReaderFontFamily(family));
+  }
 
   void _step(int direction) {
     final scale = state.fontSize / kDefaultReaderFontSize;

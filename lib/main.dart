@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
@@ -86,10 +85,6 @@ class MyBrevApp extends ConsumerWidget {
         brightness: cs.brightness,
         platform: targetPlatform,
       );
-      // Reader font is applied only inside reading surfaces. Application
-      // chrome always keeps the PWA's Source Sans UI typography.
-      final textTheme = GoogleFonts.sourceSans3TextTheme(base.textTheme);
-
       return base.copyWith(
         platform: targetPlatform,
         splashFactory: isIOS
@@ -101,7 +96,9 @@ class MyBrevApp extends ConsumerWidget {
           brightness: cs.brightness,
           scaffoldBackgroundColor: cs.surfaceContainerLowest,
         ),
-        textTheme: textTheme,
+        // Application chrome follows the real platform typography. Book faces
+        // are applied only inside ReadingScaffold/ReaderTheme.
+        textTheme: base.textTheme,
         scaffoldBackgroundColor: cs.surfaceContainerLowest,
         dividerTheme: DividerThemeData(
           color: cs.outlineVariant,

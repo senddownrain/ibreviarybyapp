@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 typedef AlternativeContentBuilder =
@@ -94,11 +95,9 @@ class _AlternativeTextState extends State<AlternativeText> {
         if (widget.showPicker && _options.length > 1) ...[
           _AlternativePicker(
             label: widget.label,
+            kind: widget.kind,
             options: _options,
             activeIndex: _activeIndex,
-            compactTitle: widget.kind == 'gospel-antiphon'
-                ? active.title
-                : null,
             onSelect: _select,
           ),
           const SizedBox(height: 18),
@@ -120,112 +119,81 @@ class _AlternativeTextState extends State<AlternativeText> {
 class _AlternativePicker extends StatelessWidget {
   const _AlternativePicker({
     required this.label,
+    required this.kind,
     required this.options,
     required this.activeIndex,
-    this.compactTitle,
     required this.onSelect,
   });
 
   final String label;
+  final String kind;
   final List<LiturgicalAlternative> options;
   final int activeIndex;
-  final String? compactTitle;
   final ValueChanged<int> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final reader = ReaderTheme.of(context);
-    final base = ReaderTheme.of(context).body(16);
+    final active = options[activeIndex];
+    final kindLabel = _kindLabel(kind);
+    final compactLabel = '$kindLabel · ${activeIndex + 1} з ${options.length}';
     return Align(
       alignment: Alignment.centerLeft,
-      child: TextButton.icon(
-        key: const Key('alternative-picker-trigger'),
-        onPressed: () async {
-          final selected = await showModalBottomSheet<int>(
-            context: context,
-            useSafeArea: true,
-            isScrollControlled: true,
-            showDragHandle: true,
-            builder: (sheetContext) => _AlternativeSheet(
-              label: label,
-              options: options,
-              activeIndex: activeIndex,
+      child: Semantics(
+        button: true,
+        label: label,
+        value: '$compactLabel. ${active.title}',
+        child: TextButton(
+          key: const Key('alternative-picker-trigger'),
+          onPressed: () async {
+            final selected = await showReaderChoiceSheet<int>(
+              context: context,
+              title: label,
+              selectedValue: activeIndex,
+              choices: [
+                for (var index = 0; index < options.length; index++)
+                  ReaderChoice(
+                    value: index,
+                    key: ValueKey('alternative-option-$index'),
+                    label: options[index].title,
+                    subtitle: 'Варыянт ${index + 1} з ${options.length}',
+                  ),
+              ],
+            );
+            if (selected != null) onSelect(selected);
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: reader.rubric,
+            minimumSize: const Size(48, 48),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontSize: 14,
+              height: 1.3,
+              fontWeight: FontWeight.w600,
             ),
-          );
-          if (selected != null) onSelect(selected);
-        },
-        icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 19),
-        label: Text(
-          compactTitle ?? 'Варыянт ${activeIndex + 1} з ${options.length}',
-        ),
-        style: TextButton.styleFrom(
-          foregroundColor: reader.rubric,
-          minimumSize: const Size(48, 48),
-          textStyle: base.copyWith(
-            fontSize: 14,
-            height: 1.35,
-            fontWeight: FontWeight.w600,
+          ),
+          child: ExcludeSemantics(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(child: Text(compactLabel)),
+                const SizedBox(width: 5),
+                const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 16),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-}
 
-class _AlternativeSheet extends StatelessWidget {
-  const _AlternativeSheet({
-    required this.label,
-    required this.options,
-    required this.activeIndex,
-  });
-
-  final String label;
-  final List<LiturgicalAlternative> options;
-  final int activeIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return SizedBox(
-      height: MediaQuery.sizeOf(context).height * .78,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 4, 24, 12),
-            child: Text(label, style: Theme.of(context).textTheme.titleLarge),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                bottom: 16 + MediaQuery.viewPaddingOf(context).bottom,
-              ),
-              child: Column(
-                children: [
-                  for (var index = 0; index < options.length; index++)
-                    ListTile(
-                      key: ValueKey('alternative-option-$index'),
-                      minTileHeight: 56,
-                      selected: index == activeIndex,
-                      title: Text(options[index].title),
-                      subtitle: Text(
-                        'Варыянт ${index + 1} з ${options.length}',
-                      ),
-                      trailing: index == activeIndex
-                          ? PhosphorIcon(
-                              PhosphorIconsBold.check,
-                              color: cs.primary,
-                            )
-                          : null,
-                      onTap: () => Navigator.pop(context, index),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  static String _kindLabel(String kind) => switch (kind) {
+    'hymn' => 'Гімн',
+    'gospel-antiphon' || 'marian-antiphon' => 'Антыфона',
+    'reading' => 'Чытанне',
+    'prayer' => 'Малітва',
+    'intercession' => 'Просьбы',
+    'psalm' => 'Псальм',
+    _ => 'Варыянт',
+  };
 }

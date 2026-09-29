@@ -1524,7 +1524,11 @@ class _HtmlOrText extends StatelessWidget {
         fontFamily: textStyle.fontFamily,
         fontWeight: textStyle.fontWeight,
         color: textColor,
-        lineHeight: LineHeight(1.75),
+        lineHeight: LineHeight(
+          alternativeKind == 'hymn'
+              ? ReaderTheme.hymnHeight
+              : ReaderTheme.bodyHeight,
+        ),
         margin: Margins.zero,
         padding: HtmlPaddings.zero,
         textAlign: TextAlign.left,
@@ -1535,14 +1539,14 @@ class _HtmlOrText extends StatelessWidget {
       ),
       '.liturgical-subheading': Style(
         fontSize: FontSize((baseSize * 0.88).clamp(14, double.infinity)),
-        lineHeight: LineHeight(1.45),
+        lineHeight: LineHeight(ReaderTheme.metadataHeight),
         color: reader.muted,
         margin: Margins.only(bottom: 7),
       ),
       '.psalm-metadata': Style(textAlign: TextAlign.center),
       '.liturgical-heading': Style(
         fontSize: FontSize((baseSize * 0.98).clamp(15, double.infinity)),
-        lineHeight: LineHeight(1.3),
+        lineHeight: LineHeight(ReaderTheme.headingHeight),
         color: reader.rubric,
         fontWeight: FontWeight.w700,
         margin: Margins.only(bottom: 12),
@@ -1553,7 +1557,7 @@ class _HtmlOrText extends StatelessWidget {
       '.liturgical-rubric': Style(
         color: reader.rubric,
         fontSize: FontSize((baseSize * 0.90).clamp(14, double.infinity)),
-        lineHeight: LineHeight(1.45),
+        lineHeight: LineHeight(ReaderTheme.rubricHeight),
       ),
       '.liturgical-rubric-inline': Style(color: reader.rubric),
       '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),

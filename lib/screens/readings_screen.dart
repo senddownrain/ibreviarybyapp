@@ -1332,20 +1332,20 @@ class _ReadingTextState extends State<_ReadingText> {
             fontFamily: widget.textStyle.fontFamily,
             fontSize: FontSize(base),
             fontWeight: widget.textStyle.fontWeight,
-            lineHeight: LineHeight(1.78),
+            lineHeight: LineHeight(ReaderTheme.bodyHeight),
             textAlign: TextAlign.left,
           ),
           'p': Style(margin: Margins.only(bottom: 8)),
           '.liturgical-subheading': Style(
             fontSize: FontSize((base * 0.88).clamp(14, double.infinity)),
-            lineHeight: LineHeight(1.45),
+            lineHeight: LineHeight(ReaderTheme.metadataHeight),
             color: reader.muted,
             margin: Margins.only(bottom: 7),
           ),
           '.psalm-metadata': Style(textAlign: TextAlign.center),
           '.liturgical-heading': Style(
             fontSize: FontSize((base * 0.98).clamp(15, double.infinity)),
-            lineHeight: LineHeight(1.3),
+            lineHeight: LineHeight(ReaderTheme.headingHeight),
             color: reader.rubric,
             fontWeight: FontWeight.w700,
           ),
@@ -1383,7 +1383,7 @@ class _ReadingTextState extends State<_ReadingText> {
                         : _recognizerFor('$namespace:${sentence.index}'),
                     style: piece == '*' || piece == '†'
                         ? widget.textStyle.copyWith(
-                            height: 1.78,
+                            height: ReaderTheme.bodyHeight,
                             color: reader.rubric,
                             fontWeight: FontWeight.w600,
                           )
@@ -1401,7 +1401,7 @@ class _ReadingTextState extends State<_ReadingText> {
     final selected = widget.selectedSentenceId == sentenceId;
     final brightness = Theme.of(context).brightness;
     return widget.textStyle.copyWith(
-      height: 1.78,
+      height: ReaderTheme.bodyHeight,
       backgroundColor: selected
           ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18)
           : color?.withValues(

@@ -81,8 +81,8 @@ class AdaptiveChromeSurface extends StatelessWidget {
         ? base
         : Color.alphaBlend(seasonColor!.withValues(alpha: 0.055), base);
     final shadowAlpha = Theme.of(context).brightness == Brightness.dark
-        ? 0.30
-        : 0.11;
+        ? 0.20
+        : 0.085;
 
     Widget content = child;
     if (padding != null) content = Padding(padding: padding!, child: content);

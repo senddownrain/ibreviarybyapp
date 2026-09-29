@@ -3,14 +3,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 
-const kAvailableFonts = [
-  'Сістэмны',
-  'Merriweather',
-  'Lora',
-  'Playfair Display',
-  'Source Serif 4',
+class ReaderFontOption {
+  const ReaderFontOption({
+    required this.id,
+    required this.label,
+    required this.description,
+  });
+
+  final String id;
+  final String label;
+  final String description;
+}
+
+const kAvailableReaderFonts = <ReaderFontOption>[
+  ReaderFontOption(
+    id: ReaderFontFamily.literata,
+    label: 'Кніжны',
+    description: 'Literata · рэкамендаваны',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.system,
+    label: 'Сістэмны',
+    description: 'Шрыфт вашай прылады',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.sourceSerif4,
+    label: 'Класічны',
+    description: 'Source Serif 4',
+  ),
 ];
+
+String normalizeReaderFontFamily(String? stored) => switch (stored) {
+  ReaderFontFamily.literata || 'Literata' => ReaderFontFamily.literata,
+  ReaderFontFamily.system => ReaderFontFamily.system,
+  ReaderFontFamily.sourceSerif4 ||
+  'Source Serif 4' => ReaderFontFamily.sourceSerif4,
+  // Before VNext this label rendered Literata, not the system face. Preserve
+  // the actual reading appearance during migration.
+  'Сістэмны' => ReaderFontFamily.literata,
+  _ => ReaderFontFamily.literata,
+};
+
+ReaderFontOption readerFontOption(String id) =>
+    kAvailableReaderFonts.firstWhere(
+      (option) => option.id == normalizeReaderFontFamily(id),
+      orElse: () => kAvailableReaderFonts.first,
+    );
 
 const kDefaultReaderFontSize = 16.0;
 const kMinReaderFontScale = 0.7;
@@ -80,7 +120,7 @@ class SettingsState {
   const SettingsState({
     this.themeMode = ThemeMode.system,
     this.fontSize = kDefaultReaderFontSize,
-    this.fontFamily = 'Сістэмны',
+    this.fontFamily = ReaderFontFamily.literata,
     this.keepScreenOn = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
@@ -91,9 +131,12 @@ class SettingsState {
     this.prayerCategoryMap = const {},
   });
 
-  /// null means use system font
-  String? get resolvedFontFamily =>
-      fontFamily == 'Сістэмны' ? null : fontFamily;
+  /// null means use the native platform font.
+  String? get resolvedFontFamily => switch (fontFamily) {
+    ReaderFontFamily.system => null,
+    ReaderFontFamily.sourceSerif4 => 'Source Serif 4',
+    _ => 'Literata',
+  };
 
   SettingsState copyWith({
     ThemeMode? themeMode,
@@ -154,7 +197,10 @@ class SettingsNotifier extends Notifier<SettingsState> {
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
       ),
-      fontFamily: _box.get('fontFamily', defaultValue: 'Сістэмны') as String,
+      fontFamily: normalizeReaderFontFamily(
+        _box.get('fontFamily', defaultValue: ReaderFontFamily.literata)
+            as String,
+      ),
       keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
       userCategories: (jsonDecode(cats) as List)
           .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
@@ -226,7 +272,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void setFontFamily(String family) {
-    state = state.copyWith(fontFamily: family);
+    state = state.copyWith(fontFamily: normalizeReaderFontFamily(family));
     _save();
   }
 

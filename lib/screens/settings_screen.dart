@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/cache_sync_settings.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/cache_stats.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 
@@ -117,7 +118,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 Text(
                   'Прыклад: Госпадзе, памілуй нас.',
-                  style: TextStyle(fontSize: settings.fontSize),
+                  style: ReaderTheme.of(
+                    context,
+                  ).body(settings.fontSize, family: settings.fontFamily),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'Шрыфт чытання',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  key: const Key('settings-reader-font'),
+                  initialValue: settings.fontFamily,
+                  isExpanded: true,
+                  items: [
+                    for (final option in kAvailableReaderFonts)
+                      DropdownMenuItem(
+                        value: option.id,
+                        child: Text(option.label),
+                      ),
+                  ],
+                  onChanged: (family) {
+                    if (family != null) {
+                      ref.read(settingsProvider.notifier).setFontFamily(family);
+                    }
+                  },
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  readerFontOption(settings.fontFamily).description,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),

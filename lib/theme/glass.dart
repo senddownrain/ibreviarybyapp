@@ -16,19 +16,19 @@ class GlassTokens {
   double get softBlur => 10;
 
   // Ambient wash (full / soft page tints)
-  double get ambientStrong => isDark ? 0.22 : 0.14;
-  double get ambientMid => isDark ? 0.10 : 0.06;
-  double get ambientSoft => isDark ? 0.12 : 0.07;
-  double get ambientPill => isDark ? 0.12 : 0.08;
-  double get ambientCard => isDark ? 0.10 : 0.06;
+  double get ambientStrong => isDark ? 0.15 : 0.11;
+  double get ambientMid => isDark ? 0.06 : 0.045;
+  double get ambientSoft => isDark ? 0.07 : 0.055;
+  double get ambientPill => isDark ? 0.08 : 0.065;
+  double get ambientCard => isDark ? 0.06 : 0.045;
 
   // Glass fills
   Color get cardFill =>
-      isDark ? const Color(0xF0151515) : const Color(0xF0FAFAFA);
+      isDark ? const Color(0xF0171917) : const Color(0xF0F8F8F5);
   Color get softFill =>
-      isDark ? const Color(0xD9151515) : const Color(0xD9FAFAFA);
+      isDark ? const Color(0xE8171917) : const Color(0xE8F8F8F5);
   Color get pillFill =>
-      isDark ? const Color(0xF7151515) : const Color(0xF7FAFAFA);
+      isDark ? const Color(0xF5171917) : const Color(0xF5F8F8F5);
 
   Color get border =>
       isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
@@ -37,15 +37,15 @@ class GlassTokens {
   Color get pillBorder =>
       isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
   Color get specular => isDark
-      ? Colors.white.withValues(alpha: 0.045)
-      : Colors.white.withValues(alpha: 0.28);
+      ? Colors.white.withValues(alpha: 0.022)
+      : Colors.white.withValues(alpha: 0.22);
 
   Color get ambientBase =>
-      isDark ? const Color(0xFF3A3A3A) : const Color(0xFFBEBEBE);
+      isDark ? const Color(0xFF343A34) : const Color(0xFFC8CAC3);
 
   List<BoxShadow> get cardShadow => [
     BoxShadow(
-      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.07),
+      color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
       blurRadius: 14,
       spreadRadius: -1,
       offset: const Offset(0, 3),
@@ -54,13 +54,13 @@ class GlassTokens {
 
   List<BoxShadow> get pillShadow => [
     BoxShadow(
-      color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
-      blurRadius: 30,
+      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.11),
+      blurRadius: 24,
       spreadRadius: -4,
       offset: const Offset(0, 10),
     ),
     BoxShadow(
-      color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.06),
+      color: Colors.black.withValues(alpha: isDark ? 0.10 : 0.045),
       blurRadius: 8,
       spreadRadius: -1,
       offset: const Offset(0, 2),
@@ -89,7 +89,7 @@ class AmbientBackdrop extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = GlassTokens.of(context);
     final background = Theme.of(context).colorScheme.surfaceContainerLowest;
-    final strength = tokens.isDark ? 0.18 : 0.13;
+    final strength = tokens.isDark ? 0.11 : 0.09;
 
     return DecoratedBox(
       decoration: BoxDecoration(

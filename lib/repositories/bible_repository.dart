@@ -53,11 +53,11 @@ class BibleVersionMeta {
 const kBibleVersionMeta = {
   'bel': BibleVersionMeta(
     id: 'bel',
-    name: 'Пераклад кс. Ўладзіслава Чарняўскага MIC',
+    name: 'Пераклад кс. Уладзіслава Чарняўскага MIC',
     shortName: 'ЧБ',
     langLabel: 'Беларуская',
     shortLabel: 'БЕЛ',
-    attribution: 'Пераклад кс. Ўладзіслава Чарняўскага MIC · bible.by',
+    attribution: 'Пераклад кс. Уладзіслава Чарняўскага MIC · bible.by',
   ),
   'ru': BibleVersionMeta(
     id: 'ru',

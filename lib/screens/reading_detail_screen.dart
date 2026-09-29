@@ -139,7 +139,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
             fontSize: FontSize(base),
             fontFamily: textStyle.fontFamily,
             color: textColor,
-            lineHeight: LineHeight(1.78),
+            lineHeight: LineHeight(ReaderTheme.bodyHeight),
             margin: Margins.zero,
             padding: HtmlPaddings.zero,
             textAlign: TextAlign.left,
@@ -147,12 +147,12 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
           'p': Style(color: textColor, margin: Margins.only(bottom: 14)),
           '.liturgical-subheading': Style(
             fontSize: FontSize(base * 0.84),
-            lineHeight: LineHeight(1.45),
+            lineHeight: LineHeight(ReaderTheme.metadataHeight),
             color: reader.muted,
           ),
           '.liturgical-heading': Style(
             fontSize: FontSize(base * 0.94),
-            lineHeight: LineHeight(1.3),
+            lineHeight: LineHeight(ReaderTheme.headingHeight),
             color: reader.rubric,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.7,

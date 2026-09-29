@@ -35,6 +35,7 @@ void main() {
     controller.value = ReaderChromeMode.hidden;
     await tester.pump();
     expect(find.byKey(const Key('reader-top-fade')), findsOneWidget);
+    expect(find.byKey(const Key('reader-bottom-fade')), findsNothing);
     expect(find.byKey(const Key('reader-chrome-back')), findsNothing);
     expect(find.byKey(const Key('reader-chrome-hidden')), findsOneWidget);
     expect(find.byKey(const Key('reader-chrome-restore')), findsNothing);
@@ -74,8 +75,8 @@ void main() {
           .color;
     }
 
-    expect(await surfaceFor(Brightness.light), const Color(0xFFFCFBF8));
-    expect(await surfaceFor(Brightness.dark), const Color(0xFF171A18));
+    expect(await surfaceFor(Brightness.light), const Color(0xFFFDFCF9));
+    expect(await surfaceFor(Brightness.dark), const Color(0xFF171917));
   });
 
   testWidgets('reader reserves space for floating bottom navigation', (

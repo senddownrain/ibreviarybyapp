@@ -78,7 +78,7 @@ class ReaderScaffold extends StatelessWidget {
     this.drawer,
     this.scrollController,
     this.scrollKey,
-    this.maxContentWidth = 760,
+    this.maxContentWidth = 700,
     this.semanticLabel,
     this.showAmbient = true,
     this.enableDoubleTapFullscreen = true,
@@ -237,6 +237,7 @@ class ReaderEdgeProtection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = ReaderTheme.of(context).surface;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final safeTop = MediaQuery.viewPaddingOf(context).top;
     final safeBottom = MediaQuery.viewPaddingOf(context).bottom;
     return IgnorePointer(
@@ -247,7 +248,7 @@ class ReaderEdgeProtection extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: safeTop + (mode == ReaderChromeMode.hidden ? 18 : 72),
+            height: safeTop + (mode == ReaderChromeMode.hidden ? 10 : 58),
             child: DecoratedBox(
               key: const Key('reader-top-fade'),
               decoration: BoxDecoration(
@@ -255,32 +256,33 @@ class ReaderEdgeProtection extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    surface.withValues(alpha: 0.94),
+                    surface.withValues(alpha: dark ? 0.86 : 0.92),
                     surface.withValues(alpha: 0),
                   ],
                 ),
               ),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: safeBottom + (mode == ReaderChromeMode.hidden ? 24 : 96),
-            child: DecoratedBox(
-              key: const Key('reader-bottom-fade'),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    surface.withValues(alpha: 0),
-                    surface.withValues(alpha: 0.72),
-                  ],
+          if (mode != ReaderChromeMode.hidden)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: safeBottom + 56,
+              child: DecoratedBox(
+                key: const Key('reader-bottom-fade'),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      surface.withValues(alpha: 0),
+                      surface.withValues(alpha: dark ? 0.46 : 0.62),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -437,7 +439,7 @@ class ReaderContentSurface extends StatelessWidget {
   const ReaderContentSurface({
     super.key,
     required this.child,
-    this.maxContentWidth = 760,
+    this.maxContentWidth = 700,
     this.semanticLabel,
   });
 
@@ -716,6 +718,7 @@ class ReaderChoice<T> {
   const ReaderChoice({
     required this.value,
     required this.label,
+    this.key,
     this.subtitle,
     this.icon,
     this.enabled = true,
@@ -723,6 +726,7 @@ class ReaderChoice<T> {
 
   final T value;
   final String label;
+  final Key? key;
   final String? subtitle;
   final IconData? icon;
   final bool enabled;
@@ -791,6 +795,7 @@ class _ReaderChoiceSheet<T> extends StatelessWidget {
           ),
           for (final choice in choices)
             ListTile(
+              key: choice.key,
               enabled: choice.enabled,
               leading: choice.icon == null ? null : Icon(choice.icon),
               title: Text(choice.label),

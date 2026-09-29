@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/navigation/bible_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
@@ -763,7 +764,10 @@ class _VerseRow extends StatelessWidget {
               key: Key('bible-verse-body-$verseNum'),
               textScaler: MediaQuery.textScalerOf(context),
               text: TextSpan(
-                style: textStyle.copyWith(color: cs.onSurface, height: 1.72),
+                style: textStyle.copyWith(
+                  color: cs.onSurface,
+                  height: ReaderTheme.bodyHeight,
+                ),
                 children: [
                   WidgetSpan(
                     alignment: PlaceholderAlignment.top,

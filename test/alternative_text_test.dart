@@ -37,7 +37,7 @@ void main() {
     );
 
     expect(find.textContaining('Антыфона 1'), findsNWidgets(2));
-    expect(find.text('Варыянт 1 з 2'), findsOneWidget);
+    expect(find.text('Варыянт · 1 з 2'), findsOneWidget);
     expect(find.text('Другі'), findsNothing);
     final trigger = find.byKey(const Key('alternative-picker-trigger'));
     await tester.ensureVisible(trigger);

@@ -16,10 +16,14 @@ class TextScaleControl extends ConsumerWidget {
     final fontSize = ref.watch(
       settingsProvider.select((settings) => settings.fontSize),
     );
-
+    final fontFamily = ref.watch(
+      settingsProvider.select((settings) => settings.fontFamily),
+    );
     return Semantics(
       button: true,
-      label: 'Памер тэксту, ${readerFontScalePercent(fontSize)} адсоткаў',
+      label:
+          'Выгляд тэксту, ${readerFontScalePercent(fontSize)} адсоткаў, '
+          '${readerFontOption(fontFamily).label}',
       child: AdaptiveChromeSurface(
         role: ChromeSurfaceRole.control,
         borderRadius: BorderRadius.circular(24),
@@ -27,7 +31,7 @@ class TextScaleControl extends ConsumerWidget {
           dimension: 48,
           child: IconButton(
             key: const Key('text-scale-open'),
-            tooltip: 'Памер тэксту',
+            tooltip: 'Выгляд тэксту',
             onPressed: () {
               HapticFeedback.selectionClick();
               _showTextScalePanel(context);
@@ -55,6 +59,7 @@ Future<void> _showTextScalePanel(BuildContext context) {
     context: context,
     useRootNavigator: true,
     useSafeArea: true,
+    isScrollControlled: true,
     enableDrag: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.28),
@@ -73,6 +78,9 @@ class _TextScalePanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final fontSize = ref.watch(
       settingsProvider.select((settings) => settings.fontSize),
+    );
+    final fontFamily = ref.watch(
+      settingsProvider.select((settings) => settings.fontFamily),
     );
     final notifier = ref.read(settingsProvider.notifier);
     final percent = readerFontScalePercent(fontSize);
@@ -114,7 +122,7 @@ class _TextScalePanel extends ConsumerWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Памер тэксту',
+                        'Выгляд тэксту',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w700),
                       ),
@@ -191,6 +199,49 @@ class _TextScalePanel extends ConsumerWidget {
                       onPressed: canIncrease ? notifier.increaseFontSize : null,
                     ),
                   ],
+                ),
+                const SizedBox(height: 12),
+                Divider(color: cs.outlineVariant),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Шрыфт чытання',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final option in kAvailableReaderFonts)
+                        ChoiceChip(
+                          key: ValueKey('reader-font-${option.id}'),
+                          label: Text(option.label),
+                          selected: option.id == fontFamily,
+                          onSelected: (_) {
+                            HapticFeedback.selectionClick();
+                            notifier.setFontFamily(option.id);
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    readerFontOption(fontFamily).description,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
                 ),
               ],
             ),
