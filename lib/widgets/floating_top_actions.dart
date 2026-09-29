@@ -87,6 +87,9 @@ class FloatingTopActions extends ConsumerWidget {
                     height: 52,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
+                      // A single action sits in a fixed 52dp circle; without
+                      // centring, its 48dp IconButton hugs the left edge.
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: actions,
                     ),
                   ),
