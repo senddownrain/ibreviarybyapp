@@ -487,9 +487,15 @@ Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) => {
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.w600,
   ),
-  '.${MassBlockClass.inlineRubric}': Style(
+  '.${MassBlockClass.comment}': Style(
+    color: text.withValues(alpha: 0.78),
+    fontSize: FontSize(size * 0.92),
+    margin: Margins.symmetric(vertical: 10),
+  ),
+  '.${MassBlockClass.inlineAlternative}': Style(
     color: reader.rubric,
     fontStyle: FontStyle.italic,
+    fontWeight: FontWeight.w700,
     fontSize: FontSize(size * 0.9),
   ),
   '.${MassBlockClass.response}': Style(fontWeight: FontWeight.w700),
