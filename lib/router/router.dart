@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
 import 'package:mybrev_flutter/screens/bible_search_screen.dart';
+import 'package:mybrev_flutter/screens/compendium_node_screen.dart';
 import 'package:mybrev_flutter/screens/compendium_reader_screens.dart';
 import 'package:mybrev_flutter/screens/compendium_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
@@ -152,6 +153,12 @@ const _compendiumRoute = AppRouteDescriptor(
 );
 const _compendiumPartRoute = AppRouteDescriptor(
   id: 'prayerbook.compendium.part',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _compendiumNodeRoute = AppRouteDescriptor(
+  id: 'prayerbook.compendium.node',
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.legacy,
@@ -445,6 +452,17 @@ final router = GoRouter(
                         _compendiumPartRoute,
                         CompendiumPartScreen(
                           partId: state.pathParameters['partId']!,
+                        ),
+                      ),
+                    ),
+                    // Section and subsection screens.
+                    GoRoute(
+                      path: 'node/:nodeId',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _compendiumNodeRoute,
+                        CompendiumNodeScreen(
+                          nodeId: state.pathParameters['nodeId']!,
                         ),
                       ),
                     ),
