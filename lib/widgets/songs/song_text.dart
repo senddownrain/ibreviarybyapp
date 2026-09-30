@@ -24,6 +24,7 @@ class SongText extends StatelessWidget {
     this.showChords = false,
     this.layout = SongChordLayout.above,
     this.transpose = 0,
+    this.onRightFallbackChanged,
   });
 
   final Song song;
@@ -31,6 +32,11 @@ class SongText extends StatelessWidget {
   final bool showChords;
   final SongChordLayout layout;
   final int transpose;
+
+  /// Reports, on every layout, whether the preferred
+  /// [SongChordLayout.right] is currently rendered as `above` because the
+  /// width is too small. Called during layout: defer any state change.
+  final ValueChanged<bool>? onRightFallbackChanged;
 
   /// Minimum lyric column width, in effective em of the lyric text.
   static const rightLayoutMinLyricsEm = 15.0;
@@ -127,6 +133,7 @@ class SongText extends StatelessWidget {
                 ) ==
                 SongChordLayout.right;
         final gap = textScaler.scale(fontSize) * rightLayoutGapEm;
+        onRightFallbackChanged?.call(wantsSide && !side);
 
         return Column(
           key: Key(side ? 'song-text-right' : 'song-text-above'),

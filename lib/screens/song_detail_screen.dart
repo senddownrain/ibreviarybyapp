@@ -29,6 +29,10 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
   /// Display-only transposition in semitones; never persisted.
   int _transpose = 0;
 
+  /// Whether the preferred `right` layout is rendered as `above` right now.
+  /// Runtime-only hint for the chord control; the preference is untouched.
+  final ValueNotifier<bool> _rightFallback = ValueNotifier(false);
+
   @override
   void didUpdateWidget(covariant SongDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -38,7 +42,17 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _rightFallback.dispose();
     super.dispose();
+  }
+
+  /// [SongText] reports from its layout pass, so the hint is updated after
+  /// the frame.
+  void _setRightFallback(bool value) {
+    if (_rightFallback.value == value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _rightFallback.value = value;
+    });
   }
 
   void _setTranspose(int value) {
@@ -97,20 +111,24 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
           details: song.hasChords
               ? Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: SongChordControl(
-                    showChords: prefs.showChords,
-                    layout: prefs.chordLayout,
-                    transpose: _transpose,
-                    seasonColor: cs.tertiary,
-                    onShowChordsChanged: (value) {
-                      HapticFeedback.selectionClick();
-                      prefsNotifier.setShowChords(value);
-                    },
-                    onLayoutChanged: (value) {
-                      HapticFeedback.selectionClick();
-                      prefsNotifier.setChordLayout(value);
-                    },
-                    onTransposeChanged: _setTranspose,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _rightFallback,
+                    builder: (context, fallback, _) => SongChordControl(
+                      showChords: prefs.showChords,
+                      layout: prefs.chordLayout,
+                      layoutFallback: fallback,
+                      transpose: _transpose,
+                      seasonColor: cs.tertiary,
+                      onShowChordsChanged: (value) {
+                        HapticFeedback.selectionClick();
+                        prefsNotifier.setShowChords(value);
+                      },
+                      onLayoutChanged: (value) {
+                        HapticFeedback.selectionClick();
+                        prefsNotifier.setChordLayout(value);
+                      },
+                      onTransposeChanged: _setTranspose,
+                    ),
                   ),
                 )
               : null,
@@ -124,6 +142,7 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
               showChords: prefs.showChords,
               layout: prefs.chordLayout,
               transpose: _transpose,
+              onRightFallbackChanged: _setRightFallback,
             ),
             if (song.source.isNotEmpty) _SongSource(song: song),
           ],
