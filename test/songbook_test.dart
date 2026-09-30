@@ -91,6 +91,27 @@ const _longSeed = <Map<String, dynamic>>[
   },
 ];
 
+/// A typical song: short chord runs next to ordinary lyric lines.
+///
+/// The test font is 1 em per glyph, about 1.7× a real monospace face, so
+/// these two-chord lines take the room of four-chord lines ("G D G D") on a
+/// device.
+const _typicalSeed = <Map<String, dynamic>>[
+  {
+    'id': 's-typ',
+    'title': 'Тыповы спеў',
+    'text':
+        'Аллелюя, Езус смерць перамог\n'
+        'Устаў з магілы наш Пан і Бог\n'
+        'Радуйся, зямля, спявай, неба\n'
+        'Хрыстус уваскрос, аллелюя',
+    'chord': 'e a\nG D\na7 F\ne D',
+    'tag': <int>[],
+    'tags': <String>[],
+    'source': '',
+  },
+];
+
 void main() {
   group('Prayerbook sections', () {
     testWidgets('root shows four section tiles after Favorites', (
@@ -868,7 +889,7 @@ void main() {
       variant: _platforms,
     );
 
-    testWidgets('long lyrics wrap under their chords on a narrow phone', (
+    testWidgets('long lyrics wrap without overflow on a 320 dp phone', (
       tester,
     ) async {
       addTearDown(tester.view.resetPhysicalSize);
@@ -891,19 +912,161 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull, reason: '$layout');
-        expect(find.byKey(const Key('song-text-above')), findsOneWidget);
+        final side = find
+            .byKey(const Key('song-text-right'))
+            .evaluate()
+            .isNotEmpty;
         final lyric = tester.getRect(find.textContaining('Вельмі доўгі'));
         final chord = tester.getRect(find.text('C G a F'));
-        expect(chord.bottom, lessThanOrEqualTo(lyric.top + 0.5));
         expect(lyric.left, greaterThanOrEqualTo(22));
         expect(lyric.right, lessThanOrEqualTo(size.width - 22));
+        expect(chord.right, lessThanOrEqualTo(size.width - 22));
+        if (side) {
+          expect(layout, SongChordLayout.right);
+          expect(lyric.right, lessThan(chord.left));
+          expect(
+            lyric.width,
+            greaterThanOrEqualTo(16 * SongText.rightLayoutMinLyricsEm),
+            reason: 'the lyric column keeps its minimum',
+          );
+        } else {
+          expect(chord.bottom, lessThanOrEqualTo(lyric.top + 0.5));
+        }
         expect(
           _opacity(tester, 'song-chord-layout-fallback'),
-          layout == SongChordLayout.right ? 1 : 0,
+          layout == SongChordLayout.right && !side ? 1 : 0,
+          reason: 'a fallback is never silent',
         );
         await tester.pumpWidget(const SizedBox());
         router.dispose();
       }
+    });
+
+    testWidgets(
+      'right renders beside the lyrics on 360-430 dp phones in every key',
+      (tester) async {
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        tester.view.devicePixelRatio = 1;
+        for (final size in const [
+          Size(360, 760),
+          Size(393, 852),
+          Size(430, 932),
+        ]) {
+          final router = _router(initialLocation: '/prayers/songs/s-typ');
+          tester.view.physicalSize = size;
+          await tester.pumpWidget(
+            MediaQuery(
+              data: MediaQueryData(size: size),
+              child: _app(
+                null,
+                router: router,
+                prefs: const SongPreferences(
+                  showChords: true,
+                  chordLayout: SongChordLayout.right,
+                ),
+                seed: _typicalSeed,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final lyricFinder = find.text('Аллелюя, Езус смерць перамог');
+          Rect chordColumn() => tester.getRect(
+            find
+                .ancestor(
+                  of: find.byWidgetPredicate(
+                    (widget) =>
+                        widget is Text &&
+                        widget.maxLines == 1 &&
+                        widget.softWrap == false &&
+                        widget.key == null,
+                  ),
+                  matching: find.byType(SizedBox),
+                )
+                .first,
+          );
+          void expectRight(String reason) {
+            expect(tester.takeException(), isNull, reason: reason);
+            expect(
+              find.byKey(const Key('song-text-right')),
+              findsOneWidget,
+              reason: reason,
+            );
+            expect(
+              _opacity(tester, 'song-chord-layout-fallback'),
+              0,
+              reason: reason,
+            );
+          }
+
+          expectRight('$size original key');
+          final lyric = tester.getRect(lyricFinder);
+          final column = chordColumn();
+          final chord = tester.getRect(find.text('e a'));
+          expect(chord.left, greaterThan(lyric.right - 0.5), reason: '$size');
+          expect(chord.top, lessThan(lyric.bottom));
+          expect(chord.bottom, greaterThan(lyric.top));
+          expect(chord.right, lessThanOrEqualTo(size.width - 22));
+          expect(
+            lyric.width,
+            greaterThanOrEqualTo(16 * SongText.rightLayoutMinLyricsEm),
+          );
+
+          Future<void> step(String key, int times) async {
+            for (var i = 0; i < times; i++) {
+              await tester.tap(find.byKey(Key(key)));
+              await tester.pump();
+              final value = tester
+                  .widget<Text>(find.byKey(const Key('song-transpose-value')))
+                  .data;
+              expectRight('$size at $value');
+              expect(
+                chordColumn(),
+                column,
+                reason: 'chord column is stable at $value',
+              );
+              expect(
+                tester.getRect(lyricFinder),
+                lyric,
+                reason: 'lyrics do not re-wrap at $value',
+              );
+            }
+          }
+
+          await step('song-transpose-down', 12);
+          expect(find.text('-12'), findsOneWidget);
+          await step('song-transpose-up', 24);
+          expect(find.text('+12'), findsOneWidget);
+          await tester.pumpWidget(const SizedBox());
+          router.dispose();
+        }
+      },
+      variant: _platforms,
+    );
+
+    testWidgets('layout button uses distinct above and right glyphs', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/songs/s-bog');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        _app(
+          null,
+          router: router,
+          prefs: const SongPreferences(showChords: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final above = find.byKey(const Key('song-chord-layout-glyph-above'));
+      final right = find.byKey(const Key('song-chord-layout-glyph-right'));
+      expect(above, findsOneWidget);
+      expect(right, findsNothing);
+      final size = tester.getSize(above);
+      await tester.tap(find.byKey(const Key('song-chord-layout-toggle')));
+      await tester.pumpAndSettle();
+      expect(above, findsNothing);
+      expect(tester.getSize(right), size);
     });
 
     testWidgets(
@@ -948,7 +1111,12 @@ void main() {
           expect(
             find.byKey(const Key('song-text-above')),
             findsOneWidget,
-            reason: 'a chord line wider than 40% is shown above: $size',
+            reason: 'a chord line wider than 45% is shown above: $size',
+          );
+          expect(
+            _opacity(tester, 'song-chord-layout-fallback'),
+            1,
+            reason: 'the fallback is signalled on the control',
           );
           expect(
             container.read(songPreferencesProvider).chordLayout,
@@ -985,8 +1153,9 @@ void main() {
       );
       expect(resolve(700, 60), SongChordLayout.right);
       expect(resolve(346, 60), SongChordLayout.right);
-      expect(resolve(276, 60), SongChordLayout.above, reason: 'lyrics narrow');
-      expect(resolve(700, 300), SongChordLayout.above, reason: 'long chords');
+      expect(resolve(276, 60), SongChordLayout.right, reason: '12.5 em');
+      expect(resolve(230, 60), SongChordLayout.above, reason: 'lyrics narrow');
+      expect(resolve(700, 330), SongChordLayout.above, reason: 'long chords');
       expect(
         SongText.resolveLayout(
           preferred: SongChordLayout.right,

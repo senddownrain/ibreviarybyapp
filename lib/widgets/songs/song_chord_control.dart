@@ -145,11 +145,11 @@ class SongChordControl extends StatelessWidget {
               icon: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  PhosphorIcon(
-                    right
-                        ? PhosphorIconsRegular.alignRightSimple
-                        : PhosphorIconsRegular.alignTopSimple,
-                    size: 22,
+                  // Dimmed while `right` cannot be shown at this width.
+                  AnimatedOpacity(
+                    opacity: fallback ? 0.45 : 1,
+                    duration: const Duration(milliseconds: 160),
+                    child: ChordLayoutGlyph(layout: layout),
                   ),
                   // Always in the tree, so the fallback never moves anything.
                   PositionedDirectional(
@@ -229,6 +229,78 @@ class SongChordControl extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Two lyric lines with their chord marks above each line or beside it.
+///
+/// A purpose-drawn glyph: the generic Phosphor alignment icons read as
+/// unrelated actions at this size. Painted in the ambient icon colour with
+/// Phosphor-like rounded strokes.
+class ChordLayoutGlyph extends StatelessWidget {
+  const ChordLayoutGlyph({super.key, required this.layout, this.size = 22});
+
+  final SongChordLayout layout;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => CustomPaint(
+    key: Key('song-chord-layout-glyph-${layout.storageValue}'),
+    size: Size.square(size),
+    painter: _ChordLayoutGlyphPainter(
+      layout: layout,
+      color: IconTheme.of(context).color ?? const Color(0xFF000000),
+      rtl: Directionality.of(context) == TextDirection.rtl,
+    ),
+  );
+}
+
+class _ChordLayoutGlyphPainter extends CustomPainter {
+  const _ChordLayoutGlyphPainter({
+    required this.layout,
+    required this.color,
+    required this.rtl,
+  });
+
+  final SongChordLayout layout;
+  final Color color;
+  final bool rtl;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Designed on a 22 × 22 grid.
+    canvas.scale(size.width / 22, size.height / 22);
+    if (rtl) {
+      canvas
+        ..translate(22, 0)
+        ..scale(-1, 1);
+    }
+    final lyric = Paint()
+      ..color = color
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
+    final chord = Paint()
+      ..color = color
+      ..strokeWidth = 3.2
+      ..strokeCap = StrokeCap.round;
+    void mark(double x, double y) =>
+        canvas.drawLine(Offset(x, y), Offset(x + 0.01, y), chord);
+    if (layout == SongChordLayout.above) {
+      for (final top in const [3.5, 13.5]) {
+        mark(5, top);
+        mark(12, top);
+        canvas.drawLine(Offset(3, top + 5), Offset(19, top + 5), lyric);
+      }
+    } else {
+      for (final y in const [7.0, 15.0]) {
+        canvas.drawLine(Offset(3, y), Offset(12, y), lyric);
+        mark(17.5, y);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_ChordLayoutGlyphPainter old) =>
+      old.layout != layout || old.color != color || old.rtl != rtl;
 }
 
 class _TransposeValue extends StatelessWidget {
