@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 
+import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
@@ -20,6 +21,7 @@ import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/screens/bible_chapter_screen.dart';
+import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
@@ -511,6 +513,118 @@ void main() {
     }
   });
 
+  group('Holy Mass section bar', () {
+    // The previous anchor (local MediaQuery padding + 14) put the bar inside
+    // the system navigation area whenever the shell had consumed the inset.
+    const gap = 14.0;
+    const contentGap = 24.0;
+
+    Future<({Rect bar, Rect contentEnd, double localPadding})> measure(
+      WidgetTester tester, {
+      required bool shellConsumesInset,
+      TargetPlatform platform = TargetPlatform.android,
+    }) async {
+      await tester.pumpWidget(
+        _massApp(shellConsumesInset: shellConsumesInset, platform: platform),
+      );
+      await tester.pumpAndSettle();
+      // The section with the longest name: a two-line title on narrow phones.
+      await tester.tap(find.byKey(const Key('mass-section-selector')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey('mass-section-eucharistic-liturgy')),
+      );
+      await tester.pumpAndSettle();
+      await _jumpToEnd(tester);
+      await tester.pumpAndSettle();
+      final barFinder = find.byKey(const Key('mass-navigator-bar'));
+      expect(tester.takeException(), isNull);
+      return (
+        bar: tester.getRect(barFinder),
+        contentEnd: tester.getRect(
+          find.byKey(const Key('mass-content-reserve')),
+        ),
+        localPadding: MediaQuery.paddingOf(tester.element(barFinder)).bottom,
+      );
+    }
+
+    void expectClear(
+      ({Rect bar, Rect contentEnd, double localPadding}) m,
+      _Viewport viewport,
+      double systemInset,
+    ) {
+      final safeBottom = viewport.height - systemInset;
+      // Entirely above the system navigation area, at the shared gap.
+      expect(m.bar.bottom, closeTo(safeBottom - gap, 0.01));
+      expect(m.bar.bottom, lessThanOrEqualTo(safeBottom));
+      expect(m.bar.top, greaterThan(0));
+      expect(m.bar.height, greaterThanOrEqualTo(48));
+      expect(m.bar.left, greaterThanOrEqualTo(0));
+      expect(m.bar.right, lessThanOrEqualTo(viewport.width));
+      // The end of the document scrolls clear of the bar.
+      expect(m.bar.top - m.contentEnd.top, closeTo(contentGap, 0.01));
+    }
+
+    for (final viewport in _viewports) {
+      for (final mode in _modes) {
+        testWidgets('Android ${mode.label} ${viewport.label}', (tester) async {
+          _configureView(tester, viewport, mode);
+          final m = await measure(tester, shellConsumesInset: false);
+          expect(m.localPadding, mode.systemInset);
+          expectClear(m, viewport, mode.systemInset);
+          debugPrint(
+            'LAYOUT_LAB mass ${viewport.label} ${mode.label}: '
+            'barTop=${m.bar.top}, barBottom=${m.bar.bottom}, '
+            'contentEnd=${m.contentEnd.top} CORRECT',
+          );
+        });
+
+        testWidgets(
+          'Android ${mode.label} ${viewport.label}, shell consumed the inset',
+          (tester) async {
+            _configureView(tester, viewport, mode);
+            final m = await measure(tester, shellConsumesInset: true);
+            // The dock-less shell leaves no local bottom padding at all.
+            expect(m.localPadding, 0);
+            expectClear(m, viewport, mode.systemInset);
+          },
+        );
+      }
+    }
+
+    testWidgets('Android without a bottom inset', (tester) async {
+      const viewport = _Viewport(390, 840);
+      tester.view
+        ..devicePixelRatio = 1
+        ..physicalSize = Size(viewport.width, viewport.height);
+      addTearDown(tester.view.reset);
+      for (final consumed in [false, true]) {
+        final m = await measure(tester, shellConsumesInset: consumed);
+        expectClear(m, viewport, 0);
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    });
+
+    testWidgets('iOS stays 14pt above the home indicator', (tester) async {
+      const viewport = _Viewport(390, 844);
+      tester.view
+        ..devicePixelRatio = 1
+        ..physicalSize = Size(viewport.width, viewport.height)
+        ..padding = const FakeViewPadding(bottom: 34)
+        ..viewPadding = const FakeViewPadding(bottom: 34);
+      addTearDown(tester.view.reset);
+      for (final consumed in [false, true]) {
+        final m = await measure(
+          tester,
+          shellConsumesInset: consumed,
+          platform: TargetPlatform.iOS,
+        );
+        expectClear(m, viewport, 34);
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    });
+  });
+
   testWidgets('Full Compact Hidden use their actual dock reserve', (
     tester,
   ) async {
@@ -665,6 +779,43 @@ Widget _prayerApp(
   ],
   child: _themedApp(home: home, brightness: brightness, platform: platform),
 );
+
+String _massBody(String label) =>
+    List.generate(12, (i) => '$label $i.').join('\n\n');
+
+final _massPrayer = Prayer(
+  id: kMassRitual.primaryPrayerId,
+  title: 'Парадак святой Імшы',
+  textFormat: 'mybrev-markdown',
+  body: [
+    for (final major in kMassRitual.majorSections)
+      '### ${major.title}\n\n${_massBody(major.title)}',
+  ].join('\n\n'),
+);
+
+/// The Mass reader either directly under the window (local padding equals the
+/// system inset) or inside the shell with its dock hidden, which consumes the
+/// inset before the reader builds.
+Widget _massApp({
+  required bool shellConsumesInset,
+  TargetPlatform platform = TargetPlatform.android,
+}) {
+  final reader = PrayerDetailScreen(prayerId: kMassRitual.primaryPrayerId);
+  return ProviderScope(
+    overrides: [
+      settingsProvider.overrideWith(_LabSettingsNotifier.new),
+      liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
+      allPrayersProvider.overrideWithValue([_massPrayer]),
+      localPrayersProvider.overrideWith(_LabLocalPrayersNotifier.new),
+    ],
+    child: _themedApp(
+      platform: platform,
+      home: shellConsumesInset
+          ? _shellBody(body: reader, dockMode: ReaderChromeMode.hidden)
+          : reader,
+    ),
+  );
+}
 
 Widget _readingsApp({Brightness brightness = Brightness.light}) =>
     ProviderScope(
