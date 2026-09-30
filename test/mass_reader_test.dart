@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -85,6 +86,17 @@ Future<void> _openSheetAndPick(WidgetTester tester, String sectionId) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _selectLanguage(WidgetTester tester, String language) async {
+  await tester.tap(find.byKey(const Key('mass-language-selector')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(Key('mass-language-$language')));
+  await tester.pumpAndSettle();
+}
+
+/// The section name shown in the Mass section bar.
+String _barTitle(WidgetTester tester) =>
+    tester.widget<Text>(find.byKey(const Key('mass-section-title'))).data!;
+
 /// The compact «n/5» indicator of the Mass controls.
 String _position(WidgetTester tester) =>
     tester.widget<Text>(find.byKey(const Key('mass-section-position'))).data!;
@@ -115,7 +127,7 @@ bool _onScreen(WidgetTester tester, Finder finder) {
 }
 
 void main() {
-  testWidgets('Holy Mass opens in Belarusian with compact Mass controls', (
+  testWidgets('Holy Mass opens in Belarusian with the section bar', (
     tester,
   ) async {
     await tester.pumpWidget(_app(const PrayerDetailScreen(prayerId: _massId)));
@@ -124,20 +136,159 @@ void main() {
     expect(find.text('Парадак святой Імшы'), findsOneWidget);
     final bar = find.byKey(const Key('mass-navigator-bar'));
     expect(bar, findsOneWidget);
+    // One tappable selector with the full canonical section name and n/5.
+    expect(_barTitle(tester), 'Уступныя абрады');
+    expect(_position(tester), '1/5');
     expect(
-      find.descendant(of: bar, matching: find.text('Раздзелы')),
+      find.descendant(
+        of: find.byKey(const Key('mass-section-selector')),
+        matching: find.byKey(const Key('mass-section-title')),
+      ),
       findsOneWidget,
     );
-    expect(_position(tester), '1/5');
-    // The long section names are never squeezed into the bar.
-    for (final major in kMassRitual.majorSections) {
+    // No language switching in the bottom bar.
+    expect(
+      find.descendant(
+        of: bar,
+        matching: find.byKey(const Key('mass-language-selector')),
+      ),
+      findsNothing,
+    );
+    for (final variant in kMassRitual.variants) {
       expect(
-        find.descendant(of: bar, matching: find.text(major.title)),
+        find.descendant(of: bar, matching: find.text(variant.shortLabel)),
         findsNothing,
       );
     }
-    // One language selector only (bottom controls, not the top chrome).
-    expect(find.byKey(const Key('mass-language-selector')), findsOneWidget);
+  });
+
+  testWidgets('Mass top actions are language and text scale, no favorite', (
+    tester,
+  ) async {
+    for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+      await tester.pumpWidget(
+        _app(const PrayerDetailScreen(prayerId: _massId), platform: platform),
+      );
+      await tester.pumpAndSettle();
+      final chrome = find.byType(ReaderChrome);
+      final language = find.descendant(
+        of: chrome,
+        matching: find.byKey(const Key('mass-language-selector')),
+      );
+      final scale = find.descendant(
+        of: chrome,
+        matching: find.byKey(const Key('text-scale-open')),
+      );
+      expect(language, findsOneWidget);
+      expect(scale, findsOneWidget);
+      expect(find.byKey(const Key('prayer-detail-favorite')), findsNothing);
+      // [language, text scale], right-aligned, on the platform chrome surface.
+      expect(
+        tester.getCenter(language).dx,
+        lessThan(tester.getCenter(scale).dx),
+      );
+      expect(tester.getCenter(language).dx, greaterThan(400));
+      expect(
+        find.ancestor(
+          of: language,
+          matching: find.byKey(
+            Key(
+              platform == TargetPlatform.iOS
+                  ? 'adaptive-chrome-glass'
+                  : 'adaptive-chrome-ambient',
+            ),
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('mass-language-current')))
+            .data,
+        'BE',
+      );
+
+      await tester.tap(language);
+      await tester.pumpAndSettle();
+      for (final (code, label, short) in [
+        ('be', 'Беларуская', 'BE'),
+        ('la', 'Latina', 'LA'),
+        ('en', 'English', 'EN'),
+      ]) {
+        final item = find.byKey(Key('mass-language-$code'));
+        expect(find.descendant(of: item, matching: find.text(label)), findsOne);
+        expect(find.descendant(of: item, matching: find.text(short)), findsOne);
+      }
+      await tester.tap(find.byKey(const Key('mass-language-la')));
+      await tester.pumpAndSettle();
+      expect(find.text('Ordo Missae'), findsOneWidget);
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('mass-language-current')))
+            .data,
+        'LA',
+      );
+      // The bar keeps the canonical Belarusian name in every language.
+      expect(_barTitle(tester), 'Уступныя абрады');
+      await tester.pumpWidget(const SizedBox.shrink());
+    }
+  });
+
+  testWidgets('a favorited Mass keeps its state without a top control', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_FavoriteMassSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
+          allPrayersProvider.overrideWithValue([_belarusian, _latin]),
+          localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
+        ],
+        child: const MaterialApp(home: PrayerDetailScreen(prayerId: _massId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('prayer-detail-favorite')), findsNothing);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(PrayerDetailScreen)),
+    );
+    expect(container.read(settingsProvider).favoriteIds, contains(_massId));
+  });
+
+  testWidgets('section bar shows every full section name within two lines', (
+    tester,
+  ) async {
+    for (final width in [360.0, 390.0]) {
+      tester.view
+        ..physicalSize = Size(width, 800)
+        ..devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        _app(const PrayerDetailScreen(prayerId: _massId)),
+      );
+      await tester.pumpAndSettle();
+      for (final major in kMassRitual.majorSections) {
+        await _openSheetAndPick(tester, major.id);
+        final title = find.byKey(const Key('mass-section-title'));
+        expect(tester.widget<Text>(title).data, major.title);
+        expect(tester.widget<Text>(title).maxLines, 2);
+        final paragraph = tester.renderObject<RenderParagraph>(
+          find.descendant(of: title, matching: find.byType(RichText)),
+        );
+        expect(paragraph.didExceedMaxLines, isFalse, reason: major.title);
+        expect(
+          paragraph.size.height,
+          lessThanOrEqualTo(
+            2 * paragraph.getFullHeightForCaret(const TextPosition(offset: 0)) +
+                0.5,
+          ),
+          reason: major.title,
+        );
+      }
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    }
   });
 
   testWidgets('sections sheet lists the five Belarusian sections and jumps', (
@@ -203,16 +354,15 @@ void main() {
 
     await _openSheetAndPick(tester, 'liturgy-of-the-word');
     await _openSheetAndPick(tester, 'creed');
-    await tester.tap(find.byKey(const Key('mass-language-en')));
-    await tester.pumpAndSettle();
+    await _selectLanguage(tester, 'en');
     expect(_position(tester), '2/5');
     expect(await _highlighted(tester), {'liturgy-of-the-word', 'creed'});
     expect(_onScreen(tester, find.text('I believe in one God,')), isTrue);
 
     await _openSheetAndPick(tester, 'communion-rite');
-    await tester.tap(find.byKey(const Key('mass-language-be')));
-    await tester.pumpAndSettle();
+    await _selectLanguage(tester, 'be');
     expect(_position(tester), '4/5');
+    expect(_barTitle(tester), 'Абрад Камуніі');
     expect(_onScreen(tester, find.text('Камунія 0.')), isTrue);
   });
 
@@ -225,8 +375,7 @@ void main() {
     await _openSheetAndPick(tester, 'gospel');
     expect(await _highlighted(tester), {'liturgy-of-the-word', 'gospel'});
 
-    await tester.tap(find.byKey(const Key('mass-language-be')));
-    await tester.pumpAndSettle();
+    await _selectLanguage(tester, 'be');
     expect(_position(tester), '2/5');
     expect(await _highlighted(tester), {'liturgy-of-the-word'});
     expect(_onScreen(tester, find.text('Слова 0.')), isTrue);
@@ -258,6 +407,11 @@ void main() {
       final bar = tester.getRect(find.byKey(const Key('mass-navigator-bar')));
       expect(bar.left, greaterThanOrEqualTo(0));
       expect(bar.right, lessThanOrEqualTo(320));
+      for (final key in ['mass-language-selector', 'text-scale-open']) {
+        final action = tester.getRect(find.byKey(Key(key)));
+        expect(action.left, greaterThanOrEqualTo(0));
+        expect(action.right, lessThanOrEqualTo(320));
+      }
       await tester.tap(find.byKey(const Key('mass-section-selector')));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -329,6 +483,23 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('mass-navigator-bar')), findsNothing);
+    // Ordinary prayer actions: favorite + text scale, no Mass language.
+    final chrome = find.byType(ReaderChrome);
+    expect(
+      find.descendant(
+        of: chrome,
+        matching: find.byKey(const Key('prayer-detail-favorite')),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: chrome,
+        matching: find.byKey(const Key('text-scale-open')),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('mass-language-selector')), findsNothing);
   });
 
   test('Mass variant ids open the dedicated Mass reader route', () {
@@ -468,6 +639,11 @@ class _TestSettingsNotifier extends SettingsNotifier {
 
   @override
   void rememberLastSection(String section) {}
+}
+
+class _FavoriteMassSettingsNotifier extends _TestSettingsNotifier {
+  @override
+  SettingsState build() => const SettingsState(favoriteIds: [_massId]);
 }
 
 class _IdleBootstrap extends DataBootstrapNotifier {

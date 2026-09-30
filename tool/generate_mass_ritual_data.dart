@@ -8,6 +8,27 @@ import 'dart:io';
 String _lit(Object? value) =>
     "'${(value as String).replaceAll(r'\', r'\\').replaceAll("'", r"\'").replaceAll(r'$', r'\$')}'";
 
+String _list(Object? values) =>
+    '[${((values as List?) ?? const []).map(_lit).join(', ')}]';
+
+/// `{'key': 'value'}` for a JSON object of strings.
+void _stringMap(StringBuffer out, String name, Object? value) {
+  final map = (value as Map?) ?? const {};
+  if (map.isEmpty) return;
+  out.writeln('$name: {');
+  map.forEach((k, v) => out.writeln('${_lit(k)}: ${_lit(v)},'));
+  out.writeln('},');
+}
+
+/// `{'key': ['a', 'b']}` for a JSON object of string lists.
+void _listMap(StringBuffer out, String name, Object? value) {
+  final map = (value as Map?) ?? const {};
+  if (map.isEmpty) return;
+  out.writeln('$name: {');
+  map.forEach((k, v) => out.writeln('${_lit(k)}: ${_list(v)},'));
+  out.writeln('},');
+}
+
 void main() {
   final json =
       jsonDecode(
@@ -33,7 +54,18 @@ void main() {
     aliases.forEach((k, v) => out.writeln('${_lit(k)}: ${_lit(v)},'));
     out.writeln('},');
   }
-  out.writeln('sections: [');
+  out.writeln('roles: ${_list(json['roles'])},');
+  final policy = (json['rolePolicy'] as Map?) ?? const {};
+  out
+    ..writeln('rolePolicy: MassRolePolicy(')
+    ..writeln('showSpeakerLabels: ${policy['showSpeakerLabels'] == true},');
+  if (policy['labelPolicy'] != null) {
+    out.writeln('labelPolicy: ${_lit(policy['labelPolicy'])},');
+  }
+  out
+    ..writeln('responseRoles: ${_list(policy['responseRoles'])},')
+    ..writeln('),')
+    ..writeln('sections: [');
   for (final s in json['sections'] as List) {
     out.write(
       'MassSectionDef(id: ${_lit(s['id'])}, title: ${_lit(s['title'])}',
@@ -59,13 +91,14 @@ void main() {
       out.writeln('strongMarksResponses: true,');
     }
     if (v['source'] != null) out.writeln('source: ${_lit(v['source'])},');
-    out.writeln('markers: {');
-    (v['markers'] as Map).forEach((k, markers) {
-      out.writeln('${_lit(k)}: [${(markers as List).map(_lit).join(', ')}],');
-    });
-    out
-      ..writeln('},')
-      ..writeln('),');
+    if (v['callRole'] != null) out.writeln('callRole: ${_lit(v['callRole'])},');
+    _listMap(out, 'markers', v['markers']);
+    _listMap(out, 'classify', v['classify']);
+    _stringMap(out, 'speakerLabels', v['speakerLabels']);
+    _stringMap(out, 'roleLabels', v['roleLabels']);
+    _listMap(out, 'roleMarkers', v['roleMarkers']);
+    _listMap(out, 'roleCues', v['roleCues']);
+    out.writeln('),');
   }
   out
     ..writeln('],')

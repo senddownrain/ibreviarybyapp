@@ -27,6 +27,12 @@ class MassVariant {
     this.bundledAsset,
     this.strongMarksResponses = false,
     this.source,
+    this.classify = const {},
+    this.speakerLabels = const {},
+    this.roleLabels = const {},
+    this.roleMarkers = const {},
+    this.roleCues = const {},
+    this.callRole,
   });
 
   final String language;
@@ -34,10 +40,52 @@ class MassVariant {
   final String shortLabel;
   final String prayerId;
   final String title;
+
+  /// Blocks that become the visible heading of a section. For a major
+  /// section the canonical Belarusian title comes first and the heading of a
+  /// not yet migrated text second.
   final Map<String, List<String>> markers;
   final String? bundledAsset;
+
+  /// English convention: a whole bold line is the people's part.
   final bool strongMarksResponses;
   final String? source;
+
+  /// Block type (`heading`, `rubric`, `comment`, `posture`, `alternative`)
+  /// to the markers of the blocks that have it.
+  final Map<String, List<String>> classify;
+
+  /// Speaker prefix in the text (`С.`, `Н.:`, `V.`) to its role.
+  final Map<String, String> speakerLabels;
+
+  /// Role to the compact label shown in a dialogue (`С.`/`Н.`, `V.`/`R.`).
+  final Map<String, String> roleLabels;
+
+  /// Role to the texts said by it without a prefix or a cue (Gloria, Credo).
+  final Map<String, List<String>> roleMarkers;
+
+  /// Role to the rubric phrases that announce it («народ адказвае»).
+  final Map<String, List<String>> roleCues;
+
+  /// Role of the call in a call-and-response paragraph without a prefix.
+  final String? callRole;
+}
+
+/// How speaker roles are presented (shared ritual metadata).
+class MassRolePolicy {
+  const MassRolePolicy({
+    this.showSpeakerLabels = false,
+    this.labelPolicy,
+    this.responseRoles = const ['people', 'all'],
+  });
+
+  final bool showSpeakerLabels;
+
+  /// `dialogue`: a label only in a real call-and-response exchange.
+  final String? labelPolicy;
+
+  /// Roles whose lines are responses.
+  final List<String> responseRoles;
 }
 
 /// A semantic section found in a rendered variant.
@@ -66,6 +114,8 @@ class MassRitual {
     required this.sections,
     required this.variants,
     this.aliases = const {},
+    this.roles = const [],
+    this.rolePolicy = const MassRolePolicy(),
   });
 
   final int schemaVersion;
@@ -74,6 +124,8 @@ class MassRitual {
   final String defaultLanguage;
   final List<MassSectionDef> sections;
   final List<MassVariant> variants;
+  final List<String> roles;
+  final MassRolePolicy rolePolicy;
 
   /// Former section ids (for example `liturgy-of-the-eucharist`) mapped to
   /// their current canonical id.
@@ -131,38 +183,41 @@ class MassRitual {
     return defaultLanguage;
   }
 
-  /// Finds configured section markers among block texts in document order.
+  /// Finds section headings among block texts. Sections are searched in
+  /// ritual order, each after the previous one found, so a repeated line
+  /// marks only the section that follows.
   List<LocatedMassSection> locateSections(
     MassVariant variant,
     List<String> blockTexts,
   ) {
-    final index = <String, String>{};
-    variant.markers.forEach((key, markers) {
-      final sectionId = section(key)?.id;
-      if (sectionId == null) return;
-      for (final marker in markers) {
-        index.putIfAbsent(normalizeMassMarker(marker), () => sectionId);
-      }
-    });
-    final seen = <String>{};
+    final texts = [for (final text in blockTexts) normalizeMassMarker(text)];
     final located = <LocatedMassSection>[];
-    for (var i = 0; i < blockTexts.length; i++) {
-      final sectionId = index[normalizeMassMarker(blockTexts[i])];
-      if (sectionId == null || !seen.add(sectionId)) continue;
-      located.add(
-        LocatedMassSection(
-          blockIndex: i,
-          sectionId: sectionId,
-          title: blockTexts[i].replaceAll(RegExp(r'\s+'), ' ').trim(),
-          parent: section(sectionId)!.parent,
-        ),
-      );
+    var last = -1;
+    for (final def in sections) {
+      final markers = variant.markers[def.id];
+      if (markers == null || markers.isEmpty) continue;
+      for (var i = last + 1; i < texts.length; i++) {
+        if (!markers.any((m) => _markerMatchesNormalized(m, texts[i]))) {
+          continue;
+        }
+        last = i;
+        located.add(
+          LocatedMassSection(
+            blockIndex: i,
+            sectionId: def.id,
+            title: blockTexts[i].replaceAll(RegExp(r'\s+'), ' ').trim(),
+            parent: def.parent,
+          ),
+        );
+        break;
+      }
     }
     return located;
   }
 
-  /// Target after a language switch: same section, its parent, the closest
-  /// preceding section in ritual order, then the next one.
+  /// Target after a language switch: same section, the nearest preceding
+  /// sibling, its parent, the closest preceding section in ritual order, then
+  /// the next one.
   String? resolveSectionTarget(String? requested, Iterable<String> available) {
     final ids = available.map(canonicalSectionId).whereType<String>().toSet();
     final sectionId = canonicalSectionId(requested);
@@ -171,7 +226,12 @@ class MassRitual {
     final order = sections.indexWhere((s) => s.id == sectionId);
     if (order < 0) return null;
     final parent = sections[order].parent;
-    if (parent != null && ids.contains(parent)) return parent;
+    if (parent != null) {
+      for (var i = order - 1; i >= 0 && sections[i].parent == parent; i--) {
+        if (ids.contains(sections[i].id)) return sections[i].id;
+      }
+      if (ids.contains(parent)) return parent;
+    }
     for (var i = order - 1; i >= 0; i--) {
       if (ids.contains(sections[i].id)) return sections[i].id;
     }
@@ -185,9 +245,22 @@ class MassRitual {
 String normalizeMassMarker(String value) => value
     .toLowerCase()
     .replaceAll(RegExp('[’‘`]'), "'")
-    .replaceAll(RegExp(r'''[*_#:.,;!?«»"()\[\]—–-]+'''), ' ')
+    .replaceAll(RegExp(r'''[*_#:.,;!?«»"()\[\]—–…-]+'''), ' ')
     .replaceAll(RegExp(r'\s+'), ' ')
     .trim();
+
+/// A marker matches the whole normalized text; a marker ending with `…`
+/// matches every text that starts with it.
+bool massMarkerMatches(String marker, String text) =>
+    _markerMatchesNormalized(marker, normalizeMassMarker(text));
+
+bool _markerMatchesNormalized(String marker, String normalizedText) {
+  final raw = marker.trim();
+  final key = normalizeMassMarker(raw);
+  if (key.isEmpty) return false;
+  if (normalizedText == key) return true;
+  return raw.endsWith('…') && normalizedText.startsWith('$key ');
+}
 
 /// The section whose heading is the last one at or above [readingLine].
 String? activeMassSectionAt(
