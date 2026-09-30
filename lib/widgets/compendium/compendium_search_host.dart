@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// Height of [PrayerSearchDock].
 const double kCompendiumSearchDockHeight = 58;
@@ -293,7 +294,7 @@ List<Widget> compendiumSearchResultItems(BuildContext context, WidgetRef ref) {
     return const [
       Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
-        child: LinearProgressIndicator(),
+        child: AppProgressLine(),
       ),
     ];
   }

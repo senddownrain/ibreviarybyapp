@@ -27,6 +27,8 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
+import 'package:mybrev_flutter/utils/firestore_cache.dart';
+import 'package:mybrev_flutter/utils/readings_index.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
@@ -182,12 +184,29 @@ void main() {
         '_periodWeekNumber': 26,
         '_dayOfWeek': 2,
         'title': 'Панядзелак',
-        'gospel': {'bible': 'Лк 9, 46-50', 'text': 'У той час Езус сказаў сваім вучням.'},
+        'gospel': {
+          'bible': 'Лк 9, 46-50',
+          'text': 'У той час Езус сказаў сваім вучням.',
+        },
       });
       expect(cached(), isNull, reason: 'the date is not marked complete yet');
       await HiveService.markDateCached('readings', date);
       expect(cached()!.single.id, 'r1');
     });
+  });
+
+  test('readings linked to a day are found through the index', () async {
+    await ReadingsIndex.ensureBuilt();
+    expect(ReadingsIndex.isBuilt, isTrue);
+    await cacheReadingDoc('linked', {
+      '_date': '01.08',
+      '_dayIds': ['01-08-sv-alphonsus-liguori'],
+    });
+    expect(ReadingsIndex.lookupByDayId('01-08-sv-alphonsus-liguori'), [
+      'linked',
+    ]);
+    await cacheReadingDoc('linked', {'_date': '01.08'});
+    expect(ReadingsIndex.lookupByDayId('01-08-sv-alphonsus-liguori'), isEmpty);
   });
 
   group('requests', () {

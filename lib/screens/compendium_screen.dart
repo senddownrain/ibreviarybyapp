@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/utils/compendium_data.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_search_host.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// `/prayers/compendium`: the four parts and local search.
 ///
@@ -94,7 +95,7 @@ class _CompendiumRoot extends ConsumerWidget {
       body = const [
         Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: LinearProgressIndicator(key: Key('compendium-loading')),
+          child: AppProgressLine(key: Key('compendium-loading')),
         ),
       ];
     } else if (searching) {

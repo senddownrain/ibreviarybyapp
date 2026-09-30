@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/prayerbook_section_tiles.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
@@ -133,7 +134,7 @@ class PrayersScreen extends ConsumerWidget {
                   ),
                 ),
                 if (categoryState.isLoading && categories.isEmpty)
-                  const LinearProgressIndicator()
+                  const AppProgressLine()
                 else if (categoryState.hasError && categories.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -380,7 +381,7 @@ class PrayerCategoriesScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 globals.when(
-                  loading: () => const LinearProgressIndicator(),
+                  loading: () => const AppProgressLine(),
                   error: (_, _) => const Text(
                     'Не атрымалася загрузіць стандартныя катэгорыі',
                   ),

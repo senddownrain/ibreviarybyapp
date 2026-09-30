@@ -5,6 +5,13 @@ class ReadingsIndex {
   static const _datePrefix = 'date:';
   static const _periodPrefix = 'period:';
   static const _feastPrefix = 'feast:';
+  static const _dayIdPrefix = 'dayId:';
+
+  /// Version 2 also indexes `_dayId` / `_dayIds` links.
+  static const builtFlag = 'readingsIndexBuiltV2';
+
+  /// The persisted index covers every cached reading.
+  static bool get isBuilt => HiveService.getMetaFlag(builtFlag) == true;
 
   static Future<void> removeDoc(String docId, Map<String, dynamic> data) async {
     final box = HiveService.readingsIndexBox;
@@ -37,6 +44,9 @@ class ReadingsIndex {
   static List<String> lookupByFeast(String feast) =>
       _lookup('$_feastPrefix$feast');
 
+  static List<String> lookupByDayId(String dayId) =>
+      _lookup('$_dayIdPrefix$dayId');
+
   static List<String> lookupForDateContext({
     required String periodType,
     required int periodWeek,
@@ -63,13 +73,13 @@ class ReadingsIndex {
       final id = data['id']?.toString() ?? key.toString();
       await indexDoc(id, data);
     }
-    await HiveService.setMetaFlag('readingsIndexBuilt', true);
+    await HiveService.setMetaFlag(builtFlag, true);
   }
 
   static Future<void> ensureBuilt() async {
-    if (HiveService.getMetaFlag('readingsIndexBuilt') == true) return;
+    if (isBuilt) return;
     if (HiveService.readingsBox.isEmpty) {
-      await HiveService.setMetaFlag('readingsIndexBuilt', true);
+      await HiveService.setMetaFlag(builtFlag, true);
       return;
     }
     await rebuildFromReadingsBox();
@@ -96,6 +106,16 @@ class ReadingsIndex {
     final feast = data['_feast']?.toString();
     if (feast != null && feast.isNotEmpty) {
       keys.add('$_feastPrefix$feast');
+    }
+    final linked = data['_dayId']?.toString();
+    if (linked != null && linked.isNotEmpty) keys.add('$_dayIdPrefix$linked');
+    final many = data['_dayIds'];
+    if (many is List) {
+      for (final id in many) {
+        if (id != null && id.toString().isNotEmpty) {
+          keys.add('$_dayIdPrefix$id');
+        }
+      }
     }
     return keys;
   }

@@ -48,7 +48,10 @@ void main() {
       contains('палюбіў Бог свет'),
     );
     // Chernyavski wording differs from the retired Bokun translation.
-    expect(BibleRepository.getChapter('bel', 'gn', 1).first.text, 'Спачатку стварыў Бог неба і зямлю.');
+    expect(
+      BibleRepository.getChapter('bel', 'gn', 1).first.text,
+      'Спачатку стварыў Бог неба і зямлю.',
+    );
   });
 
   test('parallel mapping aligns both translations', () {

@@ -304,13 +304,27 @@ class ParsedReadingsService {
       results[id] = ParsedReading.fromMap(id, Map<String, dynamic>.from(raw));
     }
 
-    for (final reading in _scanCachedForDate(
-      context,
-      ddmm,
-      feastSet,
-      dayId: dayId,
-    )) {
-      results[reading.id] = reading;
+    if (ReadingsIndex.isBuilt) {
+      // The index also knows the readings linked to a day by `_dayId(s)`.
+      for (final id in [
+        if (dayId != null && dayId.isNotEmpty)
+          ...ReadingsIndex.lookupByDayId(dayId),
+      ]) {
+        final raw = box.get(id);
+        if (raw == null) continue;
+        results[id] = ParsedReading.fromMap(id, Map<String, dynamic>.from(raw));
+      }
+    } else {
+      // Index not built yet (first run after an update): one pass without
+      // copying documents.
+      for (final reading in _scanCachedForDate(
+        context,
+        ddmm,
+        feastSet,
+        dayId: dayId,
+      )) {
+        results[reading.id] = reading;
+      }
     }
 
     return results.values.toList();

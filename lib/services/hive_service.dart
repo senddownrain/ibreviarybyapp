@@ -203,7 +203,8 @@ class HiveService {
                   key == 'lastSync_readings' ||
                   key == 'warmupFrom' ||
                   key == 'warmupTo' ||
-                  key == 'readingsIndexBuilt'),
+                  key == 'readingsIndexBuilt' ||
+                  key == 'readingsIndexBuiltV2'),
         )
         .toList();
     await _meta.deleteAll(keys);
