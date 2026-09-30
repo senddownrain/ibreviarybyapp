@@ -15,7 +15,8 @@ import 'package:mybrev_flutter/utils/song_chords.dart';
 /// first baseline of the line. The side layout is used only when the actual
 /// constraints leave the lyrics enough room ([resolveLayout]); otherwise the
 /// song temporarily renders with chords above, without touching the stored
-/// preference.
+/// preference. The decision and the chord column width are measured over
+/// every transposition, so stepping the key never switches the layout.
 class SongText extends StatelessWidget {
   const SongText({
     super.key,
@@ -24,6 +25,7 @@ class SongText extends StatelessWidget {
     this.showChords = false,
     this.layout = SongChordLayout.above,
     this.transpose = 0,
+    this.onRightFallbackChanged,
   });
 
   final Song song;
@@ -32,11 +34,18 @@ class SongText extends StatelessWidget {
   final SongChordLayout layout;
   final int transpose;
 
-  /// Minimum lyric column width, in effective em of the lyric text.
-  static const rightLayoutMinLyricsEm = 15.0;
+  /// Reports, on every layout, whether the preferred
+  /// [SongChordLayout.right] is currently rendered as `above` because the
+  /// width is too small. Called during layout: defer any state change.
+  final ValueChanged<bool>? onRightFallbackChanged;
+
+  /// Minimum lyric column width, in effective em of the lyric text. Lyric
+  /// lines may wrap in the column, but it never gets narrower than this
+  /// (about 20 characters), which keeps `right` usable on 360–430 dp phones.
+  static const rightLayoutMinLyricsEm = 10.0;
 
   /// The chord column may take at most this share of the available width.
-  static const rightLayoutMaxChordShare = 0.4;
+  static const rightLayoutMaxChordShare = 0.45;
 
   /// Gap between the lyric and the chord column, in effective em.
   static const rightLayoutGapEm = 1.0;
@@ -66,6 +75,30 @@ class SongText extends StatelessWidget {
     return fits ? SongChordLayout.right : SongChordLayout.above;
   }
 
+  /// Last song's candidates: transposing rebuilds the text on every step.
+  static String? _candidatesSource;
+  static Set<String> _candidates = const {};
+
+  /// The longest chord line of [chord] in each key of the transpose range.
+  static Set<String> _widestChordLines(String chord) {
+    if (_candidatesSource == chord) return _candidates;
+    final rows = [
+      for (final row in chord.split('\n'))
+        if (row.trim().isNotEmpty) row,
+    ];
+    final result = <String>{};
+    for (var shift = kMinTranspose; shift <= kMaxTranspose; shift++) {
+      var longest = '';
+      for (final row in rows) {
+        final value = transposeChordLine(row, shift);
+        if (value.length > longest.length) longest = value;
+      }
+      if (longest.isNotEmpty) result.add(longest);
+    }
+    _candidatesSource = chord;
+    return _candidates = result;
+  }
+
   static TextStyle chordStyleFor(BuildContext context, TextStyle textStyle) =>
       textStyle.copyWith(
         fontSize: (textStyle.fontSize ?? 16) * chordScale,
@@ -93,10 +126,13 @@ class SongText extends StatelessWidget {
     final textScaler = MediaQuery.textScalerOf(context);
     final textDirection = Directionality.of(context);
 
+    // Widest chord line over every transposition (sharps make some keys
+    // wider), so the column and the right/above decision do not depend on the
+    // current key. Only the longest line of each key is measured.
     double measureChordColumn() {
+      final candidates = _widestChordLines(song.chord);
       var widest = 0.0;
-      for (final chord in chords) {
-        if (chord.isEmpty) continue;
+      for (final chord in candidates) {
         final painter = TextPainter(
           text: TextSpan(text: chord, style: chordStyle),
           textDirection: textDirection,
@@ -127,6 +163,7 @@ class SongText extends StatelessWidget {
                 ) ==
                 SongChordLayout.right;
         final gap = textScaler.scale(fontSize) * rightLayoutGapEm;
+        onRightFallbackChanged?.call(wantsSide && !side);
 
         return Column(
           key: Key(side ? 'song-text-right' : 'song-text-above'),

@@ -193,12 +193,18 @@ class SongPreferencesNotifier extends Notifier<SongPreferences> {
     }
     final storedLayout = box.get(chordLayoutKey);
     final layout = SongChordLayout.parse(storedLayout);
-    // One-time migrations: `left` → `right`, drop the compact-list flag.
-    if (storedLayout != null && storedLayout != layout.storageValue) {
-      box.put(chordLayoutKey, layout.storageValue);
-    }
-    if (box.containsKey(legacyCompactListKey)) {
-      box.delete(legacyCompactListKey);
+    // Migrations: `left` → `right`, drop the compact-list flag. Idempotent:
+    // once the box is normalized nothing is written again, and a failed
+    // write never prevents the preferences from being read.
+    try {
+      if (storedLayout != null && storedLayout != layout.storageValue) {
+        box.put(chordLayoutKey, layout.storageValue);
+      }
+      if (box.containsKey(legacyCompactListKey)) {
+        box.delete(legacyCompactListKey);
+      }
+    } catch (_) {
+      // The stored values are still read safely on the next start.
     }
     return SongPreferences(
       favoriteSongIds: favorites,
