@@ -4,17 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
-import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
-import 'package:mybrev_flutter/widgets/cache_sync_settings.dart';
+import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
-import 'package:mybrev_flutter/utils/cache_stats.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 
 // ignore_for_file: use_build_context_synchronously
@@ -51,10 +48,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
-    final bootstrap = ref.watch(dataBootstrapProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
-    ref.watch(cacheEpochProvider); // refresh Hive stats after warmup
-    final stats = CacheStats.collect();
 
     return AmbientWash(
       seasonColor: seasonColor,
@@ -205,49 +199,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                CacheSyncSettings(key: _syncKey),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-
-                ExpansionTile(
-                  key: const Key('settings-diagnostics'),
-                  tilePadding: EdgeInsets.zero,
-                  childrenPadding: const EdgeInsets.only(bottom: 8),
-                  title: const Text('Дыягностыка'),
-                  subtitle: const Text('Кэш і пакрыццё даных'),
-                  children: [
-                    if (stats.bootstrapNeeded)
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          'База яшчэ не загружана — адкрыйце галоўны экран',
-                        ),
-                      )
-                    else if (bootstrap.isRunning)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          'Загрузка: ${bootstrap.phase == 'static' ? 'база' : 'дні'}...',
-                        ),
-                      ),
-                    if (stats.coverageLabel != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text('Пакрыццё дат: ${stats.coverageLabel}'),
-                      ),
-                    _StatRow(label: 'Малітвы', count: stats.prayers),
-                    _StatRow(label: 'Дні ў кэшы', count: stats.days),
-                    _StatRow(label: 'Гады', count: stats.years),
-                    _StatRow(label: 'Чытанні ў кэшы', count: stats.readings),
-                    _StatRow(label: 'Заклік', count: stats.invitatoriums),
-                    _StatRow(label: 'Камплета', count: stats.completoriums),
-                    _StatRow(
-                      label: 'Абраныя',
-                      count: settings.favoriteIds.length,
-                    ),
-                  ],
-                ),
+                DataSettingsSection(key: _syncKey),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -589,23 +541,3 @@ class _CategoryDialogState extends ConsumerState<_CategoryDialog> {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-class _StatRow extends StatelessWidget {
-  final String label;
-  final int count;
-  const _StatRow({required this.label, required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Text(label),
-          const Spacer(),
-          Text('$count', style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}

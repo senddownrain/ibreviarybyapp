@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
@@ -1053,40 +1054,47 @@ class _ReadingsStatus extends StatelessWidget {
   final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 360,
-    child: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (loading)
-            const DataLoadingNotice(label: 'Загружаем чытанні выбранага дня')
-          else if (icon != null)
-            PhosphorIcon(
-              icon!,
-              size: 52,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+  Widget build(BuildContext context) => loading
+      // First load only: a still outline of the text that is coming.
+      ? const SizedBox(
+          height: 360,
+          child: DataLoadingNotice(
+            label: 'Загружаем чытанні',
+            shape: LoadingShape.text,
+          ),
+        )
+      : SizedBox(
+          height: 360,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null)
+                  PhosphorIcon(
+                    icon!,
+                    size: 52,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                const SizedBox(height: 14),
+                Text(title, textAlign: TextAlign.center),
+                if (message != null) ...[
+                  const SizedBox(height: 7),
+                  Text(
+                    message!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+                if (onAction != null && actionLabel != null) ...[
+                  const SizedBox(height: 18),
+                  FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+                ],
+              ],
             ),
-          const SizedBox(height: 14),
-          Text(title, textAlign: TextAlign.center),
-          if (message != null) ...[
-            const SizedBox(height: 7),
-            Text(
-              message!,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-          if (onAction != null && actionLabel != null) ...[
-            const SizedBox(height: 18),
-            FilledButton(onPressed: onAction, child: Text(actionLabel!)),
-          ],
-        ],
-      ),
-    ),
-  );
+          ),
+        );
 }
 
 // ---------------------------------------------------------------------------

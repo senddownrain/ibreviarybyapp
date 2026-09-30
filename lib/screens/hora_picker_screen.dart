@@ -22,7 +22,7 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
-import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
@@ -90,9 +90,8 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
         content
             .getContentForDate(widget.date, opts, nextOpts, dynamicDates)
             .where(
-              (item) => item.templates.any(
-                (template) => template.id == widget.dayId,
-              ),
+              (item) =>
+                  item.templates.any((template) => template.id == widget.dayId),
             )
             .firstOrNull
             ?.templates ??
@@ -223,10 +222,10 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                 MediaQuery.paddingOf(context).bottom + 24,
               ),
               children: const [
-                DataLoadingNotice(label: 'Загружаем літургічныя тэксты дня'),
-                TileShimmer(),
-                TileShimmer(),
-                TileShimmer(),
+                DataLoadingNotice(
+                  label: 'Загружаем літургію дня',
+                  shape: LoadingShape.tiles,
+                ),
               ],
             ),
           ],

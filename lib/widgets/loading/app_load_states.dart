@@ -159,9 +159,9 @@ class AppOfflineNotice extends StatelessWidget {
               Flexible(
                 child: Text(
                   message,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ),
             ],

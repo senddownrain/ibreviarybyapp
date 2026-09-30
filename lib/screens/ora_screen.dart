@@ -24,7 +24,7 @@ import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/alternative_text.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
-import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
@@ -387,12 +387,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             0,
             MediaQuery.paddingOf(context).bottom + 24,
           ),
+          // A still outline of a text page: nothing moves next to the
+          // place where the prayer is about to appear.
           children: const [
-            DataLoadingNotice(label: 'Загружаем тэкст літургічнай гадзіны'),
-            TileShimmer(),
-            TileShimmer(),
-            TileShimmer(),
-            TileShimmer(),
+            DataLoadingNotice(
+              label: 'Загружаем тэкст гадзіны',
+              shape: LoadingShape.text,
+            ),
           ],
         ),
       ],

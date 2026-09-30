@@ -85,7 +85,8 @@ class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
   /// Neighbouring days of the day being read. Silent: no progress UI, no
   /// page state; an already cached or already requested date costs nothing.
   Future<void> _prefetchAround(DateTime date) async {
-    if (_disposed || !ref.read(cachePolicyProvider).enabled) return;
+    final policy = ref.read(cachePolicyProvider);
+    if (_disposed || !policy.enabled || !policy.prefetchNearby) return;
     if (ref.read(isOfflineProvider)) return;
     final counter = ref.read(backgroundPrefetchCountProvider.notifier);
     for (final offset in const [1, -1]) {
@@ -129,7 +130,11 @@ class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
             .read(syncStatusProvider.notifier)
             .synchronize(
               SyncPlan(
-                targets: kAutomaticSyncTargets,
+                // On mobile data the large collections wait for Wi-Fi.
+                targets:
+                    policy.wifiOnlyLarge && ref.read(isOnMobileDataProvider)
+                    ? kAutomaticSyncTargets.difference(kLargeSyncTargets)
+                    : kAutomaticSyncTargets,
                 dates: CacheWarmupService.buildDateOrder(
                   DateTime.now(),
                   behind: policy.behind,
