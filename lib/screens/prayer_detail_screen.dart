@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -18,9 +19,9 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
-import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/mass_semantics.dart';
+import 'package:mybrev_flutter/utils/system_insets.dart';
 
 String _stripHtmlText(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -252,14 +253,21 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         overlay: _isMass
             ? _MassNavigatorBar(
                 controller: _massNav,
-                language: _massLanguage,
                 seasonColor: cs.tertiary,
-                onLanguageChanged: _selectMassLanguage,
                 onOpenSections: _openMassSections,
               )
             : null,
+        // Holy Mass: language instead of the favorite control. The favorite
+        // state itself is untouched and stays reachable from the lists.
         actions: [
-          _PrayerFavoriteControl(prayerId: p.id, favorite: isFav),
+          if (_isMass)
+            _MassLanguageControl(
+              language: _massLanguage,
+              seasonColor: cs.tertiary,
+              onChanged: _selectMassLanguage,
+            )
+          else
+            _PrayerFavoriteControl(prayerId: p.id, favorite: isFav),
           const TextScaleControl(),
         ],
         secondaryActions: [
@@ -520,6 +528,17 @@ class MassNavigatorController extends ChangeNotifier {
   List<LocatedMassSection> get sections => _sections;
   String? get active => _active;
 
+  /// Laid-out height of the floating section bar, reported by the bar so the
+  /// document can reserve exactly that much space at its end.
+  double get barHeight => _barHeight;
+  double _barHeight = _MassNavigatorBar.minHeight;
+
+  void _reportBarHeight(double height) {
+    if ((height - _barHeight).abs() < 0.5) return;
+    _barHeight = height;
+    notifyListeners();
+  }
+
   /// The canonical major section containing the current position.
   MassSectionDef? get activeMajor => kMassRitual.majorSectionOf(_active);
 
@@ -732,27 +751,49 @@ class _MassDocumentState extends State<_MassDocument> {
             ),
           ),
         ],
-        // Keeps the last lines clear of the floating Mass controls.
-        SizedBox(height: MediaQuery.paddingOf(context).bottom + 72),
+        // Keeps the last lines clear of the floating section bar. Same
+        // window-inset anchor as the bar itself, minus the space the reader
+        // surface already adds below its content.
+        ListenableBuilder(
+          listenable: widget.controller,
+          builder: (context, _) => SizedBox(
+            key: const Key('mass-content-reserve'),
+            height: floatingOverlayContentReserve(
+              overlayHeight: widget.controller.barHeight,
+              overlayBottom: floatingOverlayBottom(
+                context,
+                gap: _MassNavigatorBar.gap,
+              ),
+              readerBottomPadding:
+                  ReaderContentSurface.bottomSpacing +
+                  MediaQuery.paddingOf(context).bottom,
+              contentGap: _MassNavigatorBar.contentGap,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
-/// Compact Mass controls: «Раздзелы» · n/5 · BE|LA|EN. The five long section
-/// names live only in the sections sheet.
+/// Floating section selector: the full canonical Belarusian name of the
+/// current major section (up to two lines), n/5 and a list affordance. Tapping
+/// it opens the sections sheet. The language lives in the top reader actions.
 class _MassNavigatorBar extends StatelessWidget {
   const _MassNavigatorBar({
     required this.controller,
-    required this.language,
-    required this.onLanguageChanged,
     required this.onOpenSections,
     this.seasonColor,
   });
 
+  /// Distance between the bar and the system navigation area.
+  static const gap = 14.0;
+
+  /// Distance between the end of the document and the bar.
+  static const contentGap = 24.0;
+  static const minHeight = 56.0;
+
   final MassNavigatorController controller;
-  final String language;
-  final ValueChanged<String> onLanguageChanged;
   final VoidCallback onOpenSections;
   final Color? seasonColor;
 
@@ -761,140 +802,235 @@ class _MassNavigatorBar extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final labelStyle = Theme.of(
       context,
-    ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700);
+    ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700, height: 1.2);
     final majorCount = kMassRitual.majorSections.length;
-    return Positioned(
-      left: 16,
-      right: 16,
-      bottom: MediaQuery.paddingOf(context).bottom + 14,
+    // Anchored to the window's system obstruction: the shell hides its dock
+    // on the Mass route, so the local MediaQuery padding may already be
+    // consumed (Android 3-button navigation).
+    return FloatingOverlayPositioned(
+      gap: gap,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
-          child: AdaptiveChromeSurface(
-            key: const Key('mass-navigator-bar'),
-            role: ChromeSurfaceRole.navigation,
-            seasonColor: seasonColor,
-            borderRadius: BorderRadius.circular(28),
-            padding: const EdgeInsets.all(4),
-            child: ListenableBuilder(
-              listenable: controller,
-              builder: (context, _) {
-                final major = controller.activeMajor;
-                final position = controller.activePosition;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Semantics(
-                              button: true,
-                              label: major == null
-                                  ? 'Раздзелы'
-                                  : 'Раздзелы. Цяпер: ${major.title}',
-                              excludeSemantics: true,
-                              child: InkWell(
-                                key: const Key('mass-section-selector'),
-                                borderRadius: BorderRadius.circular(24),
-                                onTap: controller.sections.isEmpty
-                                    ? null
-                                    : onOpenSections,
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    minHeight: 44,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        PhosphorIcon(
-                                          PhosphorIconsRegular.listBullets,
-                                          size: 18,
-                                          color: cs.tertiary,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          child: Text(
-                                            'Раздзелы',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: labelStyle,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+          child: _MassBarHeightReporter(
+            controller: controller,
+            child: AdaptiveChromeSurface(
+              key: const Key('mass-navigator-bar'),
+              role: ChromeSurfaceRole.navigation,
+              seasonColor: seasonColor,
+              borderRadius: BorderRadius.circular(28),
+              padding: const EdgeInsets.all(4),
+              child: MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.3,
+                child: ListenableBuilder(
+                  listenable: controller,
+                  builder: (context, _) {
+                    final major = controller.activeMajor;
+                    final position = controller.activePosition;
+                    final onTap = controller.sections.isEmpty
+                        ? null
+                        : onOpenSections;
+                    return Semantics(
+                      button: true,
+                      onTap: onTap,
+                      label: major == null
+                          ? 'Раздзелы'
+                          : 'Раздзелы. Цяпер: ${major.title}, '
+                                'раздзел $position з $majorCount',
+                      excludeSemantics: true,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: InkWell(
+                          key: const Key('mass-section-selector'),
+                          borderRadius: BorderRadius.circular(24),
+                          onTap: onTap,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minHeight: minHeight - 8,
                             ),
-                          ),
-                          if (position != null)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                              ),
-                              child: Semantics(
-                                label:
-                                    'Раздзел $position з $majorCount: ${major!.title}',
-                                excludeSemantics: true,
-                                child: Text(
-                                  '$position/$majorCount',
-                                  key: const Key('mass-section-position'),
-                                  maxLines: 1,
-                                  style: labelStyle?.copyWith(
-                                    color: cs.onSurfaceVariant,
-                                    fontFeatures: const [
-                                      FontFeature.tabularFigures(),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Flexible(
-                      flex: 4,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerRight,
-                        child: Semantics(
-                          label: 'Мова святой Імшы',
-                          container: true,
-                          child: AdaptiveSegmentedControl<String>(
-                            key: const Key('mass-language-selector'),
-                            showSelectedIcon: false,
-                            value: language,
-                            onChanged: onLanguageChanged,
-                            segments: [
-                              for (final variant in kMassRitual.variants)
-                                AdaptiveSegment(
-                                  value: variant.language,
-                                  label: Semantics(
-                                    label: variant.label,
-                                    excludeSemantics: true,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+                              child: Row(
+                                children: [
+                                  Expanded(
                                     child: Text(
-                                      variant.shortLabel,
-                                      key: Key(
-                                        'mass-language-${variant.language}',
+                                      major?.title ?? 'Раздзелы',
+                                      key: const Key('mass-section-title'),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: labelStyle,
+                                    ),
+                                  ),
+                                  if (position != null) ...[
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '$position/$majorCount',
+                                      key: const Key('mass-section-position'),
+                                      maxLines: 1,
+                                      style: labelStyle?.copyWith(
+                                        color: cs.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                        fontFeatures: const [
+                                          FontFeature.tabularFigures(),
+                                        ],
                                       ),
                                     ),
+                                  ],
+                                  const SizedBox(width: 8),
+                                  PhosphorIcon(
+                                    PhosphorIconsRegular.listBullets,
+                                    size: 18,
+                                    color: cs.tertiary,
                                   ),
-                                ),
-                            ],
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Reports the bar's laid-out height (one or two title lines, text scale) to
+/// the controller after each layout.
+class _MassBarHeightReporter extends SingleChildRenderObjectWidget {
+  const _MassBarHeightReporter({required this.controller, super.child});
+
+  final MassNavigatorController controller;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderMassBarHeightReporter(controller);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderMassBarHeightReporter renderObject,
+  ) => renderObject.controller = controller;
+}
+
+class _RenderMassBarHeightReporter extends RenderProxyBox {
+  _RenderMassBarHeightReporter(this.controller);
+
+  MassNavigatorController controller;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    final height = size.height;
+    final target = controller;
+    // Listeners rebuild after this frame, not during layout.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (attached && identical(target, controller)) {
+        target._reportBarHeight(height);
+      }
+    });
+  }
+}
+
+/// Top-right Mass language control: shows the current language code and opens
+/// a compact menu with the three variants.
+class _MassLanguageControl extends StatelessWidget {
+  const _MassLanguageControl({
+    required this.language,
+    required this.onChanged,
+    this.seasonColor,
+  });
+
+  final String language;
+  final ValueChanged<String> onChanged;
+  final Color? seasonColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final current = kMassRitual.variant(language);
+    return Semantics(
+      container: true,
+      child: AdaptiveChromeSurface(
+        role: ChromeSurfaceRole.control,
+        seasonColor: seasonColor,
+        borderRadius: BorderRadius.circular(24),
+        child: Material(
+          type: MaterialType.transparency,
+          child: PopupMenuButton<String>(
+            key: const Key('mass-language-selector'),
+            tooltip: 'Мова святой Імшы: ${current?.label ?? language}',
+            initialValue: language,
+            position: PopupMenuPosition.under,
+            offset: const Offset(0, 6),
+            borderRadius: BorderRadius.circular(24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            onSelected: onChanged,
+            itemBuilder: (context) => [
+              for (final variant in kMassRitual.variants)
+                PopupMenuItem<String>(
+                  key: Key('mass-language-${variant.language}'),
+                  value: variant.language,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 28,
+                        child: variant.language == language
+                            ? Icon(
+                                Icons.check_rounded,
+                                size: 20,
+                                color: cs.tertiary,
+                              )
+                            : null,
+                      ),
+                      Expanded(child: Text(variant.label)),
+                      const SizedBox(width: 16),
+                      Text(
+                        variant.shortLabel,
+                        style: text.labelMedium?.copyWith(
+                          color: cs.onSurfaceVariant,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 14, right: 8),
+                child: MediaQuery.withClampedTextScaling(
+                  maxScaleFactor: 1.3,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        current?.shortLabel ?? language.toUpperCase(),
+                        key: const Key('mass-language-current'),
+                        maxLines: 1,
+                        style: text.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_drop_down_rounded,
+                        size: 20,
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),
