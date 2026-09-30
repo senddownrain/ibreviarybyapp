@@ -465,10 +465,15 @@ void main() {
         kAutomaticSyncTargets,
         containsAll(
           SyncTarget.values.where(
-            (t) => t != SyncTarget.songs && t != SyncTarget.compendium,
+            (t) =>
+                t != SyncTarget.songs &&
+                t != SyncTarget.compendium &&
+                // The calendar is computed on the device.
+                t != SyncTarget.years,
           ),
         ),
       );
+      expect(SyncTarget.years.automatic, isFalse);
       expect(Hive.isBoxOpen('songs'), isTrue);
     });
 

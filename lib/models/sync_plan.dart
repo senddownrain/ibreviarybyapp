@@ -4,7 +4,9 @@ enum SyncTarget {
   prayers('prayers', 'Малітвы'),
   bibleBel('bible_bel', 'Біблія · беларуская'),
   bibleRu('bible_ru', 'Біблія · руская'),
-  years('yearOptions', 'Параметры літургічных гадоў'),
+  /// Legacy collection. The calendar is computed on the device
+  /// (`computeYearOptions`), so it is downloaded only on explicit request.
+  years('yearOptions', 'Параметры літургічных гадоў', automatic: false),
   invitatoriums('invitatoriums', 'Заклік'),
   completoriums('completoriums', 'Камплета'),
   prayerCategories('prayerCategories', 'Катэгорыі малітваў'),

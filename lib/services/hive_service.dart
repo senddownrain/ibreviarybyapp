@@ -166,9 +166,9 @@ class HiveService {
     return (from, to);
   }
 
-  /// True when essential offline data has never been synced.
+  /// True when essential offline data has never been synced. The calendar
+  /// itself is computed on the device and needs no download.
   static bool needsBootstrap() =>
-      yearOptionsBox.isEmpty ||
       prayersBox.isEmpty ||
       invitatoriumsBox.isEmpty ||
       completoriumsBox.isEmpty;
