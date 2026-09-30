@@ -99,6 +99,14 @@ final compendiumPartOutlineProvider =
           .whenData((index) => index.partOutline(partId)),
     );
 
+/// A visible navigation node (part, section, chapter or named topic) by id.
+final compendiumNodeProvider =
+    Provider.family<AsyncValue<CompendiumNavNode?>, String>(
+      (ref, nodeId) => ref
+          .watch(compendiumIndexProvider)
+          .whenData((index) => index.getNode(nodeId)),
+    );
+
 // ── Search ───────────────────────────────────────────────────────────────────
 
 /// Search index, built lazily the first time a query is entered and only

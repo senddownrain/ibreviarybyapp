@@ -148,6 +148,10 @@ class CompendiumBadge extends StatelessWidget {
 
 /// A navigation row on the Compendium list screens (same structure as the
 /// songbook and prayer rows: text, then a chevron).
+///
+/// The hierarchy levels are the wrappers below ([CompendiumSectionRow],
+/// [CompendiumSubsectionRow], [CompendiumTopicRow], [CompendiumQuestionRow]);
+/// they differ in typography and spacing only, never in colour.
 class CompendiumListRow extends StatelessWidget {
   const CompendiumListRow({
     super.key,
@@ -156,6 +160,9 @@ class CompendiumListRow extends StatelessWidget {
     this.leading,
     this.eyebrow,
     this.subtitle,
+    this.titleStyle,
+    this.eyebrowStyle,
+    this.verticalPadding = 12,
   });
 
   final String title;
@@ -163,6 +170,13 @@ class CompendiumListRow extends StatelessWidget {
   final String? subtitle;
   final Widget? leading;
   final VoidCallback onTap;
+
+  /// Merged over the default `titleMedium` title style.
+  final TextStyle? titleStyle;
+
+  /// Merged over the default accent `labelSmall` eyebrow style.
+  final TextStyle? eyebrowStyle;
+  final double verticalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -182,26 +196,30 @@ class CompendiumListRow extends StatelessWidget {
               if (leading != null) ...[leading!, const SizedBox(width: 14)],
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.symmetric(vertical: verticalPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if ((eyebrow ?? '').isNotEmpty) ...[
                         Text(
                           eyebrow!,
-                          style: textTheme.labelSmall?.copyWith(
-                            color: GlassTokens.of(
-                              context,
-                            ).accentOnSurface(cs.tertiary),
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.6,
-                          ),
+                          style: textTheme.labelSmall
+                              ?.copyWith(
+                                color: GlassTokens.of(
+                                  context,
+                                ).accentOnSurface(cs.tertiary),
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.6,
+                              )
+                              .merge(eyebrowStyle),
                         ),
                         const SizedBox(height: 3),
                       ],
                       Text(
                         title,
-                        style: textTheme.titleMedium?.copyWith(height: 1.3),
+                        style: textTheme.titleMedium
+                            ?.copyWith(height: 1.3)
+                            .merge(titleStyle),
                       ),
                       if ((subtitle ?? '').isNotEmpty) ...[
                         const SizedBox(height: 3),
@@ -223,6 +241,99 @@ class CompendiumListRow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// РАЗДЗЕЛ: the major destination of a part outline. Accent eyebrow, the
+/// largest row title and the widest spacing.
+class CompendiumSectionRow extends StatelessWidget {
+  const CompendiumSectionRow({super.key, required this.node, this.onTap});
+
+  final CompendiumNavNode node;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return CompendiumListRow(
+      eyebrow: node.displayLabel,
+      title: node.title,
+      subtitle: node.rangeLabel,
+      verticalPadding: 18,
+      eyebrowStyle: TextStyle(
+        fontSize: textTheme.labelMedium?.fontSize,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.1,
+      ),
+      titleStyle: TextStyle(
+        fontSize: textTheme.titleLarge?.fontSize,
+        fontWeight: FontWeight.w700,
+        height: 1.25,
+      ),
+      onTap: onTap ?? () => context.push(compendiumNodeLocation(node.id)),
+    );
+  }
+}
+
+/// ПАДРАЗДЗЕЛ: a secondary destination inside a section. Small accent
+/// eyebrow and a `titleMedium` title, one step below [CompendiumSectionRow].
+class CompendiumSubsectionRow extends StatelessWidget {
+  const CompendiumSubsectionRow({super.key, required this.node, this.onTap});
+
+  final CompendiumNavNode node;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => CompendiumListRow(
+    eyebrow: node.displayLabel,
+    title: node.title,
+    subtitle: node.rangeLabel,
+    verticalPadding: 14,
+    eyebrowStyle: const TextStyle(letterSpacing: 0.9),
+    titleStyle: const TextStyle(fontWeight: FontWeight.w700),
+    onTap: onTap ?? () => context.push(compendiumNodeLocation(node.id)),
+  );
+}
+
+/// A named topic: its real title and question range, with no generic level
+/// label and a lighter title than [CompendiumSubsectionRow].
+class CompendiumTopicRow extends StatelessWidget {
+  const CompendiumTopicRow({super.key, required this.node, this.onTap});
+
+  final CompendiumNavNode node;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => CompendiumListRow(
+    title: node.title,
+    subtitle: node.rangeLabel,
+    verticalPadding: 10,
+    titleStyle: const TextStyle(fontWeight: FontWeight.w500),
+    onTap: onTap ?? () => context.push(compendiumTopicLocation(node.id)),
+  );
+}
+
+/// The one question row of the Compendium: number badge, question text,
+/// chevron. Used unchanged wherever a question is listed (section screen,
+/// subsection screen, search results), whoever owns the question.
+class CompendiumQuestionRow extends StatelessWidget {
+  const CompendiumQuestionRow({
+    super.key,
+    required this.question,
+    this.subtitle,
+  });
+
+  final CompendiumQuestion question;
+
+  /// Optional context line (search results).
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) => CompendiumListRow(
+    leading: CompendiumBadge(label: '${question.number}'),
+    title: question.question,
+    subtitle: subtitle,
+    onTap: () => openCompendiumQuestion(context, question.number),
+  );
 }
 
 /// Answer paragraphs with source emphasis, Catechism references and

@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/constants/compendium.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
+import 'package:mybrev_flutter/screens/compendium_node_screen.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_search_host.dart';
@@ -143,179 +144,15 @@ class _CompendiumRoot extends ConsumerWidget {
   }
 }
 
-/// `/prayers/compendium/part/:partId`: the source outline of a part.
-///
-/// Only real source headings are shown (РАЗДЗЕЛ, ГЛАВА, named topics). Questions
-/// printed directly under a section or chapter (question 1 under «ВЕРУ» —
-/// «ВЕРЫМ») are question rows that open the question reader; untitled reading
-/// groups never appear as headings.
-class CompendiumPartScreen extends ConsumerWidget {
+/// `/prayers/compendium/part/:partId`: the compact outline of a part, its
+/// sections only. Questions and subsections are one level down, on the
+/// section's own [CompendiumNodeScreen].
+class CompendiumPartScreen extends StatelessWidget {
   const CompendiumPartScreen({super.key, required this.partId});
 
   final String partId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final accent = GlassTokens.of(context).accentOnSurface(cs.tertiary);
-    final state = ref.watch(compendiumPartOutlineProvider(partId));
-    final outline = state.valueOrNull;
-
-    final children = <Widget>[];
-
-    Widget levelLabel(String label) => Text(
-      label,
-      style: textTheme.labelSmall?.copyWith(
-        color: accent,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.1,
-      ),
-    );
-
-    void addQuestions(CompendiumNavNode node) {
-      for (final question in node.directQuestions) {
-        children.add(
-          CompendiumListRow(
-            key: ValueKey('compendium-question-row-${question.number}'),
-            leading: CompendiumBadge(label: '${question.number}'),
-            title: question.question,
-            onTap: () => openCompendiumQuestion(context, question.number),
-          ),
-        );
-      }
-    }
-
-    void addTopic(CompendiumNavNode topic) {
-      if (topic.heading case final heading?) {
-        children.add(
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Text(
-              heading,
-              style: textTheme.labelSmall?.copyWith(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.6,
-              ),
-            ),
-          ),
-        );
-      }
-      children.add(
-        CompendiumListRow(
-          key: ValueKey('compendium-group-${topic.id}'),
-          title: topic.title,
-          subtitle: topic.rangeLabel,
-          onTap: () => context.push(compendiumTopicLocation(topic.id)),
-        ),
-      );
-    }
-
-    void addChildren(CompendiumNavNode node) {
-      for (final child in node.children) {
-        switch (child.kind) {
-          case CompendiumNodeKind.topic:
-            addTopic(child);
-          case CompendiumNodeKind.chapter:
-            children.addAll([
-              const SizedBox(height: 16),
-              if ((child.label ?? '').isNotEmpty) levelLabel(child.label!),
-              if (child.title.isNotEmpty)
-                Text(
-                  child.title,
-                  key: ValueKey('compendium-chapter-${child.id}'),
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-            ]);
-            addQuestions(child);
-            addChildren(child);
-          case CompendiumNodeKind.section || CompendiumNodeKind.part:
-            children.addAll([
-              const SizedBox(height: 22),
-              if ((child.label ?? '').isNotEmpty) levelLabel(child.label!),
-              if (child.title.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  child.title,
-                  key: ValueKey('compendium-section-${child.id}'),
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ]);
-            addQuestions(child);
-            addChildren(child);
-        }
-      }
-    }
-
-    if (outline == null) {
-      children.add(
-        state.isLoading
-            ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: LinearProgressIndicator(key: Key('compendium-loading')),
-              )
-            : CompendiumMessage(
-                key: const Key('compendium-part-not-found'),
-                icon: PhosphorIconsLight.bookOpenText,
-                title: 'Частка не знойдзена',
-                message: 'Вярніцеся да зместу Кампендыя.',
-                action: TextButton(
-                  onPressed: () => context.go(compendiumLocation()),
-                  child: const Text('Да зместу'),
-                ),
-              ),
-      );
-    } else {
-      children.addAll([
-        if ((outline.label ?? '').isNotEmpty)
-          Text(
-            outline.label!,
-            style: textTheme.labelMedium?.copyWith(
-              color: accent,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        const SizedBox(height: 4),
-        Text(
-          outline.title,
-          key: const Key('compendium-part-title'),
-          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 8),
-      ]);
-      addQuestions(outline);
-      addChildren(outline);
-      children.add(const CompendiumSourceAttribution());
-    }
-
-    return CompendiumSearchHost(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            AmbientWash(
-              seasonColor: cs.tertiary,
-              child: ListView.builder(
-                key: PageStorageKey('compendium-part-$partId-scroll'),
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  MediaQuery.paddingOf(context).top + 90,
-                  20,
-                  104 + MediaQuery.viewPaddingOf(context).bottom,
-                ),
-                itemCount: children.length,
-                itemBuilder: (context, index) => children[index],
-              ),
-            ),
-            FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      CompendiumNodeScreen.part(partId: partId);
 }

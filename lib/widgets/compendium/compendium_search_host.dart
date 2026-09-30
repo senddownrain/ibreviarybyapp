@@ -316,12 +316,10 @@ List<Widget> compendiumSearchResultItems(BuildContext context, WidgetRef ref) {
         message: 'Паспрабуйце іншае слова або нумар пытання.',
       ),
     for (final result in results)
-      CompendiumListRow(
+      CompendiumQuestionRow(
         key: ValueKey('compendium-result-${result.question.number}'),
-        leading: CompendiumBadge(label: '${result.question.number}'),
-        title: result.question.question,
+        question: result.question,
         subtitle: compendiumQuestionContext(result.question),
-        onTap: () => openCompendiumQuestion(context, result.question.number),
       ),
   ];
 }
