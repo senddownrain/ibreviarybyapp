@@ -9,6 +9,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -21,7 +22,7 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
-import 'package:mybrev_flutter/widgets/shimmer_placeholder.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
@@ -66,7 +67,45 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     }
   }
 
+  /// Cache first: a day that is on the device is shown in the first frame.
+  bool _applyLocal() {
+    if (!HiveService.isCacheReady || HiveService.completoriumsBox.isEmpty) {
+      return false;
+    }
+    final calendar = ref.read(calendarServiceProvider);
+    final opts = calendar.getYearOptionsCached(widget.date.year);
+    final nextOpts = calendar.getYearOptionsCached(widget.date.year + 1);
+    final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
+    final content = LiturgicalContentService();
+    final day = content.resolveDayLocal(
+      widget.date,
+      widget.dayId,
+      opts,
+      nextOpts,
+      dynamicDates,
+    );
+    if (day == null) return false;
+    _day = day;
+    _templates =
+        content
+            .getContentForDate(widget.date, opts, nextOpts, dynamicDates)
+            .where(
+              (item) =>
+                  item.templates.any((template) => template.id == widget.dayId),
+            )
+            .firstOrNull
+            ?.templates ??
+        const [];
+    _loading = false;
+    unawaited(_loadReadingSubtitle(calendar, dynamicDates));
+    return true;
+  }
+
   Future<void> _loadDay() async {
+    if (_applyLocal()) {
+      if (mounted) setState(() {});
+      return;
+    }
     try {
       await _loadDayContent();
     } catch (_) {
@@ -183,10 +222,10 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                 MediaQuery.paddingOf(context).bottom + 24,
               ),
               children: const [
-                DataLoadingNotice(label: 'Загружаем літургічныя тэксты дня'),
-                TileShimmer(),
-                TileShimmer(),
-                TileShimmer(),
+                DataLoadingNotice(
+                  label: 'Загружаем літургію дня',
+                  shape: LoadingShape.tiles,
+                ),
               ],
             ),
           ],

@@ -4,7 +4,10 @@ enum SyncTarget {
   prayers('prayers', 'Малітвы'),
   bibleBel('bible_bel', 'Біблія · беларуская'),
   bibleRu('bible_ru', 'Біблія · руская'),
-  years('yearOptions', 'Параметры літургічных гадоў'),
+
+  /// Legacy collection. The calendar is computed on the device
+  /// (`computeYearOptions`), so it is downloaded only on explicit request.
+  years('yearOptions', 'Параметры літургічных гадоў', automatic: false),
   invitatoriums('invitatoriums', 'Заклік'),
   completoriums('completoriums', 'Камплета'),
   prayerCategories('prayerCategories', 'Катэгорыі малітваў'),
@@ -27,6 +30,15 @@ enum SyncTarget {
   /// Whether the automatic background window downloads this collection.
   final bool automatic;
 }
+
+/// Collections that are large enough to wait for Wi-Fi when the user asks
+/// for it (both Bible translations, the songbook and the Compendium).
+const Set<SyncTarget> kLargeSyncTargets = {
+  SyncTarget.bibleBel,
+  SyncTarget.bibleRu,
+  SyncTarget.songs,
+  SyncTarget.compendium,
+};
 
 /// Targets refreshed by the automatic background synchronization.
 final Set<SyncTarget> kAutomaticSyncTargets = {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mybrev_flutter/models/year_options.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
@@ -52,8 +51,8 @@ final dayOptionsProvider = Provider<List<DayOption>>((ref) {
   final date = ref.watch(selectedDateProvider);
   final calService = ref.watch(calendarServiceProvider);
 
-  final opts = _loadYearOptions(date.year);
-  final nextOpts = _loadYearOptions(date.year + 1);
+  final opts = calService.getYearOptionsCached(date.year);
+  final nextOpts = calService.getYearOptionsCached(date.year + 1);
   final dynamicDates = calService.getDynamicDatesCached(date.year);
 
   final service = LiturgicalContentService();
@@ -114,10 +113,3 @@ String _dateKey(DateTime date) =>
 
 /// Stable date key shared by the synchronized Hours/Readings navigation.
 String liturgicalDateKey(DateTime date) => _dateKey(date);
-
-YearOptions? _loadYearOptions(int year) {
-  final box = HiveService.yearOptionsBox;
-  final raw = box.get('$year') ?? box.get(year);
-  if (raw == null) return null;
-  return YearOptions.fromMap(Map<String, dynamic>.from(raw));
-}

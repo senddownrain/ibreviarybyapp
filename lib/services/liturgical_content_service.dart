@@ -1,6 +1,7 @@
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
+import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
@@ -217,6 +218,48 @@ class LiturgicalContentService {
     return options;
   }
 
+  /// The selected day resolved against its period / psalter day from the
+  /// device only — the synchronous counterpart of
+  /// `LiturgicalDayService.resolveDayForDate`. Returns null when the date is
+  /// not completely cached, so the caller falls back to the network path.
+  LiturgicalDay? resolveDayLocal(
+    DateTime date,
+    String dayId,
+    YearOptions? opts,
+    YearOptions? nextYearOpts,
+    DynamicDates? dynamicDates,
+  ) {
+    if (!HiveService.isDateCached('days', date)) return null;
+    final selected = _dayById(dayId);
+    if (selected == null) return null;
+    final context = computeLiturgicalContext(
+      date,
+      opts,
+      nextYearOpts,
+      dynamicDates,
+    );
+    final period = _resolvedPeriod(date, context);
+    final seasonalId = seasonalDateExceptionId(date, context.periodType);
+    LiturgicalDay? resolved;
+    if (seasonalId == dayId) {
+      resolved = context.periodType == 'christmas'
+          ? resolveChristmasDateAgainstPeriod(selected, period)
+          : resolveDayAgainstPeriod(selected, period, fillMissing: true);
+      resolved = applySeasonalWeekdayAntiphons(resolved!, context.dayOfWeek);
+    } else if (selected.date != null && selected.date!.isNotEmpty) {
+      resolved = resolveDayAgainstPeriod(selected, period, fillMissing: true);
+    } else {
+      resolved = resolveDayAgainstPeriod(selected, period);
+    }
+    final data = resolved!.toMap()
+      ..['_periodType'] = context.periodType
+      ..['_periodWeekNumber'] = context.periodWeek
+      ..['_dayOfWeek'] = context.dayOfWeek
+      ..['_calendarDate'] = _isoDate(date)
+      ..['_contextPeriodType'] = context.periodType;
+    return LiturgicalDay.fromMap(data);
+  }
+
   DayOption _option({
     required LiturgicalOptionSource source,
     required String title,
@@ -246,13 +289,14 @@ class LiturgicalContentService {
         context.dayOfWeek,
       ),
     );
-    day ??= _allDays().where((candidate) {
-      final noFeast = (candidate.feast ?? '').trim().isEmpty;
-      return noFeast &&
-          candidate.periodType == context.periodType &&
-          candidate.periodWeekNumber == context.periodWeek &&
-          candidate.dayOfWeek == context.dayOfWeek;
-    }).firstOrNull;
+    day ??= _dayById(
+      DaysIndex.idByPeriod(
+            context.periodType,
+            context.periodWeek,
+            context.dayOfWeek,
+          ) ??
+          '',
+    );
     if (day == null && context.periodType == 'christmas') {
       final psalterWeek = calculatePsalterWeek(
         date: date,
@@ -286,15 +330,6 @@ class LiturgicalContentService {
     return resolved;
   }
 
-  Iterable<LiturgicalDay> _allDays() sync* {
-    for (final key in HiveService.daysBox.keys) {
-      final raw = HiveService.daysBox.get(key);
-      if (raw is Map) {
-        yield LiturgicalDay.fromMap(Map<String, dynamic>.from(raw));
-      }
-    }
-  }
-
   LiturgicalDay? _dayById(String id) {
     if (id.isEmpty) return null;
     final raw = HiveService.daysBox.get(id);
@@ -305,7 +340,7 @@ class LiturgicalContentService {
 
   List<LiturgicalDay> _daysByFeast(String code) {
     final variants = {_normalizeFeast(code), 'feast-${_normalizeFeast(code)}'};
-    return _allDays().where((day) => variants.contains(day.feast)).toList();
+    return _daysByIds(DaysIndex.idsByFeast(variants));
   }
 
   List<LiturgicalDay> _daysByDate(DateTime date) {
@@ -313,8 +348,13 @@ class LiturgicalContentService {
       '${date.day}.${date.month}',
       '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}',
     };
-    return _allDays().where((day) => variants.contains(day.date)).toList();
+    return _daysByIds(DaysIndex.idsByDate(variants));
   }
+
+  // Only the documents the index names are deserialized.
+  List<LiturgicalDay> _daysByIds(Iterable<String> ids) => [
+    for (final id in {...ids}) ?_dayById(id),
+  ];
 }
 
 String _periodTitle(LiturgicalContext context, DateTime date) =>

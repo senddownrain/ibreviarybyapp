@@ -108,8 +108,13 @@ class HiveService {
       getMetaFlag('fullCache_$collection') == true ||
       getMetaFlag(dateCacheKey(collection, date)) == true;
 
-  static Future<void> markDateCached(String collection, DateTime date) =>
-      setMetaFlag(dateCacheKey(collection, date), true);
+  /// Marks a date as completely loaded. Re-marking is free: a date that is
+  /// already ready causes no disk write.
+  static Future<void> markDateCached(String collection, DateTime date) async {
+    final key = dateCacheKey(collection, date);
+    if (getMetaFlag(key) == true) return;
+    await setMetaFlag(key, true);
+  }
 
   static Future<void> init({String? path}) async {
     if (path == null) {
@@ -166,9 +171,35 @@ class HiveService {
     return (from, to);
   }
 
-  /// True when essential offline data has never been synced.
+  /// Removes the downloaded liturgical texts (days and readings) together
+  /// with their readiness marks. Settings, own prayers, highlights and the
+  /// bundled content stay. The texts are downloaded again when needed.
+  static Future<void> clearDownloadedTexts() async {
+    await _days.clear();
+    await _readings.clear();
+    await _readingsIndex.clear();
+    final keys = _meta.keys
+        .where(
+          (key) =>
+              key is String &&
+              (key.startsWith('ready_') ||
+                  key.startsWith('fullCache_') ||
+                  key == 'bytes_days' ||
+                  key == 'bytes_readings' ||
+                  key == 'lastSync_days' ||
+                  key == 'lastSync_readings' ||
+                  key == 'warmupFrom' ||
+                  key == 'warmupTo' ||
+                  key == 'readingsIndexBuilt'),
+        )
+        .toList();
+    await _meta.deleteAll(keys);
+    cacheRevision.value++;
+  }
+
+  /// True when essential offline data has never been synced. The calendar
+  /// itself is computed on the device and needs no download.
   static bool needsBootstrap() =>
-      yearOptionsBox.isEmpty ||
       prayersBox.isEmpty ||
       invitatoriumsBox.isEmpty ||
       completoriumsBox.isEmpty;

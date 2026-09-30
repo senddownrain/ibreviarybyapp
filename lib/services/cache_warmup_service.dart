@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/services/data_log.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_day_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
@@ -96,12 +97,68 @@ class CacheWarmupService {
     }
   }
 
+  /// Requests in flight, shared by every instance: the selected date, the
+  /// neighbour prefetch, Vespers of tomorrow and the background window never
+  /// download the same date twice at the same time.
+  static final Map<String, Future<bool>> _inFlight = {};
+
+  /// Number of date loads that actually started (diagnostics and tests).
+  static int startedLoads = 0;
+
+  static bool isDateReady(DateTime date) =>
+      HiveService.isDateCached('days', date) &&
+      HiveService.isDateCached('readings', date);
+
   Future<bool> warmupDate(
     DateTime date, {
     bool forceRefresh = false,
     bool includeDays = true,
     bool includeReadings = true,
+  }) {
+    final needsDays =
+        includeDays &&
+        (forceRefresh || !HiveService.isDateCached('days', date));
+    final needsReadings =
+        includeReadings &&
+        (forceRefresh || !HiveService.isDateCached('readings', date));
+    // Christmas weekdays take their psalter from an Advent document that a
+    // «ready» date may still lack; that lookup is local when it is cached.
+    if (!needsDays && !needsReadings && !forceRefresh) {
+      DataLog.cacheHit(() => 'date ${_dayKey(date)}');
+    }
+    final key = '${_dayKey(date)}|$includeDays|$includeReadings|$forceRefresh';
+    final running = _inFlight[key];
+    if (running != null) return running;
+    final request =
+        _warmupDate(
+          date,
+          forceRefresh: forceRefresh,
+          includeDays: includeDays,
+          includeReadings: includeReadings,
+          network: needsDays || needsReadings,
+        ).whenComplete(() {
+          // A block body: `remove` returns the future itself, and returning it
+          // from `whenComplete` would make the request wait for itself.
+          _inFlight.remove(key);
+        });
+    _inFlight[key] = request;
+    return request;
+  }
+
+  static String _dayKey(DateTime date) =>
+      '${date.year}-${date.month}-${date.day}';
+
+  Future<bool> _warmupDate(
+    DateTime date, {
+    required bool forceRefresh,
+    required bool includeDays,
+    required bool includeReadings,
+    required bool network,
   }) async {
+    if (network) {
+      startedLoads++;
+      DataLog.fetchStart(() => 'date ${_dayKey(date)}');
+    }
     try {
       await prepareDate(date);
       final opts = _calendar.getYearOptionsCached(date.year);
@@ -158,8 +215,10 @@ class CacheWarmupService {
       await Future.wait(requests);
       if (includeDays) await HiveService.markDateCached('days', date);
       if (includeReadings) await HiveService.markDateCached('readings', date);
+      if (network) DataLog.fetchEnd(() => 'date ${_dayKey(date)}');
       return true;
     } catch (e, st) {
+      DataLog.networkError(() => 'date ${_dayKey(date)}: $e');
       if (kDebugMode) {
         debugPrint('[CacheWarmup] skip ${date.toIso8601String()}: $e\n$st');
       }

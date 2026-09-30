@@ -9,6 +9,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
@@ -22,6 +23,7 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
@@ -35,6 +37,11 @@ class HomeScreen extends ConsumerWidget {
     final selection = ref.watch(hoursLiturgicalSelectionProvider);
     final bootstrap = ref.watch(dataBootstrapProvider);
     final loading = ref.watch(homeDataLoadingProvider);
+    // Content on screen + a request in flight = refresh, never a loader.
+    final refreshing = loading && selection.selected != null;
+    final savedOnly =
+        selection.selected != null && ref.watch(isOfflineProvider);
+    final dateFailed = ref.watch(homeDataFailedProvider);
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final navigationDirection = ref.watch(homeNavDirectionProvider);
     final dayNavigation = ref.read(liturgicalNavigationControllerProvider);
@@ -84,7 +91,20 @@ class HomeScreen extends ConsumerWidget {
                                   ? null
                                   : () => dayNavigation.openDate(today),
                             ),
-                            const SizedBox(height: 28),
+                            // Same two pixels whether or not a refresh runs:
+                            // nothing below moves.
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: AppRefreshBar(
+                                active: refreshing,
+                                color: _semanticInk(context, seasonColor),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            if (savedOnly) ...[
+                              const AppOfflineNotice(),
+                              const SizedBox(height: 14),
+                            ],
                             if (selection.selected case final selected?) ...[
                               _Celebration(
                                 option: selected,
@@ -126,12 +146,15 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ] else if (loading) ...[
                               const _HoursLoading(),
-                            ] else if (bootstrap.error != null) ...[
-                              const _HoursMessage(
-                                icon: PhosphorIconsRegular.warningCircle,
+                            ] else if (bootstrap.error != null ||
+                                dateFailed) ...[
+                              AppErrorState(
                                 title: 'Не ўдалося загрузіць дзень',
-                                body:
-                                    'Праверце падключэнне або сінхранізацыю ў Наладах.',
+                                message:
+                                    'Гэты дзень яшчэ не захаваны на прыладзе. '
+                                    'Праверце падключэнне і паўтарыце.',
+                                onRetry: () =>
+                                    ref.invalidate(selectedDateReadyProvider),
                               ),
                             ] else ...[
                               const _HoursMessage(
@@ -447,7 +470,8 @@ class _HoursLoading extends StatelessWidget {
   Widget build(BuildContext context) => const Padding(
     padding: EdgeInsets.symmetric(vertical: 44),
     child: DataLoadingNotice(
-      label: 'Загружаем літургію і чытанні выбранага дня',
+      label: 'Загружаем літургію дня',
+      shape: LoadingShape.tiles,
     ),
   );
 }

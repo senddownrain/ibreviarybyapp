@@ -72,6 +72,47 @@ class ParsedReadingsService {
     return merged.values.toList();
   }
 
+  /// Readings of a date from the device, or null when the date is not
+  /// completely cached. Synchronous: a screen can render without a loading
+  /// frame and without touching the network.
+  List<ParsedReading>? cachedForDate(
+    DateTime date,
+    YearOptions? opts,
+    YearOptions? nextYearOpts,
+    DynamicDates? dynamicDates, {
+    bool includeAlternatives = false,
+    String? dayId,
+  }) {
+    if (!HiveService.isDateCached('readings', date)) return null;
+    final context = computeLiturgicalContext(
+      date,
+      opts,
+      nextYearOpts,
+      dynamicDates,
+    );
+    final ddmm =
+        '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
+    final cached = _filterWithContent(
+      _getCachedForDate(context, ddmm, dynamicDates, date, dayId: dayId),
+    );
+    if (cached.isEmpty) return null;
+    return includeAlternatives
+        ? _sortForDate(cached, dayId: dayId)
+        : _selectActiveForDate(
+            cached,
+            date: date,
+            context: context,
+            feastCodes: getDynamicFeastCodesForDate(date, dynamicDates),
+            dayId: dayId,
+          );
+  }
+
+  /// Readings of a period day from the device, or null.
+  List<ParsedReading>? cachedByLiturgicalKey(String period, int week, int day) {
+    final cached = _filterWithContent(_getCachedByPeriod(period, week, day));
+    return cached.isEmpty ? null : cached;
+  }
+
   Future<List<ParsedReading>> fetchForDate(
     DateTime date,
     YearOptions? opts,
@@ -284,27 +325,30 @@ class ParsedReadingsService {
     final box = HiveService.readingsBox;
     final results = <String, ParsedReading>{};
 
+    // Selector fields are read in place; only a matching document is copied.
     for (final key in box.keys) {
       final raw = box.get(key);
-      if (raw == null) continue;
-      final data = Map<String, dynamic>.from(raw);
-      final feast = data['_feast'] as String?;
-      final matchesFeast = feast != null && feastSet.contains(feast);
-      final matchesDate = data['_date'] == ddmm;
+      if (raw is! Map) continue;
+      final feast = raw['_feast'];
+      final matchesFeast = feast is String && feastSet.contains(feast);
+      final matchesDate = raw['_date'] == ddmm;
       final matchesPeriod =
-          data['_periodType'] == context.periodType &&
-          _toInt(data['_periodWeekNumber']) == context.periodWeek &&
-          _toInt(data['_dayOfWeek']) == context.dayOfWeek;
-      final linked = data['_dayId']?.toString();
-      final linkedMany = data['_dayIds'];
+          raw['_periodType'] == context.periodType &&
+          _toInt(raw['_periodWeekNumber']) == context.periodWeek &&
+          _toInt(raw['_dayOfWeek']) == context.dayOfWeek;
+      final linked = raw['_dayId']?.toString();
+      final linkedMany = raw['_dayIds'];
       final matchesDayId =
           dayId != null &&
           dayId.isNotEmpty &&
           (linked == dayId ||
               (linkedMany is List &&
-                  linkedMany.map((e) => e.toString()).contains(dayId)));
+                  linkedMany.any((item) => item.toString() == dayId)));
       if (matchesFeast || matchesDate || matchesPeriod || matchesDayId) {
-        results[key as String] = ParsedReading.fromMap(key, data);
+        results[key as String] = ParsedReading.fromMap(
+          key,
+          Map<String, dynamic>.from(raw),
+        );
       }
     }
     return results.values.toList();
@@ -330,12 +374,13 @@ class ParsedReadingsService {
     final results = <ParsedReading>[];
     for (final key in box.keys) {
       final raw = box.get(key);
-      if (raw == null) continue;
-      final data = Map<String, dynamic>.from(raw);
-      if (data['_periodType'] == periodType &&
-          _toInt(data['_periodWeekNumber']) == week &&
-          _toInt(data['_dayOfWeek']) == day) {
-        results.add(ParsedReading.fromMap(key as String, data));
+      if (raw is! Map) continue;
+      if (raw['_periodType'] == periodType &&
+          _toInt(raw['_periodWeekNumber']) == week &&
+          _toInt(raw['_dayOfWeek']) == day) {
+        results.add(
+          ParsedReading.fromMap(key as String, Map<String, dynamic>.from(raw)),
+        );
       }
     }
     return results;

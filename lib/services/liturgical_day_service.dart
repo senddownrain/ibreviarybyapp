@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
@@ -146,17 +147,10 @@ class LiturgicalDayService {
   }) async {
     final results = <String, LiturgicalDay>{};
     if (!forceRefresh) {
-      for (final variant in feastCodeVariants(feastCode)) {
-        for (final key in HiveService.daysBox.keys) {
-          final raw = HiveService.daysBox.get(key);
-          if (raw == null) continue;
-          final data = Map<String, dynamic>.from(raw);
-          if (data['_feast']?.toString() == variant) {
-            results[data['id']?.toString() ?? key.toString()] =
-                LiturgicalDay.fromMap(data);
-          }
-        }
-      }
+      _collectCached(
+        DaysIndex.idsByFeast(feastCodeVariants(feastCode)),
+        results,
+      );
     }
     if (results.isNotEmpty) return results.values.toList();
 
@@ -203,16 +197,7 @@ class LiturgicalDayService {
 
     final results = <String, LiturgicalDay>{};
     if (!forceRefresh) {
-      for (final key in HiveService.daysBox.keys) {
-        final raw = HiveService.daysBox.get(key);
-        if (raw == null) continue;
-        final data = Map<String, dynamic>.from(raw);
-        final stored = data['_date']?.toString();
-        if (stored != null && variants.contains(stored)) {
-          results[data['id']?.toString() ?? key.toString()] =
-              LiturgicalDay.fromMap(data);
-        }
-      }
+      _collectCached(DaysIndex.idsByDate(variants), results);
     }
     if (results.isNotEmpty) return results.values.toList();
 
@@ -354,13 +339,20 @@ class LiturgicalDayService {
     return resolvePeriodDayAgainstPsalter(resolved, fallback)!;
   }
 
+  /// Cached documents by id (the index names them; nothing is scanned).
+  void _collectCached(Iterable<String> ids, Map<String, LiturgicalDay> into) {
+    for (final id in ids) {
+      final raw = HiveService.daysBox.get(id);
+      if (raw == null) continue;
+      into[id] = LiturgicalDay.fromMap(Map<String, dynamic>.from(raw));
+    }
+  }
+
   LiturgicalDay? _hiveFindPeriod(
     String periodType,
     int periodWeek,
     int dayOfWeek,
   ) {
-    final weekStr = periodWeek.toString();
-    final dayStr = dayOfWeek.toString();
     final canonicalId = periodDayDocumentId(periodType, periodWeek, dayOfWeek);
     if (canonicalId.isNotEmpty) {
       final raw = HiveService.daysBox.get(canonicalId);
@@ -368,17 +360,10 @@ class LiturgicalDayService {
         return LiturgicalDay.fromMap(Map<String, dynamic>.from(raw));
       }
     }
-    for (final key in HiveService.daysBox.keys) {
-      final raw = HiveService.daysBox.get(key);
-      if (raw == null) continue;
-      final data = Map<String, dynamic>.from(raw);
-      final feast = data['_feast'];
-      if (feast != null && feast.toString().isNotEmpty) continue;
-      if (data['_periodType'] == periodType &&
-          data['_periodWeekNumber']?.toString() == weekStr &&
-          data['_dayOfWeek']?.toString() == dayStr) {
-        return LiturgicalDay.fromMap(data);
-      }
+    final indexed = DaysIndex.idByPeriod(periodType, periodWeek, dayOfWeek);
+    final raw = indexed == null ? null : HiveService.daysBox.get(indexed);
+    if (raw != null) {
+      return LiturgicalDay.fromMap(Map<String, dynamic>.from(raw));
     }
     return null;
   }
