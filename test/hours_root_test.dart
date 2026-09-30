@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
@@ -309,6 +310,8 @@ List<Override> _overrides(DateTime date, List<DayOption> options) => [
   selectedDateProvider.overrideWith((ref) => date),
   dayOptionsProvider.overrideWithValue(options),
   homeDataLoadingProvider.overrideWithValue(false),
+  homeDataFailedProvider.overrideWithValue(false),
+  isOfflineProvider.overrideWithValue(false),
   dataBootstrapProvider.overrideWith(_TestBootstrapNotifier.new),
 ];
 

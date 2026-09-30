@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/sync_plan.dart';
+import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/cache_policy_provider.dart';
+import 'package:mybrev_flutter/providers/data_activity_provider.dart';
+import 'package:mybrev_flutter/services/data_log.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/sync_provider.dart';
@@ -45,6 +48,13 @@ class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
       }
       if (state.initialComplete && next.enabled) unawaited(_background());
     });
+    // «Probable next action»: once a day is on screen, its neighbours are
+    // prepared silently (tomorrow first — Vespers may need it).
+    ref.listen(selectedDateReadyProvider, (prev, next) {
+      if (next.hasValue && !next.isLoading) {
+        unawaited(_prefetchAround(ref.read(selectedDateProvider)));
+      }
+    });
     Future.microtask(_runInitialBootstrap);
     return const DataBootstrapState();
   }
@@ -69,6 +79,32 @@ class DataBootstrapNotifier extends Notifier<DataBootstrapState> {
       unawaited(_background());
     } catch (e) {
       if (!_disposed) state = DataBootstrapState(error: e.toString());
+    }
+  }
+
+  /// Neighbouring days of the day being read. Silent: no progress UI, no
+  /// page state; an already cached or already requested date costs nothing.
+  Future<void> _prefetchAround(DateTime date) async {
+    if (_disposed || !ref.read(cachePolicyProvider).enabled) return;
+    if (ref.read(isOfflineProvider)) return;
+    final counter = ref.read(backgroundPrefetchCountProvider.notifier);
+    for (final offset in const [1, -1]) {
+      final day = DateTime(date.year, date.month, date.day + offset);
+      if (CacheWarmupService.isDateReady(day)) continue;
+      DataLog.prefetch(() => 'date ${day.year}-${day.month}-${day.day}');
+      counter.state++;
+      try {
+        final service = ref.read(selectedDateWarmupServiceProvider);
+        if (await service.warmupDate(day) && !_disposed) {
+          ref.read(cacheEpochProvider.notifier).state++;
+        }
+      } catch (error) {
+        // Optional work: a failed prefetch is never an error of the screen.
+        DataLog.networkError(() => 'prefetch: $error');
+      } finally {
+        if (!_disposed) counter.state--;
+      }
+      if (_disposed) return;
     }
   }
 
@@ -114,6 +150,13 @@ final dataBootstrapProvider =
     NotifierProvider<DataBootstrapNotifier, DataBootstrapState>(
       DataBootstrapNotifier.new,
     );
+
+/// The selected day could not be loaded (and may have nothing to show).
+final homeDataFailedProvider = Provider<bool>((ref) {
+  ref.watch(dataBootstrapProvider);
+  final ready = ref.watch(selectedDateReadyProvider);
+  return ready.hasError && !ready.isLoading;
+});
 
 final homeDataLoadingProvider = Provider<bool>((ref) {
   ref.watch(dataBootstrapProvider);
