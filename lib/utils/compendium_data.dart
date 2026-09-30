@@ -390,6 +390,28 @@ class CompendiumIndex {
     this,
   );
 
+  late final Map<String, CompendiumNavNode> _nodes = {
+    for (final part in navigation)
+      for (final node in part.descendants) node.id: node,
+  };
+
+  /// A visible navigation node by its id: part (`p1`), section (`p1-s1`),
+  /// chapter (`p1-s1-ch1`) or named topic (`p1-s1-ch2-t1`). Untitled reading
+  /// groups (`p1-s1-intro`) are not nodes.
+  CompendiumNavNode? getNode(String? id) => _nodes[id];
+
+  late final Map<int, CompendiumNavNode> _owners = {
+    for (final node in _nodes.values)
+      for (final question in node.group?.questions ?? node.directQuestions)
+        question.number: node,
+  };
+
+  /// The nearest real heading that owns [question]: its named topic, or the
+  /// chapter/section it is printed directly under. This is the screen on
+  /// which the question is listed.
+  CompendiumNavNode? ownerOf(CompendiumQuestion question) =>
+      _owners[question.number];
+
   /// Source outline of a part, by id (`p2`) or number (`2`).
   CompendiumNavNode? partOutline(String? id) {
     final part = getPart(id);
@@ -453,9 +475,36 @@ class CompendiumIndex {
 }
 
 /// Level of a visible source heading. Model names stay close to the data
-/// (`section` is a РАЗДЗЕЛ, `chapter` a ГЛАВА); the UI always shows the
-/// source-provided `label`/`title`, never a guessed translation.
+/// (`section` is a РАЗДЗЕЛ, `chapter` a source ГЛАВА). The product shows a
+/// chapter as a ПАДРАЗДЗЕЛ: see [CompendiumNavNode.displayLabel].
 enum CompendiumNodeKind { part, section, chapter, topic }
+
+const _masculineOrdinals = [
+  'ПЕРШЫ',
+  'ДРУГІ',
+  'ТРЭЦІ',
+  'ЧАЦВЁРТЫ',
+  'ПЯТЫ',
+  'ШОСТЫ',
+  'СЁМЫ',
+  'ВОСЬМЫ',
+  'ДЗЯВЯТЫ',
+  'ДЗЯСЯТЫ',
+];
+
+/// Product name of the chapter level.
+const kCompendiumSubsectionTerm = 'ПАДРАЗДЗЕЛ';
+
+/// «ПАДРАЗДЗЕЛ ПЕРШЫ»: the product label of a source chapter, generated from
+/// its number with a masculine ordinal (the source «ГЛАВА ПЕРШАЯ» is feminine,
+/// so the label is never derived by replacing the noun). Numbers without a
+/// known ordinal fall back to «ПАДРАЗДЗЕЛ 11».
+String compendiumSubsectionLabel(int? number) {
+  if (number == null || number < 1) return kCompendiumSubsectionTerm;
+  return number <= _masculineOrdinals.length
+      ? '$kCompendiumSubsectionTerm ${_masculineOrdinals[number - 1]}'
+      : '$kCompendiumSubsectionTerm $number';
+}
 
 /// A visible node of the source hierarchy (ЧАСТКА → РАЗДЗЕЛ → ГЛАВА → named
 /// topic), derived from the canonical dataset without copying its content.
@@ -473,8 +522,10 @@ class CompendiumNavNode {
     required this.kind,
     required this.title,
     this.label,
+    this.number,
     this.heading,
     this.group,
+    this.parent,
   });
 
   /// Part/section/chapter id from the dataset (`p1`, `p1-s1`, `p1-s1-ch1`)
@@ -482,9 +533,48 @@ class CompendiumNavNode {
   final String id;
   final CompendiumNodeKind kind;
 
-  /// «ЧАСТКА ПЕРШАЯ», «РАЗДЗЕЛ ПЕРШЫ», «ГЛАВА ПЕРШАЯ»; `null` for topics.
+  /// Source label: «ЧАСТКА ПЕРШАЯ», «РАЗДЗЕЛ ПЕРШЫ», «ГЛАВА ПЕРШАЯ»; `null`
+  /// for topics. Screens show [displayLabel] instead.
   final String? label;
+
+  /// Part, section or chapter number; `null` for topics.
+  final int? number;
   final String title;
+
+  /// The node above this one; `null` for a part.
+  final CompendiumNavNode? parent;
+
+  /// Quotation boxes the source prints under this heading.
+  final List<CompendiumCitation> leadCitations = [];
+
+  /// Level label shown in the UI: ЧАСТКА and РАЗДЗЕЛ come from the source, a
+  /// chapter is a «ПАДРАЗДЗЕЛ …» ([compendiumSubsectionLabel]), and a named
+  /// topic has no generic level name.
+  String? get displayLabel => switch (kind) {
+    CompendiumNodeKind.chapter => compendiumSubsectionLabel(number),
+    CompendiumNodeKind.topic => null,
+    CompendiumNodeKind.part || CompendiumNodeKind.section => label,
+  };
+
+  /// Part, section or chapter: a screen of rows, not a reader.
+  bool get isStructural => kind != CompendiumNodeKind.topic;
+
+  /// Headings above this node, outermost first, as shown in a context line:
+  /// the part by its label, deeper levels by their titles.
+  List<String> get contextTrail => [
+    for (CompendiumNavNode? node = parent; node != null; node = node.parent)
+      node.kind == CompendiumNodeKind.part
+          ? (node.label ?? node.title)
+          : node.title,
+  ].reversed.where((text) => text.isNotEmpty).toList();
+
+  /// This node and everything below it, in canonical order.
+  Iterable<CompendiumNavNode> get descendants sync* {
+    yield this;
+    for (final child in children) {
+      yield* child.descendants;
+    }
+  }
 
   /// A source heading printed above this topic that groups it with the next
   /// topics (`CompendiumTopic.parentTitle`).
@@ -528,6 +618,10 @@ List<CompendiumNavNode> buildCompendiumNavigation(CompendiumIndex index) => [
 /// with untitled lead-in questions attached directly to the nearest real
 /// heading (MyBrev `buildPartOutline`, refined). Returns `null` for an
 /// unknown part.
+///
+/// Browsing rule (docs/compendium.md): every node is its own screen, which
+/// lists the node's `directQuestions` and then its `children`, so a question
+/// is always reached by drilling down to its nearest real owner.
 CompendiumNavNode? buildCompendiumPartOutline(
   CompendiumIndex index,
   String partId,
@@ -538,6 +632,7 @@ CompendiumNavNode? buildCompendiumPartOutline(
     id: part.id,
     kind: CompendiumNodeKind.part,
     label: _nonEmpty(part.label),
+    number: part.number,
     title: part.title,
   );
   final sections = <int, CompendiumNavNode>{};
@@ -552,7 +647,9 @@ CompendiumNavNode? buildCompendiumPartOutline(
         id: sectionInfo?.id ?? '${part.id}-s${unit.sectionNumber}',
         kind: CompendiumNodeKind.section,
         label: _nonEmpty(unit.sectionLabel) ?? _nonEmpty(sectionInfo?.label),
+        number: unit.sectionNumber,
         title: _nonEmpty(unit.sectionTitle) ?? sectionInfo?.title ?? '',
+        parent: root,
       );
       root.children.add(node);
       return node;
@@ -568,12 +665,15 @@ CompendiumNavNode? buildCompendiumPartOutline(
           id: id,
           kind: CompendiumNodeKind.chapter,
           label: _nonEmpty(unit.chapterLabel) ?? _nonEmpty(chapterInfo?.label),
+          number: number,
           title: _nonEmpty(unit.chapterTitle) ?? chapterInfo?.title ?? '',
+          parent: section,
         );
         section.children.add(node);
         return node;
       });
     }
+    target.leadCitations.addAll(unit.leadCitations);
     // The untitled lead-in (validated to precede every topic of the unit).
     if (index.groups[unit.id] case final lead?
         when lead.kind == CompendiumGroupKind.unit) {
@@ -589,6 +689,7 @@ CompendiumNavNode? buildCompendiumPartOutline(
           title: topic.title,
           heading: _nonEmpty(topic.parentTitle),
           group: group,
+          parent: target,
         ),
       );
     }

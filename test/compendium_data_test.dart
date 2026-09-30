@@ -260,6 +260,169 @@ void main() {
       expect(celebration.heading, 'ЦЭЛЕБРАЦЫЯ ЛIТУРГII КАСЦЁЛА');
     });
 
+    test('ПАДРАЗДЗЕЛ labels use masculine ordinals from the number', () {
+      expect(
+        [
+          for (var number = 1; number <= 10; number++) number,
+        ].map(compendiumSubsectionLabel),
+        [
+          'ПАДРАЗДЗЕЛ ПЕРШЫ',
+          'ПАДРАЗДЗЕЛ ДРУГІ',
+          'ПАДРАЗДЗЕЛ ТРЭЦІ',
+          'ПАДРАЗДЗЕЛ ЧАЦВЁРТЫ',
+          'ПАДРАЗДЗЕЛ ПЯТЫ',
+          'ПАДРАЗДЗЕЛ ШОСТЫ',
+          'ПАДРАЗДЗЕЛ СЁМЫ',
+          'ПАДРАЗДЗЕЛ ВОСЬМЫ',
+          'ПАДРАЗДЗЕЛ ДЗЯВЯТЫ',
+          'ПАДРАЗДЗЕЛ ДЗЯСЯТЫ',
+        ],
+      );
+      expect(compendiumSubsectionLabel(11), 'ПАДРАЗДЗЕЛ 11');
+      expect(compendiumSubsectionLabel(null), 'ПАДРАЗДЗЕЛ');
+      expect(compendiumSubsectionLabel(0), 'ПАДРАЗДЗЕЛ');
+
+      // The source label stays faithful; only the display label changes.
+      final chapter = index.getNode('p1-s1-ch1')!;
+      expect(chapter.label, 'ГЛАВА ПЕРШАЯ');
+      expect(chapter.displayLabel, 'ПАДРАЗДЗЕЛ ПЕРШЫ');
+      expect(index.getNode('p2-s2-ch4')!.displayLabel, 'ПАДРАЗДЗЕЛ ЧАЦВЁРТЫ');
+      expect(index.getNode('p1-s1')!.displayLabel, 'РАЗДЗЕЛ ПЕРШЫ');
+      expect(index.getNode('p1')!.displayLabel, 'ЧАСТКА ПЕРШАЯ');
+      expect(index.getNode('p1-s1-ch2-t1')!.displayLabel, isNull);
+      expect(
+        index.units.map((unit) => unit.chapterLabel).whereType<String>(),
+        everyElement(startsWith('ГЛАВА ')),
+        reason: 'canonical data is not rewritten',
+      );
+    });
+
+    test('audit: every node is addressable and owns its questions once', () {
+      final nodes = [for (final part in index.navigation) ...part.descendants];
+      expect(nodes.map((node) => node.id).toSet(), hasLength(nodes.length));
+      final counts = <CompendiumNodeKind, int>{};
+      final owned = <int>[];
+      for (final node in nodes) {
+        counts[node.kind] = (counts[node.kind] ?? 0) + 1;
+        expect(identical(index.getNode(node.id), node), isTrue);
+        expect(node.questions, isNotEmpty, reason: node.id);
+        final label = node.displayLabel ?? '';
+        expect(label, isNot(contains('ГЛАВА')), reason: node.id);
+        switch (node.kind) {
+          case CompendiumNodeKind.part:
+            expect(node.parent, isNull);
+            expect(label, startsWith('ЧАСТКА '));
+            expect(node.directQuestions, isEmpty, reason: node.id);
+            expect(
+              node.children.map((child) => child.kind).toSet(),
+              {CompendiumNodeKind.section},
+              reason: 'a part screen lists sections only',
+            );
+            expect(node.contextTrail, isEmpty);
+          case CompendiumNodeKind.section:
+            expect(node.parent!.kind, CompendiumNodeKind.part);
+            expect(label, startsWith('РАЗДЗЕЛ '));
+            expect(node.contextTrail, [node.parent!.label]);
+          case CompendiumNodeKind.chapter:
+            expect(node.parent!.kind, CompendiumNodeKind.section);
+            expect(label, compendiumSubsectionLabel(node.number));
+            expect(label, matches(RegExp(r'^ПАДРАЗДЗЕЛ \S+[ЫІ]$')));
+            expect(
+              node.children.map((child) => child.kind).toSet().difference({
+                CompendiumNodeKind.topic,
+              }),
+              isEmpty,
+              reason: 'a subsection holds questions and topics only',
+            );
+            expect(node.contextTrail, [
+              node.parent!.parent!.label,
+              node.parent!.title,
+            ]);
+          case CompendiumNodeKind.topic:
+            expect(node.parent!.isStructural, isTrue);
+            expect(node.isStructural, isFalse);
+        }
+        for (final child in node.children) {
+          expect(identical(child.parent, node), isTrue, reason: child.id);
+        }
+        // Direct questions precede the children, in canonical order.
+        if (node.directQuestions.isNotEmpty && node.children.isNotEmpty) {
+          expect(
+            node.directQuestions.last.number,
+            lessThan(node.children.first.firstQuestion),
+            reason: node.id,
+          );
+        }
+        final own = node.group?.questions ?? node.directQuestions;
+        for (final question in own) {
+          owned.add(question.number);
+          expect(identical(index.ownerOf(question), node), isTrue);
+        }
+      }
+      expect(counts, {
+        CompendiumNodeKind.part: 4,
+        CompendiumNodeKind.section: 8,
+        CompendiumNodeKind.chapter: 20,
+        CompendiumNodeKind.topic: 70,
+      });
+      expect(owned, [for (var number = 1; number <= 598; number++) number]);
+      expect(index.getNode('p1-s1-intro'), isNull);
+      expect(index.getNode(null), isNull);
+    });
+
+    test('audit: direct questions of sections and subsections', () {
+      final direct = {
+        for (final part in index.navigation)
+          for (final node in part.descendants)
+            if (node.isStructural && node.directQuestions.isNotEmpty)
+              node.id: [
+                node.directQuestions.first.number,
+                node.directQuestions.last.number,
+              ],
+      };
+      expect(direct, {
+        'p1-s1': [1, 1],
+        'p1-s1-ch1': [2, 5],
+        'p1-s2-ch2': [79, 80],
+        'p2-s1': [218, 220],
+        'p2-s2-ch1': [251, 251],
+        'p2-s2-ch2': [295, 295],
+        'p2-s2-ch3': [321, 321],
+        'p3-s1': [357, 357],
+        'p3-s2': [434, 441],
+        'p4-s1': [534, 534],
+        'p4-s1-ch1': [535, 535],
+        'p4-s1-ch2': [557, 557],
+        'p4-s1-ch3': [567, 568],
+      });
+      // A section without chapters holds named topics only.
+      final lordsPrayer = index.getNode('p4-s2')!;
+      expect(lordsPrayer.children.map((node) => node.kind).toSet(), {
+        CompendiumNodeKind.topic,
+      });
+      // A section with its own named topic before its subsections.
+      expect(index.getNode('p2-s2')!.children.map((node) => node.id), [
+        'p2-s2-intro-t1',
+        'p2-s2-ch1',
+        'p2-s2-ch2',
+        'p2-s2-ch3',
+        'p2-s2-ch4',
+      ]);
+      expect(index.getNode('p1-s1')!.rangeLabel, 'Пытанні 1–32');
+      expect(index.getNode('p1-s1-ch1')!.rangeLabel, 'Пытанні 2–5');
+      expect(index.getNode('p1-s1-ch1')!.leadCitations, hasLength(1));
+      // Subtopic headings stay inside a topic, never a navigation level.
+      final church = index.getNode('p1-s2-ch3-t2')!;
+      expect(church.children, isEmpty);
+      expect(
+        church.questions
+            .map((q) => q.subtopicTitle)
+            .whereType<String>()
+            .toSet(),
+        hasLength(6),
+      );
+    });
+
     test('untitled lead-ins are reading chunks, not headings', () {
       final intro = index.getGroup('p1-s1-intro')!;
       expect(intro.hasSourceHeading, isFalse);
