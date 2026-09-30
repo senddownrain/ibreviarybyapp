@@ -144,6 +144,11 @@ class MassRitual {
         index.putIfAbsent(normalizeMassMarker(marker), () => sectionId);
       }
     });
+    // Normalized content uses the canonical Belarusian names of the five
+    // major sections in every language; configured markers keep priority.
+    for (final major in majorSections) {
+      index.putIfAbsent(normalizeMassMarker(major.title), () => major.id);
+    }
     final seen = <String>{};
     final located = <LocatedMassSection>[];
     for (var i = 0; i < blockTexts.length; i++) {

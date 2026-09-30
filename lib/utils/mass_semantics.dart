@@ -55,13 +55,23 @@ final Map<String, List<(RegExp, MassRole)>> _roleLabels = {
     (RegExp(r'^V\.(?=\s|$)'), MassRole.celebrant),
     (RegExp(r'^R\.(?=\s|$)'), MassRole.people),
   ],
+  // `С.:`/`Н.:` in the current text, `С.`/`Н.` after normalization.
   'be': [
-    (RegExp(r'^[СC]\.:'), MassRole.celebrant),
-    (RegExp(r'^Н\.:'), MassRole.people),
+    (RegExp(r'^[СC]\.(?::|(?=\s|$))'), MassRole.celebrant),
+    (RegExp(r'^Н\.(?::|(?=\s|$))'), MassRole.people),
     (RegExp(r'^Цэлебрант:'), MassRole.celebrant),
     (RegExp(r'^Усе:'), MassRole.all),
   ],
+  // The bundled English text has no abbreviations today; the normalized one
+  // may use `P.`/`R.`.
+  'en': [
+    (RegExp(r'^P\.(?=\s|$)'), MassRole.celebrant),
+    (RegExp(r'^R\.(?=\s|$)'), MassRole.people),
+  ],
 };
+
+/// A bold run opened before a role label (`<strong>R. Amen.</strong>`).
+final _leadingStrong = RegExp(r'^<(?:strong|b)>\s*', caseSensitive: false);
 
 /// Rubrics that introduce the congregation's part in variants without role
 /// abbreviations for it (Belarusian): the following spoken block is a response.
@@ -380,7 +390,9 @@ List<dom.Element> _classifySpoken(
     var allResponses = true;
     final out = <String>[];
     for (final line in lines) {
-      final trimmed = line.trimLeft();
+      var trimmed = line.trimLeft();
+      final opening = _leadingStrong.firstMatch(trimmed)?[0] ?? '';
+      trimmed = trimmed.substring(opening.length);
       (RegExp, MassRole)? hit;
       for (final entry in labels) {
         if (entry.$1.hasMatch(trimmed)) {
@@ -395,7 +407,7 @@ List<dom.Element> _classifySpoken(
       }
       labelled = true;
       final label = hit.$1.firstMatch(trimmed)![0]!;
-      final rest = trimmed.substring(label.length).trimLeft();
+      final rest = opening + trimmed.substring(label.length).trimLeft();
       final role = hit.$2;
       final isResponse = role != MassRole.celebrant;
       if (!isResponse) allResponses = false;

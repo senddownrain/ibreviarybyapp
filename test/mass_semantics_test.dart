@@ -333,6 +333,79 @@ void main() {
     }
   });
 
+  group('normalized content', () {
+    const majors = [
+      'Уступныя абрады',
+      'Літургія слова',
+      'Эўхарыстычная літургія',
+      'Абрад Камуніі',
+      'Заключныя абрады',
+    ];
+    const ids = [
+      'introductory-rites',
+      'liturgy-of-the-word',
+      'eucharistic-liturgy',
+      'communion-rite',
+      'concluding-rites',
+    ];
+
+    test('canonical Belarusian major headings are located in any language', () {
+      for (final (language, line) in [
+        ('be', 'С. Пан з вамі.'),
+        ('la', 'V. Dominus vobiscum.'),
+        ('en', 'P. The Lord be with you.'),
+      ]) {
+        final doc = _build(
+          language,
+          [for (final title in majors) '## $title\n\n$line'].join('\n\n'),
+        );
+        expect(doc.sections.map((s) => s.sectionId), ids, reason: language);
+        expect(_textsOf(doc, MassBlockClass.major), majors, reason: language);
+      }
+    });
+
+    test('normalized speaker prefixes are role labels in every language', () {
+      List<String> roles(String language, String markdown) => [
+        for (final r in _fragment(
+          _build(language, markdown),
+        ).querySelectorAll('.${MassBlockClass.roleLabel}'))
+          '${r.text}=${r.attributes['data-role']}',
+      ];
+      expect(
+        roles(
+          'be',
+          '## Уступныя абрады\n\nС. Пан з вамі.\nН. І з духам тваім.',
+        ),
+        ['С.=celebrant', 'Н.=people'],
+      );
+      expect(
+        roles(
+          'la',
+          '## Уступныя абрады\n\nV. Dominus vobiscum.\nR. Et cum spiritu tuo.',
+        ),
+        ['V.=celebrant', 'R.=people'],
+      );
+      final english =
+          '## Уступныя абрады\n\nP. The Lord be with you.\n**R. And with your spirit.**';
+      expect(roles('en', english), ['P.=celebrant', 'R.=people']);
+      // The response keeps its semantic class and its wording.
+      expect(_textsOf(_build('en', english), MassBlockClass.response), [
+        'And with your spirit.',
+      ]);
+    });
+
+    test('ordinary words starting with a role letter are not labels', () {
+      final doc = _build(
+        'be',
+        '## Уступныя абрады\n\nСвятар гаворыць.\n\nНа зямлі супакой.',
+      );
+      expect(
+        _fragment(doc).querySelectorAll('.${MassBlockClass.roleLabel}'),
+        isEmpty,
+      );
+    });
+  });
+
   test('chunks start at every located section', () {
     final doc = _build('be', _belarusian);
     expect(
