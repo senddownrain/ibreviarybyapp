@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -9,6 +10,7 @@ import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/services/data_log.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/cache_warmup_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -197,7 +199,53 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     super.dispose();
   }
 
-  Future<LiturgicalDay?> _loadDay() async {
+  /// Cache first: when the day (and, for Vespers, tomorrow) is already on
+  /// the device the hour is resolved synchronously and rendered in the first
+  /// frame — no loading state, no network.
+  Future<LiturgicalDay?> _loadDay() {
+    final local = _resolveLocal();
+    if (local != null) {
+      DataLog.cacheHit(() => 'hour ${widget.oraType} ${widget.dayId}');
+      return SynchronousFuture(local);
+    }
+    DataLog.cacheMiss(() => 'hour ${widget.oraType} ${widget.dayId}');
+    return _loadDayRemote();
+  }
+
+  LiturgicalDay? _resolveLocal() {
+    if (!HiveService.isCacheReady) return null;
+    if (HiveService.invitatoriumsBox.isEmpty ||
+        HiveService.completoriumsBox.isEmpty) {
+      return null;
+    }
+    final calendar = ref.read(calendarServiceProvider);
+    final content = LiturgicalContentService();
+    final selected = content.resolveDayLocal(
+      widget.date,
+      widget.dayId,
+      calendar.getYearOptionsCached(widget.date.year),
+      calendar.getYearOptionsCached(widget.date.year + 1),
+      calendar.getDynamicDatesCached(widget.date.year),
+    );
+    if (selected == null || widget.oraType != 'vespers') return selected;
+    if (usesOwnVespers(selected)) return selected;
+    // I Vespers may belong to tomorrow: decided locally only when tomorrow
+    // is cached too (it is prefetched with today).
+    final tomorrow = DateUtils.addDaysToDate(widget.date, 1);
+    if (!HiveService.isDateCached('days', tomorrow)) return null;
+    return _vespersFrom(
+      selected,
+      tomorrow,
+      content.getContentForDate(
+        tomorrow,
+        calendar.getYearOptionsCached(tomorrow.year),
+        calendar.getYearOptionsCached(tomorrow.year + 1),
+        calendar.getDynamicDatesCached(tomorrow.year),
+      ),
+    );
+  }
+
+  Future<LiturgicalDay?> _loadDayRemote() async {
     final calendar = CalendarService();
     final staticContent = StaticLiturgicalService();
     await Future.wait([
@@ -243,46 +291,64 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         calendar.getYearOptionsCached(tomorrow.year + 1),
         calendar.getDynamicDatesCached(tomorrow.year),
       );
-      final candidates = options
-          .map((option) => option.day)
-          .whereType<LiturgicalDay>();
-
-      bool isUniversal(LiturgicalDay day) {
-        final place = day.data['_place'];
-        return place == null ||
-            (place is String && place.trim().isEmpty) ||
-            (place is List && place.isEmpty);
-      }
-
-      final first = candidates
-          .where(
-            (day) =>
-                isUniversal(day) &&
-                hasFirstVespersRank(day) &&
-                hasFirstVespers(day),
-          )
-          .firstOrNull;
-      if (first != null) {
-        final title = liturgicalDayDisplayTitle(first, tomorrow);
-        _vespersRubric =
-            'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
-        return normalizeFirstVespers(first)!;
-      }
-      if (widget.date.weekday == DateTime.saturday) {
-        final tomorrowDay = candidates.where(isUniversal).firstOrNull;
-        if (tomorrowDay != null) {
-          final title = liturgicalDayDisplayTitle(tomorrowDay, tomorrow);
-          _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'нядзелі' : title}';
-          return tomorrowDay;
-        }
-      }
+      final resolved = _firstVespersOf(tomorrow, options);
+      if (resolved != null) return resolved;
     } catch (error) {
       debugPrint('[OraScreen] tomorrow Vespers lookup failed: $error');
     }
+    return _secondVespers(selected);
+  }
+
+  /// Vespers of [selected] given tomorrow's options (already on the device).
+  LiturgicalDay _vespersFrom(
+    LiturgicalDay selected,
+    DateTime tomorrow,
+    List<DayOption> options,
+  ) => _firstVespersOf(tomorrow, options) ?? _secondVespers(selected);
+
+  LiturgicalDay _secondVespers(LiturgicalDay selected) {
     if (widget.date.weekday == DateTime.sunday || isSolemnity(selected)) {
       _vespersRubric = 'II Нешпары';
     }
     return selected;
+  }
+
+  /// I Vespers of tomorrow's celebration, when tomorrow has them.
+  LiturgicalDay? _firstVespersOf(DateTime tomorrow, List<DayOption> options) {
+    final candidates = options
+        .map((option) => option.day)
+        .whereType<LiturgicalDay>();
+
+    bool isUniversal(LiturgicalDay day) {
+      final place = day.data['_place'];
+      return place == null ||
+          (place is String && place.trim().isEmpty) ||
+          (place is List && place.isEmpty);
+    }
+
+    final first = candidates
+        .where(
+          (day) =>
+              isUniversal(day) &&
+              hasFirstVespersRank(day) &&
+              hasFirstVespers(day),
+        )
+        .firstOrNull;
+    if (first != null) {
+      final title = liturgicalDayDisplayTitle(first, tomorrow);
+      _vespersRubric =
+          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+      return normalizeFirstVespers(first)!;
+    }
+    if (widget.date.weekday == DateTime.saturday) {
+      final tomorrowDay = candidates.where(isUniversal).firstOrNull;
+      if (tomorrowDay != null) {
+        final title = liturgicalDayDisplayTitle(tomorrowDay, tomorrow);
+        _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'нядзелі' : title}';
+        return tomorrowDay;
+      }
+    }
+    return null;
   }
 
   @override

@@ -108,8 +108,13 @@ class HiveService {
       getMetaFlag('fullCache_$collection') == true ||
       getMetaFlag(dateCacheKey(collection, date)) == true;
 
-  static Future<void> markDateCached(String collection, DateTime date) =>
-      setMetaFlag(dateCacheKey(collection, date), true);
+  /// Marks a date as completely loaded. Re-marking is free: a date that is
+  /// already ready causes no disk write.
+  static Future<void> markDateCached(String collection, DateTime date) async {
+    final key = dateCacheKey(collection, date);
+    if (getMetaFlag(key) == true) return;
+    await setMetaFlag(key, true);
+  }
 
   static Future<void> init({String? path}) async {
     if (path == null) {

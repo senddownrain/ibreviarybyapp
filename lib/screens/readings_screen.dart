@@ -124,19 +124,54 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     }
   }
 
+  void _applyResult(ReadingsLoadResult result, String? dayId, bool byDate) {
+    final selection = resolveDefaultReadings(
+      readings: result.readings,
+      sundayCycle: result.sundayCycle,
+      weekdayCycle: result.weekdayCycle,
+      dayId: dayId,
+      groupByCelebration: byDate,
+    );
+    _readings = result.readings;
+    _groups = selection.groups;
+    _activeGroupKey = selection.activeGroupKey;
+    _automaticGroupKey = selection.activeGroupKey;
+    _sundayCycle = result.sundayCycle;
+    _weekdayCycle = result.weekdayCycle;
+    _loading = false;
+    _error = null;
+  }
+
+  /// Cache first: readings already on the device are shown in the same
+  /// frame. A loader appears only when there is nothing to show; a refresh
+  /// keeps the text on screen.
   Future<void> _load({bool forceRefresh = false}) async {
     if (!mounted) return;
     final generation = ++_loadGeneration;
     final requestedDateStr = widget.dateStr;
     final requestedLiturgicalKey = widget.liturgicalKey;
     final requestedDayId = widget.dayId;
+
+    if (!forceRefresh) {
+      final local = ref.read(readingsLocalLoaderProvider)(
+        dateStr: requestedDateStr,
+        liturgicalKey: requestedLiturgicalKey,
+        dayId: requestedDayId,
+      );
+      if (local != null) {
+        setState(() {
+          _applyResult(local, requestedDayId, requestedDateStr != null);
+        });
+        return;
+      }
+    }
+
+    final keepContent = forceRefresh && _readings.isNotEmpty;
+    // Pull-to-refresh shows its own indicator; the text stays where it is.
     setState(() {
-      _loading = true;
+      _loading = !keepContent;
       _error = null;
     });
-    // Yield to event loop so loading spinner renders before fetch
-    await Future.delayed(const Duration(milliseconds: 32));
-    if (!mounted || generation != _loadGeneration) return;
 
     try {
       final result = await ref.read(readingsLoaderProvider)(
@@ -145,36 +180,28 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         dayId: requestedDayId,
         forceRefresh: forceRefresh,
       );
-      final readings = result.readings;
-      final sundayCycle = result.sundayCycle;
-      final weekdayCycle = result.weekdayCycle;
-
+      // A newer request (another date) owns the screen now.
       if (!mounted || generation != _loadGeneration) return;
-
-      final selection = resolveDefaultReadings(
-        readings: readings,
-        sundayCycle: sundayCycle,
-        weekdayCycle: weekdayCycle,
-        dayId: requestedDayId,
-        groupByCelebration: requestedDateStr != null,
-      );
-
       setState(() {
-        _readings = readings;
-        _groups = selection.groups;
-        _activeGroupKey = selection.activeGroupKey;
-        _automaticGroupKey = selection.activeGroupKey;
-        _sundayCycle = sundayCycle;
-        _weekdayCycle = weekdayCycle;
-        _loading = false;
+        _applyResult(result, requestedDayId, requestedDateStr != null);
       });
     } catch (e) {
       if (!mounted || generation != _loadGeneration) return;
       setState(() {
-        _error = e.toString();
         _loading = false;
+        // A failed refresh never takes the text off the screen.
+        if (!keepContent) _error = e.toString();
       });
+      if (keepContent) _notifyRefreshFailed();
     }
+  }
+
+  void _notifyRefreshFailed() {
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      const SnackBar(
+        content: Text('Не ўдалося абнавіць. Паказаны захаваныя чытанні.'),
+      ),
+    );
   }
 
   @override

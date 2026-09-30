@@ -218,6 +218,48 @@ class LiturgicalContentService {
     return options;
   }
 
+  /// The selected day resolved against its period / psalter day from the
+  /// device only — the synchronous counterpart of
+  /// `LiturgicalDayService.resolveDayForDate`. Returns null when the date is
+  /// not completely cached, so the caller falls back to the network path.
+  LiturgicalDay? resolveDayLocal(
+    DateTime date,
+    String dayId,
+    YearOptions? opts,
+    YearOptions? nextYearOpts,
+    DynamicDates? dynamicDates,
+  ) {
+    if (!HiveService.isDateCached('days', date)) return null;
+    final selected = _dayById(dayId);
+    if (selected == null) return null;
+    final context = computeLiturgicalContext(
+      date,
+      opts,
+      nextYearOpts,
+      dynamicDates,
+    );
+    final period = _resolvedPeriod(date, context);
+    final seasonalId = seasonalDateExceptionId(date, context.periodType);
+    LiturgicalDay? resolved;
+    if (seasonalId == dayId) {
+      resolved = context.periodType == 'christmas'
+          ? resolveChristmasDateAgainstPeriod(selected, period)
+          : resolveDayAgainstPeriod(selected, period, fillMissing: true);
+      resolved = applySeasonalWeekdayAntiphons(resolved!, context.dayOfWeek);
+    } else if (selected.date != null && selected.date!.isNotEmpty) {
+      resolved = resolveDayAgainstPeriod(selected, period, fillMissing: true);
+    } else {
+      resolved = resolveDayAgainstPeriod(selected, period);
+    }
+    final data = resolved!.toMap()
+      ..['_periodType'] = context.periodType
+      ..['_periodWeekNumber'] = context.periodWeek
+      ..['_dayOfWeek'] = context.dayOfWeek
+      ..['_calendarDate'] = _isoDate(date)
+      ..['_contextPeriodType'] = context.periodType;
+    return LiturgicalDay.fromMap(data);
+  }
+
   DayOption _option({
     required LiturgicalOptionSource source,
     required String title,

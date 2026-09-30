@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/providers/sync_provider.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 String formatCacheBytes(int bytes) {
   if (bytes < 1024) return '$bytes Б';
@@ -10,46 +9,30 @@ String formatCacheBytes(int bytes) {
   return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} МБ';
 }
 
+/// First load of a screen: what is being loaded, in the reader's words.
+///
+/// Storage sizes, servers and collections belong to Settings → «Даныя
+/// праграмы», not to a reading screen.
 class DataLoadingNotice extends ConsumerWidget {
   const DataLoadingNotice({
     super.key,
     required this.label,
+    this.shape = LoadingShape.none,
+    // Kept for source compatibility; sizes are no longer shown here.
     this.collections = const ['days', 'readings'],
   });
+
   final String label;
+  final LoadingShape shape;
   final List<String> collections;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(syncStatusProvider);
     final offline = ref.watch(connectivityProvider).value == false;
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(width: 180, child: LinearProgressIndicator()),
-          const SizedBox(height: 12),
-          Text(label, textAlign: TextAlign.center),
-          const SizedBox(height: 6),
-          Text(
-            offline
-                ? 'Няма сеткі · шукаем захаваныя даныя'
-                : 'Адсутныя даныя запытваем з сервера',
-            textAlign: TextAlign.center,
-          ),
-          if (HiveService.isCacheReady) ...[
-            const SizedBox(height: 6),
-            ValueListenableBuilder<int>(
-              valueListenable: HiveService.cacheRevision,
-              builder: (context, _, child) => Text(
-                'У кэшы: ${formatCacheBytes(collections.fold<int>(0, (sum, name) => sum + HiveService.cachedBytes(name)))}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-          ],
-        ],
-      ),
+    return AppLoadingState(
+      label: label,
+      detail: offline ? 'Няма сеткі — шукаем захаваныя тэксты' : null,
+      shape: shape,
     );
   }
 }
