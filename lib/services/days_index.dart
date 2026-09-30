@@ -57,6 +57,8 @@ class DaysIndex {
     for (final key in box.keys) {
       final raw = box.get(key);
       if (raw is! Map) continue;
+      // Documents retired by a data migration are never offered.
+      if (raw['_obsolete'] == true) continue;
       final id = raw['id']?.toString() ?? key.toString();
       final date = raw['_date']?.toString();
       if (date != null && date.isNotEmpty) {

@@ -12,6 +12,9 @@ enum SyncTarget {
   completoriums('completoriums', 'Камплета'),
   prayerCategories('prayerCategories', 'Катэгорыі малітваў'),
 
+  /// Commons and the Sunday week I psalter used by sparse feast documents.
+  templates('liturgicalTemplates', 'Агульныя тэксты'),
+
   /// Optional songbook content. The app ships a bundled seed, so songs are
   /// synced only on request, from «Загрузіць усю базу» or when the songbook
   /// is opened — never as part of the automatic startup/background window.

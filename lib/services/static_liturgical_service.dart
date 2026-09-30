@@ -23,6 +23,27 @@ class StaticLiturgicalService {
     return loaded == null ? null : Map<String, dynamic>.from(loaded as Map);
   }
 
+  /// Commons for sparse feast documents; downloaded once, then local.
+  Future<void> ensureTemplates({bool forceRefresh = false}) async {
+    if (!forceRefresh && HiveService.templatesBox.isNotEmpty) return;
+    try {
+      final snapshot = await retryFirestore(
+        () => _db
+            .collection(kTemplatesBoxName)
+            .get(const GetOptions(source: Source.server)),
+      );
+      for (final doc in snapshot.docs) {
+        await HiveService.putCached(
+          kTemplatesBoxName,
+          doc.id,
+          firestoreToStorable({...doc.data(), 'id': doc.id}),
+        );
+      }
+    } catch (_) {
+      // Offline or not published yet: the Office falls back to the day.
+    }
+  }
+
   Future<List<Map<String, dynamic>>> _getCollection(String name) async {
     final box = name == 'invitatoriums'
         ? HiveService.invitatoriumsBox

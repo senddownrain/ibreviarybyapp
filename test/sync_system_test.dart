@@ -78,6 +78,7 @@ void main() {
         SyncTarget.invitatoriums,
         SyncTarget.completoriums,
         SyncTarget.prayerCategories,
+        SyncTarget.templates,
       },
       'sync-songs': {SyncTarget.songs},
       'sync-compendium': {SyncTarget.compendium},

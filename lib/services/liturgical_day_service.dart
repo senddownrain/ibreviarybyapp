@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/services/static_liturgical_service.dart';
+import 'package:mybrev_flutter/utils/office_assembly.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
@@ -255,6 +258,14 @@ class LiturgicalDayService {
       if (seasonalDateExceptionId(date, periodType) case final id?)
         getDayById(id, forceRefresh: forceRefresh),
     ]);
+    // A sparse feast document needs its Commons.
+    final sparse = DaysIndex.idsByDate([
+      '${date.day}.${date.month}',
+      '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}',
+    ]).any((id) => isSparseDayData(HiveService.daysBox.get(id) as Map?));
+    if (sparse) {
+      await StaticLiturgicalService(db: _db).ensureTemplates();
+    }
   }
 
   /// Resolve the selected route day against its period/psalter template.
@@ -272,7 +283,16 @@ class LiturgicalDayService {
       dayOfWeek: context.dayOfWeek,
       feastCodes: feastCodes,
     );
-    final selected = await getDayById(dayId);
+    var selected = await getDayById(dayId);
+    String? choice;
+    if (selected == null || selected.data['_obsolete'] == true) {
+      // `<sparse id>--<choice>`: one legal assembly of a sparse document.
+      final parsed = parseAssemblyDayId(dayId);
+      final base = parsed == null ? null : await getDayById(parsed.$1);
+      if (!isSparseDay(base)) return selected;
+      selected = base;
+      choice = parsed!.$2;
+    }
     if (selected == null) return null;
     var period = await findDayByPeriod(
       context.periodType,
@@ -295,7 +315,16 @@ class LiturgicalDayService {
     }
     final seasonalId = seasonalDateExceptionId(date, context.periodType);
     LiturgicalDay? resolved;
-    if (seasonalId == dayId) {
+    if (isSparseDay(selected)) {
+      await StaticLiturgicalService(db: _db).ensureTemplates();
+      final assembled = assembleSparseDay(
+        date,
+        selected,
+        period,
+        choice: choice,
+      );
+      resolved = LiturgicalDay.fromMap({...assembled.toMap(), 'id': dayId});
+    } else if (seasonalId == dayId) {
       resolved = context.periodType == 'christmas'
           ? resolveChristmasDateAgainstPeriod(selected, period)
           : resolveDayAgainstPeriod(selected, period, fillMissing: true);

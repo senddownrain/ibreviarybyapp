@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
 
+const kTemplatesBoxName = 'liturgicalTemplates';
+
 class HiveService {
   static const _metaBox = 'meta';
   static const _prayersBoxName = 'prayers';
@@ -44,6 +46,15 @@ class HiveService {
   static Box get completoriumsBox => _completoriums;
 
   static Box boxFor(String collection) => Hive.box(collection);
+
+  static Box get templatesBox => Hive.box(kTemplatesBoxName);
+
+  /// `liturgicalTemplates` by id (a handful of documents).
+  static Map<String, Map<String, dynamic>> templates() => {
+    for (final key in templatesBox.keys)
+      if (templatesBox.get(key) case final Map raw)
+        key.toString(): Map<String, dynamic>.from(raw),
+  };
 
   static final cacheRevision = ValueNotifier<int>(0);
   static int receivedBytes = 0;
@@ -135,6 +146,8 @@ class HiveService {
     await Hive.openBox('bible_bel');
     await Hive.openBox('bible_ru');
     await Hive.openBox('prayerCategories');
+    // Commons and the Sunday week I psalter of sparse feast documents.
+    await Hive.openBox(kTemplatesBoxName);
     // Opening an empty or small box is cheap; the bundled songbook seed is
     // parsed lazily when the songbook is first opened.
     await Hive.openBox('songs');
