@@ -21,7 +21,18 @@ void main() {
             )
             as Map<String, dynamic>;
     expect(kMassRitual.schemaVersion, json['schemaVersion']);
-    expect(kMassRitual.schemaVersion, 2);
+    expect(kMassRitual.schemaVersion, 3);
+    expect(kMassRitual.roles, List<String>.from(json['roles'] as List));
+    final policy = json['rolePolicy'] as Map<String, dynamic>;
+    expect(
+      kMassRitual.rolePolicy.showSpeakerLabels,
+      policy['showSpeakerLabels'],
+    );
+    expect(kMassRitual.rolePolicy.labelPolicy, policy['labelPolicy']);
+    expect(
+      kMassRitual.rolePolicy.responseRoles,
+      List<String>.from(policy['responseRoles'] as List),
+    );
     expect(kMassRitual.id, json['id']);
     expect(
       kMassRitual.aliases,
@@ -51,10 +62,24 @@ void main() {
         d.bundledAsset,
         v['bundledText'] == null ? null : 'assets/mass/${v['bundledText']}',
       );
-      expect(d.markers, {
-        for (final e in (v['markers'] as Map).entries)
-          e.key: List<String>.from(e.value as List),
-      });
+      Map<String, List<String>> lists(String key) => {
+        for (final e in ((v[key] as Map?) ?? const {}).entries)
+          e.key as String: List<String>.from(e.value as List),
+      };
+      Map<String, String> strings(String key) =>
+          Map<String, String>.from((v[key] as Map?) ?? const {});
+      expect(d.label, v['label']);
+      expect(d.markers, lists('markers'));
+      expect(d.classify, lists('classify'));
+      expect(d.roleMarkers, lists('roleMarkers'));
+      expect(d.roleCues, lists('roleCues'));
+      expect(d.speakerLabels, strings('speakerLabels'));
+      expect(d.roleLabels, strings('roleLabels'));
+      expect(d.callRole, v['callRole']);
+      // Canonical Belarusian title first, the legacy heading as a fallback.
+      for (final major in kMassRitual.majorSections) {
+        expect(d.markers[major.id]!.first, major.title, reason: d.language);
+      }
     }
   });
 
@@ -98,6 +123,35 @@ void main() {
       ]),
       'eucharistic-liturgy',
     );
+  });
+
+  test('a missing subsection lands on the nearest preceding sibling', () {
+    const available = ['liturgy-of-the-word', 'first-reading', 'creed'];
+    expect(
+      kMassRitual.resolveSectionTarget('homily', available),
+      'first-reading',
+    );
+    expect(kMassRitual.resolveSectionTarget('creed', available), 'creed');
+    // No preceding sibling: the parent section.
+    expect(
+      kMassRitual.resolveSectionTarget('prayer-over-the-offerings', [
+        'liturgy-of-the-word',
+        'eucharistic-liturgy',
+      ]),
+      'eucharistic-liturgy',
+    );
+  });
+
+  test('markers ending with an ellipsis match as a prefix', () {
+    expect(
+      massMarkerMatches('Credo in unum Deum…', 'Credo in unum Deum, Patrem'),
+      isTrue,
+    );
+    expect(
+      massMarkerMatches('Credo in unum Deum', 'Credo in unum Deum, Patrem'),
+      isFalse,
+    );
+    expect(massMarkerMatches('Или:', '**Или**'), isTrue);
   });
 
   test('existing Belarusian and Latin prayers are reused as variants', () {
