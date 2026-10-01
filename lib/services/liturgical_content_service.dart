@@ -254,10 +254,15 @@ class LiturgicalContentService {
       );
     }
 
+    final memorialsLead = obligatoryMemorialOutranksDay(date, context);
     options.sort((left, right) {
-      final priority = _celebrationPriority(
-        left.day,
-      ).compareTo(_celebrationPriority(right.day));
+      final priority =
+          _celebrationPriority(
+            left.day,
+            memorialsLead: memorialsLead,
+          ).compareTo(
+            _celebrationPriority(right.day, memorialsLead: memorialsLead),
+          );
       return priority != 0 ? priority : left.order.compareTo(right.order);
     });
     return options;
@@ -432,7 +437,29 @@ String _rankLabel(LiturgicalDay day) {
   return feastTypeLabelMap[rank] ?? 'Літургічны дзень';
 }
 
-int _celebrationPriority(LiturgicalDay? day) {
+/// Whether an obligatory memorial on [date] is celebrated in place of the
+/// weekday (Table of Liturgical Days, nos. 10 and 13). It is not on Sundays,
+/// on Lent and Holy Week weekdays, on 17–24 December and in the Christmas and
+/// Easter octaves — there the weekday stays primary and the memorial remains
+/// an alternative.
+bool obligatoryMemorialOutranksDay(DateTime date, LiturgicalContext context) {
+  if (date.weekday == DateTime.sunday) return false;
+  switch (context.periodType) {
+    case 'lent':
+    case 'holyweek':
+      return false;
+    case 'advent':
+      return !(date.month == 12 && date.day >= 17);
+    case 'christmas':
+      return !((date.month == 12 && date.day >= 25) ||
+          (date.month == 1 && date.day == 1));
+    case 'easter':
+      return context.periodWeek > 1;
+  }
+  return true;
+}
+
+int _celebrationPriority(LiturgicalDay? day, {bool memorialsLead = false}) {
   final rank = (day?.rank ?? day?.field('_feastType') ?? '').toLowerCase();
   if (const {
     'solemnitas',
@@ -443,7 +470,11 @@ int _celebrationPriority(LiturgicalDay? day) {
     return 0;
   }
   if (const {'festum', 'feast', 'свята'}.contains(rank)) return 1;
-  return 2;
+  if (memorialsLead &&
+      const {'memoria', 'memorial', 'успамін', 'ўспамін'}.contains(rank)) {
+    return 2;
+  }
+  return 3;
 }
 
 String _normalizeFeast(String value) =>

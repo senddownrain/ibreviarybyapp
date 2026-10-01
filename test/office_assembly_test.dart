@@ -5,9 +5,12 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/office_assembly.dart';
 
 void main() {
@@ -185,6 +188,16 @@ void main() {
       },
     );
 
+    test('an obligatory memorial is primary over the weekday', () async {
+      await seed(withLegacy: false);
+      final selection = resolveHoursLiturgicalSelection(options());
+      expect(selection.primary?.dayId, '01-08-sv-alphonsus-liguori');
+      expect(
+        options().any((o) => o.source == LiturgicalOptionSource.period),
+        isTrue,
+      );
+    });
+
     test('obsolete documents are never offered', () async {
       await seed(withLegacy: false);
       await HiveService.daysBox.put('01-08-old', {
@@ -209,5 +222,60 @@ void main() {
         expect(option.day!.data['officeOfReadingsR2'], isNot(''));
       },
     );
+  });
+
+  group('obligatory memorial against the weekday', () {
+    LiturgicalContext ctx(String period, [int week = 3]) =>
+        LiturgicalContext(periodType: period, periodWeek: week, dayOfWeek: 2);
+
+    test('leads on ordinary, Advent, Christmas and Easter weekdays', () {
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2026, 10, 1), ctx('ordinary')),
+        isTrue,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2026, 12, 7), ctx('advent')),
+        isTrue,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2027, 1, 2), ctx('christmas')),
+        isTrue,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2026, 4, 29), ctx('easter', 3)),
+        isTrue,
+      );
+    });
+
+    test('yields on Sundays, in Lent, 17-24 December and the octaves', () {
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2026, 10, 4), ctx('ordinary')),
+        isFalse,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2027, 3, 17), ctx('lent')),
+        isFalse,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2027, 3, 23), ctx('holyweek')),
+        isFalse,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2026, 12, 21), ctx('advent')),
+        isFalse,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2026, 12, 29), ctx('christmas')),
+        isFalse,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2027, 1, 1), ctx('christmas')),
+        isFalse,
+      );
+      expect(
+        obligatoryMemorialOutranksDay(DateTime(2027, 3, 30), ctx('easter', 1)),
+        isFalse,
+      );
+    });
   });
 }
