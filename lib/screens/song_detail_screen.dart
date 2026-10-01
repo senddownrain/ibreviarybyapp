@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/songs/song_chord_control.dart';
 import 'package:mybrev_flutter/widgets/songs/song_text.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// `/prayers/songs/:id`: one song on the shared Reader foundation.
 class SongDetailScreen extends ConsumerStatefulWidget {
@@ -76,7 +77,7 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
           child: message == null
               ? const Padding(
                   padding: EdgeInsets.only(top: 24),
-                  child: LinearProgressIndicator(key: Key('song-loading')),
+                  child: AppProgressLine(key: Key('song-loading')),
                 )
               : Text(message, key: const Key('song-not-found')),
         ),

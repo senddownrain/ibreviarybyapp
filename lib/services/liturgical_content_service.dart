@@ -7,10 +7,14 @@ import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
+import 'package:mybrev_flutter/utils/office_assembly.dart';
 
+/// Option titles are one-line labels: `<br>` and line breaks in the source
+/// title become plain spaces so the list wraps naturally.
 String _stripHtml(String value) => value
-    .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+    .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), ' ')
     .replaceAll(RegExp(r'<[^>]+>'), '')
+    .replaceAll(RegExp(r'\s+'), ' ')
     .trim();
 
 class DayTemplate {
@@ -141,19 +145,26 @@ class LiturgicalContentService {
       }
     }
 
+    final dated = exclusiveFeast == null
+        ? _daysByDate(date)
+              .where(
+                (day) =>
+                    day.id != seasonalId && !isSeasonalDateDocumentId(day.id),
+              )
+              .toList()
+        : <LiturgicalDay>[];
+    // A sparse document replaces its former per-template copies.
+    final sparseDocs = dated.where(isSparseDay).toList();
+    final replaced = {for (final doc in sparseDocs) ..._legacyIdsOf(doc)};
     final fixed = <LiturgicalDay>[
       if (seasonal != null) contextual(seasonal),
-      if (exclusiveFeast == null)
-        ..._daysByDate(date)
-            .where(
-              (day) =>
-                  day.id != seasonalId && !isSeasonalDateDocumentId(day.id),
-            )
-            .map(
-              (day) => contextual(
-                resolveDayAgainstPeriod(day, period, fillMissing: true)!,
-              ),
+      ...dated
+          .where((day) => !isSparseDay(day) && !replaced.contains(day.id))
+          .map(
+            (day) => contextual(
+              resolveDayAgainstPeriod(day, period, fillMissing: true)!,
             ),
+          ),
     ];
     final fixedGroups = <String, List<LiturgicalDay>>{};
     for (final day in fixed) {
@@ -194,6 +205,40 @@ class LiturgicalContentService {
       );
     }
 
+    for (final doc in sparseDocs) {
+      final choices = assemblyChoices(doc.toMap(), officeKindOfRank(doc.rank));
+      final variants = [
+        for (final (index, choice) in choices.indexed)
+          DayTemplate(
+            id: assemblyDayId(doc.id, choice, isDefault: index == 0),
+            label: choice == kCurrentDayChoice
+                ? 'З дня'
+                : _templateLabel(
+                    LiturgicalDay.fromMap({
+                      'id': doc.id,
+                      '_currentVersion': choice,
+                    }),
+                  ),
+            day: contextual(
+              assembleSparseDay(date, doc, period, choice: choice).copyWithId(
+                assemblyDayId(doc.id, choice, isDefault: index == 0),
+              ),
+            ),
+          ),
+      ];
+      options.add(
+        _option(
+          source: LiturgicalOptionSource.fixed,
+          title: _dayTitle(variants.first.day, date),
+          subtitle: _rankLabel(variants.first.day),
+          day: variants.first.day,
+          order: 3,
+          context: context,
+          templates: variants,
+        ),
+      );
+    }
+
     final deadRaw = _dayById('office-for-dead');
     if (deadRaw != null) {
       final day = contextual(resolveDayAgainstPeriod(deadRaw, period)!);
@@ -230,8 +275,15 @@ class LiturgicalContentService {
     DynamicDates? dynamicDates,
   ) {
     if (!HiveService.isDateCached('days', date)) return null;
-    final selected = _dayById(dayId);
-    if (selected == null) return null;
+    var selected = _dayById(dayId);
+    String? choice;
+    if (selected == null || selected.data['_obsolete'] == true) {
+      final parsed = parseAssemblyDayId(dayId);
+      final base = parsed == null ? null : _dayById(parsed.$1);
+      if (!isSparseDay(base)) return null;
+      selected = base;
+      choice = parsed!.$2;
+    }
     final context = computeLiturgicalContext(
       date,
       opts,
@@ -241,12 +293,19 @@ class LiturgicalContentService {
     final period = _resolvedPeriod(date, context);
     final seasonalId = seasonalDateExceptionId(date, context.periodType);
     LiturgicalDay? resolved;
-    if (seasonalId == dayId) {
+    if (isSparseDay(selected)) {
+      resolved = assembleSparseDay(
+        date,
+        selected!,
+        period,
+        choice: choice,
+      ).copyWithId(dayId);
+    } else if (seasonalId == dayId) {
       resolved = context.periodType == 'christmas'
           ? resolveChristmasDateAgainstPeriod(selected, period)
           : resolveDayAgainstPeriod(selected, period, fillMissing: true);
       resolved = applySeasonalWeekdayAntiphons(resolved!, context.dayOfWeek);
-    } else if (selected.date != null && selected.date!.isNotEmpty) {
+    } else if (selected!.date != null && selected.date!.isNotEmpty) {
       resolved = resolveDayAgainstPeriod(selected, period, fillMissing: true);
     } else {
       resolved = resolveDayAgainstPeriod(selected, period);
@@ -439,4 +498,32 @@ String _templateLabel(LiturgicalDay day) {
         'works-of-mercy': 'Пра справы міласэрнасці',
       }[key] ??
       (key.isEmpty ? 'Асноўны' : key);
+}
+
+List<String> _legacyIdsOf(LiturgicalDay day) {
+  final raw = day.data['_legacyIds'];
+  return raw is List ? raw.map((id) => id.toString()).toList() : const [];
+}
+
+/// A sparse feast document assembled for [date] (Commons from the device,
+/// the current day as [period]). Missing Commons fall back to the day.
+LiturgicalDay assembleSparseDay(
+  DateTime date,
+  LiturgicalDay doc,
+  LiturgicalDay? period, {
+  String? choice,
+}) {
+  final assembly = assembleOffice(
+    proper: {...doc.toMap(), 'id': doc.id},
+    currentDay: period?.toMap() ?? const {},
+    templates: HiveService.isCacheReady ? HiveService.templates() : const {},
+    isSunday: date.weekday == DateTime.sunday,
+    choice: choice,
+  );
+  return LiturgicalDay.fromMap({...assembly.data, 'id': doc.id});
+}
+
+extension on LiturgicalDay {
+  LiturgicalDay copyWithId(String id) =>
+      LiturgicalDay.fromMap({...toMap(), 'id': id});
 }

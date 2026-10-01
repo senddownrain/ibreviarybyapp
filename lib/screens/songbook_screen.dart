@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 String songLocation(String id) =>
     Uri(pathSegments: ['', 'prayers', 'songs', id]).toString();
@@ -120,7 +121,7 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
       if (songs.isLoading && !songs.hasValue)
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: LinearProgressIndicator(key: Key('songbook-loading')),
+          child: AppProgressLine(key: Key('songbook-loading')),
         )
       else if (songs.hasError && !songs.hasValue)
         _SongbookMessage(

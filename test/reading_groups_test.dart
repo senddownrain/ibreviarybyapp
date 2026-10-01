@@ -58,7 +58,10 @@ void main() {
   });
 
   test('strips the hardcoded year suffix from stored titles', () {
-    expect(stripReadingYearSuffix('XXIV Звычайная нядзеля, Год A'), 'XXIV Звычайная нядзеля');
+    expect(
+      stripReadingYearSuffix('XXIV Звычайная нядзеля, Год A'),
+      'XXIV Звычайная нядзеля',
+    );
     expect(stripReadingYearSuffix('Нядзеля, год Б:'), 'Нядзеля');
     expect(stripReadingYearSuffix('Серада, Год II'), 'Серада');
     expect(stripReadingYearSuffix('Святая Сям’я'), 'Святая Сям’я');

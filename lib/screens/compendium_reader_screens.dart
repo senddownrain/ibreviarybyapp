@@ -14,6 +14,7 @@ import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// Loading / not-found state on the shared reader foundation.
 Widget _readerMessage({
@@ -28,7 +29,7 @@ Widget _readerMessage({
       child: loading
           ? const Padding(
               padding: EdgeInsets.only(top: 24),
-              child: LinearProgressIndicator(key: Key('compendium-loading')),
+              child: AppProgressLine(key: Key('compendium-loading')),
             )
           : Text(message, key: const Key('compendium-not-found')),
     ),

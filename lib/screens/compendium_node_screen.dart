@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/utils/compendium_data.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_search_host.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
+import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// One structural level of the Compendium: a ЧАСТКА, a РАЗДЗЕЛ or a
 /// ПАДРАЗДЗЕЛ (`/prayers/compendium/part/:partId`,
@@ -64,7 +65,7 @@ class CompendiumNodeScreen extends ConsumerWidget {
         state.isLoading
             ? const Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
-                child: LinearProgressIndicator(key: Key('compendium-loading')),
+                child: AppProgressLine(key: Key('compendium-loading')),
               )
             : CompendiumMessage(
                 key: Key(
@@ -293,7 +294,7 @@ class _CompendiumRedirectState extends State<_CompendiumRedirect> {
     body: Center(
       child: Padding(
         padding: EdgeInsets.all(24),
-        child: LinearProgressIndicator(key: Key('compendium-loading')),
+        child: AppProgressLine(key: Key('compendium-loading')),
       ),
     ),
   );

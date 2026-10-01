@@ -39,6 +39,7 @@ class _CacheSyncSettingsState extends ConsumerState<CacheSyncSettings> {
     SyncTarget.invitatoriums,
     SyncTarget.completoriums,
     SyncTarget.prayerCategories,
+    SyncTarget.templates,
   };
 
   Future<void> _sync(String title, SyncPlan plan) async {
