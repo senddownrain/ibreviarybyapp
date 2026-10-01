@@ -9,9 +9,12 @@ import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/office_assembly.dart';
 
+/// Option titles are one-line labels: `<br>` and line breaks in the source
+/// title become plain spaces so the list wraps naturally.
 String _stripHtml(String value) => value
-    .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+    .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), ' ')
     .replaceAll(RegExp(r'<[^>]+>'), '')
+    .replaceAll(RegExp(r'\s+'), ' ')
     .trim();
 
 class DayTemplate {

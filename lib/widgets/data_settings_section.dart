@@ -77,10 +77,14 @@ List<DataGroupStatus> collectDataStatus({
       return DataGroupStatus(
         title,
         DataReadiness.ready,
-        has ? 'даступна без сеткі' : 'убудавана ў праграму',
+        has ? 'працуе без сеткі' : 'уваходзіць у праграму',
       );
     }
-    return DataGroupStatus(title, DataReadiness.missing, 'яшчэ не загружана');
+    return DataGroupStatus(
+      title,
+      DataReadiness.missing,
+      'загрузіцца пры адкрыцці',
+    );
   }
 
   return [
