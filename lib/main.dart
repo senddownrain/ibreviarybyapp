@@ -24,6 +24,7 @@ void main() async {
     );
   }
   await HiveService.init();
+  _registerFontLicenses();
 
   // Both designs are edge-to-edge. Platform chrome floats above the content;
   // only iOS uses blur while Android uses tonal Material surfaces.
@@ -42,6 +43,24 @@ void main() async {
   }
 
   runApp(const ProviderScope(child: MyBrevApp()));
+}
+
+/// The bundled book faces (assets/google_fonts) are under the SIL Open Font
+/// License; it is shown in «Інфармацыя пра дадатак» → licences.
+void _registerFontLicenses() {
+  const families = {
+    'cormorantgaramond': 'Cormorant Garamond',
+    'literata': 'Literata',
+    'sourceserif4': 'Source Serif 4',
+  };
+  LicenseRegistry.addLicense(() async* {
+    for (final entry in families.entries) {
+      final text = await rootBundle.loadString(
+        'assets/google_fonts/OFL-${entry.key}.txt',
+      );
+      yield LicenseEntryWithLineBreaks([entry.value], text);
+    }
+  });
 }
 
 class MyBrevApp extends ConsumerWidget {

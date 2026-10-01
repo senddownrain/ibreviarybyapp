@@ -56,3 +56,6 @@ flutter:
     - assets/songs_seed.json
     - assets/compendium/compendium.json.gz
     - assets/compendium/compendium_search_aliases.json
+    # Book faces used by ReaderTheme, bundled so the first launch without a
+    # network has the right typography (google_fonts reads these first).
+    - assets/google_fonts/
