@@ -20,6 +20,7 @@ import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
 import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
+import 'package:mybrev_flutter/screens/reader_consistency_lab_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
@@ -28,6 +29,11 @@ import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+
+const readerConsistencyLabRoute = '/design/reader-consistency-lab';
+const readerConsistencyLabEnabled = bool.fromEnvironment(
+  'IBREVIARY_READER_CONSISTENCY_LAB',
+);
 
 const hoursRootRoute = AppRouteDescriptor(
   id: 'hours.root',
@@ -572,6 +578,16 @@ final router = GoRouter(
       ],
     ),
 
+    if (readerConsistencyLabEnabled)
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: readerConsistencyLabRoute,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
+          child: const ReaderConsistencyLabScreen(),
+        ),
+      ),
+
     // Compatibility aliases normalize directly to a canonical branch route.
     GoRoute(path: '/', redirect: (_, state) => _withSameQuery('/hours', state)),
     GoRoute(
@@ -702,6 +718,7 @@ final router = GoRouter(
 );
 
 String _initialLocation() {
+  if (readerConsistencyLabEnabled) return readerConsistencyLabRoute;
   try {
     final box = HiveService.settingsBox;
     return startSectionLocation(
