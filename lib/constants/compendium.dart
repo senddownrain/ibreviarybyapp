@@ -10,11 +10,12 @@ const kCompendiumSourceHost = 'Catholic.by';
 
 String compendiumLocation() => '/prayers/compendium';
 
-String compendiumPartLocation(String partId) =>
-    Uri(pathSegments: ['', 'prayers', 'compendium', 'part', partId]).toString();
+String compendiumPartLocation(String partId, {String? target}) => Uri(
+  pathSegments: ['', 'prayers', 'compendium', 'part', partId],
+  queryParameters: target == null ? null : {'target': target},
+).toString();
 
-/// A section or subsection screen (`CompendiumNodeScreen`); [nodeId] is the
-/// dataset id (`p1-s1`, `p1-s1-ch1`).
+/// Legacy source-heading link; the route redirects into the owning Part.
 String compendiumNodeLocation(String nodeId) =>
     Uri(pathSegments: ['', 'prayers', 'compendium', 'node', nodeId]).toString();
 

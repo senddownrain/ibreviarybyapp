@@ -197,7 +197,7 @@ String _searchTextOf(Song song) => _searchIndex[song] ??= [
   ...song.displayTags,
 ].join('\u0000').toLowerCase();
 
-/// Search, tag and favorites filter with MyBrev semantics:
+/// Search and tag filter with favorite-first sorting:
 /// * the query matches title, lyrics or any resolved tag (case-insensitive);
 /// * selected tags use OR semantics;
 /// * favorites sort first, then titles in Belarusian alphabetical order.
@@ -206,14 +206,12 @@ List<Song> filterSongs(
   String query = '',
   Set<String> tags = const {},
   Iterable<String> favorites = const [],
-  bool favoritesOnly = false,
 }) {
   final needle = query.trim().toLowerCase();
   final favoriteSet = favorites.toSet();
   final result = songs
       .where(
         (song) =>
-            (!favoritesOnly || favoriteSet.contains(song.id)) &&
             (tags.isEmpty || song.displayTags.any(tags.contains)) &&
             (needle.isEmpty || _searchTextOf(song).contains(needle)),
       )

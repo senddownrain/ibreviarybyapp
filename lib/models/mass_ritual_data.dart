@@ -145,6 +145,38 @@ const kMassRitual = MassRitual(
         'communion-rite': ['Абрад Камуніі'],
         'concluding-rites': ['Заключныя абрады', 'Абрад заканчэння'],
       },
+      anchors: {
+        'sign-of-the-cross': ['Святар гаворыць:'],
+        'greeting': [
+          'Затым святар з разведзенымі рукамі вітае народ, гаворачы:',
+        ],
+        'kyrie': ['Пасля гэтага гаворыцца Пане, змілуйся над намі:'],
+        'first-reading': [
+          'Затым лектар ідзе да амбоны і чытае першае чытанне…',
+        ],
+        'psalm': ['Псальміст альбо кантар спявае ці чытае псальм…'],
+        'gospel': ['Потым спяваецца…'],
+        'homily': ['Потым прамаўляецца гамілія.'],
+        'prayer-of-the-faithful': [
+          'Затым адбываецца агульная малітва, альбо малітва вернікаў.',
+        ],
+        'offertory': ['Пасля заканчэння літургіі слова прыслугоўваючыя…'],
+        'prayer-over-the-offerings': [
+          'Потым святар, развёўшы рукі, прамаўляе малітву над дарамі…',
+        ],
+        'lords-prayer': ['Святар, звёўшы рукі, гаворыць:'],
+        'sign-of-peace': [
+          'Пасля, развёўшы рукі, святар гучным голасам гаворыць:',
+        ],
+        'breaking-of-the-bread': ['У гэты час народ спявае альбо прамаўляе:'],
+        'invitation-to-communion': ['Святар укленчвае, бярэ Гостыю…'],
+        'communion': ['Павярнуўшыся да алтара, святар ціха гаворыць:'],
+        'prayer-after-communion': [
+          'Пасля гэтага святар можа вярнуцца да свайго месца…',
+        ],
+        'blessing': ['Святар благаслаўляе народ са словамі:'],
+        'dismissal': ['Потым дыякан альбо сам святар, звёўшы рукі…'],
+      },
       classify: {
         'alternative': ['Альбо:'],
       },
@@ -202,19 +234,49 @@ const kMassRitual = MassRitual(
       markers: {
         'introductory-rites': ['Уступныя абрады', 'Вступительные обряды'],
         'liturgy-of-the-word': ['Літургія слова', 'Литургия Слова'],
-        'creed': ['Исповедание веры'],
+        'creed': ['Вызнанне веры', 'Исповедание веры'],
         'eucharistic-liturgy': [
           'Эўхарыстычная літургія',
           'Евхаристическая Литургия',
         ],
-        'eucharistic-prayer': ['Вторая Евхаристическая молитва'],
+        'eucharistic-prayer': [
+          'II эўхарыстычная малітва',
+          'Вторая Евхаристическая молитва',
+        ],
         'communion-rite': ['Абрад Камуніі', 'Обряд причащения'],
         'concluding-rites': ['Заключныя абрады', 'Заключительный обряд'],
       },
+      anchors: {
+        'sign-of-the-cross': ['V. In nomine Patris…'],
+        'greeting': ['V. Gratia Domini nostri Iesu Christi…'],
+        'penitential-act': ['V. Fratres, agnoscamus peccata nostra…'],
+        'kyrie': ['V. Kyrie eleison.'],
+        'gloria': ['Gloria in excelsis Deo…'],
+        'collect': ['V. Oremus:'],
+        'first-reading': ['Пасля чытання:', 'После чтения:'],
+        'gospel': ['Евангелле:', 'Евангелие:'],
+        'offertory': ['V. Benedictus es, Domine, Deus universi…'],
+        'lords-prayer': ['V. Praeceptis salutaribus moniti…'],
+        'sign-of-peace': ['V. Domine Iesu Christe, qui dixisti…'],
+        'breaking-of-the-bread': ['V. Haec commixtio…'],
+        'invitation-to-communion': ['V. Ecce Agnus Dei…'],
+        'communion': ['V. Corpus Christi custodiat me…'],
+        'prayer-after-communion': ['V. Oremus…'],
+        'blessing': ['V. Benedicat vos…'],
+        'dismissal': ['V. Ite, missa est.'],
+      },
       classify: {
-        'heading': ['ЧИН МЕССЫ НА ЛАТИНСКОМ ЯЗЫКЕ'],
-        'rubric': ['После чтения:', 'Евангелие:'],
-        'alternative': ['Или:'],
+        'heading': [
+          'ПАРАДАК СВЯТОЙ ІМШЫ НА ЛАЦІНСКАЙ МОВЕ',
+          'ЧИН МЕССЫ НА ЛАТИНСКОМ ЯЗЫКЕ',
+        ],
+        'rubric': [
+          'Пасля чытання:',
+          'После чтения:',
+          'Евангелле:',
+          'Евангелие:',
+        ],
+        'alternative': ['Альбо:', 'Или:'],
       },
       speakerLabels: {'V.': 'priest', 'R.': 'people'},
       roleLabels: {
@@ -273,6 +335,14 @@ const kMassRitual = MassRitual(
         'concluding-rites': ['Заключныя абрады', 'The Concluding Rites'],
         'blessing': ['Blessing'],
         'dismissal': ['Dismissal'],
+      },
+      anchors: {
+        'kyrie': ['The Kyrie, eleison (Lord, have mercy) may follow.'],
+        'offertory': ['During the Offertory Song…'],
+        'prayer-over-the-offerings': [
+          'Then the Priest says the Prayer over the Offerings…',
+        ],
+        'sign-of-peace': ['Lord Jesus Christ…'],
       },
       classify: {
         'comment': [

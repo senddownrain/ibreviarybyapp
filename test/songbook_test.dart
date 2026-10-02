@@ -113,6 +113,28 @@ const _typicalSeed = <Map<String, dynamic>>[
 ];
 
 void main() {
+  group('Song filter state', () {
+    test('search and tags alone determine activity and badge count', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(songsFilterProvider.notifier);
+      expect(container.read(songsFilterProvider).isActive, isFalse);
+      notifier.setSearch('  Бог  ');
+      expect(container.read(songsFilterProvider).isActive, isTrue);
+      expect(container.read(songsFilterProvider).filterCount, 0);
+      notifier.toggleTag('Марыйныя');
+      notifier.toggleTag('Калядныя');
+      expect(container.read(songsFilterProvider).filterCount, 2);
+      notifier.clearFilters();
+      final cleared = container.read(songsFilterProvider);
+      expect(cleared.selectedTags, isEmpty);
+      expect(cleared.searchQuery, '  Бог  ');
+      expect(cleared.isActive, isTrue);
+      notifier.setSearch('  ');
+      expect(container.read(songsFilterProvider).isActive, isFalse);
+    });
+  });
+
   group('Prayerbook sections', () {
     testWidgets('root shows four section tiles after Favorites', (
       tester,
@@ -283,7 +305,7 @@ void main() {
       expect(find.text('Спевы не знойдзены'), findsOneWidget);
     });
 
-    testWidgets('filter sheet combines tags and favorites only', (
+    testWidgets('filter sheet supports tags, removal and reset', (
       tester,
     ) async {
       final router = _router(initialLocation: '/prayers/songs');
@@ -291,31 +313,119 @@ void main() {
       await tester.pumpWidget(_app(null, router: router));
       await tester.pumpAndSettle();
 
+      await tester.tap(find.byKey(const ValueKey('song-favorite-s-kal')));
+      await tester.pump();
+
       await tester.tap(find.byKey(const Key('song-filter-action')));
       await tester.pumpAndSettle();
+      expect(find.text('Толькі абраныя'), findsNothing);
       await tester.tap(find.byKey(const ValueKey('song-tag-filter-Марыйныя')));
       await tester.tap(find.byKey(const ValueKey('song-tag-filter-Калядныя')));
       await tester.pump();
       await tester.tap(find.byKey(const Key('song-filter-done')));
       await tester.pumpAndSettle();
-      expect(_rowOrder(tester), ['s-bog', 's-kal']);
+      expect(_rowOrder(tester), ['s-kal', 's-bog']);
+      expect(
+        find.byKey(const ValueKey('songbook-active-tag-Марыйныя')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('songbook-active-tag-Калядныя')),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(const ValueKey('songbook-active-tag-Марыйныя')),
+          matching: find.byTooltip('Delete'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(_rowOrder(tester), ['s-kal']);
+      expect(
+        find.byKey(const ValueKey('songbook-active-tag-Марыйныя')),
+        findsNothing,
+      );
 
       await tester.tap(find.byKey(const Key('song-filter-action')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('song-favorites-only')));
+      await tester.tap(find.text('Ачысціць'));
       await tester.pump();
       await tester.tap(find.byKey(const Key('song-filter-done')));
       await tester.pumpAndSettle();
-      expect(_rowOrder(tester), isEmpty);
+      expect(_rowOrder(tester), ['s-kal', 's-ave', 's-bog']);
       expect(
-        find.text('Няма абраных спеваў для гэтых фільтраў'),
-        findsOneWidget,
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('song-favorite-s-kal')),
+            )
+            .tooltip,
+        'Выдаліць з абраных',
       );
       expect(
-        find.byKey(const Key('songbook-active-favorites')),
-        findsOneWidget,
+        find.byKey(const ValueKey('songbook-active-tag-Калядныя')),
+        findsNothing,
       );
     });
+
+    testWidgets('tag chips fit a 320 dp phone at 200 percent text', (
+      tester,
+    ) async {
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.view.devicePixelRatio = 1;
+      const size = Size(320, 640);
+      tester.view.physicalSize = size;
+      const longTag = 'ВельміДоўгіТэгБезПрабелаўДляМаленькагаЭкрана';
+      final router = _router(initialLocation: '/prayers/songs');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: size,
+            textScaler: TextScaler.linear(2),
+          ),
+          child: _app(
+            null,
+            router: router,
+            seed: [
+              ..._seed,
+              {
+                'id': 'long',
+                'title': 'Доўгі',
+                'text': 'Тэкст',
+                'tags': [longTag],
+              },
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('song-filter-action')));
+      await tester.pumpAndSettle();
+      expect(find.text('Толькі абраныя'), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('song-tag-filter-$longTag')),
+      );
+      await tester.tap(find.byKey(const ValueKey('song-tag-filter-$longTag')));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('song-tag-filter-Уласны')),
+      );
+      await tester.tap(find.byKey(const ValueKey('song-tag-filter-Уласны')));
+      await tester.tap(find.byKey(const Key('song-filter-done')));
+      await tester.pumpAndSettle();
+      expect(_rowOrder(tester), ['s-ave', 'long']);
+      final longChip = tester.getRect(
+        find.byKey(const ValueKey('songbook-active-tag-$longTag')),
+      );
+      final otherChip = tester.getRect(
+        find.byKey(const ValueKey('songbook-active-tag-Уласны')),
+      );
+      expect(longChip.right, lessThanOrEqualTo(size.width));
+      expect(otherChip.top, greaterThanOrEqualTo(longChip.bottom));
+      expect(tester.takeException(), isNull);
+    }, variant: _platforms);
 
     testWidgets('list is always compact and has no songbook settings', (
       tester,

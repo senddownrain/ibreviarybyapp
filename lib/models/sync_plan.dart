@@ -2,8 +2,10 @@ enum SyncTarget {
   days('days', 'Літургічныя дні'),
   readings('readings', 'Чытанні'),
   prayers('prayers', 'Малітвы'),
-  bibleBel('bible_bel', 'Біблія · беларуская'),
-  bibleRu('bible_ru', 'Біблія · руская'),
+  /// The Bible collections are large; download them only when explicitly
+  /// requested from the cache settings instead of during startup sync.
+  bibleBel('bible_bel', 'Біблія · беларуская', automatic: false),
+  bibleRu('bible_ru', 'Біблія · руская', automatic: false),
 
   /// Legacy collection. The calendar is computed on the device
   /// (`computeYearOptions`), so it is downloaded only on explicit request.

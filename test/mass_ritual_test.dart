@@ -70,6 +70,7 @@ void main() {
           Map<String, String>.from((v[key] as Map?) ?? const {});
       expect(d.label, v['label']);
       expect(d.markers, lists('markers'));
+      expect(d.anchors, lists('anchors'));
       expect(d.classify, lists('classify'));
       expect(d.roleMarkers, lists('roleMarkers'));
       expect(d.roleCues, lists('roleCues'));
@@ -175,7 +176,12 @@ void main() {
     final text = File('assets/mass/order-of-mass-en.md').readAsStringSync();
     final en = kMassRitual.variant('en')!;
     final located = kMassRitual.locateSections(en, _blockTexts(text));
-    expect(located.map((s) => s.sectionId).toList(), en.markers.keys.toList());
+    expect(located.map((s) => s.sectionId).toList(), [
+      for (final section in kMassRitual.sections)
+        if (en.markers.containsKey(section.id) ||
+            en.anchors.containsKey(section.id))
+          section.id,
+    ]);
     expect(located.where((s) => s.isMajor).map((s) => s.sectionId).toList(), [
       'introductory-rites',
       'liturgy-of-the-word',

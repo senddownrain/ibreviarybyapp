@@ -191,8 +191,9 @@ MassSemanticDocument buildMassDocument(
   ]);
   final byIndex = {for (final s in located) s.blockIndex: s};
   for (final section in located) {
-    final block = blocks[section.blockIndex]
-      ..sectionId = section.sectionId
+    final block = blocks[section.blockIndex]..sectionId = section.sectionId;
+    if (!section.heading) continue;
+    block
       ..type = section.isMajor
           ? MassBlockType.majorSection
           : MassBlockType.subsection

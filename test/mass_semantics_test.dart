@@ -362,6 +362,19 @@ V. Ite, missa est.
 
 R. Deo gratias.''';
 
+// MyBrev V4.1 replaces only these whole service lines in the V4 Latin text.
+// Keep _laAfter as the older cached fixture for the transition period.
+final _laV41 = _laAfter
+    .replaceAll(
+      'ЧИН МЕССЫ НА ЛАТИНСКОМ ЯЗЫКЕ',
+      'ПАРАДАК СВЯТОЙ ІМШЫ НА ЛАЦІНСКАЙ МОВЕ',
+    )
+    .replaceAll('Исповедание веры', 'Вызнанне веры')
+    .replaceAll('Вторая Евхаристическая молитва', 'II эўхарыстычная малітва')
+    .replaceAll('Или:', 'Альбо:')
+    .replaceAll('После чтения:', 'Пасля чытання:')
+    .replaceAll('(После чтения)', '(Пасля чытання)');
+
 // Block shapes produced by MyBrev's adapter for the excerpts above.
 const _beShape = [
   'majorSection::',
@@ -487,6 +500,69 @@ void main() {
     expect(_shape(_build('la', _laBefore)), _laShape);
     expect(_shape(_build('la', _laAfter)), _laShape);
     expect(_shape(_build('en', englishBefore)), _shape(_build('en', english)));
+  });
+
+  test('old cached and V4.1 Latin service text have the same semantics', () {
+    final old = _laAfter
+        .replaceFirst(
+          '## Літургія слова',
+          ':::rubric\n(молитва из Миссала)\n:::\n\n## Літургія слова',
+        )
+        .replaceFirst(
+          '### Исповедание веры',
+          ':::rubric\nЕвангелие:\n:::\n\n### Исповедание веры',
+        );
+    final migrated = _laV41
+        .replaceFirst(
+          '## Літургія слова',
+          ':::rubric\n(малітва з Імшала)\n:::\n\n## Літургія слова',
+        )
+        .replaceFirst(
+          '### Вызнанне веры',
+          ':::rubric\nЕвангелле:\n:::\n\n### Вызнанне веры',
+        );
+    final oldDoc = _build('la', old);
+    final newDoc = _build('la', migrated);
+    expect(_shape(newDoc), _shape(oldDoc));
+    expect(
+      newDoc.sections.map((s) => s.sectionId),
+      oldDoc.sections.map((s) => s.sectionId),
+    );
+    for (final (phrase, type, sectionId) in [
+      ('ПАРАДАК СВЯТОЙ ІМШЫ НА ЛАЦІНСКАЙ МОВЕ', MassBlockType.heading, null),
+      ('Вызнанне веры', MassBlockType.subsection, 'creed'),
+      (
+        'II эўхарыстычная малітва',
+        MassBlockType.subsection,
+        'eucharistic-prayer',
+      ),
+      ('Пасля чытання:', MassBlockType.rubric, 'first-reading'),
+      ('Евангелле:', MassBlockType.rubric, 'gospel'),
+      ('Альбо:', MassBlockType.alternative, null),
+    ]) {
+      final block = _find(newDoc, phrase);
+      expect(block.type, type, reason: phrase);
+      expect(block.sectionId, sectionId, reason: phrase);
+    }
+    expect(_find(newDoc, '(Пасля чытання)').type, MassBlockType.rubric);
+    expect(_find(newDoc, '(малітва з Імшала)').type, MassBlockType.rubric);
+    expect(_dialogue(newDoc, 'Kyrie eleison.'), [
+      'spoken:priest:V.',
+      'response:people:R.',
+    ]);
+    final rendered = newDoc.chunks.map((c) => c.html).join();
+    for (final oldPhrase in [
+      'ЧИН МЕССЫ НА ЛАТИНСКОМ ЯЗЫКЕ',
+      'Исповедание веры',
+      'Вторая Евхаристическая молитва',
+      'Или:',
+      'После чтения:',
+      '(После чтения)',
+      'Евангелие:',
+      '(молитва из Миссала)',
+    ]) {
+      expect(rendered, isNot(contains(oldPhrase)), reason: oldPhrase);
+    }
   });
 
   test('the migration changes no wording in the rendered blocks', () {

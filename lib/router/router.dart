@@ -452,6 +452,7 @@ final router = GoRouter(
                         _compendiumPartRoute,
                         CompendiumPartScreen(
                           partId: state.pathParameters['partId']!,
+                          target: state.uri.queryParameters['target'],
                         ),
                       ),
                     ),

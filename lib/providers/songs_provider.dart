@@ -57,30 +57,19 @@ final songTagsProvider = Provider<List<String>>((ref) {
 // ── Search and filter ────────────────────────────────────────────────────────
 
 class SongsFilter {
-  const SongsFilter({
-    this.searchQuery = '',
-    this.selectedTags = const {},
-    this.favoritesOnly = false,
-  });
+  const SongsFilter({this.searchQuery = '', this.selectedTags = const {}});
 
   final String searchQuery;
   final Set<String> selectedTags;
-  final bool favoritesOnly;
+  bool get isActive => searchQuery.trim().isNotEmpty || selectedTags.isNotEmpty;
 
-  bool get isActive =>
-      searchQuery.trim().isNotEmpty || selectedTags.isNotEmpty || favoritesOnly;
+  int get filterCount => selectedTags.length;
 
-  int get filterCount => selectedTags.length + (favoritesOnly ? 1 : 0);
-
-  SongsFilter copyWith({
-    String? searchQuery,
-    Set<String>? selectedTags,
-    bool? favoritesOnly,
-  }) => SongsFilter(
-    searchQuery: searchQuery ?? this.searchQuery,
-    selectedTags: selectedTags ?? this.selectedTags,
-    favoritesOnly: favoritesOnly ?? this.favoritesOnly,
-  );
+  SongsFilter copyWith({String? searchQuery, Set<String>? selectedTags}) =>
+      SongsFilter(
+        searchQuery: searchQuery ?? this.searchQuery,
+        selectedTags: selectedTags ?? this.selectedTags,
+      );
 }
 
 class SongsFilterNotifier extends Notifier<SongsFilter> {
@@ -95,11 +84,7 @@ class SongsFilterNotifier extends Notifier<SongsFilter> {
     state = state.copyWith(selectedTags: tags);
   }
 
-  void setFavoritesOnly(bool value) =>
-      state = state.copyWith(favoritesOnly: value);
-
-  void clearFilters() =>
-      state = state.copyWith(selectedTags: const {}, favoritesOnly: false);
+  void clearFilters() => state = state.copyWith(selectedTags: const {});
 }
 
 final songsFilterProvider = NotifierProvider<SongsFilterNotifier, SongsFilter>(
@@ -119,7 +104,6 @@ final filteredSongsProvider = Provider<AsyncValue<List<Song>>>((ref) {
           query: filter.searchQuery,
           tags: filter.selectedTags,
           favorites: favorites,
-          favoritesOnly: filter.favoritesOnly,
         ),
       );
 });

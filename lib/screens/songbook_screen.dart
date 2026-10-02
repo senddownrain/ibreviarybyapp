@@ -9,6 +9,7 @@ import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/songs_provider.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
@@ -94,23 +95,17 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
         key: const Key('songbook-count'),
         style: TextStyle(color: cs.onSurfaceVariant),
       ),
-      if (filter.selectedTags.isNotEmpty || filter.favoritesOnly) ...[
+      if (filter.selectedTags.isNotEmpty) ...[
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            if (filter.favoritesOnly)
-              InputChip(
-                key: const Key('songbook-active-favorites'),
-                label: const Text('Толькі абраныя'),
-                onDeleted: () => ref
-                    .read(songsFilterProvider.notifier)
-                    .setFavoritesOnly(false),
-              ),
             for (final tag in filter.selectedTags)
-              InputChip(
-                label: Text(tag),
+              _SongTagChip(
+                key: ValueKey('songbook-active-tag-$tag'),
+                tag: tag,
+                selected: true,
                 onDeleted: () =>
                     ref.read(songsFilterProvider.notifier).toggleTag(tag),
               ),
@@ -138,9 +133,7 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
         _SongbookMessage(
           key: const Key('songbook-empty'),
           icon: PhosphorIconsLight.musicNotesSimple,
-          title: filter.favoritesOnly
-              ? 'Няма абраных спеваў для гэтых фільтраў'
-              : 'Спевы не знойдзены',
+          title: 'Спевы не знойдзены',
           message: filter.isActive
               ? 'Змяніце пошук або фільтры.'
               : 'Сінхранізуйце Спеўнік у наладах.',
@@ -299,14 +292,7 @@ class _SongFilterSheet extends ConsumerWidget {
               'Фільтр спеваў',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            SwitchListTile.adaptive(
-              key: const Key('song-favorites-only'),
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Толькі абраныя'),
-              value: filter.favoritesOnly,
-              onChanged: notifier.setFavoritesOnly,
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Flexible(
               child: SingleChildScrollView(
                 child: Wrap(
@@ -314,18 +300,21 @@ class _SongFilterSheet extends ConsumerWidget {
                   runSpacing: 8,
                   children: [
                     for (final tag in tags)
-                      FilterChip(
+                      _SongTagChip(
                         key: ValueKey('song-tag-filter-$tag'),
-                        label: Text(tag),
+                        tag: tag,
                         selected: filter.selectedTags.contains(tag),
-                        onSelected: (_) => notifier.toggleTag(tag),
+                        onSelected: () => notifier.toggleTag(tag),
                       ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            Row(
+            OverflowBar(
+              alignment: MainAxisAlignment.spaceBetween,
+              spacing: 8,
+              overflowSpacing: 8,
               children: [
                 TextButton(
                   onPressed: filter.filterCount == 0
@@ -333,7 +322,6 @@ class _SongFilterSheet extends ConsumerWidget {
                       : notifier.clearFilters,
                   child: const Text('Ачысціць'),
                 ),
-                const Spacer(),
                 FilledButton(
                   key: const Key('song-filter-done'),
                   onPressed: () => Navigator.pop(context),
@@ -342,6 +330,56 @@ class _SongFilterSheet extends ConsumerWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The same compact tag surface in the filter sheet and above the list.
+class _SongTagChip extends StatelessWidget {
+  const _SongTagChip({
+    super.key,
+    required this.tag,
+    required this.selected,
+    this.onSelected,
+    this.onDeleted,
+  });
+
+  final String tag;
+  final bool selected;
+  final VoidCallback? onSelected;
+  final VoidCallback? onDeleted;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final glass = usesCupertinoGlass(context);
+    final tokens = GlassTokens.of(context);
+    final base = glass ? tokens.pillFill : cs.surfaceContainerLow;
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.sizeOf(context).width - 40,
+      ),
+      child: InputChip(
+        label: Text(tag, maxLines: 2, overflow: TextOverflow.ellipsis),
+        selected: selected,
+        onSelected: onSelected == null ? null : (_) => onSelected!(),
+        onDeleted: onDeleted,
+        showCheckmark: onDeleted == null,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+        shape: const StadiumBorder(),
+        backgroundColor: base,
+        selectedColor: glass
+            ? Color.alphaBlend(cs.primary.withValues(alpha: 0.16), base)
+            : cs.primaryContainer,
+        side: BorderSide(
+          color: selected
+              ? cs.primary.withValues(alpha: 0.45)
+              : cs.outlineVariant,
         ),
       ),
     );

@@ -20,106 +20,20 @@ Riverpod/Hive/go_router, по образцу Спеўніка.
 - `lib/utils/compendium_data.dart` — порт `validateCompendiumDataset`,
   `compendiumFromDocuments`, `isNewerCompendium`, `indexCompendium`
   (`CompendiumIndex`: порядок, lookup по номеру/`q042`, reading groups),
-  `buildCompendiumPartOutline` / `CompendiumIndex.navigation`,
+  `buildCompendiumPartReadingOutline` / `CompendiumIndex.partReadingOutlines`,
+  compatibility index `buildCompendiumPartOutline` / `CompendiumIndex.navigation`,
   `answerParagraphs`, `formatCccRefs`.
 
-## Иерархия источника и reading groups
+## Навигация и плоский план части
 
-**Иерархия источника и внутренние reading groups — разные понятия; видимыми
-узлами навигации становятся только реальные заголовки источника.**
+Normal browsing has two levels before a question: Compendium root → Part. A Part screen contains all questions of that Part in canonical order. РАЗДЗЕЛ, product ПАДРАЗДЗЕЛ, named topic and subtopic are inline structural headings rather than navigation destinations. Only an individual question opens its reader. Old node/topic routes are compatibility redirects to the owning Part and scroll target.
 
-- Источник (Catholic.by) печатает уровни `ЧАСТКА → РАЗДЗЕЛ → ГЛАВА → именованные
-  тэмы → пытанні`. `РАЗДЗЕЛ` и `ГЛАВА` — разные уровни; в Dart они называются
-  `section`/`chapter`. В продукте уровень `chapter` называется `ПАДРАЗДЗЕЛ`
-  (см. «Навигация v2» ниже); канонические данные при этом не меняются.
-- `CompendiumGroup` — внутренний кусок чтения (reader-страница, prev/next,
-  раскрытые строки, deep links). Группа `CompendiumGroupKind.unit` —
-  безымянный lead-in unit'а (например `p1-s1-intro` = вопрос 1); это **не**
-  заголовок источника (`hasSourceHeading == false`).
-- Навигация строится производным индексом `CompendiumNavNode`
-  (`buildCompendiumPartOutline`, кэш `CompendiumIndex.navigation`) из
-  канонического датасета, без копирования контента и без изменения схемы:
-  узел `part/section/chapter/topic` имеет `directQuestions` и `children`.
-  Вопросы lead-in'а — `directQuestions` ближайшего реального заголовка
-  (раздела или главы); они всегда идут перед `children` (валидатор
-  гарантирует, что вопросы без тэмы предшествуют тэмам). Порядок узлов
-  детерминирован и совпадает с каноническим порядком вопросов.
-- Прямые вопросы рисуются строками вопроса (номер + текст →
-  `CompendiumQuestionScreen`), а не контейнерами «Пытанне 1» / «Пытанні
-  25–27». Именованная тэма остаётся строкой с диапазоном как вторичной
-  метаинформацией («БОЖАЕ АБ’ЯЎЛЕННЕ / Пытанні 6–10»); `parentTitle` тэмы —
-  подзаголовок над ней.
-- Контекст (`questionContextTrail`, `groupContextTrail`,
-  `compendiumQuestionContext`, `ReaderContextHeader`) — только реальные
-  заголовки: для вопроса 1 «ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»», без третьего
-  уровня; внутри тэмы — часть · раздел · глава · тэма.
-- Legacy `/prayers/compendium/topic/<unitId>`: lead-in из одного вопроса
-  (`compendiumGroupQuestionRedirect`, например `p1-s1-intro`) открывается как
-  reader этого вопроса; lead-in из нескольких вопросов (`p1-s1-ch1`, 2–5)
-  открывается reader'ом с заголовком ближайшей главы/раздела и диапазоном
-  только в metadata. Prev/next и «Уся тэма» не ведут на фиктивные тэмы
-  (для lead-in кнопка показывает диапазон или скрыта).
-
-## Навигация v2: всегда спускаемся к ближайшему реальному владельцу
-
-**Правило.** Каждый структурный узел — отдельный экран. Экран показывает
-заголовок узла, затем вопросы, которые источник печатает прямо под этим
-заголовком (`directQuestions`), затем реальных детей узла как строки-переходы.
-Ничего, что лежит ниже ребёнка, на экран не «выплющивается», поэтому каждый
-из 598 вопросов перечислен ровно один раз — на экране своего ближайшего
-владельца (`CompendiumIndex.ownerOf`).
-
-```text
-ЧАСТКА      → только её РАЗДЗЕЛЫ (метка, заголовок, диапазон, chevron)
-РАЗДЗЕЛ     → прямые вопросы → ПАДРАЗДЗЕЛЫ и тэмы, принадлежащие разделу
-ПАДРАЗДЗЕЛ  → прямые вопросы → именованные тэмы
-ТЭМА        → reader (раскрываемые вопросы, `subtopicTitle` — заголовки внутри)
-```
-
-Никаких частных случаев для вопроса 1: то же правило даёт q1 и q218–220,
-q357, q434–441, q534 на экранах разделов; q2–5, q79–80, q251, q295, q321,
-q535, q557, q567–568 — на экранах подразделов; раздел без глав (`p4-s2`)
-показывает свои тэмы напрямую; у `p2-s2` перед подразделами идёт собственная
-тэма раздела (q250). Цитата под заголовком главы (`leadCitations`,
-`p1-s1-ch1`) показывается на экране подраздела.
-
-**Терминология UI.**
-
-| Данные / Dart | Источник | UI |
-| --- | --- | --- |
-| `part`, `partLabel` | ЧАСТКА ПЕРШАЯ | ЧАСТКА ПЕРШАЯ (из данных) |
-| `section`, `sectionLabel` | РАЗДЗЕЛ ПЕРШЫ | РАЗДЗЕЛ ПЕРШЫ (из данных) |
-| `chapter`, `chapterLabel` | ГЛАВА ПЕРШАЯ | ПАДРАЗДЗЕЛ ПЕРШЫ (генерируется) |
-| `topic` | заголовок тэмы | реальный заголовок, без родового слова |
-
-`chapterLabel` остаётся «ГЛАВА …» (данные общие с MyBrev и Firestore). UI берёт
-метку только из `CompendiumNavNode.displayLabel`; для главы это
-`compendiumSubsectionLabel(chapterNumber)` с порядковым числительным мужского
-рода (ПЕРШЫ, ДРУГІ, ТРЭЦІ, ЧАЦВЁРТЫ, ПЯТЫ, ШОСТЫ, СЁМЫ, ВОСЬМЫ, ДЗЯВЯТЫ,
-ДЗЯСЯТЫ; дальше — «ПАДРАЗДЗЕЛ 11»). Замена слова в строке («ПАДРАЗДЗЕЛ
-ПЕРШАЯ») не используется. «ГЛАВА …» как продуктовая метка нигде не выводится.
-
-**Визуальные уровни** (только типографика, отступы и eyebrow; новых цветов
-нет; все строки — `CompendiumListRow`):
-
-| Уровень | Виджет | Оформление |
-| --- | --- | --- |
-| РАЗДЗЕЛ | `CompendiumSectionRow` | accent eyebrow `labelMedium` w800, заголовок `titleLarge` w700, диапазон, отступ 18 |
-| ПАДРАЗДЗЕЛ | `CompendiumSubsectionRow` | accent eyebrow `labelSmall`, заголовок `titleMedium` w700, диапазон, отступ 14 |
-| Тэма | `CompendiumTopicRow` | заголовок `titleMedium` w500 + «Пытанні N–M», без eyebrow, отступ 10 |
-| Пытанне | `CompendiumQuestionRow` | бейдж номера + текст + chevron; один и тот же компонент на экране раздела, подраздела и в результатах поиска |
-
-Заголовок экрана: контекст («ЧАСТКА ПЕРШАЯ · «ВЕРУ» — «ВЕРЫМ»»), метка уровня,
-заголовок (`headlineSmall` у части и раздела, `titleLarge` у подраздела),
-диапазон вопросов.
-
-**Маршруты.** Один экран `CompendiumNodeScreen`
-(`lib/screens/compendium_node_screen.dart`): `part/:partId` —
-`CompendiumNodeScreen.part`, `node/:nodeId` — раздел или подраздел по id из
-датасета (`p1-s1`, `p1-s1-ch1`). `node/<id тэмы или reading group>` заменяется
-на `topic/<id>`; неизвестный id — «Раздзел не знойдзены». Старые ссылки
-`part/…`, `topic/…` (включая технические группы, см. выше) и `question/…` не
-менялись.
+- `CompendiumIndex.partReadingOutline(partId)` кэширует неизменяемый поток `CompendiumPartItem` и карту `targetId → itemIndex` для каждой части. Порядок повторяет Web `buildPartReadingOutline()`: раздел, подраздел, цитаты, темы, подзаголовки и вопросы в канонической последовательности units. Все четыре потока вместе содержат 598 вопросов ровно по одному разу.
+- Технические `unit`, `intro`, `group` и диапазоны вопросов не становятся заголовками. `CompendiumGroup` и `CompendiumNavNode` остаются производным индексом для разрешения старых ссылок и контекста.
+- Исходная метка `chapterLabel = "ГЛАВА ПЕРШАЯ"` остаётся в данных. UI показывает мужские формы через `compendiumSubsectionLabel`, например `ПАДРАЗДЗЕЛ ПЕРШЫ`.
+- `CompendiumPartScreen` строит длинный список лениво через `ScrollablePositionedList.builder`. Заголовки не интерактивны; каждый вопрос использует `CompendiumQuestionRow`. Индексная прокрутка учитывает переменную высоту строк и масштаб текста.
+- Обычные маршруты: `/prayers/compendium`, `/prayers/compendium/part/:partId`, `/prayers/compendium/question/:number`. Ссылки `/node/:nodeId` и `/topic/:topicId` переадресуют на часть с `?target=<stable id>`. Техническая группа направляет к первому вопросу своей группы. Асинхронная загрузка не мешает cold deep link.
+- Reader вопроса сохраняет канонические prev/next. Центральная кнопка `Да часткі` открывает часть с якорем текущего вопроса. Контекст показывает только реальные заголовки источника.
 
 ## Offline и синхронизация
 
@@ -168,25 +82,17 @@ AND по словам как префиксам, веса полей (вопро
 
 | Route | Экран |
 | --- | --- |
-| `/prayers/compendium` | 4 части, поиск в нижнем dock (`PrayerSearchDock` без фильтра), результаты |
-| `/prayers/compendium/part/:partId` | Компактный план части: только её раздзелы |
-| `/prayers/compendium/node/:nodeId` | Раздзел или падраздзел: прямые вопросы, затем дочерние узлы |
-| `/prayers/compendium/topic/:topicId` | Reader: раскрываемые вопросы, prev/next группа |
-| `/prayers/compendium/question/:number` | Reader: вопрос, контекст, prev/next, «Уся тэма»; deep link |
-| `/prayers/catechism` | redirect на `/prayers/compendium` |
+| `/prayers/compendium` | 4 части и глобальный поиск |
+| `/prayers/compendium/part/:partId` | Вся часть: inline заголовки, цитаты и все вопросы |
+| `/prayers/compendium/question/:number` | Reader одного вопроса с prev/next и `Да часткі` |
+| `/prayers/compendium/node/:nodeId`, `/topic/:topicId` | Совместимость: переход в часть к соответствующему заголовку или вопросу |
+| `/prayers/catechism` | Redirect на `/prayers/compendium` |
 
-- Плитка «Катэхізіс» (`catechism-destination`) открывает `/prayers/compendium`.
-- Списки — `AmbientWash` + `FloatingTopActions` + строки как в Спеўніку;
-  readers — `ReadingScaffold` → `ReaderScaffold` / `ReaderContextHeader` /
-  `ReaderContentSurface` с общим `TextScaleControl`, свайпы prev/next.
-- Запрос поиска (`compendiumSearchQueryProvider`) и раскрытые строки
-  (`compendiumExpandedProvider`) живут в сессии; скролл — `PageStorageKey`.
-  Enter на точном номере открывает вопрос.
+`AmbientWash`, `FloatingTopActions`, `GlassTokens`, `ReadingScaffold`, `ReaderScaffold`, `TextScaleControl` и нижний dock сохраняют платформенный вид Android Ambient / iOS Glass. Навигация не создаёт второй dock.
 
 ### Постоянный поиск
 
-- Каждый экран Кампендыя (корень, часть, раздел, подраздел, reader тэмы, reader вопроса,
-  loading/not-found) обёрнут в `CompendiumSearchHost`
+- Каждый экран Кампендыя (корень, часть, reader вопроса и compatibility/loading state) обёрнут в `CompendiumSearchHost`
   (`lib/widgets/compendium/compendium_search_host.dart`): он регистрирует
   contextual bottom slot маршрута (`AppRouteEntryScope.showContextualBottomBar`,
   dock приложения скрывается, как в Спеўніку и каталоге малітваў) и ставит

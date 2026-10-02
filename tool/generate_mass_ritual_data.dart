@@ -93,6 +93,7 @@ void main() {
     if (v['source'] != null) out.writeln('source: ${_lit(v['source'])},');
     if (v['callRole'] != null) out.writeln('callRole: ${_lit(v['callRole'])},');
     _listMap(out, 'markers', v['markers']);
+    _listMap(out, 'anchors', v['anchors']);
     _listMap(out, 'classify', v['classify']);
     _stringMap(out, 'speakerLabels', v['speakerLabels']);
     _stringMap(out, 'roleLabels', v['roleLabels']);

@@ -210,16 +210,10 @@ void main() {
       expect(ids(filterSongs(songs, favorites: ['3'])), ['3', '1', '2']);
     });
 
-    test('search, tags and favorites combine', () {
+    test('search and tags combine while favorites remain a sort key', () {
       expect(
         ids(
-          filterSongs(
-            songs,
-            query: 'НАДЗЕЯ',
-            tags: {'Дух'},
-            favorites: ['1'],
-            favoritesOnly: true,
-          ),
+          filterSongs(songs, query: 'НАДЗЕЯ', tags: {'Дух'}, favorites: ['1']),
         ),
         ['1'],
       );
@@ -243,8 +237,12 @@ void main() {
       expect(filterSongs(songs, tags: {'Калядныя'}), isEmpty);
     });
 
-    test('favoritesOnly without favorites is empty', () {
-      expect(filterSongs(songs, favoritesOnly: true), isEmpty);
+    test('favorites never hide songs', () {
+      expect(ids(filterSongs(songs, favorites: ['3'])), ['3', '1', '2']);
+      expect(ids(filterSongs(songs, tags: {'Дух'}, favorites: ['2'])), [
+        '1',
+        '3',
+      ]);
     });
 
     test('alphabetical order follows the Belarusian alphabet', () {

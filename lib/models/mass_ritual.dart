@@ -24,6 +24,7 @@ class MassVariant {
     required this.prayerId,
     required this.title,
     required this.markers,
+    this.anchors = const {},
     this.bundledAsset,
     this.strongMarksResponses = false,
     this.source,
@@ -45,6 +46,9 @@ class MassVariant {
   /// section the canonical Belarusian title comes first and the heading of a
   /// not yet migrated text second.
   final Map<String, List<String>> markers;
+
+  /// Blocks that carry a section location without changing their visible type.
+  final Map<String, List<String>> anchors;
   final String? bundledAsset;
 
   /// English convention: a whole bold line is the people's part.
@@ -95,12 +99,14 @@ class LocatedMassSection {
     required this.sectionId,
     required this.title,
     this.parent,
+    this.heading = true,
   });
 
   final int blockIndex;
   final String sectionId;
   final String title;
   final String? parent;
+  final bool heading;
 
   bool get isMajor => parent == null;
 }
@@ -194,10 +200,17 @@ class MassRitual {
     final located = <LocatedMassSection>[];
     var last = -1;
     for (final def in sections) {
-      final markers = variant.markers[def.id];
-      if (markers == null || markers.isEmpty) continue;
+      final markers = variant.markers[def.id] ?? const <String>[];
+      final anchors = variant.anchors[def.id] ?? const <String>[];
+      if (markers.isEmpty && anchors.isEmpty) continue;
       for (var i = last + 1; i < texts.length; i++) {
-        if (!markers.any((m) => _markerMatchesNormalized(m, texts[i]))) {
+        final heading = markers.any(
+          (m) => _markerMatchesNormalized(m, texts[i]),
+        );
+        final anchored = anchors.any(
+          (m) => _markerMatchesNormalized(m, texts[i]),
+        );
+        if (!heading && !anchored) {
           continue;
         }
         last = i;
@@ -207,6 +220,7 @@ class MassRitual {
             sectionId: def.id,
             title: blockTexts[i].replaceAll(RegExp(r'\s+'), ' ').trim(),
             parent: def.parent,
+            heading: heading,
           ),
         );
         break;

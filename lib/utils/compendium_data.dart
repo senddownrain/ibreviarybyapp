@@ -272,9 +272,8 @@ enum CompendiumGroupKind { unit, topic }
 
 /// A reading group: a topic, or a unit's questions before its first topic.
 ///
-/// Groups are internal reading chunks (reader pages, previous/next, expansion
-/// state, legacy deep links). Visible navigation comes from
-/// [buildCompendiumPartOutline], not from groups.
+/// Groups remain an internal compatibility index for legacy deep links.
+/// Visible Part content comes from [buildCompendiumPartReadingOutline].
 class CompendiumGroup {
   CompendiumGroup._({
     required this.id,
@@ -385,7 +384,18 @@ class CompendiumIndex {
 
   final CompendiumDataset dataset;
 
-  /// Visible source navigation, built once per index.
+  /// Reading streams are derived once per dataset, including stable anchors.
+  late final Map<String, CompendiumPartOutline> partReadingOutlines = {
+    for (final part in parts)
+      part.id: buildCompendiumPartReadingOutline(this, part.id)!,
+  };
+
+  CompendiumPartOutline? partReadingOutline(String? id) {
+    final part = getPart(id);
+    return part == null ? null : partReadingOutlines[part.id];
+  }
+
+  /// Source heading tree retained for compatibility links, built once.
   late final List<CompendiumNavNode> navigation = buildCompendiumNavigation(
     this,
   );
@@ -406,9 +416,7 @@ class CompendiumIndex {
         question.number: node,
   };
 
-  /// The nearest real heading that owns [question]: its named topic, or the
-  /// chapter/section it is printed directly under. This is the screen on
-  /// which the question is listed.
+  /// The nearest real source heading that owns [question].
   CompendiumNavNode? ownerOf(CompendiumQuestion question) =>
       _owners[question.number];
 
@@ -614,14 +622,9 @@ List<CompendiumNavNode> buildCompendiumNavigation(CompendiumIndex index) => [
   for (final part in index.parts) ?buildCompendiumPartOutline(index, part.id),
 ];
 
-/// Source outline of one part: part → sections → chapters → named topics,
-/// with untitled lead-in questions attached directly to the nearest real
-/// heading (MyBrev `buildPartOutline`, refined). Returns `null` for an
-/// unknown part.
-///
-/// Browsing rule (docs/compendium.md): every node is its own screen, which
-/// lists the node's `directQuestions` and then its `children`, so a question
-/// is always reached by drilling down to its nearest real owner.
+/// Source heading tree used by compatibility links and lookups. Untitled
+/// lead-in questions attach to the nearest real heading. The Part screen uses
+/// [buildCompendiumPartReadingOutline] instead.
 CompendiumNavNode? buildCompendiumPartOutline(
   CompendiumIndex index,
   String partId,
@@ -723,6 +726,169 @@ List<String> groupContextTrail(CompendiumGroup group) => [
   ?group.unit.chapterTitle,
   ?group.topic?.title,
 ].where((label) => label.isNotEmpty).toList();
+
+enum CompendiumPartItemKind {
+  sectionHeading,
+  subsectionHeading,
+  topicHeading,
+  subtopicHeading,
+  leadCitations,
+  question,
+}
+
+/// One immutable entry in a Part's canonical reading stream.
+class CompendiumPartItem {
+  const CompendiumPartItem({
+    required this.kind,
+    required this.id,
+    this.label,
+    this.title,
+    this.citations = const [],
+    this.question,
+  });
+
+  final CompendiumPartItemKind kind;
+  final String id;
+  final String? label;
+  final String? title;
+  final List<CompendiumCitation> citations;
+  final CompendiumQuestion? question;
+}
+
+class CompendiumPartOutline {
+  const CompendiumPartOutline(this.part, this.items, this.targetIndices);
+
+  final CompendiumPart part;
+  final List<CompendiumPartItem> items;
+  final Map<String, int> targetIndices;
+}
+
+/// Matches the Web `buildPartReadingOutline`: units are only ordering data;
+/// their ids and question ranges never become visible headings.
+CompendiumPartOutline? buildCompendiumPartReadingOutline(
+  CompendiumIndex index,
+  String partId,
+) {
+  final part = index.getPart(partId);
+  if (part == null) return null;
+  final items = <CompendiumPartItem>[];
+  final targets = <String, int>{};
+  void add(CompendiumPartItem item) {
+    targets[item.id] = items.length;
+    items.add(item);
+  }
+
+  String? sectionId;
+  String? chapterId;
+  String? topicId;
+  String? parentTitle;
+  String? subtopicTitle;
+  for (final unit in index.units.where((unit) => unit.partId == part.id)) {
+    final section = part.sections.firstWhere(
+      (section) => section.number == unit.sectionNumber,
+    );
+    if (sectionId != section.id) {
+      sectionId = section.id;
+      add(
+        CompendiumPartItem(
+          kind: CompendiumPartItemKind.sectionHeading,
+          id: section.id,
+          label: section.label,
+          title: section.title,
+        ),
+      );
+      chapterId = topicId = parentTitle = subtopicTitle = null;
+    }
+    final chapter = unit.chapterNumber == null
+        ? null
+        : section.chapters.firstWhere(
+            (chapter) => chapter.number == unit.chapterNumber,
+          );
+    if (chapterId != chapter?.id) {
+      chapterId = chapter?.id;
+      if (chapter != null) {
+        add(
+          CompendiumPartItem(
+            kind: CompendiumPartItemKind.subsectionHeading,
+            id: chapter.id,
+            label: compendiumSubsectionLabel(chapter.number),
+            title: chapter.title,
+          ),
+        );
+      }
+      topicId = parentTitle = subtopicTitle = null;
+    }
+    if (unit.leadCitations.isNotEmpty) {
+      add(
+        CompendiumPartItem(
+          kind: CompendiumPartItemKind.leadCitations,
+          id: '${unit.id}-lead',
+          citations: List.unmodifiable(unit.leadCitations),
+        ),
+      );
+    }
+    for (final question in unit.questions) {
+      if (topicId != question.topicId) {
+        topicId = question.topicId;
+        subtopicTitle = null;
+        if (topicId != null) {
+          final topic = unit.topics.firstWhere((topic) => topic.id == topicId);
+          if (topic.parentTitle != null && topic.parentTitle != parentTitle) {
+            add(
+              CompendiumPartItem(
+                kind: CompendiumPartItemKind.topicHeading,
+                id: '${topic.id}-parent',
+                title: topic.parentTitle,
+              ),
+            );
+          }
+          parentTitle = topic.parentTitle;
+          add(
+            CompendiumPartItem(
+              kind: CompendiumPartItemKind.topicHeading,
+              id: topic.id,
+              title: topic.title,
+            ),
+          );
+          if (topic.leadCitations.isNotEmpty) {
+            add(
+              CompendiumPartItem(
+                kind: CompendiumPartItemKind.leadCitations,
+                id: '${topic.id}-lead',
+                citations: List.unmodifiable(topic.leadCitations),
+              ),
+            );
+          }
+        } else {
+          parentTitle = null;
+        }
+      }
+      if (question.subtopicTitle != null &&
+          question.subtopicTitle != subtopicTitle) {
+        add(
+          CompendiumPartItem(
+            kind: CompendiumPartItemKind.subtopicHeading,
+            id: '${question.id}-subtopic',
+            title: question.subtopicTitle,
+          ),
+        );
+      }
+      subtopicTitle = question.subtopicTitle;
+      add(
+        CompendiumPartItem(
+          kind: CompendiumPartItemKind.question,
+          id: question.id,
+          question: question,
+        ),
+      );
+    }
+  }
+  return CompendiumPartOutline(
+    part,
+    List.unmodifiable(items),
+    Map.unmodifiable(targets),
+  );
+}
 
 /// A run of answer text with an optional emphasis style.
 class CompendiumTextRun {
