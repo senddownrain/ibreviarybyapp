@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:mybrev_flutter/constants/compendium.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
@@ -9,6 +11,7 @@ import 'package:mybrev_flutter/providers/songs_provider.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/utils/compendium_data.dart';
 import 'package:mybrev_flutter/utils/compendium_search.dart';
 import 'package:mybrev_flutter/utils/song_chords.dart';
 import 'package:mybrev_flutter/widgets/bottom_control_geometry.dart';
@@ -23,6 +26,159 @@ enum LibrarySearchScope {
 
   const LibrarySearchScope(this.label);
   final String label;
+}
+
+/// Shared browser rows. Only the active domain is watched and built.
+class LibraryBrowserResults extends ConsumerWidget {
+  const LibraryBrowserResults({
+    super.key,
+    required this.scope,
+    required this.query,
+  });
+
+  final LibrarySearchScope scope;
+  final String query;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trimmed = query.trim();
+    switch (scope) {
+      case LibrarySearchScope.prayers:
+        final prayers = filterAndSortPrayers(
+          ref.watch(prayerCatalogProvider),
+          PrayersFilter(searchQuery: trimmed),
+          ref.watch(settingsProvider).favoriteIds,
+        );
+        return SliverList.builder(
+          itemCount: prayers.length + 1,
+          itemBuilder: (context, index) => index == 0
+              ? Text(
+                  trimmed.isEmpty
+                      ? 'Каталог малітваў'
+                      : 'Знойдзена: ${prayers.length}',
+                  key: const Key('library-results-count'),
+                  style: Theme.of(context).textTheme.titleMedium,
+                )
+              : PrayerListRow(
+                  prayer: prayers[index - 1],
+                  rowKey: ValueKey(
+                    'library-prayer-row-${prayers[index - 1].id}',
+                  ),
+                ),
+        );
+      case LibrarySearchScope.songs:
+        final state = ref.watch(songsProvider);
+        if (!state.hasValue) {
+          return SliverToBoxAdapter(
+            child: Text(
+              state.hasError ? 'Спеўнік недаступны' : 'Загрузка спеўніка…',
+            ),
+          );
+        }
+        final songs = filterSongs(state.requireValue, query: trimmed);
+        return SliverList.builder(
+          itemCount: songs.length + 1,
+          itemBuilder: (context, index) => index == 0
+              ? Text(
+                  trimmed.isEmpty ? 'Усе спевы' : 'Знойдзена: ${songs.length}',
+                  key: const Key('library-results-count'),
+                  style: Theme.of(context).textTheme.titleMedium,
+                )
+              : SongListRow(song: songs[index - 1]),
+        );
+      case LibrarySearchScope.compendium:
+        if (trimmed.isEmpty) {
+          final state = ref.watch(compendiumIndexProvider);
+          if (!state.hasValue) {
+            return SliverToBoxAdapter(
+              child: Text(
+                state.hasError
+                    ? 'Катэхізіс недаступны'
+                    : 'Загрузка Катэхізіса…',
+              ),
+            );
+          }
+          final data = state.requireValue;
+          return SliverList.builder(
+            itemCount: data.parts.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return Text(
+                  'Часткі Кампендыя',
+                  key: const Key('library-results-count'),
+                  style: Theme.of(context).textTheme.titleMedium,
+                );
+              }
+              final part = data.parts[index - 1];
+              return CompendiumListRow(
+                key: ValueKey('library-part-${part.id}'),
+                leading: CompendiumBadge(label: romanNumeral(part.number)),
+                eyebrow: part.label,
+                title: part.title,
+                subtitle: switch (data.partRange(part.id)) {
+                  (final first, final last) => 'Пытанні $first–$last',
+                  null => null,
+                },
+                onTap: () => context.push(compendiumPartLocation(part.id)),
+              );
+            },
+          );
+        }
+        final index = ref.watch(compendiumSearchIndexProvider);
+        if (index == null) {
+          return const SliverToBoxAdapter(child: Text('Загрузка Катэхізіса…'));
+        }
+        final results = searchCompendium(index, trimmed);
+        return SliverList.builder(
+          itemCount: results.length + 1,
+          itemBuilder: (context, position) => position == 0
+              ? Text(
+                  'Знойдзена: ${results.length}',
+                  key: const Key('library-results-count'),
+                  style: Theme.of(context).textTheme.titleMedium,
+                )
+              : CompendiumQuestionRow(
+                  key: ValueKey(
+                    'library-question-${results[position - 1].question.number}',
+                  ),
+                  question: results[position - 1].question,
+                  subtitle: compendiumQuestionContext(
+                    results[position - 1].question,
+                  ),
+                ),
+        );
+    }
+  }
+}
+
+class LibraryScopeSelector extends StatelessWidget {
+  const LibraryScopeSelector({
+    super.key,
+    required this.scope,
+    required this.onChanged,
+  });
+  final LibrarySearchScope scope;
+  final ValueChanged<LibrarySearchScope> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: 8,
+    runSpacing: 8,
+    children: [
+      for (final candidate in LibrarySearchScope.values)
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: BottomControlGeometry.minimumTarget,
+          ),
+          child: ChoiceChip(
+            key: Key('library-scope-${candidate.name}'),
+            label: Text(candidate.label),
+            selected: scope == candidate,
+            onSelected: (_) => onChanged(candidate),
+          ),
+        ),
+    ],
+  );
 }
 
 /// One query and three search domains. Every domain keeps its own matching
@@ -78,67 +234,6 @@ class _LibrarySearchScreenState extends ConsumerState<LibrarySearchScreen> {
     super.dispose();
   }
 
-  List<Widget> _results() {
-    final query = _query.text.trim();
-    if (query.isEmpty) {
-      return const [
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 32),
-          child: Text('Увядзіце слова або нумар пытання.'),
-        ),
-      ];
-    }
-    switch (_scope) {
-      case LibrarySearchScope.prayers:
-        final prayers = filterAndSortPrayers(
-          ref.watch(prayerCatalogProvider),
-          PrayersFilter(searchQuery: query),
-          ref.watch(settingsProvider).favoriteIds,
-        );
-        return [
-          Text(
-            'Знойдзена: ${prayers.length}',
-            key: const Key('library-results-count'),
-          ),
-          if (prayers.isEmpty) const Text('Малітваў не знойдзена'),
-          for (final prayer in prayers) PrayerListRow(prayer: prayer),
-        ];
-      case LibrarySearchScope.songs:
-        final songs = ref.watch(songsProvider);
-        if (!songs.hasValue) {
-          return [
-            Text(songs.hasError ? 'Спеўнік недаступны' : 'Загрузка спеўніка…'),
-          ];
-        }
-        final results = filterSongs(songs.requireValue, query: query);
-        return [
-          Text(
-            'Знойдзена: ${results.length}',
-            key: const Key('library-results-count'),
-          ),
-          if (results.isEmpty) const Text('Спеваў не знойдзена'),
-          for (final song in results) SongListRow(song: song),
-        ];
-      case LibrarySearchScope.compendium:
-        final index = ref.watch(compendiumSearchIndexProvider);
-        if (index == null) return const [Text('Загрузка Катэхізіса…')];
-        final results = searchCompendium(index, query);
-        return [
-          Text(
-            'Знойдзена: ${results.length}',
-            key: const Key('library-results-count'),
-          ),
-          if (results.isEmpty) const Text('Пытанняў не знойдзена'),
-          for (final result in results)
-            CompendiumQuestionRow(
-              key: ValueKey('library-question-${result.question.number}'),
-              question: result.question,
-              subtitle: compendiumQuestionContext(result.question),
-            ),
-        ];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,43 +241,46 @@ class _LibrarySearchScreenState extends ConsumerState<LibrarySearchScreen> {
         children: [
           AmbientWash(
             seasonColor: Theme.of(context).colorScheme.tertiary,
-            child: ListView(
+            child: CustomScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.fromLTRB(
-                20,
-                MediaQuery.paddingOf(context).top + 90,
-                20,
-                BottomControlGeometry.searchHeight +
-                    BottomControlGeometry.gap +
-                    systemBottomInset(context) +
-                    BottomControlGeometry.contentGap,
-              ),
-              children: [
-                Text(
-                  'Пошук у Малітоўніку',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final scope in LibrarySearchScope.values)
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minHeight: BottomControlGeometry.minimumTarget,
-                        ),
-                        child: ChoiceChip(
-                          key: Key('library-scope-${scope.name}'),
-                          label: Text(scope.label),
-                          selected: _scope == scope,
-                          onSelected: (_) => setState(() => _scope = scope),
-                        ),
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    MediaQuery.paddingOf(context).top + 90,
+                    20,
+                    0,
+                  ),
+                  sliver: SliverList.list(
+                    children: [
+                      Text(
+                        'Пошук у Малітоўніку',
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                  ],
+                      const SizedBox(height: 16),
+                      LibraryScopeSelector(
+                        scope: _scope,
+                        onChanged: (scope) => setState(() => _scope = scope),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20),
-                ..._results(),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    0,
+                    20,
+                    BottomControlGeometry.searchHeight +
+                        BottomControlGeometry.gap +
+                        systemBottomInset(context) +
+                        BottomControlGeometry.contentGap,
+                  ),
+                  sliver: LibraryBrowserResults(
+                    scope: _scope,
+                    query: _query.text,
+                  ),
+                ),
               ],
             ),
           ),

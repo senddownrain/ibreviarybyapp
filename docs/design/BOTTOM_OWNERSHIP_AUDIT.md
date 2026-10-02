@@ -1,5 +1,31 @@
 # Phase 2A — Bottom Ownership Audit
 
+## Phase 2B corrective pass — current production decision
+
+After reviewing Phase 2B in the app, Bible is again a global branch with its
+global dock visible on the chapter reader. The fixed floating chapter bar was
+removed. The top reader context opens the existing full book/chapter picker;
+horizontal swipes still use `BibleNavigation.relative()` across book boundaries.
+Canonical full book names remain in the data, reader context and picker.
+Verse selection temporarily suppresses the global dock for its palette; closing
+selection restores the global dock.
+
+Prayerbook root is one continuous scroll: shelf and categories, then an inline
+Library Browser. There is no Search tile or Search entity in the shelf. The
+top search action scrolls to the inline field. Browser scopes are `Малітвы`,
+`Спеўнік`, and `Катэхізіс`; only the active scope builds rows. Empty query
+means browse all prayers, all songs, or the Compendium parts. A nonempty query
+uses each domain's existing search function. Query persists across scope
+changes. The global dock remains on the root; focused search temporarily
+suppresses it while the keyboard is active. Back dismisses focus in place.
+The standalone `/prayers/library-search` route remains for existing links.
+
+Current decisions: Mass = its existing local selector; Bible = global dock +
+top picker + swipe; Ora = global dock + scroll-to-top; Prayerbook root = shelf
++ continuous Library Browser; Search is a temporary mode, not a separate
+Prayerbook entity. The Phase 2B description below records the earlier state
+and is superseded by this corrective section where it differs.
+
 ## Phase 2B — принятые решения и реализация
 
 Phase 2B развивается на ветке Phase 2A (`bc92f01`); `main` на момент старта

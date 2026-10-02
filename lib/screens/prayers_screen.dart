@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/screens/library_search_screen.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
@@ -19,11 +20,61 @@ import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
-class PrayersScreen extends ConsumerWidget {
+class PrayersScreen extends ConsumerStatefulWidget {
   const PrayersScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PrayersScreen> createState() => _PrayersScreenState();
+}
+
+class _PrayersScreenState extends ConsumerState<PrayersScreen> {
+  final TextEditingController _query = TextEditingController();
+  final FocusNode _focus = FocusNode();
+  final GlobalKey _browserKey = GlobalKey();
+  AppRouteEntryScope? _routeScope;
+  LibrarySearchScope _scope = LibrarySearchScope.prayers;
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_onFocusChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeScope = AppRouteEntryScope.maybeOf(context);
+  }
+
+  void _onFocusChanged() {
+    setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _routeScope?.showContextualBottomBar(_focus.hasFocus);
+    });
+  }
+
+  void _scrollToBrowser() {
+    final target = _browserKey.currentContext;
+    if (target == null) return;
+    Scrollable.ensureVisible(
+      target,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      alignment: 0.12,
+    );
+    _focus.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _routeScope?.showContextualBottomBar(false);
+    _query.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final favorites = ref.watch(favoritePrayersProvider);
     final categories = ref.watch(prayerMenuCategoriesProvider);
     final catalog = ref.watch(prayerCatalogProvider);
@@ -35,166 +86,213 @@ class PrayersScreen extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final top = MediaQuery.paddingOf(context).top + 78;
 
-    return Material(
-      color: Colors.transparent,
-      child: Stack(
-        children: [
-          AmbientWash(
-            seasonColor: cs.tertiary,
-            child: ListView(
-              key: const PageStorageKey('prayerbook-root-scroll'),
-              padding: EdgeInsets.fromLTRB(
-                20,
-                top + 16,
-                20,
-                // The app shell's floating dock is included in padding when
-                // extendBody is enabled. Keep the final row clear of it with
-                // a small visual gap.
-                MediaQuery.paddingOf(context).bottom + 24,
-              ),
-              children: [
-                Text(
-                  'Малітоўнік',
-                  key: const Key('prayerbook-title'),
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.7,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                const _SectionTitle(title: 'Абраныя'),
-                if (favorites.isEmpty)
-                  const Padding(
-                    key: Key('prayerbook-empty-favorites'),
-                    padding: EdgeInsets.fromLTRB(2, 8, 2, 12),
-                    child: Text('Дадавайце частыя малітвы ў Абраныя'),
-                  )
-                else
-                  for (final prayer in favorites)
-                    PrayerListRow(prayer: prayer, showFavorite: true),
-                const SizedBox(height: 24),
-                const _SectionTitle(title: 'Раздзелы'),
-                const SizedBox(height: 12),
-                PrayerbookSectionGrid(
-                  tiles: [
-                    PrayerbookSectionTile(
-                      key: const Key('holy-mass-destination'),
-                      title: 'Святая Імша',
-                      subtitle: massLoading && !massAvailable
-                          ? 'Загрузка тэксту…'
-                          : 'Парадак Імшы',
-                      icon: PhosphorIconsRegular.church,
-                      busy: massLoading && !massAvailable,
-                      onTap: () {
-                        if (massAvailable) {
-                          context.push('/prayers/prayer/$_kMassOrderPrayerId');
-                          return;
-                        }
-                        if (massLoading) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('Тэкст пакуль недаступны'),
-                            action: SnackBarAction(
-                              label: 'Сінхранізацыя',
+    return PopScope(
+      canPop: !_focus.hasFocus,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _focus.unfocus();
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            AmbientWash(
+              seasonColor: cs.tertiary,
+              child: CustomScrollView(
+                key: const PageStorageKey('prayerbook-root-scroll'),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(20, top + 16, 20, 0),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Малітоўнік',
+                            key: const Key('prayerbook-title'),
+                            style: Theme.of(context).textTheme.headlineLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.7,
+                                ),
+                          ),
+                          const SizedBox(height: 30),
+                          const _SectionTitle(title: 'Абраныя'),
+                          if (favorites.isEmpty)
+                            const Padding(
+                              key: Key('prayerbook-empty-favorites'),
+                              padding: EdgeInsets.fromLTRB(2, 8, 2, 12),
+                              child: Text('Дадавайце частыя малітвы ў Абраныя'),
+                            )
+                          else
+                            for (final prayer in favorites)
+                              PrayerListRow(prayer: prayer, showFavorite: true),
+                          const SizedBox(height: 24),
+                          const _SectionTitle(title: 'Раздзелы'),
+                          const SizedBox(height: 12),
+                          PrayerbookSectionGrid(
+                            tiles: [
+                              PrayerbookSectionTile(
+                                key: const Key('holy-mass-destination'),
+                                title: 'Святая Імша',
+                                subtitle: massLoading && !massAvailable
+                                    ? 'Загрузка тэксту…'
+                                    : 'Парадак Імшы',
+                                icon: PhosphorIconsRegular.church,
+                                busy: massLoading && !massAvailable,
+                                onTap: () {
+                                  if (massAvailable) {
+                                    context.push(
+                                      '/prayers/prayer/$_kMassOrderPrayerId',
+                                    );
+                                    return;
+                                  }
+                                  if (massLoading) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        'Тэкст пакуль недаступны',
+                                      ),
+                                      action: SnackBarAction(
+                                        label: 'Сінхранізацыя',
+                                        onPressed: () => context.push(
+                                          '/settings?section=sync',
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              PrayerbookSectionTile(
+                                key: const Key('songbook-destination'),
+                                title: 'Спеўнік',
+                                subtitle: 'Спевы і акорды',
+                                icon: PhosphorIconsRegular.playlist,
+                                onTap: () => context.push('/prayers/songs'),
+                              ),
+                              PrayerbookSectionTile(
+                                key: const Key('catechism-destination'),
+                                title: 'Катэхізіс',
+                                subtitle: 'Кампендый',
+                                icon: PhosphorIconsRegular.bookOpenText,
+                                onTap: () =>
+                                    context.push('/prayers/compendium'),
+                              ),
+                              PrayerbookSectionTile(
+                                key: const Key('sacraments-destination'),
+                                title: 'Сакрамэнты',
+                                subtitle: 'Хутка',
+                                icon: PhosphorIconsRegular.cross,
+                                onTap: () =>
+                                    context.push('/prayers/sacraments'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          _SectionTitle(
+                            title: 'Катэгорыі',
+                            action: TextButton(
+                              key: const Key('manage-prayer-categories'),
                               onPressed: () =>
-                                  context.push('/settings?section=sync'),
+                                  context.push('/prayers/categories'),
+                              child: const Text('Кіраваць'),
                             ),
                           ),
-                        );
-                      },
+                          if (categoryState.isLoading && categories.isEmpty)
+                            const AppProgressLine()
+                          else if (categoryState.hasError && categories.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text('Катэгорыі пакуль недаступныя'),
+                            )
+                          else if (categories.isEmpty)
+                            const Padding(
+                              key: Key('prayerbook-empty-categories'),
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text('Катэгорый пакуль няма'),
+                            )
+                          else
+                            for (final category in categories)
+                              _CategoryRow(category: category),
+                          const SizedBox(height: 28),
+                          const _SectionTitle(title: 'Усе малітвы'),
+                          _DestinationRow(
+                            key: const Key('all-prayers-destination'),
+                            title: 'Адкрыць увесь малітоўнік',
+                            subtitle: '${catalog.length} малітваў',
+                            icon: PhosphorIconsRegular.books,
+                            onTap: () => context.push('/prayers/all'),
+                          ),
+                          const SizedBox(height: 12),
+                          _DestinationRow(
+                            key: const Key('my-prayers-destination'),
+                            title: 'Мае малітвы',
+                            subtitle: 'Стварыць або змяніць асабістую малітву',
+                            icon: PhosphorIconsRegular.notepad,
+                            onTap: () => context.push('/prayers/my'),
+                          ),
+                          const SizedBox(height: 30),
+                          Divider(color: cs.outlineVariant),
+                          const SizedBox(height: 22),
+                          PrayerSearchDock(
+                            key: _browserKey,
+                            hintText: 'Пошук у Малітоўніку',
+                            dockKey: const Key('library-browser-search'),
+                            fieldKey: const Key('library-search-field'),
+                            controller: _query,
+                            focusNode: _focus,
+                            selectedFilterCount: 0,
+                            onChanged: (_) => setState(() {}),
+                            onSubmitted: (_) => _focus.unfocus(),
+                            onClear: () {
+                              _query.clear();
+                              setState(() {});
+                              _focus.requestFocus();
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          LibraryScopeSelector(
+                            scope: _scope,
+                            onChanged: (scope) =>
+                                setState(() => _scope = scope),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
                     ),
-                    PrayerbookSectionTile(
-                      key: const Key('songbook-destination'),
-                      title: 'Спеўнік',
-                      subtitle: 'Спевы і акорды',
-                      icon: PhosphorIconsRegular.playlist,
-                      onTap: () => context.push('/prayers/songs'),
-                    ),
-                    PrayerbookSectionTile(
-                      key: const Key('catechism-destination'),
-                      title: 'Катэхізіс',
-                      subtitle: 'Кампендый',
-                      icon: PhosphorIconsRegular.bookOpenText,
-                      onTap: () => context.push('/prayers/compendium'),
-                    ),
-                    PrayerbookSectionTile(
-                      key: const Key('sacraments-destination'),
-                      title: 'Сакрамэнты',
-                      subtitle: 'Хутка',
-                      icon: PhosphorIconsRegular.cross,
-                      onTap: () => context.push('/prayers/sacraments'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _SectionTitle(
-                  title: 'Катэгорыі',
-                  action: TextButton(
-                    key: const Key('manage-prayer-categories'),
-                    onPressed: () => context.push('/prayers/categories'),
-                    child: const Text('Кіраваць'),
                   ),
-                ),
-                if (categoryState.isLoading && categories.isEmpty)
-                  const AppProgressLine()
-                else if (categoryState.hasError && categories.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Катэгорыі пакуль недаступныя'),
-                  )
-                else if (categories.isEmpty)
-                  const Padding(
-                    key: Key('prayerbook-empty-categories'),
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Катэгорый пакуль няма'),
-                  )
-                else
-                  for (final category in categories)
-                    _CategoryRow(category: category),
-                const SizedBox(height: 28),
-                const _SectionTitle(title: 'Усе малітвы'),
-                _DestinationRow(
-                  key: const Key('all-prayers-destination'),
-                  title: 'Адкрыць увесь малітоўнік',
-                  subtitle: '${catalog.length} малітваў',
-                  icon: PhosphorIconsRegular.books,
-                  onTap: () => context.push('/prayers/all'),
-                ),
-                const SizedBox(height: 12),
-                _DestinationRow(
-                  key: const Key('my-prayers-destination'),
-                  title: 'Мае малітвы',
-                  subtitle: 'Стварыць або змяніць асабістую малітву',
-                  icon: PhosphorIconsRegular.notepad,
-                  onTap: () => context.push('/prayers/my'),
-                ),
-                const SizedBox(height: 24),
-                const _SectionTitle(title: 'Пошук'),
-                _DestinationRow(
-                  key: const Key('library-search-destination'),
-                  title: 'Пошук у Малітоўніку',
-                  subtitle: 'Малітвы, Спеўнік і Катэхізіс',
-                  icon: PhosphorIconsRegular.magnifyingGlass,
-                  onTap: () => context.push('/prayers/library-search'),
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      0,
+                      20,
+                      MediaQuery.paddingOf(context).bottom + 24,
+                    ),
+                    sliver: LibraryBrowserResults(
+                      scope: _scope,
+                      query: _query.text,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            FloatingTopActions(
+              seasonColor: cs.tertiary,
+              actions: [
+                IconButton(
+                  key: const Key('prayerbook-search-action'),
+                  tooltip: 'Пошук у Малітоўніку',
+                  onPressed: _scrollToBrowser,
+                  icon: const PhosphorIcon(
+                    PhosphorIconsRegular.magnifyingGlass,
+                    size: 22,
+                  ),
                 ),
               ],
             ),
-          ),
-          FloatingTopActions(
-            seasonColor: cs.tertiary,
-            actions: [
-              IconButton(
-                key: const Key('prayerbook-search-action'),
-                tooltip: 'Пошук у Малітоўніку',
-                onPressed: () => context.push('/prayers/library-search'),
-                icon: const PhosphorIcon(
-                  PhosphorIconsRegular.magnifyingGlass,
-                  size: 22,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -519,10 +617,12 @@ class PrayerListRow extends ConsumerWidget {
     super.key,
     required this.prayer,
     this.showFavorite = true,
+    this.rowKey,
   });
 
   final Prayer prayer;
   final bool showFavorite;
+  final Key? rowKey;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -535,7 +635,7 @@ class PrayerListRow extends ConsumerWidget {
       button: true,
       label: prayer.displayTitle,
       child: InkWell(
-        key: ValueKey('prayer-row-${prayer.id}'),
+        key: rowKey ?? ValueKey('prayer-row-${prayer.id}'),
         onTap: () {
           HapticFeedback.lightImpact();
           context.push('/prayers/prayer/${prayer.id}');

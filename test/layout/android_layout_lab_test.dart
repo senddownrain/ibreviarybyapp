@@ -257,16 +257,12 @@ void main() {
           await _jumpToEnd(tester);
           await tester.pump();
 
-          final last = tester.getRect(
-            find.byKey(const Key('library-search-destination')),
-          );
+          final last = tester.getRect(find.byType(PrayerListRow).last);
           final dock = tester.getRect(find.byKey(const Key('app-dock-full')));
           final bodyMedia = MediaQuery.of(
-            tester.element(find.byKey(const Key('library-search-destination'))),
+            tester.element(find.byType(PrayerListRow).last),
           );
-          final view = View.of(
-            tester.element(find.byKey(const Key('library-search-destination'))),
-          );
+          final view = View.of(tester.element(find.byType(PrayerListRow).last));
           final directViewInset =
               view.viewPadding.bottom / view.devicePixelRatio;
           final gap = dock.top - last.bottom;
@@ -432,35 +428,6 @@ void main() {
           'selectionReserve=$reserveBottom, tail=$tail, '
           'scroll=${_maxScrollExtent(tester)} CORRECT',
         );
-      });
-    }
-  });
-
-  group('Bible local chapter control', () {
-    for (final mode in _modes) {
-      testWidgets('${mode.label} bar leaves the final verse readable', (
-        tester,
-      ) async {
-        const viewport = _Viewport(390, 840);
-        _configureView(tester, viewport, mode);
-        final app = _bibleApp();
-        addTearDown(app.router.dispose);
-        await tester.pumpWidget(app.widget);
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 500));
-        await _jumpToEnd(tester);
-        await tester.pump();
-        final bar = tester.getRect(
-          find.byKey(const Key('bible-chapter-navigation')),
-        );
-        final lastVerse = tester.getRect(
-          find.byKey(const Key('bible-verse-36')),
-        );
-        expect(
-          viewport.height - mode.systemInset - bar.bottom,
-          closeTo(14, 0.01),
-        );
-        expect(bar.top - lastVerse.bottom, greaterThanOrEqualTo(24));
       });
     }
   });

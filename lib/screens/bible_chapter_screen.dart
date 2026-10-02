@@ -17,7 +17,6 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
-import 'package:mybrev_flutter/widgets/bottom_control_geometry.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -278,42 +277,11 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 onTitleTap: () => _openPicker(book),
                 actions: [_translationControl(book)],
               ),
-              overlay: _selected.isEmpty
-                  ? FloatingOverlayPositioned(
-                      gap: BottomControlGeometry.gap,
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: BottomControlGeometry.maxWidth,
-                          ),
-                          child: _ChapterNavBar(
-                            book: book,
-                            chapter: widget.chapter,
-                            hasPrevious: _relative(-1) != null,
-                            hasNext: _relative(1) != null,
-                            onPrevious: () => _goRelative(-1),
-                            onCurrent: () => _openPicker(book),
-                            onNext: () => _goRelative(1),
-                          ),
-                        ),
-                      ),
-                    )
-                  : null,
               content: Padding(
                 key: const Key('bible-selection-content-reserve'),
                 padding: EdgeInsets.only(
                   bottom: _selected.isEmpty
-                      ? floatingOverlayContentReserve(
-                          overlayHeight: _ChapterNavBar.heightFor(context),
-                          overlayBottom: floatingOverlayBottom(
-                            context,
-                            gap: BottomControlGeometry.gap,
-                          ),
-                          readerBottomPadding:
-                              ReaderContentSurface.bottomSpacing +
-                              MediaQuery.paddingOf(context).bottom,
-                          contentGap: BottomControlGeometry.contentGap,
-                        )
+                      ? 0
                       : Theme.of(context).platform == TargetPlatform.android
                       ? floatingOverlayContentReserve(
                           overlayHeight: _paletteHeight,
@@ -814,90 +782,6 @@ class _VerseRow extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ChapterNavBar extends StatelessWidget {
-  static double heightFor(BuildContext context) =>
-      (MediaQuery.textScalerOf(context).scale(16) * 1.25 + 28).clamp(60, 86);
-  final BibleBookInfo book;
-  final int chapter;
-  final bool hasPrevious;
-  final bool hasNext;
-  final VoidCallback onPrevious;
-  final VoidCallback onCurrent;
-  final VoidCallback onNext;
-
-  const _ChapterNavBar({
-    required this.book,
-    required this.chapter,
-    required this.hasPrevious,
-    required this.hasNext,
-    required this.onPrevious,
-    required this.onCurrent,
-    required this.onNext,
-  });
-
-  @override
-  Widget build(BuildContext context) => SafeArea(
-    key: const Key('bible-chapter-navigation'),
-    top: false,
-    bottom: false,
-    child: AdaptiveChromeSurface(
-      role: ChromeSurfaceRole.navigation,
-      borderRadius: BorderRadius.circular(BottomControlGeometry.radius),
-      child: SizedBox(
-        height: heightFor(context),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 54,
-              child: IconButton(
-                key: const Key('bible-previous-chapter'),
-                tooltip: 'Папярэдні раздзел',
-                onPressed: hasPrevious ? onPrevious : null,
-                icon: const PhosphorIcon(PhosphorIconsBold.caretLeft, size: 22),
-              ),
-            ),
-            VerticalDivider(
-              width: 1,
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-            Expanded(
-              child: TextButton.icon(
-                key: const Key('bible-book-chapter-picker'),
-                onPressed: onCurrent,
-                icon: const PhosphorIcon(
-                  PhosphorIconsRegular.bookOpenText,
-                  size: 20,
-                ),
-                label: Text(
-                  '${book.name} $chapter',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            VerticalDivider(
-              width: 1,
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-            SizedBox(
-              width: 54,
-              child: IconButton(
-                key: const Key('bible-next-chapter'),
-                tooltip: 'Наступны раздзел',
-                onPressed: hasNext ? onNext : null,
-                icon: const PhosphorIcon(
-                  PhosphorIconsBold.caretRight,
-                  size: 22,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 class _SheetHeader extends StatelessWidget {

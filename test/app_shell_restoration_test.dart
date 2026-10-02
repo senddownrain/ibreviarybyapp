@@ -8,8 +8,8 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
-import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 class _IdleBootstrap extends DataBootstrapNotifier {
   @override
@@ -29,6 +29,19 @@ class _MemorySettings extends SettingsNotifier {
 }
 
 void main() {
+  test('Bible root dock returns after a temporary selection owner', () {
+    const entry = AppRouteEntry(id: 'bible', descriptor: bibleRootRoute);
+    final controller = BranchShellController(AppBranch.bible, bibleRootRoute)
+      ..activate(entry);
+    expect(bibleRootRoute.showsNavigationDock, isTrue);
+    expect(controller.navigationDockSuppressed, isFalse);
+    controller.requestContextualBottomSlot(entry.id, visible: true);
+    expect(controller.navigationDockSuppressed, isTrue);
+    controller.requestContextualBottomSlot(entry.id, visible: false);
+    expect(controller.navigationDockSuppressed, isFalse);
+    controller.dispose();
+  });
+
   testWidgets(
     'shell starts and restores the shared date without build writes',
     (tester) async {
@@ -43,15 +56,11 @@ void main() {
       );
       addTearDown(container.dispose);
       final shellState = AppShellState(
-        roots: [
-          for (final branch in AppBranch.values)
-            AppRouteDescriptor(
-              id: branch.name,
-              branch: branch,
-              defaultChromeMode: ReaderChromeMode.full,
-              topChromeOwner: TopChromeOwner.shell,
-              isBranchRoot: true,
-            ),
+        roots: const [
+          hoursRootRoute,
+          readingsRootRoute,
+          prayerbookRootRoute,
+          bibleRootRoute,
         ],
       );
       addTearDown(shellState.dispose);
@@ -122,6 +131,37 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(container.read(settingsProvider).lastSection, 'readings');
       expect(shellState.activeController.activeEntryId, isNotNull);
+
+      router.go('/bible');
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('app-dock-compact')), findsOneWidget);
+      for (final branch in [
+        AppBranch.prayerbook,
+        AppBranch.readings,
+        AppBranch.hours,
+      ]) {
+        if (find.byKey(const Key('app-dock-expand')).evaluate().isNotEmpty) {
+          await tester.tap(find.byKey(const Key('app-dock-expand')));
+          await tester.pumpAndSettle();
+        }
+        expect(find.byKey(const Key('app-dock-full')), findsOneWidget);
+        await tester.tap(
+          find.byKey(
+            Key(
+              'app-destination-${switch (branch) {
+                AppBranch.hours => 'Літургія',
+                AppBranch.readings => 'Чытанні',
+                AppBranch.prayerbook => 'Малітоўнік',
+                AppBranch.bible => 'Біблія',
+              }}',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(branch.name), findsOneWidget);
+        router.go('/bible');
+        await tester.pumpAndSettle();
+      }
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

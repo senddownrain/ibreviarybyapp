@@ -63,7 +63,6 @@ const bibleRootRoute = AppRouteDescriptor(
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
   isBranchRoot: true,
-  showsNavigationDock: false,
 );
 const _bibleSearchRoute = AppRouteDescriptor(
   id: 'bible.search',
@@ -76,7 +75,6 @@ const _bibleSearchResultRoute = AppRouteDescriptor(
   branch: AppBranch.bible,
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
-  showsNavigationDock: false,
 );
 
 const _hoursPickerRoute = AppRouteDescriptor(
