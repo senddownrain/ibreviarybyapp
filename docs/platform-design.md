@@ -1,5 +1,12 @@
 # iBreviary platform design
 
+> **HISTORICAL platform note (2 October 2026).** Current visual authority:
+> [DESIGN_CONCEPT](design/DESIGN_CONCEPT.md) and
+> [DESIGN_SYSTEM](design/DESIGN_SYSTEM.md). The content-GlassSurface rule and
+> deleted AppBottomNav/ReadingsBottomNav names below describe an earlier design.
+> Target: opaque page/modal content, platform material in chrome, one shared
+> hierarchy. Keep this note as rationale, not a competing implementation guide.
+
 iBreviary has one content design system and two platform chrome treatments. It
 does not maintain separate screen trees for Android and iOS.
 

@@ -1,5 +1,13 @@
 # iBreviary Mobile — Design Language 1.1
 
+> **HISTORICAL — superseded visual specification (2 октября 2026).**
+> Канон: [DESIGN_CONCEPT](DESIGN_CONCEPT.md) и [DESIGN_SYSTEM](DESIGN_SYSTEM.md).
+> Прежние SectionSwitcher/три раздела, обязательный mist-indigo ambient,
+> typography/scale и геометрия ниже сохраняются как история, не требования
+> новых задач. Таблица liturgical marker/ink/tint остаётся справочным набором
+> swatches для проверки на новых surfaces. JSON 1.1 — legacy handoff.
+> Формулировки приоритета в исходном тексте ниже относятся к версии 1.1.
+
 Детализация экранов: [Бібліятэка](library-design.md).
 
 Дата: 7 сентября 2026; уточнение Ambient-направления — 8 сентября 2026. Статус: спецификация предлагаемой системы для последовательной реализации во Flutter. Экраны приложения на этом этапе не переписываются.

@@ -1,5 +1,14 @@
 # Reader / Typography VNext
 
+> **HISTORICAL rationale, принято с изменениями (2 октября 2026).**
+> Общие целевые роли и масштаб: [DESIGN_SYSTEM](DESIGN_SYSTEM.md),
+> принципы: [DESIGN_CONCEPT](DESIGN_CONCEPT.md). Точные semantic locators:
+> [LITURGY_CONTENT_VISUAL_SPEC](../LITURGY_CONTENT_VISUAL_SPEC.md).
+> Наблюдения «текущая реализация» ниже описывают прежний срез, не current main;
+> [повторная проверка](../DESIGN_CONCEPT_VNEXT.md) отделяет исправленное от долга.
+> Cormorant — титулы страниц; Literata — документ и внутренние заголовки;
+> Aa ориентируется на 85–180% с независимым системным масштабированием.
+
 Статус: решение для поэтапного внедрения, 29 сентября 2026 года.
 
 ## Позиция

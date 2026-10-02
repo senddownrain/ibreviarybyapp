@@ -1,11 +1,22 @@
 # Liturgy content visual specification
 
+> **Hierarchy / consolidation, 2 октября 2026.** Принципы задаёт
+> [DESIGN_CONCEPT](design/DESIGN_CONCEPT.md), общие визуальные роли —
+> [DESIGN_SYSTEM](design/DESIGN_SYSTEM.md). Этот документ владеет semantic IDs,
+> locators, структурой источника и точным mapping ролей. Его CURRENT-таблицы
+> остаются датированным аудитом, а implementation pass ниже относится к
+> рабочей ветке `20cf1b4`, не к `origin/main @ 1ac450d`.
+> Целевой SECTION_TITLE согласован с Literata; Cormorant в текущем
+> `ReaderTheme.blockHeading` ветки — известное расхождение, исправление кода
+> сюда не входит. Семантика FIXED-01…03 и структура литургического текста
+> сохраняются; пустой TARGET не разрешает придумывать новый стиль.
+
 Статус: **CURRENT-аудит сохранён; TARGET ниже фиксирует первый implementation pass визуальной унификации**.
 
 Исходный audit commit: `1540a7d` (29 сентября 2026). CURRENT перепроверен 1 октября 2026 против `main` HEAD `1ac450d9c184e63561e3fcb0b80ae94353d44f7b`.
 Область: экран Чтений (`ReadingsScreen`), legacy/detail-экран отдельного чтения (`ReadingDetailScreen`) и все реально реализованные варианты Литургии часов (`OraScreen`).
 
-Этот документ — источник правды для следующего этапа. `CURRENT` описывает код как есть. Пустые дизайнерские `TARGET` оставлены `—`; ранее принятые правила вынесены в FIXED REQUIREMENTS. Сравнение всех перечисленных ниже renderer-файлов с `1540a7d` показало только перемены cache/loading/status в `ora_screen.dart` и `readings_screen.dart`: типографика и ритм основного документа не менялись. Текущая загрузка часов — `DataLoadingNotice(shape: text)` вместо shimmer, Чтений — тот же notice в контейнере высотой `360`; строки загрузки теперь «Загружаем тэкст гадзіны» / «Загружаем чытанні». Поэтому содержательный CURRENT каталога сохранён.
+Этот документ — специализированный источник для адресации и семантики литургического контента в иерархии Concept → System → specialized TARGET. `CURRENT` описывает срез `main @ 1ac450d`, до implementation pass рабочей ветки. Пустые дизайнерские `TARGET` оставлены `—`; ранее принятые правила вынесены в FIXED REQUIREMENTS. Сравнение перечисленных renderer-файлов между `1540a7d` и `1ac450d` показало только перемены cache/loading/status в `ora_screen.dart` и `readings_screen.dart`: типографика и ритм основного документа в этом сравнении не менялись. Загрузка часов на этом срезе — `DataLoadingNotice(shape: text)` вместо shimmer, Чтений — тот же notice в контейнере высотой `360`; строки загрузки «Загружаем тэкст гадзіны» / «Загружаем чытанні». Поэтому содержательный CURRENT каталога сохранён.
 
 ## Как читать спецификацию
 
@@ -535,7 +546,7 @@ Rendered HTML имеет собственную, третью таблицу с�
 | Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
 |---|---|---|---|---|---|---|
 | `BODY_TEXT` | B/h1.68, ink | B/h1.68; выбранная reader-family, по умолчанию Literata | ink | source | paragraph 8 | base reader |
-| `SECTION_TITLE` | max(1.10B,18)/w600, red | Cormorant Garamond Bold, max(1.42B,22), h1.12; normal case | rubric | 24 у самостоятельного блока | 8 | Hours/Readings/молитвенный document/крупные разделы Мессы |
+| `SECTION_TITLE` | max(1.10B,18)/w600, red | Literata 600, max(B,18), h1.30; sentence case; reader-family override допустим | rubric | 24 у самостоятельного блока | 8 | Целевой reader.blockHeading по DESIGN_SYSTEM; крупные части могут использовать reader.majorHeading; реализация ветки пока Cormorant |
 | `CONTEXT_METADATA` | UI 12/muted | — | — | — | — | «metadata» в header; псалм — `PSALM_METADATA` |
 | `RUBRIC_BLOCK` | .90B или .88B, red | max(.90B,14), h1.48, regular, non-italic | rubric | source | paragraph 8 | explicit class и распознанная красная инструкция; не диалог |
 | `RUBRIC_INLINE` | inherit/red | размер и высота окружающей строки | rubric | 0 | 0 | только marker внутри строки |
@@ -610,7 +621,7 @@ Rendered HTML имеет собственную, третью таблицу с�
 
 ## Implementation status — первый pass (2 октября 2026)
 
-`CURRENT` в таблицах и Master Catalog ниже остаётся снимком до этого pass. Принятый TARGET записан в worksheet выше; не следует читать старые `CURRENT` как описание нового renderer.
+`CURRENT` в таблицах и Master Catalog ниже остаётся снимком до этого pass. TARGET записан в worksheet выше; не следует читать старые `CURRENT` как описание нового renderer. После консолидации TARGET SECTION_TITLE изменён на Literata по DESIGN_SYSTEM; перечисленные ниже факты pass не означают, что эта последующая редакция уже реализована.
 
 - `ReaderTheme.blockHeading` теперь общий content-heading token: Cormorant Garamond Bold, нормальный регистр, rubric red; `ReaderTheme.body` сохраняет reader-family и размер. UI controls и navigation остаются системными. `ReaderTheme.serviceHeading`, `rubricReference`, `rubricBlock` разделяют служебный red и muted metadata.
 - `liturgicalDocumentStyles` централизует HTML-роли Hours, Readings и ReadingDetail: heading, reference, caption, psalm subtitle, pericope title, rubric, cadence marker и responsory turn. `LiturgicalSpacing` хранит базовые semantic gaps; `LiturgicalSectionDivider` отделяет крупные части нейтральной линией.
@@ -978,4 +989,4 @@ LiturgicalSpacing.refrainRepeat
 9. Несоблюдение reader-family у Ora headings и invitatory trigger.
 10. Множество локальных magic spacing numbers и независимое масштабирование body/UI.
 
-На этом этапе production-код не менялся. Следующий этап унификации следует начинать только после заполнения `TARGET` и ручного подтверждения каталога.
+Этот итог относится к первоначальному аудиту до implementation pass: тогда production-код не менялся. Последующая реализация рабочей ветки описана в «Implementation status», а её расхождение с новой ролью Literata — в баннере консолидации. Перед будущей реализацией проверять актуальный код и изменяемые TARGET; уже утверждённые Concept/System-решения не требуют повторного подтверждения всего каталога.
