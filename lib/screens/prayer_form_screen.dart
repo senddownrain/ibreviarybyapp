@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
@@ -178,7 +177,6 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.paddingOf(context).top;
 
@@ -220,7 +218,7 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
         ],
       ),
       body: AmbientWash(
-        seasonColor: seasonColor,
+        seasonColor: GlassTokens.of(context).ambientBase,
         height: 220,
         child: Form(
           key: _formKey,
@@ -236,7 +234,6 @@ class _PrayerFormScreenState extends ConsumerState<PrayerFormScreen> {
             children: [
               GlassSurface(
                 style: GlassStyle.card,
-                seasonColor: seasonColor,
                 borderRadius: BorderRadius.circular(24),
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
                 child: Column(

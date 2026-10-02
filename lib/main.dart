@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
+import 'package:mybrev_flutter/theme/ib_colors.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -103,6 +104,7 @@ class MyBrevApp extends ConsumerWidget {
         colorScheme: cs,
         brightness: cs.brightness,
         platform: targetPlatform,
+        extensions: [IbColors.forBrightness(cs.brightness)],
       );
       return base.copyWith(
         platform: targetPlatform,

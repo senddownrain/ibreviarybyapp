@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -17,7 +16,6 @@ class FavoritesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
     final favIds = settings.favoriteIds;
 
@@ -31,7 +29,7 @@ class FavoritesScreen extends ConsumerWidget {
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar.text('Абраныя малітвы'),
       body: AmbientWash(
-        seasonColor: seasonColor,
+        seasonColor: GlassTokens.of(context).ambientBase,
         height: kToolbarHeight + 100,
         child: favorites.isEmpty
             ? Center(

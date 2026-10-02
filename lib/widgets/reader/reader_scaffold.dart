@@ -92,6 +92,8 @@ class ReaderScaffold extends StatelessWidget {
   final Widget? contextHeader;
   final List<Widget> actions;
   final List<ReaderSecondaryAction> secondaryActions;
+
+  /// Day-context accent for the ambient header, never for reader controls.
   final Color? seasonColor;
   final ReaderChromeMode chromeMode;
   final ValueChanged<ReaderChromeMode>? onChromeModeChanged;
@@ -205,7 +207,6 @@ class ReaderScaffold extends StatelessWidget {
             _ReaderScrollToTopControl(
               controller: scrollController!,
               mode: resolvedMode,
-              seasonColor: seasonColor,
             ),
           Positioned(
             top: 0,
@@ -213,7 +214,6 @@ class ReaderScaffold extends StatelessWidget {
             right: 0,
             child: ReaderChrome(
               mode: resolvedMode,
-              seasonColor: seasonColor,
               actions: actions,
               secondaryActions: secondaryActions,
               onBack: onBack,
@@ -293,12 +293,10 @@ class _ReaderScrollToTopControl extends StatefulWidget {
   const _ReaderScrollToTopControl({
     required this.controller,
     required this.mode,
-    required this.seasonColor,
   });
 
   final ScrollController controller;
   final ReaderChromeMode mode;
-  final Color? seasonColor;
 
   @override
   State<_ReaderScrollToTopControl> createState() =>
@@ -347,7 +345,6 @@ class _ReaderScrollToTopControlState extends State<_ReaderScrollToTopControl> {
       bottom: MediaQuery.paddingOf(context).bottom + 16,
       child: AdaptiveChromeSurface(
         role: ChromeSurfaceRole.control,
-        seasonColor: widget.seasonColor,
         borderRadius: BorderRadius.circular(24),
         child: SizedBox.square(
           dimension: 48,
@@ -491,6 +488,8 @@ class ReaderChrome extends StatelessWidget {
   final ValueChanged<ReaderChromeMode> onModeChanged;
   final List<Widget> actions;
   final List<ReaderSecondaryAction> secondaryActions;
+
+  /// Kept for existing callers; reader controls use neutral chrome colors.
   final Color? seasonColor;
   final VoidCallback? onBack;
   final Widget? leading;
@@ -513,7 +512,6 @@ class ReaderChrome extends StatelessWidget {
               if (leading != null)
                 AdaptiveChromeSurface(
                   role: ChromeSurfaceRole.control,
-                  seasonColor: seasonColor,
                   borderRadius: BorderRadius.circular(24),
                   child: SizedBox.square(dimension: 48, child: leading),
                 )
@@ -525,7 +523,6 @@ class ReaderChrome extends StatelessWidget {
                       ? Icons.arrow_back_ios_new
                       : Icons.arrow_back_rounded,
                   iconSize: cupertino ? 18 : 22,
-                  seasonColor: seasonColor,
                   onPressed: onBack ?? () => Navigator.maybePop(context),
                 ),
               const Spacer(),
@@ -533,7 +530,6 @@ class ReaderChrome extends StatelessWidget {
               if (secondaryActions.isNotEmpty)
                 AdaptiveChromeSurface(
                   role: ChromeSurfaceRole.control,
-                  seasonColor: seasonColor,
                   borderRadius: BorderRadius.circular(24),
                   child: SizedBox.square(
                     dimension: 48,
@@ -569,21 +565,18 @@ class _ReaderChromeButton extends StatelessWidget {
     super.key,
     required this.tooltip,
     required this.icon,
-    required this.seasonColor,
     required this.onPressed,
     this.iconSize = 22,
   });
 
   final String tooltip;
   final IconData icon;
-  final Color? seasonColor;
   final VoidCallback onPressed;
   final double iconSize;
 
   @override
   Widget build(BuildContext context) => AdaptiveChromeSurface(
     role: ChromeSurfaceRole.control,
-    seasonColor: seasonColor,
     borderRadius: BorderRadius.circular(24),
     child: SizedBox.square(
       dimension: 48,

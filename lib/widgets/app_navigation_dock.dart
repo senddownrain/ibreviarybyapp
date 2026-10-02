@@ -17,6 +17,8 @@ class AppNavigationDock extends StatelessWidget {
 
   final AppBranch activeBranch;
   final ReaderChromeMode mode;
+
+  /// Kept for existing callers; the global dock uses neutral chrome colors.
   final Color seasonColor;
   final ValueChanged<AppBranch> onSelect;
   final VoidCallback onExpand;
@@ -82,13 +84,11 @@ class AppNavigationDock extends StatelessWidget {
                     ? _FullDock(
                         activeBranch: activeBranch,
                         items: _items,
-                        seasonColor: seasonColor,
                         onSelect: onSelect,
                       )
                     : _CompactDock(
                         branch: activeBranch,
                         item: _items[activeBranch.index],
-                        seasonColor: seasonColor,
                         onExpand: onExpand,
                       ),
               ),
@@ -109,14 +109,12 @@ class _FullDock extends StatelessWidget {
   const _FullDock({
     required this.activeBranch,
     required this.items,
-    required this.seasonColor,
     required this.onSelect,
   });
 
   final AppBranch activeBranch;
   final List<({String label, PhosphorIconData icon, PhosphorIconData selected})>
   items;
-  final Color seasonColor;
   final ValueChanged<AppBranch> onSelect;
 
   @override
@@ -128,7 +126,6 @@ class _FullDock extends StatelessWidget {
       child: AdaptiveChromeSurface(
         key: const Key('app-dock-full'),
         role: ChromeSurfaceRole.navigation,
-        seasonColor: seasonColor,
         borderRadius: BorderRadius.circular(ios ? 30 : 24),
         child: SizedBox(
           height: ios ? 62 : 60,
@@ -226,13 +223,11 @@ class _CompactDock extends StatelessWidget {
   const _CompactDock({
     required this.branch,
     required this.item,
-    required this.seasonColor,
     required this.onExpand,
   });
 
   final AppBranch branch;
   final ({String label, PhosphorIconData icon, PhosphorIconData selected}) item;
-  final Color seasonColor;
   final VoidCallback onExpand;
 
   @override
@@ -241,7 +236,6 @@ class _CompactDock extends StatelessWidget {
     return AdaptiveChromeSurface(
       key: const Key('app-dock-compact'),
       role: ChromeSurfaceRole.navigation,
-      seasonColor: seasonColor,
       borderRadius: BorderRadius.circular(28),
       child: Semantics(
         button: true,
