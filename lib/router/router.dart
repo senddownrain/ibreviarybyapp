@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/screens/bible_search_screen.dart';
 import 'package:mybrev_flutter/screens/compendium_node_screen.dart';
 import 'package:mybrev_flutter/screens/compendium_reader_screens.dart';
 import 'package:mybrev_flutter/screens/compendium_screen.dart';
+import 'package:mybrev_flutter/screens/design_top_chrome_lab_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -28,6 +29,9 @@ import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+
+const topChromeLabRoute = '/design/top-chrome-lab';
+const topChromeLabEnabled = bool.fromEnvironment('IBREVIARY_TOP_CHROME_LAB');
 
 const hoursRootRoute = AppRouteDescriptor(
   id: 'hours.root',
@@ -571,6 +575,16 @@ final router = GoRouter(
         ),
       ],
     ),
+
+    if (topChromeLabEnabled)
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: topChromeLabRoute,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
+          child: const TopChromeLabScreen(),
+        ),
+      ),
 
     // Compatibility aliases normalize directly to a canonical branch route.
     GoRoute(path: '/', redirect: (_, state) => _withSameQuery('/hours', state)),
