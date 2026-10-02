@@ -12,13 +12,14 @@ import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/bottom_control_geometry.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// Height of [PrayerSearchDock].
-const double kCompendiumSearchDockHeight = 58;
+const double kCompendiumSearchDockHeight = BottomControlGeometry.searchHeight;
 
 /// Gap between the dock and the bottom system inset.
-const double kCompendiumSearchDockGap = 12;
+const double kCompendiumSearchDockGap = BottomControlGeometry.gap;
 
 /// Search state of the enclosing [CompendiumSearchHost].
 class CompendiumSearchScope extends InheritedWidget {

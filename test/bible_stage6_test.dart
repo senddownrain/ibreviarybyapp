@@ -225,6 +225,50 @@ void main() {
       );
     });
 
+    testWidgets('bottom center opens the same full book and chapter picker', (
+      tester,
+    ) async {
+      await _pumpBible(tester);
+      await tester.tap(find.byKey(const Key('bible-book-chapter-picker')));
+      await tester.pumpAndSettle();
+      expect(find.text('Кнігі і раздзелы'), findsOneWidget);
+      expect(
+        find.byKey(const Key('reader-context-title-action')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('floating chapter controls fit width and system text matrix', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      for (final width in [320.0, 360.0, 390.0, 700.0]) {
+        for (final scale in [1.0, 1.5, 2.0]) {
+          tester.view.physicalSize = Size(width, 720);
+          await _pumpBible(tester, textScale: scale);
+          final bar = tester.getRect(
+            find.byKey(const Key('bible-chapter-navigation')),
+          );
+          expect(bar.left, greaterThanOrEqualTo(0));
+          expect(bar.right, lessThanOrEqualTo(width));
+          for (final key in [
+            'bible-previous-chapter',
+            'bible-book-chapter-picker',
+            'bible-next-chapter',
+          ]) {
+            expect(
+              tester.getSize(find.byKey(Key(key))).height,
+              greaterThanOrEqualTo(48),
+            );
+          }
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox.shrink());
+        }
+      }
+      addTearDown(tester.view.resetPhysicalSize);
+    });
+
     testWidgets('next and previous chapter controls navigate', (tester) async {
       final app = await _pumpBible(tester);
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -4000));

@@ -16,6 +16,7 @@ import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
 import 'package:mybrev_flutter/screens/liturgical_day_options_screen.dart';
 import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
+import 'package:mybrev_flutter/screens/library_search_screen.dart';
 import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
@@ -62,6 +63,7 @@ const bibleRootRoute = AppRouteDescriptor(
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
   isBranchRoot: true,
+  showsNavigationDock: false,
 );
 const _bibleSearchRoute = AppRouteDescriptor(
   id: 'bible.search',
@@ -74,6 +76,7 @@ const _bibleSearchResultRoute = AppRouteDescriptor(
   branch: AppBranch.bible,
   defaultChromeMode: ReaderChromeMode.compact,
   topChromeOwner: TopChromeOwner.reader,
+  showsNavigationDock: false,
 );
 
 const _hoursPickerRoute = AppRouteDescriptor(
@@ -123,6 +126,13 @@ const _prayerListRoute = AppRouteDescriptor(
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.legacy,
+);
+const _librarySearchRoute = AppRouteDescriptor(
+  id: 'prayerbook.librarySearch',
+  branch: AppBranch.prayerbook,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+  showsNavigationDock: false,
 );
 const _prayerDetailRoute = AppRouteDescriptor(
   id: 'prayerbook.detail',
@@ -375,6 +385,22 @@ final router = GoRouter(
                 const PrayersScreen(key: PageStorageKey('prayerbook-root')),
               ),
               routes: [
+                GoRoute(
+                  path: 'library-search',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _librarySearchRoute,
+                    LibrarySearchScreen(
+                      initialQuery: state.uri.queryParameters['q'] ?? '',
+                      initialScope:
+                          switch (state.uri.queryParameters['scope']) {
+                            'songs' => LibrarySearchScope.songs,
+                            'compendium' => LibrarySearchScope.compendium,
+                            _ => LibrarySearchScope.prayers,
+                          },
+                    ),
+                  ),
+                ),
                 GoRoute(
                   path: 'all',
                   pageBuilder: (context, state) => _branchPage(

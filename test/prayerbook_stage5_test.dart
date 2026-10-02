@@ -266,7 +266,7 @@ void main() {
     final searchDock = tester.getRect(
       find.byKey(const Key('prayer-search-dock')),
     );
-    expect(screenHeight - searchDock.bottom, closeTo(12, 0.01));
+    expect(screenHeight - searchDock.bottom, closeTo(14, 0.01));
 
     await tester.tap(find.byKey(const Key('prayer-filter-action')));
     await tester.pumpAndSettle();

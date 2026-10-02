@@ -258,14 +258,14 @@ void main() {
           await tester.pump();
 
           final last = tester.getRect(
-            find.byKey(const Key('my-prayers-destination')),
+            find.byKey(const Key('library-search-destination')),
           );
           final dock = tester.getRect(find.byKey(const Key('app-dock-full')));
           final bodyMedia = MediaQuery.of(
-            tester.element(find.byKey(const Key('my-prayers-destination'))),
+            tester.element(find.byKey(const Key('library-search-destination'))),
           );
           final view = View.of(
-            tester.element(find.byKey(const Key('my-prayers-destination'))),
+            tester.element(find.byKey(const Key('library-search-destination'))),
           );
           final directViewInset =
               view.viewPadding.bottom / view.devicePixelRatio;
@@ -303,7 +303,7 @@ void main() {
           find.byKey(const Key('prayer-search-dock')),
         );
         final closedGap = viewport.height - mode.systemInset - closed.bottom;
-        expect(closedGap, closeTo(12, 0.01));
+        expect(closedGap, closeTo(14, 0.01));
 
         tester.view.viewInsets = const FakeViewPadding(bottom: 300);
         await tester.pump();
@@ -312,7 +312,7 @@ void main() {
         );
         final imeTop = viewport.height - 300;
         final openGap = imeTop - open.bottom;
-        expect(openGap, closeTo(12, 0.01));
+        expect(openGap, closeTo(14, 0.01));
         expect(open.bottom, lessThan(imeTop));
         expect(find.byKey(const Key('prayer-search-field')), findsOneWidget);
 
@@ -349,13 +349,13 @@ void main() {
       await tester.pumpAndSettle();
       Rect search() =>
           tester.getRect(find.byKey(const Key('prayer-search-dock')));
-      expect(viewport.height - 34 - search().bottom, closeTo(12, 0.01));
+      expect(viewport.height - 34 - search().bottom, closeTo(14, 0.01));
       tester.view.viewInsets = const FakeViewPadding(bottom: 300);
       await tester.pump();
-      expect(viewport.height - 300 - search().bottom, closeTo(12, 0.01));
+      expect(viewport.height - 300 - search().bottom, closeTo(14, 0.01));
       tester.view.viewInsets = FakeViewPadding.zero;
       await tester.pump();
-      expect(viewport.height - 34 - search().bottom, closeTo(12, 0.01));
+      expect(viewport.height - 34 - search().bottom, closeTo(14, 0.01));
       await tester.pumpWidget(const SizedBox.shrink());
     }
   });
@@ -414,9 +414,8 @@ void main() {
         final palette = tester.getRect(
           find.byKey(const Key('bible-highlight-palette')),
         );
-        final last = tester.getRect(
-          find.byKey(const Key('bible-chapter-navigation')),
-        );
+        expect(find.byKey(const Key('bible-chapter-navigation')), findsNothing);
+        final last = tester.getRect(find.byKey(const Key('bible-verse-36')));
         final safeTop = viewport.height - mode.systemInset;
         final safeGap = safeTop - palette.bottom;
         final tail = palette.top - last.bottom;
@@ -427,12 +426,41 @@ void main() {
 
         expect(safeGap, closeTo(16, 0.01));
         expect(reserveBottom, lessThan(72));
-        expect(tail, closeTo(24, 0.01));
+        expect(tail, greaterThanOrEqualTo(24));
         debugPrint(
           'LAYOUT_LAB bible ${mode.label}: safeGap=$safeGap, '
           'selectionReserve=$reserveBottom, tail=$tail, '
           'scroll=${_maxScrollExtent(tester)} CORRECT',
         );
+      });
+    }
+  });
+
+  group('Bible local chapter control', () {
+    for (final mode in _modes) {
+      testWidgets('${mode.label} bar leaves the final verse readable', (
+        tester,
+      ) async {
+        const viewport = _Viewport(390, 840);
+        _configureView(tester, viewport, mode);
+        final app = _bibleApp();
+        addTearDown(app.router.dispose);
+        await tester.pumpWidget(app.widget);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+        await _jumpToEnd(tester);
+        await tester.pump();
+        final bar = tester.getRect(
+          find.byKey(const Key('bible-chapter-navigation')),
+        );
+        final lastVerse = tester.getRect(
+          find.byKey(const Key('bible-verse-36')),
+        );
+        expect(
+          viewport.height - mode.systemInset - bar.bottom,
+          closeTo(14, 0.01),
+        );
+        expect(bar.top - lastVerse.bottom, greaterThanOrEqualTo(24));
       });
     }
   });
@@ -454,7 +482,7 @@ void main() {
         );
         expect(
           viewport.height - mode.systemInset - search.bottom,
-          closeTo(12, 0.01),
+          closeTo(14, 0.01),
         );
         expect(search.left, greaterThanOrEqualTo(0));
         expect(search.right, lessThanOrEqualTo(viewport.width));
@@ -502,10 +530,11 @@ void main() {
         );
         await _jumpToEnd(tester);
         await tester.pump();
-        final chapterNavigation = tester.getRect(
-          find.byKey(const Key('bible-chapter-navigation')),
+        expect(find.byKey(const Key('bible-chapter-navigation')), findsNothing);
+        final lastVerse = tester.getRect(
+          find.byKey(const Key('bible-verse-36')),
         );
-        expect(biblePalette.top - chapterNavigation.bottom, closeTo(24, 0.01));
+        expect(biblePalette.top - lastVerse.bottom, greaterThanOrEqualTo(24));
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         bible.router.dispose();

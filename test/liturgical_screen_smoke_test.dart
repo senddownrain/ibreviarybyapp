@@ -143,6 +143,41 @@ void main() {
     expect(schemes[0].primaryContainer, schemes[1].primaryContainer);
   });
 
+  testWidgets(
+    'Ora keeps hour picker above and offers scroll-to-top after reading',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+          child: MaterialApp(
+            home: OraScreen(dayId: 'smoke', oraType: 'laudes', date: date),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final reader = tester.widget<ReaderScaffold>(find.byType(ReaderScaffold));
+      expect(reader.showScrollToTop, isTrue);
+      expect(find.byKey(const Key('reader-scroll-to-top')), findsNothing);
+      expect(find.byKey(const Key('bible-previous-chapter')), findsNothing);
+      expect(find.byKey(const Key('bible-next-chapter')), findsNothing);
+      final scroll = reader.scrollController!;
+      expect(scroll.position.maxScrollExtent, greaterThan(560));
+      scroll.jumpTo(600);
+      await tester.pump();
+      expect(find.byKey(const Key('reader-scroll-to-top')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('reader-scroll-to-top')));
+      await tester.pumpAndSettle();
+      expect(scroll.offset, 0);
+      await tester.tap(find.byKey(const Key('reader-context-title-action')));
+      await tester.pumpAndSettle();
+      expect(find.text('Літургія гадзінаў'), findsOneWidget);
+    },
+  );
+
   final cases = <(String, String, Brightness, double, Size)>[
     ('ordinary-smoke', 'laudes', Brightness.light, 16, const Size(900, 1600)),
     ('smoke', 'laudes', Brightness.light, 16, const Size(900, 1600)),

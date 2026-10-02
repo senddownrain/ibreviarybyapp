@@ -10,6 +10,8 @@ import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/widgets/bottom_control_geometry.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/prayerbook_section_tiles.dart';
@@ -166,6 +168,15 @@ class PrayersScreen extends ConsumerWidget {
                   icon: PhosphorIconsRegular.notepad,
                   onTap: () => context.push('/prayers/my'),
                 ),
+                const SizedBox(height: 24),
+                const _SectionTitle(title: 'Пошук'),
+                _DestinationRow(
+                  key: const Key('library-search-destination'),
+                  title: 'Пошук у Малітоўніку',
+                  subtitle: 'Малітвы, Спеўнік і Катэхізіс',
+                  icon: PhosphorIconsRegular.magnifyingGlass,
+                  onTap: () => context.push('/prayers/library-search'),
+                ),
               ],
             ),
           ),
@@ -174,8 +185,8 @@ class PrayersScreen extends ConsumerWidget {
             actions: [
               IconButton(
                 key: const Key('prayerbook-search-action'),
-                tooltip: 'Пошук малітваў',
-                onPressed: () => context.push('/prayers/search'),
+                tooltip: 'Пошук у Малітоўніку',
+                onPressed: () => context.push('/prayers/library-search'),
                 icon: const PhosphorIcon(
                   PhosphorIconsRegular.magnifyingGlass,
                   size: 22,
@@ -639,7 +650,7 @@ class _PrayerListPage extends StatelessWidget {
           ),
           if (searchDock != null)
             FloatingOverlayPositioned(
-              gap: 12,
+              gap: BottomControlGeometry.gap,
               child: Center(child: searchDock!),
             ),
         ],
@@ -685,12 +696,14 @@ class PrayerSearchDock extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return ConstrainedBox(
       key: dockKey,
-      constraints: const BoxConstraints(maxWidth: 480),
-      child: GlassSurface(
-        style: GlassStyle.pill,
-        borderRadius: BorderRadius.circular(30),
+      constraints: const BoxConstraints(
+        maxWidth: BottomControlGeometry.maxWidth,
+      ),
+      child: AdaptiveChromeSurface(
+        role: ChromeSurfaceRole.navigation,
+        borderRadius: BorderRadius.circular(BottomControlGeometry.radius),
         child: SizedBox(
-          height: 58,
+          height: BottomControlGeometry.searchHeight,
           child: Row(
             children: [
               const SizedBox(width: 17),

@@ -17,6 +17,7 @@ import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
+import 'package:mybrev_flutter/widgets/bottom_control_geometry.dart';
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -277,11 +278,42 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 onTitleTap: () => _openPicker(book),
                 actions: [_translationControl(book)],
               ),
+              overlay: _selected.isEmpty
+                  ? FloatingOverlayPositioned(
+                      gap: BottomControlGeometry.gap,
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: BottomControlGeometry.maxWidth,
+                          ),
+                          child: _ChapterNavBar(
+                            book: book,
+                            chapter: widget.chapter,
+                            hasPrevious: _relative(-1) != null,
+                            hasNext: _relative(1) != null,
+                            onPrevious: () => _goRelative(-1),
+                            onCurrent: () => _openPicker(book),
+                            onNext: () => _goRelative(1),
+                          ),
+                        ),
+                      ),
+                    )
+                  : null,
               content: Padding(
                 key: const Key('bible-selection-content-reserve'),
                 padding: EdgeInsets.only(
                   bottom: _selected.isEmpty
-                      ? 0
+                      ? floatingOverlayContentReserve(
+                          overlayHeight: _ChapterNavBar.heightFor(context),
+                          overlayBottom: floatingOverlayBottom(
+                            context,
+                            gap: BottomControlGeometry.gap,
+                          ),
+                          readerBottomPadding:
+                              ReaderContentSurface.bottomSpacing +
+                              MediaQuery.paddingOf(context).bottom,
+                          contentGap: BottomControlGeometry.contentGap,
+                        )
                       : Theme.of(context).platform == TargetPlatform.android
                       ? floatingOverlayContentReserve(
                           overlayHeight: _paletteHeight,
@@ -321,16 +353,6 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                           selected: _selected.contains(verse.verse),
                           onTap: () => _toggleVerse(verse.verse),
                         ),
-                    const SizedBox(height: 24),
-                    _ChapterNavBar(
-                      book: book,
-                      chapter: widget.chapter,
-                      hasPrevious: _relative(-1) != null,
-                      hasNext: _relative(1) != null,
-                      onPrevious: () => _goRelative(-1),
-                      onCurrent: () => _openPicker(book),
-                      onNext: () => _goRelative(1),
-                    ),
                   ],
                 ),
               ),
@@ -795,6 +817,8 @@ class _VerseRow extends StatelessWidget {
 }
 
 class _ChapterNavBar extends StatelessWidget {
+  static double heightFor(BuildContext context) =>
+      (MediaQuery.textScalerOf(context).scale(16) * 1.25 + 28).clamp(60, 86);
   final BibleBookInfo book;
   final int chapter;
   final bool hasPrevious;
@@ -819,10 +843,10 @@ class _ChapterNavBar extends StatelessWidget {
     top: false,
     bottom: false,
     child: AdaptiveChromeSurface(
-      role: ChromeSurfaceRole.group,
-      borderRadius: BorderRadius.circular(30),
+      role: ChromeSurfaceRole.navigation,
+      borderRadius: BorderRadius.circular(BottomControlGeometry.radius),
       child: SizedBox(
-        height: 60,
+        height: heightFor(context),
         child: Row(
           children: [
             SizedBox(

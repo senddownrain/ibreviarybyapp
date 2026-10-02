@@ -136,6 +136,8 @@ void main() {
     expect(find.text('Парадак святой Імшы'), findsOneWidget);
     final bar = find.byKey(const Key('mass-navigator-bar'));
     expect(bar, findsOneWidget);
+    expect(find.byKey(const Key('bible-previous-chapter')), findsNothing);
+    expect(find.byKey(const Key('bible-next-chapter')), findsNothing);
     // One tappable selector with the full canonical section name and n/5.
     expect(_barTitle(tester), 'Уступныя абрады');
     expect(_position(tester), '1/5');
