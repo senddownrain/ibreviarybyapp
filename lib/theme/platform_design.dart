@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/ib_colors.dart';
 
 /// The platform-specific chrome layered over the shared iBreviary content.
 enum AppPlatformDesign { materialAmbient, cupertinoGlass }
@@ -50,6 +51,8 @@ class AdaptiveChromeSurface extends StatelessWidget {
   });
 
   final Widget child;
+
+  /// Kept for call-site compatibility; generic chrome is always neutral.
   final Color? seasonColor;
   final ChromeSurfaceRole role;
   final BorderRadius? borderRadius;
@@ -62,7 +65,6 @@ class AdaptiveChromeSurface extends StatelessWidget {
         key: const Key('adaptive-chrome-glass'),
         child: GlassSurface(
           style: GlassStyle.pill,
-          seasonColor: seasonColor,
           borderRadius: borderRadius ?? _defaultRadius,
           padding: padding,
           child: child,
@@ -71,15 +73,13 @@ class AdaptiveChromeSurface extends StatelessWidget {
     }
 
     final cs = Theme.of(context).colorScheme;
+    final colors = IbColors.of(context);
     final radius = borderRadius ?? _defaultRadius;
     final base = switch (role) {
-      ChromeSurfaceRole.control => cs.surfaceContainerHigh,
-      ChromeSurfaceRole.group => cs.surfaceContainer,
-      ChromeSurfaceRole.navigation => cs.surfaceContainerHigh,
+      ChromeSurfaceRole.control => colors.floating,
+      ChromeSurfaceRole.group => colors.surfaceRaised,
+      ChromeSurfaceRole.navigation => colors.floating,
     };
-    final fill = seasonColor == null
-        ? base
-        : Color.alphaBlend(seasonColor!.withValues(alpha: 0.055), base);
     final shadowAlpha = Theme.of(context).brightness == Brightness.dark
         ? 0.20
         : 0.085;
@@ -91,7 +91,7 @@ class AdaptiveChromeSurface extends StatelessWidget {
       key: const Key('adaptive-chrome-ambient'),
       child: Container(
         decoration: BoxDecoration(
-          color: fill,
+          color: base,
           borderRadius: radius,
           border: Border.all(color: cs.outlineVariant, width: 0.8),
           boxShadow: [

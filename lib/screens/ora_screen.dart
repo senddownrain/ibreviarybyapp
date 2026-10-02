@@ -403,14 +403,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   Widget _buildForDay(BuildContext context, LiturgicalDay day) {
     final seasonColor = liturgicalColorForDay(day);
-    final baseTheme = Theme.of(context);
-    final themedScheme = baseTheme.colorScheme.copyWith(
-      primary: seasonColor,
-      primaryContainer: Color.alphaBlend(
-        seasonColor.withValues(alpha: 0.18),
-        baseTheme.colorScheme.surface,
-      ),
-    );
 
     // Invitatoriums — all variants for selection
     final allInvit = HiveService.invitatoriumsBox.values
@@ -424,22 +416,19 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ? Map<String, dynamic>.from(compRaw as Map)
         : null;
 
-    return Theme(
-      data: baseTheme.copyWith(colorScheme: themedScheme),
-      child: ReadingScaffold(
-        builder: (context, textStyle) => ReaderScaffold(
-          seasonColor: seasonColor,
-          chromeMode: _chromeMode,
-          onChromeModeChanged: (mode) => setState(() => _chromeMode = mode),
-          scrollController: _scrollController,
-          scrollKey: PageStorageKey(
-            'ora-${widget.date.toIso8601String()}-${widget.dayId}-${widget.oraType}',
-          ),
-          semanticLabel: 'Тэкст Ora',
-          actions: const [TextScaleControl()],
-          contextHeader: _buildReaderContext(context, day),
-          content: _buildContent(context, day, allInvit, comp, textStyle),
+    return ReadingScaffold(
+      builder: (context, textStyle) => ReaderScaffold(
+        seasonColor: seasonColor,
+        chromeMode: _chromeMode,
+        onChromeModeChanged: (mode) => setState(() => _chromeMode = mode),
+        scrollController: _scrollController,
+        scrollKey: PageStorageKey(
+          'ora-${widget.date.toIso8601String()}-${widget.dayId}-${widget.oraType}',
         ),
+        semanticLabel: 'Тэкст Ora',
+        actions: const [TextScaleControl()],
+        contextHeader: _buildReaderContext(context, day),
+        content: _buildContent(context, day, allInvit, comp, textStyle),
       ),
     );
   }

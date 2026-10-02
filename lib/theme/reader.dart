@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mybrev_flutter/theme/ib_colors.dart';
 
 /// Persisted reader-family identifiers. User-facing labels live in Settings;
 /// storage keys stay language-neutral and must not be passed to Google Fonts.
@@ -33,7 +34,7 @@ class ReaderTypographyScope extends InheritedWidget {
 
 /// Reader typography and surfaces (mirrors web `--reader-*` tokens).
 class ReaderTheme {
-  const ReaderTheme._(this.isDark, this.useSystemFonts);
+  const ReaderTheme._(this.isDark, this.useSystemFonts, this.colors);
 
   static const double bodyHeight = 1.68;
   static const double hymnHeight = 1.72;
@@ -45,21 +46,20 @@ class ReaderTheme {
   factory ReaderTheme.of(BuildContext context) => ReaderTheme._(
     Theme.of(context).brightness == Brightness.dark,
     ReaderTypographyScope.useSystemFontsOf(context),
+    IbColors.of(context),
   );
 
   final bool isDark;
   final bool useSystemFonts;
+  final IbColors colors;
 
-  Color get ink => isDark ? const Color(0xFFE9ECE7) : const Color(0xFF20211F);
-  Color get muted => isDark ? const Color(0xFFAEB3AB) : const Color(0xFF62645F);
-  Color get rubric =>
-      isDark ? const Color(0xFFEF9188) : const Color(0xFF9B302A);
+  Color get ink => colors.ink;
+  Color get muted => colors.readerMuted;
+  Color get rubric => colors.rubric;
   Color get rubricSoft =>
-      isDark ? const Color(0x17EF9188) : const Color(0x139B302A);
-  Color get surface =>
-      isDark ? const Color(0xFF171917) : const Color(0xFFFDFCF9);
-  Color get border =>
-      isDark ? const Color(0x21FFFFFF) : const Color(0x1F000000);
+      colors.rubric.withValues(alpha: isDark ? 0x17 / 255 : 0x13 / 255);
+  Color get surface => colors.reader;
+  Color get border => colors.separator;
 
   TextStyle displayTitle(double size) {
     final base = TextStyle(

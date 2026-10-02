@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
@@ -13,7 +11,7 @@ const double kFloatingReaderAppBarContentInset = kFloatingAppBarContentInset;
 ///
 /// The page title remains part of the content hierarchy. Only navigation and
 /// actions receive a floating surface: glass on iOS, Material tonal on Android.
-class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
+class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AdaptiveAppBar({
     super.key,
     required this.title,
@@ -33,15 +31,15 @@ class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final Widget title;
   final List<Widget>? actions;
   final Widget? leading;
+
+  /// Kept for existing callers; app bar actions use neutral chrome colors.
   final Color? seasonColor;
 
   @override
   Size get preferredSize => const Size.fromHeight(64);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final resolvedSeasonColor =
-        seasonColor ?? ref.watch(liturgicalSeasonColorProvider);
+  Widget build(BuildContext context) {
     final cupertino = usesCupertinoGlass(context);
     final cs = Theme.of(context).colorScheme;
     final canPop = Navigator.canPop(context);
@@ -77,7 +75,6 @@ class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
               children: [
                 if (leadingWidget != null) ...[
                   AdaptiveChromeSurface(
-                    seasonColor: resolvedSeasonColor,
                     role: ChromeSurfaceRole.control,
                     child: SizedBox.square(dimension: 48, child: leadingWidget),
                   ),
@@ -107,7 +104,6 @@ class AdaptiveAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 if (pageActions != null && pageActions.isNotEmpty) ...[
                   const SizedBox(width: 10),
                   AdaptiveChromeSurface(
-                    seasonColor: resolvedSeasonColor,
                     role: ChromeSurfaceRole.group,
                     child: SizedBox(
                       height: 48,

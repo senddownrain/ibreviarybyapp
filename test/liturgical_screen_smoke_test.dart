@@ -17,6 +17,10 @@ import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/theme/app_theme.dart';
+import 'package:mybrev_flutter/utils/liturgical_theme.dart';
+import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
@@ -102,6 +106,41 @@ void main() {
   tearDownAll(() async {
     await Hive.close();
     await directory.delete(recursive: true);
+  });
+
+  testWidgets('Ora day color reaches context without recoloring Reader or Aa', (
+    tester,
+  ) async {
+    final contexts = <Color>[];
+    final schemes = <ColorScheme>[];
+    for (final dayId in ['ordinary-smoke', 'smoke']) {
+      final day = LiturgicalDay.fromMap(
+        Map<String, dynamic>.from(HiveService.daysBox.get(dayId) as Map),
+      );
+      contexts.add(liturgicalColorForDay(day));
+      await tester.pumpWidget(
+        ProviderScope(
+          key: ValueKey(dayId),
+          overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+          child: MaterialApp(
+            key: ValueKey('app-$dayId'),
+            theme: ThemeData(colorScheme: AppPalette.scheme(Brightness.light)),
+            home: OraScreen(dayId: dayId, oraType: 'laudes', date: date),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final reader = tester.widget<ReaderScaffold>(find.byType(ReaderScaffold));
+      expect(reader.seasonColor, contexts.last);
+      expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
+      schemes.add(
+        Theme.of(tester.element(find.byType(TextScaleControl))).colorScheme,
+      );
+      expect(tester.takeException(), isNull);
+    }
+    expect(contexts[0], isNot(contexts[1]));
+    expect(schemes[0].primary, schemes[1].primary);
+    expect(schemes[0].primaryContainer, schemes[1].primaryContainer);
   });
 
   final cases = <(String, String, Brightness, double, Size)>[

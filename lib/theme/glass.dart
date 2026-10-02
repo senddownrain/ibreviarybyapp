@@ -1,14 +1,18 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/theme/ib_colors.dart';
 
 /// Shared liquid-glass / ambient tokens for the liturgical UI.
 class GlassTokens {
-  const GlassTokens._(this.isDark);
+  const GlassTokens._(this.isDark, this.colors);
 
-  factory GlassTokens.of(BuildContext context) =>
-      GlassTokens._(Theme.of(context).brightness == Brightness.dark);
+  factory GlassTokens.of(BuildContext context) => GlassTokens._(
+    Theme.of(context).brightness == Brightness.dark,
+    IbColors.of(context),
+  );
 
   final bool isDark;
+  final IbColors colors;
 
   // Blur strengths
   double get pillBlur => 20;
@@ -23,25 +27,19 @@ class GlassTokens {
   double get ambientCard => isDark ? 0.06 : 0.045;
 
   // Glass fills
-  Color get cardFill =>
-      isDark ? const Color(0xF0171917) : const Color(0xF0F8F8F5);
-  Color get softFill =>
-      isDark ? const Color(0xE8171917) : const Color(0xE8F8F8F5);
-  Color get pillFill =>
-      isDark ? const Color(0xF5171917) : const Color(0xF5F8F8F5);
+  Color get cardFill => colors.surface.withValues(alpha: 0xF0 / 255);
+  Color get softFill => colors.surface.withValues(alpha: 0xE8 / 255);
+  Color get pillFill => colors.surface.withValues(alpha: 0xF5 / 255);
 
   Color get border =>
-      isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
-  Color get softBorder =>
-      isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
-  Color get pillBorder =>
-      isDark ? const Color(0x21FFFFFF) : const Color(0x1A000000);
+      colors.separator.withValues(alpha: isDark ? 0x21 / 255 : 0x1A / 255);
+  Color get softBorder => border;
+  Color get pillBorder => border;
   Color get specular => isDark
       ? Colors.white.withValues(alpha: 0.022)
       : Colors.white.withValues(alpha: 0.22);
 
-  Color get ambientBase =>
-      isDark ? const Color(0xFF343A34) : const Color(0xFFC8CAC3);
+  Color get ambientBase => colors.neutralAmbient;
 
   List<BoxShadow> get cardShadow => [
     BoxShadow(

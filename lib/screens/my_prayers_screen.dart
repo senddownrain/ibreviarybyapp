@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
@@ -24,7 +23,6 @@ class MyPrayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prayers = ref.watch(localPrayersProvider);
-    final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -44,7 +42,7 @@ class MyPrayersScreen extends ConsumerWidget {
         ),
       ),
       body: AmbientWash(
-        seasonColor: seasonColor,
+        seasonColor: GlassTokens.of(context).ambientBase,
         height: kToolbarHeight + 100,
         child: prayers.isEmpty
             ? Padding(
@@ -60,7 +58,6 @@ class MyPrayersScreen extends ConsumerWidget {
                     constraints: const BoxConstraints(maxWidth: 420),
                     child: GlassSurface(
                       style: GlassStyle.card,
-                      seasonColor: seasonColor,
                       borderRadius: BorderRadius.circular(28),
                       padding: const EdgeInsets.fromLTRB(26, 28, 26, 26),
                       child: Column(

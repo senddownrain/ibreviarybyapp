@@ -108,13 +108,6 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
 
   @override
   Widget build(BuildContext context) {
-    final liturgicalColor = ref.watch(liturgicalSeasonColorProvider);
-    final seasonColor = switch (widget.activeBranch) {
-      AppBranch.hours => liturgicalColor,
-      AppBranch.readings ||
-      AppBranch.prayerbook ||
-      AppBranch.bible => Theme.of(context).colorScheme.primary,
-    };
     return AppNavigationScope(
       shell: widget.navigationShell,
       shellState: widget.shellState,
@@ -150,7 +143,6 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                         top: topPadding + 10,
                         left: 14,
                         child: _FloatingMenuButton(
-                          seasonColor: seasonColor,
                           onTap: () => showSecondaryMenu(context),
                         ),
                       ),
@@ -161,7 +153,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                   mode: controller.navigationDockSuppressed
                       ? ReaderChromeMode.hidden
                       : mode,
-                  seasonColor: seasonColor,
+                  seasonColor: Theme.of(context).colorScheme.primary,
                   onSelect: AppNavigationScope.of(context).selectBranch,
                   onExpand: () => _requestActiveMode(ReaderChromeMode.full),
                 ),
@@ -175,9 +167,8 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
 }
 
 class _FloatingMenuButton extends StatelessWidget {
-  const _FloatingMenuButton({required this.seasonColor, required this.onTap});
+  const _FloatingMenuButton({required this.onTap});
 
-  final Color seasonColor;
   final VoidCallback onTap;
 
   @override
@@ -187,7 +178,6 @@ class _FloatingMenuButton extends StatelessWidget {
       message: 'Меню',
       child: AdaptiveChromeSurface(
         role: ChromeSurfaceRole.control,
-        seasonColor: seasonColor,
         borderRadius: BorderRadius.circular(28),
         child: Material(
           color: Colors.transparent,

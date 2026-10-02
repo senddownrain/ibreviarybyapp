@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 
 /// Floating top controls inspired by Samsung One UI.
@@ -11,7 +9,7 @@ import 'package:mybrev_flutter/theme/platform_design.dart';
 ///
 /// The global menu button can live in AppShell, while individual screens
 /// can place their own actions on the right.
-class FloatingTopActions extends ConsumerWidget {
+class FloatingTopActions extends StatelessWidget {
   final List<Widget> actions;
 
   /// Show a separate floating back button on the left.
@@ -25,7 +23,7 @@ class FloatingTopActions extends ConsumerWidget {
   /// Optional custom widget on the left instead of the back button.
   final Widget? leading;
 
-  /// Optional override for liturgical/glass tint.
+  /// Compatibility argument. Generic top actions keep a neutral surface.
   final Color? seasonColor;
 
   const FloatingTopActions({
@@ -38,12 +36,7 @@ class FloatingTopActions extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final resolvedSeasonColor =
-        seasonColor ??
-        ref.watch(liturgicalSeasonColorProvider) ??
-        Colors.transparent;
-
+  Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final cupertino = usesCupertinoGlass(context);
 
@@ -58,7 +51,6 @@ class FloatingTopActions extends ConsumerWidget {
               leading!
             else if (showBack)
               _FloatingTopButton(
-                seasonColor: resolvedSeasonColor,
                 tooltip: 'Назад',
                 onTap: onBack ?? () => Navigator.maybePop(context),
                 child: Icon(
@@ -78,7 +70,6 @@ class FloatingTopActions extends ConsumerWidget {
                 role: actions.length == 1
                     ? ChromeSurfaceRole.control
                     : ChromeSurfaceRole.group,
-                seasonColor: resolvedSeasonColor,
                 borderRadius: BorderRadius.circular(28),
                 child: Material(
                   color: Colors.transparent,
@@ -103,13 +94,11 @@ class FloatingTopActions extends ConsumerWidget {
 }
 
 class _FloatingTopButton extends StatelessWidget {
-  final Color seasonColor;
   final VoidCallback onTap;
   final Widget child;
   final String? tooltip;
 
   const _FloatingTopButton({
-    required this.seasonColor,
     required this.onTap,
     required this.child,
     this.tooltip,
@@ -119,7 +108,6 @@ class _FloatingTopButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final button = AdaptiveChromeSurface(
       role: ChromeSurfaceRole.control,
-      seasonColor: seasonColor,
       borderRadius: BorderRadius.circular(28),
       child: Material(
         color: Colors.transparent,
