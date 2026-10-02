@@ -33,6 +33,13 @@ void main() {
     },
   );
 
+  test('numbered HTML paragraphs without cadence keep verse line breaks', () {
+    final html = formatReadingPsalmHtml(
+      '<p>2. Першы верш. 4.&nbsp;Другі верш.</p>',
+    );
+    expect(html, contains('Першы верш.<br>4.'));
+  });
+
   group('formatPsalmHtml', () {
     test('marks cadence signs and alternating strophes', () {
       final result = formatPsalmHtml(
@@ -58,9 +65,22 @@ void main() {
       expect(neutral, isNot(contains('psalm-choir-muted')));
 
       final firstSelected = preparePsalmChoirHtml(formatted, selectedChoir: 1);
+      final secondChoirLinks = RegExp(
+        'href="psalm-choir:2"',
+      ).allMatches(firstSelected).length;
+      expect(secondChoirLinks, greaterThan(0));
       expect(
         RegExp('psalm-choir-muted').allMatches(firstSelected),
-        hasLength(1),
+        hasLength(secondChoirLinks),
+      );
+      expect(
+        firstSelected,
+        isNot(
+          contains(
+            'href="psalm-choir:1" class="psalm-choir-strophe '
+            'psalm-choir-muted"',
+          ),
+        ),
       );
       expect(
         firstSelected,

@@ -21,6 +21,7 @@ import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/readings_selection.dart';
@@ -1263,13 +1264,11 @@ class _SectionLabel extends StatelessWidget {
     final base = textStyle?.fontSize ?? 16.0;
     final rubric = reader ?? ReaderTheme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(top: 24, bottom: 8),
-      child: Text(
-        _readingLabel(text),
-        style: rubric
-            .blockHeading(base)
-            .copyWith(fontFamily: textStyle?.fontFamily),
+      padding: const EdgeInsets.only(
+        top: LiturgicalSpacing.sectionBefore,
+        bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
+      child: Text(_readingLabel(text), style: rubric.blockHeading(base)),
     );
   }
 }
@@ -1296,12 +1295,7 @@ class _BibleRef extends StatelessWidget {
     final theme = reader ?? ReaderTheme.of(context);
     return Text(
       text,
-      style: (textStyle ?? theme.body(base)).copyWith(
-        fontSize: (base * 0.88).clamp(14, double.infinity),
-        color: theme.muted,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.02,
-      ),
+      style: theme.referenceStyle(base, family: textStyle?.fontFamily),
     );
   }
 }
@@ -1354,42 +1348,13 @@ class _ReadingTextState extends State<_ReadingText> {
   Widget build(BuildContext context) {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
-      final base = widget.textStyle.fontSize ?? 16;
       return Html(
         data: widget.isPsalm
             ? formatReadingPsalmHtml(widget.text)
             : formatLiturgicalHtml(widget.text),
         style: {
-          'body': Style(
-            margin: Margins.zero,
-            padding: HtmlPaddings.zero,
-            color: widget.textStyle.color ?? reader.ink,
-            fontFamily: widget.textStyle.fontFamily,
-            fontSize: FontSize(base),
-            fontWeight: widget.textStyle.fontWeight,
-            lineHeight: LineHeight(ReaderTheme.bodyHeight),
-            textAlign: TextAlign.left,
-          ),
-          'p': Style(margin: Margins.only(bottom: 8)),
-          '.liturgical-subheading': Style(
-            fontSize: FontSize((base * 0.88).clamp(14, double.infinity)),
-            lineHeight: LineHeight(ReaderTheme.metadataHeight),
-            color: reader.muted,
-            margin: Margins.only(bottom: 7),
-          ),
-          '.psalm-metadata': Style(textAlign: TextAlign.center),
-          '.liturgical-heading': Style(
-            fontSize: FontSize((base * 0.98).clamp(15, double.infinity)),
-            lineHeight: LineHeight(ReaderTheme.headingHeight),
-            color: reader.rubric,
-            fontWeight: FontWeight.w700,
-          ),
+          ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
           '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
-          '.psalm-marker': Style(
-            color: reader.rubric,
-            fontWeight: FontWeight.w600,
-          ),
-          '.liturgical-rubric-inline': Style(color: reader.rubric),
         },
       );
     }
@@ -1613,7 +1578,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
         ] else if (display.isNotEmpty && !hasAcclamation) ...[
           const SizedBox(height: 12),
           Text(
-            isGospel ? 'Гэта Слова Пана.' : 'Гэта Слова Божае.',
+            isGospel ? 'Гэта слова Пана.' : 'Гэта слова Божае.',
             style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
         ],

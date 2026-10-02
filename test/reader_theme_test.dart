@@ -43,8 +43,9 @@ void main() {
       ),
     );
 
-    expect(heading.fontSize, 18);
+    expect(heading.fontSize, greaterThanOrEqualTo(22));
     expect(heading.fontSize, greaterThan(16));
-    expect(heading.fontWeight, FontWeight.w600);
+    expect(heading.fontWeight, FontWeight.w700);
+    expect(heading.fontFamily, startsWith('CormorantGaramond'));
   });
 }

@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+
+/// Shared HTML role styling for document surfaces. Screen renderers may add
+/// structure-specific rules (choirs, intercessions), but roles live here.
+Map<String, Style> liturgicalDocumentStyles({
+  required ReaderTheme reader,
+  required TextStyle body,
+  double paragraphAfter = LiturgicalSpacing.paragraphAfter,
+}) {
+  final size = body.fontSize ?? 16;
+  final heading = reader.blockHeading(size);
+  final metadataSize = (size * .88).clamp(14, double.infinity).toDouble();
+  return {
+    'body': Style(
+      fontSize: FontSize(size),
+      fontFamily: body.fontFamily,
+      fontWeight: body.fontWeight,
+      color: body.color ?? reader.ink,
+      lineHeight: LineHeight(body.height ?? ReaderTheme.bodyHeight),
+      margin: Margins.zero,
+      padding: HtmlPaddings.zero,
+      textAlign: TextAlign.left,
+    ),
+    'p': Style(margin: Margins.only(bottom: paragraphAfter)),
+    '.liturgical-heading': Style(
+      fontFamily: heading.fontFamily,
+      fontSize: FontSize(heading.fontSize!),
+      lineHeight: LineHeight(heading.height!),
+      color: reader.rubric,
+      fontWeight: heading.fontWeight,
+      fontStyle: FontStyle.normal,
+      margin: Margins.only(bottom: LiturgicalSpacing.sectionTitleToBody),
+    ),
+    '.liturgical-service-heading': Style(
+      fontSize: FontSize(metadataSize),
+      lineHeight: LineHeight(ReaderTheme.metadataHeight),
+      color: reader.rubric,
+      fontWeight: FontWeight.normal,
+      fontStyle: FontStyle.normal,
+      margin: Margins.only(bottom: LiturgicalSpacing.metadataToBody),
+    ),
+    '.liturgical-reference': Style(
+      fontSize: FontSize(metadataSize),
+      lineHeight: LineHeight(ReaderTheme.referenceHeight),
+      color: reader.rubric,
+      fontWeight: FontWeight.w500,
+      fontStyle: FontStyle.normal,
+      margin: Margins.only(bottom: LiturgicalSpacing.metadataToBody),
+    ),
+    '.liturgical-subheading': Style(
+      fontSize: FontSize(metadataSize),
+      lineHeight: LineHeight(ReaderTheme.metadataHeight),
+      color: reader.muted,
+      margin: Margins.only(bottom: LiturgicalSpacing.metadataToBody),
+    ),
+    '.psalm-metadata': Style(textAlign: TextAlign.center),
+    '.psalm-subtitle': Style(
+      fontSize: FontSize(metadataSize),
+      lineHeight: LineHeight(ReaderTheme.metadataHeight),
+      color: reader.muted,
+      fontStyle: FontStyle.italic,
+      textAlign: TextAlign.center,
+    ),
+    '.office-reading-pericope-title': Style(
+      fontSize: FontSize(metadataSize),
+      lineHeight: LineHeight(ReaderTheme.metadataHeight),
+      color: reader.rubric,
+      fontStyle: FontStyle.normal,
+    ),
+    '.liturgical-rubric': Style(
+      color: reader.rubric,
+      fontSize: FontSize((size * .90).clamp(14, double.infinity).toDouble()),
+      lineHeight: LineHeight(ReaderTheme.rubricHeight),
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.normal,
+    ),
+    '.liturgical-rubric-inline': Style(color: reader.rubric),
+    '.liturgical-reading-reference': Style(
+      color: reader.muted,
+      fontSize: FontSize(metadataSize),
+      fontWeight: FontWeight.w500,
+    ),
+    '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
+    '.responsory-turn': Style(margin: Margins.only(bottom: 3)),
+  };
+}
+
+class LiturgicalSectionDivider extends StatelessWidget {
+  const LiturgicalSectionDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(
+      top: LiturgicalSpacing.dividerBefore,
+      bottom: LiturgicalSpacing.dividerAfter,
+    ),
+    child: Divider(
+      height: 1,
+      thickness: 0.5,
+      color: ReaderTheme.of(context).border,
+    ),
+  );
+}

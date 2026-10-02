@@ -69,7 +69,7 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
     options.add(
       LiturgicalAlternative(
         title: title,
-        html: removeBreakAfterAsterisk(option.html),
+        html: removeBreakAfterCadenceMarker(option.html),
       ),
     );
   }
@@ -78,7 +78,7 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
       : [
           LiturgicalAlternative(
             title: 'Варыянт 1',
-            html: removeBreakAfterAsterisk(source),
+            html: removeBreakAfterCadenceMarker(source),
           ),
         ];
 }

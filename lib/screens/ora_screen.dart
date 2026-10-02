@@ -33,6 +33,7 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
@@ -797,6 +798,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addHymn(items, day, 'officeOfReadingsHymn');
     _addPsalmBlock(items, day, 'officeOfReadingsAnt', 'officeOfReadingsPs', 3);
     _addField(items, day, 'officeOfReadingsVers', '');
+    _addDividerBeforeField(items, day, 'officeOfReadingsR1');
     _addField(items, day, 'officeOfReadingsR1', 'Першае чытанне');
     _addField(items, day, 'officeOfReadingsR2', 'Другое чытанне');
     if (shouldShowTeDeum(day)) {
@@ -815,6 +817,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addIntro(items);
     _addHymn(items, day, 'laudesHymn');
     _addPsalmBlock(items, day, 'laudesAnt', 'laudesPs', 3);
+    _addDividerBeforeField(items, day, 'laudesR');
     _addField(items, day, 'laudesR', '');
 
     final antBen = (day.field('laudesAntBen') ?? '').trim();
@@ -829,6 +832,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       );
     }
 
+    _addDividerBeforeField(items, day, 'laudesInter');
     _addField(items, day, 'laudesInter', 'Просьбы');
     items.add(_OraItem.plain(_kPaterNoster));
     _addField(items, day, 'laudesPr', 'Малітва');
@@ -860,7 +864,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     ], controllerScope: 'sext$num');
 
     final r = daytimeHourField(day, num, 'R');
-    if (r.isNotEmpty) items.add(_OraItem.html(r, kind: 'reading'));
+    if (r.isNotEmpty) {
+      items.add(_OraItem.divider());
+      items.add(_OraItem.html(r, kind: 'reading'));
+    }
 
     final pr = daytimeHourField(day, num, 'Pr');
     if (pr.isNotEmpty) {
@@ -894,6 +901,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
     _addHymn(items, day, 'vesperHymn');
     _addPsalmBlock(items, day, 'vesperAnt', 'vesperPs', 3);
+    _addDividerBeforeField(items, day, 'vesperR');
     _addField(items, day, 'vesperR', '');
 
     final antMag = (day.field('vesperAntMag') ?? '').trim();
@@ -908,6 +916,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       );
     }
 
+    _addDividerBeforeField(items, day, 'vesperInter');
     _addField(items, day, 'vesperInter', 'Просьбы');
     items.add(_OraItem.plain(_kPaterNoster));
 
@@ -968,7 +977,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     ], controllerScope: 'completorium');
 
     final r = cf('compR');
-    if (r.isNotEmpty) items.add(_OraItem.html(r, kind: 'reading'));
+    if (r.isNotEmpty) {
+      items.add(_OraItem.divider());
+      items.add(_OraItem.html(r, kind: 'reading'));
+    }
 
     final resp = cf('compResp');
     if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'reading'));
@@ -976,13 +988,14 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final antS = cf('compAntS');
     if (antS.isNotEmpty) {
       final antController = _alternativeController('compline-ant-s');
-      items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
+      items.add(_OraItem.divider());
+      items.add(_OraItem.antiphon(antS, controller: antController));
+      items.add(_OraItem.serviceHeader('Песня з Евангелля'));
       items.add(
         _OraItem.html(
           '<p><em>Песня Сімяона (Лк 2, 29–32) — Хрыстус — святло народаў і хвала Ізраэля</em></p>',
         ),
       );
-      items.add(_OraItem.antiphon(antS, controller: antController));
       items.add(_OraItem.psalm(_kNunc));
       items.add(
         _OraItem.antiphon(antS, controller: antController, showPicker: false),
@@ -1036,6 +1049,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addHymn(items, day, 'laudesHymn');
     _addPsalmBlock(items, day, 'officeOfReadingsAnt', 'officeOfReadingsPs', 3);
     _addField(items, day, 'officeOfReadingsVers', '');
+    _addDividerBeforeField(items, day, 'officeOfReadingsR1');
     _addField(items, day, 'officeOfReadingsR1', 'Першае чытанне');
     _addField(items, day, 'officeOfReadingsR2', 'Другое чытанне');
     if (shouldShowTeDeum(day)) {
@@ -1044,6 +1058,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
 
     _addPsalmBlock(items, day, 'laudesAnt', 'laudesPs', 3);
+    _addDividerBeforeField(items, day, 'laudesR');
     _addField(items, day, 'laudesR', '');
     final antBen = (day.field('laudesAntBen') ?? '').trim();
     if (antBen.isNotEmpty) {
@@ -1056,6 +1071,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         psalm: _kBenedictus,
       );
     }
+    _addDividerBeforeField(items, day, 'laudesInter');
     _addField(items, day, 'laudesInter', 'Просьбы');
     items.add(_OraItem.plain(_kPaterNoster));
     _addField(items, day, 'laudesPr', 'Малітва');
@@ -1077,6 +1093,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     required String psalm,
   }) {
     final antController = _alternativeController(controllerScope);
+    items.add(_OraItem.divider());
     items.add(
       _OraItem.antiphon(
         antiphon,
@@ -1084,7 +1101,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         controller: antController,
       ),
     );
-    items.add(_OraItem.blockHeader('ПЕСНЯ З ЕВАНГЕЛЛЯ'));
+    items.add(_OraItem.serviceHeader('Песня з Евангелля'));
     items.add(_OraItem.html(caption));
     items.add(_OraItem.psalm(psalm));
     items.add(
@@ -1128,8 +1145,22 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   String _alternativeKind(String fieldName) {
     if (fieldName.endsWith('Inter')) return 'intercession';
     if (fieldName.endsWith('Pr')) return 'prayer';
+    if (fieldName == 'officeOfReadingsR1' ||
+        fieldName == 'officeOfReadingsR2') {
+      return 'office-reading';
+    }
     if (fieldName.contains('R')) return 'reading';
     return 'generic';
+  }
+
+  void _addDividerBeforeField(
+    List<_OraItem> items,
+    LiturgicalDay day,
+    String fieldName,
+  ) {
+    if ((day.field(fieldName) ?? '').trim().isNotEmpty) {
+      items.add(_OraItem.divider());
+    }
   }
 
   // Reads ant/ps pairs from day and calls _addPsalmBlockResolved
@@ -1182,8 +1213,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       if (!structured) {
         items.add(_OraItem.antiphon(pairs[0].$1, controller: controller));
       }
+      var psalmIndex = 0;
       for (final (_, ps) in pairs) {
         if (ps.isNotEmpty) {
+          if (psalmIndex++ > 0) items.add(_OraItem.psalmGap());
           items.add(
             _OraItem.psalm(
               ps,
@@ -1202,8 +1235,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         );
       }
     } else {
+      var hasBlock = false;
       for (var index = 0; index < pairs.length; index++) {
         final (ant, ps) = pairs[index];
+        if (ant.isEmpty && ps.isEmpty) continue;
+        if (hasBlock) items.add(_OraItem.psalmGap());
+        hasBlock = true;
         final controller = _alternativeController(
           '${widget.oraType}-$controllerScope-ant-$index',
         );
@@ -1241,7 +1278,18 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
 // ─── _OraItem ─────────────────────────────────────────────────────────────────
 
-enum _OraItemType { blockHeader, antiphon, labeled, html, psalm, plain, custom }
+enum _OraItemType {
+  blockHeader,
+  serviceHeader,
+  divider,
+  psalmGap,
+  antiphon,
+  labeled,
+  html,
+  psalm,
+  plain,
+  custom,
+}
 
 class _ExpandableFeastComment extends StatefulWidget {
   const _ExpandableFeastComment(this.text);
@@ -1359,6 +1407,12 @@ class _OraItem {
   factory _OraItem.blockHeader(String title) =>
       _OraItem._(_OraItemType.blockHeader, title);
 
+  factory _OraItem.serviceHeader(String title) =>
+      _OraItem._(_OraItemType.serviceHeader, title);
+
+  factory _OraItem.divider() => const _OraItem._(_OraItemType.divider, '');
+  factory _OraItem.psalmGap() => const _OraItem._(_OraItemType.psalmGap, '');
+
   factory _OraItem.antiphon(
     String text, {
     String kind = 'generic',
@@ -1403,11 +1457,30 @@ class _OraItem {
     final cs = Theme.of(context).colorScheme;
 
     switch (type) {
+      case _OraItemType.divider:
+        return const LiturgicalSectionDivider();
+      case _OraItemType.psalmGap:
+        return const SizedBox(height: LiturgicalSpacing.psalmBlockToNext);
+      case _OraItemType.serviceHeader:
+        return Padding(
+          padding: const EdgeInsets.only(
+            bottom: LiturgicalSpacing.metadataToBody,
+          ),
+          child: Text(
+            content,
+            style: ReaderTheme.of(
+              context,
+            ).serviceHeading(textStyle.fontSize ?? 16),
+          ),
+        );
       case _OraItemType.blockHeader:
         final reader = ReaderTheme.of(context);
         final base = textStyle.fontSize ?? 16;
         return Padding(
-          padding: const EdgeInsets.only(top: 24, bottom: 9),
+          padding: const EdgeInsets.only(
+            top: LiturgicalSpacing.sectionBefore,
+            bottom: LiturgicalSpacing.sectionTitleToBody,
+          ),
           child: Text(
             _managedHeading(content),
             style: reader.blockHeading(base),
@@ -1416,13 +1489,13 @@ class _OraItem {
 
       case _OraItemType.antiphon:
         return Padding(
-          // Paragraph spacing already separates the antiphon from its psalm.
-          // Avoid adding a second gap around the paired reader blocks.
           padding: EdgeInsets.zero,
           child: _HtmlOrText(
             content: content,
             textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
-            alternativeKind: alternativeKind,
+            alternativeKind: alternativeKind == 'generic'
+                ? 'psalm-antiphon'
+                : alternativeKind,
             alternativeController: alternativeController,
             showPicker: showPicker,
             pickerLabel: 'Выбар антыфоны',
@@ -1499,6 +1572,8 @@ String _managedHeading(String value) => switch (value.toUpperCase()) {
   'ГІМН' => 'Гімн',
   'ПСАЛМОДЫЯ' => 'Псалмодыя',
   'ПЕСНЯ З ЕВАНГЕЛЛЯ' => 'Песня з Евангелля',
+  'АНТЫФОНЫ НА ЗАКАНЧЭННЕ ДА НАЙСВЯЦЕЙШАЙ ПАННЫ МАРЫІ' =>
+    'Антыфоны на заканчэнне да Найсвяцейшай Панны Марыі',
   _ => value,
 };
 
@@ -1525,14 +1600,14 @@ class _LabeledSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: reader.blockHeading(base)),
-        const SizedBox(height: 6),
+        const SizedBox(height: LiturgicalSpacing.sectionTitleToBody),
         _HtmlOrText(
           content: content,
           textStyle: textStyle,
           alternativeKind: alternativeKind,
           pickerLabel: _OraItem._pickerLabel(alternativeKind),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: LiturgicalSpacing.paragraphAfter),
       ],
     );
   }
@@ -1576,6 +1651,15 @@ class _HtmlOrText extends StatelessWidget {
         },
       );
     }
+    if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
+      return _renderHtml(
+        context,
+        normalizeOfficeHtml(
+          content,
+          officeReading: alternativeKind == 'office-reading',
+        ),
+      );
+    }
     return _LiturgicalSelectableText(content: content, textStyle: textStyle);
   }
 
@@ -1584,49 +1668,22 @@ class _HtmlOrText extends StatelessWidget {
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
     final baseSize = textStyle.fontSize ?? 16;
-    final paragraphSpacing = alternativeKind == 'hymn' ? 15.0 : 8.0;
+    final paragraphSpacing = alternativeKind == 'hymn'
+        ? LiturgicalSpacing.hymnStropheAfter
+        : alternativeKind == 'psalm-antiphon' ||
+              alternativeKind == 'gospel-antiphon'
+        ? LiturgicalSpacing.antiphonToPsalm
+        : LiturgicalSpacing.paragraphAfter;
     final styles = <String, Style>{
-      'body': Style(
-        fontSize: FontSize(textStyle.fontSize ?? 16),
-        fontFamily: textStyle.fontFamily,
-        fontWeight: textStyle.fontWeight,
-        color: textColor,
-        lineHeight: LineHeight(
-          alternativeKind == 'hymn'
-              ? ReaderTheme.hymnHeight
-              : ReaderTheme.bodyHeight,
-        ),
-        margin: Margins.zero,
-        padding: HtmlPaddings.zero,
-        textAlign: TextAlign.left,
-      ),
-      'p': Style(
-        color: textColor,
-        margin: Margins.only(bottom: paragraphSpacing),
-      ),
-      '.liturgical-subheading': Style(
-        fontSize: FontSize((baseSize * 0.88).clamp(14, double.infinity)),
-        lineHeight: LineHeight(ReaderTheme.metadataHeight),
-        color: reader.muted,
-        margin: Margins.only(bottom: 7),
-      ),
-      '.psalm-metadata': Style(textAlign: TextAlign.center),
-      '.liturgical-heading': Style(
-        fontSize: FontSize((baseSize * 0.98).clamp(15, double.infinity)),
-        lineHeight: LineHeight(ReaderTheme.headingHeight),
-        color: reader.rubric,
-        fontWeight: FontWeight.w700,
-        margin: Margins.only(bottom: 12),
+      ...liturgicalDocumentStyles(
+        reader: reader,
+        body: alternativeKind == 'hymn'
+            ? textStyle.copyWith(height: ReaderTheme.hymnHeight)
+            : textStyle,
+        paragraphAfter: paragraphSpacing,
       ),
       '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
       '.psalm-strophe-even': Style(margin: Margins.only(left: 16, bottom: 8)),
-      '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
-      '.liturgical-rubric': Style(
-        color: reader.rubric,
-        fontSize: FontSize((baseSize * 0.90).clamp(14, double.infinity)),
-        lineHeight: LineHeight(ReaderTheme.rubricHeight),
-      ),
-      '.liturgical-rubric-inline': Style(color: reader.rubric),
       '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),
       '.intercessions__refrain': Style(
         margin: Margins.only(top: 4, bottom: 22),
@@ -1641,15 +1698,14 @@ class _HtmlOrText extends StatelessWidget {
         color: reader.ink,
       ),
       '.intercessions__marker': Style(color: reader.rubric),
-      '.ora-ant': Style(color: reader.ink, fontWeight: FontWeight.w600),
+      '.ora-ant': Style(
+        color: reader.ink,
+        fontWeight: FontWeight.w600,
+        margin: Margins.only(bottom: LiturgicalSpacing.antiphonToPsalm),
+      ),
       '.ora-sub': Style(
         color: reader.muted,
         fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
-      ),
-      '.liturgical-reading-reference': Style(
-        color: reader.muted,
-        fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
-        fontWeight: FontWeight.w500,
       ),
       '.intercessions__conclusion': Style(
         margin: Margins.only(top: 22),
@@ -1667,7 +1723,14 @@ class _HtmlOrText extends StatelessWidget {
         rubricColor: reader.rubric,
       );
     }
-    return Html(data: formatLiturgicalHtml(html), style: styles);
+    final officeHtml =
+        alternativeKind == 'reading' || alternativeKind == 'office-reading'
+        ? normalizeOfficeHtml(
+            html,
+            officeReading: alternativeKind == 'office-reading',
+          )
+        : html;
+    return Html(data: formatLiturgicalHtml(officeHtml), style: styles);
   }
 }
 

@@ -1,11 +1,11 @@
 # Liturgy content visual specification
 
-Статус: **CURRENT-аудит существующей реализации; дизайн не унифицирован**.
+Статус: **CURRENT-аудит сохранён; TARGET ниже фиксирует первый implementation pass визуальной унификации**.
 
-Срез кода: `1540a7d`, 29 сентября 2026.
+Исходный audit commit: `1540a7d` (29 сентября 2026). CURRENT перепроверен 1 октября 2026 против `main` HEAD `1ac450d9c184e63561e3fcb0b80ae94353d44f7b`.
 Область: экран Чтений (`ReadingsScreen`), legacy/detail-экран отдельного чтения (`ReadingDetailScreen`) и все реально реализованные варианты Литургии часов (`OraScreen`).
 
-Этот документ — источник правды для следующего этапа. `CURRENT` описывает код как есть. `TARGET` намеренно оставлен `—`: его можно заполнять вручную, не меняя идентификаторы.
+Этот документ — источник правды для следующего этапа. `CURRENT` описывает код как есть. Пустые дизайнерские `TARGET` оставлены `—`; ранее принятые правила вынесены в FIXED REQUIREMENTS. Сравнение всех перечисленных ниже renderer-файлов с `1540a7d` показало только перемены cache/loading/status в `ora_screen.dart` и `readings_screen.dart`: типографика и ритм основного документа не менялись. Текущая загрузка часов — `DataLoadingNotice(shape: text)` вместо shimmer, Чтений — тот же notice в контейнере высотой `360`; строки загрузки теперь «Загружаем тэкст гадзіны» / «Загружаем чытанні». Поэтому содержательный CURRENT каталога сохранён.
 
 ## Как читать спецификацию
 
@@ -15,7 +15,45 @@
 - Все размеры и отступы — logical px Flutter.
 - `inherit` ниже всегда сопровождается источником. Значение `normal` означает реально не переопределённый параметр у названного `TextStyle`, а не неизвестный default.
 - У HTML итоговый отступ — объявленный margin элемента в `flutter_html`; фактическое поведение соседних CSS-like margins принадлежит `flutter_html 3.0.0`.
-- `CURRENT / TARGET` относится к визуальному контракту. В `TARGET` везде `—` до ручного решения владельца дизайна.
+- `CURRENT / TARGET` относится к визуальному контракту. `—` означает открытое дизайнерское решение, а `see FIXED-…` — уже принятое требование, не новую гипотезу.
+
+## Как передавать визуальные изменения Codex
+
+Полный `VISUAL LOCATOR` адресует **одно место на экране**: `SCREEN > SECTION > INSTANCE > ELEMENT`. `ROLE: PSALM_TITLE` адресует **все места с этим semantic ID**, в том числе в разных часах. Для позиционных повторов `PSALM_1` означает первый псалом данной псалмодии, не Псалом 1 Псалтири. Укажите, если изменение должно быть только локальным: нынешний общий renderer может потребовать локального override; это не означает, что такой override уже есть в CURRENT.
+
+```text
+SCREEN: LAUDES
+CHANGE: LAUDES > PSALMODY > PSALM_1 > PSALM_TITLE
+fontSize: чуть меньше текущего; weight: оставить; color: оставить
+CHANGE: LAUDES > PSALMODY > PSALM_1 > PSALM_SUBTITLE
+fontStyle: italic; spaceAfter: увеличить
+CHANGE: LAUDES > PSALMODY > PSALM_1 > REPEATED_ANTIPHON
+spaceBefore: увеличить
+Все остальные роли не менять.
+```
+
+```text
+ROLE: PSALM_TITLE
+TARGET: fontSize: …; fontWeight: …; color: …; spaceBefore: …; spaceAfter: …
+```
+
+```text
+SCREENSHOT: <имя/номер screenshot>
+SCREEN: LAUDES
+Элемент, который я отметил: LAUDES > PSALMODY > PSALM_2 > PSALM_SUBTITLE
+Изменение: …
+```
+
+Русские алиасы для поиска: `PSALM_TITLE` — название псалма; `PSALM_REFERENCE` — библейская ссылка/номер в метаданных; `PSALM_SUBTITLE` — краткий подзаголовок; `OPENING_ANTIPHON` — антифона перед псалмом; `REPEATED_ANTIPHON` — её повтор после псалма; `RUBRIC_BLOCK` — служебная красная строка; `CADENCE_MARKER` — звёздочка или крестик; `PSALM_BODY` — строфы псалма.
+
+### Правила VISUAL LOCATORS
+
+- Имена экранов: `INVITATORIUM`, `MORNING`, `LECTIONIS`, `LAUDES`, `TERZ`, `SEXT`, `NON`, `VESPERS`, `COMPLETORIUM`, `READINGS`, `READING_DETAIL`. Они не зависят от текста дня.
+- Путь идёт сверху вниз. Промежуточный `INSTANCE` опускается у одиночных блоков (`LAUDES > HYMN > BODY`). В повторяемых блоках он обязателен: `PSALM_1/2/3`, `READING_1/2`, `VERSE_1/2/…`, `PETITION_1/2/…`.
+- `MORNING > OFFICE_PSALMODY` и `MORNING > LAUDES_PSALMODY` никогда не смешиваются. `VESPERS` сохраняет один locator-schema и для I, и для II Нешпаров; выбранный вариант — данные, а не новое имя экрана.
+- Необязательный элемент сохраняет адрес, даже когда в конкретный день не показан. Пустой source не создаёт пустой видимый widget. В structured HTML-псалмодии `.ora-ant/.ora-psalm` внешние антифоны подавлены: locator внешней антифоны остаётся зарезервированным, а видимая внутренняя антифона получает `STRUCTURED_ANTIPHON_n`.
+- Обозначение `PSALM_{1..3}` в таблицах — **три отдельных стабильных адреса** `PSALM_1`, `PSALM_2`, `PSALM_3`; `VERSE_n` и `PETITION_n` расширяются по видимому порядку, не по содержимому. Таблица «внутри псалма» ниже раскрывает каждый такой слот.
+- Локатор — адрес для задания, не обещание отдельного CURRENT TextStyle. Если два адреса сейчас рисуются одной строкой/классом, это прямо отмечено ниже.
 
 ## Фактически реализованные экраны
 
@@ -97,7 +135,7 @@ Hive readingsBox[readingId]
 | Property | CURRENT | TARGET | Источник |
 |---|---|---|---|
 | max document width | `700` | — | `ReaderScaffold.maxContentWidth` |
-| document padding | `left/right 22; top 25; bottom 42 + MediaQuery.padding.bottom` | — | `ReaderContentSurнемface` |
+| document padding | `left/right 22; top 25; bottom 42 + MediaQuery.padding.bottom` | — | `ReaderContentSurface` |
 | top scroll inset | visible chrome: `safeTop + 76`; hidden: `safeTop + 16` | — | `ReaderScaffold` |
 | reader surface light/dark | `#FDFCF9` / `#171917` | — | `ReaderTheme.surface` |
 | reader ink light/dark | `#20211F` / `#E9ECE7` | — | `ReaderTheme.ink` |
@@ -121,7 +159,209 @@ Reader body contract:
 | color | `ReaderTheme.ink` | — |
 | align/maxLines/overflow | left / unlimited / visible | — |
 
-## Карта экранов
+## SCREEN ELEMENT MAP
+
+Это навигация по **видимым** элементам сверху вниз, а не повтор всех параметров Master Catalog. В столбце CURRENT `B` — reader body; `UI` — platform theme; `red` — rubric; `meta` — muted `max(.88B,14)`; `shared` — тот же CURRENT renderer, что у указанной роли. `±` означает «зависит от данных/варианта». `PSALM_{1..3}`, `READING_{1..2}` и `PETITION_n` раскрываются по правилу выше. Повторные блоки занимают последовательные позиции между соседними строками таблицы.
+
+### Общая расшифровка строки «псалом»
+
+Для каждой строки `… > PSALM_n > INTERNALS` в часах и `READINGS > RESPONSORIAL_PSALM > VERSE_n > INTERNALS` используйте следующие адреса. Это **адреса внутри конкретного слота**, не отдельная фиксированная раскладка для всех source-форматов.
+
+| Порядок | Видимая часть | Добавить к `… > PSALM_n` | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Антифона перед псалмом ± | `OPENING_ANTIPHON` | `ANTIPHON_TEXT` | B/w600; внешний widget либо source HTML | — |
+| 2 | Название псалма ± | `PSALM_TITLE` | `PSALM_TITLE` | meta/center; общая строка metadata | — |
+| 3 | Номер псалма, если виден отдельно ± | `PSALM_NUMBER` | `PSALM_METADATA` | самостоятельного span/стиля нет; иногда часть title/reference | — |
+| 4 | Библейская ссылка ± | `PSALM_REFERENCE` | `PSALM_REFERENCE` | тот же meta renderer, часто та же строка | — |
+| 5 | Краткое пояснение ± | `PSALM_SUBTITLE` | `PSALM_SUBTITLE` | тот же meta renderer, отдельного token нет | — |
+| 6 | Служебная/редакционная строка ± | `EDITORIAL_LINE` | `RUBRIC_BLOCK` или `HTML_SUBHEADING` | источник решает: красная рубрика либо muted подзаголовок; нет одного psalm-token | — |
+| 7 | Строфы | `PSALM_BODY` | `PSALM_STROPHE` | B/h1.68; even-зазор зависит от renderer-а | — |
+| 8 | Цифра стиха ± | `VERSE_n > NUMBER` | `PSALM_VERSE_NUMBER` | часть текста строфы, без отдельного span | — |
+| 9 | Текст стиха | `VERSE_n > BODY` | `PSALM_STROPHE` | та же строфа, не отдельный widget | — |
+| 10 | Звёздочка/крестик ± | `VERSE_n > CADENCE_MARKER_n` | `CADENCE_MARKER` | обычно red; plain detail exception | see FIXED-01 |
+| 11 | Слава Айцу… ± | `DOXOLOGY` | `PSALM_DOXOLOGY` | обычная строфа, отдельного class нет | — |
+| 12 | Антифона после псалма ± | `REPEATED_ANTIPHON` | `ANTIPHON_TEXT` | тот же визуальный role, другой instance | — |
+
+Порядок metadata — порядок, если такие части различимы в source; сам formatter может объединить title/reference/subtitle. В structured `.ora-ant/.ora-psalm` внутренние антифоны получают `… > STRUCTURED_ANTIPHON_n` по порядку, а внешний `OPENING_ANTIPHON`/`REPEATED_ANTIPHON` отсутствует. При single-ant режиме псалмодии адрес `REPEATED_ANTIPHON` у первых двух псалмов не видим: один финальный повтор — `… > FINAL_ANTIPHON` после `PSALM_3`.
+
+### INVITATORIUM — Заклік
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Дата, день, название часа, метаданные/место, действие ± | `INVITATORIUM > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION` | `CONTEXT_DATE`, `DAY_TITLE`, `HOUR_TITLE`, `CONTEXT_METADATA`, `CONTEXT_PLACE`, `CONTEXT_ACTION` | UI header | — |
+| 2 | Комментарий праздника ± | `INVITATORIUM > CONTEXT > FEAST_COMMENT` | `FEAST_COMMENT_TITLE/BODY/ACTION` | UI card | — |
+| 3 | Красная инструкция ± | `INVITATORIUM > INTRO > RUBRIC` | `RUBRIC_BLOCK` | red/.90B | — |
+| 4 | Вступительный диалог | `INVITATORIUM > INTRO > BODY` | `INTRO_DIALOGUE` | B/h1.68 | — |
+| 5 | Выбор псалма ± | `INVITATORIUM > PSALMODY > SELECTOR` | `INVITATORY_PSALM_TRIGGER` | UI 14 | — |
+| 6 | Антифона перед очередной частью ± | `INVITATORIUM > PSALMODY > PART_n > OPENING_ANTIPHON` | `ANTIPHON_TEXT` | B/w600 | — |
+| 7 | Текст псалма/метаданные, части 1…6 ± | `INVITATORIUM > PSALMODY > PART_n > INTERNALS` | psalm roles из таблицы выше | B + meta | — |
+| 8 | Финальный повтор антифоны ± | `INVITATORIUM > PSALMODY > FINAL_ANTIPHON` | `ANTIPHON_TEXT` | B/w600 | — |
+| 9 | Сообщение о пустом кеше ± | `INVITATORIUM > PSALMODY > MISSING_CONTENT` | `BODY_TEXT` / source italic | обычный HTML-параграф, не `CONTENT_NOTICE` | — |
+| 10 | Знак конца | `INVITATORIUM > END > MARK` | `DOCUMENT_END_MARK` | UI 14/muted | — |
+
+У `PART_n` возможны `PSALM_TITLE/REFERENCE/SUBTITLE/EDITORIAL_LINE/PSALM_BODY/VERSE_n/DOXOLOGY` из общей таблицы; последний повтор находится **после всех частей**, а не у каждой.
+
+### MORNING — Агульная гадзіна
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст: дата/день/час/метаданные/место/действие/комментарий ± | `MORNING > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Заклік: инструкция, диалог, выбор ± | `MORNING > INVITATORY > RUBRIC/DIALOGUE/SELECTOR` | `RUBRIC_BLOCK`, `INTRO_DIALOGUE`, `INVITATORY_PSALM_TRIGGER` | red/B/UI | — |
+| 3 | Заклік: антифона и части 1…6 ± | `MORNING > INVITATORY > PART_n > OPENING_ANTIPHON/INTERNALS` | antiphon + psalm roles | B/meta | — |
+| 4 | Заклік: финальный повтор ± | `MORNING > INVITATORY > FINAL_ANTIPHON` | `ANTIPHON_TEXT` | B/w600 | — |
+| 5 | «Гімн», гимн Ютрани | `MORNING > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red heading; B/h1.72 | — |
+| 6 | Первая «Псалмодыя» | `MORNING > OFFICE_PSALMODY > TITLE` | `SECTION_TITLE` | red heading | — |
+| 7 | Псалмы оффиция 1, 2, 3 ± | `MORNING > OFFICE_PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles из таблицы выше | ant/B/meta | — |
+| 8 | Стих после псалмодии ± | `MORNING > OFFICE_VERSE > BODY` | `VERSICLE_BODY` | B | — |
+| 9 | Первое чтение: заголовок/текст ± | `MORNING > OFFICE_READINGS > READING_1 > TITLE/BODY` | `OFFICE_READING_TITLE/BODY` | red heading/B | — |
+| 10 | Второе чтение: заголовок/текст ± | `MORNING > OFFICE_READINGS > READING_2 > TITLE/BODY` | `OFFICE_READING_TITLE/BODY` | red heading/B | — |
+| 11 | Te Deum, заголовок/текст ± | `MORNING > TE_DEUM > TITLE/BODY` | `SECTION_TITLE`, `TE_DEUM_BODY` | red heading/B | — |
+| 12 | Вторая «Псалмодыя» | `MORNING > LAUDES_PSALMODY > TITLE` | `SECTION_TITLE` | red heading | — |
+| 13 | Псалмы Ютрани 1, 2, 3 ± | `MORNING > LAUDES_PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles из таблицы выше | ant/B/meta | — |
+| 14 | Респонсорий ± | `MORNING > RESPONSORY > BODY` | `RESPONSORY_BODY` | B | — |
+| 15 | Benedictus: антифона, заголовок, подпись, песнь, повтор ± | `MORNING > CANTICLE > OPENING_ANTIPHON/TITLE/CAPTION/BODY/REPEATED_ANTIPHON` | `ANTIPHON_TEXT`, `SECTION_TITLE`, `GOSPEL_CANTICLE_CAPTION`, `CANTICLE_BODY` | ant/red/meta/B | — |
+| 16 | Просьбы: заголовок, вступление, рефрен, прошения и ответы ± | `MORNING > INTERCESSIONS > TITLE/INTRO/REFRAIN/PETITION_n/RESPONSE_n/CONCLUSION` | intercession roles | red/B | — |
+| 17 | Ойча наш | `MORNING > PATER_NOSTER > BODY` | `PATER_NOSTER` | B | — |
+| 18 | Молитва: заголовок/текст ± | `MORNING > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 19 | Окончание/рубрика ± | `MORNING > END > RUBRIC/DIALOGUE/MARK` | `RUBRIC_BLOCK`, `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | red/B/UI | — |
+
+### LECTIONIS — Гадзіна чытанняў
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `LECTIONIS > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление | `LECTIONIS > INTRO > BODY` | `INTRO_DIALOGUE` | B | — |
+| 3 | «Гімн» и текст | `LECTIONIS > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 4 | «Псалмодыя» | `LECTIONIS > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 5 | Псалмы 1, 2, 3 ± | `LECTIONIS > PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles | ant/meta/B | — |
+| 6 | Стих ± | `LECTIONIS > OFFICE_VERSE > BODY` | `VERSICLE_BODY` | B | — |
+| 7 | Первое чтение: заголовок/текст ± | `LECTIONIS > OFFICE_READINGS > READING_1 > TITLE/BODY` | `OFFICE_READING_TITLE/BODY` | red/B | — |
+| 8 | Второе чтение: заголовок/текст ± | `LECTIONIS > OFFICE_READINGS > READING_2 > TITLE/BODY` | `OFFICE_READING_TITLE/BODY` | red/B | — |
+| 9 | Te Deum ± | `LECTIONIS > TE_DEUM > TITLE/BODY` | `SECTION_TITLE`, `TE_DEUM_BODY` | red/B | — |
+| 10 | Молитва | `LECTIONIS > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 11 | Окончание ± | `LECTIONIS > END > DIALOGUE/MARK` | `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | B/UI | — |
+
+### LAUDES — Ютрань
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `LAUDES > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление | `LAUDES > INTRO > BODY` | `INTRO_DIALOGUE` | B | — |
+| 3 | «Гімн» и текст | `LAUDES > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 4 | «Псалмодыя» | `LAUDES > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 5 | Первый псалом, включая антифоны и внутренние части ± | `LAUDES > PSALMODY > PSALM_1 > INTERNALS` | psalm roles | ant/meta/B | — |
+| 6 | Второй псалом ± | `LAUDES > PSALMODY > PSALM_2 > INTERNALS` | psalm roles | ant/meta/B | — |
+| 7 | Третий псалом ± | `LAUDES > PSALMODY > PSALM_3 > INTERNALS` | psalm roles | ant/meta/B | — |
+| 8 | Респонсорий ± | `LAUDES > RESPONSORY > BODY` | `RESPONSORY_BODY` | B | — |
+| 9 | Benedictus: первая антифона, заголовок, подпись, текст, повтор ± | `LAUDES > CANTICLE > OPENING_ANTIPHON/TITLE/CAPTION/BODY/REPEATED_ANTIPHON` | `ANTIPHON_TEXT`, `SECTION_TITLE`, `GOSPEL_CANTICLE_CAPTION`, `CANTICLE_BODY` | ant/red/meta/B | — |
+| 10 | Просьбы: заголовок/вступление/рефрен/прошения/ответы ± | `LAUDES > INTERCESSIONS > TITLE/INTRO/REFRAIN/PETITION_n/RESPONSE_n/CONCLUSION` | intercession roles | red/B | — |
+| 11 | Ойча наш | `LAUDES > PATER_NOSTER > BODY` | `PATER_NOSTER` | B | — |
+| 12 | Молитва | `LAUDES > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 13 | Рубрика/окончание ± | `LAUDES > END > RUBRIC/DIALOGUE/MARK` | `RUBRIC_BLOCK`, `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | red/B/UI | — |
+
+### TERZ — перед поўднем
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `TERZ > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление | `TERZ > INTRO > BODY` | `INTRO_DIALOGUE` | B | — |
+| 3 | Гимн: заголовок/текст | `TERZ > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 4 | Псалмодия: заголовок | `TERZ > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 5 | Псалмы 1, 2, 3 ± | `TERZ > PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles | ant/meta/B | — |
+| 6 | Краткое чтение/ответ ± | `TERZ > SHORT_READING > BODY` | `OFFICE_READING_BODY` / `RESPONSORY_BODY` | B | — |
+| 7 | Молитва | `TERZ > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 8 | Окончание ± | `TERZ > END > DIALOGUE/MARK` | `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | B/UI | — |
+
+### SEXT — апоўдні
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `SEXT > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление | `SEXT > INTRO > BODY` | `INTRO_DIALOGUE` | B | — |
+| 3 | Гимн: заголовок/текст | `SEXT > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 4 | Псалмодия: заголовок | `SEXT > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 5 | Псалмы 1, 2, 3 ± | `SEXT > PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles | ant/meta/B | — |
+| 6 | Краткое чтение/ответ ± | `SEXT > SHORT_READING > BODY` | `OFFICE_READING_BODY` / `RESPONSORY_BODY` | B | — |
+| 7 | Молитва | `SEXT > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 8 | Окончание ± | `SEXT > END > DIALOGUE/MARK` | `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | B/UI | — |
+
+### NON — после поўдня
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `NON > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление | `NON > INTRO > BODY` | `INTRO_DIALOGUE` | B | — |
+| 3 | Гимн: заголовок/текст | `NON > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 4 | Псалмодия: заголовок | `NON > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 5 | Псалмы 1, 2, 3 ± | `NON > PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles | ant/meta/B | — |
+| 6 | Краткое чтение/ответ ± | `NON > SHORT_READING > BODY` | `OFFICE_READING_BODY` / `RESPONSORY_BODY` | B | — |
+| 7 | Молитва | `NON > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 8 | Окончание ± | `NON > END > DIALOGUE/MARK` | `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | B/UI | — |
+
+### VESPERS — Нешпары I/II
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `VESPERS > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление | `VESPERS > INTRO > BODY` | `INTRO_DIALOGUE` | B | — |
+| 3 | Метка I/II ± | `VESPERS > VARIANT > LABEL` | `VESPERS_VARIANT_LABEL` | UI 12/accent | — |
+| 4 | Гимн: заголовок/текст | `VESPERS > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 5 | Псалмодия: заголовок | `VESPERS > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 6 | Псалмы 1, 2, 3 ± | `VESPERS > PSALMODY > PSALM_{1..3} > INTERNALS` | psalm roles | ant/meta/B | — |
+| 7 | Респонсорий ± | `VESPERS > RESPONSORY > BODY` | `RESPONSORY_BODY` | B | — |
+| 8 | Magnificat: первая антифона, заголовок, подпись, песнь, повтор ± | `VESPERS > CANTICLE > OPENING_ANTIPHON/TITLE/CAPTION/BODY/REPEATED_ANTIPHON` | `ANTIPHON_TEXT`, `SECTION_TITLE`, `GOSPEL_CANTICLE_CAPTION`, `CANTICLE_BODY` | ant/red/meta/B | — |
+| 9 | Просьбы: заголовок/вступление/рефрен/прошения/ответы ± | `VESPERS > INTERCESSIONS > TITLE/INTRO/REFRAIN/PETITION_n/RESPONSE_n/CONCLUSION` | intercession roles | red/B | — |
+| 10 | Ойча наш | `VESPERS > PATER_NOSTER > BODY` | `PATER_NOSTER` | B | — |
+| 11 | Молитва | `VESPERS > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 12 | Рубрика/окончание ± | `VESPERS > END > RUBRIC/DIALOGUE/MARK` | `RUBRIC_BLOCK`, `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | red/B/UI | — |
+
+### COMPLETORIUM — Камплета
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Контекст и комментарий ± | `COMPLETORIUM > CONTEXT > DATE/DAY/HOUR/METADATA/PLACE/ACTION/FEAST_COMMENT` | context/feast roles | UI header | — |
+| 2 | Вступление/рахунак сумлення | `COMPLETORIUM > INTRO > BODY/RUBRIC` | `INTRO_DIALOGUE`, `RUBRIC_BLOCK` | B/red | — |
+| 3 | Гимн: заголовок/текст | `COMPLETORIUM > HYMN > TITLE/BODY` | `SECTION_TITLE`, `HYMN_BODY` | red/B | — |
+| 4 | Псалмодия: заголовок | `COMPLETORIUM > PSALMODY > TITLE` | `SECTION_TITLE` | red | — |
+| 5 | Псалмы 1, 2 ± | `COMPLETORIUM > PSALMODY > PSALM_{1..2} > INTERNALS` | psalm roles | ant/meta/B | — |
+| 6 | Краткое чтение ± | `COMPLETORIUM > SHORT_READING > BODY` | `OFFICE_READING_BODY` | B | — |
+| 7 | Респонсорий ± | `COMPLETORIUM > RESPONSORY > BODY` | `RESPONSORY_BODY` | B | — |
+| 8 | Nunc dimittis: заголовок/подпись, антифона, песнь, повтор ± | `COMPLETORIUM > CANTICLE > TITLE/CAPTION/OPENING_ANTIPHON/BODY/REPEATED_ANTIPHON` | `SECTION_TITLE`, `GOSPEL_CANTICLE_CAPTION`, `ANTIPHON_TEXT`, `CANTICLE_BODY` | red/meta/ant/B | — |
+| 9 | Молитва | `COMPLETORIUM > PRAYER > TITLE/BODY` | `PRAYER_TITLE/BODY` | red/B | — |
+| 10 | Рубрика/благословение ± | `COMPLETORIUM > END > RUBRIC/DIALOGUE/MARK` | `RUBRIC_BLOCK`, `ENDING_DIALOGUE`, `DOCUMENT_END_MARK` | red/B/UI | — |
+| 11 | Марийная антифона ± | `COMPLETORIUM > MARIAN_ANTIPHON > TITLE/BODY` | `SECTION_TITLE`, `MARIAN_ANTIPHON_BODY` | red/B | — |
+
+### READINGS — Чтения дня
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Заголовок «Чытанні» | `READINGS > HEADER > TITLE` | `READINGS_SCREEN_TITLE` | display 36 | — |
+| 2 | Дата, праздник, цикл, действия ± | `READINGS > HEADER > DATE/CELEBRATION/CYCLE/ACTION` | `CONTEXT_DATE`, `CELEBRATION_TITLE`, `READINGS_CYCLE_METADATA`, `CONTEXT_ACTION` | UI/accent | — |
+| 3 | Уведомление ± | `READINGS > NOTICE > BODY` | `CONTENT_NOTICE` | UI notice | — |
+| 4 | Первое чтение: заголовок, ссылка, комментарий, название, текст, заключение ± | `READINGS > READING_1 > TITLE/REFERENCE/COMMENT/PERICOPE_TITLE/BODY/ACCLAMATION` | `MASS_READING_SECTION_TITLE/REFERENCE/COMMENT/PERICOPE_TITLE/BODY/ACCLAMATION` | red/meta/B | see FIXED-03 |
+| 5 | Респонсарийный псалом: заголовок ± | `READINGS > RESPONSORIAL_PSALM > TITLE` | `MASS_READING_SECTION_TITLE` | red | — |
+| 6 | Начальный/альтернативный рефрен ± | `READINGS > RESPONSORIAL_PSALM > REFRAIN_OPENING/REFRAIN_ALTERNATE` | `RESPONSORIAL_PSALM_REFRAIN_LABEL/TEXT` | red label/B | — |
+| 7 | Стих n: номер, текст, marker ± | `READINGS > RESPONSORIAL_PSALM > VERSE_n > NUMBER/BODY/CADENCE_MARKER_n` | `PSALM_VERSE_NUMBER`, `RESPONSORIAL_PSALM_VERSE`, `CADENCE_MARKER` | B; source number inline | see FIXED-01/02 |
+| 8 | Повтор рефрена после стиха n ± | `READINGS > RESPONSORIAL_PSALM > VERSE_n > REFRAIN_REPEAT` | `RESPONSORIAL_PSALM_REFRAIN_REPEAT` | B/w600 | — |
+| 9 | Финальный рефрен ± | `READINGS > RESPONSORIAL_PSALM > REFRAIN_FINAL` | `RESPONSORIAL_PSALM_REFRAIN_TEXT` | B/w700 | — |
+| 10 | Второе чтение ± | `READINGS > READING_2 > TITLE/REFERENCE/COMMENT/PERICOPE_TITLE/BODY/ACCLAMATION` | mass reading roles | red/meta/B | see FIXED-03 |
+| 11 | Акламация перед Евангелием ± | `READINGS > GOSPEL_ACCLAMATION > LABEL/TEXT/VERSE` | `GOSPEL_ACCLAMATION_LABEL/TEXT/VERSE` | B | — |
+| 12 | Евангелие ± | `READINGS > GOSPEL > TITLE/REFERENCE/COMMENT/PERICOPE_TITLE/BODY/ACCLAMATION` | mass reading roles | red/meta/B | see FIXED-03 |
+
+### READING_DETAIL — отдельное legacy-чтение
+
+| № | Что видно | Visual locator | Semantic ID | CURRENT кратко | TARGET |
+|---|---|---|---|---|---|
+| 1 | Заголовок и действия AppBar (HTML/rendered, share) | `READING_DETAIL > HEADER > TITLE/RENDER_MODE_ACTION/SHARE_ACTION` | `LEGACY_READING_APPBAR_TITLE` + UI IconButton | UI theme | — |
+| 2 | Цикл ± | `READING_DETAIL > HEADER > CYCLE` | `LEGACY_READING_CYCLE` | UI Chip | — |
+| 3 | Чтение, rendered режим | `READING_DETAIL > CONTENT > BODY` | `LEGACY_READING_BODY` | B/h1.68, local HTML rules | — |
+| 4 | Псалом внутри чтения ± | `READING_DETAIL > CONTENT > PSALM_n > INTERNALS` | psalm roles, где source их обнаруживает | plain/HTML различаются | see FIXED-01 |
+| 5 | Исходный HTML при переключении ± | `READING_DETAIL > CONTENT > RAW_HTML` | `LEGACY_READING_RAW_HTML` | monospace B | — |
+| 6 | Отсутствующее чтение ± | `READING_DETAIL > STATUS > EMPTY` | `STATUS_TITLE` | UI | — |
+
+Для `READING_DETAIL > CONTENT > PSALM_n` locator условный: legacy model хранит одну строку тела, не отдельный массив псалмов. `n` — порядок распознанных на экране псалмов; без source-разметки title/reference/subtitle/verse могут быть неотделимы от `BODY`.
+
+## Техническая схема компоновки экранов
 
 ### `invitatorium` — Заклік
 
@@ -134,7 +374,7 @@ Reader body contract:
 [DOCUMENT_END_MARK]
 ```
 
-Данные: `day.invitatoriumAnt`; `invitatoriums[].invitatoriumPs1…6`. При пустом кеше вместо псалма выводится `CONTENT_NOTICE`.
+Данные: `day.invitatoriumAnt`; `invitatoriums[].invitatoriumPs1…6`. При пустом кеше вместо псалма выводится обычный italic HTML-параграф, **не** `CONTENT_NOTICE`.
 
 ### `morning` — Агульная гадзіна
 
@@ -276,35 +516,111 @@ Invitatorium без повторного standard intro
 
 Rendered HTML имеет собственную, третью таблицу стилей: body `B/h1.68`, paragraph bottom14, subheading `.84B/h1.42`, heading `.94B/h1.28/w700/tracking.7`, cadence marker rubric+w600. Plain rendered text не проходит marker RichText parser.
 
-## Подтверждённое направление для будущего TARGET
+## FIXED REQUIREMENTS / ALREADY DECIDED
 
-Экран Чтений **не обязан визуально повторять экран Часов**. Основание для подобия — общий reader foundation: выбранная книжная гарнитура и масштаб, ширина строки, ink/muted/rubric palette, доступность и стабильные semantic roles. Композиция может различаться: Часы — последовательная молитва оффиция, Чтения — порядок провозглашения чтений с самостоятельным респонсарийным псалмом.
+Экран Чтений **не обязан визуально повторять экран Часов**. Мотивы подобия — общий reader foundation: выбранная книжная гарнитура и масштаб, ширина строки, ink/muted/rubric palette, доступность и стабильные semantic roles. Композиция может различаться: Часы — последовательная молитва оффиция, Чтения — порядок провозглашения чтений с самостоятельным респонсарийным псалмом. Это архитектурное наблюдение, **не** утверждённый TARGET размеров или отступов.
 
-Для респонсарийного псалма Чтений подтверждён обязательный line-break contract:
+**FIXED-01 — каденционные знаки.** Во **всех псалмах** звёздочка `*` и крестик `†` всегда rubric red из `ReaderTheme.rubric`: light `#9B302A`, dark `#EF9188`. Область: Invitatorium, псалмодия всех Часов и Агульнай гадзіны, Benedictus/Magnificat/Nunc dimittis, респонсарийный псалом Чтений и отдельный reading detail, если он содержит псалом. Результат не должен зависеть от renderer-а (plain/HTML/RichText), literal/entity формы или inline tag. CURRENT: HTML formatter распознаёт literal `*`, `†`, `&ast;`, `&dagger;`, decimal/hex entities и создаёт `.psalm-marker`; основные plain Ora/Readings RichText-ветки распознают literal markers. Plain `ReadingDetailScreen` — обычный `SelectableText`, поэтому marker там пока не красный. Иные glyphs вроде `✝` текущим pattern не охвачены.
 
-1. каждая строка, начинающаяся номером вида `N.`, должна начинаться с новой строки;
-2. текст после каждой звёздочки `*` должен начинаться с новой строки;
-3. правило должно одинаково работать для plain text и HTML, включая `&nbsp;`, существующие `<br>` и inline spans;
-4. это специальное правило `RESPONSORIAL_PSALM_VERSE` на экране Чтений; автоматически переносить его на псалмы Часов без отдельного решения не следует.
+**FIXED-02 — строки респонсарийного псалма Чтений.** Каждая строка с номером вида `N.` начинается с новой строки; текст после каждой `*` начинается с новой строки. Одинаково для plain/HTML, включая `&nbsp;`, существующие `<br>` и inline spans. Это правило `RESPONSORIAL_PSALM_VERSE`, не автоматический контракт псалмов Часов. CURRENT: plain `formatReadingPsalmText` выполняет оба преобразования; HTML `formatReadingPsalmHtml` восстанавливает `<br>` после `*` и перед `N.` внутри `.psalm-strophe`. Абсолютную гарантию для любого допустимого HTML ещё должна проверить fixture с номером в абзаце без `.psalm-strophe`.
 
-**CURRENT:** plain path уже выполняет оба преобразования в `formatReadingPsalmText`. HTML path в `formatReadingPsalmHtml` восстанавливает `<br>` после `*` и перед `N.` внутри размеченных `.psalm-strophe`. Для абсолютной гарантии на любом допустимом HTML нужна отдельная fixture-проверка параграфа с номером, который не получил `.psalm-strophe`.
+**FIXED-03 — заключительная формула чтения.** `Гэта слова Божае.` после первого/второго чтения и `Гэта слова Пана.` после Евангелия: `слова` со строчной буквы. Это `MASS_READING_ACCLAMATION`, а не `GOSPEL_ACCLAMATION_*` («Акламацыя: Аллелюя…» перед Евангелием). CURRENT generated strings ещё имеют `Гэта Слова Божае.` / `Гэта Слова Пана.`.
 
-Заключительная формула после чтения имеет ID `MASS_READING_ACCLAMATION`:
+## TARGET WORKSHEET
 
-- `Гэта слова Божае.` — после первого/второго чтения;
-- `Гэта слова Пана.` — после Евангелия.
+Заполнять только те строки, по которым принято решение. CURRENT — короткая подсказка; точные условия и renderer — в Master Catalog. `TARGET before/after` — расстояние **перед/после** роли, не внутренний line-height. Для изменения одного места сначала укажите locator, затем значения из соответствующей строки role. Пустые поля не предполагают нового стиля.
 
-В обеих формулах `слова` должно начинаться со строчной буквы. Это не `GOSPEL_ACCLAMATION_*`: последние ID относятся к блоку «Акламацыя: Аллелюя…» перед Евангелием.
+### Document
 
-Во **всех псалмах** действует ещё один подтверждённый обязательный TARGET:
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `BODY_TEXT` | B/h1.68, ink | B/h1.68; выбранная reader-family, по умолчанию Literata | ink | source | paragraph 8 | base reader |
+| `SECTION_TITLE` | max(1.10B,18)/w600, red | Cormorant Garamond Bold, max(1.42B,22), h1.12; normal case | rubric | 24 у самостоятельного блока | 8 | Hours/Readings/молитвенный document/крупные разделы Мессы |
+| `CONTEXT_METADATA` | UI 12/muted | — | — | — | — | «metadata» в header; псалм — `PSALM_METADATA` |
+| `RUBRIC_BLOCK` | .90B или .88B, red | max(.90B,14), h1.48, regular, non-italic | rubric | source | paragraph 8 | explicit class и распознанная красная инструкция; не диалог |
+| `RUBRIC_INLINE` | inherit/red | размер и высота окружающей строки | rubric | 0 | 0 | только marker внутри строки |
 
-1. звёздочка `*` всегда rubric red;
-2. крестик `†` всегда rubric red;
-3. правило распространяется на Invitatorium, псалмодию всех Часов и Агульнай гадзіны, Benedictus/Magnificat/Nunc dimittis, респонсарийный псалом Чтений и отдельный reading detail, если он содержит псалом;
-4. результат не должен зависеть от renderer-а (plain/HTML/RichText), от literal/entity формы символа или от того, вложен ли marker в inline tag;
-5. цвет берётся из `ReaderTheme.rubric`: light `#9B302A`, dark `#EF9188`.
+### Hymn
 
-**CURRENT:** HTML formatter распознаёт literal `*`, `†`, `&ast;`, `&dagger;`, decimal и hex entities и создаёт `.psalm-marker`. Основные plain Ora/Readings RichText-ветки распознают literal `*`/`†`. Но plain branch `ReadingDetailScreen` выводит обычный `SelectableText`, поэтому marker там не красный. Иные визуальные cross glyphs, например `✝`, текущим pattern не охвачены.
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `HYMN_BODY` | B/h1.72, ink | — | — | — | — | гимн; Te Deum сейчас иной renderer |
+
+### Psalmody
+
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `ANTIPHON_TEXT` | B/w600, ink | B/w600, reader-family | ink; inline marker rubric | source | 4 до своего псалма | между соседними psalm blocks отдельный gap 22; single-ant mode сохраняет собственную структуру |
+| `PSALM_TITLE` | meta/center | max(.88B,14), h1.42, centered | source semantic red/muted | source | 7 | самостоятельного title span нет, где source не различает |
+| `PSALM_REFERENCE` | meta/center | max(.88B,14), h1.42, centered | source semantic red/muted | source | 7 | source reference может быть общей строкой с title |
+| `PSALM_SUBTITLE` | meta/center | max(.88B,14), h1.42, italic, centered | muted | source | 7 | отдельный `.psalm-subtitle` при надёжном emphasis recognition |
+| `PSALM_STROPHE` | B/h1.68, ink | — | — | — | — | locator `PSALM_BODY` |
+| `PSALM_DOXOLOGY` | как строфа | — | — | — | — | нет отдельного class |
+| `CADENCE_MARKER` | red, detail exception | surrounding size/w600 | rubric | 0 | 0 | FIXED-01: HTML и plain detail |
+
+### Readings
+
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `OFFICE_READING_TITLE` | fixed Literata/red | section heading token | rubric | logical section | 8 | Hours |
+| `OFFICE_READING_REFERENCE` | .88B/muted | — | — | — | — | inline |
+| `OFFICE_READING_PERICOPE_TITLE` | italic source line | max(.88B,14)/h1.42/regular, non-italic | rubric | source | 7 | только office readings 1/2 |
+| `SHORT_READING_TITLE` | source CAPS вместе с reference | section heading token; normal case | rubric | logical section | 8 | Laudes/Vespers/daytime/Compline/Morning |
+| `SHORT_READING_REFERENCE` | source вместе с title | max(.88B,14)/h1.40/w500 | rubric | 0 | 7 | отдельный semantic paragraph |
+| `RESPONSORY_TITLE` | source CAPS или вместе с reference | section heading token; normal case | rubric | source | 8 | краткий и полный варианты |
+| `RESPONSORY_REFERENCE` | source вместе с title | max(.88B,14)/h1.40/w500 | rubric | 0 | 7 | отдельный semantic paragraph |
+| `RESPONSORY_BODY` | source turns могут сливаться | B/h1.68; каждый К./Н. в отдельном paragraph, gap 3 | ink; markers rubric | source | 3 | normal responsory rhythm |
+| `OFFICE_READING_BODY` | B/h1.68 | — | — | — | — | Hours |
+| `MASS_READING_SECTION_TITLE` | selected family/red | section heading token | rubric | 24 | 8 | Readings |
+| `MASS_READING_REFERENCE` | .88B/muted | — | — | — | — | Readings |
+| `MASS_READING_BODY` | B/h1.68 | — | — | — | — | Readings |
+| `MASS_READING_ACCLAMATION` | B/w700 | — | — | — | — | FIXED-03 текст, не style |
+| `RESPONSORIAL_PSALM_VERSE` | B/h1.68 | — | — | — | — | FIXED-02 breaks |
+
+### Canticles
+
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `GOSPEL_CANTICLE_SERVICE_TITLE` | section-heading scale | max(.88B,14)/h1.42/regular | rubric | 0 | 7 | «Песня з Евангелля», после opening antiphon |
+| `GOSPEL_CANTICLE_CAPTION` | .88B/italic/muted | max(.88B,14)/h1.42/italic | muted | 0 | 7 | caption |
+| `CANTICLE_BODY` | как строфа/B | — | — | — | — | Benedictus/Magnificat/Nunc |
+
+### Intercessions
+
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `INTERCESSION_TITLE` | fixed Literata/red | section heading token | rubric | divider group | 8 | labeled section |
+| `INTERCESSION_INTRO` | B | — | — | — | — | вступление |
+| `INTERCESSION_REFRAIN` | B/w700 | — | — | — | — | рефрен |
+| `INTERCESSION_PETITION` | B | — | — | — | — | n по порядку |
+| `INTERCESSION_RESPONSE` | B | — | — | — | — | n по порядку |
+
+### Prayer
+
+| Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
+|---|---|---|---|---|---|---|
+| `PRAYER_TITLE` | fixed Literata/red | section heading token | rubric | logical section | 8 | labeled section |
+| `PRAYER_BODY` | B/h1.68 | — | — | — | — | prayer |
+
+### Inheritance: факт и возможность
+
+**CURRENT implementation:** `ReaderTheme.body(B,family)` — фактическая база `BODY_TEXT`, `HYMN_BODY` (другой height), `PRAYER_BODY`, `OFFICE_READING_BODY`, `MASS_READING_BODY`, `CANTICLE_BODY` и `PSALM_STROPHE`, но локальные Html styles и wrappers меняют margin, weight, color. `SECTION_TITLE` не один общий token: Hours `_OraItem.blockHeader` использует fixed Literata, Readings `_SectionLabel` selected family, а `PRAYER_TITLE`, `INTERCESSION_TITLE`, `OFFICE_READING_TITLE` рендерит `_LabeledSection` без общего верхнего отступа `SECTION_TITLE`. `PSALM_TITLE/REFERENCE/SUBTITLE` сейчас нередко один `.psalm-metadata`, а `PSALM_VERSE_NUMBER` и `PSALM_DOXOLOGY` не имеют отдельных spans/classes.
+
+**Потенциальная TARGET inheritance, только для обсуждения, не текущая архитектура:** `BODY_TEXT → HYMN_BODY / PRAYER_BODY / OFFICE_READING_BODY / MASS_READING_BODY / CANTICLE_BODY / PSALM_STROPHE`; `SECTION_TITLE → HYMN_TITLE / PSALMODY_TITLE / PRAYER_TITLE / INTERCESSION_TITLE / OFFICE_READING_TITLE`. Названия `HYMN_TITLE` и `PSALMODY_TITLE` здесь являются возможными производными **будущей** схемы, не новыми CURRENT semantic IDs. Никакая миграция или унификация не подразумевается.
+
+## Implementation status — первый pass (2 октября 2026)
+
+`CURRENT` в таблицах и Master Catalog ниже остаётся снимком до этого pass. Принятый TARGET записан в worksheet выше; не следует читать старые `CURRENT` как описание нового renderer.
+
+- `ReaderTheme.blockHeading` теперь общий content-heading token: Cormorant Garamond Bold, нормальный регистр, rubric red; `ReaderTheme.body` сохраняет reader-family и размер. UI controls и navigation остаются системными. `ReaderTheme.serviceHeading`, `rubricReference`, `rubricBlock` разделяют служебный red и muted metadata.
+- `liturgicalDocumentStyles` централизует HTML-роли Hours, Readings и ReadingDetail: heading, reference, caption, psalm subtitle, pericope title, rubric, cadence marker и responsory turn. `LiturgicalSpacing` хранит базовые semantic gaps; `LiturgicalSectionDivider` отделяет крупные части нейтральной линией.
+- Во всех Hours `_addPsalmBlockResolved` использует одну схему: gap 4 после opening antiphon к своему псалму; 22 между соседними psalm blocks. Structured `.ora-ant/.ora-psalm` и single-ant имеют собственную литургическую структуру, но те же роли и gap tokens там, где элемент существует.
+- `normalizeOfficeHtml` разделяет полную строку «Кароткае чытанне / Кароткі рэспансорый / Рэспансорый + reference» только при распознаваемой первой строке; plain и HTML обрабатываются одинаково. Реплики `К.`/`Н.` получают отдельные paragraphs и красные inline markers. Для Office 1/2 курсивный тематический заголовок после библейской ссылки становится `office-reading-pericope-title`, малым red non-italic. Неоднозначный source сохраняет исходное содержание без придуманной роли.
+- Benedictus, Magnificat и Nunc dimittis идут в порядке opening antiphon → малый red service title → muted italic caption → body → repeated antiphon. Completorium переставлен структурно. Заголовок Marian antiphons нормализован в normal case и section scale.
+- Divider стоит на границе psalmody/readings и group/canticle/intercessions, если соответствующие части присутствуют. Между антифоной и псалмом, между псалмами, в responsory и внутри reading body divider не ставится.
+- FIXED-01 поддержан и в plain `ReadingDetailScreen`; FIXED-02 распространяется также на numbered HTML paragraph без `.psalm-strophe`; FIXED-03 исправлен в generated reading formula.
+
+**Intentional exceptions и границы распознавания:** Invitatorium имеет отдельный порядок антифоны и псалма; single-ant псалмодия повторяет антифону один раз после всей последовательности; structured HTML владеет внутренними антифонами. Метаданные псалма могут оставаться объединённой source-строкой, если разбиение на title/reference нельзя доказать по структуре. Библейские ссылки Office могут быть muted, в то время как ссылки, извлечённые из short reading/responsory heading, rubric red. Compendium navigation rows остаются UI typography; его document headings должны применять общий `blockHeading` при следующем изменении соответствующего reader renderer.
 
 ## Master Liturgical Style Catalog
 
@@ -336,7 +652,7 @@ Rendered HTML имеет собственную, третью таблицу с�
 | `RUBRIC_BLOCK` | explicit class: `max(.90B,14)`, h1.48; fully-red legacy paragraph: `max(.88B,14)`, h1.42; weight inherited, italic only from source `<em>/<i>` | rubric (legacy paragraph gets rubric from child span) | explicit `p` bottom8/15; legacy subheading bottom7 | `.liturgical-rubric` versus leading-red → `.liturgical-subheading` + inline rubric | — |
 | `RUBRIC_INLINE` | inherits surrounding family/size/height/weight | rubric | no own spacing | normalized red `span/font` → `.liturgical-rubric-inline` | — |
 | `DIALOGUE_MARKER` | surrounding size/h/weight (обычно normal) | rubric | inline | red `К./Н./С.` normalized as rubric inline | — |
-| `CADENCE_MARKER` | surrounding size/h; w600 in HTML and main RichText branches; plain `ReadingDetailScreen` inherits normal body | rubric, **except plain ReadingDetail CURRENT** | inline; break immediately after marker is removed | `.psalm-marker`, literal `*`/`†` and HTML entities | all psalms: `*` and `†` rubric red regardless of renderer/source encoding |
+| `CADENCE_MARKER` | surrounding size/h; w600 in HTML and main RichText branches; plain `ReadingDetailScreen` inherits normal body | rubric, **except plain ReadingDetail CURRENT** | inline; break immediately after marker is removed | `.psalm-marker`, literal `*`/`†` and HTML entities | see FIXED-01 |
 | `ANTIPHON_TEXT` | reader family, `B`, w600, h1.68 | ink | outer padding 0; HTML last `p` bottom8; picker may add 18 before text | `_OraItem.antiphon`; `.ora-ant` same weight | — |
 | `PSALM_METADATA` | `max(.88B,14)`, h1.42, centered | muted | bottom7 | umbrella visual role for psalm leading metadata | — |
 | `PSALM_TITLE` | selected reader family, `max(.88B,14)`, source weight/style, h1.42, centered | muted | bottom7 | source first metadata paragraph → `.liturgical-subheading.psalm-metadata` | — |
@@ -376,11 +692,11 @@ Rendered HTML имеет собственную, третью таблицу с�
 | `MASS_READING_PERICOPE_TITLE` | reader family, `B`, w600, h1.68 | ink | top6, bottom4 | `_ReadingSection.s.title` | — |
 | `MASS_READING_BODY` | reader family, `B`, normal, h1.68 | ink | before6; HTML `p` bottom8 | `_ReadingText` | — |
 | `HIGHLIGHTED_SENTENCE` | `MASS_READING_BODY`; selected also underline 1.5 | ink; bg accent `.18` selected or highlight `.30` light/`.32` dark | inline | `_sentenceStyle` | — |
-| `MASS_READING_ACCLAMATION` | reader family, `B`, w700, h1.68 | ink | before8 when source phrase; before12 when generated | closing phrase in `_ReadingSection`: `Гэта Слова Божае.` / `Гэта Слова Пана.` в generated CURRENT | `Гэта слова Божае.` / `Гэта слова Пана.` — `слова` со строчной |
+| `MASS_READING_ACCLAMATION` | reader family, `B`, w700, h1.68 | ink | before8 when source phrase; before12 when generated | closing phrase in `_ReadingSection`: `Гэта Слова Божае.` / `Гэта Слова Пана.` в generated CURRENT | see FIXED-03 |
 | `RESPONSORIAL_PSALM_REFRAIN_LABEL` | reader family, `max(.88B,14)`, w800, h1.2 | rubric; alternate muted | label-to-text 5 (3 compact) | `_ChorusBox` | — |
 | `RESPONSORIAL_PSALM_REFRAIN_TEXT` | reader family, `B`, w700, h1.5 | ink | box top2/bottom13 | opening/final `_ChorusBox` | — |
 | `RESPONSORIAL_PSALM_REFRAIN_REPEAT` | reader family, `B`, w600, h1.48 | ink | box top5/bottom9 | compact `_ChorusBox` | — |
-| `RESPONSORIAL_PSALM_VERSE` | reader family, `B`, normal, h1.68 | ink/rubric cadence | wrapper padding y10; HTML odd p8/even14 | `_ReadingText(isPsalm)` | каждый `N.` с новой строки; после каждого `*` новая строка; одинаково для plain/HTML |
+| `RESPONSORIAL_PSALM_VERSE` | reader family, `B`, normal, h1.68 | ink/rubric cadence | wrapper padding y10; HTML odd p8/even14 | `_ReadingText(isPsalm)` | see FIXED-02 |
 | `GOSPEL_ACCLAMATION_LABEL` | reader family, `B`, bold, h1.68 | ink | line wrapper y4 | “Акламацыя:” TextSpan | — |
 | `GOSPEL_ACCLAMATION_TEXT` | reader family, `B`, normal, h1.68 | ink | same line | fixed “Аллелюя…” | — |
 | `GOSPEL_ACCLAMATION_VERSE` | reader family, `B`, normal, h1.68 | ink/rubric cadence | before4 | `_ReadingText` | — |
@@ -582,7 +898,7 @@ Hour choice, alternative choice, date actions и Readings options входят �
 22. **Te Deum визуально не является hymn body.** Он получает заголовок `Гімн`, но добавляется `_OraItem.html(_kTeDeum)` без `kind: hymn`: h1.68 и paragraph gap8 вместо hymn h1.72/gap15.
 23. **Два вида block rubric внутри Ora.** Явная `.liturgical-rubric` даёт `.90B/h1.48`; полностью красный legacy paragraph без класса эвристически становится `.liturgical-subheading` (`.88B/h1.42`) с rubric-colored child span.
 24. **Reading-psalm line-break contract не полностью доказан для произвольного HTML.** Plain formatter безусловно обрабатывает `*` и пробел перед `N.`; HTML formatter выполняет обход только `.psalm-strophe`, поэтому numbered HTML paragraph без cadence marker/этого класса требует regression fixture или расширения formatter-а на implementation-этапе.
-25. **Generated reading closing formula использует неверный регистр.** `_ReadingSection` создаёт `Гэта Слова Пана.` / `Гэта Слова Божае.` с прописной `С` (`readings_screen.dart`); подтверждённый TARGET — строчная: `Гэта слова …`. Формула, уже находящаяся в source text, отображается с исходным регистром.
+25. **Generated reading closing formula использует неверный регистр.** `_ReadingSection` создаёт `Гэта Слова Пана.` / `Гэта Слова Божае.` с прописной `С` (`readings_screen.dart`); принятое требование FIXED-03 — строчная: `Гэта слова …`. Формула, уже находящаяся в source text, отображается с исходным регистром.
 26. **Cadence markers не красные в plain ReadingDetail.** HTML branch получает `.psalm-marker`, но plain branch возвращает `SelectableText(text, style: textStyle)` без разбиения `*`/`†`; это прямой источник наблюдаемого несоответствия.
 27. **Третья независимая HTML style map.** `ReadingDetailScreen` использует paragraph bottom14, `.84B` subheading и `.94B/tracking.7` heading, отличаясь и от Ora, и от основного Readings renderer-а.
 
@@ -622,6 +938,8 @@ LiturgicalSpacing.refrainRepeat
 
 ## Проверка полноты
 
+Практический тест адресации: если на телефоне в Ютрани у первого псалма строка под названием слишком крупная и далеко от текста, указать `LAUDES > PSALMODY > PSALM_1 > PSALM_SUBTITLE` и отдельно его `TARGET typography` / `TARGET after`; если это нужно во всех псалмах всех часов, указать `ROLE: PSALM_SUBTITLE`. В обоих случаях CURRENT честно предупреждает: title/reference/subtitle могут рендериться одним `.psalm-metadata`; отдельного style override ещё нет. Аналогично `LAUDES > PSALMODY > PSALM_1 > REPEATED_ANTIPHON` — конкретный повтор, тогда как `ROLE: ANTIPHON_TEXT` включает и opening, и repeated во всех часах.
+
 Повторно пройдены сверху вниз:
 
 - все 9 веток `_buildContent` в `OraScreen`;
@@ -639,7 +957,10 @@ LiturgicalSpacing.refrainRepeat
 | Метрика | Результат |
 |---|---:|
 | Исследованные content screens | 11: 9 вариантов Ora + Readings + ReadingDetail |
+| Навигационные SCREEN ELEMENT MAP | 11 отдельных таблиц |
+| Visual locator groups в этих таблицах | 118 строк + 12 sublocators в общем шаблоне псалма; конкретных адресов больше и их число зависит от `VERSE_n`/`PETITION_n` и optional source |
 | Стабильные semantic IDs в каталоге | 87 |
+| Перенесённые уже принятые требования | 3: FIXED-01 markers, FIXED-02 responsorial line breaks, FIXED-03 регистр «слова» |
 | Фактически различимые typography variants после схлопывания полных дублей | 49 |
 | Зафиксированные inconsistencies / risk points | 27 |
 | Главная зона дублирования | три HTML style maps и локальный vertical rhythm |

@@ -28,6 +28,12 @@ void main() {
     String renderedHtml() => tester.widget<Html>(find.byType(Html)).data!;
 
     expect(renderedHtml(), isNot(contains('psalm-choir-muted')));
+    final firstStrophe = tester
+        .widgetList<RichText>(find.byType(RichText))
+        .firstWhere(
+          (widget) => widget.text.toPlainText().contains('Першы радок'),
+        );
+    expect(_colorOfCadence(firstStrophe.text as TextSpan), Colors.red);
 
     void tapFirstChoirLink() {
       final richText = tester
@@ -48,6 +54,18 @@ void main() {
     await tester.pump();
     expect(renderedHtml(), isNot(contains('psalm-choir-muted')));
   });
+}
+
+Color? _colorOfCadence(TextSpan span, [Color? inherited]) {
+  final color = span.style?.color ?? inherited;
+  for (final child in span.children ?? const <InlineSpan>[]) {
+    if (child is TextSpan) {
+      final found = _colorOfCadence(child, color);
+      if (found != null) return found;
+    }
+  }
+  if (span.text?.contains('*') ?? false) return color;
+  return null;
 }
 
 TapGestureRecognizer? _firstTapRecognizer(TextSpan span) {

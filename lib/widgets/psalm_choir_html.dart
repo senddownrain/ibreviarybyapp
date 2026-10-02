@@ -38,8 +38,6 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
     // The alternating inset already identifies the choirs, so the selection
     // state only needs a restrained contrast change.
     final dimmedText = widget.textColor.withValues(alpha: 0.60);
-    final dimmedRubric = widget.rubricColor.withValues(alpha: 0.60);
-
     return Html(
       key: ValueKey(_selectedChoir),
       data: preparePsalmChoirHtml(widget.html, selectedChoir: _selectedChoir),
@@ -60,13 +58,11 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
           color: widget.textColor,
           textDecoration: TextDecoration.none,
         ),
+        '.psalm-marker': Style(color: widget.rubricColor),
+        '.liturgical-rubric-inline': Style(color: widget.rubricColor),
         '.psalm-choir-muted': Style(
           color: dimmedText,
           textDecoration: TextDecoration.none,
-        ),
-        '.psalm-choir-muted .psalm-marker': Style(color: dimmedRubric),
-        '.psalm-choir-muted .liturgical-rubric-inline': Style(
-          color: dimmedRubric,
         ),
       },
     );

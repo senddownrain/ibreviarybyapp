@@ -370,6 +370,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
 
     if (html.contains('<') && html.contains('>')) {
       final reader = ReaderTheme.of(context);
+      final heading = reader.blockHeading(textStyle.fontSize ?? 16);
       final textColor =
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       final formattedHtml = formatLiturgicalHtml(html);
@@ -403,15 +404,19 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           listStylePosition: ListStylePosition.outside,
         ),
         'h2': Style(
-          fontSize: FontSize((textStyle.fontSize ?? 16) * 1.2),
-          fontWeight: FontWeight.w700,
-          color: isMass ? reader.rubric : textColor,
+          fontFamily: heading.fontFamily,
+          fontSize: FontSize(heading.fontSize!),
+          lineHeight: LineHeight(heading.height!),
+          fontWeight: heading.fontWeight,
+          color: reader.rubric,
           margin: Margins.only(top: 16, bottom: 8),
         ),
         'h3': Style(
-          fontSize: FontSize((textStyle.fontSize ?? 16) * 1.1),
-          fontWeight: FontWeight.w700,
-          color: isMass ? reader.rubric : textColor,
+          fontFamily: heading.fontFamily,
+          fontSize: FontSize(heading.fontSize!),
+          lineHeight: LineHeight(heading.height!),
+          fontWeight: heading.fontWeight,
+          color: reader.rubric,
           margin: Margins.only(top: 14, bottom: 6),
         ),
         if (isMass)
@@ -457,69 +462,75 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
 /// One renderer style per semantic Mass element (see [MassBlockClass]), used
 /// for every language variant. Meaning is carried by weight, style, size and
 /// layout, not only by colour.
-Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) => {
-  'hr': Style(
-    margin: Margins.symmetric(vertical: 12),
-    width: Width(42, Unit.percent),
-    border: Border(top: BorderSide(color: reader.rubric, width: 0.6)),
-  ),
-  '.${MassBlockClass.major}': Style(
-    fontSize: FontSize(size * 1.3),
-    fontWeight: FontWeight.w800,
-    color: reader.rubric,
-    lineHeight: LineHeight(1.25),
-    margin: Margins.only(top: 28, bottom: 12),
-  ),
-  '.${MassBlockClass.subsection}': Style(
-    fontSize: FontSize(size * 1.12),
-    fontWeight: FontWeight.w700,
-    color: reader.rubric,
-    lineHeight: LineHeight(1.3),
-    margin: Margins.only(top: 20, bottom: 8),
-  ),
-  '.${MassBlockClass.minorHeading}': Style(
-    fontSize: FontSize(size * 0.98),
-    fontWeight: FontWeight.w700,
-    color: text,
-    margin: Margins.only(top: 14, bottom: 6),
-  ),
-  '.${MassBlockClass.cited}': Style(
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.w600,
-  ),
-  '.${MassBlockClass.comment}': Style(
-    color: text.withValues(alpha: 0.78),
-    fontSize: FontSize(size * 0.92),
-    margin: Margins.symmetric(vertical: 10),
-  ),
-  '.${MassBlockClass.inlineAlternative}': Style(
-    color: reader.rubric,
-    fontStyle: FontStyle.italic,
-    fontWeight: FontWeight.w700,
-    fontSize: FontSize(size * 0.9),
-  ),
-  '.${MassBlockClass.response}': Style(fontWeight: FontWeight.w700),
-  '.${MassBlockClass.roleLabel}': Style(
-    color: reader.rubric,
-    fontWeight: FontWeight.w800,
-    fontStyle: FontStyle.normal,
-  ),
-  '.${MassBlockClass.alternative}': Style(
-    color: reader.rubric,
-    fontStyle: FontStyle.italic,
-    fontWeight: FontWeight.w700,
-    fontSize: FontSize(size * 0.9),
-    margin: Margins.only(top: 12, bottom: 6),
-  ),
-  '.${MassBlockClass.posture}': Style(
-    color: reader.rubric,
-    fontStyle: FontStyle.italic,
-    fontSize: FontSize(size * 0.85),
-    letterSpacing: 0.4,
-    textAlign: TextAlign.center,
-    margin: Margins.symmetric(vertical: 8),
-  ),
-};
+Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) {
+  final heading = reader.blockHeading(size);
+  final major = reader.majorHeading(size);
+  return {
+    'hr': Style(
+      margin: Margins.symmetric(vertical: 12),
+      width: Width(42, Unit.percent),
+      border: Border(top: BorderSide(color: reader.rubric, width: 0.6)),
+    ),
+    '.${MassBlockClass.major}': Style(
+      fontFamily: major.fontFamily,
+      fontSize: FontSize(major.fontSize!),
+      fontWeight: major.fontWeight,
+      color: reader.rubric,
+      lineHeight: LineHeight(1.25),
+      margin: Margins.only(top: 28, bottom: 12),
+    ),
+    '.${MassBlockClass.subsection}': Style(
+      fontFamily: heading.fontFamily,
+      fontSize: FontSize(heading.fontSize!),
+      fontWeight: heading.fontWeight,
+      color: reader.rubric,
+      lineHeight: LineHeight(1.3),
+      margin: Margins.only(top: 20, bottom: 8),
+    ),
+    '.${MassBlockClass.minorHeading}': Style(
+      fontSize: FontSize(size * 0.98),
+      fontWeight: FontWeight.w700,
+      color: text,
+      margin: Margins.only(top: 14, bottom: 6),
+    ),
+    '.${MassBlockClass.cited}': Style(
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w600,
+    ),
+    '.${MassBlockClass.comment}': Style(
+      color: text.withValues(alpha: 0.78),
+      fontSize: FontSize(size * 0.92),
+      margin: Margins.symmetric(vertical: 10),
+    ),
+    '.${MassBlockClass.inlineAlternative}': Style(
+      color: reader.rubric,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w700,
+      fontSize: FontSize(size * 0.9),
+    ),
+    '.${MassBlockClass.response}': Style(fontWeight: FontWeight.w700),
+    '.${MassBlockClass.roleLabel}': Style(
+      color: reader.rubric,
+      fontWeight: FontWeight.w800,
+      fontStyle: FontStyle.normal,
+    ),
+    '.${MassBlockClass.alternative}': Style(
+      color: reader.rubric,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w700,
+      fontSize: FontSize(size * 0.9),
+      margin: Margins.only(top: 12, bottom: 6),
+    ),
+    '.${MassBlockClass.posture}': Style(
+      color: reader.rubric,
+      fontStyle: FontStyle.italic,
+      fontSize: FontSize(size * 0.85),
+      letterSpacing: 0.4,
+      textAlign: TextAlign.center,
+      margin: Margins.symmetric(vertical: 8),
+    ),
+  };
+}
 
 /// Shared state between the Mass text, its bottom controls and the sections
 /// sheet. Section ids are canonical ritual ids.

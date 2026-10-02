@@ -98,8 +98,8 @@ class ReaderTheme {
   TextStyle rubricStyle(double size, {String? family}) =>
       body(size, family: family).copyWith(
         color: rubric,
-        fontStyle: FontStyle.italic,
-        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        fontWeight: FontWeight.w400,
         height: rubricHeight,
       );
 
@@ -111,13 +111,36 @@ class ReaderTheme {
         letterSpacing: 0.02,
       );
 
-  TextStyle majorHeading(double bodySize) => body(
-    (bodySize * .98).clamp(15, double.infinity),
-  ).copyWith(height: headingHeight, fontWeight: FontWeight.w600);
+  TextStyle majorHeading(double bodySize) {
+    final heading = blockHeading(bodySize);
+    return heading.copyWith(fontSize: heading.fontSize! * 1.12);
+  }
 
-  TextStyle blockHeading(double bodySize) => body(
-    (bodySize * 1.10).clamp(18, double.infinity),
-  ).copyWith(height: headingHeight, color: rubric, fontWeight: FontWeight.w600);
+  /// Content heading, shared by Hours, Mass, Readings and document readers.
+  /// The title face has a smaller x-height than the reader body, so its scale
+  /// and line height are chosen together rather than copied from Literata.
+  TextStyle blockHeading(double bodySize) {
+    final base = TextStyle(
+      fontSize: (bodySize * 1.42).clamp(22, double.infinity),
+      height: 1.12,
+      color: rubric,
+      fontWeight: FontWeight.w700,
+    );
+    return useSystemFonts
+        ? base
+        : GoogleFonts.cormorantGaramond(textStyle: base);
+  }
+
+  TextStyle serviceHeading(double bodySize, {String? family}) => body(
+    (bodySize * .88).clamp(14, double.infinity),
+    family: family,
+  ).copyWith(color: rubric, height: metadataHeight);
+
+  TextStyle rubricReference(double bodySize, {String? family}) =>
+      serviceHeading(
+        bodySize,
+        family: family,
+      ).copyWith(fontWeight: FontWeight.w500);
 
   TextStyle metadata(double bodySize, {bool italic = false}) =>
       body((bodySize * .88).clamp(14, double.infinity)).copyWith(
@@ -126,10 +149,20 @@ class ReaderTheme {
         fontStyle: italic ? FontStyle.italic : FontStyle.normal,
       );
 
-  TextStyle rubricBlock(double bodySize, {bool italic = false}) =>
-      body((bodySize * .90).clamp(14, double.infinity)).copyWith(
-        height: rubricHeight,
-        color: rubric,
-        fontStyle: italic ? FontStyle.italic : FontStyle.normal,
-      );
+  TextStyle rubricBlock(double bodySize) => body(
+    (bodySize * .90).clamp(14, double.infinity),
+  ).copyWith(height: rubricHeight, color: rubric, fontStyle: FontStyle.normal);
+}
+
+/// Vertical relationships belong to semantic roles, not individual hours.
+abstract final class LiturgicalSpacing {
+  static const sectionBefore = 24.0;
+  static const sectionTitleToBody = 8.0;
+  static const paragraphAfter = 8.0;
+  static const hymnStropheAfter = 15.0;
+  static const antiphonToPsalm = 4.0;
+  static const psalmBlockToNext = 22.0;
+  static const metadataToBody = 7.0;
+  static const dividerBefore = 22.0;
+  static const dividerAfter = 21.0;
 }

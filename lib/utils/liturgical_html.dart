@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parseFragment;
 
@@ -52,10 +54,142 @@ String _markCadenceInText(String text) => text.replaceAllMapped(
 String formatLiturgicalHtml(String html) => markLiturgicalCadenceSigns(
   _normalizeLegacyPresentation(
     _normalizeRubricColors(
-      _markInlineReadingReference(_markLeadingMetadata(html)),
+      _markInlineReadingReference(
+        _normalizeRubricBlocks(_markLeadingMetadata(html)),
+      ),
     ),
   ),
 );
+
+String _normalizeRubricBlocks(String html) {
+  final fragment = parseFragment(html);
+  for (final rubric in fragment.querySelectorAll('.liturgical-rubric')) {
+    for (final emphasis in rubric.querySelectorAll('em, i')) {
+      emphasis.replaceWith(dom.Text(emphasis.text));
+    }
+  }
+  return fragment.outerHtml;
+}
+
+/// Derives office roles from legacy paragraphs without changing the corpus.
+/// A heading is split only when the whole first source line matches a known
+/// liturgical label followed by an optional reference.
+String normalizeOfficeHtml(String source, {bool officeReading = false}) {
+  final fragment = parseFragment(
+    source.contains('<')
+        ? source
+        : source
+              .split(RegExp(r'\r?\n'))
+              .where((line) => line.trim().isNotEmpty)
+              .map((line) => '<p>${const HtmlEscape().convert(line)}</p>')
+              .join(),
+  );
+  for (final rubric in fragment.querySelectorAll('.liturgical-rubric')) {
+    for (final emphasis in rubric.querySelectorAll('em, i')) {
+      emphasis.replaceWith(dom.Text(emphasis.text));
+    }
+  }
+
+  final heading = RegExp(
+    r'^(КАРОТКАЕ\s+ЧЫТАННЕ|КАРОТКІ\s+РЭСПАНСОРЫЙ|РЭСПАНСОРЫЙ)(?:\s+(.+))?$',
+    caseSensitive: false,
+  );
+  for (final paragraph in fragment.querySelectorAll('p').toList()) {
+    final parts = paragraph.innerHtml.split(
+      RegExp(r'<br\s*/?>', caseSensitive: false),
+    );
+    final firstLine =
+        parseFragment(
+          parts.first,
+        ).text?.replaceAll(RegExp(r'\s+'), ' ').trim() ??
+        '';
+    final match = heading.firstMatch(
+      firstLine.replaceAllMapped(RegExp(r'\s+([,.;:])'), (m) => m.group(1)!),
+    );
+    if (match == null) continue;
+    final title = switch (match
+        .group(1)!
+        .toUpperCase()
+        .replaceAll(RegExp(r'\s+'), ' ')) {
+      'КАРОТКАЕ ЧЫТАННЕ' => 'Кароткае чытанне',
+      'КАРОТКІ РЭСПАНСОРЫЙ' => 'Кароткі рэспансорый',
+      _ => 'Рэспансорый',
+    };
+    final titleNode = dom.Element.tag('p')
+      ..classes.add('liturgical-heading')
+      ..text = title;
+    paragraph.parentNode!.insertBefore(titleNode, paragraph);
+    final reference = match.group(2)?.trim();
+    if (reference != null && reference.isNotEmpty) {
+      final referenceNode = dom.Element.tag('p')
+        ..classes.add('liturgical-reference')
+        ..text = reference;
+      paragraph.parentNode!.insertBefore(referenceNode, paragraph);
+    }
+    if (parts.length == 1) {
+      paragraph.remove();
+    } else {
+      paragraph.innerHtml = parts.skip(1).join('<br>');
+    }
+  }
+
+  // Responsory source often places several turns in one paragraph, including
+  // inline spans. Rebuild only those paragraphs as turns; other text survives.
+  final speaker = RegExp(r'(?<!\S)[КН]\.\s*');
+  for (final paragraph in fragment.querySelectorAll('p').toList()) {
+    if (paragraph.classes.contains('liturgical-heading') ||
+        paragraph.classes.contains('liturgical-reference')) {
+      continue;
+    }
+    final plain = paragraph.text.replaceAll('\u00a0', ' ');
+    final matches = speaker.allMatches(plain).toList();
+    if (matches.isEmpty) continue;
+    final turns = <String>[];
+    if (matches.first.start > 0 &&
+        plain.substring(0, matches.first.start).trim().isNotEmpty) {
+      turns.add(plain.substring(0, matches.first.start).trim());
+    }
+    for (var i = 0; i < matches.length; i++) {
+      final end = i + 1 < matches.length ? matches[i + 1].start : plain.length;
+      final turn = plain.substring(matches[i].start, end).trim();
+      if (turn.isNotEmpty) turns.add(turn);
+    }
+    for (final turn in turns) {
+      final node = dom.Element.tag('p')..classes.add('responsory-turn');
+      final marker = speaker.matchAsPrefix(turn);
+      if (marker == null) {
+        node.text = turn;
+      } else {
+        node.innerHtml =
+            '<span class="liturgical-rubric-inline">'
+            '${const HtmlEscape().convert(marker.group(0)!.trim())}</span> '
+            '${const HtmlEscape().convert(turn.substring(marker.end).trim())}';
+      }
+      paragraph.parentNode!.insertBefore(node, paragraph);
+    }
+    paragraph.remove();
+  }
+
+  if (officeReading) {
+    final paragraphs = fragment.querySelectorAll('p');
+    for (var i = 1; i < paragraphs.length && i < 5; i++) {
+      final paragraph = paragraphs[i];
+      final previous = paragraphs[i - 1].text.trim();
+      final emphasis = paragraph.querySelector('em, i');
+      if (RegExp(r'\d+\s*,\s*\d').hasMatch(previous) &&
+          emphasis != null &&
+          emphasis.text.trim() == paragraph.text.trim() &&
+          paragraph.text.trim().isNotEmpty) {
+        paragraph.classes.add('office-reading-pericope-title');
+        for (final emphasis in paragraph.querySelectorAll('em, i')) {
+          emphasis.replaceWith(dom.Text(emphasis.text));
+        }
+        break;
+      }
+    }
+  }
+  return fragment.outerHtml;
+}
 
 String formatPsalmHtml(String html) {
   var value = removeBreakAfterCadenceMarker(html);
@@ -110,7 +244,7 @@ String formatReadingPsalmHtml(String html) {
   final fragment = parseFragment(
     formatPsalmHtml(parseFragment(html).outerHtml.replaceAll('&nbsp;', ' ')),
   );
-  for (final paragraph in fragment.querySelectorAll('.psalm-strophe')) {
+  for (final paragraph in fragment.querySelectorAll('p')) {
     var needsBreak = false;
     var lineStart = true;
     void visit(dom.Node node) {
@@ -180,9 +314,62 @@ String preparePsalmChoirHtml(String html, {int? selectedChoir}) {
         ? ' psalm-choir-muted'
         : '';
 
-    return '<p$attributes><a href="psalm-choir:$choir" '
-        'class="psalm-choir-strophe$mutedClass">$content</a></p>';
+    final pieces = parseFragment(content).nodes.expand(_choirPieces);
+    final rendered = StringBuffer();
+    final linked = StringBuffer();
+    void flushLink() {
+      if (linked.isEmpty) return;
+      rendered.write(
+        '<a href="psalm-choir:$choir" '
+        'class="psalm-choir-strophe$mutedClass">$linked</a>',
+      );
+      linked.clear();
+    }
+
+    for (final piece in pieces) {
+      if (piece.isMarker) {
+        flushLink();
+        rendered.write(piece.html);
+      } else {
+        linked.write(piece.html);
+      }
+    }
+    flushLink();
+    return '<p$attributes>$rendered</p>';
   });
+}
+
+/// Lift cadence marks out of the choir link while preserving their inline
+/// ancestors. flutter_html applies a link's color after descendant classes.
+Iterable<({String html, bool isMarker})> _choirPieces(dom.Node node) sync* {
+  if (node is dom.Element && node.classes.contains('psalm-marker')) {
+    yield (html: node.outerHtml, isMarker: true);
+    return;
+  }
+  if (node is! dom.Element) {
+    yield (html: htmlEscape.convert(node.text ?? ''), isMarker: false);
+    return;
+  }
+  if (node.nodes.isEmpty) {
+    yield (html: node.outerHtml, isMarker: false);
+    return;
+  }
+  final outer = node.outerHtml;
+  final openEnd = outer.indexOf('>') + 1;
+  final closeStart = outer.lastIndexOf('</');
+  if (closeStart < openEnd) {
+    yield (html: outer, isMarker: false);
+    return;
+  }
+  final opening = outer.substring(0, openEnd);
+  final closing = outer.substring(closeStart);
+  for (final child in node.nodes) {
+    for (final piece in _choirPieces(child)) {
+      yield piece.isMarker
+          ? piece
+          : (html: '$opening${piece.html}$closing', isMarker: false);
+    }
+  }
 }
 
 String _markInlineReadingReference(String html) => html.replaceAllMapped(
@@ -268,7 +455,8 @@ String _markLeadingMetadata(
     // Explicit document roles own their typography. In particular, opening
     // rubrics must not be reclassified as smaller leading metadata merely
     // because all of their source text is red or emphasized.
-    if (_hasClass(attributes, 'liturgical-rubric')) {
+    if (_hasClass(attributes, 'liturgical-rubric') ||
+        _hasClass(attributes, 'office-reading-pericope-title')) {
       return match.group(0)!;
     }
 
@@ -292,13 +480,28 @@ String _markLeadingMetadata(
     );
     final red = _allVisibleTextIsRubric(content, visible);
 
+    // Legacy instructions sometimes have only a red inline span. Their
+    // semantic role is the entire paragraph, unlike K./N. dialogue markers.
+    if (!psalmMetadata &&
+        (red ||
+            RegExp(
+              r'color\s*:\s*(?:red|#ff0000)',
+              caseSensitive: false,
+            ).hasMatch(content)) &&
+        RegExp(
+          r'^(?:Потым|Калі|Пасля|Перад|Паводле)(?:\s|$|[.,])',
+          caseSensitive: false,
+        ).hasMatch(visible)) {
+      return '<p${_withClass(attributes, 'liturgical-rubric')}>$content</p>';
+    }
+
     final hasRoom = remaining == null || remaining! > 0;
     if (centered || (canMark && hasRoom && (emphasized || red))) {
       if (remaining != null && remaining! > 0) {
         remaining = remaining! - 1;
       }
       final className = psalmMetadata
-          ? 'liturgical-subheading psalm-metadata'
+          ? 'liturgical-subheading psalm-metadata${emphasized && !red && !RegExp(r'^Псальм(?:\s|$)', caseSensitive: false).hasMatch(visible) ? ' psalm-subtitle' : ''}'
           : 'liturgical-subheading';
       return '<p${_withClass(attributes, className)}>$content</p>';
     }
