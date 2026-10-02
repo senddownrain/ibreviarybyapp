@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,6 +16,8 @@ import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 double _fontSize = 16;
@@ -101,25 +104,33 @@ void main() {
     await directory.delete(recursive: true);
   });
 
-  final cases = <(String, String, Brightness, double)>[
-    ('ordinary-smoke', 'laudes', Brightness.light, 16),
-    ('smoke', 'laudes', Brightness.light, 16),
-    ('smoke', 'laudes', Brightness.dark, 24),
-    ('smoke', 'vespers', Brightness.light, 16),
-    ('smoke', 'lectionis', Brightness.light, 16),
-    ('smoke', 'morning', Brightness.light, 16),
-    ('smoke', 'terz', Brightness.light, 16),
-    ('smoke', 'sext', Brightness.light, 16),
-    ('smoke', 'non', Brightness.light, 16),
-    ('smoke', 'completorium', Brightness.light, 16),
-    ('smoke', 'completorium', Brightness.dark, 24),
+  final cases = <(String, String, Brightness, double, Size)>[
+    ('ordinary-smoke', 'laudes', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'laudes', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'laudes', Brightness.dark, 24, const Size(900, 1600)),
+    ('smoke', 'vespers', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'lectionis', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'morning', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'terz', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'sext', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'non', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'completorium', Brightness.light, 16, const Size(900, 1600)),
+    ('smoke', 'completorium', Brightness.dark, 24, const Size(900, 1600)),
+    // Phone widths exercise wrapping in both the chrome and long document.
+    ('smoke', 'laudes', Brightness.light, 16, const Size(360, 800)),
+    ('smoke', 'lectionis', Brightness.light, 16, const Size(360, 800)),
+    ('smoke', 'terz', Brightness.light, 16, const Size(360, 800)),
+    ('smoke', 'completorium', Brightness.light, 16, const Size(360, 800)),
+    ('smoke', 'laudes', Brightness.light, 16, const Size(390, 844)),
+    ('smoke', 'lectionis', Brightness.light, 16, const Size(390, 844)),
+    ('smoke', 'sext', Brightness.light, 16, const Size(390, 844)),
+    ('smoke', 'completorium', Brightness.dark, 24, const Size(390, 844)),
   ];
-  for (final (dayId, hour, brightness, size) in cases) {
-    testWidgets('$dayId $hour ${brightness.name} $size builds document', (
-      tester,
-    ) async {
+  for (final (dayId, hour, brightness, size, viewport) in cases) {
+    testWidgets('$dayId $hour ${brightness.name} $size '
+        '${viewport.width}x${viewport.height} builds document', (tester) async {
       _fontSize = size;
-      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.physicalSize = viewport;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -141,9 +152,64 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
+      final headings = tester
+          .widgetList<LiturgicalSectionHeading>(
+            find.byType(LiturgicalSectionHeading),
+          )
+          .toList();
+      if (hour == 'lectionis' || hour == 'morning') {
+        // The divider owns the first transition; the second reading owns its
+        // gap because no divider separates the two readings.
+        expect(
+          headings
+              .singleWhere((heading) => heading.title == 'Першае чытанне')
+              .startsSection,
+          isFalse,
+        );
+        expect(
+          headings
+              .singleWhere((heading) => heading.title == 'Другое чытанне')
+              .startsSection,
+          isTrue,
+        );
+      }
+      if (const {'laudes', 'vespers', 'morning'}.contains(hour)) {
+        expect(
+          headings
+              .singleWhere((heading) => heading.title == 'Просьбы')
+              .startsSection,
+          isFalse,
+        );
+      }
+      if (const {
+        'laudes',
+        'vespers',
+        'morning',
+        'completorium',
+      }.contains(hour)) {
+        expect(
+          headings
+              .singleWhere((heading) => heading.title == 'Малітва')
+              .startsSection,
+          isTrue,
+        );
+      }
+      if (hour == 'lectionis' || hour == 'morning') {
+        // A feast includes Te Deum. It shares HYMN_BODY in both compositions.
+        final teDeum = tester
+            .widgetList<Html>(find.byType(Html))
+            .singleWhere(
+              (html) => html.data?.contains('Цябе, Бога, праслаўляем') ?? false,
+            );
+        expect(teDeum.style['body']?.lineHeight?.size, ReaderTheme.hymnHeight);
+        expect(
+          teDeum.style['p']?.margin?.bottom?.value,
+          LiturgicalSpacing.hymnStropheAfter,
+        );
+      }
       await _captureIfRequested(
         tester,
-        '$dayId-$hour-${brightness.name}-$size',
+        '$dayId-$hour-${brightness.name}-$size-${viewport.width}x${viewport.height}',
       );
       if (const {
         'laudes',
@@ -157,7 +223,7 @@ void main() {
           await tester.pumpAndSettle();
           await _captureIfRequested(
             tester,
-            '$dayId-$hour-${brightness.name}-$size-canticle',
+            '$dayId-$hour-${brightness.name}-$size-${viewport.width}x${viewport.height}-canticle',
           );
         }
       }
@@ -170,22 +236,23 @@ void main() {
           await tester.pumpAndSettle();
           await _captureIfRequested(
             tester,
-            '$dayId-$hour-${brightness.name}-$size-marian',
+            '$dayId-$hour-${brightness.name}-$size-${viewport.width}x${viewport.height}-marian',
           );
         }
       }
     });
   }
 
-  for (final (brightness, size) in [
-    (Brightness.light, 16.0),
-    (Brightness.dark, 24.0),
+  for (final (brightness, size, viewport) in [
+    (Brightness.light, 16.0, const Size(900, 1600)),
+    (Brightness.dark, 24.0, const Size(900, 1600)),
+    (Brightness.light, 16.0, const Size(360, 800)),
+    (Brightness.dark, 24.0, const Size(390, 844)),
   ]) {
-    testWidgets('readings ${brightness.name} $size builds document', (
-      tester,
-    ) async {
+    testWidgets('readings ${brightness.name} $size '
+        '${viewport.width}x${viewport.height} builds document', (tester) async {
       _fontSize = size;
-      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.physicalSize = viewport;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -244,7 +311,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await _captureIfRequested(tester, 'readings-${brightness.name}-$size');
+      await _captureIfRequested(
+        tester,
+        'readings-${brightness.name}-$size-${viewport.width}x${viewport.height}',
+      );
     });
   }
 }

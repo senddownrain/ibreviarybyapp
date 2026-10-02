@@ -1,7 +1,11 @@
 # iBreviaryBy — Design Concept vNext: consolidated review
 
 Статус: **audit / rationale / historical design review**, редакция 2 октября 2026.
-Это документационная консолидация; production-код и assets не менялись.
+Это датированный обзор; production-код и assets в той редакции не менялись.
+После него коммиты `20cf1b4`, `7d48807` и `7b72cc9` вошли в main. При
+типографическом расхождении действуют канонические Concept/System и TARGET
+литургической спецификации: Cormorant — page titles и content section headings,
+Literata / выбранная reader-family — body, System — UI.
 
 Ежедневный канон: [DESIGN_CONCEPT](design/DESIGN_CONCEPT.md) — каким ощущается
 продукт; [DESIGN_SYSTEM](design/DESIGN_SYSTEM.md) — практические роли, компоненты
@@ -13,9 +17,10 @@
 Первоначальный аудит: `origin/main @ 1540a7d`, 29 сентября 2026.
 Повторная проверка: после `git fetch origin main`,
 `origin/main @ 1ac450d9c184e63561e3fcb0b80ae94353d44f7b`.
-Рабочий checkout: `feature/liturgy-visual-unification @ 7d48807`, на два коммита
-впереди main (`20cf1b4`, `7d48807`). Их изменения отмечены отдельно; они не
-считаются исправлениями main. Локальные пользовательские вложения не затронуты.
+На момент повторной проверки checkout `feature/liturgy-visual-unification @
+7d48807` был на два коммита впереди main (`20cf1b4`, `7d48807`). Их изменения
+отмечены отдельно как история проверки; позже оба коммита вошли в main.
+Локальные пользовательские вложения не затронуты.
 
 Первоначальный документ прочитан полностью. Повторно сверены тема Ora,
 FloatingTopActions, ReaderScaffold, dock, Mass/Bible bars, Compendium,
@@ -48,7 +53,7 @@ Literata и рубрикация, нейтральная ivory/charcoal пали
 
 | Тема | Окончательное направление | Что изменено относительно первого аудита |
 | --- | --- | --- |
-| Гарнитуры | Cormorant Garamond — крупный титул L1/L2; Literata — голос документа, включая его заголовки; System — интерфейс | Устранено пересечение `book` и `display` в page titles; Cormorant не переносится внутрь документа |
+| Гарнитуры | Cormorant Garamond — титул страницы и смысловые section headings документа; Literata / выбранная reader-family — body; System — интерфейс | Книжный body и content headings имеют разные роли; Cormorant не переносится в controls |
 | Uppercase | Не основной способ иерархии; sentence case, размер, вес и интервалы предпочтительны | Абсолютный запрет снят; короткие оправданные метки и аббревиатуры допустимы |
 | Aa | Ориентир базы 17, минимум около 85%, цель до 180%; независимый системный TextScaler | Автоматический потолок 160% снят; доступность определяет композицию |
 | Нижняя зона | `BottomSlot`: один владелец, максимум один floating layer | `ReaderBottomBar` принят архитектурно; конкретная горизонтальная капсула — гипотеза, проверяются 2–3 варианта |
@@ -60,10 +65,10 @@ Literata и рубрикация, нейтральная ivory/charcoal пали
 
 Выбор Source Serif 4 / системной гарнитуры сохраняется как существующая
 пользовательская настройка чтения, а не третья продуктовая концепция. По
-умолчанию документ и его заголовки — Literata; пользовательский override
-книжного слоя не меняет Cormorant page titles и системный chrome.
+умолчанию длительный текст документа — Literata; пользовательский override
+body не меняет Cormorant page/section headings и системный chrome.
 
-## 4. Реестр актуальности: проверенный main
+## 4. Реестр актуальности: датированный main `1ac450d`
 
 `CURRENT` — долг сохраняется; `PARTIALLY FIXED` — часть исправлена, остаток
 назван явно; `HISTORICAL` — старое утверждение уже не описывает main.
@@ -92,30 +97,28 @@ Literata и рубрикация, нейтральная ivory/charcoal пали
 | Имена, icon pipeline, splash, web | CURRENT | В main сохраняются Mybrev в web manifest, Малітоўнік в native labels, несогласованные manifest colors. Брендовые assets не менялись после исходной базы; circular-icon fix касается UI, а не app icon |
 | Старая документация согласована | CURRENT → закрыто этой редакцией | DL 1.1, platform-design и library-design содержали конкурирующие верхнеуровневые правила; теперь явно перенаправляют к двум каноническим документам |
 
-### Отдельно: изменения рабочей ветки поверх main
+### Отдельно: коммиты, интегрированные после датированного аудита
 
 `20cf1b4` вводит `liturgicalDocumentStyles` / `LiturgicalSpacing`, унифицирует
 часть ролей и семантики Hours/Readings/ReadingDetail, затрагивает Mass.
-Это **PARTIALLY FIXED в рабочей ветке**, но ещё CURRENT-долг main. Использовать
-существующую фабрику как основу после интеграции, не строить конкурирующую.
-Её `ReaderTheme.blockHeading` использует Cormorant внутри документа — это
-расхождение с принятым здесь правилом Literata. Целевой `SECTION_TITLE` в
-[liturgical spec](LITURGY_CONTENT_VISUAL_SPEC.md) согласован документально;
-реализация не менялась.
+Это уже часть main. `ReaderTheme.blockHeading` использует Cormorant внутри
+документа намеренно и соответствует целевому `SECTION_TITLE` в
+[liturgical spec](LITURGY_CONTENT_VISUAL_SPEC.md). Для дальнейшей унификации
+использовать существующую фабрику, не строить конкурирующую.
 
 `7d48807` меняет Compendium на root → Part с плоским планом и отдельным
 question reader; node/topic routes становятся compatibility redirects.
-На main ещё drill-down. Рабочая `docs/compendium.md` описывает именно новую
-ветку, поэтому нельзя по её тексту датировать внедрение на main. Ветка также
-обновляет Songbook filters. Эти изменения сохраняются; Quiet Book определяет
+Новый reading flow уже в main; `docs/compendium.md` описывает его.
+Коммит также обновляет Songbook filters. Эти изменения сохраняются; Quiet Book определяет
 визуальные роли и владение слотами, не отменяет доменную навигацию.
 
 ## 5. Обоснования, которые важно не потерять
 
 ### Типографика
 
-Два книжных голоса имеют разные задачи: Cormorant обозначает титул страницы,
-Literata ведёт длительное чтение. Системный шрифт обслуживает управление.
+Два книжных голоса имеют разные задачи: Cormorant обозначает титул страницы
+и смысловые заголовки внутри документа, Literata ведёт длительное чтение.
+Системный шрифт обслуживает управление.
 Стремление к одной гарнитуре везде стирало эту границу; три случайных системы
 по разделам — другая крайность. Роли общие для всех книг.
 
@@ -181,15 +184,16 @@ splash, manifest и источник строки имени можно гото
 
 ## 7. Roadmap после консолидации
 
-Ни один этап реализации ниже в этой задаче не запускался.
+На момент этой документационной консолидации этапы ниже не запускались;
+последующие implementation commits описаны выше.
 
 | Этап | Работа | Выход / gate |
 | --- | --- | --- |
 | Phase 0 — docs | Эта консолидация и маркировка старых specs | Два канонических входа; история main/ветки разведена; утверждённые принципы не возвращаются владельцу на повторное голосование |
-| Phase 1 — Foundations | Минимальный `IbTokens`, роли цветов/типографики/ритма; убрать seasonal primary/chrome; использовать имеющуюся font bundle и общую фабрику после интеграции ветки | Согласованные роли, neutral chrome, offline glyph/face QA, Aa + TextScaler matrix. Сначала решить интеграцию двух коммитов с владельцем ветки в отдельной реализации |
+| Phase 1 — Foundations | Минимальный `IbTokens`, роли цветов/типографики/ритма; убрать seasonal primary/chrome; использовать имеющуюся font bundle и уже интегрированную общую фабрику | Согласованные роли, neutral chrome, offline glyph/face QA, Aa + TextScaler matrix |
 | Phase 2 — BottomSlot & chrome | Прототипы 2–3 композиций, выбор по accessibility; единый арбитр и измеряемые insets; адаптация Mass/Bible/Compendium/search/selection | Один владелец во всех переходах; длинные labels и последний абзац доступны; Mass dock fix сохранён |
 | Phase 3 — Корни и коллекции | Cormorant page title; общий header/list rhythm; молитвенник как полка; спокойные Settings | Сравнение 320/360/390 light/dark на обеих платформах без нового dashboard |
-| Phase 4 — Readers | Literata document headings, общий role mapping, сохранение anchor, Aa migration; убрать оставшиеся local overrides по роли | Все типы документов проходят единый контракт; source semantics и пользовательские предпочтения сохранены |
+| Phase 4 — Readers | Cormorant document section headings, общий role mapping, сохранение anchor, Aa migration; убрать оставшиеся local overrides по роли | Все типы документов проходят единый контракт; source semantics и пользовательские предпочтения сохранены |
 | Phase 5 — Platform/accessibility | Нативные переходы, predictive back, scroll edge, reduce motion/transparency, screen readers | Device QA обеих платформ; автоматические layout-тесты не выдаются за него |
 | Parallel branding track | Имя, знак, узнаваемая католическая семантика, утверждение вариантов | Отдельное решение владельца; не блокирует Phases 1–4 |
 | Pipeline/polish | Согласованные manifest, icon generation/adaptive layers/splash; финальные assets после branding | Нет несвязанных имён и старых placeholder-assets в поставке |

@@ -4,11 +4,10 @@
 > [DESIGN_CONCEPT](design/DESIGN_CONCEPT.md), общие визуальные роли —
 > [DESIGN_SYSTEM](design/DESIGN_SYSTEM.md). Этот документ владеет semantic IDs,
 > locators, структурой источника и точным mapping ролей. Его CURRENT-таблицы
-> остаются датированным аудитом, а implementation pass ниже относится к
-> рабочей ветке `20cf1b4`, не к `origin/main @ 1ac450d`.
-> Целевой SECTION_TITLE согласован с Literata; Cormorant в текущем
-> `ReaderTheme.blockHeading` ветки — известное расхождение, исправление кода
-> сюда не входит. Семантика FIXED-01…03 и структура литургического текста
+> остаются датированным аудитом `origin/main @ 1ac450d`, а implementation pass
+> `20cf1b4` уже включён в main. Целевой `SECTION_TITLE` — Cormorant Garamond
+> через `ReaderTheme.blockHeading`; это намеренный контракт для document
+> headings. Семантика FIXED-01…03 и структура литургического текста
 > сохраняются; пустой TARGET не разрешает придумывать новый стиль.
 
 Статус: **CURRENT-аудит сохранён; TARGET ниже фиксирует первый implementation pass визуальной унификации**.
@@ -546,7 +545,7 @@ Rendered HTML имеет собственную, третью таблицу с�
 | Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
 |---|---|---|---|---|---|---|
 | `BODY_TEXT` | B/h1.68, ink | B/h1.68; выбранная reader-family, по умолчанию Literata | ink | source | paragraph 8 | base reader |
-| `SECTION_TITLE` | max(1.10B,18)/w600, red | Literata 600, max(B,18), h1.30; sentence case; reader-family override допустим | rubric | 24 у самостоятельного блока | 8 | Целевой reader.blockHeading по DESIGN_SYSTEM; крупные части могут использовать reader.majorHeading; реализация ветки пока Cormorant |
+| `SECTION_TITLE` | max(1.10B,18)/w600, red | Cormorant Garamond 700, max(1.42B,22), h1.12; sentence case | rubric | 24 у самостоятельного блока без divider; divider владеет своим переходом | 8 | `ReaderTheme.blockHeading`; крупные части используют `majorHeading` |
 | `CONTEXT_METADATA` | UI 12/muted | — | — | — | — | «metadata» в header; псалм — `PSALM_METADATA` |
 | `RUBRIC_BLOCK` | .90B или .88B, red | max(.90B,14), h1.48, regular, non-italic | rubric | source | paragraph 8 | explicit class и распознанная красная инструкция; не диалог |
 | `RUBRIC_INLINE` | inherit/red | размер и высота окружающей строки | rubric | 0 | 0 | только marker внутри строки |
@@ -555,7 +554,7 @@ Rendered HTML имеет собственную, третью таблицу с�
 
 | Role | CURRENT | TARGET typography | TARGET color | TARGET before | TARGET after | Notes |
 |---|---|---|---|---|---|---|
-| `HYMN_BODY` | B/h1.72, ink | — | — | — | — | гимн; Te Deum сейчас иной renderer |
+| `HYMN_BODY` | B/h1.72, ink | B/h1.72 через `kind: hymn` | ink | source | строфа 15 | гимны и Te Deum |
 
 ### Psalmody
 
@@ -621,7 +620,7 @@ Rendered HTML имеет собственную, третью таблицу с�
 
 ## Implementation status — первый pass (2 октября 2026)
 
-`CURRENT` в таблицах и Master Catalog ниже остаётся снимком до этого pass. TARGET записан в worksheet выше; не следует читать старые `CURRENT` как описание нового renderer. После консолидации TARGET SECTION_TITLE изменён на Literata по DESIGN_SYSTEM; перечисленные ниже факты pass не означают, что эта последующая редакция уже реализована.
+`CURRENT` в таблицах и Master Catalog ниже остаётся снимком до этого pass. TARGET записан в worksheet выше; не следует читать старые `CURRENT` как описание нового renderer. Cormorant для `SECTION_TITLE` — принятое и реализованное решение, согласованное с DESIGN_SYSTEM.
 
 - `ReaderTheme.blockHeading` теперь общий content-heading token: Cormorant Garamond Bold, нормальный регистр, rubric red; `ReaderTheme.body` сохраняет reader-family и размер. UI controls и navigation остаются системными. `ReaderTheme.serviceHeading`, `rubricReference`, `rubricBlock` разделяют служебный red и muted metadata.
 - `liturgicalDocumentStyles` централизует HTML-роли Hours, Readings и ReadingDetail: heading, reference, caption, psalm subtitle, pericope title, rubric, cadence marker и responsory turn. `LiturgicalSpacing` хранит базовые semantic gaps; `LiturgicalSectionDivider` отделяет крупные части нейтральной линией.
@@ -629,6 +628,8 @@ Rendered HTML имеет собственную, третью таблицу с�
 - `normalizeOfficeHtml` разделяет полную строку «Кароткае чытанне / Кароткі рэспансорый / Рэспансорый + reference» только при распознаваемой первой строке; plain и HTML обрабатываются одинаково. Реплики `К.`/`Н.` получают отдельные paragraphs и красные inline markers. Для Office 1/2 курсивный тематический заголовок после библейской ссылки становится `office-reading-pericope-title`, малым red non-italic. Неоднозначный source сохраняет исходное содержание без придуманной роли.
 - Benedictus, Magnificat и Nunc dimittis идут в порядке opening antiphon → малый red service title → muted italic caption → body → repeated antiphon. Completorium переставлен структурно. Заголовок Marian antiphons нормализован в normal case и section scale.
 - Divider стоит на границе psalmody/readings и group/canticle/intercessions, если соответствующие части присутствуют. Между антифоной и псалмом, между псалмами, в responsory и внутри reading body divider не ставится.
+- Corrective pass: `LiturgicalSectionHeading` разделяет заголовок с собственным `sectionBefore` и заголовок после divider; второй не дублирует отступ divider. Второе Office reading и молитва без divider получают один semantic section gap. После Pater Noster при наличии молитвы переходом владеет её заголовок. Te Deum использует общий hymn rhythm.
+- Проверенные переходы: psalmody → reading, responsory → Gospel canticle и canticle → intercessions принадлежат divider; reading 1 → reading 2 и Pater Noster → prayer принадлежат следующему heading. Заключительная rubric после prayer остаётся частью окончания без дополнительного section gap. Phone smoke покрывает 360×800 и 390×844, включая увеличенный reader font.
 - FIXED-01 поддержан и в plain `ReadingDetailScreen`; FIXED-02 распространяется также на numbered HTML paragraph без `.psalm-strophe`; FIXED-03 исправлен в generated reading formula.
 
 **Intentional exceptions и границы распознавания:** Invitatorium имеет отдельный порядок антифоны и псалма; single-ant псалмодия повторяет антифону один раз после всей последовательности; structured HTML владеет внутренними антифонами. Метаданные псалма могут оставаться объединённой source-строкой, если разбиение на title/reference нельзя доказать по структуре. Библейские ссылки Office могут быть muted, в то время как ссылки, извлечённые из short reading/responsory heading, rubric red. Compendium navigation rows остаются UI typography; его document headings должны применять общий `blockHeading` при следующем изменении соответствующего reader renderer.
@@ -989,4 +990,4 @@ LiturgicalSpacing.refrainRepeat
 9. Несоблюдение reader-family у Ora headings и invitatory trigger.
 10. Множество локальных magic spacing numbers и независимое масштабирование body/UI.
 
-Этот итог относится к первоначальному аудиту до implementation pass: тогда production-код не менялся. Последующая реализация рабочей ветки описана в «Implementation status», а её расхождение с новой ролью Literata — в баннере консолидации. Перед будущей реализацией проверять актуальный код и изменяемые TARGET; уже утверждённые Concept/System-решения не требуют повторного подтверждения всего каталога.
+Этот итог относится к первоначальному аудиту до implementation pass: тогда production-код не менялся. Последующая реализация main описана в «Implementation status». Перед будущей реализацией проверять актуальный код и TARGET; уже утверждённый Cormorant-контракт не требует повторного подтверждения всего каталога.

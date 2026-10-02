@@ -103,3 +103,27 @@ class LiturgicalSectionDivider extends StatelessWidget {
     ),
   );
 }
+
+/// A content heading owns the section gap only when no divider owns that
+/// transition. The same title-to-body rhythm applies to both cases.
+class LiturgicalSectionHeading extends StatelessWidget {
+  const LiturgicalSectionHeading({
+    super.key,
+    required this.title,
+    required this.bodySize,
+    this.startsSection = false,
+  });
+
+  final String title;
+  final double bodySize;
+  final bool startsSection;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(
+      top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
+      bottom: LiturgicalSpacing.sectionTitleToBody,
+    ),
+    child: Text(title, style: ReaderTheme.of(context).blockHeading(bodySize)),
+  );
+}

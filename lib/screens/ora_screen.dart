@@ -798,14 +798,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addHymn(items, day, 'officeOfReadingsHymn');
     _addPsalmBlock(items, day, 'officeOfReadingsAnt', 'officeOfReadingsPs', 3);
     _addField(items, day, 'officeOfReadingsVers', '');
-    _addDividerBeforeField(items, day, 'officeOfReadingsR1');
-    _addField(items, day, 'officeOfReadingsR1', 'Першае чытанне');
-    _addField(items, day, 'officeOfReadingsR2', 'Другое чытанне');
+    _addOfficeReadings(items, day);
     if (shouldShowTeDeum(day)) {
       items.add(_OraItem.blockHeader('ГІМН'));
-      items.add(_OraItem.html(_kTeDeum));
+      items.add(_OraItem.html(_kTeDeum, kind: 'hymn'));
     }
-    _addField(items, day, 'officeOfReadingsPr', 'Малітва');
+    _addField(items, day, 'officeOfReadingsPr', 'Малітва', startsSection: true);
     if (!skipEnding) items.add(_OraItem.html(_kEndOfSext));
     return items;
   }
@@ -834,8 +832,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     _addDividerBeforeField(items, day, 'laudesInter');
     _addField(items, day, 'laudesInter', 'Просьбы');
-    items.add(_OraItem.plain(_kPaterNoster));
-    _addField(items, day, 'laudesPr', 'Малітва');
+    _addPaterAndPrayer(items, (day.field('laudesPr') ?? '').trim());
     items.add(_OraItem.html(_kEndOfVesper));
     return items;
   }
@@ -871,7 +868,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final pr = daytimeHourField(day, num, 'Pr');
     if (pr.isNotEmpty) {
-      items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
+      items.add(
+        _OraItem.labeled('Малітва', pr, kind: 'prayer', startsSection: true),
+      );
     }
 
     items.add(_OraItem.html(_kEndOfSext));
@@ -918,16 +917,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     _addDividerBeforeField(items, day, 'vesperInter');
     _addField(items, day, 'vesperInter', 'Просьбы');
-    items.add(_OraItem.plain(_kPaterNoster));
-
     // vesperPr fallback to laudesPr
     final pr = (day.field('vesperPr') ?? '').trim();
     final effectivePr = pr.isNotEmpty
         ? pr
         : (day.field('laudesPr') ?? '').trim();
-    if (effectivePr.isNotEmpty) {
-      items.add(_OraItem.labeled('Малітва', effectivePr, kind: 'prayer'));
-    }
+    _addPaterAndPrayer(items, effectivePr);
 
     items.add(_OraItem.html(_kEndOfVesper));
     return items;
@@ -1004,7 +999,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final pr = cf('compPr');
     if (pr.isNotEmpty) {
-      items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
+      items.add(
+        _OraItem.labeled('Малітва', pr, kind: 'prayer', startsSection: true),
+      );
     }
 
     items.add(
@@ -1049,12 +1046,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addHymn(items, day, 'laudesHymn');
     _addPsalmBlock(items, day, 'officeOfReadingsAnt', 'officeOfReadingsPs', 3);
     _addField(items, day, 'officeOfReadingsVers', '');
-    _addDividerBeforeField(items, day, 'officeOfReadingsR1');
-    _addField(items, day, 'officeOfReadingsR1', 'Першае чытанне');
-    _addField(items, day, 'officeOfReadingsR2', 'Другое чытанне');
+    _addOfficeReadings(items, day);
     if (shouldShowTeDeum(day)) {
       items.add(_OraItem.blockHeader('ГІМН'));
-      items.add(_OraItem.html(_kTeDeum));
+      items.add(_OraItem.html(_kTeDeum, kind: 'hymn'));
     }
 
     _addPsalmBlock(items, day, 'laudesAnt', 'laudesPs', 3);
@@ -1073,8 +1068,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
     _addDividerBeforeField(items, day, 'laudesInter');
     _addField(items, day, 'laudesInter', 'Просьбы');
-    items.add(_OraItem.plain(_kPaterNoster));
-    _addField(items, day, 'laudesPr', 'Малітва');
+    _addPaterAndPrayer(items, (day.field('laudesPr') ?? '').trim());
     items.add(_OraItem.html(_kEndOfVesper));
     return items;
   }
@@ -1121,12 +1115,48 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     items.add(_OraItem.html(v, kind: 'hymn'));
   }
 
+  void _addPaterAndPrayer(List<_OraItem> items, String prayer) {
+    // The prayer heading owns this transition. Keep the ordinary trailing
+    // space on Pater Noster only when the prayer is absent.
+    items.add(
+      _OraItem.plain(
+        _kPaterNoster,
+        trailingSpacing: prayer.isEmpty ? LiturgicalSpacing.plainTextAfter : 0,
+      ),
+    );
+    if (prayer.isNotEmpty) {
+      items.add(
+        _OraItem.labeled(
+          'Малітва',
+          prayer,
+          kind: 'prayer',
+          startsSection: true,
+        ),
+      );
+    }
+  }
+
+  void _addOfficeReadings(List<_OraItem> items, LiturgicalDay day) {
+    final hasFirst = (day.field('officeOfReadingsR1') ?? '').trim().isNotEmpty;
+    final hasSecond = (day.field('officeOfReadingsR2') ?? '').trim().isNotEmpty;
+    if (hasFirst || hasSecond) items.add(_OraItem.divider());
+    _addField(items, day, 'officeOfReadingsR1', 'Першае чытанне');
+    _addField(
+      items,
+      day,
+      'officeOfReadingsR2',
+      'Другое чытанне',
+      startsSection: hasFirst,
+    );
+  }
+
   void _addField(
     List<_OraItem> items,
     LiturgicalDay day,
     String fieldName,
-    String label,
-  ) {
+    String label, {
+    bool startsSection = false,
+  }) {
     final v = (day.field(fieldName) ?? '').trim();
     if (v.isEmpty) return;
     if (label.isNotEmpty) {
@@ -1135,7 +1165,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           ? stripLeadingReadingHeading(v, label)
           : v;
       items.add(
-        _OraItem.labeled(label, content, kind: _alternativeKind(fieldName)),
+        _OraItem.labeled(
+          label,
+          content,
+          kind: _alternativeKind(fieldName),
+          startsSection: startsSection,
+        ),
       );
     } else {
       items.add(_OraItem.html(v, kind: _alternativeKind(fieldName)));
@@ -1391,6 +1426,8 @@ class _OraItem {
   final ValueNotifier<int>? alternativeController;
   final bool showPicker;
   final String? externalAntiphon;
+  final bool startsSection;
+  final double trailingSpacing;
   final Widget Function(BuildContext, TextStyle)? _customWidget;
 
   const _OraItem._(
@@ -1401,6 +1438,8 @@ class _OraItem {
     this.alternativeController,
     this.showPicker = true,
     this.externalAntiphon,
+    this.startsSection = false,
+    this.trailingSpacing = LiturgicalSpacing.plainTextAfter,
     Widget Function(BuildContext, TextStyle)? customWidget,
   }) : _customWidget = customWidget;
 
@@ -1430,11 +1469,13 @@ class _OraItem {
     String label,
     String content, {
     String kind = 'generic',
+    bool startsSection = false,
   }) => _OraItem._(
     _OraItemType.labeled,
     content,
     label: label,
     alternativeKind: kind,
+    startsSection: startsSection,
   );
 
   factory _OraItem.html(String html, {String kind = 'generic'}) =>
@@ -1447,8 +1488,16 @@ class _OraItem {
     externalAntiphon: externalAntiphon,
   );
 
-  factory _OraItem.plain(String text, {String? label}) =>
-      _OraItem._(_OraItemType.plain, text, label: label);
+  factory _OraItem.plain(
+    String text, {
+    String? label,
+    double trailingSpacing = LiturgicalSpacing.plainTextAfter,
+  }) => _OraItem._(
+    _OraItemType.plain,
+    text,
+    label: label,
+    trailingSpacing: trailingSpacing,
+  );
 
   factory _OraItem.custom(Widget Function(BuildContext, TextStyle) builder) =>
       _OraItem._(_OraItemType.custom, '', customWidget: builder);
@@ -1474,17 +1523,10 @@ class _OraItem {
           ),
         );
       case _OraItemType.blockHeader:
-        final reader = ReaderTheme.of(context);
-        final base = textStyle.fontSize ?? 16;
-        return Padding(
-          padding: const EdgeInsets.only(
-            top: LiturgicalSpacing.sectionBefore,
-            bottom: LiturgicalSpacing.sectionTitleToBody,
-          ),
-          child: Text(
-            _managedHeading(content),
-            style: reader.blockHeading(base),
-          ),
+        return LiturgicalSectionHeading(
+          title: _managedHeading(content),
+          bodySize: textStyle.fontSize ?? 16,
+          startsSection: true,
         );
 
       case _OraItemType.antiphon:
@@ -1508,6 +1550,7 @@ class _OraItem {
           content: content,
           textStyle: textStyle,
           alternativeKind: alternativeKind,
+          startsSection: startsSection,
         );
 
       case _OraItemType.html:
@@ -1548,7 +1591,7 @@ class _OraItem {
                 ),
               ),
             _LiturgicalSelectableText(content: content, textStyle: textStyle),
-            const SizedBox(height: 12),
+            SizedBox(height: trailingSpacing),
           ],
         );
 
@@ -1584,23 +1627,27 @@ class _LabeledSection extends StatelessWidget {
   final String content;
   final TextStyle textStyle;
   final String alternativeKind;
+  final bool startsSection;
 
   const _LabeledSection({
     required this.label,
     required this.content,
     required this.textStyle,
     this.alternativeKind = 'generic',
+    this.startsSection = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final reader = ReaderTheme.of(context);
     final base = textStyle.fontSize ?? 16;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: reader.blockHeading(base)),
-        const SizedBox(height: LiturgicalSpacing.sectionTitleToBody),
+        LiturgicalSectionHeading(
+          title: label,
+          bodySize: base,
+          startsSection: startsSection,
+        ),
         _HtmlOrText(
           content: content,
           textStyle: textStyle,

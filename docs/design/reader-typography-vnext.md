@@ -6,8 +6,10 @@
 > [LITURGY_CONTENT_VISUAL_SPEC](../LITURGY_CONTENT_VISUAL_SPEC.md).
 > Наблюдения «текущая реализация» ниже описывают прежний срез, не current main;
 > [повторная проверка](../DESIGN_CONCEPT_VNEXT.md) отделяет исправленное от долга.
-> Cormorant — титулы страниц; Literata — документ и внутренние заголовки;
+> Cormorant — титулы страниц и смысловые заголовки документа; Literata — body;
 > Aa ориентируется на 85–180% с независимым системным масштабированием.
+> Таблица ролей ниже сохранена как исходный proposal: её строки `Section heading`
+> и `Display title` заменены текущим `ReaderTheme.blockHeading` и DESIGN_SYSTEM.
 
 Статус: решение для поэтапного внедрения, 29 сентября 2026 года.
 

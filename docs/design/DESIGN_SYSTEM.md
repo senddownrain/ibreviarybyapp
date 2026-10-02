@@ -21,11 +21,11 @@
 | Роль | Гарнитура | Baseline | Область |
 | --- | --- | --- | --- |
 | `type.pageTitle` | Cormorant Garamond, 600–700 | 32–34 / 1.12 | Крупные титулы L1/L2, одинаковая роль во всех разделах |
-| `reader.docTitle` | Literata 600 | 26 / 1.20 | Титул документа в context header |
+| `reader.docTitle` | Cormorant Garamond 700 | По роли page title | Титул документа в context header, если это содержательный page title |
 | `reader.docSubtitle` | Literata | 17 / 1.40 | Название празднования/подзаголовок документа |
 | `reader.body` | Literata 400 | B / 1.68 | Prayer, Scripture, Catechism, Mass, song text |
-| `reader.majorHeading` | Literata 600 | max(1.15B, 20) / 1.28 | Крупные части внутри документа |
-| `reader.blockHeading` | Literata 600 | max(B, 18) / 1.30, rubric | Название блока/части; не Cormorant |
+| `reader.majorHeading` | Cormorant Garamond 700 | `blockHeading × 1.12` / 1.12, rubric | Крупные части внутри документа |
+| `reader.blockHeading` | Cormorant Garamond 700 | max(1.42B, 22) / 1.12, rubric | Смысловой заголовок раздела; `ReaderTheme.blockHeading` |
 | `reader.reference` | Literata 500–600 | max(.88B, 14) / 1.40 | Библейские ссылки; цвет по semantic role |
 | `reader.rubric` | Literata | max(.90B, 14) / 1.48 | Служебный литургический текст; не UI metadata |
 | `type.ui.sectionTitle` | System 500–600 | 20 / 1.30 | Секции коллекции/настроек |
@@ -37,12 +37,19 @@
 | `reader.chord` | Monospace | По song layout | Только аккорды; основной текст песни остаётся Literata |
 
 `type.pageTitle` не входит в System UI-гарнитуру. Root-reader Чытанні может
-иметь Cormorant-титул страницы и Literata-заголовки чтений внутри неё.
+иметь Cormorant-титул страницы и Cormorant-заголовки разделов чтений внутри неё.
 Празднование — контекст книги, не второй большой display-title.
 
 Пользовательские Source Serif 4 / System остаются override reader-family
-(текст и книжные заголовки), не новой identity. Cormorant никогда не входит
-в выбор гарнитуры длительного чтения. Ui metadata не наследует reader-family.
+длительного текста, не новой identity. Cormorant-заголовки разделов не
+наследуют этот выбор; UI metadata не наследует reader-family. Cormorant
+не становится гарнитурой body.
+
+`ReaderTheme.blockHeading` уже реализует этот content-heading token в Hours,
+Readings, Prayer и Mass. В Compendium навигационные строки остаются UI;
+содержательные заголовки в `CompendiumPartScreen` (`_PartHeader` и `_PartItem`)
+ещё используют локальные Material styles. Их перевод на общий token — отдельная
+миграция reader без изменения иерархии вопросов и маршрутов.
 
 Uppercase не основной источник иерархии. Сократить большие CAPS и повторные
 eyebrows; короткие language codes, аббревиатуры и оправданные типографические

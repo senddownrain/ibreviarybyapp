@@ -165,4 +165,5 @@ abstract final class LiturgicalSpacing {
   static const metadataToBody = 7.0;
   static const dividerBefore = 22.0;
   static const dividerAfter = 21.0;
+  static const plainTextAfter = 12.0;
 }

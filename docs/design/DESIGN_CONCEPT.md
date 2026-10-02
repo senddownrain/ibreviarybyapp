@@ -37,17 +37,18 @@ bottom controls, sheets, search. Оно нейтрально и тише кон�
 
 ## Типографический характер
 
-**Cormorant = title of the book/page.** Cormorant Garamond — крупные титулы
-L1/L2: «Літургія гадзін», «Малітоўнік», «Спеўнік», «Катэхізіс».
+**Cormorant = page title and content section heading.** Cormorant Garamond —
+крупные титулы L1/L2 и смысловые заголовки внутри книжных документов:
+«Гімн», «Псалмодыя», «Кароткае чытанне», «Малітва», части Імшы и Чытанняў.
 
-**Literata = voice of the book.** Основной текст, заголовок документа,
-названия его частей, чтения, молитвы, Scripture, Catechism, Mass и song text.
-Cormorant не используется для обычных контролов и заголовков внутри документа.
+**Literata = voice of the book.** Основной длительный текст чтений, молитв,
+Scripture, Catechism, Mass и песен. Выбранная читателем гарнитура и размер
+сохраняются в body там, где это уже предусмотрено reader.
 
 **System = interface around the book.** SF / Android system font — navigation,
-controls, metadata, sheets, settings, search и небольшие служебные подписи.
-Существующий выбор гарнитуры чтения остаётся пользовательским override
-книжного слоя; он не меняет титулы страниц и chrome.
+controls, sheets, settings, search и UI-подписи. Литургические metadata и
+rubric внутри документа имеют собственные семантические стили. Выбор
+гарнитуры body не меняет Cormorant-заголовки и системный chrome.
 
 Uppercase **не является основным способом создания визуальной иерархии**.
 Предпочтительны sentence case, размер, вес и интервалы. Короткие оправданные
