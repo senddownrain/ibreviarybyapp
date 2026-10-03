@@ -679,11 +679,45 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('prayerbook-title')), findsOneWidget);
   });
+
+  testWidgets('Prayerbook title clears top search at narrow and wide sizes', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    for (final width in [320.0, 390.0, 700.0]) {
+      for (final brightness in [Brightness.light, Brightness.dark]) {
+        for (final scale in [1.0, 1.5, 2.0]) {
+          tester.view.physicalSize = Size(width, 844);
+          await tester.pumpWidget(
+            MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: _app(const PrayersScreen(), brightness: brightness),
+            ),
+          );
+          await tester.pump();
+
+          final title = tester.getRect(
+            find.byKey(const Key('prayerbook-title')),
+          );
+          final search = tester.getRect(
+            find.byKey(const Key('prayerbook-search-action')),
+          );
+          expect(title.top, greaterThan(search.bottom));
+          expect(search.width, greaterThanOrEqualTo(48));
+          expect(tester.takeException(), isNull);
+        }
+      }
+    }
+  });
 }
 
 Widget _app(
   Widget child, {
   SettingsState settings = const SettingsState(),
+  Brightness brightness = Brightness.light,
   _TestSettingsNotifier? settingsOverride,
   List<Prayer> prayers = _builtIn,
   GoRouter? router,
@@ -701,7 +735,10 @@ Widget _app(
       ),
     ],
     child: router == null
-        ? MaterialApp(home: child)
+        ? MaterialApp(
+            theme: ThemeData(brightness: brightness),
+            home: child,
+          )
         : MaterialApp.router(routerConfig: router),
   );
 }

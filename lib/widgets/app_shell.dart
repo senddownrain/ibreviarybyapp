@@ -140,8 +140,8 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                     ),
                     if (shellOwnsTop)
                       Positioned(
-                        top: topPadding + 10,
-                        left: 14,
+                        top: topPadding + 8,
+                        left: 12,
                         child: _FloatingMenuButton(
                           onTap: () => showSecondaryMenu(context),
                         ),
@@ -178,14 +178,14 @@ class _FloatingMenuButton extends StatelessWidget {
       message: 'Меню',
       child: AdaptiveChromeSurface(
         role: ChromeSurfaceRole.control,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(24),
             child: SizedBox.square(
-              dimension: 52,
+              dimension: 48,
               child: Center(
                 child: PhosphorIcon(
                   PhosphorIconsRegular.list,

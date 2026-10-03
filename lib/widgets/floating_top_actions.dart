@@ -43,7 +43,7 @@ class FloatingTopActions extends StatelessWidget {
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -70,16 +70,15 @@ class FloatingTopActions extends StatelessWidget {
                 role: actions.length == 1
                     ? ChromeSurfaceRole.control
                     : ChromeSurfaceRole.group,
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(24),
                 child: Material(
                   color: Colors.transparent,
                   child: SizedBox(
-                    width: actions.length == 1 ? 52 : null,
-                    height: 52,
+                    width: actions.length == 1 ? 48 : null,
+                    height: 48,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      // A single action sits in a fixed 52dp circle; without
-                      // centring, its 48dp IconButton hugs the left edge.
+                      // Keep a single 48dp action centred in its surface.
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: actions,
                     ),
@@ -108,13 +107,13 @@ class _FloatingTopButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final button = AdaptiveChromeSurface(
       role: ChromeSurfaceRole.control,
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(24),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(28),
-          child: SizedBox(width: 52, height: 52, child: Center(child: child)),
+          borderRadius: BorderRadius.circular(24),
+          child: SizedBox(width: 48, height: 48, child: Center(child: child)),
         ),
       ),
     );
