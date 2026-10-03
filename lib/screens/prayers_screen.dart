@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/prayerbook_section_tiles.dart';
@@ -42,9 +43,9 @@ class PrayersScreen extends ConsumerWidget {
             child: ListView(
               key: const PageStorageKey('prayerbook-root-scroll'),
               padding: EdgeInsets.fromLTRB(
-                20,
-                top + 16,
-                20,
+                22,
+                top + 8,
+                22,
                 // The app shell's floating dock is included in padding when
                 // extendBody is enabled. Keep the final row clear of it with
                 // a small visual gap.
@@ -54,12 +55,9 @@ class PrayersScreen extends ConsumerWidget {
                 Text(
                   'Малітоўнік',
                   key: const Key('prayerbook-title'),
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.7,
-                  ),
+                  style: ReaderTheme.of(context).displayTitle(36),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 22),
                 const _SectionTitle(title: 'Абраныя'),
                 if (favorites.isEmpty)
                   const Padding(

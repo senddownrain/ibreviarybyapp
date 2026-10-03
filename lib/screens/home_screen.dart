@@ -70,9 +70,9 @@ class HomeScreen extends ConsumerWidget {
                       constraints: const BoxConstraints(maxWidth: 720),
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(
-                          24,
-                          top + 16,
-                          24,
+                          22,
+                          top + 8,
+                          22,
                           116 + MediaQuery.viewPaddingOf(context).bottom,
                         ),
                         child: Column(
@@ -80,7 +80,7 @@ class HomeScreen extends ConsumerWidget {
                           children: [
                             Text(
                               'Літургія гадзін',
-                              style: ReaderTheme.of(context).displayTitle(38),
+                              style: ReaderTheme.of(context).displayTitle(36),
                             ),
                             const SizedBox(height: 22),
                             _DateHeader(
