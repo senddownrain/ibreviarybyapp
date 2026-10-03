@@ -35,6 +35,9 @@ class BibleChapterScreen extends ConsumerStatefulWidget {
 }
 
 class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
+  static const double _compactThreshold = 180;
+  bool _didRequestCompact = false;
+
   static const _colors = <String, Color>{
     'amber': Color(0xFFE2AE34),
     'rose': Color(0xFFD37074),
@@ -90,6 +93,24 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     if (oldWidget.versionId != widget.versionId ||
         oldWidget.bookId != widget.bookId ||
         oldWidget.chapter != widget.chapter) {
+      _didRequestCompact = false;
+      final chrome = ReaderChromeModeScope.maybeControllerOf(context);
+      final initialMode =
+          AppRouteEntryScope.maybeOf(
+            context,
+          )?.entry.descriptor.defaultChromeMode ??
+          ReaderChromeMode.full;
+      final versionId = widget.versionId;
+      final bookId = widget.bookId;
+      final chapter = widget.chapter;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted &&
+            widget.versionId == versionId &&
+            widget.bookId == bookId &&
+            widget.chapter == chapter) {
+          chrome?.value = initialMode;
+        }
+      });
       _selected.clear();
       AppRouteEntryScope.maybeOf(context)?.showContextualBottomBar(false);
       _verseKeys.clear();
@@ -184,6 +205,19 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       ..dispose();
   }
 
+  bool _onScroll(ScrollNotification notification) {
+    if (!_didRequestCompact &&
+        notification.metrics.axis == Axis.vertical &&
+        notification.metrics.pixels >= _compactThreshold &&
+        notification is ScrollUpdateNotification &&
+        notification.dragDetails != null) {
+      _didRequestCompact = true;
+      ReaderChromeModeScope.maybeControllerOf(context)?.value =
+          ReaderChromeMode.compact;
+    }
+    return false;
+  }
+
   @override
   void dispose() {
     _routeScope?.showContextualBottomBar(false);
@@ -239,99 +273,104 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       child: ReadingScaffold(
         builder: (context, textStyle) => Stack(
           children: [
-            ReaderScaffold(
-              onSwipePrevious: _selected.isEmpty && _relative(-1) != null
-                  ? () => _goRelative(-1)
-                  : null,
-              onSwipeNext: _selected.isEmpty && _relative(1) != null
-                  ? () => _goRelative(1)
-                  : null,
-              showAmbient: false,
-              enableDoubleTapFullscreen: false,
-              scrollController: _scrollController,
-              scrollKey: PageStorageKey(
-                'bible-${_location.documentKey}-scroll',
-              ),
-              semanticLabel: '${book.name}, раздзел ${widget.chapter}',
-              chromeMode: ReaderChromeMode.compact,
-              leading: isSearchResult ? null : _menuLeading(),
-              actions: [
-                _ChromeAction(
-                  key: const Key('bible-search-open'),
-                  tooltip: 'Пошук у Бібліі',
-                  icon: PhosphorIconsRegular.magnifyingGlass,
-                  onPressed: () => _openSearch(book),
+            NotificationListener<ScrollNotification>(
+              onNotification: _onScroll,
+              child: ReaderScaffold(
+                onSwipePrevious: _selected.isEmpty && _relative(-1) != null
+                    ? () => _goRelative(-1)
+                    : null,
+                onSwipeNext: _selected.isEmpty && _relative(1) != null
+                    ? () => _goRelative(1)
+                    : null,
+                showAmbient: false,
+                enableDoubleTapFullscreen: false,
+                scrollController: _scrollController,
+                scrollKey: PageStorageKey(
+                  'bible-${_location.documentKey}-scroll',
                 ),
-                const TextScaleControl(),
-              ],
-              contextHeader: ReaderContextHeader(
-                eyebrow: book.isNewTestament ? 'НОВЫ ЗАПАВЕТ' : 'СТАРЫ ЗАПАВЕТ',
-                title: book.name,
-                titleActionLabel:
-                    'Выбраць кнігу або раздзел. Зараз ${book.name} ${widget.chapter}',
-                subtitle: 'Раздзел ${widget.chapter}',
-                metadata: bibleAttribution(
-                  versionId: widget.versionId,
-                  isNewTestament: book.isNewTestament,
+                semanticLabel: '${book.name}, раздзел ${widget.chapter}',
+                chromeMode: ReaderChromeMode.compact,
+                leading: isSearchResult ? null : _menuLeading(),
+                actions: [
+                  _ChromeAction(
+                    key: const Key('bible-search-open'),
+                    tooltip: 'Пошук у Бібліі',
+                    icon: PhosphorIconsRegular.magnifyingGlass,
+                    onPressed: () => _openSearch(book),
+                  ),
+                  const TextScaleControl(),
+                ],
+                contextHeader: ReaderContextHeader(
+                  eyebrow: book.isNewTestament
+                      ? 'НОВЫ ЗАПАВЕТ'
+                      : 'СТАРЫ ЗАПАВЕТ',
+                  title: book.name,
+                  titleActionLabel:
+                      'Выбраць кнігу або раздзел. Зараз ${book.name} ${widget.chapter}',
+                  subtitle: 'Раздзел ${widget.chapter}',
+                  metadata: bibleAttribution(
+                    versionId: widget.versionId,
+                    isNewTestament: book.isNewTestament,
+                  ),
+                  onTitleTap: () => _openPicker(book),
+                  actions: [_translationControl(book)],
                 ),
-                onTitleTap: () => _openPicker(book),
-                actions: [_translationControl(book)],
-              ),
-              content: Padding(
-                key: const Key('bible-selection-content-reserve'),
-                padding: EdgeInsets.only(
-                  bottom: _selected.isEmpty
-                      ? 0
-                      : Theme.of(context).platform == TargetPlatform.android
-                      ? floatingOverlayContentReserve(
-                          overlayHeight: _paletteHeight,
-                          overlayBottom: floatingOverlayBottom(
-                            context,
-                            gap: floatingPaletteGap(context),
+                content: Padding(
+                  key: const Key('bible-selection-content-reserve'),
+                  padding: EdgeInsets.only(
+                    bottom: _selected.isEmpty
+                        ? 0
+                        : Theme.of(context).platform == TargetPlatform.android
+                        ? floatingOverlayContentReserve(
+                            overlayHeight: _paletteHeight,
+                            overlayBottom: floatingOverlayBottom(
+                              context,
+                              gap: floatingPaletteGap(context),
+                            ),
+                            readerBottomPadding:
+                                ReaderContentSurface.bottomSpacing +
+                                MediaQuery.paddingOf(context).bottom,
+                            contentGap: 24,
+                          )
+                        : 72,
+                  ),
+                  child: Column(
+                    children: [
+                      if (verses.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(32),
+                          child: Center(
+                            child: Text('У гэтым раздзеле няма тэксту.'),
                           ),
-                          readerBottomPadding:
-                              ReaderContentSurface.bottomSpacing +
-                              MediaQuery.paddingOf(context).bottom,
-                          contentGap: 24,
                         )
-                      : 72,
-                ),
-                child: Column(
-                  children: [
-                    if (verses.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Center(
-                          child: Text('У гэтым раздзеле няма тэксту.'),
-                        ),
-                      )
-                    else
-                      for (final verse in verses)
-                        _VerseRow(
-                          key: _verseKeys.putIfAbsent(
-                            verse.verse,
-                            GlobalKey.new,
+                      else
+                        for (final verse in verses)
+                          _VerseRow(
+                            key: _verseKeys.putIfAbsent(
+                              verse.verse,
+                              GlobalKey.new,
+                            ),
+                            verseNum: verse.verse,
+                            text: verse.text,
+                            textStyle: textStyle,
+                            highlightColor: _resolvedColor(
+                              _highlights[verse.verse],
+                            ),
+                            selected: _selected.contains(verse.verse),
+                            onTap: () => _toggleVerse(verse.verse),
                           ),
-                          verseNum: verse.verse,
-                          text: verse.text,
-                          textStyle: textStyle,
-                          highlightColor: _resolvedColor(
-                            _highlights[verse.verse],
-                          ),
-                          selected: _selected.contains(verse.verse),
-                          onTap: () => _toggleVerse(verse.verse),
-                        ),
-                    const SizedBox(height: 24),
-                    _ChapterNavBar(
-                      book: book,
-                      chapter: widget.chapter,
-                      hasPrevious: _relative(-1) != null,
-                      hasNext: _relative(1) != null,
-                      onPrevious: () => _goRelative(-1),
-                      onCurrent: () => _openPicker(book),
-                      onNext: () => _goRelative(1),
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      _ChapterNavBar(
+                        book: book,
+                        chapter: widget.chapter,
+                        hasPrevious: _relative(-1) != null,
+                        hasNext: _relative(1) != null,
+                        onPrevious: () => _goRelative(-1),
+                        onCurrent: () => _openPicker(book),
+                        onNext: () => _goRelative(1),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

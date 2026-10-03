@@ -225,6 +225,44 @@ void main() {
       );
     });
 
+    testWidgets('inline chapter center opens the existing full-name picker', (
+      tester,
+    ) async {
+      await _pumpBible(tester);
+      final book = BibleRepository.getBooks('bel').first;
+      expect(find.byKey(const Key('bible-chapter-navigation')), findsOneWidget);
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -4000));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('bible-book-chapter-picker')));
+      await tester.pumpAndSettle();
+      expect(find.text('Кнігі і раздзелы'), findsOneWidget);
+      expect(find.text(book.name), findsWidgets);
+    });
+
+    testWidgets(
+      'manual downward scroll compacts the Bible dock and a new chapter resets it',
+      (tester) async {
+        final controller = ReaderChromeModeController(ReaderChromeMode.full);
+        addTearDown(controller.dispose);
+        final app = await _pumpBible(tester, chromeController: controller);
+        expect(controller.value, ReaderChromeMode.full);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -100));
+        await tester.pump();
+        expect(controller.value, ReaderChromeMode.full);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+        await tester.pump();
+        expect(controller.value, ReaderChromeMode.compact);
+
+        final next = BibleNavigation.relative(app.location, 1)!;
+        app.router.go(BibleNavigation.route(next));
+        await tester.pumpAndSettle();
+        expect(controller.value, ReaderChromeMode.full);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+        await tester.pump();
+        expect(controller.value, ReaderChromeMode.compact);
+      },
+    );
+
     testWidgets('next and previous chapter controls navigate', (tester) async {
       final app = await _pumpBible(tester);
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -4000));

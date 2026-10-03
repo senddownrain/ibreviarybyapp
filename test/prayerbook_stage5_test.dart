@@ -172,6 +172,52 @@ void main() {
     expect(find.byKey(const Key('holy-mass-destination')), findsOneWidget);
   });
 
+  testWidgets('root magnifier opens the original prayer-only search', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: '/prayers',
+      routes: [
+        GoRoute(
+          path: '/prayers',
+          builder: (context, state) => const PrayersScreen(),
+          routes: [
+            GoRoute(
+              path: 'search',
+              builder: (context, state) =>
+                  const PrayerCatalogScreen(searchInitially: true),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(_app(const SizedBox.shrink(), router: router));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView).first, const Offset(0, -900));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('all-prayers-destination')), findsOneWidget);
+    expect(find.byKey(const Key('my-prayers-destination')), findsOneWidget);
+    expect(find.byKey(const Key('library-browser-search')), findsNothing);
+    expect(find.byKey(const Key('library-scope-songs')), findsNothing);
+    await tester.tap(find.byKey(const Key('prayerbook-search-action')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PrayerCatalogScreen), findsOneWidget);
+    expect(
+      GoRouterState.of(tester.element(find.byType(PrayerCatalogScreen))).uri.path,
+      '/prayers/search',
+    );
+    expect(find.byKey(const ValueKey('prayer-row-morning')), findsOneWidget);
+    expect(find.byKey(const ValueKey('prayer-row-evening')), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('prayer-search-field')),
+      'дзякуй',
+    );
+    await tester.pump();
+    expect(find.byKey(const ValueKey('prayer-row-evening')), findsOneWidget);
+    expect(find.byKey(const ValueKey('prayer-row-morning')), findsNothing);
+  });
+
   testWidgets('empty favorites is compact and categories remain visible', (
     tester,
   ) async {

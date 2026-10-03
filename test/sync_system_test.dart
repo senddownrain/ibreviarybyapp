@@ -462,18 +462,10 @@ void main() {
       expect(SyncTarget.songs.collection, 'songs');
       expect(SyncTarget.songs.automatic, isFalse);
       expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.songs)));
-      expect(
-        kAutomaticSyncTargets,
-        containsAll(
-          SyncTarget.values.where(
-            (t) =>
-                t != SyncTarget.songs &&
-                t != SyncTarget.compendium &&
-                // The calendar is computed on the device.
-                t != SyncTarget.years,
-          ),
-        ),
-      );
+      expect(kAutomaticSyncTargets, contains(SyncTarget.prayers));
+      expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.bibleBel)));
+      expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.bibleRu)));
+      expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.compendium)));
       expect(SyncTarget.years.automatic, isFalse);
       expect(Hive.isBoxOpen('songs'), isTrue);
     });

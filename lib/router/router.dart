@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/screens/bible_search_screen.dart';
 import 'package:mybrev_flutter/screens/compendium_node_screen.dart';
 import 'package:mybrev_flutter/screens/compendium_reader_screens.dart';
 import 'package:mybrev_flutter/screens/compendium_screen.dart';
+import 'package:mybrev_flutter/screens/design_bottom_navigation_lab_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
@@ -28,6 +29,11 @@ import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+
+const bottomNavigationLabRoute = '/design/bottom-navigation-lab';
+const bottomNavigationLabEnabled = bool.fromEnvironment(
+  'IBREVIARY_BOTTOM_NAV_LAB',
+);
 
 const hoursRootRoute = AppRouteDescriptor(
   id: 'hours.root',
@@ -53,7 +59,7 @@ const prayerbookRootRoute = AppRouteDescriptor(
 const bibleRootRoute = AppRouteDescriptor(
   id: 'bible.root',
   branch: AppBranch.bible,
-  defaultChromeMode: ReaderChromeMode.compact,
+  defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.reader,
   isBranchRoot: true,
 );
@@ -572,6 +578,16 @@ final router = GoRouter(
       ],
     ),
 
+    if (bottomNavigationLabEnabled)
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: bottomNavigationLabRoute,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
+          child: const BottomNavigationLabScreen(),
+        ),
+      ),
+
     // Compatibility aliases normalize directly to a canonical branch route.
     GoRoute(path: '/', redirect: (_, state) => _withSameQuery('/hours', state)),
     GoRoute(
@@ -702,6 +718,7 @@ final router = GoRouter(
 );
 
 String _initialLocation() {
+  if (bottomNavigationLabEnabled) return bottomNavigationLabRoute;
   try {
     final box = HiveService.settingsBox;
     return startSectionLocation(
