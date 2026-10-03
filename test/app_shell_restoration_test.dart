@@ -29,11 +29,11 @@ class _MemorySettings extends SettingsNotifier {
 }
 
 void main() {
-  test('Bible root dock returns after a temporary selection owner', () {
+  test('Bible selection temporarily owns the bottom slot', () {
     const entry = AppRouteEntry(id: 'bible', descriptor: bibleRootRoute);
     final controller = BranchShellController(AppBranch.bible, bibleRootRoute)
       ..activate(entry);
-    expect(bibleRootRoute.showsNavigationDock, isTrue);
+    expect(bibleRootRoute.defaultChromeMode.name, 'full');
     expect(controller.navigationDockSuppressed, isFalse);
     controller.requestContextualBottomSlot(entry.id, visible: true);
     expect(controller.navigationDockSuppressed, isTrue);
@@ -134,33 +134,18 @@ void main() {
 
       router.go('/bible');
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('app-dock-compact')), findsOneWidget);
-      for (final branch in [
-        AppBranch.prayerbook,
-        AppBranch.readings,
-        AppBranch.hours,
+      expect(find.byKey(const Key('app-dock-full')), findsOneWidget);
+      for (final (branch, label) in [
+        (AppBranch.hours, 'Літургія'),
+        (AppBranch.readings, 'Чытанні'),
+        (AppBranch.prayerbook, 'Малітоўнік'),
       ]) {
-        if (find.byKey(const Key('app-dock-expand')).evaluate().isNotEmpty) {
-          await tester.tap(find.byKey(const Key('app-dock-expand')));
-          await tester.pumpAndSettle();
-        }
-        expect(find.byKey(const Key('app-dock-full')), findsOneWidget);
-        await tester.tap(
-          find.byKey(
-            Key(
-              'app-destination-${switch (branch) {
-                AppBranch.hours => 'Літургія',
-                AppBranch.readings => 'Чытанні',
-                AppBranch.prayerbook => 'Малітоўнік',
-                AppBranch.bible => 'Біблія',
-              }}',
-            ),
-          ),
-        );
+        await tester.tap(find.byKey(Key('app-destination-$label')));
         await tester.pumpAndSettle();
         expect(find.text(branch.name), findsOneWidget);
         router.go('/bible');
         await tester.pumpAndSettle();
+        expect(find.byKey(const Key('app-dock-full')), findsOneWidget);
       }
       await tester.pumpWidget(const SizedBox.shrink());
     },

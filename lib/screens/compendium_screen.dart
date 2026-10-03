@@ -73,20 +73,6 @@ class _CompendiumRoot extends ConsumerWidget {
             : '${index.requireValue.questions.length} пытанняў і адказаў',
         style: TextStyle(color: cs.onSurfaceVariant),
       ),
-      TextButton.icon(
-        key: const Key('compendium-library-search'),
-        onPressed: () => context.push(
-          Uri(
-            path: '/prayers/library-search',
-            queryParameters: {
-              'scope': 'compendium',
-              'q': ref.read(compendiumSearchQueryProvider),
-            },
-          ).toString(),
-        ),
-        icon: const Icon(Icons.search_rounded),
-        label: const Text('Пошук ва ўсім Малітоўніку'),
-      ),
       const SizedBox(height: 14),
     ];
 

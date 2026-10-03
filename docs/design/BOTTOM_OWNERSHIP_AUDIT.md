@@ -1,72 +1,20 @@
 # Phase 2A — Bottom Ownership Audit
 
-## Phase 2B corrective pass — current production decision
+## Current production status after the Phase 2B rollback
 
-After reviewing Phase 2B in the app, Bible is again a global branch with its
-global dock visible on the chapter reader. The fixed floating chapter bar was
-removed. The top reader context opens the existing full book/chapter picker;
-horizontal swipes still use `BibleNavigation.relative()` across book boundaries.
-Canonical full book names remain in the data, reader context and picker.
-Verse selection temporarily suppresses the global dock for its palette; closing
-selection restores the global dock.
+Phase 2B's product experiment was rejected after in-app review. Production
+behavior was restored to the pre-2B state (`bc92f01`): there is no shared
+Library Browser or cross-domain search. Prayer search is prayer-only;
+Songbook and Compendium retain their own screens and search systems. Bible
+keeps the global app dock and the old inline end-of-chapter navigator, with
+the existing full book/chapter picker, swipe, search, and selection palette.
 
-Prayerbook root is one continuous scroll: shelf and categories, then an inline
-Library Browser. There is no Search tile or Search entity in the shelf. The
-top search action scrolls to the inline field. Browser scopes are `Малітвы`,
-`Спеўнік`, and `Катэхізіс`; only the active scope builds rows. Empty query
-means browse all prayers, all songs, or the Compendium parts. A nonempty query
-uses each domain's existing search function. Query persists across scope
-changes. The global dock remains on the root; focused search temporarily
-suppresses it while the keyboard is active. Back dismisses focus in place.
-The standalone `/prayers/library-search` route remains for existing links.
+The sole new visible behavior is that the **full** four-branch dock appears at
+the top of a Bible chapter and becomes **compact** after a deliberate downward
+scroll past the Readings threshold. Mass and Ora retain their pre-2B behavior.
 
-Current decisions: Mass = its existing local selector; Bible = global dock +
-top picker + swipe; Ora = global dock + scroll-to-top; Prayerbook root = shelf
-+ continuous Library Browser; Search is a temporary mode, not a separate
-Prayerbook entity. The Phase 2B description below records the earlier state
-and is superseded by this corrective section where it differs.
-
-## Phase 2B — принятые решения и реализация
-
-Phase 2B развивается на ветке Phase 2A (`bc92f01`); `main` на момент старта
-оставался на чистом Color Foundations commit `ad437ff`. Prototype lab остаётся
-исследовательским экраном и не используется как production-компонент.
-
-Принята модель **разные функции, одна визуальная и геометрическая семья**.
-Mass сохраняет существующий selector, active section tracking, `n/5`, section
-sheet, управление языком сверху и измеренный inset. Стрелки в Mass не
-добавляются. Bible использует floating `previous | current | next`,
-`BibleNavigation.relative()` и один существующий picker с двумя входами:
-верхним title и центром bar. Палитра выделения заменяет Bible bar.
-
-Ora не получает последовательную навигацию часов: выбор остаётся в верхнем
-контексте, а после длинной прокрутки появляется существующая reader-кнопка
-«Да пачатку». Обычная молитва и песня не получают previous/next. Search
-в Prayer catalog, Songbook и Compendium остаётся contextual bottom owner,
-подавляющим global dock. Search dock разделяет `AdaptiveChromeSurface`,
-safe-area anchor и `BottomControlGeometry`: iOS glass, Android neutral tonal.
-
-Library Search Mode доступен в конце полки Малітоўніка и через действия
-в Prayerbook, Songbook и Compendium. Начальная область определяется входом:
-`Малітвы`, `Спеўнік`, `Катэхізіс` соответственно. Query принадлежит одному
-экрану и сохраняется при переключении scope. Каждая область использует свою
-существующую функцию поиска, данные и result row; chips входят в search UI,
-не образуют второй bottom bar. Маршрут: `/prayers/library-search`, с
-`?scope=songs` или `?scope=compendium` для контекстного входа. При входе из
-Songbook или Compendium текущий query передаётся в режим через параметр `q`.
-
-Текущий production bottom owner после Phase 2B: root ветки — global;
-Mass — local selector; Bible chapter — local chapter bar, при выделении —
-selection; Ora, prayer detail, song detail — существующий compact global
-dock без локального prev/next; каталоги с поиском и Library Search — search.
-Compendium question пока сохраняет search dock и inline pager. Общий typed
-`BottomOwner` не вводился: route descriptor и contextual slot покрывают эти
-переходы. Дальнейшую архитектурную миграцию следует решать отдельно после
-проверки Compendium search/reader и Bible search/IME.
-
-Разделы ниже фиксируют аудит и гипотезы **Phase 2A**. Там, где они предлагают
-иной результат (в частности, локальный Hours navigator или общий
-`ReaderBottomBar`), решение Phase 2B выше имеет приоритет.
+The remainder of this document records the historical Phase 2A audit and
+prototypes. Its proposed migrations are not current product decisions.
 
 Проверено по production-коду после чистого merge Color Foundations Phase 1
 (ad437ff). Phase 2A не переносит production navigation на новый компонент.
@@ -187,7 +135,7 @@ Mass B может остаться отдельным valid pattern даже п�
 добавить --dart-define=IBREVIARY_PLATFORM=ios или android. Эти preview flags
 меняют Flutter platform styling, не симулируют нативное устройство.
 
-### Исторический Phase 2A migration plan до решений Phase 2B
+### Следующая production migration после выбора
 
 1. Записать выбранный A/B/C как default geometry локальной навигации.
    Исключение Mass selector сохраняется, если владелец не выберет для него

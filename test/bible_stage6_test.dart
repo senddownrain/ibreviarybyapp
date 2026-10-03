@@ -164,10 +164,9 @@ void main() {
         expect(find.text('БЕЛ'), findsOneWidget);
         expect(find.text('РУС'), findsOneWidget);
         expect(
-          find.byKey(const Key('reader-context-title-action')),
+          find.byKey(const Key('bible-book-chapter-picker')),
           findsOneWidget,
         );
-        expect(find.byKey(const Key('bible-chapter-navigation')), findsNothing);
         expect(find.byKey(const Key('bible-search-open')), findsOneWidget);
         expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
       },
@@ -226,44 +225,49 @@ void main() {
       );
     });
 
-    testWidgets('top context opens picker with canonical full book names', (
+    testWidgets('inline chapter center opens the existing full-name picker', (
       tester,
     ) async {
       await _pumpBible(tester);
-      final first = BibleRepository.getBooks('bel').first;
-      await tester.tap(find.byKey(const Key('reader-context-title-action')));
+      final book = BibleRepository.getBooks('bel').first;
+      expect(find.byKey(const Key('bible-chapter-navigation')), findsOneWidget);
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -4000));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('bible-book-chapter-picker')));
       await tester.pumpAndSettle();
       expect(find.text('Кнігі і раздзелы'), findsOneWidget);
-      expect(find.text(first.name), findsWidgets);
+      expect(find.text(book.name), findsWidgets);
     });
 
     testWidgets(
-      'reader has no fixed chapter controls at width and text matrix',
+      'manual downward scroll compacts the Bible dock and a new chapter resets it',
       (tester) async {
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.resetDevicePixelRatio);
-        for (final width in [320.0, 360.0, 390.0, 700.0]) {
-          for (final scale in [1.0, 1.5, 2.0]) {
-            tester.view.physicalSize = Size(width, 720);
-            await _pumpBible(tester, textScale: scale);
-            expect(
-              find.byKey(const Key('bible-chapter-navigation')),
-              findsNothing,
-            );
-            expect(tester.takeException(), isNull);
-            await tester.pumpWidget(const SizedBox.shrink());
-          }
-        }
-        addTearDown(tester.view.resetPhysicalSize);
+        final controller = ReaderChromeModeController(ReaderChromeMode.full);
+        addTearDown(controller.dispose);
+        final app = await _pumpBible(tester, chromeController: controller);
+        expect(controller.value, ReaderChromeMode.full);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -100));
+        await tester.pump();
+        expect(controller.value, ReaderChromeMode.full);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+        await tester.pump();
+        expect(controller.value, ReaderChromeMode.compact);
+
+        final next = BibleNavigation.relative(app.location, 1)!;
+        app.router.go(BibleNavigation.route(next));
+        await tester.pumpAndSettle();
+        expect(controller.value, ReaderChromeMode.full);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+        await tester.pump();
+        expect(controller.value, ReaderChromeMode.compact);
       },
     );
 
-    testWidgets('swipe next and previous navigate chapters', (tester) async {
+    testWidgets('next and previous chapter controls navigate', (tester) async {
       final app = await _pumpBible(tester);
-      await tester.drag(
-        find.byKey(const Key('horizontal-swipe-navigation')),
-        const Offset(-240, 0),
-      );
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -4000));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('bible-next-chapter')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       expect(
@@ -275,10 +279,9 @@ void main() {
             .queryParameters['chapter'],
         '2',
       );
-      await tester.drag(
-        find.byKey(const Key('horizontal-swipe-navigation')),
-        const Offset(240, 0),
-      );
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -4000));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('bible-previous-chapter')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       expect(

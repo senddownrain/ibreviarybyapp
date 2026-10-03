@@ -12,7 +12,6 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
-import 'package:mybrev_flutter/widgets/bottom_control_geometry.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 String songLocation(String id) =>
@@ -96,17 +95,6 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
         key: const Key('songbook-count'),
         style: TextStyle(color: cs.onSurfaceVariant),
       ),
-      TextButton.icon(
-        key: const Key('songbook-library-search'),
-        onPressed: () => context.push(
-          Uri(
-            path: '/prayers/library-search',
-            queryParameters: {'scope': 'songs', 'q': _query.text},
-          ).toString(),
-        ),
-        icon: const Icon(Icons.search_rounded),
-        label: const Text('Пошук ва ўсім Малітоўніку'),
-      ),
       if (filter.selectedTags.isNotEmpty) ...[
         const SizedBox(height: 12),
         Wrap(
@@ -175,7 +163,7 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
           ),
           FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
           FloatingOverlayPositioned(
-            gap: BottomControlGeometry.gap,
+            gap: 12,
             child: Center(
               child: PrayerSearchDock(
                 hintText: 'Пошук спеваў',

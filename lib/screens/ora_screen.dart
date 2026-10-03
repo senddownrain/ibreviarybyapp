@@ -422,7 +422,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         chromeMode: _chromeMode,
         onChromeModeChanged: (mode) => setState(() => _chromeMode = mode),
         scrollController: _scrollController,
-        showScrollToTop: true,
         scrollKey: PageStorageKey(
           'ora-${widget.date.toIso8601String()}-${widget.dayId}-${widget.oraType}',
         ),

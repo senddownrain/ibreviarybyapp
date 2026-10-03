@@ -465,6 +465,7 @@ void main() {
       expect(kAutomaticSyncTargets, contains(SyncTarget.prayers));
       expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.bibleBel)));
       expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.bibleRu)));
+      expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.compendium)));
       expect(SyncTarget.years.automatic, isFalse);
       expect(Hive.isBoxOpen('songs'), isTrue);
     });
