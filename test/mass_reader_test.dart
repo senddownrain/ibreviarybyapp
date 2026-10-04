@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/models/mass_ritual.dart';
@@ -17,6 +18,8 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart'
     show massReaderRoute, prayerDetailDescriptorFor;
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/mass_semantics.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
@@ -389,6 +392,20 @@ void main() {
     expect(find.text('Ordo Missae'), findsOneWidget);
     expect(find.byKey(const Key('mass-navigator-bar')), findsOneWidget);
     expect(_position(tester), '1/5');
+    final html = tester.widget<Html>(find.byType(Html).first);
+    final reader = ReaderTheme.of(tester.element(find.byType(Html).first));
+    final rubric = html.style['.prayer-rubric p']!;
+    expect(rubric.color, reader.rubric);
+    expect(rubric.fontStyle, FontStyle.normal);
+    expect(rubric.lineHeight?.size, ReaderTheme.rubricHeight);
+    final major = html.style['.${MassBlockClass.major}']!;
+    expect(major.lineHeight?.size, reader.majorHeading(17).height);
+    expect(major.margin?.top?.value, 0);
+    final later = tester.widget<Html>(find.byType(Html).at(1));
+    expect(
+      later.style['.${MassBlockClass.major}']?.margin?.top?.value,
+      LiturgicalSpacing.sectionBefore,
+    );
   });
 
   testWidgets('controls fit a narrow phone with large text', (tester) async {
@@ -434,6 +451,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('The Order of Mass'), findsOneWidget);
     expect(find.byKey(const Key('mass-variant-source')), findsOneWidget);
+    final source = tester.widget<Text>(
+      find.byKey(const Key('mass-variant-source')),
+    );
+    final reader = ReaderTheme.of(
+      tester.element(find.byKey(const Key('mass-variant-source'))),
+    );
+    expect(source.style?.color, reader.muted);
+    expect(source.style?.height, ReaderTheme.metadataHeight);
   });
 
   testWidgets('system back closes the sections sheet before the reader', (

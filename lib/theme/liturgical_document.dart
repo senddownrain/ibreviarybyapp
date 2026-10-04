@@ -2,6 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
+/// The same unspoken direction in HTML documents of different domains.
+Style readerRubricHtmlStyle({
+  required ReaderTheme reader,
+  required TextStyle body,
+  Margins? margin,
+  TextAlign? textAlign,
+}) {
+  final rubric = reader.rubricBlock(body.fontSize ?? 16);
+  return Style(
+    color: rubric.color,
+    fontFamily: body.fontFamily,
+    fontSize: FontSize(rubric.fontSize!),
+    lineHeight: LineHeight(rubric.height!),
+    fontStyle: rubric.fontStyle,
+    fontWeight: rubric.fontWeight,
+    margin: margin,
+    textAlign: textAlign,
+  );
+}
+
 /// Shared HTML role styling for document surfaces. Screen renderers may add
 /// structure-specific rules (choirs, intercessions), but roles live here.
 Map<String, Style> liturgicalDocumentStyles({
@@ -11,6 +31,7 @@ Map<String, Style> liturgicalDocumentStyles({
 }) {
   final size = body.fontSize ?? 16;
   final heading = reader.blockHeading(size);
+  final reference = reader.referenceStyle(size);
   final metadataSize = (size * .88).clamp(14, double.infinity).toDouble();
   return {
     'body': Style(
@@ -69,18 +90,14 @@ Map<String, Style> liturgicalDocumentStyles({
       color: reader.rubric,
       fontStyle: FontStyle.normal,
     ),
-    '.liturgical-rubric': Style(
-      color: reader.rubric,
-      fontSize: FontSize((size * .90).clamp(14, double.infinity).toDouble()),
-      lineHeight: LineHeight(ReaderTheme.rubricHeight),
-      fontStyle: FontStyle.normal,
-      fontWeight: FontWeight.normal,
-    ),
+    '.liturgical-rubric': readerRubricHtmlStyle(reader: reader, body: body),
     '.liturgical-rubric-inline': Style(color: reader.rubric),
     '.liturgical-reading-reference': Style(
-      color: reader.muted,
-      fontSize: FontSize(metadataSize),
-      fontWeight: FontWeight.w500,
+      color: reference.color,
+      fontFamily: body.fontFamily,
+      fontSize: FontSize(reference.fontSize!),
+      lineHeight: LineHeight(reference.height!),
+      fontWeight: reference.fontWeight,
     ),
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
     '.responsory-turn': Style(margin: Margins.only(bottom: 3)),

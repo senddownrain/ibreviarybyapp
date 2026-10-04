@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/compendium_node_screen.dart';
 import 'package:mybrev_flutter/screens/compendium_reader_screens.dart';
 import 'package:mybrev_flutter/screens/compendium_screen.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
@@ -76,6 +77,19 @@ void main() {
         find.textContaining('Libreria Editrice Vaticana', findRichText: true),
         findsOneWidget,
       );
+      final sourceText = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(const Key('compendium-source')),
+          matching: find.byType(Text),
+        ),
+      );
+      expect(sourceText.style?.height, ReaderTheme.metadataHeight);
+      expect(
+        sourceText.style?.color,
+        ReaderTheme.of(
+          tester.element(find.byKey(const Key('compendium-source'))),
+        ).muted,
+      );
     });
 
     testWidgets('source attribution opens Catholic.by externally', (
@@ -95,6 +109,14 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      final refs = tester.widget<Text>(
+        find.byKey(const ValueKey('compendium-refs-1')),
+      );
+      final reader = ReaderTheme.of(
+        tester.element(find.byKey(const ValueKey('compendium-refs-1'))),
+      );
+      expect(refs.style?.color, reader.muted);
+      expect(refs.style?.height, ReaderTheme.referenceHeight);
       final source = find.byKey(const Key('compendium-source'));
       await tester.ensureVisible(source);
       await tester.pumpAndSettle();

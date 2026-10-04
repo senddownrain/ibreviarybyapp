@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mybrev_flutter/constants/compendium.dart';
 import 'package:mybrev_flutter/models/compendium.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
@@ -22,16 +23,22 @@ final compendiumLinkLauncherProvider = Provider<Future<bool> Function(Uri)>(
 /// Visible attribution with a link to the Catholic.by source page, shown on
 /// every Compendium screen.
 class CompendiumSourceAttribution extends ConsumerWidget {
-  const CompendiumSourceAttribution({super.key, this.onReader = false});
+  const CompendiumSourceAttribution({
+    super.key,
+    this.onReader = false,
+    this.readerTextStyle,
+  });
 
   /// Uses reader surface colours (inside [ReaderContentSurface]).
   final bool onReader;
+  final TextStyle? readerTextStyle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final reader = ReaderTheme.of(context);
-    final muted = onReader ? reader.muted : cs.onSurfaceVariant;
+    final muted = reader.muted;
+    final settings = ref.watch(settingsProvider);
     final link = onReader
         ? reader.rubric
         : GlassTokens.of(context).accentOnSurface(cs.tertiary);
@@ -61,7 +68,13 @@ class CompendiumSourceAttribution extends ConsumerWidget {
           if (copyright.isNotEmpty) TextSpan(text: '. $copyright'),
         ],
       ),
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: muted),
+      style: onReader && readerTextStyle != null
+          ? reader
+                .sourceStyle(readerTextStyle!.fontSize ?? 16)
+                .copyWith(fontFamily: readerTextStyle!.fontFamily)
+          : reader
+                .sourceStyle(settings.fontSize, family: settings.fontFamily)
+                .copyWith(color: muted),
     );
     return Padding(
       padding: EdgeInsets.only(top: onReader ? 28 : 20),
@@ -359,7 +372,9 @@ class CompendiumAnswer extends StatelessWidget {
       children: [
         for (final paragraph in paragraphs)
           Padding(
-            padding: EdgeInsets.only(bottom: size * 0.6),
+            padding: const EdgeInsets.only(
+              bottom: LiturgicalSpacing.paragraphAfter,
+            ),
             child: Text.rich(
               TextSpan(
                 children: [
@@ -383,11 +398,15 @@ class CompendiumAnswer extends StatelessWidget {
           ),
         if (question.cccRefs.isNotEmpty)
           Padding(
-            padding: EdgeInsets.only(bottom: size * 0.6),
+            padding: const EdgeInsets.only(
+              bottom: LiturgicalSpacing.metadataToBody,
+            ),
             child: Text(
               'ККК ${formatCccRefs(question.cccRefs)}',
               key: ValueKey('compendium-refs-${question.number}'),
-              style: reader.metadata(size),
+              style: reader
+                  .referenceStyle(size)
+                  .copyWith(fontFamily: textStyle.fontFamily),
             ),
           ),
         for (final citation in question.citations)

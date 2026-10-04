@@ -804,7 +804,7 @@ class _VerseRow extends StatelessWidget {
               textScaler: MediaQuery.textScalerOf(context),
               text: TextSpan(
                 style: textStyle.copyWith(
-                  color: cs.onSurface,
+                  color: ReaderTheme.of(context).ink,
                   height: ReaderTheme.bodyHeight,
                 ),
                 children: [

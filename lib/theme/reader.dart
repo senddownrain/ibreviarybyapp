@@ -42,6 +42,7 @@ class ReaderTheme {
   static const double rubricHeight = 1.48;
   static const double metadataHeight = 1.42;
   static const double headingHeight = 1.28;
+  static const double documentTitleSize = 33;
 
   factory ReaderTheme.of(BuildContext context) => ReaderTheme._(
     Theme.of(context).brightness == Brightness.dark,
@@ -73,6 +74,10 @@ class ReaderTheme {
         ? base
         : GoogleFonts.cormorantGaramond(textStyle: base);
   }
+
+  /// A document title is fixed to the page scale, independent of reader Aa.
+  TextStyle documentTitle() =>
+      displayTitle(documentTitleSize).copyWith(height: 1.12);
 
   TextStyle body(double size, {String? family}) {
     final base = TextStyle(fontSize: size, height: bodyHeight, color: ink);
@@ -142,16 +147,21 @@ class ReaderTheme {
         family: family,
       ).copyWith(fontWeight: FontWeight.w500);
 
-  TextStyle metadata(double bodySize, {bool italic = false}) =>
-      body((bodySize * .88).clamp(14, double.infinity)).copyWith(
+  TextStyle metadata(double bodySize, {bool italic = false, String? family}) =>
+      body(
+        (bodySize * .88).clamp(14, double.infinity),
+        family: family,
+      ).copyWith(
         height: metadataHeight,
         color: muted,
         fontStyle: italic ? FontStyle.italic : FontStyle.normal,
       );
 
-  TextStyle rubricBlock(double bodySize) => body(
-    (bodySize * .90).clamp(14, double.infinity),
-  ).copyWith(height: rubricHeight, color: rubric, fontStyle: FontStyle.normal);
+  TextStyle sourceStyle(double bodySize, {String? family}) =>
+      metadata(bodySize, family: family);
+
+  TextStyle rubricBlock(double bodySize, {String? family}) =>
+      rubricStyle((bodySize * .90).clamp(14, double.infinity), family: family);
 }
 
 /// Vertical relationships belong to semantic roles, not individual hours.

@@ -145,7 +145,8 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
               transpose: _transpose,
               onRightFallbackChanged: _setRightFallback,
             ),
-            if (song.source.isNotEmpty) _SongSource(song: song),
+            if (song.source.isNotEmpty)
+              _SongSource(song: song, bodyStyle: textStyle),
           ],
         ),
       ),
@@ -154,9 +155,10 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
 }
 
 class _SongSource extends StatelessWidget {
-  const _SongSource({required this.song});
+  const _SongSource({required this.song, required this.bodyStyle});
 
   final Song song;
+  final TextStyle bodyStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -180,9 +182,9 @@ class _SongSource extends StatelessWidget {
                 TextSpan(text: song.source),
               ],
             ),
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: reader.muted),
+            style: reader
+                .sourceStyle(bodyStyle.fontSize ?? 16)
+                .copyWith(fontFamily: bodyStyle.fontFamily),
           ),
         ),
       ),
