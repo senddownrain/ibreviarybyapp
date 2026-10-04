@@ -35,6 +35,16 @@ void main() {
     expect(rubric.fontSize, lessThan(16));
     expect(styles, contains('.office-reading-pericope-title'));
     expect(styles, contains('.liturgical-rubric'));
+    final htmlRubric = styles['.liturgical-rubric']!;
+    final prayerRubric = readerRubricHtmlStyle(
+      reader: reader,
+      body: reader.body(16),
+    );
+    expect(htmlRubric.color, prayerRubric.color);
+    expect(htmlRubric.fontSize?.value, prayerRubric.fontSize?.value);
+    expect(htmlRubric.lineHeight?.size, prayerRubric.lineHeight?.size);
+    expect(htmlRubric.fontStyle, FontStyle.normal);
+    expect(styles['.liturgical-reading-reference']?.color, reader.muted);
   });
 
   test('short reading title and reference become distinct roles', () {

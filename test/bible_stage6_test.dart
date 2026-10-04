@@ -260,6 +260,8 @@ void main() {
         await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
         await tester.pump();
         expect(controller.value, ReaderChromeMode.compact);
+        // Let the gesture recognizer's short double-tap window expire.
+        await tester.pump(const Duration(milliseconds: 50));
       },
     );
 

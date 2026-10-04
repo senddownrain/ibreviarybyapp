@@ -189,6 +189,6 @@ void main() {
       find.byKey(const Key('floating-top-actions-surface')),
     );
     expect(size.width, size.height);
-    expect(size.width, closeTo(53.6, 0.01));
+    expect(size.width, closeTo(49.6, 0.01));
   });
 }

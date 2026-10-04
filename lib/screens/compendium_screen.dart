@@ -6,7 +6,9 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:mybrev_flutter/constants/compendium.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_search_host.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
@@ -174,6 +176,7 @@ class _CompendiumPartScreenState extends ConsumerState<CompendiumPartScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final state = ref.watch(compendiumIndexProvider);
+    final bodySize = ref.watch(settingsProvider).fontSize;
     final outline = state.valueOrNull?.partReadingOutline(widget.partId);
     final targetIndex = outline?.targetIndices[widget.target];
     if (targetIndex != null && _scheduledTarget != widget.target) {
@@ -223,7 +226,10 @@ class _CompendiumPartScreenState extends ConsumerState<CompendiumPartScreen> {
                   if (position == itemCount - 1) {
                     return const CompendiumSourceAttribution();
                   }
-                  return _PartItem(item: outline.items[position - 1]);
+                  return _PartItem(
+                    item: outline.items[position - 1],
+                    bodySize: bodySize,
+                  );
                 },
               ),
             ),
@@ -260,7 +266,7 @@ class _PartHeader extends StatelessWidget {
           Text(
             outline.part.title,
             key: const Key('compendium-part-title'),
-            style: theme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+            style: ReaderTheme.of(context).documentTitle(),
           ),
         ],
       ),
@@ -269,8 +275,9 @@ class _PartHeader extends StatelessWidget {
 }
 
 class _PartItem extends StatelessWidget {
-  const _PartItem({required this.item});
+  const _PartItem({required this.item, required this.bodySize});
   final CompendiumPartItem item;
+  final double bodySize;
 
   @override
   Widget build(BuildContext context) {
@@ -282,6 +289,7 @@ class _PartItem extends StatelessWidget {
     }
     final cs = Theme.of(context).colorScheme;
     final theme = Theme.of(context).textTheme;
+    final reader = ReaderTheme.of(context);
     final accent = GlassTokens.of(context).accentOnSurface(cs.tertiary);
     if (item.kind == CompendiumPartItemKind.leadCitations) {
       return Column(
@@ -343,20 +351,14 @@ class _PartItem extends StatelessWidget {
           ],
           Text(
             item.title ?? '',
-            style:
-                (isSection
-                        ? theme.titleLarge
-                        : isSubsection
-                        ? theme.titleMedium
-                        : isSubtopic
-                        ? theme.bodyLarge
-                        : theme.titleMedium)
-                    ?.copyWith(
-                      fontWeight: isSection || isSubsection
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      fontStyle: isSubtopic ? FontStyle.italic : null,
-                    ),
+            style: isSection
+                ? reader.majorHeading(bodySize)
+                : isSubsection
+                ? reader.blockHeading(bodySize)
+                : (isSubtopic ? theme.bodyLarge : theme.titleMedium)?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontStyle: isSubtopic ? FontStyle.italic : null,
+                  ),
           ),
         ],
       ),

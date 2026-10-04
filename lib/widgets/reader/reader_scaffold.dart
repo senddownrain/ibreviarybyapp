@@ -624,12 +624,7 @@ class ReaderContextHeader extends StatelessWidget {
     final accent = accentColor ?? cs.primary;
     final titleText = Text(
       title,
-      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-        color: cs.onSurface,
-        fontSize: 27,
-        fontWeight: FontWeight.w600,
-        height: 1.18,
-      ),
+      style: ReaderTheme.of(context).documentTitle(),
     );
 
     return SizedBox(

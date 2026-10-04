@@ -19,6 +19,7 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/mass_semantics.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
@@ -371,6 +372,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
     if (html.contains('<') && html.contains('>')) {
       final reader = ReaderTheme.of(context);
       final heading = reader.blockHeading(textStyle.fontSize ?? 16);
+      final major = reader.majorHeading(textStyle.fontSize ?? 16);
       final textColor =
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
       final formattedHtml = formatLiturgicalHtml(html);
@@ -391,7 +393,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           fontSize: FontSize(textStyle.fontSize ?? 16),
           fontFamily: textStyle.fontFamily,
           color: textColor,
-          margin: Margins.only(bottom: 10),
+          margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
         ),
         'ul': Style(
           margin: Margins.symmetric(vertical: 10),
@@ -404,12 +406,15 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           listStylePosition: ListStylePosition.outside,
         ),
         'h2': Style(
-          fontFamily: heading.fontFamily,
-          fontSize: FontSize(heading.fontSize!),
-          lineHeight: LineHeight(heading.height!),
-          fontWeight: heading.fontWeight,
+          fontFamily: major.fontFamily,
+          fontSize: FontSize(major.fontSize!),
+          lineHeight: LineHeight(major.height!),
+          fontWeight: major.fontWeight,
           color: reader.rubric,
-          margin: Margins.only(top: 16, bottom: 8),
+          margin: Margins.only(
+            top: LiturgicalSpacing.sectionBefore,
+            bottom: LiturgicalSpacing.sectionTitleToBody,
+          ),
         ),
         'h3': Style(
           fontFamily: heading.fontFamily,
@@ -417,31 +422,33 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           lineHeight: LineHeight(heading.height!),
           fontWeight: heading.fontWeight,
           color: reader.rubric,
-          margin: Margins.only(top: 14, bottom: 6),
+          margin: Margins.only(
+            top: LiturgicalSpacing.sectionBefore,
+            bottom: LiturgicalSpacing.sectionTitleToBody,
+          ),
         ),
         if (isMass)
           'em': Style(color: reader.rubric, fontStyle: FontStyle.italic),
-        '.prayer-rubric': Style(
-          color: textColor,
-          fontStyle: FontStyle.italic,
-          fontSize: FontSize((textStyle.fontSize ?? 16) * 0.90),
-          lineHeight: LineHeight(ReaderTheme.rubricHeight),
-          margin: Margins.symmetric(vertical: 14),
-          padding: HtmlPaddings.only(left: 13, top: 1, bottom: 1),
-          border: Border(left: BorderSide(color: reader.rubric, width: 3)),
+        '.prayer-rubric': readerRubricHtmlStyle(
+          reader: reader,
+          body: textStyle,
+          margin: Margins.zero,
+        )..padding = HtmlPaddings.zero,
+        '.prayer-rubric p': readerRubricHtmlStyle(
+          reader: reader,
+          body: textStyle,
+          margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
         ),
-        '.prayer-rubric p': Style(
-          color: textColor,
-          fontStyle: FontStyle.italic,
-          fontSize: FontSize((textStyle.fontSize ?? 16) * 0.90),
-          lineHeight: LineHeight(ReaderTheme.rubricHeight),
+        '.prayer-rubric em': Style(
+          color: reader.rubric,
+          fontStyle: FontStyle.normal,
         ),
         '.psalm-marker': Style(
           color: reader.rubric,
           fontWeight: FontWeight.w600,
         ),
         '.liturgical-rubric-inline': Style(color: reader.rubric),
-        if (isMass) ..._massStyles(reader, textColor, textStyle.fontSize ?? 16),
+        if (isMass) ..._massStyles(reader, textStyle),
       };
       if (isMass) {
         return _MassDocument(
@@ -451,6 +458,9 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           variant: massVariant,
           controller: _massNav,
           scrollController: _scrollController,
+          sourceStyle: reader
+              .sourceStyle(textStyle.fontSize ?? 16)
+              .copyWith(fontFamily: textStyle.fontFamily),
         );
       }
       return Html(onLinkTap: _onLinkTap, data: formattedHtml, style: styles);
@@ -462,7 +472,9 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
 /// One renderer style per semantic Mass element (see [MassBlockClass]), used
 /// for every language variant. Meaning is carried by weight, style, size and
 /// layout, not only by colour.
-Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) {
+Map<String, Style> _massStyles(ReaderTheme reader, TextStyle body) {
+  final size = body.fontSize ?? 16;
+  final text = body.color ?? reader.ink;
   final heading = reader.blockHeading(size);
   final major = reader.majorHeading(size);
   return {
@@ -476,16 +488,22 @@ Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) {
       fontSize: FontSize(major.fontSize!),
       fontWeight: major.fontWeight,
       color: reader.rubric,
-      lineHeight: LineHeight(1.25),
-      margin: Margins.only(top: 28, bottom: 12),
+      lineHeight: LineHeight(major.height!),
+      margin: Margins.only(
+        top: LiturgicalSpacing.sectionBefore,
+        bottom: LiturgicalSpacing.sectionTitleToBody,
+      ),
     ),
     '.${MassBlockClass.subsection}': Style(
       fontFamily: heading.fontFamily,
       fontSize: FontSize(heading.fontSize!),
       fontWeight: heading.fontWeight,
       color: reader.rubric,
-      lineHeight: LineHeight(1.3),
-      margin: Margins.only(top: 20, bottom: 8),
+      lineHeight: LineHeight(heading.height!),
+      margin: Margins.only(
+        top: LiturgicalSpacing.sectionBefore,
+        bottom: LiturgicalSpacing.sectionTitleToBody,
+      ),
     ),
     '.${MassBlockClass.minorHeading}': Style(
       fontSize: FontSize(size * 0.98),
@@ -497,10 +515,10 @@ Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) {
       fontStyle: FontStyle.normal,
       fontWeight: FontWeight.w600,
     ),
-    '.${MassBlockClass.comment}': Style(
-      color: text.withValues(alpha: 0.78),
-      fontSize: FontSize(size * 0.92),
-      margin: Margins.symmetric(vertical: 10),
+    '.${MassBlockClass.comment}': readerRubricHtmlStyle(
+      reader: reader,
+      body: body,
+      margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
     ),
     '.${MassBlockClass.inlineAlternative}': Style(
       color: reader.rubric,
@@ -521,13 +539,11 @@ Map<String, Style> _massStyles(ReaderTheme reader, Color text, double size) {
       fontSize: FontSize(size * 0.9),
       margin: Margins.only(top: 12, bottom: 6),
     ),
-    '.${MassBlockClass.posture}': Style(
-      color: reader.rubric,
-      fontStyle: FontStyle.italic,
-      fontSize: FontSize(size * 0.85),
-      letterSpacing: 0.4,
+    '.${MassBlockClass.posture}': readerRubricHtmlStyle(
+      reader: reader,
+      body: body,
       textAlign: TextAlign.center,
-      margin: Margins.symmetric(vertical: 8),
+      margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
     ),
   };
 }
@@ -581,6 +597,7 @@ class _MassDocument extends StatefulWidget {
     required this.variant,
     required this.controller,
     required this.scrollController,
+    required this.sourceStyle,
   });
 
   final String html;
@@ -589,6 +606,7 @@ class _MassDocument extends StatefulWidget {
   final MassVariant variant;
   final MassNavigatorController controller;
   final ScrollController scrollController;
+  final TextStyle sourceStyle;
 
   @override
   State<_MassDocument> createState() => _MassDocumentState();
@@ -733,11 +751,27 @@ class _MassDocumentState extends State<_MassDocument> {
   @override
   Widget build(BuildContext context) {
     final source = widget.variant.source;
-    final cs = Theme.of(context).colorScheme;
+    final firstMajorStyle =
+        _chunks.isNotEmpty &&
+            _chunks.first.html.trimLeft().startsWith(
+              '<h2 class="${MassBlockClass.major}"',
+            )
+        ? {
+            ...widget.styles,
+            '.${MassBlockClass.major}': widget
+                .styles['.${MassBlockClass.major}']!
+                .copyWith(
+                  margin: Margins.only(
+                    top: 0,
+                    bottom: LiturgicalSpacing.sectionTitleToBody,
+                  ),
+                ),
+          }
+        : widget.styles;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final chunk in _chunks)
+        for (final (index, chunk) in _chunks.indexed)
           if (chunk.section case final section?)
             KeyedSubtree(
               key: _keys[section.sectionId],
@@ -747,7 +781,7 @@ class _MassDocumentState extends State<_MassDocument> {
                 child: Html(
                   onLinkTap: widget.onLinkTap,
                   data: chunk.html,
-                  style: widget.styles,
+                  style: index == 0 ? firstMajorStyle : widget.styles,
                 ),
               ),
             )
@@ -755,17 +789,14 @@ class _MassDocumentState extends State<_MassDocument> {
             Html(
               onLinkTap: widget.onLinkTap,
               data: chunk.html,
-              style: widget.styles,
+              style: index == 0 ? firstMajorStyle : widget.styles,
             ),
         if (source != null) ...[
           const SizedBox(height: 18),
           Text(
             'Крыніца: $source',
             key: const Key('mass-variant-source'),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: cs.onSurfaceVariant,
-              height: 1.4,
-            ),
+            style: widget.sourceStyle,
           ),
         ],
         // Keeps the last lines clear of the floating section bar. Same

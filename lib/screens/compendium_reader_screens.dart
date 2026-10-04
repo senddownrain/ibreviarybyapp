@@ -115,7 +115,10 @@ class _CompendiumQuestionScreenState
                 nextLabel: next == null ? null : '${next.number}',
                 onNext: next == null ? null : () => open(next),
               ),
-              const CompendiumSourceAttribution(onReader: true),
+              CompendiumSourceAttribution(
+                onReader: true,
+                readerTextStyle: textStyle,
+              ),
             ],
           ),
         ),

@@ -20,6 +20,7 @@ import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/songs/song_chord_control.dart';
 import 'package:mybrev_flutter/widgets/songs/song_text.dart';
@@ -502,6 +503,12 @@ void main() {
       expect(find.text('Марыйныя'), findsOneWidget);
       expect(find.text('Бог наш вялікі'), findsOneWidget);
       expect(find.byKey(const Key('song-source')), findsOneWidget);
+      final source = tester.widget<Text>(find.byKey(const Key('song-source')));
+      final reader = ReaderTheme.of(
+        tester.element(find.byKey(const Key('song-source'))),
+      );
+      expect(source.style?.color, reader.muted);
+      expect(source.style?.height, ReaderTheme.metadataHeight);
       expect(
         find.textContaining('Тэставая крыніца', findRichText: true),
         findsOneWidget,

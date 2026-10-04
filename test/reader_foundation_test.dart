@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 void main() {
@@ -178,6 +179,11 @@ void main() {
       find.descendant(of: surfaceFinder, matching: contextFinder),
       findsNothing,
     );
+    final title = tester.widget<Text>(
+      find.descendant(of: contextFinder, matching: find.text('Ютрань')),
+    );
+    expect(title.style?.fontFamily, startsWith('CormorantGaramond'));
+    expect(title.style?.fontSize, ReaderTheme.documentTitleSize);
   });
 
   testWidgets('long reader content has no overflow at 180% on iOS and Android', (
@@ -232,6 +238,61 @@ void main() {
             ),
           ),
           findsOneWidget,
+        );
+      }
+    }
+  });
+
+  testWidgets('document title and body fit the 200% system text matrix', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    for (final width in [320.0, 390.0, 700.0]) {
+      tester.view.physicalSize = Size(width, 900);
+      for (final brightness in [Brightness.light, Brightness.dark]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            key: ValueKey((width, brightness)),
+            theme: ThemeData(brightness: brightness),
+            home: MediaQuery(
+              data: MediaQueryData(
+                size: Size(width, 900),
+                textScaler: const TextScaler.linear(2),
+              ),
+              child: ReaderScaffold(
+                contextHeader: ReaderContextHeader(
+                  title:
+                      'Малітва за еднасць хрысціянаў і супакой ва ўсім свеце',
+                  subtitle: 'Доўгая назва святкавання',
+                  metadata: '3 кастрычніка · звычайны перыяд',
+                  onTitleTap: () {},
+                ),
+                content: Builder(
+                  builder: (context) => Text(
+                    'Пане, дапамажы нам ісці шляхам любові і міру.',
+                    style: ReaderTheme.of(context).body(30.6),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        final title = tester.widget<Text>(
+          find.descendant(
+            of: find.byKey(const Key('reader-context-header')),
+            matching: find.text(
+              'Малітва за еднасць хрысціянаў і супакой ва ўсім свеце',
+            ),
+          ),
+        );
+        expect(title.style?.fontSize, ReaderTheme.documentTitleSize);
+        expect(
+          tester.getRect(find.byKey(const Key('reader-context-header'))).right,
+          lessThanOrEqualTo(width),
         );
       }
     }

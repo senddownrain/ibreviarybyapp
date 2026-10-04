@@ -48,4 +48,46 @@ void main() {
     expect(heading.fontWeight, FontWeight.w700);
     expect(heading.fontFamily, startsWith('CormorantGaramond'));
   });
+
+  testWidgets('document roles keep meaning in light and dark themes', (
+    tester,
+  ) async {
+    for (final brightness in [Brightness.light, Brightness.dark]) {
+      late ReaderTheme reader;
+      await tester.pumpWidget(
+        MaterialApp(
+          key: ValueKey(brightness),
+          theme: ThemeData(brightness: brightness),
+          home: Builder(
+            builder: (context) {
+              reader = ReaderTheme.of(context);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      final title = reader.documentTitle();
+      final body = reader.body(18, family: ReaderFontFamily.sourceSerif4);
+      final major = reader.majorHeading(18);
+      final block = reader.blockHeading(18);
+      final rubric = reader.rubricBlock(18);
+      final reference = reader.referenceStyle(18);
+      final source = reader.sourceStyle(18);
+
+      expect(title.fontFamily, startsWith('CormorantGaramond'));
+      expect(title.fontSize, ReaderTheme.documentTitleSize);
+      expect(title.color, reader.ink);
+      expect(body.fontFamily, startsWith('SourceSerif4'));
+      expect(major.fontSize, greaterThan(block.fontSize!));
+      expect(major.color, reader.rubric);
+      expect(rubric.color, reader.rubric);
+      expect(rubric.fontStyle, FontStyle.normal);
+      expect(rubric.fontSize, 16.2);
+      expect(rubric.height, ReaderTheme.rubricHeight);
+      expect(reference.color, reader.muted);
+      expect(reference.height, ReaderTheme.referenceHeight);
+      expect(source.color, reader.muted);
+      expect(source.height, ReaderTheme.metadataHeight);
+    }
+  });
 }
