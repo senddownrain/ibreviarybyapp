@@ -80,6 +80,31 @@ void main() {
     expect(await surfaceFor(Brightness.dark), const Color(0xFF171917));
   });
 
+  testWidgets('reader masks scrolling text throughout the status bar', (
+    tester,
+  ) async {
+    for (final brightness in [Brightness.light, Brightness.dark]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          key: ValueKey(brightness),
+          theme: ThemeData(brightness: brightness),
+          home: const MediaQuery(
+            data: MediaQueryData(viewPadding: EdgeInsets.only(top: 32)),
+            child: ReaderEdgeProtection(mode: ReaderChromeMode.full),
+          ),
+        ),
+      );
+      final decoration = tester
+          .widget<DecoratedBox>(find.byKey(const Key('reader-top-fade')))
+          .decoration as BoxDecoration;
+      final gradient = decoration.gradient! as LinearGradient;
+      expect(gradient.colors[0].a, 1);
+      expect(gradient.colors[1].a, 1);
+      expect(gradient.stops![1], 32 / 90);
+      expect(gradient.colors[2].a, 0);
+    }
+  });
+
   testWidgets('reader reserves space for floating bottom navigation', (
     tester,
   ) async {

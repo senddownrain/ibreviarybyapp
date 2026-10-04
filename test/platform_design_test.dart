@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/screens/settings_screen.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
@@ -147,6 +149,112 @@ void main() {
       expect(tester.getSize(paragraph).height, lessThan(30));
     }
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('theme choices keep full labels at 320 dp and 200% text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.android),
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(320, 720),
+            textScaler: TextScaler.linear(2),
+          ),
+          child: Scaffold(
+            body: SizedBox(
+              width: 260,
+              child: SettingsThemeControl(
+                value: ThemeMode.system,
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(DropdownButtonFormField<ThemeMode>), findsOneWidget);
+    final selected = tester.renderObject<RenderParagraph>(
+      find.descendant(
+        of: find.text('Сістэма').first,
+        matching: find.byType(RichText),
+      ),
+    );
+    expect(selected.didExceedMaxLines, isFalse);
+    await tester.tap(find.byType(DropdownButtonFormField<ThemeMode>));
+    await tester.pumpAndSettle();
+    expect(find.text('Светлая').last, findsOneWidget);
+    expect(find.text('Цёмная').last, findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('theme choice labels fit the width and text-scale matrix', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+      for (final width in [320.0, 360.0, 390.0, 430.0, 700.0]) {
+        for (final scale in [1.0, 1.5, 2.0]) {
+          tester.view.physicalSize = Size(width, 800);
+          await tester.pumpWidget(
+            MaterialApp(
+              key: ValueKey((platform, width, scale)),
+              theme: ThemeData(platform: platform),
+              home: MediaQuery(
+                data: MediaQueryData(
+                  size: Size(width, 800),
+                  textScaler: TextScaler.linear(scale),
+                ),
+                child: Scaffold(
+                  body: SizedBox(
+                    width: width - 60,
+                    child: SettingsThemeControl(
+                      value: ThemeMode.system,
+                      onChanged: (_) {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          if (find
+              .byType(DropdownButtonFormField<ThemeMode>)
+              .evaluate()
+              .isEmpty) {
+            for (final label in ['Сістэма', 'Светлая', 'Цёмная']) {
+              final paragraph = tester.renderObject<RenderParagraph>(
+                find.descendant(
+                  of: find.text(label),
+                  matching: find.byType(RichText),
+                ),
+              );
+              expect(
+                paragraph.didExceedMaxLines,
+                isFalse,
+                reason: '$platform $width/$scale $label',
+              );
+            }
+          } else {
+            expect(
+              find.byType(DropdownButtonFormField<ThemeMode>),
+              findsOneWidget,
+            );
+          }
+          expect(
+            tester.takeException(),
+            isNull,
+            reason: '$platform $width/$scale',
+          );
+        }
+      }
+    }
   });
 
   testWidgets('floating back icon follows the target platform', (tester) async {

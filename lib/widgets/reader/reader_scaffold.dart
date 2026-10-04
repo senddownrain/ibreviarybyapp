@@ -240,6 +240,7 @@ class ReaderEdgeProtection extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final safeTop = MediaQuery.viewPaddingOf(context).top;
     final safeBottom = MediaQuery.viewPaddingOf(context).bottom;
+    final topFadeHeight = safeTop + (mode == ReaderChromeMode.hidden ? 10 : 58);
     return IgnorePointer(
       key: const Key('reader-edge-protection'),
       child: Stack(
@@ -248,7 +249,7 @@ class ReaderEdgeProtection extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: safeTop + (mode == ReaderChromeMode.hidden ? 10 : 58),
+            height: topFadeHeight,
             child: DecoratedBox(
               key: const Key('reader-top-fade'),
               decoration: BoxDecoration(
@@ -256,9 +257,11 @@ class ReaderEdgeProtection extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    surface.withValues(alpha: dark ? 0.86 : 0.92),
+                    surface,
+                    surface,
                     surface.withValues(alpha: 0),
                   ],
+                  stops: [0, safeTop / topFadeHeight, 1],
                 ),
               ),
             ),

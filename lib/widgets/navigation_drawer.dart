@@ -7,9 +7,11 @@ Future<void> showSecondaryMenu(BuildContext context) =>
       context: context,
       useRootNavigator: true,
       useSafeArea: true,
+      isScrollControlled: true,
       showDragHandle: true,
-      builder: (sheetContext) =>
-          const _SecondaryMenuContent(includeBottomSystemInset: true),
+      builder: (sheetContext) => SingleChildScrollView(
+        child: const _SecondaryMenuContent(includeBottomSystemInset: true),
+      ),
     );
 
 class AppNavigationDrawer extends StatelessWidget {
