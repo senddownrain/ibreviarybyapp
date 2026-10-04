@@ -23,6 +23,7 @@ import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
 
 double _fontSize = 16;
 
@@ -47,6 +48,9 @@ void main() {
             as Map<String, dynamic>;
     final apostle = Map<String, dynamic>.from(
       (fixture['templates'] as Map<String, dynamic>)['apostles'] as Map,
+    );
+    final sunday = Map<String, dynamic>.from(
+      (fixture['templates'] as Map<String, dynamic>)['sunday-week-1'] as Map,
     );
     apostle.remove('_schema');
     apostle.remove('_kind');
@@ -81,6 +85,52 @@ void main() {
       '_periodWeekNumber': '17',
       '_dayOfWeek': '3',
       '_rank': 'festum',
+    });
+    await HiveService.daysBox.put('sunday-smoke', {
+      ...ordinary,
+      ...sunday,
+      'id': 'sunday-smoke',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '1',
+      '_dayOfWeek': '7',
+      '_rank': 'dominica',
+    });
+    final structured = Map<String, dynamic>.from(apostle);
+    for (var i = 1; i <= 3; i++) {
+      structured['laudesPs$i'] =
+          '<p class="ora-ant">Ант. Хвала Пану.</p>'
+          '<div class="ora-psalm"><p>Псальм $i</p>'
+          '<p><span><em>Гэты псальм аддае хвалу</em></span></p>'
+          '<p>Добра ёсць дзякаваць Пану *</p></div>'
+          '<p class="ora-ant">Ант. Хвала Пану.</p>';
+    }
+    await HiveService.daysBox.put('structured-smoke', {
+      ...structured,
+      'id': 'structured-smoke',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '17',
+      '_dayOfWeek': '3',
+    });
+    final singleAnt = Map<String, dynamic>.from(apostle);
+    singleAnt['laudesAnt2'] = '';
+    singleAnt['laudesAnt3'] = '';
+    await HiveService.daysBox.put('single-ant-smoke', {
+      ...singleAnt,
+      'id': 'single-ant-smoke',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '17',
+      '_dayOfWeek': '3',
+    });
+    final plainAnt = Map<String, dynamic>.from(apostle);
+    for (var i = 1; i <= 3; i++) {
+      plainAnt['laudesAnt$i'] = 'Ант. Хвала Пану $i.';
+    }
+    await HiveService.daysBox.put('plain-ant-smoke', {
+      ...plainAnt,
+      'id': 'plain-ant-smoke',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '17',
+      '_dayOfWeek': '3',
     });
     await HiveService.markDateCached('days', date);
     await HiveService.markDateCached('days', date.add(const Duration(days: 1)));
@@ -145,6 +195,7 @@ void main() {
 
   final cases = <(String, String, Brightness, double, Size)>[
     ('ordinary-smoke', 'laudes', Brightness.light, 16, const Size(900, 1600)),
+    ('sunday-smoke', 'laudes', Brightness.light, 16, const Size(390, 844)),
     ('smoke', 'laudes', Brightness.light, 16, const Size(900, 1600)),
     ('smoke', 'laudes', Brightness.dark, 24, const Size(900, 1600)),
     ('smoke', 'vespers', Brightness.light, 16, const Size(900, 1600)),
@@ -164,6 +215,12 @@ void main() {
     ('smoke', 'lectionis', Brightness.light, 16, const Size(390, 844)),
     ('smoke', 'sext', Brightness.light, 16, const Size(390, 844)),
     ('smoke', 'completorium', Brightness.dark, 24, const Size(390, 844)),
+    ('smoke', 'morning', Brightness.light, 16, const Size(360, 800)),
+    ('smoke', 'morning', Brightness.dark, 24, const Size(390, 844)),
+    ('smoke', 'non', Brightness.light, 16, const Size(390, 844)),
+    ('structured-smoke', 'laudes', Brightness.light, 16, const Size(390, 844)),
+    ('single-ant-smoke', 'laudes', Brightness.light, 16, const Size(390, 844)),
+    ('plain-ant-smoke', 'laudes', Brightness.light, 16, const Size(390, 844)),
   ];
   for (final (dayId, hour, brightness, size, viewport) in cases) {
     testWidgets('$dayId $hour ${brightness.name} $size '
@@ -196,6 +253,55 @@ void main() {
             find.byType(LiturgicalSectionHeading),
           )
           .toList();
+      if (dayId == 'smoke') {
+        const expectedBoundaries = {
+          'laudes': 4,
+          'vespers': 4,
+          'terz': 2,
+          'sext': 2,
+          'non': 2,
+          'lectionis': 3,
+          'completorium': 5,
+          'morning': 7,
+        };
+        expect(
+          find.byType(LiturgicalSectionDivider),
+          findsNWidgets(expectedBoundaries[hour]!),
+        );
+        expect(
+          find.byType(LiturgicalHeadingReferenceRow),
+          hour == 'lectionis' ? findsNothing : findsOneWidget,
+        );
+      }
+      if (const {
+        'structured-smoke',
+        'single-ant-smoke',
+        'plain-ant-smoke',
+      }.contains(dayId)) {
+        expect(
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is SizedBox &&
+                widget.height ==
+                    psalmBlockSpacerAfter(
+                      antiphon: dayId != 'single-ant-smoke',
+                    ),
+          ),
+          findsAtLeastNWidgets(2),
+        );
+      }
+      if (dayId == 'structured-smoke') {
+        final psalmHtml = tester
+            .widgetList<Html>(find.byType(Html))
+            .map((e) => e.data ?? '');
+        expect(
+          psalmHtml.any(
+            (data) =>
+                data.contains('ora-psalm') && data.contains('psalm-subtitle'),
+          ),
+          isTrue,
+        );
+      }
       if (hour == 'lectionis' || hour == 'morning') {
         // The divider owns the first transition; the second reading owns its
         // gap because no divider separates the two readings.
@@ -230,7 +336,7 @@ void main() {
           headings
               .singleWhere((heading) => heading.title == 'Малітва')
               .startsSection,
-          isTrue,
+          isFalse,
         );
       }
       if (hour == 'lectionis' || hour == 'morning') {
@@ -250,6 +356,48 @@ void main() {
         tester,
         '$dayId-$hour-${brightness.name}-$size-${viewport.width}x${viewport.height}',
       );
+      final captureName =
+          '$dayId-$hour-${brightness.name}-$size-${viewport.width}x${viewport.height}';
+      final psalms = find.byType(PsalmChoirHtml);
+      if (psalms.evaluate().length > 1) {
+        await _captureSectionIfRequested(
+          tester,
+          '$captureName-psalm-blocks',
+          psalms.at(1),
+        );
+      }
+      await _captureSectionIfRequested(
+        tester,
+        '$captureName-short-reading',
+        find.byType(LiturgicalHeadingReferenceRow),
+      );
+      await _captureSectionIfRequested(
+        tester,
+        '$captureName-second-reading',
+        find.text('Другое чытанне'),
+      );
+      await _captureSectionIfRequested(
+        tester,
+        '$captureName-intercessions',
+        find.text('Просьбы'),
+      );
+      await _captureSectionIfRequested(
+        tester,
+        '$captureName-prayer',
+        find.text('Малітва'),
+      );
+      if (hour == 'morning' && psalms.evaluate().length > 4) {
+        await _captureSectionIfRequested(
+          tester,
+          '$captureName-laudes-transition',
+          find.text('Псалмодыя').last,
+        );
+        await _captureSectionIfRequested(
+          tester,
+          '$captureName-laudes-psalmody',
+          psalms.at(4),
+        );
+      }
       if (const {
         'laudes',
         'vespers',
@@ -373,4 +521,22 @@ Future<void> _captureIfRequested(WidgetTester tester, String name) async {
     ).writeAsBytesSync(data!.buffer.asUint8List());
     image.dispose();
   });
+}
+
+Future<void> _captureSectionIfRequested(
+  WidgetTester tester,
+  String name,
+  Finder target,
+) async {
+  if (Platform.environment['LITURGY_SMOKE_IMAGES'] != '1' ||
+      target.evaluate().isEmpty) {
+    return;
+  }
+  await Scrollable.ensureVisible(
+    tester.element(target.first),
+    alignment: 0.22,
+    duration: Duration.zero,
+  );
+  await tester.pumpAndSettle();
+  await _captureIfRequested(tester, name);
 }

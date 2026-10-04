@@ -55,6 +55,69 @@ void main() {
     expect(root.querySelector('.liturgical-heading')?.text, 'Кароткае чытанне');
     expect(root.querySelector('.liturgical-reference')?.text, 'Дрг 8, 5b–6');
     expect(root.querySelectorAll('p').last.text, 'Сыне мой.');
+    final pieces = extractShortReadingHeader(html)!;
+    expect(pieces.title, 'Кароткае чытанне');
+    expect(pieces.reference, 'Дрг 8, 5b–6');
+    expect(parseFragment(pieces.bodyHtml).text, 'Сыне мой.');
+  });
+
+  for (final width in [360.0, 390.0]) {
+    testWidgets('short reading header fits $width px and scaled text', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(16),
+              child: MediaQuery(
+                data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
+                child: const LiturgicalHeadingReferenceRow(
+                  title: 'Кароткае чытанне',
+                  reference: '1 Кар 12, 12–31; Эф 4, 11–13',
+                  bodySize: 24,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text('Кароткае чытанне'), findsOneWidget);
+      expect(find.text('1 Кар 12, 12–31; Эф 4, 11–13'), findsOneWidget);
+    });
+  }
+
+  testWidgets('short reading reference sits right on one line when it fits', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Padding(
+            padding: EdgeInsets.all(16),
+            child: LiturgicalHeadingReferenceRow(
+              title: 'Кароткае чытанне',
+              reference: 'Ер 6, 16',
+              bodySize: 16,
+            ),
+          ),
+        ),
+      ),
+    );
+    final title = tester.getTopLeft(find.text('Кароткае чытанне'));
+    final reference = tester.getTopLeft(find.text('Ер 6, 16'));
+    expect((title.dy - reference.dy).abs(), lessThan(6));
+    expect(reference.dx, greaterThan(title.dx + 100));
+    expect(tester.takeException(), isNull);
   });
 
   test('bundled feast reading splits real legacy heading and turns', () {
@@ -172,13 +235,93 @@ void main() {
     expect(root.querySelector('.psalm-marker'), isNotNull);
   });
 
+  test('leading psalm subtitles recognize nested and styled italics only', () {
+    for (final subtitle in [
+      '<em>Гэты псальм аддае хвалу</em>',
+      '<i>Гэты псальм аддае хвалу</i>',
+      '<span><em>Гэты псальм аддае хвалу</em></span>',
+      '<span style="font-style: italic">Гэты псальм аддае хвалу</span>',
+    ]) {
+      final root = parseFragment(
+        formatPsalmHtml(
+          '<p style="text-align:center">Псальм 92 (91)</p>'
+          '<p style="text-align:center">Хвала Богу Стварыцелю</p>'
+          '<p>$subtitle</p><p>Добра ёсць дзякаваць Пану.</p>'
+          '<p><em>Курсіў у целе псалма</em></p>',
+        ),
+      );
+      expect(
+        root.querySelector('.psalm-subtitle')?.text,
+        'Гэты псальм аддае хвалу',
+      );
+      expect(root.querySelectorAll('.psalm-subtitle'), hasLength(1));
+      expect(root.querySelectorAll('.psalm-metadata'), hasLength(3));
+    }
+    final paragraphItalic = parseFragment(
+      formatPsalmHtml(
+        '<p>Псальм 92 (91)</p>'
+        '<p style="font-style: italic">Псальм усхваляе Пана</p>'
+        '<p>Добра ёсць дзякаваць Пану.</p>',
+      ),
+    );
+    expect(
+      paragraphItalic.querySelector('.psalm-subtitle')?.text,
+      'Псальм усхваляе Пана',
+    );
+  });
+
+  test('structured psalm package keeps antiphons outside psalm metadata', () {
+    final root = parseFragment(
+      formatPsalmHtml(
+        '<p class="ora-ant"><span style="color:red">Ант.</span> Прыйдзіце.</p>'
+        '<div class="ora-psalm">'
+        '<p style="text-align:center">Псальм 92 (91)</p>'
+        '<p><span><em>Гэты псальм аддае хвалу</em></span></p>'
+        '<p>Добра ёсць дзякаваць Пану *</p></div>'
+        '<p class="ora-ant">Ант. Прыйдзіце.</p>',
+      ),
+    );
+    expect(root.querySelectorAll('.ora-ant'), hasLength(2));
+    expect(root.querySelector('.ora-ant.psalm-metadata'), isNull);
+    expect(
+      root.querySelector('.ora-psalm .psalm-subtitle')?.text,
+      'Гэты псальм аддае хвалу',
+    );
+    expect(root.querySelector('.ora-psalm .psalm-marker')?.text, '*');
+  });
+
+  test('responsory turns keep nested emphasis across lost spaces', () {
+    for (final source in [
+      '<p>К. Першы <em>вылучаны</em> тэкст *Н. Другі адказ.</p>',
+      '<p><span style="color:red">К.</span> Першы <em>вылучаны</em> тэкст *'
+          '<span style="color:red">Н.</span> Другі адказ.</p>',
+      '<p><span>К.</span> Першы <em>вылучаны</em> тэкст *<br>'
+          '<span>Н.</span> Другі адказ.</p>',
+    ]) {
+      final root = parseFragment(
+        formatLiturgicalHtml(normalizeOfficeHtml(source)),
+      );
+      final turns = root.querySelectorAll('.responsory-turn');
+      expect(turns, hasLength(2));
+      expect(turns.first.querySelector('em')?.text, 'вылучаны');
+      expect(turns.first.querySelector('.psalm-marker')?.text, '*');
+      expect(turns.last.text.trim(), startsWith('Н.'));
+      expect(turns.last.querySelector('.liturgical-rubric-inline')?.text, 'Н.');
+      expect(root.text, contains('Другі адказ.'));
+    }
+  });
+
   test('Hours use one psalm rhythm and shared canticle composition', () {
     final source = File('lib/screens/ora_screen.dart').readAsStringSync();
     expect(
-      RegExp(r'_OraItem\.psalmGap\(\)').allMatches(source).length,
+      RegExp(r'_OraItem\.psalmGap\(').allMatches(source).length,
       greaterThanOrEqualTo(2),
     );
-    expect(source, contains('LiturgicalSpacing.psalmBlockToNext'));
+    expect(source, contains('psalmBlockSpacerAfter'));
+    expect(
+      psalmBlockSpacerAfter(antiphon: true) + LiturgicalSpacing.antiphonToPsalm,
+      psalmBlockSpacerAfter(antiphon: false) + LiturgicalSpacing.paragraphAfter,
+    );
     expect(source, contains('LiturgicalSpacing.antiphonToPsalm'));
     final compline = source.substring(
       source.indexOf('final antS = cf('),

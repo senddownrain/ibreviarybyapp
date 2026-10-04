@@ -789,10 +789,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'officeOfReadingsVers', '');
     _addOfficeReadings(items, day);
     if (shouldShowTeDeum(day)) {
-      items.add(_OraItem.blockHeader('ГІМН'));
+      _addMajorBoundary(items);
+      items.add(_OraItem.blockHeader('ГІМН', startsSection: false));
       items.add(_OraItem.html(_kTeDeum, kind: 'hymn'));
     }
-    _addField(items, day, 'officeOfReadingsPr', 'Малітва', startsSection: true);
+    _addDividerBeforeField(items, day, 'officeOfReadingsPr');
+    _addField(items, day, 'officeOfReadingsPr', 'Малітва');
     if (!skipEnding) items.add(_OraItem.html(_kEndOfSext));
     return items;
   }
@@ -851,15 +853,14 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final r = daytimeHourField(day, num, 'R');
     if (r.isNotEmpty) {
-      items.add(_OraItem.divider());
+      _addMajorBoundary(items);
       items.add(_OraItem.html(r, kind: 'reading'));
     }
 
     final pr = daytimeHourField(day, num, 'Pr');
     if (pr.isNotEmpty) {
-      items.add(
-        _OraItem.labeled('Малітва', pr, kind: 'prayer', startsSection: true),
-      );
+      _addMajorBoundary(items);
+      items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
     }
 
     items.add(_OraItem.html(_kEndOfSext));
@@ -962,7 +963,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final r = cf('compR');
     if (r.isNotEmpty) {
-      items.add(_OraItem.divider());
+      _addMajorBoundary(items);
       items.add(_OraItem.html(r, kind: 'reading'));
     }
 
@@ -972,7 +973,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final antS = cf('compAntS');
     if (antS.isNotEmpty) {
       final antController = _alternativeController('compline-ant-s');
-      items.add(_OraItem.divider());
+      _addMajorBoundary(items);
       items.add(_OraItem.antiphon(antS, controller: antController));
       items.add(_OraItem.serviceHeader('Песня з Евангелля'));
       items.add(
@@ -988,11 +989,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final pr = cf('compPr');
     if (pr.isNotEmpty) {
-      items.add(
-        _OraItem.labeled('Малітва', pr, kind: 'prayer', startsSection: true),
-      );
+      _addMajorBoundary(items);
+      items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
     }
 
+    _addMajorBoundary(items);
     items.add(
       _OraItem.html(
         '<p><span style="color:red">Потым, нават тады, калі Камплета чытаецца індывідуальна, прамаўляецца благаслаўленне:</span></p>',
@@ -1002,9 +1003,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     final antM = cf('compAntM');
     if (antM.isNotEmpty) {
+      _addMajorBoundary(items);
       items.add(
         _OraItem.blockHeader(
           'АНТЫФОНЫ НА ЗАКАНЧЭННЕ ДА НАЙСВЯЦЕЙШАЙ ПАННЫ МАРЫІ',
+          startsSection: false,
         ),
       );
       items.add(_OraItem.html(antM, kind: 'marian-antiphon'));
@@ -1037,10 +1040,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'officeOfReadingsVers', '');
     _addOfficeReadings(items, day);
     if (shouldShowTeDeum(day)) {
-      items.add(_OraItem.blockHeader('ГІМН'));
+      _addMajorBoundary(items);
+      items.add(_OraItem.blockHeader('ГІМН', startsSection: false));
       items.add(_OraItem.html(_kTeDeum, kind: 'hymn'));
     }
 
+    _addMajorBoundary(items);
     _addPsalmBlock(items, day, 'laudesAnt', 'laudesPs', 3);
     _addDividerBeforeField(items, day, 'laudesR');
     _addField(items, day, 'laudesR', '');
@@ -1076,7 +1081,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     required String psalm,
   }) {
     final antController = _alternativeController(controllerScope);
-    items.add(_OraItem.divider());
+    _addMajorBoundary(items);
     items.add(
       _OraItem.antiphon(
         antiphon,
@@ -1114,12 +1119,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       ),
     );
     if (prayer.isNotEmpty) {
+      _addMajorBoundary(items);
       items.add(
         _OraItem.labeled(
           'Малітва',
           prayer,
           kind: 'prayer',
-          startsSection: true,
+          startsSection: false,
         ),
       );
     }
@@ -1128,7 +1134,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   void _addOfficeReadings(List<_OraItem> items, LiturgicalDay day) {
     final hasFirst = (day.field('officeOfReadingsR1') ?? '').trim().isNotEmpty;
     final hasSecond = (day.field('officeOfReadingsR2') ?? '').trim().isNotEmpty;
-    if (hasFirst || hasSecond) items.add(_OraItem.divider());
+    if (hasFirst || hasSecond) _addMajorBoundary(items);
     _addField(items, day, 'officeOfReadingsR1', 'Першае чытанне');
     _addField(
       items,
@@ -1183,6 +1189,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     String fieldName,
   ) {
     if ((day.field(fieldName) ?? '').trim().isNotEmpty) {
+      _addMajorBoundary(items);
+    }
+  }
+
+  void _addMajorBoundary(List<_OraItem> items) {
+    if (items.isNotEmpty && items.last.type != _OraItemType.divider) {
       items.add(_OraItem.divider());
     }
   }
@@ -1215,7 +1227,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final hasSomething = pairs.any((p) => p.$1.isNotEmpty || p.$2.isNotEmpty);
     if (!hasSomething) return;
 
-    items.add(_OraItem.blockHeader('ПСАЛМОДЫЯ'));
+    items.add(
+      _OraItem.blockHeader(
+        'ПСАЛМОДЫЯ',
+        startsSection: items.isEmpty || items.last.type != _OraItemType.divider,
+      ),
+    );
 
     // Single-ant mode: ant1 & all psalms present, ant2/ant3 absent
     final isSingleAnt =
@@ -1240,7 +1257,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       var psalmIndex = 0;
       for (final (_, ps) in pairs) {
         if (ps.isNotEmpty) {
-          if (psalmIndex++ > 0) items.add(_OraItem.psalmGap());
+          if (psalmIndex++ > 0) {
+            items.add(_OraItem.psalmGap(afterAntiphon: false));
+          }
           items.add(
             _OraItem.psalm(
               ps,
@@ -1260,10 +1279,15 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       }
     } else {
       var hasBlock = false;
+      var previousEndedWithAntiphon = false;
       for (var index = 0; index < pairs.length; index++) {
         final (ant, ps) = pairs[index];
         if (ant.isEmpty && ps.isEmpty) continue;
-        if (hasBlock) items.add(_OraItem.psalmGap());
+        if (hasBlock) {
+          items.add(
+            _OraItem.psalmGap(afterAntiphon: previousEndedWithAntiphon),
+          );
+        }
         hasBlock = true;
         final controller = _alternativeController(
           '${widget.oraType}-$controllerScope-ant-$index',
@@ -1282,6 +1306,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             _OraItem.antiphon(ant, controller: controller, showPicker: false),
           );
         }
+        previousEndedWithAntiphon = structured
+            ? structuredPsalmEndsWithAntiphon(ps)
+            : ant.isNotEmpty;
       }
     }
   }
@@ -1417,6 +1444,7 @@ class _OraItem {
   final String? externalAntiphon;
   final bool startsSection;
   final double trailingSpacing;
+  final double? gapHeight;
   final Widget Function(BuildContext, TextStyle)? _customWidget;
 
   const _OraItem._(
@@ -1429,17 +1457,22 @@ class _OraItem {
     this.externalAntiphon,
     this.startsSection = false,
     this.trailingSpacing = LiturgicalSpacing.plainTextAfter,
+    this.gapHeight,
     Widget Function(BuildContext, TextStyle)? customWidget,
   }) : _customWidget = customWidget;
 
-  factory _OraItem.blockHeader(String title) =>
-      _OraItem._(_OraItemType.blockHeader, title);
+  factory _OraItem.blockHeader(String title, {bool startsSection = true}) =>
+      _OraItem._(_OraItemType.blockHeader, title, startsSection: startsSection);
 
   factory _OraItem.serviceHeader(String title) =>
       _OraItem._(_OraItemType.serviceHeader, title);
 
   factory _OraItem.divider() => const _OraItem._(_OraItemType.divider, '');
-  factory _OraItem.psalmGap() => const _OraItem._(_OraItemType.psalmGap, '');
+  factory _OraItem.psalmGap({required bool afterAntiphon}) => _OraItem._(
+    _OraItemType.psalmGap,
+    '',
+    gapHeight: psalmBlockSpacerAfter(antiphon: afterAntiphon),
+  );
 
   factory _OraItem.antiphon(
     String text, {
@@ -1498,7 +1531,7 @@ class _OraItem {
       case _OraItemType.divider:
         return const LiturgicalSectionDivider();
       case _OraItemType.psalmGap:
-        return const SizedBox(height: LiturgicalSpacing.psalmBlockToNext);
+        return SizedBox(height: gapHeight);
       case _OraItemType.serviceHeader:
         return Padding(
           padding: const EdgeInsets.only(
@@ -1515,7 +1548,7 @@ class _OraItem {
         return LiturgicalSectionHeading(
           title: _managedHeading(content),
           bodySize: textStyle.fontSize ?? 16,
-          startsSection: true,
+          startsSection: startsSection,
         );
 
       case _OraItemType.antiphon:
@@ -1688,15 +1721,22 @@ class _HtmlOrText extends StatelessWidget {
       );
     }
     if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
-      return _renderHtml(
-        context,
-        normalizeOfficeHtml(
-          content,
-          officeReading: alternativeKind == 'office-reading',
+      return _renderHtml(context, content);
+    }
+    final plain = _LiturgicalSelectableText(
+      content: content,
+      textStyle: textStyle,
+    );
+    if (alternativeKind == 'psalm-antiphon' ||
+        alternativeKind == 'gospel-antiphon') {
+      return Padding(
+        padding: const EdgeInsets.only(
+          bottom: LiturgicalSpacing.antiphonToPsalm,
         ),
+        child: plain,
       );
     }
-    return _LiturgicalSelectableText(content: content, textStyle: textStyle);
+    return plain;
   }
 
   Widget _renderHtml(BuildContext context, String html) {
@@ -1766,6 +1806,22 @@ class _HtmlOrText extends StatelessWidget {
             officeReading: alternativeKind == 'office-reading',
           )
         : html;
+    if (alternativeKind == 'reading') {
+      final header = extractShortReadingHeader(officeHtml);
+      if (header != null) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            LiturgicalHeadingReferenceRow(
+              title: header.title,
+              reference: header.reference,
+              bodySize: baseSize,
+            ),
+            Html(data: formatLiturgicalHtml(header.bodyHtml), style: styles),
+          ],
+        );
+      }
+    }
     return Html(data: formatLiturgicalHtml(officeHtml), style: styles);
   }
 }
