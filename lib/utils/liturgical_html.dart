@@ -135,36 +135,29 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
 
   // Responsory source often places several turns in one paragraph, including
   // inline spans. Rebuild only those paragraphs as turns; other text survives.
-  final speaker = RegExp(r'(?<!\S)[КН]\.\s*');
+  final speaker = RegExp(r'(?<![\p{L}\p{N}])[КН]\.\s*', unicode: true);
   for (final paragraph in fragment.querySelectorAll('p').toList()) {
     if (paragraph.classes.contains('liturgical-heading') ||
         paragraph.classes.contains('liturgical-reference')) {
       continue;
     }
-    final plain = paragraph.text.replaceAll('\u00a0', ' ');
+    final plain = _textWithBreaks(paragraph).replaceAll('\u00a0', ' ');
     final matches = speaker.allMatches(plain).toList();
     if (matches.isEmpty) continue;
-    final turns = <String>[];
     if (matches.first.start > 0 &&
         plain.substring(0, matches.first.start).trim().isNotEmpty) {
-      turns.add(plain.substring(0, matches.first.start).trim());
+      final prefix = dom.Element.tag('p');
+      prefix.nodes.addAll(_copyTextRange(paragraph, 0, matches.first.start));
+      paragraph.parentNode!.insertBefore(prefix, paragraph);
     }
     for (var i = 0; i < matches.length; i++) {
       final end = i + 1 < matches.length ? matches[i + 1].start : plain.length;
-      final turn = plain.substring(matches[i].start, end).trim();
-      if (turn.isNotEmpty) turns.add(turn);
-    }
-    for (final turn in turns) {
       final node = dom.Element.tag('p')..classes.add('responsory-turn');
-      final marker = speaker.matchAsPrefix(turn);
-      if (marker == null) {
-        node.text = turn;
-      } else {
-        node.innerHtml =
-            '<span class="liturgical-rubric-inline">'
-            '${const HtmlEscape().convert(marker.group(0)!.trim())}</span> '
-            '${const HtmlEscape().convert(turn.substring(marker.end).trim())}';
-      }
+      final marker = dom.Element.tag('span')
+        ..classes.add('liturgical-rubric-inline')
+        ..text = plain.substring(matches[i].start, matches[i].start + 2);
+      node.nodes.add(marker);
+      node.nodes.addAll(_copyTextRange(paragraph, matches[i].start + 2, end));
       paragraph.parentNode!.insertBefore(node, paragraph);
     }
     paragraph.remove();
@@ -189,6 +182,62 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
     }
   }
   return fragment.outerHtml;
+}
+
+/// Pulls the already-normalized short-reading header out as semantic pieces.
+/// The body retains its original inline HTML for the common document renderer.
+({String title, String? reference, String bodyHtml})? extractShortReadingHeader(
+  String normalizedHtml,
+) {
+  final root = parseFragment(normalizedHtml);
+  final heading = root.querySelector('.liturgical-heading');
+  if (heading?.text.trim() != 'Кароткае чытанне') return null;
+  final reference = heading!.nextElementSibling;
+  final referenceText =
+      reference?.classes.contains('liturgical-reference') == true
+      ? reference!.text.trim()
+      : null;
+  heading.remove();
+  if (referenceText != null) reference!.remove();
+  return (
+    title: 'Кароткае чытанне',
+    reference: referenceText,
+    bodyHtml: root.outerHtml,
+  );
+}
+
+String _textWithBreaks(dom.Node node) {
+  if (node is dom.Text) return node.data;
+  if (node is dom.Element && node.localName == 'br') return '\n';
+  return node.nodes.map(_textWithBreaks).join();
+}
+
+/// Copies a character range while retaining every inline ancestor and style.
+List<dom.Node> _copyTextRange(dom.Node root, int start, int end) {
+  var position = 0;
+  List<dom.Node> copyChildren(dom.Node parent) {
+    final result = <dom.Node>[];
+    for (final child in parent.nodes) {
+      final length = _textWithBreaks(child).length;
+      final from = (start - position).clamp(0, length);
+      final to = (end - position).clamp(0, length);
+      if (child is dom.Text) {
+        if (to > from) result.add(dom.Text(child.data.substring(from, to)));
+        position += length;
+      } else if (child is dom.Element && child.localName == 'br') {
+        if (to > from) result.add(dom.Element.tag('br'));
+        position += length;
+      } else if (child is dom.Element) {
+        final clone = dom.Element.tag(child.localName!)
+          ..attributes.addAll(child.attributes);
+        clone.nodes.addAll(copyChildren(child));
+        if (clone.nodes.isNotEmpty) result.add(clone);
+      }
+    }
+    return result;
+  }
+
+  return copyChildren(root);
 }
 
 String formatPsalmHtml(String html) {
@@ -226,10 +275,24 @@ String formatPsalmHtml(String html) {
   return markLiturgicalCadenceSigns(
     _normalizeLegacyPresentation(
       _normalizeRubricColors(
-        _markLeadingMetadata(value, limit: null, psalmMetadata: true),
+        ownsStructuredPsalmPackage(value)
+            ? _markStructuredPsalmMetadata(value)
+            : _markLeadingMetadata(value, limit: null, psalmMetadata: true),
       ),
     ),
   );
+}
+
+String _markStructuredPsalmMetadata(String html) {
+  final root = parseFragment(html);
+  for (final psalm in root.querySelectorAll('.ora-psalm')) {
+    psalm.innerHtml = _markLeadingMetadata(
+      psalm.innerHtml,
+      limit: null,
+      psalmMetadata: true,
+    );
+  }
+  return root.outerHtml;
 }
 
 /// Singing layout for responsorial psalm verses on the readings page.
@@ -471,14 +534,17 @@ String _markLeadingMetadata(
       r'text-align\s*:\s*center',
       caseSensitive: false,
     ).hasMatch(attributes);
-    final emphasized = _fullyWrapped(
-      content,
-      RegExp(
-        r'^\s*<(?:em|i|strong|b)\b[^>]*>[\s\S]*</(?:em|i|strong|b)>\s*$',
-        caseSensitive: false,
-      ),
-    );
+    final outerItalic = RegExp(
+      r'font-style\s*:\s*italic',
+      caseSensitive: false,
+    ).hasMatch(attributes);
+    final italic =
+        outerItalic || _allVisibleTextStyled(content, italicOnly: true);
+    final emphasized = italic || _allVisibleTextStyled(content);
     final red = _allVisibleTextIsRubric(content, visible);
+    final psalmTitle =
+        psalmMetadata &&
+        RegExp(r'^Псальм\s+\d+', caseSensitive: false).hasMatch(visible);
 
     // Legacy instructions sometimes have only a red inline span. Their
     // semantic role is the entire paragraph, unlike K./N. dialogue markers.
@@ -496,12 +562,12 @@ String _markLeadingMetadata(
     }
 
     final hasRoom = remaining == null || remaining! > 0;
-    if (centered || (canMark && hasRoom && (emphasized || red))) {
+    if (canMark && hasRoom && (centered || emphasized || red || psalmTitle)) {
       if (remaining != null && remaining! > 0) {
         remaining = remaining! - 1;
       }
       final className = psalmMetadata
-          ? 'liturgical-subheading psalm-metadata${emphasized && !red && !RegExp(r'^Псальм(?:\s|$)', caseSensitive: false).hasMatch(visible) ? ' psalm-subtitle' : ''}'
+          ? 'liturgical-subheading psalm-metadata${italic && !red && !psalmTitle ? ' psalm-subtitle' : ''}'
           : 'liturgical-subheading';
       return '<p${_withClass(attributes, className)}>$content</p>';
     }
@@ -514,6 +580,40 @@ String _markLeadingMetadata(
     }
     return match.group(0)!;
   });
+}
+
+bool _allVisibleTextStyled(String html, {bool italicOnly = false}) {
+  final root = parseFragment(html);
+  var sawText = false;
+  var unstyled = false;
+  void visit(dom.Node node, bool styled) {
+    if (node is dom.Text) {
+      if (node.data.trim().isNotEmpty) {
+        sawText = true;
+        if (!styled) unstyled = true;
+      }
+      return;
+    }
+    if (node is dom.Element) {
+      final tag = node.localName;
+      final style = node.attributes['style'] ?? '';
+      styled =
+          styled ||
+          tag == 'em' ||
+          tag == 'i' ||
+          (!italicOnly && (tag == 'strong' || tag == 'b')) ||
+          RegExp(
+            r'font-style\s*:\s*italic',
+            caseSensitive: false,
+          ).hasMatch(style);
+    }
+    for (final child in node.nodes) {
+      visit(child, styled);
+    }
+  }
+
+  visit(root, false);
+  return sawText && !unstyled;
 }
 
 bool _hasClass(String attributes, String className) {
@@ -571,6 +671,11 @@ bool ownsStructuredPsalmPackage(String html) =>
       r'''class\s*=\s*["'][^"']*\bora-psalm\b''',
       caseSensitive: false,
     ).hasMatch(html);
+
+bool structuredPsalmEndsWithAntiphon(String html) {
+  final blocks = parseFragment(html).querySelectorAll('.ora-ant, .ora-psalm');
+  return blocks.isNotEmpty && blocks.last.classes.contains('ora-ant');
+}
 
 /// Removes only the legacy structural label already supplied by composition.
 /// Source/reference/body content following a break remains intact.
@@ -652,14 +757,6 @@ bool _hasNoVisibleTextBefore(dom.Node root, dom.Node target) {
 
   visit(root);
   return reachedTarget && _normalizeVisible(text.toString()).isEmpty;
-}
-
-bool _fullyWrapped(String content, RegExp pattern) {
-  final normalized = content
-      .replaceAll(_breakPattern, '')
-      .replaceAll(RegExp(r'&nbsp;', caseSensitive: false), ' ')
-      .trim();
-  return pattern.hasMatch(normalized);
 }
 
 String _visibleText(String html) => html
