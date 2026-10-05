@@ -22,15 +22,6 @@ Style readerRubricHtmlStyle({
   );
 }
 
-/// Keeps the visible block gap equal when the preceding source ends in an
-/// antiphon (4 px paragraph tail) or directly in a psalm (8 px tail).
-double psalmBlockSpacerAfter({required bool antiphon}) =>
-    LiturgicalSpacing.psalmBlockToNext +
-    LiturgicalSpacing.antiphonToPsalm -
-    (antiphon
-        ? LiturgicalSpacing.antiphonToPsalm
-        : LiturgicalSpacing.paragraphAfter);
-
 /// Shared HTML role styling for document surfaces. Screen renderers may add
 /// structure-specific rules (choirs, intercessions), but roles live here.
 Map<String, Style> liturgicalDocumentStyles({
@@ -55,6 +46,8 @@ Map<String, Style> liturgicalDocumentStyles({
       textAlign: TextAlign.left,
     ),
     'p': Style(margin: Margins.only(bottom: paragraphAfter)),
+    '.semantic-first': Style(margin: Margins.zero),
+    '.semantic-last': Style(margin: Margins.zero),
     '.liturgical-heading': Style(
       fontFamily: heading.fontFamily,
       fontSize: FontSize(heading.fontSize!),
@@ -110,7 +103,54 @@ Map<String, Style> liturgicalDocumentStyles({
       fontWeight: reference.fontWeight,
     ),
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
-    '.responsory-turn': Style(margin: Margins.only(bottom: 3)),
+    '.ora-sub': Style(
+      fontSize: FontSize(psalmSubtitleSize),
+      lineHeight: LineHeight(ReaderTheme.metadataHeight),
+      color: reader.muted,
+      fontStyle: FontStyle.italic,
+      textAlign: TextAlign.center,
+    ),
+    '.responsory-turn': Style(
+      fontSize: FontSize(size),
+      lineHeight: LineHeight(ReaderTheme.responsoryHeight),
+      margin: Margins.only(bottom: LiturgicalSpacing.responsoryTurnAfter),
+    ),
+    '.intercessions__intro': Style(
+      margin: Margins.only(bottom: LiturgicalSpacing.intercessionIntroAfter),
+    ),
+    '.intercessions__refrain': Style(
+      margin: Margins.only(
+        top: 4,
+        bottom: LiturgicalSpacing.intercessionRefrainAfter,
+      ),
+      color: reader.ink,
+      fontWeight: FontWeight.w700,
+    ),
+    '.intercessions__petition': Style(
+      margin: Margins.only(
+        top: LiturgicalSpacing.intercessionPetitionBefore,
+        bottom: LiturgicalSpacing.intercessionPetitionAfter,
+      ),
+    ),
+    '.intercessions__response': Style(
+      margin: Margins.only(
+        left: LiturgicalSpacing.intercessionResponseInset,
+        bottom: LiturgicalSpacing.intercessionResponseAfter,
+      ),
+      color: reader.ink,
+    ),
+    '.intercessions__marker': Style(color: reader.rubric),
+    '.intercessions__conclusion': Style(
+      margin: Margins.only(top: LiturgicalSpacing.intercessionConclusionBefore),
+      color: reader.muted,
+      fontStyle: FontStyle.italic,
+    ),
+    '.intercessions__response.semantic-last': Style(
+      margin: Margins.only(left: LiturgicalSpacing.intercessionResponseInset),
+    ),
+    '.intercessions__conclusion.semantic-last': Style(
+      margin: Margins.only(top: LiturgicalSpacing.intercessionConclusionBefore),
+    ),
   };
 }
 
@@ -129,6 +169,22 @@ class LiturgicalSectionDivider extends StatelessWidget {
       color: ReaderTheme.of(context).border,
     ),
   );
+}
+
+/// A responsory turn group has one renderer in short, full and daytime readings.
+/// The normalized DOM keeps its inline emphasis and rubric markers intact.
+class LiturgicalResponsoryBlock extends StatelessWidget {
+  const LiturgicalResponsoryBlock({
+    super.key,
+    required this.html,
+    required this.style,
+  });
+
+  final String html;
+  final Map<String, Style> style;
+
+  @override
+  Widget build(BuildContext context) => Html(data: html, style: style);
 }
 
 /// A content heading owns the section gap only when no divider owns that

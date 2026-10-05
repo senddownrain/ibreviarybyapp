@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
+import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 
 void main() {
   testWidgets('document role typography follows one reader contract', (
@@ -59,6 +62,165 @@ void main() {
     expect(pieces.title, 'Кароткае чытанне');
     expect(pieces.reference, 'Дрг 8, 5b–6');
     expect(parseFragment(pieces.bodyHtml).text, 'Сыне мой.');
+  });
+
+  test('structured and legacy subtitle classes map to one role', () {
+    for (final subtitle in [
+      '<p class="ora-sub"><em>Тлумачэнне</em></p>',
+      '<p><span><em>Тлумачэнне</em></span></p>',
+    ]) {
+      final model = parseLiturgicalPsalms(
+        '<p class="ora-ant">Ант. Хвала.</p>'
+        '<div class="ora-psalm"><p>Псальм 92</p>$subtitle'
+        '<p>Добра ёсць дзякаваць Пану *</p></div>'
+        '<p class="ora-ant">Ант. Хвала.</p>',
+      ).single;
+      expect(model.metadata.last.role, PsalmMetadataRole.subtitle);
+      expect(model.metadata.last.html, contains('Тлумачэнне'));
+      expect(parseFragment(model.bodyHtml).text, contains('Добра ёсць'));
+    }
+  });
+
+  test('structured package keeps supplementary source text', () {
+    final model = parseLiturgicalPsalms(
+      '<p>Перад псальмам.</p>'
+      '<p class="ora-ant">Ант. Хвала.</p>'
+      '<div class="ora-psalm"><p>Псальм 92</p><p>Тэкст *</p></div>'
+      '<p class="ora-ant">Ант. Хвала.</p>'
+      '<p>Пасля псальма.</p>',
+    ).single;
+    expect(parseFragment(model.leadingHtml).text, contains('Перад псальмам'));
+    expect(parseFragment(model.trailingHtml).text, contains('Пасля псальма'));
+  });
+
+  testWidgets('responsory turns use compact rhythm without shrinking text', (
+    tester,
+  ) async {
+    late Map<String, Style> styles;
+    await tester.pumpWidget(
+      ReaderTypographyScope(
+        useSystemFonts: true,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final reader = ReaderTheme.of(context);
+                styles = liturgicalDocumentStyles(
+                  reader: reader,
+                  body: reader.body(16),
+                );
+                final turns = formatLiturgicalHtml(
+                  normalizeOfficeHtml(
+                    '<p>К. Першы <em>вылучаны</em> радок * Н. Другі радок.</p>',
+                  ),
+                );
+                return Column(
+                  children: [
+                    Html(key: const Key('turns'), data: turns, style: styles),
+                    Html(
+                      key: const Key('prose'),
+                      data:
+                          '<p>К. Першы вылучаны радок *</p><p>Н. Другі радок.</p>',
+                      style: styles,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    final turnStyle = styles['.responsory-turn']!;
+    expect(turnStyle.fontSize?.value, 16);
+    expect(turnStyle.lineHeight?.size, ReaderTheme.responsoryHeight);
+    expect(
+      tester.getSize(find.byKey(const Key('turns'))).height,
+      lessThan(tester.getSize(find.byKey(const Key('prose'))).height),
+    );
+  });
+
+  testWidgets('source variants have equal hymn, prayer and petition heights', (
+    tester,
+  ) async {
+    String prepared(String source, {bool intercession = false}) =>
+        formatLiturgicalHtml(
+          normalizeSemanticBody(
+            intercession ? formatIntercessions(source) : source,
+          ),
+        );
+    final sources = [
+      (
+        prepared(
+          '<p style="margin-bottom:40px">Першы радок.</p>'
+          '<p style="margin-bottom:60px">Другі радок.</p>',
+        ),
+        prepared('<p>Першы радок.</p><p>Другі радок.</p>'),
+        LiturgicalSpacing.hymnStropheAfter,
+      ),
+      (
+        prepared('<p style="margin-bottom:50px">Молімся Пану.</p>'),
+        prepared('<p>Молімся Пану.</p>'),
+        LiturgicalSpacing.paragraphAfter,
+      ),
+      (
+        prepared(
+          '<p>Узнясём малітвы:</p><p><em>Выслухай нас.</em></p>'
+          '<p>За Касцёл.</p><p>— Выслухай нас.</p>',
+          intercession: true,
+        ),
+        prepared(
+          '<p>Узнясём малітвы:<br><em>Выслухай нас.</em><br>'
+          'За Касцёл.<br>— Выслухай нас.</p>',
+          intercession: true,
+        ),
+        LiturgicalSpacing.paragraphAfter,
+      ),
+    ];
+    await tester.pumpWidget(
+      ReaderTypographyScope(
+        useSystemFonts: true,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final reader = ReaderTheme.of(context);
+                return Column(
+                  children: [
+                    for (var i = 0; i < sources.length; i++) ...[
+                      Html(
+                        key: Key('variant-a-$i'),
+                        data: sources[i].$1,
+                        style: liturgicalDocumentStyles(
+                          reader: reader,
+                          body: reader.body(16),
+                          paragraphAfter: sources[i].$3,
+                        ),
+                      ),
+                      Html(
+                        key: Key('variant-b-$i'),
+                        data: sources[i].$2,
+                        style: liturgicalDocumentStyles(
+                          reader: reader,
+                          body: reader.body(16),
+                          paragraphAfter: sources[i].$3,
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    for (var i = 0; i < sources.length; i++) {
+      expect(
+        tester.getSize(find.byKey(Key('variant-a-$i'))).height,
+        closeTo(tester.getSize(find.byKey(Key('variant-b-$i'))).height, .5),
+      );
+    }
   });
 
   for (final width in [360.0, 390.0]) {
@@ -311,33 +473,27 @@ void main() {
     }
   });
 
-  test('Hours use one psalm rhythm and shared canticle composition', () {
+  test('Hours use one psalm shell and fixed block gap', () {
     final source = File('lib/screens/ora_screen.dart').readAsStringSync();
-    expect(
-      RegExp(r'_OraItem\.psalmGap\(').allMatches(source).length,
-      greaterThanOrEqualTo(2),
-    );
-    expect(source, contains('psalmBlockSpacerAfter'));
-    expect(
-      psalmBlockSpacerAfter(antiphon: true) + LiturgicalSpacing.antiphonToPsalm,
-      psalmBlockSpacerAfter(antiphon: false) + LiturgicalSpacing.paragraphAfter,
-    );
-    expect(source, contains('LiturgicalSpacing.antiphonToPsalm'));
-    final compline = source.substring(
-      source.indexOf('final antS = cf('),
-      source.indexOf("final pr = cf('compPr')"),
-    );
-    expect(
-      compline.indexOf('_OraItem.antiphon(antS'),
-      lessThan(compline.indexOf('_OraItem.serviceHeader(')),
-    );
-    expect(
-      compline.indexOf('_OraItem.serviceHeader('),
-      lessThan(compline.indexOf('Песня Сімяона')),
-    );
-    expect(
-      compline.indexOf('Песня Сімяона'),
-      lessThan(compline.indexOf('_OraItem.psalm(_kNunc)')),
-    );
+    expect(source, contains('_OraItem.psalmBlock('));
+    expect(source, isNot(contains('psalmBlockSpacerAfter')));
+    expect(source, contains('LiturgicalSpacing.psalmBlockToNext'));
+    expect(source, contains('canticleCaption:'));
+    final external = parseLiturgicalPsalms(
+      '<p style="margin-bottom:90px">Псальм 92</p><p>Тэкст *</p>',
+      openingAntiphon: 'Ант. Хвала.',
+      repeatedAntiphon: 'Ант. Хвала.',
+    ).single;
+    expect(external.openingAntiphon, 'Ант. Хвала.');
+    expect(external.repeatedAntiphon, 'Ант. Хвала.');
+    expect(external.bodyHtml, isNot(contains('margin-bottom')));
+    final structured = parseLiturgicalPsalms(
+      '<p class="ora-ant">Ант. Хвала.</p>'
+      '<div class="ora-psalm"><p>Псальм 92</p><p>Тэкст *</p></div>'
+      '<p class="ora-ant">Ант. Хвала.</p>',
+    ).single;
+    expect(parseFragment(structured.openingAntiphon!).text, contains('Хвала'));
+    expect(parseFragment(structured.repeatedAntiphon!).text, contains('Хвала'));
+    expect(parseFragment(structured.bodyHtml).text, contains('Тэкст'));
   });
 }
