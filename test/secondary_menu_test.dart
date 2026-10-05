@@ -59,6 +59,44 @@ void main() {
     expect(informationBottom, lessThan(800 - 32));
   });
 
+  testWidgets('secondary menu remains reachable at 320 dp and 200% text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(320, 720),
+            textScaler: TextScaler.linear(2),
+            viewPadding: EdgeInsets.only(bottom: 24),
+          ),
+          child: Builder(
+            builder: (context) => Scaffold(
+              body: FilledButton(
+                onPressed: () => showSecondaryMenu(context),
+                child: const Text('Адкрыць меню'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Адкрыць меню'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.text('Інфармацыя'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getBottomLeft(find.text('Інфармацыя')).dy,
+      lessThan(720 - 24),
+    );
+  });
+
   testWidgets('secondary menu is shown above the app navigation dock', (
     tester,
   ) async {

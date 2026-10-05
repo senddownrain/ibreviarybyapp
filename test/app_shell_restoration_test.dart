@@ -7,9 +7,12 @@ import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
+import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
+import 'package:mybrev_flutter/widgets/branch_hosts.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 class _IdleBootstrap extends DataBootstrapNotifier {
   @override
@@ -148,6 +151,99 @@ void main() {
         expect(find.byKey(const Key('app-dock-full')), findsOneWidget);
       }
       await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'opening Readings with an explicit date updates after route build',
+    (tester) async {
+      final requestedDate = DateTime(2028, 8, 1);
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(_MemorySettings.new),
+          dataBootstrapProvider.overrideWith(_IdleBootstrap.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          dayOptionsProvider.overrideWithValue(const []),
+          readingsLoaderProvider.overrideWithValue(
+            ({
+              required dateStr,
+              required liturgicalKey,
+              required dayId,
+              required forceRefresh,
+            }) async => const ReadingsLoadResult(
+              readings: [],
+              sundayCycle: 'A',
+              weekdayCycle: '1',
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final shellState = AppShellState(
+        roots: const [
+          hoursRootRoute,
+          readingsRootRoute,
+          prayerbookRootRoute,
+          bibleRootRoute,
+        ],
+      );
+      addTearDown(shellState.dispose);
+      final chrome = ReaderChromeModeController(ReaderChromeMode.full);
+      addTearDown(chrome.dispose);
+      final router = GoRouter(
+        initialLocation: '/hours',
+        routes: [
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, shell) => AppShell(
+              navigationShell: shell,
+              shellState: shellState,
+              activeBranch: AppBranch.values[shell.currentIndex],
+            ),
+            branches: [
+              for (final branch in AppBranch.values)
+                StatefulShellBranch(
+                  observers: [
+                    BranchRouteObserver(shellState.branches[branch]!),
+                  ],
+                  routes: [
+                    GoRoute(
+                      path: '/${branch.name}',
+                      pageBuilder: (context, state) => MaterialPage<void>(
+                        key: state.pageKey,
+                        arguments: AppRouteEntry(
+                          id: state.pageKey.value,
+                          descriptor:
+                              shellState.branches[branch]!.rootDescriptor,
+                        ),
+                        child: branch == AppBranch.readings
+                            ? ReaderChromeModeScope(
+                                controller: chrome,
+                                child: ReadingsBranchHost(date: requestedDate),
+                              )
+                            : Text(branch.name),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+      router.go('/readings');
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(container.read(selectedDateProvider), requestedDate);
+      expect(container.read(readingsBranchStateProvider).date, requestedDate);
     },
   );
 }

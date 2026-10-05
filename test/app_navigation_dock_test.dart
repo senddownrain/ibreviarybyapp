@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 void main() {
-  Widget app(TargetPlatform platform, ReaderChromeMode mode) => MaterialApp(
+  Widget app(
+    TargetPlatform platform,
+    ReaderChromeMode mode, {
+    double width = 320,
+    double textScale = 2,
+  }) => MaterialApp(
     key: ValueKey((platform, mode)),
     theme: ThemeData(useMaterial3: true, platform: platform),
     home: MediaQuery(
-      data: const MediaQueryData(
-        size: Size(320, 640),
-        textScaler: TextScaler.linear(2),
+      data: MediaQueryData(
+        size: Size(width, 640),
+        textScaler: TextScaler.linear(textScale),
         viewPadding: EdgeInsets.only(bottom: 24),
       ),
       child: Scaffold(
@@ -29,6 +35,10 @@ void main() {
   testWidgets('Full dock renders four destinations on iOS and Android', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
       await tester.pumpWidget(app(platform, ReaderChromeMode.full));
       await tester.pump();
@@ -45,6 +55,18 @@ void main() {
       );
       for (final label in ['Літургія', 'Чытанні', 'Малітоўнік', 'Біблія']) {
         expect(find.text(label), findsOneWidget);
+        final paragraph = tester.renderObject<RenderParagraph>(
+          find.descendant(
+            of: find.text(label),
+            matching: find.byType(RichText),
+          ),
+        );
+        expect(paragraph.didExceedMaxLines, isFalse, reason: label);
+        final destination = tester.getSize(
+          find.byKey(Key('app-destination-$label')),
+        );
+        expect(destination.width, greaterThanOrEqualTo(48));
+        expect(destination.height, greaterThanOrEqualTo(48));
       }
       expect(
         tester
@@ -84,9 +106,51 @@ void main() {
               ),
             )
             .height,
-        102,
+        160,
       );
       expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('dock labels stay complete across widths and text scales', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
+      for (final width in [320.0, 360.0, 390.0, 430.0, 700.0]) {
+        for (final scale in [1.0, 1.5, 2.0]) {
+          tester.view.physicalSize = Size(width, 640);
+          await tester.pumpWidget(
+            app(
+              platform,
+              ReaderChromeMode.full,
+              width: width,
+              textScale: scale,
+            ),
+          );
+          await tester.pump();
+          for (final label in ['Літургія', 'Чытанні', 'Малітоўнік', 'Біблія']) {
+            final paragraph = tester.renderObject<RenderParagraph>(
+              find.descendant(
+                of: find.text(label),
+                matching: find.byType(RichText),
+              ),
+            );
+            expect(
+              paragraph.didExceedMaxLines,
+              isFalse,
+              reason: '$platform $width/$scale $label',
+            );
+          }
+          expect(
+            tester.takeException(),
+            isNull,
+            reason: '$platform $width/$scale',
+          );
+        }
+      }
     }
   });
 

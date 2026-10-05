@@ -24,6 +24,71 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+class SettingsThemeControl extends StatelessWidget {
+  const SettingsThemeControl({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final ThemeMode value;
+  final ValueChanged<ThemeMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final textScale = MediaQuery.textScalerOf(context).scale(1);
+      final widthPerChoice = constraints.maxWidth / 3;
+      final needsFullWidthLabels =
+          constraints.hasBoundedWidth && widthPerChoice < 120 * textScale;
+      if (needsFullWidthLabels) {
+        return DropdownButtonFormField<ThemeMode>(
+          key: ValueKey(value),
+          initialValue: value,
+          isExpanded: true,
+          items: const [
+            DropdownMenuItem(value: ThemeMode.system, child: Text('Сістэма')),
+            DropdownMenuItem(value: ThemeMode.light, child: Text('Светлая')),
+            DropdownMenuItem(value: ThemeMode.dark, child: Text('Цёмная')),
+          ],
+          onChanged: (mode) {
+            if (mode != null) onChanged(mode);
+          },
+        );
+      }
+      final showIcons = widthPerChoice >= 135 * textScale;
+      return AdaptiveSegmentedControl<ThemeMode>(
+        segments: [
+          AdaptiveSegment(
+            value: ThemeMode.system,
+            icon: showIcons
+                ? const PhosphorIcon(PhosphorIconsRegular.circleHalf, size: 18)
+                : null,
+            label: const Text('Сістэма'),
+          ),
+          AdaptiveSegment(
+            value: ThemeMode.light,
+            icon: showIcons
+                ? const PhosphorIcon(PhosphorIconsRegular.sun, size: 18)
+                : null,
+            label: const Text('Светлая'),
+          ),
+          AdaptiveSegment(
+            value: ThemeMode.dark,
+            icon: showIcons
+                ? const PhosphorIcon(PhosphorIconsRegular.moon, size: 18)
+                : null,
+            label: const Text('Цёмная'),
+          ),
+        ],
+        value: value,
+        showSelectedIcon: false,
+        onChanged: onChanged,
+      );
+    },
+  );
+}
+
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _syncKey = GlobalKey();
 
@@ -62,31 +127,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 // Theme
                 Text('Тэма', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                AdaptiveSegmentedControl<ThemeMode>(
-                  segments: const [
-                    AdaptiveSegment(
-                      value: ThemeMode.system,
-                      icon: PhosphorIcon(
-                        PhosphorIconsRegular.circleHalf,
-                        size: 18,
-                      ),
-                      label: Text('Сістэма'),
-                    ),
-                    AdaptiveSegment(
-                      value: ThemeMode.light,
-                      icon: PhosphorIcon(PhosphorIconsRegular.sun, size: 18),
-                      label: Text('Светлая'),
-                    ),
-                    AdaptiveSegment(
-                      value: ThemeMode.dark,
-                      icon: PhosphorIcon(PhosphorIconsRegular.moon, size: 18),
-                      label: Text('Цёмная'),
-                    ),
-                  ],
+                SettingsThemeControl(
                   value: settings.themeMode,
-                  // The selected fill already communicates the active theme.
-                  // Omitting a second icon leaves room for translated labels.
-                  showSelectedIcon: false,
                   onChanged: (mode) =>
                       ref.read(settingsProvider.notifier).setThemeMode(mode),
                 ),

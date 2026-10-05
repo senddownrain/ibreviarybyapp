@@ -373,6 +373,26 @@ void main() {
       semantics.dispose();
     });
 
+    testWidgets('verse announces its number, text, and selected state', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await _pumpBible(tester);
+      final verse = find.byKey(const Key('bible-verse-1'));
+      final initial = tester.getSemantics(verse);
+      expect(initial.label, startsWith('Верш 1. '));
+      expect(initial.label.length, greaterThan(20));
+      expect(initial.flagsCollection.isButton, isTrue);
+
+      await tester.tap(verse);
+      await tester.pumpAndSettle();
+      expect(
+        tester.getSemantics(verse).flagsCollection.isSelected,
+        ui.Tristate.isTrue,
+      );
+      semantics.dispose();
+    });
+
     testWidgets('verse palette uses reported zero system inset', (
       tester,
     ) async {

@@ -792,38 +792,45 @@ class _VerseRow extends StatelessWidget {
               ? BorderSide(color: cs.primary, width: 2)
               : BorderSide.none,
         ),
-        child: InkWell(
-          key: Key('bible-verse-$verseNum'),
-          borderRadius: BorderRadius.circular(10),
+        child: Semantics(
+          button: true,
+          selected: selected,
+          label: 'Верш $verseNum. $text',
           onTap: onTap,
-          onDoubleTap: chromeController?.toggleFullscreen,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-            child: RichText(
-              key: Key('bible-verse-body-$verseNum'),
-              textScaler: MediaQuery.textScalerOf(context),
-              text: TextSpan(
-                style: textStyle.copyWith(
-                  color: ReaderTheme.of(context).ink,
-                  height: ReaderTheme.bodyHeight,
-                ),
-                children: [
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.top,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 6, top: 1),
-                      child: Text(
-                        '$verseNum',
-                        style: TextStyle(
-                          color: cs.tertiary,
-                          fontSize: (textStyle.fontSize ?? 16) * 0.64,
-                          fontWeight: FontWeight.w800,
+          excludeSemantics: true,
+          child: InkWell(
+            key: Key('bible-verse-$verseNum'),
+            borderRadius: BorderRadius.circular(10),
+            onTap: onTap,
+            onDoubleTap: chromeController?.toggleFullscreen,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+              child: RichText(
+                key: Key('bible-verse-body-$verseNum'),
+                textScaler: MediaQuery.textScalerOf(context),
+                text: TextSpan(
+                  style: textStyle.copyWith(
+                    color: ReaderTheme.of(context).ink,
+                    height: ReaderTheme.bodyHeight,
+                  ),
+                  children: [
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.top,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 6, top: 1),
+                        child: Text(
+                          '$verseNum',
+                          style: TextStyle(
+                            color: cs.tertiary,
+                            fontSize: (textStyle.fontSize ?? 16) * 0.64,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  TextSpan(text: text),
-                ],
+                    TextSpan(text: text),
+                  ],
+                ),
               ),
             ),
           ),

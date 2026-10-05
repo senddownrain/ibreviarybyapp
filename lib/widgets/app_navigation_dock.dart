@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -55,12 +57,26 @@ class AppNavigationDock extends StatelessWidget {
     final ios = usesCupertinoGlass(context);
     final platformKey = Key(ios ? 'app-dock-ios' : 'app-dock-android');
     final bottom = MediaQuery.viewPaddingOf(context).bottom;
+    final labelLineHeight = MediaQuery.textScalerOf(context).scale(10.5);
+    final labelLines = labelLineHeight >= 17
+        ? 4
+        : labelLineHeight >= 13
+        ? 3
+        : 2;
+    final expandedFullDockHeight = math.max(
+      ios ? 62.0 : 60.0,
+      22 + 2 + labelLineHeight * labelLines + 12,
+    );
     final systemNavigationStripColor = Theme.of(
       context,
     ).colorScheme.surface.withValues(alpha: 0.72);
     return Container(
       key: platformKey,
-      height: (mode == ReaderChromeMode.full ? 78 : 72) + bottom,
+      height:
+          (mode == ReaderChromeMode.full
+              ? math.max(78, expandedFullDockHeight + 16)
+              : 72) +
+          bottom,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -82,6 +98,8 @@ class AppNavigationDock extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: mode == ReaderChromeMode.full
                     ? _FullDock(
+                        height: expandedFullDockHeight,
+                        labelLines: labelLines,
                         activeBranch: activeBranch,
                         items: _items,
                         onSelect: onSelect,
@@ -107,11 +125,15 @@ class AppNavigationDock extends StatelessWidget {
 
 class _FullDock extends StatelessWidget {
   const _FullDock({
+    required this.height,
+    required this.labelLines,
     required this.activeBranch,
     required this.items,
     required this.onSelect,
   });
 
+  final double height;
+  final int labelLines;
   final AppBranch activeBranch;
   final List<({String label, PhosphorIconData icon, PhosphorIconData selected})>
   items;
@@ -128,13 +150,14 @@ class _FullDock extends StatelessWidget {
         role: ChromeSurfaceRole.navigation,
         borderRadius: BorderRadius.circular(ios ? 30 : 24),
         child: SizedBox(
-          height: ios ? 62 : 60,
+          height: height,
           child: Row(
             children: [
               for (var index = 0; index < items.length; index++)
                 Expanded(
                   child: _DockDestination(
                     item: items[index],
+                    labelLines: labelLines,
                     selected: index == activeBranch.index,
                     colorScheme: cs,
                     ios: ios,
@@ -152,6 +175,7 @@ class _FullDock extends StatelessWidget {
 class _DockDestination extends StatelessWidget {
   const _DockDestination({
     required this.item,
+    required this.labelLines,
     required this.selected,
     required this.colorScheme,
     required this.ios,
@@ -159,6 +183,7 @@ class _DockDestination extends StatelessWidget {
   });
 
   final ({String label, PhosphorIconData icon, PhosphorIconData selected}) item;
+  final int labelLines;
   final bool selected;
   final ColorScheme colorScheme;
   final bool ios;
@@ -200,7 +225,8 @@ class _DockDestination extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 item.label,
-                maxLines: 1,
+                textAlign: TextAlign.center,
+                maxLines: labelLines,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 10.5,

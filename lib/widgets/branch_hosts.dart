@@ -79,6 +79,8 @@ class ReadingsBranchHost extends ConsumerStatefulWidget {
 }
 
 class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
+  bool _contextUpdateScheduled = false;
+
   @override
   void initState() {
     super.initState();
@@ -96,6 +98,23 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
   }
 
   void _applyExplicitContext() {
+    if (widget.invalidContext != null) return;
+    // A route can be created during the shell build. Defer provider writes so
+    // the shared Hours/Readings listeners are not notified mid-build.
+    final binding = WidgetsBinding.instance;
+    if (binding.schedulerPhase != SchedulerPhase.idle) {
+      if (_contextUpdateScheduled) return;
+      _contextUpdateScheduled = true;
+      binding.addPostFrameCallback((_) {
+        _contextUpdateScheduled = false;
+        if (mounted) _commitExplicitContext();
+      });
+      return;
+    }
+    _commitExplicitContext();
+  }
+
+  void _commitExplicitContext() {
     if (widget.invalidContext != null) return;
     final current = ref.read(readingsBranchStateProvider);
     if (widget.liturgicalKey != null) {
