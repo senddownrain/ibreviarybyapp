@@ -46,7 +46,6 @@ Map<String, Style> liturgicalDocumentStyles({
       textAlign: TextAlign.left,
     ),
     'p': Style(margin: Margins.only(bottom: paragraphAfter)),
-    '.semantic-first': Style(margin: Margins.zero),
     '.semantic-last': Style(margin: Margins.zero),
     '.liturgical-heading': Style(
       fontFamily: heading.fontFamily,

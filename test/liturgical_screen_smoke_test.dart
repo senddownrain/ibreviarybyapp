@@ -64,7 +64,8 @@ void main() {
       apostle['laudesAnt$i'] =
           '<p><span style="color:red">$i ант.</span> Хвала Пану.</p>';
       apostle['sext1Ant$i'] =
-          '<p><span style="color:red">$i ант.</span> Хвала Пану.</p>';
+          '<p><span style="color:red">$i ант.</span> Хвала Пану.'
+          '<br><span style="color:red"></span></p>';
       apostle['sext1Ps$i'] = psalmSample;
     }
     apostle['laudesHymn'] = '<p>Спяваем хвалу Пану.</p>';

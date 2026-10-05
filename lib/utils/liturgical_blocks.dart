@@ -171,3 +171,44 @@ String normalizeSemanticBody(String html) {
   }
   return root.outerHtml;
 }
+
+/// Legacy antiphons may end with a source line break and an empty color span.
+/// Those nodes are not part of the sung text and must not add an empty line
+/// before psalm metadata or the next antiphon.
+String normalizeAntiphonBody(String html) {
+  final root = parseFragment(html);
+
+  void trimTrailing(dom.Node parent) {
+    while (parent.nodes.isNotEmpty) {
+      final last = parent.nodes.last;
+      if (last is dom.Text && last.text.trim().isEmpty) {
+        last.remove();
+      } else if (last is dom.Element && last.localName == 'br') {
+        last.remove();
+      } else if (last is dom.Element &&
+          const {
+            'span',
+            'font',
+            'b',
+            'strong',
+            'i',
+            'em',
+          }.contains(last.localName)) {
+        trimTrailing(last);
+        if (last.nodes.isEmpty) {
+          last.remove();
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+  }
+
+  for (final paragraph in root.querySelectorAll('p')) {
+    trimTrailing(paragraph);
+  }
+  trimTrailing(root);
+  return normalizeSemanticBody(root.outerHtml);
+}

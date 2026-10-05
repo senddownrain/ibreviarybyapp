@@ -242,6 +242,102 @@ void main() {
     }
   });
 
+  testWidgets('first hymn stanza keeps the shared stanza gap', (tester) async {
+    await tester.pumpWidget(
+      ReaderTypographyScope(
+        useSystemFonts: true,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final reader = ReaderTheme.of(context);
+                final styles = liturgicalDocumentStyles(
+                  reader: reader,
+                  body: reader.body(16),
+                  paragraphAfter: LiturgicalSpacing.hymnStropheAfter,
+                );
+                return Column(
+                  children: [
+                    Html(
+                      key: const Key('semantic-hymn'),
+                      data: normalizeSemanticBody(
+                        '<p>Першая страфа.</p><p>Другая страфа.</p>',
+                      ),
+                      style: styles,
+                    ),
+                    Html(
+                      key: const Key('plain-hymn'),
+                      data:
+                          '<p>Першая страфа.</p>'
+                          '<p class="semantic-last">Другая страфа.</p>',
+                      style: styles,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('semantic-hymn'))).height,
+      closeTo(tester.getSize(find.byKey(const Key('plain-hymn'))).height, .5),
+    );
+  });
+
+  testWidgets('trailing source break adds no antiphon gap', (tester) async {
+    final source =
+        '<p><span style="color:red">1 ант.</span> '
+        'Шукаю наказаў Тваіх, Пане, * бо імі Ты ажыўляеш мяне.'
+        '<br><span style="color:red"></span></p>';
+    final clean =
+        '<p><span style="color:red">1 ант.</span> '
+        'Шукаю наказаў Тваіх, Пане, * бо імі Ты ажыўляеш мяне.</p>';
+    final normalized = normalizeAntiphonBody(source);
+    expect(parseFragment(normalized).querySelector('br'), isNull);
+    await tester.pumpWidget(
+      ReaderTypographyScope(
+        useSystemFonts: true,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final reader = ReaderTheme.of(context);
+                final styles = liturgicalDocumentStyles(
+                  reader: reader,
+                  body: reader.body(16),
+                  paragraphAfter: 0,
+                );
+                return Column(
+                  children: [
+                    Html(
+                      key: const Key('source-antiphon'),
+                      data: formatLiturgicalHtml(normalized),
+                      style: styles,
+                    ),
+                    Html(
+                      key: const Key('clean-antiphon'),
+                      data: formatLiturgicalHtml(normalizeAntiphonBody(clean)),
+                      style: styles,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('source-antiphon'))).height,
+      closeTo(
+        tester.getSize(find.byKey(const Key('clean-antiphon'))).height,
+        .5,
+      ),
+    );
+  });
+
   for (final width in [360.0, 390.0]) {
     testWidgets('short reading header fits $width px and scaled text', (
       tester,

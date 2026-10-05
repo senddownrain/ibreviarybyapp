@@ -1956,14 +1956,12 @@ class _HtmlOrText extends StatelessWidget {
         );
       }
     }
-    final semanticBody =
-        const {
-          'hymn',
-          'prayer',
-          'intercession',
-          'psalm-antiphon',
-          'gospel-antiphon',
-        }.contains(alternativeKind)
+    final isAntiphon =
+        alternativeKind == 'psalm-antiphon' ||
+        alternativeKind == 'gospel-antiphon';
+    final semanticBody = isAntiphon
+        ? normalizeAntiphonBody(officeHtml)
+        : const {'hymn', 'prayer', 'intercession'}.contains(alternativeKind)
         ? normalizeSemanticBody(officeHtml)
         : officeHtml;
     if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
