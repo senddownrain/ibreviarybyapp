@@ -61,11 +61,38 @@ void main() {
         '<p>Божа, Ты Бог мой *<br>Цябе шукаю.</p>';
     for (var i = 1; i <= 3; i++) {
       apostle['laudesPs$i'] = psalmSample;
+      apostle['laudesAnt$i'] =
+          '<p><span style="color:red">$i ант.</span> Хвала Пану.</p>';
       apostle['sext1Ant$i'] =
           '<p><span style="color:red">$i ант.</span> Хвала Пану.</p>';
       apostle['sext1Ps$i'] = psalmSample;
     }
     apostle['laudesHymn'] = '<p>Спяваем хвалу Пану.</p>';
+    for (final field in [
+      'officeOfReadingsHymn',
+      'sext1Hymn',
+      'sext2Hymn',
+      'sext3Hymn',
+      'vesperHymn',
+    ]) {
+      apostle[field] = apostle['laudesHymn'];
+    }
+    for (final field in [
+      'officeOfReadingsPr',
+      'laudesPr',
+      'vesperPr',
+      'sext1Pr',
+      'sext2Pr',
+      'sext3Pr',
+    ]) {
+      apostle[field] = '<p style="margin-bottom:40px">Молімся Пану.</p>';
+    }
+    apostle['laudesInter'] =
+        '<p>Узнясём малітвы:</p><p><em>Выслухай нас.</em></p>'
+        '<p>За Касцёл.</p><p>— Выслухай нас.</p>';
+    apostle['vesperInter'] =
+        '<p>Узнясём малітвы:<br><em>Выслухай нас.</em><br>'
+        'За Касцёл.<br>— Выслухай нас.</p>';
     final ordinary = Map<String, dynamic>.from(fixture['currentDay'] as Map);
     ordinary['laudesHymn'] = '<p>Спяваем хвалу Пану.</p>';
     for (var i = 1; i <= 3; i++) {
@@ -98,11 +125,9 @@ void main() {
     final structured = Map<String, dynamic>.from(apostle);
     for (var i = 1; i <= 3; i++) {
       structured['laudesPs$i'] =
-          '<p class="ora-ant">Ант. Хвала Пану.</p>'
-          '<div class="ora-psalm"><p>Псальм $i</p>'
-          '<p><span><em>Гэты псальм аддае хвалу</em></span></p>'
-          '<p>Добра ёсць дзякаваць Пану *</p></div>'
-          '<p class="ora-ant">Ант. Хвала Пану.</p>';
+          '<p class="ora-ant"><span style="color:red">$i ант.</span> Хвала Пану.</p>'
+          '<div class="ora-psalm">$psalmSample</div>'
+          '<p class="ora-ant"><span style="color:red">$i ант.</span> Хвала Пану.</p>';
     }
     await HiveService.daysBox.put('structured-smoke', {
       ...structured,
@@ -140,7 +165,7 @@ void main() {
     });
     for (var day = 1; day <= 7; day++) {
       await HiveService.completoriumsBox.put('ordinary-d$day', {
-        'compHymn': '<p>Гімн Камплеты.</p>',
+        'compHymn': '<p>Спяваем хвалу Пану.</p>',
         'compAnt1': '<p>Ант. Пан мой.</p>',
         'compPs1': '<p><em>Псальм 4</em></p><p>Пачуй мяне, Божа *</p>',
         'compR': '<p>Кароткае чытанне 1 П 5, 8</p><p>Будзьце цвярозымі.</p>',
@@ -148,7 +173,7 @@ void main() {
             '<p>Кароткі рэспансорый<br>К. У рукі Твае * '
             'Н. Аддаю дух мой.</p>',
         'compAntS': '<p>Ант. Збаў нас, Пане.</p>',
-        'compPr': '<p>Молімся.</p>',
+        'compPr': '<p>Молімся Пану.</p>',
         'compAntM': '<p>Вітай, Каралева.</p>',
       });
     }
@@ -272,6 +297,7 @@ void main() {
           find.byType(LiturgicalHeadingReferenceRow),
           hour == 'lectionis' ? findsNothing : findsOneWidget,
         );
+        expect(find.byType(LiturgicalResponsoryBlock), findsWidgets);
       }
       if (const {
         'structured-smoke',
@@ -282,25 +308,13 @@ void main() {
           find.byWidgetPredicate(
             (widget) =>
                 widget is SizedBox &&
-                widget.height ==
-                    psalmBlockSpacerAfter(
-                      antiphon: dayId != 'single-ant-smoke',
-                    ),
+                widget.height == LiturgicalSpacing.psalmBlockToNext,
           ),
           findsAtLeastNWidgets(2),
         );
       }
       if (dayId == 'structured-smoke') {
-        final psalmHtml = tester
-            .widgetList<Html>(find.byType(Html))
-            .map((e) => e.data ?? '');
-        expect(
-          psalmHtml.any(
-            (data) =>
-                data.contains('ora-psalm') && data.contains('psalm-subtitle'),
-          ),
-          isTrue,
-        );
+        expect(find.byType(PsalmChoirHtml), findsAtLeastNWidgets(3));
       }
       if (hour == 'lectionis' || hour == 'morning') {
         // The divider owns the first transition; the second reading owns its
@@ -429,6 +443,206 @@ void main() {
       }
     });
   }
+
+  testWidgets('Laudes, Sext and structured psalms have equal geometry', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    _fontSize = 16;
+
+    Future<List<double>> gaps(String dayId, String hour) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          key: ValueKey('$dayId-$hour'),
+          overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+          child: ReaderTypographyScope(
+            useSystemFonts: true,
+            child: MaterialApp(
+              home: OraScreen(dayId: dayId, oraType: hour, date: date),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final opening = find.byKey(const Key('liturgical-psalm-opening'));
+      final metadata0 = find.byKey(const Key('liturgical-psalm-metadata-0'));
+      final metadata1 = find.byKey(const Key('liturgical-psalm-metadata-1'));
+      final body = find.byKey(const Key('liturgical-psalm-body'));
+      final repeat = find.byKey(const Key('liturgical-psalm-repeat'));
+      expect(opening, findsAtLeastNWidgets(2));
+      expect(metadata0, findsAtLeastNWidgets(2));
+      expect(metadata1, findsAtLeastNWidgets(2));
+      expect(repeat, findsAtLeastNWidgets(2));
+      return [
+        tester.getRect(metadata0.first).top -
+            tester.getRect(opening.first).bottom,
+        tester.getRect(body.first).top - tester.getRect(metadata1.first).bottom,
+        tester.getRect(opening.at(1)).top - tester.getRect(repeat.first).bottom,
+      ];
+    }
+
+    final laudes = await gaps('smoke', 'laudes');
+    final sext = await gaps('smoke', 'terz');
+    final structured = await gaps('structured-smoke', 'laudes');
+    for (var i = 0; i < laudes.length; i++) {
+      expect(sext[i], closeTo(laudes[i], .5));
+      expect(structured[i], closeTo(laudes[i], .5));
+    }
+  });
+
+  testWidgets('hymn, prayer and intercession roles keep one geometry', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    _fontSize = 16;
+
+    Future<Map<String, List<double>>> measure(String hour) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          key: ValueKey('roles-$hour'),
+          overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+          child: ReaderTypographyScope(
+            useSystemFonts: true,
+            child: MaterialApp(
+              home: OraScreen(dayId: 'smoke', oraType: hour, date: date),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final result = <String, List<double>>{};
+      for (final role in ['hymn', 'prayer', 'intercession']) {
+        final title = role == 'hymn'
+            ? find.byWidgetPredicate(
+                (widget) =>
+                    widget is LiturgicalSectionHeading &&
+                    widget.title == 'Гімн',
+              )
+            : find.byKey(Key('liturgical-$role-title'));
+        final body = role == 'hymn'
+            ? find.byWidgetPredicate(
+                (widget) =>
+                    widget is Html &&
+                    (widget.data ?? '').contains('Спяваем хвалу Пану.'),
+              )
+            : find.byKey(Key('liturgical-$role-body'));
+        if (title.evaluate().isEmpty || body.evaluate().isEmpty) continue;
+        final titleText = find
+            .descendant(of: title.first, matching: find.byType(Text))
+            .first;
+        result[role] = [
+          tester.getRect(body.first).top - tester.getRect(titleText).bottom,
+        ];
+      }
+      return result;
+    }
+
+    final laudes = await measure('laudes');
+    for (final hour in [
+      'lectionis',
+      'terz',
+      'sext',
+      'non',
+      'vespers',
+      'completorium',
+      'morning',
+    ]) {
+      final actual = await measure(hour);
+      for (final role in ['hymn', 'prayer', 'intercession']) {
+        if (!actual.containsKey(role)) continue;
+        expect(
+          actual[role]!.single,
+          closeTo(laudes[role]!.single, .5),
+          reason: '$role in $hour',
+        );
+      }
+    }
+  });
+
+  for (final width in [360.0, 390.0]) {
+    testWidgets('Gospel canticle metadata stays centered at $width px', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      _fontSize = 16;
+      for (final hour in ['laudes', 'vespers', 'completorium', 'morning']) {
+        await tester.pumpWidget(
+          ProviderScope(
+            key: ValueKey('canticle-$hour-$width'),
+            overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+            child: ReaderTypographyScope(
+              useSystemFonts: true,
+              child: MaterialApp(
+                home: OraScreen(dayId: 'smoke', oraType: hour, date: date),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final service = find.byWidgetPredicate(
+          (widget) =>
+              widget is Html &&
+              (widget.data ?? '').contains('Песня з Евангелля'),
+        );
+        final caption = find.byWidgetPredicate(
+          (widget) =>
+              widget is Html && (widget.data ?? '').contains('Песня Захарыі') ||
+              widget is Html && (widget.data ?? '').contains('Песня Марыі') ||
+              widget is Html && (widget.data ?? '').contains('Песня Сімяона'),
+        );
+        expect(service, findsOneWidget, reason: hour);
+        expect(caption, findsOneWidget, reason: hour);
+        for (final target in [service, caption]) {
+          final html = tester.widget<Html>(target);
+          expect(html.style['p']?.textAlign, TextAlign.center);
+          expect(tester.getSize(target).width, closeTo(width - 44, .5));
+        }
+        final bodies = tester.widgetList<PsalmChoirHtml>(
+          find.byType(PsalmChoirHtml),
+        );
+        expect(bodies.last.style['body']?.textAlign, TextAlign.left);
+      }
+    });
+  }
+
+  testWidgets('single antiphon has one opening and one repeat', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+        child: ReaderTypographyScope(
+          useSystemFonts: true,
+          child: MaterialApp(
+            home: OraScreen(
+              dayId: 'single-ant-smoke',
+              oraType: 'laudes',
+              date: date,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    // The second pair belongs to Benedictus; Psalmody contributes one pair.
+    expect(find.byKey(const Key('liturgical-psalm-opening')), findsNWidgets(2));
+    expect(find.byKey(const Key('liturgical-psalm-repeat')), findsNWidgets(2));
+    expect(
+      find.byKey(const Key('liturgical-psalm-body')),
+      findsAtLeastNWidgets(3),
+    );
+  });
 
   for (final (brightness, size, viewport) in [
     (Brightness.light, 16.0, const Size(900, 1600)),

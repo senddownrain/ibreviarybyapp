@@ -38,6 +38,7 @@ class ReaderTheme {
 
   static const double bodyHeight = 1.68;
   static const double hymnHeight = 1.72;
+  static const double responsoryHeight = 1.48;
   static const double referenceHeight = 1.40;
   static const double rubricHeight = 1.48;
   static const double metadataHeight = 1.42;
@@ -170,6 +171,14 @@ abstract final class LiturgicalSpacing {
   static const sectionTitleToBody = 8.0;
   static const paragraphAfter = 8.0;
   static const hymnStropheAfter = 15.0;
+  static const responsoryTurnAfter = 2.0;
+  static const intercessionIntroAfter = 13.0;
+  static const intercessionRefrainAfter = 22.0;
+  static const intercessionPetitionBefore = 18.0;
+  static const intercessionPetitionAfter = 5.0;
+  static const intercessionResponseInset = 12.0;
+  static const intercessionResponseAfter = 15.0;
+  static const intercessionConclusionBefore = 22.0;
   static const antiphonToPsalm = 4.0;
   static const psalmBlockToNext = 12.0;
   static const metadataToBody = 7.0;

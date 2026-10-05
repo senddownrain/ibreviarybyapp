@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:html/parser.dart' show parseFragment;
+import 'package:html/dom.dart' as dom;
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
@@ -35,6 +36,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 
@@ -974,16 +976,15 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     if (antS.isNotEmpty) {
       final antController = _alternativeController('compline-ant-s');
       _addMajorBoundary(items);
-      items.add(_OraItem.antiphon(antS, controller: antController));
-      items.add(_OraItem.serviceHeader('Песня з Евангелля'));
       items.add(
-        _OraItem.html(
-          '<p><em>Песня Сімяона (Лк 2, 29–32) — Хрыстус — святло народаў і хвала Ізраэля</em></p>',
+        _OraItem.psalmBlock(
+          _kNunc,
+          openingAntiphon: antS,
+          repeatedAntiphon: antS,
+          antiphonController: antController,
+          canticleCaption:
+              'Песня Сімяона (Лк 2, 29–32) — Хрыстус — святло народаў і хвала Ізраэля',
         ),
-      );
-      items.add(_OraItem.psalm(_kNunc));
-      items.add(
-        _OraItem.antiphon(antS, controller: antController, showPicker: false),
       );
     }
 
@@ -1083,21 +1084,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final antController = _alternativeController(controllerScope);
     _addMajorBoundary(items);
     items.add(
-      _OraItem.antiphon(
-        antiphon,
-        kind: 'gospel-antiphon',
-        controller: antController,
-      ),
-    );
-    items.add(_OraItem.serviceHeader('Песня з Евангелля'));
-    items.add(_OraItem.html(caption));
-    items.add(_OraItem.psalm(psalm));
-    items.add(
-      _OraItem.antiphon(
-        antiphon,
-        kind: 'gospel-antiphon',
-        controller: antController,
-        showPicker: false,
+      _OraItem.psalmBlock(
+        psalm,
+        openingAntiphon: antiphon,
+        repeatedAntiphon: antiphon,
+        antiphonController: antController,
+        canticleCaption: parseFragment(caption).text?.trim(),
       ),
     );
   }
@@ -1251,64 +1243,52 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       final structured = pairs.any(
         (pair) => ownsStructuredPsalmPackage(pair.$2),
       );
-      if (!structured) {
-        items.add(_OraItem.antiphon(pairs[0].$1, controller: controller));
-      }
+      final lastPsalmIndex =
+          pairs.where((pair) => pair.$2.isNotEmpty).length - 1;
       var psalmIndex = 0;
       for (final (_, ps) in pairs) {
         if (ps.isNotEmpty) {
-          if (psalmIndex++ > 0) {
-            items.add(_OraItem.psalmGap(afterAntiphon: false));
-          }
+          if (psalmIndex > 0) items.add(_OraItem.psalmGap());
           items.add(
-            _OraItem.psalm(
+            _OraItem.psalmBlock(
               ps,
-              externalAntiphon: structured ? null : pairs[0].$1,
+              openingAntiphon: !structured && psalmIndex == 0
+                  ? pairs[0].$1
+                  : null,
+              repeatedAntiphon: !structured && psalmIndex == lastPsalmIndex
+                  ? pairs[0].$1
+                  : null,
+              sourceAntiphon: structured ? null : pairs[0].$1,
+              antiphonController: controller,
             ),
           );
+          psalmIndex++;
         }
-      }
-      if (!structured) {
-        items.add(
-          _OraItem.antiphon(
-            pairs[0].$1,
-            controller: controller,
-            showPicker: false,
-          ),
-        );
       }
     } else {
       var hasBlock = false;
-      var previousEndedWithAntiphon = false;
       for (var index = 0; index < pairs.length; index++) {
         final (ant, ps) = pairs[index];
         if (ant.isEmpty && ps.isEmpty) continue;
-        if (hasBlock) {
-          items.add(
-            _OraItem.psalmGap(afterAntiphon: previousEndedWithAntiphon),
-          );
-        }
+        if (hasBlock) items.add(_OraItem.psalmGap());
         hasBlock = true;
         final controller = _alternativeController(
           '${widget.oraType}-$controllerScope-ant-$index',
         );
         final structured = ownsStructuredPsalmPackage(ps);
-        if (ant.isNotEmpty && !structured) {
-          items.add(_OraItem.antiphon(ant, controller: controller));
-        }
         if (ps.isNotEmpty) {
           items.add(
-            _OraItem.psalm(ps, externalAntiphon: structured ? null : ant),
+            _OraItem.psalmBlock(
+              ps,
+              openingAntiphon: structured ? null : ant,
+              repeatedAntiphon: structured ? null : ant,
+              sourceAntiphon: structured ? null : ant,
+              antiphonController: controller,
+            ),
           );
+        } else if (ant.isNotEmpty) {
+          items.add(_OraItem.antiphon(ant, controller: controller));
         }
-        if (ant.isNotEmpty && ps.isNotEmpty && !structured) {
-          items.add(
-            _OraItem.antiphon(ant, controller: controller, showPicker: false),
-          );
-        }
-        previousEndedWithAntiphon = structured
-            ? structuredPsalmEndsWithAntiphon(ps)
-            : ant.isNotEmpty;
       }
     }
   }
@@ -1331,9 +1311,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
 enum _OraItemType {
   blockHeader,
-  serviceHeader,
   divider,
   psalmGap,
+  psalmBlock,
   antiphon,
   labeled,
   html,
@@ -1442,6 +1422,10 @@ class _OraItem {
   final ValueNotifier<int>? alternativeController;
   final bool showPicker;
   final String? externalAntiphon;
+  final String? repeatedAntiphon;
+  final String? sourceAntiphon;
+  final ValueNotifier<int>? antiphonController;
+  final String? canticleCaption;
   final bool startsSection;
   final double trailingSpacing;
   final double? gapHeight;
@@ -1455,6 +1439,10 @@ class _OraItem {
     this.alternativeController,
     this.showPicker = true,
     this.externalAntiphon,
+    this.repeatedAntiphon,
+    this.sourceAntiphon,
+    this.antiphonController,
+    this.canticleCaption,
     this.startsSection = false,
     this.trailingSpacing = LiturgicalSpacing.plainTextAfter,
     this.gapHeight,
@@ -1464,14 +1452,29 @@ class _OraItem {
   factory _OraItem.blockHeader(String title, {bool startsSection = true}) =>
       _OraItem._(_OraItemType.blockHeader, title, startsSection: startsSection);
 
-  factory _OraItem.serviceHeader(String title) =>
-      _OraItem._(_OraItemType.serviceHeader, title);
-
   factory _OraItem.divider() => const _OraItem._(_OraItemType.divider, '');
-  factory _OraItem.psalmGap({required bool afterAntiphon}) => _OraItem._(
+  factory _OraItem.psalmGap() => _OraItem._(
     _OraItemType.psalmGap,
     '',
-    gapHeight: psalmBlockSpacerAfter(antiphon: afterAntiphon),
+    gapHeight: LiturgicalSpacing.psalmBlockToNext,
+  );
+
+  factory _OraItem.psalmBlock(
+    String html, {
+    String? openingAntiphon,
+    String? repeatedAntiphon,
+    String? sourceAntiphon,
+    ValueNotifier<int>? antiphonController,
+    String? canticleCaption,
+  }) => _OraItem._(
+    _OraItemType.psalmBlock,
+    html,
+    alternativeKind: 'psalm',
+    externalAntiphon: openingAntiphon,
+    repeatedAntiphon: repeatedAntiphon,
+    sourceAntiphon: sourceAntiphon,
+    antiphonController: antiphonController,
+    canticleCaption: canticleCaption,
   );
 
   factory _OraItem.antiphon(
@@ -1532,17 +1535,15 @@ class _OraItem {
         return const LiturgicalSectionDivider();
       case _OraItemType.psalmGap:
         return SizedBox(height: gapHeight);
-      case _OraItemType.serviceHeader:
-        return Padding(
-          padding: const EdgeInsets.only(
-            bottom: LiturgicalSpacing.metadataToBody,
-          ),
-          child: Text(
-            content,
-            style: ReaderTheme.of(
-              context,
-            ).serviceHeading(textStyle.fontSize ?? 16),
-          ),
+      case _OraItemType.psalmBlock:
+        return _LiturgicalPsalmBlock(
+          source: content,
+          textStyle: textStyle,
+          openingAntiphon: externalAntiphon,
+          repeatedAntiphon: repeatedAntiphon,
+          sourceAntiphon: sourceAntiphon,
+          antiphonController: antiphonController,
+          canticleCaption: canticleCaption,
         );
       case _OraItemType.blockHeader:
         return LiturgicalSectionHeading(
@@ -1666,18 +1667,183 @@ class _LabeledSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LiturgicalSectionHeading(
+          key: Key('liturgical-$alternativeKind-title'),
           title: label,
           bodySize: base,
           startsSection: startsSection,
         ),
-        _HtmlOrText(
-          content: content,
-          textStyle: textStyle,
-          alternativeKind: alternativeKind,
-          pickerLabel: _OraItem._pickerLabel(alternativeKind),
+        KeyedSubtree(
+          key: Key('liturgical-$alternativeKind-body'),
+          child: _HtmlOrText(
+            content: content,
+            textStyle: textStyle,
+            alternativeKind: alternativeKind,
+            pickerLabel: _OraItem._pickerLabel(alternativeKind),
+          ),
         ),
         const SizedBox(height: LiturgicalSpacing.paragraphAfter),
       ],
+    );
+  }
+}
+
+/// The same semantic shell renders external psalms, structured packages and
+/// Gospel canticles. Only this widget owns their outer gaps.
+class _LiturgicalPsalmBlock extends StatelessWidget {
+  const _LiturgicalPsalmBlock({
+    required this.source,
+    required this.textStyle,
+    this.openingAntiphon,
+    this.repeatedAntiphon,
+    this.sourceAntiphon,
+    this.antiphonController,
+    this.canticleCaption,
+  });
+
+  final String source;
+  final TextStyle textStyle;
+  final String? openingAntiphon;
+  final String? repeatedAntiphon;
+  final String? sourceAntiphon;
+  final ValueNotifier<int>? antiphonController;
+  final String? canticleCaption;
+
+  @override
+  Widget build(BuildContext context) => AlternativeText(
+    text: source,
+    kind: 'psalm',
+    label: 'Выбар псальма',
+    contentBuilder: (context, selected) {
+      final models = parseLiturgicalPsalms(
+        selected,
+        openingAntiphon: openingAntiphon,
+        repeatedAntiphon: repeatedAntiphon,
+        sourceAntiphon: sourceAntiphon,
+      );
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < models.length; i++) ...[
+            if (i > 0)
+              const SizedBox(height: LiturgicalSpacing.psalmBlockToNext),
+            _renderModel(context, models[i]),
+          ],
+        ],
+      );
+    },
+  );
+
+  Widget _renderModel(BuildContext context, LiturgicalPsalmModel model) {
+    final reader = ReaderTheme.of(context);
+    final size = textStyle.fontSize ?? 16;
+    final styles = {
+      ...liturgicalDocumentStyles(reader: reader, body: textStyle),
+      '.psalm-strophe': Style(
+        margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+      ),
+      '.psalm-strophe-even': Style(
+        margin: Margins.only(
+          left: 16,
+          bottom: LiturgicalSpacing.paragraphAfter,
+        ),
+      ),
+      '.semantic-last': Style(margin: Margins.zero),
+      '.psalm-strophe-even.semantic-last': Style(
+        margin: Margins.only(left: 16),
+      ),
+    };
+    final metadata = <PsalmMetadataLine>[
+      if (canticleCaption != null) ...[
+        const PsalmMetadataLine('Песня з Евангелля', PsalmMetadataRole.service),
+        PsalmMetadataLine(canticleCaption!, PsalmMetadataRole.subtitle),
+      ],
+      ...model.metadata,
+    ];
+    Widget antiphon(String html, {required bool showPicker}) => _HtmlOrText(
+      content: html,
+      textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
+      alternativeKind: canticleCaption == null
+          ? 'psalm-antiphon'
+          : 'gospel-antiphon',
+      alternativeController: antiphonController,
+      showPicker: showPicker,
+      pickerLabel: 'Выбар антыфоны',
+    );
+    return Column(
+      key: const Key('liturgical-psalm-block'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (model.leadingHtml.isNotEmpty)
+          _HtmlOrText(content: model.leadingHtml, textStyle: textStyle),
+        if (model.openingAntiphon case final opening?) ...[
+          KeyedSubtree(
+            key: const Key('liturgical-psalm-opening'),
+            child: antiphon(opening, showPicker: true),
+          ),
+          const SizedBox(height: LiturgicalSpacing.antiphonToPsalm),
+        ],
+        for (var i = 0; i < metadata.length; i++) ...[
+          if (i > 0) const SizedBox(height: 2),
+          KeyedSubtree(
+            key: Key('liturgical-psalm-metadata-$i'),
+            child: _metadata(context, metadata[i], size),
+          ),
+        ],
+        if (metadata.isNotEmpty)
+          const SizedBox(height: LiturgicalSpacing.metadataToBody),
+        if (model.bodyHtml.trim().isNotEmpty)
+          KeyedSubtree(
+            key: const Key('liturgical-psalm-body'),
+            child: PsalmChoirHtml(
+              html: model.bodyHtml,
+              style: styles,
+              textColor: textStyle.color ?? reader.ink,
+              rubricColor: reader.rubric,
+            ),
+          ),
+        if (model.repeatedAntiphon case final repeated?) ...[
+          const SizedBox(height: LiturgicalSpacing.antiphonToPsalm),
+          KeyedSubtree(
+            key: const Key('liturgical-psalm-repeat'),
+            child: antiphon(repeated, showPicker: false),
+          ),
+        ],
+        if (model.trailingHtml.isNotEmpty)
+          _HtmlOrText(content: model.trailingHtml, textStyle: textStyle),
+      ],
+    );
+  }
+
+  Widget _metadata(BuildContext context, PsalmMetadataLine line, double size) {
+    final reader = ReaderTheme.of(context);
+    final style = switch (line.role) {
+      PsalmMetadataRole.service => reader.serviceHeading(size),
+      PsalmMetadataRole.muted => reader.metadata(size),
+      PsalmMetadataRole.subtitle =>
+        reader
+            .metadata(size, italic: true)
+            .copyWith(fontSize: (size * .76).clamp(12, double.infinity)),
+    };
+    return Html(
+      data: '<p>${line.html}</p>',
+      style: {
+        'body': Style(
+          margin: Margins.zero,
+          padding: HtmlPaddings.zero,
+          textAlign: TextAlign.center,
+        ),
+        'p': Style(
+          margin: Margins.zero,
+          textAlign: TextAlign.center,
+          fontSize: FontSize(style.fontSize!),
+          lineHeight: LineHeight(style.height!),
+          fontFamily: style.fontFamily,
+          color: style.color,
+          fontStyle: style.fontStyle,
+          fontWeight: style.fontWeight,
+        ),
+        '.liturgical-rubric-inline': Style(color: reader.rubric),
+      },
     );
   }
 }
@@ -1727,15 +1893,6 @@ class _HtmlOrText extends StatelessWidget {
       content: content,
       textStyle: textStyle,
     );
-    if (alternativeKind == 'psalm-antiphon' ||
-        alternativeKind == 'gospel-antiphon') {
-      return Padding(
-        padding: const EdgeInsets.only(
-          bottom: LiturgicalSpacing.antiphonToPsalm,
-        ),
-        child: plain,
-      );
-    }
     return plain;
   }
 
@@ -1748,7 +1905,7 @@ class _HtmlOrText extends StatelessWidget {
         ? LiturgicalSpacing.hymnStropheAfter
         : alternativeKind == 'psalm-antiphon' ||
               alternativeKind == 'gospel-antiphon'
-        ? LiturgicalSpacing.antiphonToPsalm
+        ? 0.0
         : LiturgicalSpacing.paragraphAfter;
     final styles = <String, Style>{
       ...liturgicalDocumentStyles(
@@ -1760,33 +1917,10 @@ class _HtmlOrText extends StatelessWidget {
       ),
       '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
       '.psalm-strophe-even': Style(margin: Margins.only(left: 16, bottom: 8)),
-      '.intercessions__intro': Style(margin: Margins.only(bottom: 13)),
-      '.intercessions__refrain': Style(
-        margin: Margins.only(top: 4, bottom: 22),
-        color: reader.ink,
-        fontWeight: FontWeight.w700,
-      ),
-      '.intercessions__petition': Style(
-        margin: Margins.only(top: 18, bottom: 5),
-      ),
-      '.intercessions__response': Style(
-        margin: Margins.only(left: 12, bottom: 15),
-        color: reader.ink,
-      ),
-      '.intercessions__marker': Style(color: reader.rubric),
       '.ora-ant': Style(
         color: reader.ink,
         fontWeight: FontWeight.w600,
-        margin: Margins.only(bottom: LiturgicalSpacing.antiphonToPsalm),
-      ),
-      '.ora-sub': Style(
-        color: reader.muted,
-        fontSize: FontSize((baseSize * .76).clamp(12, double.infinity)),
-      ),
-      '.intercessions__conclusion': Style(
-        margin: Margins.only(top: 22),
-        color: reader.muted,
-        fontStyle: FontStyle.italic,
+        margin: Margins.zero,
       ),
     };
     if (isPsalm) {
@@ -1817,12 +1951,64 @@ class _HtmlOrText extends StatelessWidget {
               reference: header.reference,
               bodySize: baseSize,
             ),
-            Html(data: formatLiturgicalHtml(header.bodyHtml), style: styles),
+            _renderOfficeHtml(header.bodyHtml, styles),
           ],
         );
       }
     }
-    return Html(data: formatLiturgicalHtml(officeHtml), style: styles);
+    final semanticBody =
+        const {
+          'hymn',
+          'prayer',
+          'intercession',
+          'psalm-antiphon',
+          'gospel-antiphon',
+        }.contains(alternativeKind)
+        ? normalizeSemanticBody(officeHtml)
+        : officeHtml;
+    if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
+      return _renderOfficeHtml(semanticBody, styles);
+    }
+    return Html(data: formatLiturgicalHtml(semanticBody), style: styles);
+  }
+
+  Widget _renderOfficeHtml(String html, Map<String, Style> styles) {
+    final formatted = formatLiturgicalHtml(html);
+    final root = parseFragment(formatted);
+    final parts = <({bool turns, String html})>[];
+    var buffer = StringBuffer();
+    bool? turnGroup;
+    void flush() {
+      if (turnGroup != null && buffer.toString().trim().isNotEmpty) {
+        parts.add((turns: turnGroup, html: buffer.toString()));
+      }
+      buffer = StringBuffer();
+    }
+
+    for (final node in root.nodes) {
+      final isTurn =
+          node is dom.Element && node.classes.contains('responsory-turn');
+      if (node is dom.Text && node.text.trim().isEmpty) {
+        buffer.write(node.text);
+        continue;
+      }
+      if (turnGroup != null && turnGroup != isTurn) flush();
+      turnGroup = isTurn;
+      buffer.write(node is dom.Element ? node.outerHtml : node.text);
+    }
+    flush();
+    if (!parts.any((part) => part.turns)) {
+      return Html(data: formatted, style: styles);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final part in parts)
+          part.turns
+              ? LiturgicalResponsoryBlock(html: part.html, style: styles)
+              : Html(data: part.html, style: styles),
+      ],
+    );
   }
 }
 
