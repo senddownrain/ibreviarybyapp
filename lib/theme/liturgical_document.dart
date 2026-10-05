@@ -42,6 +42,7 @@ Map<String, Style> liturgicalDocumentStyles({
   final heading = reader.blockHeading(size);
   final reference = reader.referenceStyle(size);
   final metadataSize = (size * .88).clamp(14, double.infinity).toDouble();
+  final psalmSubtitleSize = (size * .76).clamp(12, double.infinity).toDouble();
   return {
     'body': Style(
       fontSize: FontSize(size),
@@ -87,7 +88,7 @@ Map<String, Style> liturgicalDocumentStyles({
     ),
     '.psalm-metadata': Style(textAlign: TextAlign.center),
     '.psalm-subtitle': Style(
-      fontSize: FontSize(metadataSize),
+      fontSize: FontSize(psalmSubtitleSize),
       lineHeight: LineHeight(ReaderTheme.metadataHeight),
       color: reader.muted,
       fontStyle: FontStyle.italic,

@@ -1781,7 +1781,7 @@ class _HtmlOrText extends StatelessWidget {
       ),
       '.ora-sub': Style(
         color: reader.muted,
-        fontSize: FontSize((baseSize * .88).clamp(14, double.infinity)),
+        fontSize: FontSize((baseSize * .76).clamp(12, double.infinity)),
       ),
       '.intercessions__conclusion': Style(
         margin: Margins.only(top: 22),

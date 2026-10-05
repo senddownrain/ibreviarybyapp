@@ -171,7 +171,7 @@ abstract final class LiturgicalSpacing {
   static const paragraphAfter = 8.0;
   static const hymnStropheAfter = 15.0;
   static const antiphonToPsalm = 4.0;
-  static const psalmBlockToNext = 22.0;
+  static const psalmBlockToNext = 12.0;
   static const metadataToBody = 7.0;
   static const dividerBefore = 22.0;
   static const dividerAfter = 21.0;
