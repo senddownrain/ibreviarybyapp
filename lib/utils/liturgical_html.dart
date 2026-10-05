@@ -151,7 +151,13 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
       paragraph.parentNode!.insertBefore(prefix, paragraph);
     }
     for (var i = 0; i < matches.length; i++) {
-      final end = i + 1 < matches.length ? matches[i + 1].start : plain.length;
+      // A <br> before the next speaker separates turns in legacy HTML. Once
+      // each turn becomes its own paragraph it must not add an empty line.
+      var end = i + 1 < matches.length ? matches[i + 1].start : plain.length;
+      while (end > matches[i].start + 2 &&
+          RegExp(r'\s').hasMatch(plain[end - 1])) {
+        end--;
+      }
       final node = dom.Element.tag('p')..classes.add('responsory-turn');
       final marker = dom.Element.tag('span')
         ..classes.add('liturgical-rubric-inline')

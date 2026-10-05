@@ -111,12 +111,24 @@ void main() {
                 );
                 final turns = formatLiturgicalHtml(
                   normalizeOfficeHtml(
-                    '<p>К. Першы <em>вылучаны</em> радок * Н. Другі радок.</p>',
+                    '<p>К. Першы <em>вылучаны</em> радок *<br>'
+                    'Н. Другі радок.</p>',
+                  ),
+                );
+                final compactTurns = formatLiturgicalHtml(
+                  normalizeOfficeHtml(
+                    '<p>К. Першы <em>вылучаны</em> радок * '
+                    'Н. Другі радок.</p>',
                   ),
                 );
                 return Column(
                   children: [
                     Html(key: const Key('turns'), data: turns, style: styles),
+                    Html(
+                      key: const Key('compact-turns'),
+                      data: compactTurns,
+                      style: styles,
+                    ),
                     Html(
                       key: const Key('prose'),
                       data:
@@ -134,6 +146,13 @@ void main() {
     final turnStyle = styles['.responsory-turn']!;
     expect(turnStyle.fontSize?.value, 16);
     expect(turnStyle.lineHeight?.size, ReaderTheme.responsoryHeight);
+    expect(
+      tester.getSize(find.byKey(const Key('turns'))).height,
+      closeTo(
+        tester.getSize(find.byKey(const Key('compact-turns'))).height,
+        .5,
+      ),
+    );
     expect(
       tester.getSize(find.byKey(const Key('turns'))).height,
       lessThan(tester.getSize(find.byKey(const Key('prose'))).height),
@@ -334,6 +353,22 @@ void main() {
       }
     },
   );
+
+  test('source breaks between responsory turns do not become blank lines', () {
+    final root = parseFragment(
+      normalizeOfficeHtml(
+        '<p>Кароткі рэспансорый<br>'
+        '<span>К.</span> Благаслаўлённы Пан * справеку і навекі.'
+        '<br><br><span>Н.</span> Благаслаўлённы Пан * справеку і навекі.'
+        '<br><span>К.</span> Адзіны, які чыніць цуды.</p>',
+      ),
+    );
+    final turns = root.querySelectorAll('.responsory-turn');
+    expect(turns, hasLength(3));
+    expect(turns[0].querySelector('br'), isNull);
+    expect(turns[1].querySelector('br'), isNull);
+    expect(turns[2].text.trim(), 'К. Адзіны, які чыніць цуды.');
+  });
 
   test(
     'office reading thematic title is red-role and loses source emphasis',
