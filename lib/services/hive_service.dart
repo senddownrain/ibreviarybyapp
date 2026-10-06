@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_migration.dart';
@@ -64,11 +64,6 @@ class HiveService {
   static Future<void> removeCached(String box, dynamic key) =>
       Hive.box(box).delete(key);
 
-  /// Every date is available once the collection is loaded: the content
-  /// is complete on the device, a date is a lookup, not a download.
-  static bool isDateCached(String collection, DateTime date) =>
-      content.isLoaded(collection);
-
   /// Opens storage. [loadBundle] false (tests): the content starts empty
   /// and is seeded through the collections' `put`.
   static Future<void> init({
@@ -89,18 +84,19 @@ class HiveService {
     final withBundle = loadBundle ?? path == null;
     await content.open(bundle: bundle, loadBundle: withBundle);
     if (withBundle) content.preloadAll();
-    if (path == null) {
-      // The former download cache is read once, after the first screen
-      // has its content (it may be large), then removed.
-      unawaited(
-        Future<void>.delayed(
-          const Duration(seconds: 2),
-        ).then((_) => ContentMigration(_meta).run()).catchError((Object _) {}),
-      );
-    } else if (!withBundle) {
+    if (!withBundle) {
       // Tests start on the current model.
       await _meta.put(kContentModelKey, kContentModel);
     }
+  }
+
+  /// The former download cache is read once and removed — after the first
+  /// frame and after the liturgical texts are decoded, so it never delays
+  /// the first screen (a full old database is large).
+  static Future<void> migrateFormerCache() async {
+    await WidgetsBinding.instance.endOfFrame;
+    await content.ensureLoaded(kLiturgicalCollections);
+    await ContentMigration(_meta).run();
   }
 
   static bool? getMetaFlag(String key) => _meta.get(key) as bool?;

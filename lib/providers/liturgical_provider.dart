@@ -21,8 +21,8 @@ final liturgicalContentReadyProvider = FutureProvider<void>((ref) async {
   await ContentStore.instance.ensureLoaded(kLiturgicalCollections);
 });
 
-/// Kept as the gate the screens watch: the selected date is ready as soon
-/// as the content is (no per-date work).
+/// The gate the screens watch: the selected date is ready as soon as the
+/// content is decoded (there is no per-date work).
 final selectedDateReadyProvider = FutureProvider<void>((ref) async {
   ref.watch(selectedDateProvider);
   await ref.watch(liturgicalContentReadyProvider.future);

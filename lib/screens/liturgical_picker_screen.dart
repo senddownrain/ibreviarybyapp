@@ -35,17 +35,6 @@ class _LiturgicalPickerScreenState
     _year = widget.isReadingsMode
         ? ref.read(readingsBranchStateProvider).date.year
         : ref.read(selectedDateProvider).year;
-    _ensureCalendarYear();
-  }
-
-  Future<void> _ensureCalendarYear() async {
-    final calendar = ref.read(calendarServiceProvider);
-    await Future.wait([
-      calendar.ensureYearOptions(_year),
-      calendar.ensureYearOptions(_year + 1),
-      calendar.ensureDynamicDates(_year),
-    ]);
-    if (mounted) setState(() {});
   }
 
   @override
@@ -134,7 +123,6 @@ class _LiturgicalPickerScreenState
                                   onChanged: (year) {
                                     if (year == null || year == _year) return;
                                     setState(() => _year = year);
-                                    _ensureCalendarYear();
                                   },
                                 ),
                               ),
@@ -550,7 +538,7 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
   @override
   Widget build(BuildContext context) {
     final calSvc = ref.read(calendarServiceProvider);
-    final dynamicDates = calSvc.getDynamicDates(widget.year);
+    final dynamicDates = calSvc.getDynamicDatesCached(widget.year);
 
     // Build dynamic feasts list
     final dynamicFeasts = _feastLabels.entries.map((entry) {

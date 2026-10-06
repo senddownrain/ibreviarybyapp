@@ -14,9 +14,6 @@ class ReadingsIndex {
   static const _feastPrefix = 'feast:';
   static const _dayIdPrefix = 'dayId:';
 
-  /// The index covers every document of the collection.
-  static bool get isBuilt => true;
-
   static List<String> lookupByDate(String ddmm) => _lookup('$_datePrefix$ddmm');
 
   static List<String> lookupByPeriod(String periodType, int week, int day) =>

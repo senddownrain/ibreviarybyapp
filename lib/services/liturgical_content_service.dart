@@ -269,9 +269,8 @@ class LiturgicalContentService {
   }
 
   /// The selected day resolved against its period / psalter day from the
-  /// device only — the synchronous counterpart of
-  /// `LiturgicalDayService.resolveDayForDate`. Returns null when the date is
-  /// not completely cached, so the caller falls back to the network path.
+  /// device. Returns null while the content is still being decoded at
+  /// launch.
   LiturgicalDay? resolveDayLocal(
     DateTime date,
     String dayId,
@@ -279,7 +278,7 @@ class LiturgicalContentService {
     YearOptions? nextYearOpts,
     DynamicDates? dynamicDates,
   ) {
-    if (!HiveService.isDateCached('days', date)) return null;
+    if (!HiveService.content.isLoaded('days')) return null;
     var selected = _dayById(dayId);
     String? choice;
     if (selected == null || selected.data['_obsolete'] == true) {

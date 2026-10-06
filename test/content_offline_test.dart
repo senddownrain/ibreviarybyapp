@@ -1,6 +1,7 @@
 // «Offline by installation»: the bundled content, the update overlay, the
 // version check, the move from the former download cache, and the
 // Settings section. No network in any of these tests.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -160,6 +161,22 @@ void main() {
       expect(HiveService.invitatoriumsBox, isNotEmpty);
       expect(HiveService.completoriumsBox, isNotEmpty);
       expect(HiveService.prayersBox, isNotEmpty);
+    });
+
+    test('the app and the bundle builder agree on collections and schema', () {
+      // MyBrev APP_CONTENT_COLLECTIONS / CONTENT_SCHEMA_VERSION wrote this.
+      final manifest =
+          jsonDecode(File('assets/content/manifest.json').readAsStringSync())
+              as Map<String, dynamic>;
+      expect(manifest['schemaVersion'], kContentSchemaVersion);
+      expect(
+        (manifest['collections'] as Map).keys.toSet(),
+        kContentCollections.toSet(),
+      );
+      expect(
+        kLiturgicalCollections.every(kContentCollections.contains),
+        isTrue,
+      );
     });
 
     test('Hive holds no copy of the bundled corpus', () async {
@@ -584,19 +601,20 @@ void main() {
         for (final name in ['days', 'readings', 'liturgicalTemplates'])
           name: store.collection(name).keys.first,
       };
-      ContentStore.crashAfter = crashAfter;
-      addTearDown(() => ContentStore.crashAfter = null);
-      await store.commit({
-        for (final MapEntry(key: name, value: id) in ids.entries)
-          name: store
-              .collection(name)
-              .planUpdate(
-                {id: edited(name, id, 'v101')},
-                {id: documentHash(edited(name, id, 'v101'))},
-                DateTime(2030).millisecondsSinceEpoch,
-              ),
-      }, DateTime(2030).millisecondsSinceEpoch);
-      ContentStore.crashAfter = null;
+      await store.commit(
+        {
+          for (final MapEntry(key: name, value: id) in ids.entries)
+            name: store
+                .collection(name)
+                .planUpdate(
+                  {id: edited(name, id, 'v101')},
+                  {id: documentHash(edited(name, id, 'v101'))},
+                  DateTime(2030).millisecondsSinceEpoch,
+                ),
+        },
+        DateTime(2030).millisecondsSinceEpoch,
+        stopAfter: crashAfter,
+      );
       return ids;
     }
 

@@ -44,10 +44,6 @@ class ContentStore {
   static const stagingBoxName = 'content_staging';
   static const _readyKey = '__ready__';
 
-  /// Diagnostics and tests: stop [commit] after a phase, as a crash would.
-  @visibleForTesting
-  static ContentCommitPhase? crashAfter;
-
   ContentCollection collection(String name) =>
       _collections[name] ?? (throw ArgumentError('Unknown collection $name'));
 
@@ -134,10 +130,13 @@ class ContentStore {
   /// 4. switch   every collection's view in one synchronous step → new content
   /// 5. clean    the staging box
   /// ```
+  ///
+  /// [stopAfter] (tests only) ends the run after a phase, as a crash would.
   Future<void> commit(
     Map<String, Map<String, Map<String, dynamic>?>> ops,
-    int version,
-  ) async {
+    int version, {
+    @visibleForTesting ContentCommitPhase? stopAfter,
+  }) async {
     final staging = await _stagingBox();
     await staging.clear();
     await staging.putAll({
@@ -146,13 +145,13 @@ class ContentStore {
           '$name\u0000$id': entry ?? const {'drop': true},
     });
     await staging.flush();
-    if (crashAfter == ContentCommitPhase.staged) return;
+    if (stopAfter == ContentCommitPhase.staged) return;
     await staging.put(_readyKey, {'v': version, 'n': staging.length});
     await staging.flush();
-    if (crashAfter == ContentCommitPhase.ready) return;
+    if (stopAfter == ContentCommitPhase.ready) return;
     await _replay(
       staging,
-      crashBeforeSwitch: crashAfter == ContentCommitPhase.written,
+      crashBeforeSwitch: stopAfter == ContentCommitPhase.written,
     );
   }
 
@@ -463,7 +462,8 @@ class ContentCollection {
   }
 }
 
-/// Points of [ContentStore.commit] a test can stop at, as a crash would.
+/// Points of [ContentStore.commit] a test can stop at, as a crash would
+/// (`stopAfter`).
 enum ContentCommitPhase {
   /// Entries staged, no READY marker.
   staged,

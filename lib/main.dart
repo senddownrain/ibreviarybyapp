@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -44,6 +46,11 @@ void main() async {
   }
 
   runApp(const ProviderScope(child: MyBrevApp()));
+  unawaited(
+    HiveService.migrateFormerCache().catchError((Object error) {
+      debugPrint('[ContentMigration] $error');
+    }),
+  );
 }
 
 /// The bundled book faces (assets/google_fonts) are under the SIL Open Font

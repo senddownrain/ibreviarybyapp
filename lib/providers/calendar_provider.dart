@@ -8,9 +8,7 @@ import 'package:mybrev_flutter/utils/computed_year_options.dart';
 ///
 /// Year options are computed on the device ([computeYearOptions]), so the
 /// calendar is always available synchronously — first launch, offline and
-/// for any year — and no screen waits for a `yearOptions` request. The
-/// `ensure*` futures are kept for callers that were written against the
-/// former network-backed API; they complete immediately.
+/// for any year — and no screen waits for anything.
 class CalendarService {
   // ignore: avoid_unused_constructor_parameters
   CalendarService({FirebaseFirestore? db});
@@ -23,17 +21,6 @@ class CalendarService {
     year,
     () => _computeFromOpts(year, computeYearOptions(year)),
   );
-
-  /// Synchronous views (always available).
-  YearOptions? getYearOptions(int year) => getYearOptionsCached(year);
-
-  DynamicDates? getDynamicDates(int year) => getDynamicDatesCached(year);
-
-  Future<YearOptions?> ensureYearOptions(int year) async =>
-      getYearOptionsCached(year);
-
-  Future<DynamicDates> ensureDynamicDates(int year) async =>
-      getDynamicDatesCached(year)!;
 
   DynamicDates _computeFromOpts(int year, YearOptions opts) {
     DateTime? parse(dynamic v) {
@@ -111,7 +98,3 @@ DateTime calculateBaptismOfLordDate(int year) {
 final calendarServiceProvider = Provider<CalendarService>((ref) {
   return CalendarService();
 });
-
-/// Kept for callers that awaited the calendar: it is computed, so it is
-/// ready at once.
-final calendarReadyProvider = FutureProvider<void>((ref) async {});
