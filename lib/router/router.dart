@@ -263,6 +263,7 @@ final router = GoRouter(
                           DateTime.now(),
                       child: HoraPickerScreen(
                         dayId: state.pathParameters['dayId']!,
+                        diocese: state.uri.queryParameters['diocese'],
                         date:
                             _parseDate(state.pathParameters['date']) ??
                             DateTime.now(),
@@ -284,8 +285,9 @@ final router = GoRouter(
                           : HoursDateContext(
                               date: date,
                               child: OraScreen(
-                                key: ValueKey('ora-${state.uri.path}'),
+                                key: ValueKey('ora-${state.uri}'),
                                 dayId: state.pathParameters['dayId']!,
+                                diocese: state.uri.queryParameters['diocese'],
                                 oraType: state.pathParameters['type']!,
                                 date: date,
                               ),

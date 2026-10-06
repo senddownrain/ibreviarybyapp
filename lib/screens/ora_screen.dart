@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/data_log.dart';
@@ -162,11 +163,15 @@ class OraScreen extends ConsumerStatefulWidget {
   final String dayId;
   final String oraType;
   final DateTime date;
+
+  /// Diocese context of the route (null: the primary of Settings).
+  final String? diocese;
   const OraScreen({
     super.key,
     required this.dayId,
     required this.oraType,
     required this.date,
+    this.diocese,
   });
 
   @override
@@ -218,12 +223,15 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     if (!HiveService.isCacheReady) return null;
     final calendar = ref.read(calendarServiceProvider);
     final content = LiturgicalContentService();
+    final diocese =
+        widget.diocese ?? ref.read(dioceseSelectionProvider).primary;
     final selected = content.resolveDayLocal(
       widget.date,
       widget.dayId,
       calendar.getYearOptionsCached(widget.date.year),
       calendar.getYearOptionsCached(widget.date.year + 1),
       calendar.getDynamicDatesCached(widget.date.year),
+      diocese: diocese,
     );
     if (selected == null || widget.oraType != 'vespers') return selected;
     if (usesOwnVespers(selected)) return selected;
@@ -237,6 +245,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         calendar.getYearOptionsCached(tomorrow.year),
         calendar.getYearOptionsCached(tomorrow.year + 1),
         calendar.getDynamicDatesCached(tomorrow.year),
+        diocese: diocese,
       ),
     );
   }
@@ -586,6 +595,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         date: widget.date,
         dayId: widget.dayId,
         oraType: selected,
+        diocese: widget.diocese,
       ),
     );
   }

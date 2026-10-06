@@ -4,14 +4,22 @@ import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
 
-/// The temporary Stage 3 primary contract.
-///
-/// [LiturgicalContentService] already returns production-sorted options, so the
-/// first usable item is primary for now. TODO: strengthen this adapter with the
-/// future normative precedence resolver without leaking that policy into UI.
-DayOption? resolvePrimaryLiturgicalOption(List<DayOption> sortedOptions) {
-  return sortedOptions.firstOrNull;
-}
+/// The engine's PRIMARY of the primary diocese (the options are already
+/// united and ordered; no priority logic lives here).
+DayOption? resolvePrimaryLiturgicalOption(
+  List<DayOption> options, {
+  String? primaryDiocese,
+}) =>
+    options
+        .where(
+          (option) =>
+              option.ordo?.role == 'primary' &&
+              (primaryDiocese == null ||
+                  option.contextDiocese == null ||
+                  option.contextDiocese == primaryDiocese),
+        )
+        .firstOrNull ??
+    options.firstOrNull;
 
 class HoursLiturgicalSelection {
   const HoursLiturgicalSelection({
@@ -28,6 +36,9 @@ class HoursLiturgicalSelection {
 
   LiturgicalDay? get day => template?.day ?? selected?.day;
   String? get dayId => day?.id;
+
+  /// The diocese the selected Office belongs to (route context).
+  String? get diocese => selected?.contextDiocese ?? selected?.ordo?.diocese;
   int get alternativesCount => primary == null ? 0 : sortedOptions.length - 1;
 
   DayOption? get effectiveOption {
@@ -36,34 +47,40 @@ class HoursLiturgicalSelection {
     if (option == null || effectiveDay == null || option.day == effectiveDay) {
       return option;
     }
-    return DayOption(
-      source: option.source,
-      title: option.title,
-      key: option.key,
-      contextPeriodType: option.contextPeriodType,
-      subtitle: option.subtitle,
-      placeLabel: option.placeLabel,
-      day: effectiveDay,
-      order: option.order,
-      disabled: option.disabled,
-      templates: option.templates,
-    );
+    return option.copyWith(day: effectiveDay);
   }
 }
 
 HoursLiturgicalSelection resolveHoursLiturgicalSelection(
   List<DayOption> sortedOptions, {
   String? selectedDayId,
+  String? selectedDiocese,
+  String? primaryDiocese,
 }) {
-  final primary = resolvePrimaryLiturgicalOption(sortedOptions);
+  final primary = resolvePrimaryLiturgicalOption(
+    sortedOptions,
+    primaryDiocese: primaryDiocese,
+  );
   DayOption? selected = primary;
   DayTemplate? template;
 
   if (selectedDayId != null) {
-    for (final option in sortedOptions) {
-      if (option.disabled || option.day == null) continue;
+    bool inDiocese(DayOption option) =>
+        selectedDiocese == null ||
+        option.dioceses.isEmpty ||
+        option.dioceses.contains(selectedDiocese);
+    final candidates = [
+      ...sortedOptions.where(
+        (o) => o.contextDiocese == selectedDiocese && selectedDiocese != null,
+      ),
+      ...sortedOptions,
+    ];
+    for (final option in candidates) {
+      if (option.disabled || option.day == null || !inDiocese(option)) {
+        continue;
+      }
       final matchingTemplate = option.templates
-          .where((candidate) => candidate.id == selectedDayId)
+          .where((candidate) => candidate.answers(selectedDayId))
           .firstOrNull;
       if (option.dayId == selectedDayId || matchingTemplate != null) {
         selected = option;

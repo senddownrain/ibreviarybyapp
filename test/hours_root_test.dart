@@ -101,11 +101,14 @@ void main() {
       final secondDate = DateTime(2026, 9, 9);
 
       notifier.select(firstDate, 'alternative');
-      expect(notifier.state['2026-09-08'], 'alternative');
+      expect(notifier.state['2026-09-08']?.dayId, 'alternative');
       expect(notifier.state['2026-09-09'], isNull);
-      notifier.select(secondDate, 'other-day');
-      expect(notifier.state['2026-09-08'], 'alternative');
-      expect(notifier.state['2026-09-09'], 'other-day');
+      notifier.select(secondDate, 'other-day', diocese: 'pinsk');
+      expect(notifier.state['2026-09-08']?.dayId, 'alternative');
+      expect(
+        notifier.state['2026-09-09'],
+        const HoursChoice('other-day', diocese: 'pinsk'),
+      );
     });
 
     test('Hours and Readings share date and selected celebration', () async {
@@ -145,7 +148,7 @@ void main() {
       await container.pump();
       expect(container.read(selectedDateProvider), secondDate);
       expect(
-        container.read(hoursLiturgicalOverridesProvider)['2026-09-09'],
+        container.read(hoursLiturgicalOverridesProvider)['2026-09-09']?.dayId,
         'primary',
       );
     });

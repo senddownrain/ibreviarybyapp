@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
@@ -35,7 +36,15 @@ class HoraPickerScreen extends ConsumerStatefulWidget {
   final String dayId;
   final DateTime date;
 
-  const HoraPickerScreen({super.key, required this.dayId, required this.date});
+  /// Diocese context of the route (null: the primary of Settings).
+  final String? diocese;
+
+  const HoraPickerScreen({
+    super.key,
+    required this.dayId,
+    required this.date,
+    this.diocese,
+  });
 
   @override
   ConsumerState<HoraPickerScreen> createState() => _HoraPickerScreenState();
@@ -66,6 +75,9 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     }
   }
 
+  String get _diocese =>
+      widget.diocese ?? ref.read(dioceseSelectionProvider).primary;
+
   /// The day is on the device and is shown in the first frame.
   bool _applyLocal() {
     if (!HiveService.isCacheReady) return false;
@@ -74,22 +86,27 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     final nextOpts = calendar.getYearOptionsCached(widget.date.year + 1);
     final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
     final content = LiturgicalContentService();
+    final diocese = _diocese;
     final day = content.resolveDayLocal(
       widget.date,
       widget.dayId,
       opts,
       nextOpts,
       dynamicDates,
+      diocese: diocese,
     );
     if (day == null) return false;
     _day = day;
     _templates =
         content
-            .getContentForDate(widget.date, opts, nextOpts, dynamicDates)
-            .where(
-              (item) =>
-                  item.templates.any((template) => template.id == widget.dayId),
+            .getContentForDate(
+              widget.date,
+              opts,
+              nextOpts,
+              dynamicDates,
+              diocese: diocese,
             )
+            .where((item) => item.ownsDayId(widget.dayId))
             .firstOrNull
             ?.templates ??
         const [];
@@ -149,10 +166,6 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     } catch (_) {
       // The subtitle is secondary; the readings route stays available.
     }
-  }
-
-  String _readingsDateKey() {
-    return DateFormat('yyyy-MM-dd').format(widget.date);
   }
 
   bool _isHoraAvailable(HoraItem hora) {
@@ -218,7 +231,6 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     final rankLabel = liturgicalDayRankLabel(day);
     final placeLabel = liturgicalDayPlaceLabel(day);
     final dayColor = liturgicalColorForDay(day);
-    final dateKey = _readingsDateKey();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -229,10 +241,11 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
             tooltip: 'Чытанні',
             icon: const PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 22),
             onPressed: () => context.go(
-              Uri(
-                path: '/readings',
-                queryParameters: {'date': dateKey, 'dayId': widget.dayId},
-              ).toString(),
+              readingsRouteForContext(
+                date: widget.date,
+                dayId: widget.dayId,
+                diocese: widget.diocese,
+              ),
             ),
           ),
         ],
@@ -378,6 +391,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                                       horaRouteForContext(
                                         date: widget.date,
                                         dayId: template.id,
+                                        diocese: widget.diocese,
                                       ),
                                     ),
                                   ),
@@ -400,13 +414,11 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                       onTap: () {
                         HapticFeedback.lightImpact();
                         context.go(
-                          Uri(
-                            path: '/readings',
-                            queryParameters: {
-                              'date': dateKey,
-                              'dayId': widget.dayId,
-                            },
-                          ).toString(),
+                          readingsRouteForContext(
+                            date: widget.date,
+                            dayId: widget.dayId,
+                            diocese: widget.diocese,
+                          ),
                         );
                       },
                     ),
@@ -428,6 +440,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                               date: widget.date,
                               dayId: widget.dayId,
                               oraType: hora.type,
+                              diocese: widget.diocese,
                             ),
                           );
                         },

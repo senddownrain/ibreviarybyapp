@@ -16,7 +16,7 @@ class LiturgicalNavigationController {
 
   final Ref ref;
 
-  void openDate(DateTime value, {String? dayId}) {
+  void openDate(DateTime value, {String? dayId, String? diocese}) {
     final date = DateUtils.dateOnly(value);
     final current = DateUtils.dateOnly(ref.read(selectedDateProvider));
     if (!DateUtils.isSameDay(date, current)) {
@@ -26,7 +26,9 @@ class LiturgicalNavigationController {
     }
 
     if (dayId != null) {
-      ref.read(hoursLiturgicalOverridesProvider.notifier).select(date, dayId);
+      ref
+          .read(hoursLiturgicalOverridesProvider.notifier)
+          .select(date, dayId, diocese: diocese);
     }
     ref.read(selectedDateProvider.notifier).state = date;
 
@@ -43,9 +45,11 @@ class LiturgicalNavigationController {
     openDate(addCivilDays(ref.read(selectedDateProvider), days));
   }
 
-  void selectDay(DateTime value, String dayId) {
+  void selectDay(DateTime value, String dayId, {String? diocese}) {
     final date = DateUtils.dateOnly(value);
-    ref.read(hoursLiturgicalOverridesProvider.notifier).select(date, dayId);
+    ref
+        .read(hoursLiturgicalOverridesProvider.notifier)
+        .select(date, dayId, diocese: diocese);
     final readings = ref.read(readingsBranchStateProvider);
     ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
       date: date,
@@ -120,7 +124,7 @@ final liturgicalNavigationSyncProvider = Provider<void>((ref) {
       if (dayId != null) {
         final overrides = ref.read(hoursLiturgicalOverridesProvider);
         final key = liturgicalDateKey(date);
-        if (overrides[key] != dayId) {
+        if (overrides[key]?.dayId != dayId) {
           ref
               .read(hoursLiturgicalOverridesProvider.notifier)
               .select(date, dayId);

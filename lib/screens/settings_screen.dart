@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -220,6 +221,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     }
                   },
                 ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                const LiturgicalCalendarSettingsSection(),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),

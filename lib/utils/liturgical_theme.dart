@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 
 const liturgicalPeriodColors = <String, Color>{
   'ordinary': Color(0xFF4D8A5B),
@@ -20,10 +21,16 @@ const _memorials = {
   'успамін',
 };
 
+/// Accent of a liturgical day. A document of the Hours carries the Ordo's
+/// vestment colour (`_vestmentColor`, stamped by the content service): that
+/// decides, through the one resolver ([visualOfDay]). The title/rank
+/// heuristics below remain only for documents without an Ordo identity.
 Color liturgicalColorForDay(
   LiturgicalDay? day, {
   String fallbackPeriodType = 'ordinary',
 }) {
+  final canonical = visualOfDay(day);
+  if (canonical != null) return canonical.accent;
   if (day?.field('_theme') == 'requiem' ||
       day?.field('_kind') == 'office-for-dead') {
     return const Color(0xFF67546B);
