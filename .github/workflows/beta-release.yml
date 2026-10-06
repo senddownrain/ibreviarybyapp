@@ -1,0 +1,188 @@
+# MyBrev Beta Release — manual only. Runs the same fastlane lanes as the
+# developer Mac (docs/RELEASE_BETA.md) on the self-hosted Mac runner.
+# Never production: TestFlight and Google Play testing tracks only.
+name: MyBrev Beta Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platforms to release
+        type: choice
+        options: [both, ios, android]
+        default: both
+      android_track:
+        description: Google Play track
+        type: choice
+        options: [internal, beta]
+        default: internal
+      release_notes:
+        description: What testers should check (optional)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+# One release at a time; a second run waits instead of racing the first.
+concurrency:
+  group: mybrev-beta-release
+  cancel-in-progress: false
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  RELEASE_NOTES: ${{ inputs.release_notes }}
+
+jobs:
+  preflight:
+    runs-on: [self-hosted, macOS, mybrev-release]
+    environment: beta
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Runner, tools and secrets (names only)
+        shell: bash -l {0}
+        env:
+          NEED_IOS: ${{ inputs.platform != 'android' }}
+          NEED_ANDROID: ${{ inputs.platform != 'ios' }}
+          HAS_ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID != '' }}
+          HAS_ASC_ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID != '' }}
+          HAS_ASC_P8: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 != '' }}
+          HAS_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 != '' }}
+          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+          HAS_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD != '' }}
+          HAS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS != '' }}
+          HAS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD != '' }}
+          HAS_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK != '' }}
+          ANDROID_TRACK: ${{ inputs.android_track }}
+        run: |
+          set -euo pipefail
+          echo "ref: $GITHUB_REF  commit: $GITHUB_SHA  runner: $(hostname)"
+          test -z "$(git status --porcelain)" || { echo "::error::checkout is not clean"; exit 1; }
+          avail_gb=$(df -g / | awk 'NR==2 {print $4}')
+          [ "$avail_gb" -ge 8 ] || { echo "::error::only ${avail_gb} GB free on the runner"; exit 1; }
+          flutter --version | head -1
+          java -version 2>&1 | head -1
+          missing=()
+          if [ "$NEED_IOS" = true ]; then
+            xcodebuild -version | head -1
+            [ "$HAS_ASC_KEY_ID" = true ] || missing+=(APP_STORE_CONNECT_KEY_ID)
+            [ "$HAS_ASC_ISSUER" = true ] || missing+=(APP_STORE_CONNECT_ISSUER_ID)
+            [ "$HAS_ASC_P8" = true ] || missing+=(APP_STORE_CONNECT_PRIVATE_KEY_BASE64)
+          fi
+          if [ "$NEED_ANDROID" = true ]; then
+            [ "$HAS_PLAY_JSON" = true ] || missing+=(GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64)
+            [ "$HAS_KEYSTORE" = true ] || missing+=(ANDROID_KEYSTORE_BASE64)
+            [ "$HAS_KEYSTORE_PASSWORD" = true ] || missing+=(ANDROID_KEYSTORE_PASSWORD)
+            [ "$HAS_KEY_ALIAS" = true ] || missing+=(ANDROID_KEY_ALIAS)
+            [ "$HAS_KEY_PASSWORD" = true ] || missing+=(ANDROID_KEY_PASSWORD)
+            if [ "$ANDROID_TRACK" = beta ] && [ "$HAS_BETA_TRACK" != true ]; then
+              missing+=("variable ANDROID_BETA_TRACK")
+            fi
+          fi
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::missing in environment 'beta': ${missing[*]}"
+            exit 1
+          fi
+          export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+          bundle config set --local path "$HOME/.cache/mybrev-release-bundle"
+          bundle install --quiet
+          bundle exec fastlane --version | tail -1
+
+  ios:
+    needs: preflight
+    if: inputs.platform != 'android'
+    runs-on: [self-hosted, macOS, mybrev-release]
+    environment: beta
+    timeout-minutes: 90
+    outputs:
+      build: ${{ steps.release.outputs.IOS_BUILD }}
+      version: ${{ steps.release.outputs.IOS_VERSION }}
+      groups: ${{ steps.release.outputs.IOS_GROUPS }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: fastlane ios beta
+        id: release
+        shell: bash -l {0}
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
+          IOS_TESTFLIGHT_GROUPS: ${{ vars.IOS_TESTFLIGHT_GROUPS }}
+        run: |
+          set -euo pipefail
+          export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+          bundle config set --local path "$HOME/.cache/mybrev-release-bundle"
+          bundle install --quiet
+          bundle exec fastlane ios beta
+          cat fastlane/release-result-ios.env >> "$GITHUB_OUTPUT"
+
+  android:
+    needs: preflight
+    if: inputs.platform != 'ios'
+    runs-on: [self-hosted, macOS, mybrev-release]
+    environment: beta
+    timeout-minutes: 60
+    outputs:
+      version_code: ${{ steps.release.outputs.ANDROID_VERSION_CODE }}
+      version: ${{ steps.release.outputs.ANDROID_VERSION }}
+      track: ${{ steps.release.outputs.ANDROID_TRACK }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: fastlane android ${{ inputs.android_track }}
+        id: release
+        shell: bash -l {0}
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK }}
+          PLAY_RELEASE_STATUS: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
+        run: |
+          set -euo pipefail
+          export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+          bundle config set --local path "$HOME/.cache/mybrev-release-bundle"
+          bundle install --quiet
+          bundle exec fastlane android ${{ inputs.android_track }}
+          cat fastlane/release-result-android.env >> "$GITHUB_OUTPUT"
+
+  summary:
+    needs: [preflight, ios, android]
+    if: always()
+    runs-on: [self-hosted, macOS, mybrev-release]
+    timeout-minutes: 5
+    steps:
+      - name: Release summary
+        shell: bash
+        env:
+          IOS_RESULT: ${{ needs.ios.result }}
+          IOS_VERSION: ${{ needs.ios.outputs.version }}
+          IOS_BUILD: ${{ needs.ios.outputs.build }}
+          IOS_GROUPS: ${{ needs.ios.outputs.groups }}
+          ANDROID_RESULT: ${{ needs.android.result }}
+          ANDROID_VERSION: ${{ needs.android.outputs.version }}
+          ANDROID_VERSION_CODE: ${{ needs.android.outputs.version_code }}
+          ANDROID_TRACK: ${{ needs.android.outputs.track }}
+        run: |
+          status() { case "$1" in success) echo SUCCESS;; skipped) echo SKIPPED;; *) echo "FAILED ($1)";; esac; }
+          {
+            echo "## MyBrev Beta Release"
+            echo
+            echo "**Commit:** \`$GITHUB_SHA\`"
+            echo
+            echo "### iOS — $(status "$IOS_RESULT")"
+            echo "- Version: ${IOS_VERSION:-—}"
+            echo "- Build: ${IOS_BUILD:-—}"
+            echo "- TestFlight: by.mybrev.testflight2026 · ${IOS_GROUPS:-—}"
+            echo
+            echo "### Android — $(status "$ANDROID_RESULT")"
+            echo "- Version: ${ANDROID_VERSION:-—}"
+            echo "- VersionCode: ${ANDROID_VERSION_CODE:-—}"
+            echo "- Google Play track: ${ANDROID_TRACK:-—} (by.mybrev.playtest2026)"
+            echo
+            echo "### Manual actions still required"
+            echo "- TestFlight external groups / Beta App Review and Play testers are managed in the consoles (docs/RELEASE_BETA.md)."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:344097781816:android:92f6c24311cce114fd8ecd",
+        "android_client_info": {
+          "package_name": "by.mybrev.playtest2026"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqZtw0FW1n9TELjTUHQ5Z-VGx3Sb98alg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:344097781816:android:87ccd0e0b2d2ce93fd8ecd",
         "android_client_info": {
           "package_name": "com.example.ibrevapp"

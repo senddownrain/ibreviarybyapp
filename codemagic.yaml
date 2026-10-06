@@ -6,6 +6,10 @@
 #   android-debug     — debug APK build.
 #   ios-visual-audit  — iOS Simulator screenshots for the visual UX audit
 #                       (branches `audit/*` only; never publishes the app).
+#   ios-testflight    — signed App Store build of «MyBrev Test»
+#                       (by.mybrev.testflight2026), uploaded to App Store
+#                       Connect for TestFlight. Started manually only.
+#                       Fallback: the main path is fastlane (docs/RELEASE_BETA.md).
 
 workflows:
   ios-simulator:
@@ -121,3 +125,59 @@ workflows:
       - audit-evidence/ios-cloud/*.txt
       - audit-evidence/ios-cloud/*.md
       - audit-evidence/ios-cloud/logs/*.log
+
+  ios-testflight:
+    name: iOS TestFlight (MyBrev Test)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    # Team integrations → App Store Connect (API key with App Manager role:
+    # Issuer ID, Key ID, .p8). The name must match the integration exactly.
+    integrations:
+      app_store_connect: MyBrev App Store Connect
+    environment:
+      flutter: 3.38.9
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        # Codemagic fetches or creates the Apple Distribution certificate and
+        # the App Store profile of this App ID.
+        distribution_type: app_store
+        bundle_identifier: by.mybrev.testflight2026
+    # No triggering: a TestFlight upload is started by hand in Codemagic.
+    scripts:
+      - name: Resolve Flutter dependencies
+        script: flutter pub get
+      - name: Install iOS dependencies
+        script: |
+          cd ios
+          pod install
+      - name: Use the App Store profile
+        script: xcode-project use-profiles
+      - name: Analyze and test
+        script: |
+          flutter analyze --no-pub
+          flutter test --no-pub
+      - name: Build signed IPA
+        # Codemagic's BUILD_NUMBER grows with every build of this workflow;
+        # +6 keeps it above the builds made before TestFlight (1.0.0+6).
+        script: |
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --build-number=$((BUILD_NUMBER + 6)) \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      email:
+        recipients:
+          - gleb2000405@outlook.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        # Upload only: internal testers get the build after processing.
+        # External groups and Beta App Review are chosen in App Store
+        # Connect → TestFlight; the App Store version is never submitted.
+        submit_to_testflight: false

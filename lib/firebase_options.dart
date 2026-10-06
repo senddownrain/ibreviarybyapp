@@ -27,7 +27,7 @@ class DefaultFirebaseOptions {
 
   static const android = FirebaseOptions(
     apiKey: 'AIzaSyBqZtw0FW1n9TELjTUHQ5Z-VGx3Sb98alg',
-    appId: '1:344097781816:android:87ccd0e0b2d2ce93fd8ecd',
+    appId: '1:344097781816:android:92f6c24311cce114fd8ecd',
     messagingSenderId: '344097781816',
     projectId: 'ibreviaryby',
     storageBucket: 'ibreviaryby.firebasestorage.app',
@@ -35,10 +35,10 @@ class DefaultFirebaseOptions {
 
   static const ios = FirebaseOptions(
     apiKey: 'AIzaSyCArtMF8yXpWsRYcN_EWnNFRztaIK8PKZk',
-    appId: '1:344097781816:ios:334d00a443310e57fd8ecd',
+    appId: '1:344097781816:ios:e3feba9d3a782b7dfd8ecd',
     messagingSenderId: '344097781816',
     projectId: 'ibreviaryby',
     storageBucket: 'ibreviaryby.firebasestorage.app',
-    iosBundleId: 'com.example.ibrevapp',
+    iosBundleId: 'by.mybrev.testflight2026',
   );
 }
