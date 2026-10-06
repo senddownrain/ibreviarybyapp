@@ -37,6 +37,14 @@ def pubspec_version
   [name, build.to_i]
 end
 
+# Flutter (and CocoaPods it calls) run in the user's own environment, not in
+# fastlane's Bundler one: CocoaPods is installed apart from this Gemfile.
+def flutter(*args, **options)
+  Bundler.with_unbundled_env do
+    Dir.chdir(ROOT) { sh(FLUTTER, *args, **options) }
+  end
+end
+
 def git_sha
   sh("git", "-C", ROOT, "rev-parse", "--short=12", "HEAD", log: false).strip
 end
@@ -129,10 +137,8 @@ platform :ios do
     sha = git_sha
     UI.message("iOS #{name} (#{build}) from #{sha}")
 
-    Dir.chdir(ROOT) do
-      sh(FLUTTER, "build", "ios", "--release", "--no-codesign",
-         "--build-name=#{name}", "--build-number=#{build}")
-    end
+    flutter("build", "ios", "--release", "--no-codesign",
+            "--build-name=#{name}", "--build-number=#{build}")
     # Automatic signing with the API key: Xcode fetches or creates the
     # Apple Distribution certificate and the App Store profile of the team.
     ipa = build_app(
@@ -246,11 +252,9 @@ platform :android do
     prepare_upload_key
     aab = File.join(ROOT, "build/app/outputs/bundle/release/app-release.aab")
     FileUtils.rm_f(aab)
-    Dir.chdir(ROOT) do
-      sh(FLUTTER, "build", "appbundle", "--release",
-         "--build-name=#{name}", "--build-number=#{version_code}",
-         error_callback: ->(output) { accept_unverified_strip(output, aab) })
-    end
+    flutter("build", "appbundle", "--release",
+            "--build-name=#{name}", "--build-number=#{version_code}",
+            error_callback: ->(output) { accept_unverified_strip(output, aab) })
     verify_bundle(aab, version_code)
 
     # Release notes as a changelog of this version code.
