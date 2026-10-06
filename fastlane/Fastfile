@@ -24,6 +24,9 @@ PLAY_STANDARD_TRACKS = %w[internal alpha beta production].freeze
 
 FLUTTER = ENV.fetch("FLUTTER", "flutter")
 
+# No generated fastlane/README.md: a release needs a clean tree.
+skip_docs
+
 # ── Shared ────────────────────────────────────────────────────────────────────
 
 # [version name, build number] from pubspec.yaml («1.0.0+6»).
