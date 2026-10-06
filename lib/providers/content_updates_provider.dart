@@ -25,7 +25,7 @@ class ContentUpdateState {
     this.lastCheck,
     this.lastUpdate,
     this.failed = false,
-    this.awaitsAppRelease = false,
+    this.appReleaseReason,
   });
 
   final ContentUpdatePhase phase;
@@ -35,9 +35,12 @@ class ContentUpdateState {
   /// The last attempt did not finish (the current texts stay).
   final bool failed;
 
-  /// The published change is a rebuild of the corpus: it comes with the
-  /// next app release, not as a patch.
-  final bool awaitsAppRelease;
+  /// The published content needs the next app release (a rebuild of the
+  /// corpus or a newer schema); null when nothing waits for it. Persisted.
+  final AppReleaseReason? appReleaseReason;
+
+  /// One message for both reasons: «прыйдуць з абнаўленнем праграмы».
+  bool get awaitsAppRelease => appReleaseReason != null;
 
   bool get isBusy =>
       phase == ContentUpdatePhase.checking ||
@@ -48,18 +51,26 @@ class ContentUpdateState {
     DateTime? lastCheck,
     DateTime? lastUpdate,
     bool? failed,
-    bool? awaitsAppRelease,
+    AppReleaseReason? appReleaseReason,
+    bool clearAppRelease = false,
   }) => ContentUpdateState(
     phase: phase ?? this.phase,
     lastCheck: lastCheck ?? this.lastCheck,
     lastUpdate: lastUpdate ?? this.lastUpdate,
     failed: failed ?? this.failed,
-    awaitsAppRelease: awaitsAppRelease ?? this.awaitsAppRelease,
+    appReleaseReason: clearAppRelease
+        ? null
+        : appReleaseReason ?? this.appReleaseReason,
   );
 }
 
 const kContentLastCheckKey = 'contentLastCheck';
 const kContentLastUpdateKey = 'contentLastUpdate';
+
+/// Persisted «needs the next app release»: the reason (`rebuild` or
+/// `schema`) and the published content version it was found for.
+const kContentAppReleaseReasonKey = 'contentRequiresAppReleaseReason';
+const kContentAppReleaseVersionKey = 'contentRequiresAppReleaseVersion';
 
 /// Content version (ms) of the last update applied on this device.
 const kContentUpdateVersionKey = 'contentUpdateVersion';
@@ -102,16 +113,23 @@ class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
         unawaited(checkIfDue());
       }
     });
+    final reason = HiveService.metaBox.get(kContentAppReleaseReasonKey);
     return ContentUpdateState(
       lastCheck: HiveService.getMetaTime(kContentLastCheckKey),
       lastUpdate: HiveService.getMetaTime(kContentLastUpdateKey),
+      appReleaseReason: AppReleaseReason.values
+          .where((value) => value.name == reason)
+          .firstOrNull,
     );
   }
 
-  /// At launch and when the app returns: at most once a day.
+  /// At launch and when the app returns: at most once a day — and at every
+  /// launch while an app release is awaited, so the flag clears as soon as
+  /// the new app's bundle matches what is published.
   Future<void> checkIfDue() async {
     final last = state.lastCheck;
-    if (last != null &&
+    if (!state.awaitsAppRelease &&
+        last != null &&
         DateTime.now().difference(last) < kContentCheckInterval) {
       return;
     }
@@ -128,40 +146,58 @@ class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
     state = state.copyWith(phase: ContentUpdatePhase.checking, failed: false);
     try {
       final updater = ref.read(contentUpdaterProvider);
-      final plan = await updater.check();
+      final result = await updater.check();
       final now = DateTime.now();
       await HiveService.setMetaTime(kContentLastCheckKey, now);
-      state = state.copyWith(lastCheck: now, awaitsAppRelease: false);
-      if (plan == null) {
-        state = state.copyWith(phase: ContentUpdatePhase.idle);
-        return;
+      state = state.copyWith(lastCheck: now);
+      switch (result.kind) {
+        case ContentCheckKind.current:
+          await _setAppRelease(null);
+          state = state.copyWith(phase: ContentUpdatePhase.idle);
+        case ContentCheckKind.appReleaseRequired:
+          debugPrint(
+            '[ContentUpdates] ${result.reason!.name}: content '
+            '${result.contentVersion} needs the next app release',
+          );
+          await _setAppRelease(result.reason, result.contentVersion);
+          state = state.copyWith(phase: ContentUpdatePhase.idle);
+        case ContentCheckKind.patch:
+          final plan = result.plan!;
+          state = state.copyWith(phase: ContentUpdatePhase.updating);
+          await updater.apply(plan);
+          final applied = DateTime.now();
+          await HiveService.setMetaTime(kContentLastUpdateKey, applied);
+          await HiveService.metaBox.put(
+            kContentUpdateVersionKey,
+            plan.contentVersion,
+          );
+          await _setAppRelease(null);
+          state = state.copyWith(
+            phase: ContentUpdatePhase.idle,
+            lastUpdate: applied,
+          );
       }
-      if (plan.isRebuildSized) {
-        debugPrint(
-          '[ContentUpdates] ${plan.documents} documents / ${plan.bytes} B: '
-          'a rebuild, left to the next app release',
-        );
-        state = state.copyWith(
-          phase: ContentUpdatePhase.idle,
-          awaitsAppRelease: true,
-        );
-        return;
-      }
-      state = state.copyWith(phase: ContentUpdatePhase.updating);
-      await updater.apply(plan);
-      final applied = DateTime.now();
-      await HiveService.setMetaTime(kContentLastUpdateKey, applied);
-      await HiveService.metaBox.put(
-        kContentUpdateVersionKey,
-        plan.contentVersion,
-      );
-      state = state.copyWith(
-        phase: ContentUpdatePhase.idle,
-        lastUpdate: applied,
-      );
     } catch (error) {
       debugPrint('[ContentUpdates] check failed: $error');
       state = state.copyWith(phase: ContentUpdatePhase.idle, failed: true);
+    }
+  }
+
+  /// Persists (or clears) the «next app release» status.
+  Future<void> _setAppRelease(AppReleaseReason? reason, [int? version]) async {
+    final meta = HiveService.metaBox;
+    if (reason == null) {
+      await meta.deleteAll([
+        kContentAppReleaseReasonKey,
+        kContentAppReleaseVersionKey,
+      ]);
+      state = state.copyWith(clearAppRelease: true);
+    } else {
+      await meta.putAll({
+        kContentAppReleaseReasonKey: reason.name,
+        kContentAppReleaseVersionKey: version,
+      });
+      state = state.copyWith(appReleaseReason: reason);
     }
   }
 }

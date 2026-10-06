@@ -99,7 +99,6 @@ platform :ios do
       base64_var: "APP_STORE_CONNECT_PRIVATE_KEY_BASE64",
       name: "AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8",
     )
-    ENV["MYBREV_ASC_KEY_FILE"] = key_file
     app_store_connect_api_key(
       key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
       issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
@@ -116,6 +115,41 @@ platform :ios do
       UI.user_error!("IPA bundle id #{id}, expected #{IOS_BUNDLE_ID}") unless id == IOS_BUNDLE_ID
     end
     UI.success("IPA OK: #{IOS_BUNDLE_ID}")
+  end
+
+  # A signed App Store IPA without registered devices: an Apple Distribution
+  # certificate (login keychain of this Mac) and an App Store profile from
+  # the API key, applied to the Runner target only and only for this build
+  # (CocoaPods targets keep their own settings; the project is restored).
+  def signed_archive(api_key)
+    get_certificates(api_key: api_key, team_id: IOS_TEAM_ID, development: false,
+                     output_path: File.join(ROOT, "build/ios/signing"))
+    get_provisioning_profile(api_key: api_key, app_identifier: IOS_BUNDLE_ID, team_id: IOS_TEAM_ID,
+                             output_path: File.join(ROOT, "build/ios/signing"))
+    profile = lane_context[SharedValues::SIGH_NAME]
+    project = File.join(ROOT, "ios/Runner.xcodeproj")
+    begin
+      update_code_signing_settings(
+        path: project, use_automatic_signing: false, team_id: IOS_TEAM_ID,
+        targets: ["Runner"], build_configurations: ["Release"],
+        code_sign_identity: "Apple Distribution", profile_name: profile,
+      )
+      build_app(
+        workspace: File.join(ROOT, "ios/Runner.xcworkspace"),
+        scheme: "Runner",
+        configuration: "Release",
+        export_method: "app-store",
+        output_directory: File.join(ROOT, "build/ios/fastlane"),
+        skip_package_dependencies_resolution: true,
+        export_options: {
+          signingStyle: "manual",
+          teamID: IOS_TEAM_ID,
+          provisioningProfiles: { IOS_BUNDLE_ID => profile },
+        },
+      )
+    ensure
+      sh("git", "-C", ROOT, "checkout", "--", "ios/Runner.xcodeproj/project.pbxproj", log: false)
+    end
   end
 
   def latest_build(api_key)
@@ -139,25 +173,7 @@ platform :ios do
 
     flutter("build", "ios", "--release", "--no-codesign",
             "--build-name=#{name}", "--build-number=#{build}")
-    # Automatic signing with the API key: Xcode fetches or creates the
-    # Apple Distribution certificate and the App Store profile of the team.
-    ipa = build_app(
-      workspace: File.join(ROOT, "ios/Runner.xcworkspace"),
-      scheme: "Runner",
-      configuration: "Release",
-      export_method: "app-store",
-      output_directory: File.join(ROOT, "build/ios/fastlane"),
-      skip_package_dependencies_resolution: true,
-      xcargs: [
-        "-allowProvisioningUpdates",
-        "-authenticationKeyPath #{ENV.fetch('MYBREV_ASC_KEY_FILE').shellescape}",
-        "-authenticationKeyID #{ENV.fetch('APP_STORE_CONNECT_KEY_ID')}",
-        "-authenticationKeyIssuerID #{ENV.fetch('APP_STORE_CONNECT_ISSUER_ID')}",
-        "DEVELOPMENT_TEAM=#{IOS_TEAM_ID}",
-        "CODE_SIGN_STYLE=Automatic",
-      ].join(" "),
-      export_options: { signingStyle: "automatic", teamID: IOS_TEAM_ID },
-    )
+    ipa = signed_archive(api_key)
     verify_ipa(ipa)
     groups = ENV["IOS_TESTFLIGHT_GROUPS"].to_s.split(",").map(&:strip).reject(&:empty?)
     upload_to_testflight(

@@ -1,10 +1,12 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1791238882217,
-  "contentDate": "2026-10-05T22:21:22.217Z",
+  "contentVersion": 1791263346630,
+  "contentDate": "2026-10-06T05:09:06.630Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 735,
       "digest": "d24a586db44e8804",
       "storedBytes": 53869832,
@@ -12,6 +14,8 @@
     },
     "readings": {
       "file": "readings.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 815,
       "digest": "13b4c83fa2cb09d5",
       "storedBytes": 4517861,
@@ -19,6 +23,8 @@
     },
     "liturgicalTemplates": {
       "file": "liturgicalTemplates.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 16,
       "digest": "ac7c338cc988e4bd",
       "storedBytes": 1115362,
@@ -26,6 +32,8 @@
     },
     "invitatoriums": {
       "file": "invitatoriums.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 4,
       "digest": "587d64f9ff8e7b0d",
       "storedBytes": 9678,
@@ -33,6 +41,8 @@
     },
     "completoriums": {
       "file": "completoriums.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 35,
       "digest": "42eb55a0b377d638",
       "storedBytes": 323076,
@@ -82,38 +92,48 @@
     },
     "prayers": {
       "file": "prayers.json.gz",
+      "contentVersion": 1791263346630,
+      "contentDate": "2026-10-06T05:09:06.630Z",
       "count": 117,
       "digest": "3545a1b2520f2a5d",
       "storedBytes": 2087949,
-      "bundleBytes": 251525
+      "bundleBytes": 251526
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
+      "contentVersion": 1791263346630,
+      "contentDate": "2026-10-06T05:09:06.630Z",
       "count": 5,
       "digest": "7a0834aa4c715956",
       "storedBytes": 879,
-      "bundleBytes": 580
+      "bundleBytes": 579
     },
     "songs": {
       "file": "songs.json.gz",
+      "contentVersion": 1791263346630,
+      "contentDate": "2026-10-06T05:09:06.630Z",
       "count": 447,
       "digest": "9752aef2fd846b49",
       "storedBytes": 369604,
-      "bundleBytes": 111479
+      "bundleBytes": 111480
     },
     "compendium": {
       "file": "compendium.json.gz",
+      "contentVersion": 1791263346630,
+      "contentDate": "2026-10-06T05:09:06.630Z",
       "count": 27,
       "digest": "7659d6be6ac3ead8",
       "storedBytes": 536467,
-      "bundleBytes": 113292
+      "bundleBytes": 113290
     },
     "compendiumMeta": {
       "file": "compendiumMeta.json.gz",
+      "contentVersion": 1791263346630,
+      "contentDate": "2026-10-06T05:09:06.630Z",
       "count": 1,
       "digest": "879c4b7ae16cb312",
       "storedBytes": 6072,
-      "bundleBytes": 1776
+      "bundleBytes": 1777
     }
   }
 }
