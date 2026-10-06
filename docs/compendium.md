@@ -35,26 +35,27 @@ Normal browsing has two levels before a question: Compendium root → Part. A Pa
 - Обычные маршруты: `/prayers/compendium`, `/prayers/compendium/part/:partId`, `/prayers/compendium/question/:number`. Ссылки `/node/:nodeId` и `/topic/:topicId` переадресуют на часть с `?target=<stable id>`. Техническая группа направляет к первому вопросу своей группы. Асинхронная загрузка не мешает cold deep link.
 - Reader вопроса сохраняет канонические prev/next. Центральная кнопка `Да часткі` открывает часть с якорем текущего вопроса. Контекст показывает только реальные заголовки источника.
 
-## Offline и синхронизация
+## Offline и обновления
 
-- Seed декодируется лениво (`compute`, вне UI isolate) при первом открытии
-  Кампендыя (`compendiumBundledProvider`) и проверяется валидатором. В startup
-  path только открывается пустой Hive box `compendium`.
-- Проверка новой версии входит в общую ежедневную проверку обновлений
-  (`ContentUpdatesNotifier`, см. `docs/data-loading-architecture.md`).
-  `CompendiumSync`: одно чтение `compendiumMeta/current` (`Source.server`);
-  коллекция `compendium` скачивается одним запросом, только если
-  `contentVersion` строго больше текущего (max(bundle, сохранённая копия)) при
-  той же схеме. Документы собираются `compendiumFromDocuments` и проверяются;
-  невалидные данные или ошибка сети не трогают текущий контент.
-- Hive: по записи на unit (+ `_contentVersion`) и `meta` (с `parts`) последним,
-  затем удаляются устаревшие ключи. Сохранённая копия используется, только если
-  все units совпадают по версии с `meta` и проходят валидацию, и только если
-  она новее bundle (`selectCompendium`). Если seed не читается, показывается
-  валидная сохранённая копия.
+Кампендый — обычный контент приложения (`docs/data-loading-architecture.md`):
+
+- в пакете: `assets/content/compendium.json.gz` (27 разделов) и
+  `assets/content/compendiumMeta.json.gz` (`current`: meta и `parts`);
+  отдельного `assets/compendium/compendium.json.gz` больше нет (остались
+  только поисковые синонимы `compendium_search_aliases.json`);
+- `CompendiumRepository.load()` при первом открытии берёт документы из
+  `ContentStore`, собирает их `compendiumFromDocuments` и проверяет
+  `validateCompendiumDataset` (вне UI isolate); невалидный набор не
+  показывается («Не атрымалася адкрыць Кампендый»);
+- исправление приходит общим патчем манифеста: изменённые разделы и meta
+  включаются одним поколением (`ContentStore.commit`), смешанный набор не
+  читается; пересборка Кампендыя (больше четверти разделов) приходит с новой
+  версией приложения;
+- бывшая скачанная копия (Hive `compendium`) удаляется миграцией.
 
 Firestore: `compendium/{unitId}` (27 документов) + `compendiumMeta/current`
-(meta + `parts` + `importedAt`); импорт — MyBrev `npm run db:import-compendium`.
+(meta + `parts` + `importedAt`); импорт — MyBrev `npm run db:import-compendium`,
+затем публикация манифеста (`npm run content:manifest`).
 
 ## Поиск
 

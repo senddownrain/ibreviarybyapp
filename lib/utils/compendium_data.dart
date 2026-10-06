@@ -1,5 +1,5 @@
 // Pure helpers for the canonical Compendium dataset. Dart port of MyBrev
-// `src/utils/compendiumData.js` and `compendiumLoader.js#isNewerCompendium`
+// `src/utils/compendiumData.js`
 // (see docs/compendium.md). No Flutter, Hive or Firebase imports.
 
 import 'package:mybrev_flutter/models/compendium.dart';
@@ -246,19 +246,6 @@ void _stableSort<T>(List<T> list, {required int Function(T, T) compare}) {
     }
     list[j + 1] = value;
   }
-}
-
-/// A candidate replaces the current content only if it is strictly newer
-/// with the same schema (MyBrev `isNewerCompendium`).
-bool isNewerCompendium(
-  Map<String, dynamic>? candidateMeta,
-  Map<String, dynamic>? currentMeta,
-) {
-  final version = candidateMeta?['contentVersion'];
-  final current = currentMeta?['contentVersion'];
-  return _isInteger(version) &&
-      candidateMeta!['schemaVersion'] == currentMeta?['schemaVersion'] &&
-      (version as num) > (current is num ? current : 0);
 }
 
 const _romanNumerals = ['', 'I', 'II', 'III', 'IV', 'V'];

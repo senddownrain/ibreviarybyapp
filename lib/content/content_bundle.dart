@@ -23,6 +23,9 @@ const kContentCollections = [
   'prayers',
   'prayerCategories',
   'songs',
+  // Compendium of the Catechism: units, and `current` (meta and parts).
+  'compendium',
+  'compendiumMeta',
 ];
 
 /// What the Liturgy of the Hours and the Readings need before a day opens.

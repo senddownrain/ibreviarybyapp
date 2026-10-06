@@ -8,10 +8,12 @@ import 'package:mybrev_flutter/utils/compendium_search.dart';
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
-/// Bundled canonical dataset, decoded on first use (never at startup).
-final compendiumBundledProvider = FutureProvider<CompendiumDataset>(
-  (ref) => CompendiumRepository.loadBundled(),
-);
+/// The Compendium from the app's content (bundled, kept current by the
+/// content update), decoded and validated on first use, never at startup.
+final compendiumDatasetProvider = FutureProvider<CompendiumDataset>((ref) {
+  ref.watch(cacheEpochProvider);
+  return CompendiumRepository.load();
+});
 
 /// Hidden search aliases. Search still works without them.
 final compendiumAliasesProvider = FutureProvider<CompendiumSearchAliases>((
@@ -24,40 +26,6 @@ final compendiumAliasesProvider = FutureProvider<CompendiumSearchAliases>((
   } catch (_) {
     return CompendiumSearchAliases.empty;
   }
-});
-
-/// A newer Compendium downloaded by the content update, if complete and
-/// valid.
-final compendiumStoredProvider = Provider<CompendiumDataset?>((ref) {
-  ref.watch(cacheEpochProvider);
-  return CompendiumRepository.readStored();
-});
-
-/// The synced copy wins only when it is strictly newer than the bundle
-/// (MyBrev `createCompendiumLoader`).
-CompendiumDataset selectCompendium(
-  CompendiumDataset bundled,
-  CompendiumDataset? stored,
-) =>
-    stored != null &&
-        stored.meta.schemaVersion == bundled.meta.schemaVersion &&
-        stored.meta.contentVersion > bundled.meta.contentVersion
-    ? stored
-    : bundled;
-
-/// Offline-first dataset: bundled seed, replaced by a newer synced copy. If
-/// the seed cannot be read, a valid synced copy is still shown.
-final compendiumDatasetProvider = Provider<AsyncValue<CompendiumDataset>>((
-  ref,
-) {
-  final bundled = ref.watch(compendiumBundledProvider);
-  final stored = ref.watch(compendiumStoredProvider);
-  return switch (bundled) {
-    AsyncData(:final value) => AsyncData(selectCompendium(value, stored)),
-    AsyncError(:final error, :final stackTrace) =>
-      stored == null ? AsyncError(error, stackTrace) : AsyncData(stored),
-    _ => const AsyncLoading(),
-  };
 });
 
 final _indexes = Expando<CompendiumIndex>('compendiumIndex');

@@ -79,7 +79,7 @@ class _CompendiumRoot extends ConsumerWidget {
           title: 'Не атрымалася адкрыць Кампендый',
           message: 'Паспрабуйце яшчэ раз.',
           action: TextButton(
-            onPressed: () => ref.invalidate(compendiumBundledProvider),
+            onPressed: () => ref.invalidate(compendiumDatasetProvider),
             child: const Text('Паўтарыць'),
           ),
         ),

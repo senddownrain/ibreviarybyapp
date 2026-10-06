@@ -14,8 +14,7 @@ const kTemplatesBoxName = 'liturgicalTemplates';
 ///   ships with the app and is read through [ContentStore]; Hive keeps only
 ///   documents updated after the app was built (`content_<collection>`).
 /// * Hive boxes of the reader's own data: `settings` (preferences,
-///   highlights, favourites), `localPrayers`, `meta` (update bookkeeping),
-///   `compendium` (a newer validated Compendium, if one was downloaded).
+///   highlights, favourites), `localPrayers`, `meta` (update bookkeeping).
 class HiveService {
   static const _metaBox = 'meta';
   static const _localPrayersBoxName = 'localPrayers';
@@ -79,8 +78,6 @@ class HiveService {
     _meta = await Hive.openBox(_metaBox);
     _localPrayers = await Hive.openBox(_localPrayersBoxName);
     _settings = await Hive.openBox(_settingsBoxName);
-    // A newer Compendium than the bundled one, when it was downloaded.
-    await Hive.openBox('compendium');
     final withBundle = loadBundle ?? path == null;
     await content.open(bundle: bundle, loadBundle: withBundle);
     if (withBundle) content.preloadAll();

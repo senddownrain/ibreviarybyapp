@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'support/compendium_fixture.dart';
 
 import 'package:mybrev_flutter/services/compendium_repository.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
@@ -12,9 +13,7 @@ import 'package:mybrev_flutter/utils/compendium_search.dart';
 /// fixture produced by the JavaScript implementation
 /// (`scripts/compendium_search_parity.mjs`).
 void main() {
-  final dataset = decodeBundledCompendium(
-    File(CompendiumRepository.assetPath).readAsBytesSync(),
-  );
+  final dataset = readBundledCompendium();
   final aliasFile =
       jsonDecode(File(CompendiumRepository.aliasesAssetPath).readAsStringSync())
           as Map<String, dynamic>;

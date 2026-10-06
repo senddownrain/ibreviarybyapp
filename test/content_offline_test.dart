@@ -179,6 +179,35 @@ void main() {
       );
     });
 
+    test('the Compendium is content: validated from the store, patched '
+        'with the rest', () async {
+      await openWithBundle();
+      final dataset = await CompendiumRepository.load();
+      expect(dataset.meta.questionCount, 598);
+      expect(dataset.units, hasLength(27));
+      // A corrected question arrives as a unit patch like any other text.
+      final units = ContentStore.instance.collection('compendium');
+      final id = units.keys.first;
+      final unit = Map<String, dynamic>.from(units.get(id) as Map);
+      final questions = [
+        for (final q in unit['questions'] as List)
+          Map<String, dynamic>.from(q as Map),
+      ];
+      questions.first['question'] =
+          '${questions.first['question']} (выпраўлена)';
+      final patched = {...unit, 'questions': questions};
+      await units.applyUpdate(
+        {id: patched},
+        {id: documentHash(patched)},
+        DateTime(2030).millisecondsSinceEpoch,
+      );
+      final updated = await CompendiumRepository.load();
+      expect(
+        updated.units.firstWhere((u) => u.id == id).questions.first.question,
+        endsWith('(выпраўлена)'),
+      );
+    });
+
     test('Hive holds no copy of the bundled corpus', () async {
       await openWithBundle();
       for (final name in kContentCollections) {
@@ -402,12 +431,6 @@ void main() {
           ),
           isOfflineProvider.overrideWithValue(false),
           connectivityProvider.overrideWith((ref) => Stream.value(true)),
-          compendiumSyncProvider.overrideWithValue(
-            CompendiumSync(
-              remote: _NoCompendium(),
-              bundledVersion: () async => 0,
-            ),
-          ),
         ],
       );
       addTearDown(container.dispose);
@@ -849,13 +872,6 @@ class _SchemaRemote extends FakeRemote {
     ...(await super.fetchCurrent())!,
     'schemaVersion': kContentSchemaVersion + 1,
   };
-}
-
-class _NoCompendium implements CompendiumRemote {
-  @override
-  Future<Map<String, dynamic>?> fetchMeta() async => null;
-  @override
-  Future<List<Map<String, dynamic>>> fetchUnits() async => const [];
 }
 
 class _FixedUpdates extends ContentUpdatesNotifier {

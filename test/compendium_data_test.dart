@@ -1,27 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:archive/archive.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 
 import 'package:mybrev_flutter/models/compendium.dart';
-import 'package:mybrev_flutter/providers/compendium_provider.dart';
-import 'package:mybrev_flutter/services/compendium_repository.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
+import 'support/compendium_fixture.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
 
-/// Raw canonical map, as MyBrev exports it.
-Map<String, dynamic> _rawDataset() =>
-    jsonDecode(
-          utf8.decode(
-            GZipDecoder().decodeBytes(
-              File(CompendiumRepository.assetPath).readAsBytesSync(),
-            ),
-          ),
-        )
-        as Map<String, dynamic>;
+/// Raw canonical map, as MyBrev exports it (from the content bundle).
+Map<String, dynamic> _rawDataset() => readCompendiumRaw();
 
 Map<String, dynamic> _copy(Map<String, dynamic> value) =>
     jsonDecode(jsonEncode(value)) as Map<String, dynamic>;
@@ -46,30 +32,6 @@ Map<String, dynamic> _copy(Map<String, dynamic> value) =>
   return (_copy(meta), [for (final unit in units) _copy(unit)]);
 }
 
-class _Remote implements CompendiumRemote {
-  _Remote({this.meta, this.units = const [], this.fail = false});
-
-  Map<String, dynamic>? meta;
-  List<Map<String, dynamic>> units;
-  bool fail;
-  int metaReads = 0;
-  int unitReads = 0;
-
-  @override
-  Future<Map<String, dynamic>?> fetchMeta() async {
-    metaReads++;
-    if (fail) throw StateError('offline');
-    return meta;
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> fetchUnits() async {
-    unitReads++;
-    if (fail) throw StateError('offline');
-    return units;
-  }
-}
-
 void main() {
   final raw = _rawDataset();
 
@@ -89,11 +51,10 @@ void main() {
         'https://catholic.by/3/lib/documents/kasciol/3963-kampendyj-katekhizisa-katalitskaga-kastsjola',
       );
       expect(dataset.meta.copyright, hasLength(2));
-      // The bundle decodes the same way off the UI isolate.
-      final decoded = decodeBundledCompendium(
-        File(CompendiumRepository.assetPath).readAsBytesSync(),
-      );
+      // The content store path (meta + units, validated) gives the same.
+      final decoded = readBundledCompendium();
       expect(decoded.meta.checksum, dataset.meta.checksum);
+      expect(decoded.meta.contentVersion, dataset.meta.contentVersion);
     });
 
     test('index: flat order, lookup by number/id and reading groups', () {
@@ -508,179 +469,5 @@ void main() {
       );
       expect(jsonEncode(compendiumFromDocuments(meta, units)), jsonEncode(raw));
     });
-
-    test('only a strictly newer version with the same schema wins', () {
-      final bundled = Map<String, dynamic>.from(raw['meta'] as Map);
-      expect(isNewerCompendium({...bundled}, bundled), isFalse);
-      expect(
-        isNewerCompendium({...bundled, 'contentVersion': 2}, bundled),
-        isTrue,
-      );
-      expect(
-        isNewerCompendium({
-          ...bundled,
-          'contentVersion': 2,
-          'schemaVersion': 99,
-        }, bundled),
-        isFalse,
-      );
-      expect(
-        isNewerCompendium({...bundled, 'contentVersion': '2'}, bundled),
-        isFalse,
-      );
-    });
-  });
-
-  group('offline storage and sync', () {
-    late Directory directory;
-    setUp(() async {
-      directory = await Directory.systemTemp.createTemp('compendium-');
-      await HiveService.init(path: directory.path);
-      CompendiumRepository.resetMemo();
-    });
-    tearDown(() async {
-      await Hive.close();
-      await directory.delete(recursive: true);
-    });
-
-    CompendiumSync sync(_Remote remote) =>
-        CompendiumSync(remote: remote, bundledVersion: () async => 1);
-
-    test('the compendium box opens at startup but stays empty', () {
-      expect(Hive.isBoxOpen(CompendiumRepository.boxName), isTrue);
-      expect(Hive.box(CompendiumRepository.boxName), isEmpty);
-      expect(CompendiumRepository.readStored(), isNull);
-    });
-
-    test('nothing newer: one meta read, no units, nothing stored', () async {
-      final (meta, units) = _firestore(raw, contentVersion: 1);
-      final remote = _Remote(meta: meta, units: units);
-      expect(await sync(remote).run(), CompendiumSyncOutcome.upToDate);
-      expect(remote.metaReads, 1);
-      expect(remote.unitReads, 0);
-      expect(Hive.box(CompendiumRepository.boxName), isEmpty);
-      expect(
-        await sync(_Remote()).run(),
-        CompendiumSyncOutcome.upToDate,
-        reason: 'Firestore without a Compendium keeps the bundle',
-      );
-    });
-
-    test('newer valid data is stored, read back and preferred', () async {
-      final (meta, units) = _firestore(raw);
-      final remote = _Remote(meta: meta, units: units);
-      expect(await sync(remote).run(), CompendiumSyncOutcome.updated);
-      final box = Hive.box(CompendiumRepository.boxName);
-      expect(box.length, 28, reason: '27 units + meta');
-      final stored = CompendiumRepository.readStored()!;
-      expect(stored.meta.contentVersion, 2);
-      expect(stored.meta.checksum, 'remote');
-      expect(stored.units, hasLength(27));
-      final bundled = CompendiumDataset.fromJson(raw);
-      expect(identical(selectCompendium(bundled, stored), stored), isTrue);
-      // A second refresh sees the stored version and downloads nothing.
-      remote.unitReads = 0;
-      expect(await sync(remote).run(), CompendiumSyncOutcome.upToDate);
-      expect(remote.unitReads, 0);
-      // A later app update with a newer bundle wins over the older copy.
-      final newerBundle = CompendiumDataset.fromJson(
-        _copy(raw)
-          ..['meta'] = {
-            ...Map<String, dynamic>.from(raw['meta'] as Map),
-            'contentVersion': 3,
-          },
-      );
-      expect(
-        identical(selectCompendium(newerBundle, stored), newerBundle),
-        isTrue,
-      );
-    });
-
-    test('invalid remote data is rejected and old data is kept', () async {
-      final (meta, units) = _firestore(raw);
-      await sync(_Remote(meta: meta, units: units)).run();
-      final (newer, newerUnits) = _firestore(raw, contentVersion: 3);
-      final remote = _Remote(meta: newer, units: newerUnits.skip(1).toList());
-      await expectLater(
-        sync(remote).run(),
-        throwsA(isA<CompendiumSyncException>()),
-      );
-      expect(CompendiumRepository.readStored()!.meta.contentVersion, 2);
-    });
-
-    test('a failed refresh keeps the current content', () async {
-      final (meta, units) = _firestore(raw);
-      await sync(_Remote(meta: meta, units: units)).run();
-      await expectLater(sync(_Remote(fail: true)).run(), throwsStateError);
-      expect(CompendiumRepository.readStored()!.meta.contentVersion, 2);
-    });
-
-    test('an interrupted write is never read as a mixed dataset', () async {
-      final (meta, units) = _firestore(raw);
-      await sync(_Remote(meta: meta, units: units)).run();
-      final box = Hive.box(CompendiumRepository.boxName);
-      final unit = Map<String, dynamic>.from(box.get('p1-s1-ch1') as Map);
-      await box.put('p1-s1-ch1', {
-        ...unit,
-        CompendiumRepository.versionField: 3,
-      });
-      CompendiumRepository.resetMemo();
-      expect(CompendiumRepository.readStored(), isNull);
-    });
-
-    test('cancellation before the download leaves storage untouched', () async {
-      final (meta, units) = _firestore(raw);
-      final remote = _Remote(meta: meta, units: units);
-      expect(
-        await sync(remote).run(shouldCancel: () => true),
-        CompendiumSyncOutcome.cancelled,
-      );
-      expect(Hive.box(CompendiumRepository.boxName), isEmpty);
-    });
-
-    test(
-      'dataset provider: bundle, newer copy, or copy when bundle fails',
-      () async {
-        final bundled = CompendiumDataset.fromJson(raw);
-        final (meta, units) = _firestore(raw);
-        await sync(_Remote(meta: meta, units: units)).run();
-        final stored = CompendiumRepository.readStored()!;
-        for (final (seed, expected) in [
-          (() async => bundled, stored),
-          (() async => throw StateError('asset'), stored),
-        ]) {
-          final container = ProviderContainer(
-            overrides: [
-              compendiumBundledProvider.overrideWith((ref) => seed()),
-            ],
-          );
-          addTearDown(container.dispose);
-          await container
-              .read(compendiumBundledProvider.future)
-              .then((_) {}, onError: (_) {});
-          final value = container.read(compendiumDatasetProvider);
-          expect(identical(value.requireValue, expected), isTrue);
-          expect(
-            container.read(compendiumIndexProvider).requireValue.questions,
-            hasLength(598),
-          );
-        }
-        final empty = ProviderContainer(
-          overrides: [
-            compendiumBundledProvider.overrideWith((ref) async => bundled),
-            compendiumStoredProvider.overrideWithValue(null),
-          ],
-        );
-        addTearDown(empty.dispose);
-        await empty.read(compendiumBundledProvider.future);
-        expect(
-          identical(
-            empty.read(compendiumDatasetProvider).requireValue,
-            bundled,
-          ),
-          isTrue,
-        );
-      },
-    );
   });
 }

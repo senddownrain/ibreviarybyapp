@@ -28,6 +28,9 @@ const kLegacyDerivedBoxes = [
   // Former downloaded Bible copies: the bundled Bible is canonical.
   'bible_bel',
   'bible_ru',
+  // Former downloaded Compendium copy: the Compendium is content now (a
+  // newer published version comes back as a patch).
+  'compendium',
 ];
 
 /// Bookkeeping of the former cache in the `meta` box.
@@ -52,8 +55,8 @@ bool isLegacyCacheMetaKey(Object? key) {
 ///    after the bundle was built;
 ///  * the former boxes are deleted only after they were read;
 ///  * the flag is written last: an interrupted run simply runs again;
-///  * user data (settings, own prayers, highlights, favourites, Bible and
-///    Compendium copies) is not touched.
+///  * user data (settings, own prayers, highlights, favourites) is not
+///    touched.
 class ContentMigration {
   ContentMigration(this._meta, {ContentStore? store})
     : _store = store ?? ContentStore.instance;

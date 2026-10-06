@@ -43,7 +43,7 @@
       "count": 117,
       "digest": "3545a1b2520f2a5d",
       "storedBytes": 2087949,
-      "bundleBytes": 251489
+      "bundleBytes": 251525
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
@@ -58,6 +58,20 @@
       "digest": "9752aef2fd846b49",
       "storedBytes": 369604,
       "bundleBytes": 111479
+    },
+    "compendium": {
+      "file": "compendium.json.gz",
+      "count": 27,
+      "digest": "7659d6be6ac3ead8",
+      "storedBytes": 536467,
+      "bundleBytes": 113292
+    },
+    "compendiumMeta": {
+      "file": "compendiumMeta.json.gz",
+      "count": 1,
+      "digest": "879c4b7ae16cb312",
+      "storedBytes": 6072,
+      "bundleBytes": 1776
     }
   }
 }

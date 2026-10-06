@@ -146,7 +146,7 @@ Hive. В C читатель с первого запуска имеет всё, 
 ```text
                     ┌──────────── пакет приложения (read-only) ────────────┐
                     │ assets/content/<collection>.json.gz  + manifest.json │
-                    │ assets/bible_seed_*.json.gz, assets/compendium/…     │
+                    │ assets/bible_seed_*.json.gz (Біблія)                 │
                     └───────────────┬──────────────────────────────────────┘
                                     │ декод в isolate, лениво, литургия первой
                                     ▼
@@ -170,7 +170,9 @@ Hive. В C читатель с первого запуска имеет всё, 
 `assets/content/`: `days`, `readings`, `liturgicalTemplates`, `invitatoriums`,
 `completoriums`, `prayers`, `prayerCategories`, `songs` (3.53 МБ), плюс
 `manifest.json` (дата контента, число документов и digest каждой коллекции).
-Отдельно, как и раньше: Біблія (bel, ru), Кампендый, чин Імшы, шрифты.
+С октября 2026 сюда же входит Кампендый: `compendium` (27 разделов) и
+`compendiumMeta` (`current`: meta и parts), +0.11 МБ. Отдельно, как и раньше:
+Біблія (bel, ru), чин Імшы, шрифты.
 
 Формат файла коллекции: `{schemaVersion, collection, contentVersion, strings,
 docs, hashes}`; строка ≥ 32 символов хранится один раз в `strings`, в
@@ -188,7 +190,6 @@ docs, hashes}`; строка ≥ 32 символов хранится один �
 | `settings` | налады, выделения, избранное |
 | `localPrayers` | свои малітвы |
 | `meta` | `contentModel`, `contentLastCheck`, `contentLastUpdate`, `contentUpdateVersion` |
-| `compendium` | более новая проверенная копия Кампендыя, если скачана |
 
 ### 3. Что вычисляется
 
@@ -202,7 +203,8 @@ docs, hashes}`; строка ≥ 32 символов хранится один �
 
 Только изменения: документ `contentManifest/current` (~1 КБ), при отличии
 digest — `contentManifest/<collection>` (хеши, ~30–40 КБ), затем изменённые
-документы по id (`whereIn`, по 30). Кампендый — своей meta-проверкой.
+документы по id (`whereIn`, по 30). Кампендый обновляется так же, своего
+механизма у него больше нет.
 
 ### 5. Когда используется сеть
 

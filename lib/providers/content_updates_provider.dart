@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_updater.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/services/compendium_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 
 /// Where the content update stands, in the reader's terms.
@@ -85,14 +83,6 @@ final contentUpdaterProvider = Provider<ContentUpdater>(
   (ref) => ContentUpdater(),
 );
 
-/// Compendium check (meta first, units only when newer).
-final compendiumSyncProvider = Provider<CompendiumSync>(
-  (ref) => CompendiumSync(
-    remote: FirestoreCompendiumRemote(FirebaseFirestore.instance),
-    bundledVersion: CompendiumRepository.bundledContentVersion,
-  ),
-);
-
 /// The one network activity of the content: a daily version check, and a
 /// download only when something changed.
 ///
@@ -142,7 +132,6 @@ class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
       final now = DateTime.now();
       await HiveService.setMetaTime(kContentLastCheckKey, now);
       state = state.copyWith(lastCheck: now, awaitsAppRelease: false);
-      await _checkCompendium();
       if (plan == null) {
         state = state.copyWith(phase: ContentUpdatePhase.idle);
         return;
@@ -173,18 +162,6 @@ class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
     } catch (error) {
       debugPrint('[ContentUpdates] check failed: $error');
       state = state.copyWith(phase: ContentUpdatePhase.idle, failed: true);
-    }
-  }
-
-  Future<void> _checkCompendium() async {
-    try {
-      if (await ref.read(compendiumSyncProvider).run() ==
-          CompendiumSyncOutcome.updated) {
-        HiveService.content.revision.value++;
-      }
-    } catch (error) {
-      // The Compendium keeps its current text; the next check retries.
-      debugPrint('[ContentUpdates] Compendium: $error');
     }
   }
 }
