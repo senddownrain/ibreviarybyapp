@@ -222,8 +222,8 @@ void main() {
       final remote = FakeRemote({
         for (final name in kContentCollections) name: bundled(name),
       });
-      final plan = await ContentUpdater(remote: remote).check();
-      expect(plan, isNull);
+      final result = await ContentUpdater(remote: remote).check();
+      expect(result.kind, ContentCheckKind.current);
       expect(remote.currentReads, 1);
       expect(remote.manifestReads, isEmpty);
       expect(remote.fetched, isEmpty);
@@ -239,7 +239,7 @@ void main() {
           name: name == 'days' ? days : bundled(name),
       }, contentVersion: DateTime(2030).millisecondsSinceEpoch);
       final updater = ContentUpdater(remote: remote);
-      final plan = (await updater.check())!;
+      final plan = (await updater.check()).plan!;
       expect(remote.manifestReads, ['days']);
       expect(plan.documents, 1);
       await updater.apply(plan);
@@ -251,7 +251,7 @@ void main() {
       expect(DaysIndex.idsByDate(['28.09']), contains(id));
       expect(HiveService.daysBox.overlayLength, 1);
       // The device now has what the manifest has.
-      expect(await updater.check(), isNull);
+      expect((await updater.check()).kind, ContentCheckKind.current);
     });
 
     test('a removed document disappears; a new one appears', () async {
@@ -269,7 +269,7 @@ void main() {
           name: name == 'prayers' ? prayers : bundled(name),
       }, contentVersion: DateTime(2030).millisecondsSinceEpoch);
       final updater = ContentUpdater(remote: remote);
-      await updater.apply((await updater.check())!);
+      await updater.apply((await updater.check()).plan!);
       expect(HiveService.prayersBox.get(removed), isNull);
       expect(HiveService.prayersBox.keys, isNot(contains(removed)));
       expect(HiveService.prayersBox.get('new-prayer'), isNotNull);
@@ -292,7 +292,7 @@ void main() {
         'note': 'broken',
       };
       final updater = ContentUpdater(remote: remote);
-      final plan = (await updater.check())!;
+      final plan = (await updater.check()).plan!;
       final before = HiveService.daysBox.digest();
       await expectLater(
         updater.apply(plan),
@@ -314,7 +314,7 @@ void main() {
       });
       final updater = ContentUpdater(remote: remote);
       await expectLater(
-        updater.apply((await updater.check())!),
+        updater.apply((await updater.check()).plan!),
         throwsA(isA<ContentUpdateRejected>()),
       );
       expect(HiveService.songsBox.overlayLength, 0);
@@ -490,10 +490,89 @@ void main() {
       final days = bundled('days');
       days[days.keys.first] = {...days[days.keys.first]!, 'note': 'v2'};
       final remote = _SchemaRemote(changed('days', days));
-      final plan = await ContentUpdater(remote: remote).check();
-      expect(plan, isNull);
+      final result = await ContentUpdater(remote: remote).check();
+      expect(result.kind, ContentCheckKind.appReleaseRequired);
+      expect(result.reason, AppReleaseReason.schema);
+      expect(result.plan, isNull);
       expect(remote.manifestReads, isEmpty);
       expect(remote.fetched, isEmpty);
+    });
+
+    /// A container that is disposed explicitly (a «restart» test).
+    ProviderContainer open(FakeRemote remote) => ProviderContainer(
+      overrides: [
+        contentUpdaterProvider.overrideWithValue(
+          ContentUpdater(remote: remote),
+        ),
+        isOfflineProvider.overrideWithValue(false),
+        connectivityProvider.overrideWith((ref) => Stream.value(true)),
+      ],
+    );
+
+    FakeRemote rebuild() {
+      final days = bundled('days');
+      for (final id in days.keys.take(500)) {
+        days[id] = {...days[id]!, 'note': 'rebuilt'};
+      }
+      return changed('days', days);
+    }
+
+    FakeRemote newSchema() {
+      final days = bundled('days');
+      days[days.keys.first] = {...days[days.keys.first]!, 'note': 'v2'};
+      return _SchemaRemote(changed('days', days));
+    }
+
+    for (final (label, remote, reason) in [
+      ('new schema', newSchema, AppReleaseReason.schema),
+      ('mass rebuild', rebuild, AppReleaseReason.rebuild),
+    ]) {
+      test('$label: app release required, nothing installed, survives a '
+          'restart, never «Актуальныя»', () async {
+        await openWithBundle();
+        final first = open(remote());
+        await first.read(contentUpdatesProvider.notifier).check();
+        final state = first.read(contentUpdatesProvider);
+        expect(state.appReleaseReason, reason);
+        expect(state.failed, isFalse);
+        expect(contentUpdateStatus(state).$1, isNot('Актуальныя'));
+        expect(HiveService.daysBox.overlayLength, 0);
+        first.dispose();
+        // Restart: a fresh notifier reads the persisted status.
+        final second = open(remote());
+        addTearDown(second.dispose);
+        final restored = second.read(contentUpdatesProvider);
+        expect(restored.appReleaseReason, reason);
+        expect(
+          contentUpdateStatus(restored).$1,
+          'Новыя тэксты прыйдуць з абнаўленнем праграмы',
+        );
+      });
+    }
+
+    test('a compatible current check clears the status — at the next '
+        'launch, even within the day', () async {
+      await openWithBundle();
+      final first = open(rebuild());
+      await first.read(contentUpdatesProvider.notifier).check();
+      expect(first.read(contentUpdatesProvider).awaitsAppRelease, isTrue);
+      first.dispose();
+      // The new app's bundle now matches what is published.
+      final current = FakeRemote({
+        for (final name in kContentCollections) name: bundled(name),
+      });
+      final second = open(current);
+      addTearDown(second.dispose);
+      await second.read(contentUpdatesProvider.notifier).checkIfDue();
+      expect(
+        current.currentReads,
+        1,
+        reason: 'checked despite a fresh lastCheck',
+      );
+      final state = second.read(contentUpdatesProvider);
+      expect(state.awaitsAppRelease, isFalse);
+      expect(contentUpdateStatus(state).$1, 'Актуальныя');
+      expect(HiveService.metaBox.get(kContentAppReleaseReasonKey), isNull);
     });
 
     test('the daily check runs once a day', () async {
@@ -574,7 +653,10 @@ void main() {
     ) async {
       await pump(
         tester,
-        ContentUpdateState(lastCheck: DateTime.now(), awaitsAppRelease: true),
+        ContentUpdateState(
+          lastCheck: DateTime.now(),
+          appReleaseReason: AppReleaseReason.rebuild,
+        ),
       );
       expect(
         find.text('Новыя тэксты прыйдуць з абнаўленнем праграмы'),
@@ -687,6 +769,34 @@ void main() {
       }
     });
 
+    test('a READY generation left by a failed commit is finished before '
+        'the next one starts', () async {
+      await openWithBundle();
+      // Generation A: READY written, overlays written, not switched on —
+      // as after an I/O error without a restart.
+      final ids = await commitRelated(crashAfter: ContentCommitPhase.written);
+      // Generation B, in the same process.
+      final store = ContentStore.instance;
+      final prayers = store.collection('prayers');
+      final pid = prayers.keys.first;
+      final prayer = {
+        ...Map<String, dynamic>.from(prayers.get(pid) as Map),
+        'note': 'B',
+      };
+      await store.commit({
+        'prayers': prayers.planUpdate(
+          {pid: prayer},
+          {pid: documentHash(prayer)},
+          DateTime(2031).millisecondsSinceEpoch,
+        ),
+      }, DateTime(2031).millisecondsSinceEpoch);
+      for (final MapEntry(key: name, value: id) in ids.entries) {
+        expect(noteOf(name, id), 'v101', reason: 'A recovered: $name');
+      }
+      expect((prayers.get(pid) as Map)['note'], 'B');
+      expect(Hive.box(ContentStore.stagingBoxName), isEmpty);
+    });
+
     test('crash while writing overlays: readers never see a mix; '
         'the restart finishes it', () async {
       await openWithBundle();
@@ -715,7 +825,7 @@ void main() {
           name: name == 'days' ? {...bundled('days'), ...docs} : bundled(name),
       }, contentVersion: version);
       final updater = ContentUpdater(remote: remote);
-      return updater.check().then((plan) => updater.apply(plan!));
+      return updater.check().then((result) => updater.apply(result.plan!));
     }
 
     test(
@@ -751,15 +861,56 @@ void main() {
       );
       expect(HiveService.daysBox.overlayEntry(id)!['v'], 102);
       expect(
-        await ContentUpdater(
+        (await ContentUpdater(
           remote: FakeRemote({
             for (final name in kContentCollections)
               name: name == 'days' ? {...bundled('days')} : bundled(name),
           }),
-        ).check(),
-        isNull,
+        ).check()).kind,
+        ContentCheckKind.current,
         reason: 'the device has exactly what is published',
       );
+    });
+
+    test('every collection keeps the version of its own snapshot', () async {
+      await openWithBundle();
+      final manifest =
+          ContentStore.instance.bundleManifest!['collections'] as Map;
+      for (final name in kContentCollections) {
+        expect(
+          ContentStore.instance.collection(name).baselineVersion,
+          (manifest[name] as Map)['contentVersion'],
+          reason: name,
+        );
+      }
+      // The two snapshots of this bundle differ: no shared minimum.
+      expect(
+        HiveService.daysBox.baselineVersion,
+        isNot(HiveService.prayersBox.baselineVersion),
+      );
+    });
+
+    test('an older patch gives way to a newer bundle of its collection; a '
+        'newer one stays', () async {
+      await openWithBundle();
+      final days = HiveService.daysBox;
+      final bundleVersion = DateTime(2026, 10, 6).millisecondsSinceEpoch;
+      final ids = days.keys.take(2).toList();
+      await publish(DateTime(2026, 9, 20).millisecondsSinceEpoch, {
+        ids[0]: withText(ids[0], 'Sep 20'),
+      });
+      await publish(DateTime(2026, 10, 8).millisecondsSinceEpoch, {
+        ids[1]: withText(ids[1], 'Oct 8'),
+      });
+      final docs = <String, Map<String, dynamic>>{
+        for (final key in days.keys)
+          key: Map<String, dynamic>.from(days.baselineDocument(key)!),
+      };
+      await days.debugReplaceBaseline(docs, {
+        for (final e in docs.entries) e.key: documentHash(e.value),
+      }, bundleVersion);
+      expect(days.overlayEntry(ids[0]), isNull, reason: 'Sep 20 < Oct 6');
+      expect((days.get(ids[1]) as Map)['laudesPr'], 'Oct 8');
     });
 
     test('a new app bundle absorbs the patches it contains', () async {

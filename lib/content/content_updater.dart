@@ -134,6 +134,62 @@ class ContentUpdatePlan {
       bytes > kPatchMaxBytes || collections.any((item) => item.isRebuildSized);
 }
 
+/// What a version check found.
+enum ContentCheckKind {
+  /// The device has the published content (or nothing is published).
+  current,
+
+  /// A small content patch: download, verify, activate.
+  patch,
+
+  /// Published, but this app cannot install it as a patch: it comes with
+  /// the next app release (not an error).
+  appReleaseRequired,
+}
+
+/// Why the next app release is needed (diagnostics; one UX for both).
+enum AppReleaseReason {
+  /// The diff is the size of a rebuild of the corpus.
+  rebuild,
+
+  /// The published content uses a newer schema than this app reads.
+  schema,
+}
+
+class ContentCheck {
+  const ContentCheck._(
+    this.kind, {
+    this.plan,
+    this.reason,
+    this.contentVersion,
+  });
+
+  const ContentCheck.current() : this._(ContentCheckKind.current);
+
+  ContentCheck.patch(ContentUpdatePlan plan)
+    : this._(
+        ContentCheckKind.patch,
+        plan: plan,
+        contentVersion: plan.contentVersion,
+      );
+
+  const ContentCheck.appRelease(AppReleaseReason reason, {int? contentVersion})
+    : this._(
+        ContentCheckKind.appReleaseRequired,
+        reason: reason,
+        contentVersion: contentVersion,
+      );
+
+  final ContentCheckKind kind;
+
+  /// The patch to apply ([ContentCheckKind.patch] only).
+  final ContentUpdatePlan? plan;
+  final AppReleaseReason? reason;
+
+  /// Published content version this result refers to.
+  final int? contentVersion;
+}
+
 /// Rejected update: nothing was activated, the current content stays.
 class ContentUpdateRejected implements Exception {
   const ContentUpdateRejected(this.reason);
@@ -163,16 +219,27 @@ class ContentUpdater {
   final ContentRemote _remote;
   final ContentStore _store;
 
-  /// Null when the content is current (or nothing is published yet).
-  Future<ContentUpdatePlan?> check() async {
+  /// Compares the device with the published manifest.
+  ///
+  ///  * schema equal, digests equal          → current
+  ///  * schema equal, a small diff           → patch
+  ///  * schema equal, a rebuild-sized diff   → appReleaseRequired(rebuild)
+  ///  * remote schema newer than this app's  → appReleaseRequired(schema)
+  ///  * remote schema older (this app is newer) → current: nothing it can
+  ///    install; the next publication catches up
+  Future<ContentCheck> check() async {
     final current = await _remote.fetchCurrent();
-    if (current == null) return null;
-    if ((current['schemaVersion'] as num?)?.toInt() != kContentSchemaVersion) {
-      // Published for a newer app: the app update brings it.
-      return null;
-    }
-    final published = (current['collections'] as Map?) ?? const {};
+    if (current == null) return const ContentCheck.current();
     final contentVersion = (current['contentVersion'] as num?)?.toInt() ?? 0;
+    final schema = (current['schemaVersion'] as num?)?.toInt() ?? 0;
+    if (schema > kContentSchemaVersion) {
+      return ContentCheck.appRelease(
+        AppReleaseReason.schema,
+        contentVersion: contentVersion,
+      );
+    }
+    if (schema < kContentSchemaVersion) return const ContentCheck.current();
+    final published = (current['collections'] as Map?) ?? const {};
     final changes = <CollectionUpdate>[];
     for (final name in kContentCollections) {
       final remote = published[name];
@@ -215,7 +282,14 @@ class ContentUpdater {
       contentVersion: contentVersion,
       collections: changes,
     );
-    return plan.isEmpty ? null : plan;
+    if (plan.isEmpty) return const ContentCheck.current();
+    if (plan.isRebuildSized) {
+      return ContentCheck.appRelease(
+        AppReleaseReason.rebuild,
+        contentVersion: contentVersion,
+      );
+    }
+    return ContentCheck.patch(plan);
   }
 
   /// Downloads, verifies and activates [plan] as one generation

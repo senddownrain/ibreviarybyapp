@@ -132,11 +132,31 @@ class ContentStore {
   /// ```
   ///
   /// [stopAfter] (tests only) ends the run after a phase, as a crash would.
+  ///
+  /// Commits run one after another (never two generations in staging at
+  /// once), and each first finishes a READY generation an earlier commit
+  /// left behind (an I/O failure without a restart): staging is never
+  /// cleared while it still holds an unfinished READY update.
   Future<void> commit(
     Map<String, Map<String, Map<String, dynamic>?>> ops,
     int version, {
     @visibleForTesting ContentCommitPhase? stopAfter,
+  }) {
+    final run = (_commitTail ?? Future<void>.value()).then(
+      (_) => _commit(ops, version, stopAfter: stopAfter),
+    );
+    _commitTail = run.catchError((Object _) {});
+    return run;
+  }
+
+  Future<void>? _commitTail;
+
+  Future<void> _commit(
+    Map<String, Map<String, Map<String, dynamic>?>> ops,
+    int version, {
+    ContentCommitPhase? stopAfter,
   }) async {
+    await _recover();
     final staging = await _stagingBox();
     await staging.clear();
     await staging.putAll({
@@ -159,7 +179,8 @@ class ContentStore {
       ? Hive.box(stagingBoxName)
       : await Hive.openBox(stagingBoxName);
 
-  /// At start: a READY generation is finished, an unfinished one dropped.
+  /// At start and before every commit: a READY generation is finished
+  /// (replaying is idempotent), an unfinished preparation is dropped.
   Future<void> _recover() async {
     final staging = await _stagingBox();
     if (staging.isEmpty) return;
