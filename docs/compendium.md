@@ -40,21 +40,18 @@ Normal browsing has two levels before a question: Compendium root → Part. A Pa
 - Seed декодируется лениво (`compute`, вне UI isolate) при первом открытии
   Кампендыя (`compendiumBundledProvider`) и проверяется валидатором. В startup
   path только открывается пустой Hive box `compendium`.
-- `SyncTarget.compendium` (`automatic: false`), группа настроек «Кампендый
-  Катэхізіса» (`sync-compendium`), входит в «Загрузіць усю базу», не входит в
-  автоматическое окно. `CompendiumSync`: одно чтение `compendiumMeta/current`
-  (`Source.server`); коллекция `compendium` скачивается одним запросом, только
-  если `contentVersion` строго больше текущего (max(bundle, сохранённая копия))
-  при той же схеме. Документы собираются `compendiumFromDocuments` и проверяются;
-  невалидные данные, ошибка сети или отмена не трогают текущий контент.
+- Проверка новой версии входит в общую ежедневную проверку обновлений
+  (`ContentUpdatesNotifier`, см. `docs/data-loading-architecture.md`).
+  `CompendiumSync`: одно чтение `compendiumMeta/current` (`Source.server`);
+  коллекция `compendium` скачивается одним запросом, только если
+  `contentVersion` строго больше текущего (max(bundle, сохранённая копия)) при
+  той же схеме. Документы собираются `compendiumFromDocuments` и проверяются;
+  невалидные данные или ошибка сети не трогают текущий контент.
 - Hive: по записи на unit (+ `_contentVersion`) и `meta` (с `parts`) последним,
   затем удаляются устаревшие ключи. Сохранённая копия используется, только если
   все units совпадают по версии с `meta` и проходят валидацию, и только если
   она новее bundle (`selectCompendium`). Если seed не читается, показывается
   валидная сохранённая копия.
-- При открытии корня (`compendiumRefreshProvider`), если сеть есть и проверки
-  не было больше суток, ставится фоновая отменяемая синхронизация только
-  `compendium` (`forceRefresh: false`).
 
 Firestore: `compendium/{unitId}` (27 документов) + `compendiumMeta/current`
 (meta + `parts` + `importedAt`); импорт — MyBrev `npm run db:import-compendium`.

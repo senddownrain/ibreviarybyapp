@@ -16,7 +16,7 @@ Android — tonal Material surface, одинаковая структура (и�
 
 | Плитка | Действие | Иконка |
 | --- | --- | --- |
-| Святая Імша | прежний `/prayers/prayer/<_kMassOrderPrayerId>` + прежний snackbar синхронизации | `church` |
+| Святая Імша | прежний `/prayers/prayer/<_kMassOrderPrayerId>`; без текста — «Тэкст Імшы недаступны» | `church` |
 | Спеўнік | `/prayers/songs` | `playlist` (строки текста с нотой — сборник песен, а не «воспроизведение») |
 | Катэхізіс | `/prayers/compendium` — Кампендый (см. `docs/compendium.md`); `/prayers/catechism` — redirect | `bookOpenText` |
 | Сакрамэнты | `/prayers/sacraments` — заглушка | `cross` |
@@ -35,36 +35,19 @@ Android — tonal Material surface, одинаковая структура (и�
 
 Категории 1–10 (`kSongCategories`) — bundled canonical definitions.
 MyBrev-коллекция `songCategories` дублирует их и в приложении не читается,
-поэтому второго SyncTarget нет. `Song.displayTags` = названия категорий +
+поэтому отдельной коллекции для них нет. `Song.displayTags` = названия категорий +
 custom `tags` без дубликатов; они используются и для отображения, и для
 поиска/фильтра.
 
 ## Bundled seed и слияние
 
 `assets/songs_seed.json` — копия MyBrev `src/data/songs.json` (447 песен).
-Он парсится лениво (`songSeedProvider`) при первом открытии Спеўніка и не
-входит в startup path. `SongRepository.merge`: сохранённый документ с тем же
-ID перекрывает bundled версию по полям (`{...seed, ...doc}`), новые серверные
-песни добавляются. Документы без названия отбрасываются. Если seed не
-прочитан, но есть синхронизированные песни, показываются они.
-
-## Hive и синхронизация
-
-Box `songs` (открывается в `HiveService.init`, пустой box дешёв).
-`SyncTarget.songs` (`automatic: false`) использует общий постраничный
-`_syncCollection`: страницы по 50 с `Source.server`, запись по мере прихода,
-удаление устаревших ключей только после успешного конца, отметка
-`lastSync_songs`, размер в `bytes_songs`, прогресс/отмена/ошибки — общие.
-
-- Settings → Сінхранізацыя: отдельная группа «Спеўнік» (`sync-songs`) с
-  количеством документов, размером и датой синхронизации.
-- «Загрузіць усю базу» (`SyncTarget.values`) включает песни.
-- Автоматическое фоновое окно после bootstrap использует
-  `kAutomaticSyncTargets` и песни **не** загружает.
-- При открытии списка (`songbookRefreshProvider`), если сеть есть и песни не
-  синхронизировались больше суток, ставится в очередь фоновая отменяемая
-  синхронизация только `songs` (`forceRefresh: false`). Bundled песни видны
-  сразу.
+Песни входят в общий контент приложения (`assets/content/songs.json.gz`,
+коллекция `songs`, см. `docs/data-loading-architecture.md`) и декодируются
+лениво (`songSeedProvider`) при первом открытии Спеўніка, не в startup path.
+Исправления песен приходят общим обновлением контента: изменённые документы
+по манифесту версий, без отдельной синхронизации и без кнопок в настройках.
+Документы без названия отбрасываются.
 
 ## Избранное и настройки
 

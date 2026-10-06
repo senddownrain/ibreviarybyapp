@@ -294,7 +294,7 @@ corpus предлагает доступный вариант; error — пон�
   — технические контракты и миграции, не конкурирующая общая type scale.
 - [Prayerbook/Mass](../prayerbook-migration.md), [Bible](../bible-migration.md),
   [Songbook](../songbook.md), [Compendium](../compendium.md) — доменное поведение.
-- [Offline sync](../offline-sync.md), [Data loading](../data-loading-architecture.md)
+- [Data and offline](../data-loading-architecture.md)
   — данные и состояния загрузки.
 - [Consolidated review](../DESIGN_CONCEPT_VNEXT.md) — проверенные CURRENT /
   PARTIALLY FIXED / HISTORICAL, rationale, открытые вопросы и roadmap.

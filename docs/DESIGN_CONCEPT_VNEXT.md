@@ -169,7 +169,7 @@ splash, manifest и источник строки имени можно гото
 | [LITURGY_CONTENT_VISUAL_SPEC](LITURGY_CONTENT_VISUAL_SPEC.md) | Semantic IDs, visual locators, source structure, CURRENT-срезы и точные TARGET ролей |
 | [reader-foundation](reader-foundation.md), [app-shell-migration](app-shell-migration.md) и root migrations | Технические контракты reader, routes, Back, сохранения состояния |
 | [songbook](songbook.md), [compendium](compendium.md), [prayerbook-migration](prayerbook-migration.md), [bible-migration](bible-migration.md) | Доменное поведение и ограничения книг |
-| [offline-sync](offline-sync.md), [data-loading-architecture](data-loading-architecture.md) | Данные, cache, загрузка и синхронизация |
+| [data-loading-architecture](data-loading-architecture.md) | Тексты в приложении, обновления, миграция |
 | Этот документ, DL 1.1, platform-design, library-design, reader-typography-vnext | Аудит, история и причины прежних решений; не конкурирующий визуальный канон |
 
 При конфликте визуального правила приоритет Concept → System → целевые
