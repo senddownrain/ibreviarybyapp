@@ -13,7 +13,7 @@ class BibleBookInfo {
   final int chapterCount;
   final String versionId;
 
-  /// Canonical order: OT 1-39, NT 40+
+  /// Position in the version's book list (the New Testament starts at `mt`).
   final int order;
 
   /// Whether verses use Russified spelling (e.g. RST text)
@@ -50,6 +50,9 @@ class BibleVersionMeta {
 }
 
 const kBibleVersionMeta = {
+  // assets/bible_seed_bel.json.gz is MyBrev
+  // scripts/bible/bible_seed_bel_mixed.json.gz (the same text as Firestore
+  // bible_bel): Old Testament Chernyavski, New Testament Catholic.by.
   'bel': BibleVersionMeta(
     id: 'bel',
     name: 'Беларуская Біблія',
