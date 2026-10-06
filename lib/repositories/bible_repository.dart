@@ -52,11 +52,11 @@ class BibleVersionMeta {
 const kBibleVersionMeta = {
   'bel': BibleVersionMeta(
     id: 'bel',
-    name: 'Пераклад кс. Уладзіслава Чарняўскага MIC',
-    shortName: 'ЧБ',
+    name: 'Беларуская Біблія',
+    shortName: 'ББ',
     langLabel: 'Беларуская',
     shortLabel: 'БЕЛ',
-    attribution: 'Пераклад кс. Уладзіслава Чарняўскага MIC · bible.by',
+    attribution: 'Стары Запавет · пераклад кс. Уладзіслава Чарняўскага MIC',
   ),
   'ru': BibleVersionMeta(
     id: 'ru',
@@ -72,6 +72,13 @@ String bibleAttribution({
   required String versionId,
   required bool isNewTestament,
 }) {
+  // The Belarusian corpus combines two translations: Chernyavski (OT) and
+  // Catholic.by (NT).
+  if (versionId == 'bel') {
+    return isNewTestament
+        ? 'Новы Запавет · Catholic.by'
+        : 'Стары Запавет · пераклад кс. Уладзіслава Чарняўскага MIC';
+  }
   return kBibleVersionMeta[versionId]?.attribution ?? '';
 }
 
