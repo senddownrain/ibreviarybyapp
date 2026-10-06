@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -127,6 +129,16 @@ class _AboutContent extends StatelessWidget {
             ),
           ),
         ),
+        if (contentDate() case final date?) ...[
+          const SizedBox(height: 4),
+          Text(
+            'Версія тэкстаў: ${formatContentVersion(date)}',
+            key: const Key('about-content-version'),
+            style: textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+        ],
       ],
     );
   }

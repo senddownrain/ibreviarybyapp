@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_updater.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/services/compendium_repository.dart';
@@ -16,14 +17,8 @@ enum ContentUpdatePhase {
   /// Asking whether newer texts exist (one small request).
   checking,
 
-  /// Newer texts are being downloaded.
+  /// Newer texts are being downloaded and switched on.
   updating,
-
-  /// A large update waits for consent (mobile data).
-  waitingForConsent,
-
-  /// A large update waits for Wi-Fi (the reader chose so).
-  waitingForWifi,
 }
 
 class ContentUpdateState {
@@ -31,19 +26,20 @@ class ContentUpdateState {
     this.phase = ContentUpdatePhase.idle,
     this.lastCheck,
     this.lastUpdate,
-    this.pendingBytes = 0,
     this.failed = false,
+    this.awaitsAppRelease = false,
   });
 
   final ContentUpdatePhase phase;
   final DateTime? lastCheck;
   final DateTime? lastUpdate;
 
-  /// Size of the update waiting for consent or Wi-Fi.
-  final int pendingBytes;
-
   /// The last attempt did not finish (the current texts stay).
   final bool failed;
+
+  /// The published change is a rebuild of the corpus: it comes with the
+  /// next app release, not as a patch.
+  final bool awaitsAppRelease;
 
   bool get isBusy =>
       phase == ContentUpdatePhase.checking ||
@@ -53,14 +49,14 @@ class ContentUpdateState {
     ContentUpdatePhase? phase,
     DateTime? lastCheck,
     DateTime? lastUpdate,
-    int? pendingBytes,
     bool? failed,
+    bool? awaitsAppRelease,
   }) => ContentUpdateState(
     phase: phase ?? this.phase,
     lastCheck: lastCheck ?? this.lastCheck,
     lastUpdate: lastUpdate ?? this.lastUpdate,
-    pendingBytes: pendingBytes ?? this.pendingBytes,
     failed: failed ?? this.failed,
+    awaitsAppRelease: awaitsAppRelease ?? this.awaitsAppRelease,
   );
 }
 
@@ -70,9 +66,10 @@ const kContentLastUpdateKey = 'contentLastUpdate';
 /// Content version (ms) of the last update applied on this device.
 const kContentUpdateVersionKey = 'contentUpdateVersion';
 
-/// Date of the texts on the device: the newer of the bundle and the last
-/// applied update.
+/// Version of the texts on the device (About screen): the newer of the
+/// bundle and the last applied update.
 DateTime? contentDate() {
+  if (!Hive.isBoxOpen('meta')) return null;
   final bundled = HiveService.content.bundleContentVersion;
   final updated = HiveService.metaBox.get(kContentUpdateVersionKey);
   final version = updated is num && updated.toInt() > bundled
@@ -99,22 +96,19 @@ final compendiumSyncProvider = Provider<CompendiumSync>(
 /// The one network activity of the content: a daily version check, and a
 /// download only when something changed.
 ///
-/// * Small check on any network; a small update downloads right away.
-/// * A large update on mobile data asks first («Загрузіць» / «Пачакаць
-///   Wi-Fi»); waiting for Wi-Fi resumes by itself when Wi-Fi appears.
-/// * Every failure keeps the current texts.
+/// * The check is one small request, on any network; a content patch is
+///   downloaded and switched on right away, on any network — patches are
+///   small by construction (the publishing safeguard of MyBrev).
+/// * A rebuild-sized diff is not installed as a patch: it comes with the
+///   next app release.
+/// * Every failure keeps the current texts; no screen ever waits for this.
 class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
-  ContentUpdatePlan? _pending;
   Future<void>? _running;
 
   @override
   ContentUpdateState build() {
     ref.listen(connectivityProvider, (previous, next) {
-      if (next.value != true) return;
-      if (state.phase == ContentUpdatePhase.waitingForWifi &&
-          !ref.read(isOnMobileDataProvider)) {
-        unawaited(_applyPending());
-      } else if (previous?.value == false) {
+      if (previous?.value == false && next.value == true) {
         unawaited(checkIfDue());
       }
     });
@@ -143,24 +137,39 @@ class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
     if (ref.read(isOfflineProvider)) return;
     state = state.copyWith(phase: ContentUpdatePhase.checking, failed: false);
     try {
-      final plan = await ref.read(contentUpdaterProvider).check();
+      final updater = ref.read(contentUpdaterProvider);
+      final plan = await updater.check();
       final now = DateTime.now();
       await HiveService.setMetaTime(kContentLastCheckKey, now);
-      state = state.copyWith(lastCheck: now);
+      state = state.copyWith(lastCheck: now, awaitsAppRelease: false);
       await _checkCompendium();
       if (plan == null) {
         state = state.copyWith(phase: ContentUpdatePhase.idle);
         return;
       }
-      _pending = plan;
-      if (plan.bytes > kLargeUpdateBytes && ref.read(isOnMobileDataProvider)) {
+      if (plan.isRebuildSized) {
+        debugPrint(
+          '[ContentUpdates] ${plan.documents} documents / ${plan.bytes} B: '
+          'a rebuild, left to the next app release',
+        );
         state = state.copyWith(
-          phase: ContentUpdatePhase.waitingForConsent,
-          pendingBytes: plan.bytes,
+          phase: ContentUpdatePhase.idle,
+          awaitsAppRelease: true,
         );
         return;
       }
-      await _applyPending();
+      state = state.copyWith(phase: ContentUpdatePhase.updating);
+      await updater.apply(plan);
+      final applied = DateTime.now();
+      await HiveService.setMetaTime(kContentLastUpdateKey, applied);
+      await HiveService.metaBox.put(
+        kContentUpdateVersionKey,
+        plan.contentVersion,
+      );
+      state = state.copyWith(
+        phase: ContentUpdatePhase.idle,
+        lastUpdate: applied,
+      );
     } catch (error) {
       debugPrint('[ContentUpdates] check failed: $error');
       state = state.copyWith(phase: ContentUpdatePhase.idle, failed: true);
@@ -176,40 +185,6 @@ class ContentUpdatesNotifier extends Notifier<ContentUpdateState> {
     } catch (error) {
       // The Compendium keeps its current text; the next check retries.
       debugPrint('[ContentUpdates] Compendium: $error');
-    }
-  }
-
-  /// «Загрузіць» on mobile data.
-  Future<void> downloadNow() => _applyPending();
-
-  /// «Пачакаць Wi-Fi».
-  void waitForWifi() {
-    if (_pending == null) return;
-    state = state.copyWith(phase: ContentUpdatePhase.waitingForWifi);
-  }
-
-  Future<void> _applyPending() async {
-    final plan = _pending;
-    if (plan == null) return;
-    state = state.copyWith(phase: ContentUpdatePhase.updating, failed: false);
-    try {
-      await ref.read(contentUpdaterProvider).apply(plan);
-      _pending = null;
-      final now = DateTime.now();
-      await HiveService.setMetaTime(kContentLastUpdateKey, now);
-      await HiveService.metaBox.put(
-        kContentUpdateVersionKey,
-        plan.contentVersion,
-      );
-      state = ContentUpdateState(lastCheck: state.lastCheck, lastUpdate: now);
-    } catch (error) {
-      debugPrint('[ContentUpdates] update failed: $error');
-      _pending = null;
-      state = state.copyWith(
-        phase: ContentUpdatePhase.idle,
-        pendingBytes: 0,
-        failed: true,
-      );
     }
   }
 }

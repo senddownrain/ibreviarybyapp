@@ -17,6 +17,10 @@ import 'package:mybrev_flutter/content/content_bundle.dart';
 ///
 /// Reads are synchronous once a collection is loaded. Hive never holds the
 /// whole corpus: only what changed since the app was built.
+///
+/// An update of several collections becomes active all at once (see
+/// [commit]): readers see either the previous or the new content, never a
+/// mix, also after a crash at any point.
 class ContentStore {
   ContentStore._();
 
@@ -36,6 +40,14 @@ class ContentStore {
   /// overlay written). UI providers rebuild on it.
   final ValueNotifier<int> revision = ValueNotifier<int>(0);
 
+  /// Staged generation: every overlay write of one update, then [_readyKey].
+  static const stagingBoxName = 'content_staging';
+  static const _readyKey = '__ready__';
+
+  /// Diagnostics and tests: stop [commit] after a phase, as a crash would.
+  @visibleForTesting
+  static ContentCommitPhase? crashAfter;
+
   ContentCollection collection(String name) =>
       _collections[name] ?? (throw ArgumentError('Unknown collection $name'));
 
@@ -52,6 +64,7 @@ class ContentStore {
     for (final item in _collections.values) {
       await item._open();
     }
+    await _recover();
     if (!loadBundle) {
       for (final item in _collections.values) {
         item._setBaseline(const {}, const {}, 0);
@@ -112,6 +125,78 @@ class ContentStore {
     );
   }
 
+  /// Makes one update active, all collections at once.
+  ///
+  /// ```text
+  /// 1. stage    every overlay write into `content_staging`   crash → old content
+  /// 2. ready    one write of the READY marker                 crash → replayed at start
+  /// 3. write    the overlay boxes                             crash → replayed at start
+  /// 4. switch   every collection's view in one synchronous step → new content
+  /// 5. clean    the staging box
+  /// ```
+  Future<void> commit(
+    Map<String, Map<String, Map<String, dynamic>?>> ops,
+    int version,
+  ) async {
+    final staging = await _stagingBox();
+    await staging.clear();
+    await staging.putAll({
+      for (final MapEntry(key: name, value: entries) in ops.entries)
+        for (final MapEntry(key: id, value: entry) in entries.entries)
+          '$name\u0000$id': entry ?? const {'drop': true},
+    });
+    await staging.flush();
+    if (crashAfter == ContentCommitPhase.staged) return;
+    await staging.put(_readyKey, {'v': version, 'n': staging.length});
+    await staging.flush();
+    if (crashAfter == ContentCommitPhase.ready) return;
+    await _replay(
+      staging,
+      crashBeforeSwitch: crashAfter == ContentCommitPhase.written,
+    );
+  }
+
+  Future<Box> _stagingBox() async => Hive.isBoxOpen(stagingBoxName)
+      ? Hive.box(stagingBoxName)
+      : await Hive.openBox(stagingBoxName);
+
+  /// At start: a READY generation is finished, an unfinished one dropped.
+  Future<void> _recover() async {
+    final staging = await _stagingBox();
+    if (staging.isEmpty) return;
+    if (staging.containsKey(_readyKey)) {
+      debugPrint('[ContentStore] finishing an interrupted update');
+      await _replay(staging);
+    } else {
+      debugPrint('[ContentStore] dropping an unfinished update');
+      await staging.clear();
+    }
+  }
+
+  Future<void> _replay(Box staging, {bool crashBeforeSwitch = false}) async {
+    final byCollection = <String, Map<String, Map<String, dynamic>?>>{};
+    for (final key in staging.keys) {
+      if (key == _readyKey) continue;
+      final parts = key.toString().split('\u0000');
+      if (parts.length != 2 || !_collections.containsKey(parts[0])) continue;
+      final raw = staging.get(key);
+      final entry = raw is Map ? Map<String, dynamic>.from(raw) : null;
+      (byCollection[parts[0]] ??= {})[parts[1]] =
+          entry == null || entry['drop'] == true ? null : entry;
+    }
+    for (final MapEntry(key: name, value: entries) in byCollection.entries) {
+      await collection(name)._writeOverlay(entries);
+    }
+    if (crashBeforeSwitch) return;
+    // One synchronous step: no reader can see some collections new and
+    // others old.
+    for (final name in byCollection.keys) {
+      collection(name)._reloadView();
+    }
+    revision.value++;
+    await staging.clear();
+  }
+
   /// Bytes kept by the update overlay (documents newer than the bundle).
   int overlayBytes() =>
       _collections.values.fold(0, (sum, item) => sum + item.overlayBytes());
@@ -129,6 +214,10 @@ class ContentCollection {
   int _baselineVersion = 0;
   bool _loaded = false;
   Box? _overlay;
+
+  /// What readers see of the overlay. Replaced as a whole when an update is
+  /// switched on, so a read never meets half of an update.
+  Map<String, Map> _view = const {};
   List<String>? _keys;
   final StreamController<void> _changes = StreamController<void>.broadcast();
 
@@ -140,6 +229,7 @@ class ContentCollection {
     _overlay = Hive.isBoxOpen(overlayBoxName)
         ? Hive.box(overlayBoxName)
         : await Hive.openBox(overlayBoxName);
+    _reloadView(notify: false);
     _loaded = false;
     _baseline = const {};
     _baselineHashes = const {};
@@ -179,7 +269,33 @@ class ContentCollection {
     }
     if (stale.isEmpty) return;
     await overlay.deleteAll(stale);
-    _changed();
+    _reloadView();
+  }
+
+  void _reloadView({bool notify = true}) {
+    final overlay = _overlay;
+    _view = overlay == null
+        ? const {}
+        : {
+            for (final key in overlay.keys)
+              if (overlay.get(key) case final Map entry) key.toString(): entry,
+          };
+    if (notify) _changed();
+  }
+
+  /// Writes overlay entries ([ops] value null = remove the entry) without
+  /// touching what readers see; [_reloadView] switches them on.
+  Future<void> _writeOverlay(Map<String, Map<String, dynamic>?> ops) async {
+    final overlay = _overlay!;
+    final puts = <String, Map<String, dynamic>>{
+      for (final MapEntry(:key, :value) in ops.entries) key: ?value,
+    };
+    final drops = [
+      for (final MapEntry(:key, :value) in ops.entries)
+        if (value == null) key,
+    ];
+    if (puts.isNotEmpty) await overlay.putAll(puts);
+    if (drops.isNotEmpty) await overlay.deleteAll(drops);
   }
 
   void _changed() {
@@ -196,14 +312,14 @@ class ContentCollection {
   Stream<void> get changes => _changes.stream;
 
   Map<String, dynamic>? _overlayEntry(Object? key) {
-    final raw = _overlay?.get(key);
-    return raw is Map ? Map<String, dynamic>.from(raw) : null;
+    final raw = _view[key];
+    return raw == null ? null : Map<String, dynamic>.from(raw);
   }
 
   /// The effective document, or null.
   dynamic get(Object? key) {
-    final raw = _overlay?.get(key);
-    if (raw is Map) {
+    final raw = _view[key];
+    if (raw != null) {
       if (raw['x'] == true) return null;
       return raw['d'];
     }
@@ -216,15 +332,11 @@ class ContentCollection {
 
   List<String> _effectiveKeys() {
     final keys = <String>{..._baseline.keys};
-    final overlay = _overlay;
-    if (overlay != null) {
-      for (final key in overlay.keys) {
-        final raw = overlay.get(key);
-        if (raw is Map && raw['x'] == true) {
-          keys.remove(key.toString());
-        } else {
-          keys.add(key.toString());
-        }
+    for (final MapEntry(:key, value: raw) in _view.entries) {
+      if (raw['x'] == true) {
+        keys.remove(key);
+      } else {
+        keys.add(key);
       }
     }
     return keys.toList(growable: false);
@@ -243,16 +355,11 @@ class ContentCollection {
     final hashes = <String, String?>{
       for (final key in _baseline.keys) key: _baselineHashes[key],
     };
-    final overlay = _overlay;
-    if (overlay != null) {
-      for (final key in overlay.keys) {
-        final raw = overlay.get(key);
-        if (raw is! Map) continue;
-        if (raw['x'] == true) {
-          hashes.remove(key.toString());
-        } else {
-          hashes[key.toString()] = raw['h'] as String?;
-        }
+    for (final MapEntry(:key, value: raw) in _view.entries) {
+      if (raw['x'] == true) {
+        hashes.remove(key);
+      } else {
+        hashes[key] = raw['h'] as String?;
       }
     }
     return hashes;
@@ -260,36 +367,43 @@ class ContentCollection {
 
   String digest() => contentDigest(effectiveHashes());
 
-  /// Writes newer documents and deletions at once ([docs] value null =
-  /// deletion). Every document carries the hash it was published with and
-  /// the content version it belongs to.
+  /// Overlay operations that bring this collection to the published
+  /// documents ([docs] value null = deletion): id → new overlay entry, or
+  /// null = remove the overlay entry (back to the bundle, or nothing).
+  /// Every document carries the hash it was published with and the content
+  /// version it belongs to.
+  Map<String, Map<String, dynamic>?> planUpdate(
+    Map<String, Map<String, dynamic>?> docs,
+    Map<String, String> hashes,
+    int version,
+  ) {
+    final ops = <String, Map<String, dynamic>?>{};
+    for (final MapEntry(:key, :value) in docs.entries) {
+      final hash = hashes[key];
+      if (value == null) {
+        // Deleting a document the bundle never had leaves nothing behind.
+        ops[key] = _baseline.containsKey(key)
+            ? {'x': true, 'h': hash, 'v': version}
+            : null;
+      } else if (hash != null && hash == _baselineHashes[key]) {
+        // The update returns to the bundled text: no overlay needed.
+        ops[key] = null;
+      } else {
+        ops[key] = {'d': value, 'h': hash, 'v': version};
+      }
+    }
+    return ops;
+  }
+
+  /// [planUpdate] written and switched on for this collection alone (tests,
+  /// single-collection callers). Several collections: [ContentStore.commit].
   Future<void> applyUpdate(
     Map<String, Map<String, dynamic>?> docs,
     Map<String, String> hashes,
     int version,
   ) async {
-    final entries = <String, Map<String, dynamic>>{};
-    final obsolete = <String>[];
-    for (final MapEntry(:key, :value) in docs.entries) {
-      final hash = hashes[key];
-      if (value == null) {
-        // Deleting a document the bundle never had leaves nothing behind.
-        if (_baseline.containsKey(key)) {
-          entries[key] = {'x': true, 'h': hash, 'v': version};
-        } else {
-          obsolete.add(key);
-        }
-      } else if (hash != null && hash == _baselineHashes[key]) {
-        // The update returns to the bundled text.
-        obsolete.add(key);
-      } else {
-        entries[key] = {'d': value, 'h': hash, 'v': version};
-      }
-    }
-    final overlay = _overlay!;
-    if (entries.isNotEmpty) await overlay.putAll(entries);
-    if (obsolete.isNotEmpty) await overlay.deleteAll(obsolete);
-    _changed();
+    await _writeOverlay(planUpdate(docs, hashes, version));
+    _reloadView();
   }
 
   /// A document written outside an update (former cache, tests): version
@@ -300,7 +414,7 @@ class ContentCollection {
       'h': hash,
       'v': version ?? DateTime.now().millisecondsSinceEpoch,
     });
-    _changed();
+    _reloadView();
   }
 
   Future<void> putAll(Map<String, Map> docs) async {
@@ -309,13 +423,25 @@ class ContentCollection {
       for (final entry in docs.entries)
         entry.key: {'d': entry.value, 'h': null, 'v': now},
     });
-    _changed();
+    _reloadView();
   }
 
   /// Drops every update (the bundle is read again).
   Future<void> clearOverlay() async {
     await _overlay!.clear();
-    _changed();
+    _reloadView();
+  }
+
+  /// An app release with another bundle, without rebuilding the app (tests):
+  /// the new baseline, then the same reconciliation as at a real start.
+  @visibleForTesting
+  Future<void> debugReplaceBaseline(
+    Map<String, Map<String, dynamic>> docs,
+    Map<String, String> hashes,
+    int version,
+  ) async {
+    _setBaseline(docs, hashes, version);
+    await _reconcileWithBaseline();
   }
 
   /// The overlay entry of [key] (diagnostics, migration and tests).
@@ -324,7 +450,7 @@ class ContentCollection {
   /// Bundled document of [key], ignoring the overlay.
   Map<String, dynamic>? baselineDocument(String key) => _baseline[key];
 
-  int get overlayLength => _overlay?.length ?? 0;
+  int get overlayLength => _view.length;
 
   int overlayBytes() {
     final overlay = _overlay;
@@ -335,4 +461,16 @@ class ContentCollection {
     }
     return bytes;
   }
+}
+
+/// Points of [ContentStore.commit] a test can stop at, as a crash would.
+enum ContentCommitPhase {
+  /// Entries staged, no READY marker.
+  staged,
+
+  /// READY marker written, overlays not yet.
+  ready,
+
+  /// Overlays written, views not switched.
+  written,
 }

@@ -8,8 +8,16 @@ import 'package:mybrev_flutter/utils/retry.dart';
 /// `npm run content:manifest`).
 const kContentManifestCollection = 'contentManifest';
 
-/// An update larger than this waits for the reader's consent on mobile data.
-const kLargeUpdateBytes = 5 * 1024 * 1024;
+/// Above these a diff is a rebuild of the corpus, not a content patch, and
+/// is left to the next app release (the bundle). Looser than the publishing
+/// safeguard (MyBrev `content:manifest`), which blocks such diffs first.
+const kPatchMaxBytes = 12 * 1024 * 1024;
+
+/// A patch never replaces more than half of an existing collection.
+const kPatchMaxChangedShare = 0.5;
+
+/// …counted only above this many changed documents (small collections).
+const kPatchChangedFloor = 50;
 
 /// What the update check reads from the network.
 abstract class ContentRemote {
@@ -78,17 +86,32 @@ class CollectionUpdate {
     required this.remove,
     required this.hashes,
     required this.bytes,
+    this.changed = 0,
+    this.existing = 0,
   });
 
   final String collection;
   final List<String> download;
   final List<String> remove;
 
+  /// Documents of [download] the device already has (edits, not additions).
+  final int changed;
+
+  /// Documents of this collection on the device before the update.
+  final int existing;
+
   /// Published hash of every document in [download].
   final Map<String, String> hashes;
   final int bytes;
 
   bool get isEmpty => download.isEmpty && remove.isEmpty;
+
+  /// Most of an existing collection replaced: a rebuild, not a patch.
+  bool get isRebuildSized {
+    final replaced = changed + remove.length;
+    return replaced > kPatchChangedFloor &&
+        replaced > existing * kPatchMaxChangedShare;
+  }
 }
 
 /// Everything that differs from the published content.
@@ -105,6 +128,10 @@ class ContentUpdatePlan {
   int get bytes => collections.fold(0, (total, item) => total + item.bytes);
   int get documents =>
       collections.fold(0, (total, item) => total + item.download.length);
+
+  /// A rebuild of the corpus: it comes with the next app release.
+  bool get isRebuildSized =>
+      bytes > kPatchMaxBytes || collections.any((item) => item.isRebuildSized);
 }
 
 /// Rejected update: nothing was activated, the current content stays.
@@ -124,6 +151,10 @@ class ContentUpdateRejected implements Exception {
 ///   download those documents          → verify each against its hash
 ///   all verified                      → activate (Hive overlay), else keep
 /// ```
+///
+/// Two delivery channels: a small content change arrives here as a patch;
+/// a rebuild of the corpus or a new schema arrives with the next app
+/// release (the bundle) and is never installed as a patch.
 class ContentUpdater {
   ContentUpdater({ContentRemote? remote, ContentStore? store})
     : _remote = remote ?? FirestoreContentRemote(),
@@ -171,6 +202,8 @@ class ContentUpdater {
           download: download,
           remove: remove,
           hashes: {for (final id in download) id: hashes[id]!},
+          changed: download.where(localHashes.containsKey).length,
+          existing: localHashes.length,
           bytes: download.fold(
             0,
             (total, id) => total + (sizes[id] ?? 0).toInt(),
@@ -185,7 +218,8 @@ class ContentUpdater {
     return plan.isEmpty ? null : plan;
   }
 
-  /// Downloads, verifies and activates [plan]. Throws
+  /// Downloads, verifies and activates [plan] as one generation
+  /// ([ContentStore.commit]). Throws
   /// [ContentUpdateRejected] (or a network error) without changing
   /// anything when any document is missing or does not match its hash.
   Future<void> apply(ContentUpdatePlan plan) async {
@@ -212,19 +246,19 @@ class ContentUpdater {
       }
       staged[update] = docs;
     }
-    // Everything verified: activate.
-    for (final MapEntry(key: update, value: docs) in staged.entries) {
-      await _store
-          .collection(update.collection)
-          .applyUpdate(
-            {
-              for (final id in update.download) id: docs[id],
-              for (final id in update.remove) id: null,
-            },
-            update.hashes,
-            plan.contentVersion,
-          );
-    }
-    _store.revision.value++;
+    // Everything verified: one generation, active all at once.
+    await _store.commit({
+      for (final MapEntry(key: update, value: docs) in staged.entries)
+        update.collection: _store
+            .collection(update.collection)
+            .planUpdate(
+              {
+                for (final id in update.download) id: docs[id],
+                for (final id in update.remove) id: null,
+              },
+              update.hashes,
+              plan.contentVersion,
+            ),
+    }, plan.contentVersion);
   }
 }
