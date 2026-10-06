@@ -229,14 +229,14 @@ void main() {
       expect(find.byKey(const Key('songbook-title')), findsOneWidget);
     });
 
-    testWidgets('missing Mass keeps the sync hint on the tile', (tester) async {
+    testWidgets('missing Mass says so on the tile', (tester) async {
       await tester.pumpWidget(
         _app(const Scaffold(body: PrayersScreen()), prayers: const []),
       );
       await tester.pump();
       await tester.tap(find.byKey(const Key('holy-mass-destination')));
       await tester.pump();
-      expect(find.text('Тэкст пакуль недаступны'), findsOneWidget);
+      expect(find.text('Тэкст Імшы недаступны'), findsOneWidget);
     });
 
     testWidgets('tiles do not overflow at 200 percent system text', (
@@ -467,17 +467,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('songbook-error')), findsOneWidget);
       expect(find.text('Паўтарыць'), findsOneWidget);
-    });
-
-    testWidgets('opening the list requests a songbook refresh', (tester) async {
-      var refreshes = 0;
-      final router = _router(initialLocation: '/prayers/songs');
-      addTearDown(router.dispose);
-      await tester.pumpWidget(
-        _app(null, router: router, onRefresh: () => refreshes++),
-      );
-      await tester.pumpAndSettle();
-      expect(refreshes, 1);
     });
   });
 
@@ -1631,7 +1620,6 @@ Widget _app(
   SongPreferences prefs = const SongPreferences(),
   bool seedFails = false,
   List<Map<String, dynamic>> seed = _seed,
-  VoidCallback? onRefresh,
   void Function(ProviderContainer)? onContainer,
 }) {
   return ProviderScope(
@@ -1639,6 +1627,7 @@ Widget _app(
       settingsProvider.overrideWith(_TestSettingsNotifier.new),
       liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
       allPrayersProvider.overrideWithValue(prayers),
+      prayersContentProvider.overrideWith((ref) async {}),
       localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
       prayerMenuCategoriesProvider.overrideWithValue(const []),
       globalPrayerCategoriesProvider.overrideWith(
@@ -1647,9 +1636,7 @@ Widget _app(
       songSeedProvider.overrideWith(
         (ref) async => seedFails ? throw StateError('asset') : seed,
       ),
-      cachedSongDocsProvider.overrideWithValue(const []),
       songPreferencesProvider.overrideWith(() => _TestSongPrefs(prefs)),
-      songbookRefreshProvider.overrideWithValue(onRefresh ?? () {}),
       ...compendiumOverrides(_compendium),
     ],
     child: Consumer(

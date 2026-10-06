@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
-import 'package:mybrev_flutter/services/cache_warmup_service.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
@@ -15,39 +14,24 @@ final homeNavDirectionProvider = StateProvider<int>((ref) => 0);
 /// Currently selected date in the liturgical calendar.
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
-final selectedDateWarmupServiceProvider = Provider<CacheWarmupService>(
-  (ref) => CacheWarmupService(calendar: ref.watch(calendarServiceProvider)),
-);
+/// The Liturgy of the Hours and the Readings are on the device (decoded
+/// from the bundle once per launch). Every date is then a local lookup:
+/// there is nothing to download for a date.
+final liturgicalContentReadyProvider = FutureProvider<void>((ref) async {
+  await ContentStore.instance.ensureLoaded(kLiturgicalCollections);
+});
 
-/// Foreground request for the exact selected date, independent of background jobs.
+/// Kept as the gate the screens watch: the selected date is ready as soon
+/// as the content is (no per-date work).
 final selectedDateReadyProvider = FutureProvider<void>((ref) async {
-  final date = ref.watch(selectedDateProvider);
-  final calendar = ref.read(calendarServiceProvider);
-  final service = ref.read(selectedDateWarmupServiceProvider);
-  await service.prepareDate(date);
-  // A previous full download must never hide a genuinely missing local day.
-  final local = LiturgicalContentService().getContentForDate(
-    date,
-    calendar.getYearOptionsCached(date.year),
-    calendar.getYearOptionsCached(date.year + 1),
-    calendar.getDynamicDatesCached(date.year),
-  );
-  final missing =
-      HiveService.isDateCached('days', date) &&
-      !local.any(
-        (option) =>
-            option.day != null &&
-            option.source != LiturgicalOptionSource.officeForDead,
-      );
-  if (!await service.warmupDate(date, forceRefresh: missing)) {
-    throw StateError('Не ўдалося загрузіць выбраны дзень');
-  }
+  ref.watch(selectedDateProvider);
+  await ref.watch(liturgicalContentReadyProvider.future);
 });
 
 /// Day options for the selected date.
 final dayOptionsProvider = Provider<List<DayOption>>((ref) {
   ref.watch(selectedDateReadyProvider);
-  ref.watch(cacheEpochProvider); // rebuild after warmup / sync fills Hive
+  ref.watch(cacheEpochProvider); // rebuild after a content update
   final date = ref.watch(selectedDateProvider);
   final calService = ref.watch(calendarServiceProvider);
 

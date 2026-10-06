@@ -42,9 +42,6 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
     _query = TextEditingController(
       text: ref.read(songsFilterProvider).searchQuery,
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) ref.read(songbookRefreshProvider)();
-    });
   }
 
   @override
@@ -121,9 +118,9 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
       else if (songs.hasError && !songs.hasValue)
         _SongbookMessage(
           key: const Key('songbook-error'),
-          icon: PhosphorIconsLight.cloudSlash,
+          icon: PhosphorIconsLight.warning,
           title: 'Не атрымалася адкрыць спеўнік',
-          message: 'Праверце сетку або сінхранізуйце Спеўнік у наладах.',
+          message: 'Паспрабуйце яшчэ раз.',
           action: TextButton(
             onPressed: () => ref.invalidate(songSeedProvider),
             child: const Text('Паўтарыць'),
@@ -136,7 +133,7 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
           title: 'Спевы не знойдзены',
           message: filter.isActive
               ? 'Змяніце пошук або фільтры.'
-              : 'Сінхранізуйце Спеўнік у наладах.',
+              : 'Спеўнік пусты.',
         ),
     ];
 

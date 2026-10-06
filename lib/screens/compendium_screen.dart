@@ -30,14 +30,6 @@ class CompendiumScreen extends ConsumerStatefulWidget {
 
 class _CompendiumScreenState extends ConsumerState<CompendiumScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) ref.read(compendiumRefreshProvider)();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) =>
       const CompendiumSearchHost(inlineResults: true, child: _CompendiumRoot());
 }
@@ -83,10 +75,9 @@ class _CompendiumRoot extends ConsumerWidget {
       body = [
         CompendiumMessage(
           key: const Key('compendium-error'),
-          icon: PhosphorIconsLight.cloudSlash,
+          icon: PhosphorIconsLight.warning,
           title: 'Не атрымалася адкрыць Кампендый',
-          message:
-              'Паспрабуйце яшчэ раз або сінхранізуйце Кампендый у наладах.',
+          message: 'Паспрабуйце яшчэ раз.',
           action: TextButton(
             onPressed: () => ref.invalidate(compendiumBundledProvider),
             child: const Text('Паўтарыць'),

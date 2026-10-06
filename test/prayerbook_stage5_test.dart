@@ -204,7 +204,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(PrayerCatalogScreen), findsOneWidget);
     expect(
-      GoRouterState.of(tester.element(find.byType(PrayerCatalogScreen))).uri.path,
+      GoRouterState.of(
+        tester.element(find.byType(PrayerCatalogScreen)),
+      ).uri.path,
       '/prayers/search',
     );
     expect(find.byKey(const ValueKey('prayer-row-morning')), findsOneWidget);
@@ -232,16 +234,14 @@ void main() {
     expect(emptySize.height, lessThan(80));
   });
 
-  testWidgets('missing Holy Mass stays recognizable and offers sync', (
-    tester,
-  ) async {
+  testWidgets('missing Holy Mass stays recognizable', (tester) async {
     await tester.pumpWidget(_app(const Scaffold(body: PrayersScreen())));
     await tester.pump();
 
     await tester.tap(find.byKey(const Key('holy-mass-destination')));
     await tester.pump();
-    expect(find.text('Тэкст пакуль недаступны'), findsOneWidget);
-    expect(find.text('Сінхранізацыя'), findsOneWidget);
+    expect(find.text('Тэкст Імшы недаступны'), findsOneWidget);
+    expect(find.text('Сінхранізацыя'), findsNothing);
   });
 
   testWidgets('favorite toggle is shared by catalog and root providers', (
@@ -350,6 +350,7 @@ void main() {
         settingsProvider.overrideWith(_TestSettingsNotifier.new),
         liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
         allPrayersProvider.overrideWithValue(_builtIn),
+        prayersContentProvider.overrideWith((ref) async {}),
         localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
         prayerMenuCategoriesProvider.overrideWithValue(_categories),
       ],
@@ -728,6 +729,7 @@ Widget _app(
       settingsProvider.overrideWith(() => notifier),
       liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
       allPrayersProvider.overrideWithValue(prayers),
+      prayersContentProvider.overrideWith((ref) async {}),
       localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
       prayerMenuCategoriesProvider.overrideWithValue(_categories),
       globalPrayerCategoriesProvider.overrideWith(

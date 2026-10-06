@@ -4,41 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:mybrev_flutter/models/song.dart';
-import 'package:mybrev_flutter/models/sync_plan.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
-import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/song_repository.dart';
 import 'package:mybrev_flutter/utils/song_chords.dart';
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
-/// Bundled initial songs, parsed on first use of the songbook.
-final songSeedProvider = FutureProvider<List<Map<String, dynamic>>>(
-  (ref) => SongRepository.loadSeed(),
-);
-
-/// Songs saved by the `songs` SyncTarget.
-final cachedSongDocsProvider = Provider<List<Map<String, dynamic>>>((ref) {
+/// The songs of the app's content, decoded on first use of the songbook.
+final songSeedProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
   ref.watch(cacheEpochProvider);
-  return SongRepository.readCached();
+  return SongRepository.loadSeed();
 });
 
-/// Bundled seed merged with synced documents. When the seed cannot be read,
-/// synced documents alone remain available offline.
-final songsProvider = Provider<AsyncValue<List<Song>>>((ref) {
-  final seed = ref.watch(songSeedProvider);
-  final cached = ref.watch(cachedSongDocsProvider);
-  return switch (seed) {
-    AsyncData(:final value) => AsyncData(SongRepository.merge(value, cached)),
-    AsyncError(:final error, :final stackTrace) =>
-      cached.isEmpty
-          ? AsyncError(error, stackTrace)
-          : AsyncData(SongRepository.merge(const [], cached)),
-    _ => const AsyncLoading(),
-  };
-});
+final songsProvider = Provider<AsyncValue<List<Song>>>(
+  (ref) => ref
+      .watch(songSeedProvider)
+      .whenData((docs) => SongRepository.merge(docs, const [])),
+);
 
 final songByIdProvider = Provider.family<AsyncValue<Song?>, String>(
   (ref, id) => ref
@@ -221,29 +204,3 @@ final songPreferencesProvider =
     NotifierProvider<SongPreferencesNotifier, SongPreferences>(
       SongPreferencesNotifier.new,
     );
-
-// ── Opportunistic refresh ────────────────────────────────────────────────────
-
-/// Called when the songbook is opened. If the device is online and songs
-/// were not synced during the last day, queue a background, cancellable
-/// `songs`-only sync. Bundled songs remain visible meanwhile.
-final songbookRefreshProvider = Provider<void Function()>((ref) {
-  return () {
-    if (ref.read(isOfflineProvider)) return;
-    if (!Hive.isBoxOpen('meta')) return;
-    final last = HiveService.getLastSync(SyncTarget.songs.collection);
-    if (last != null &&
-        DateTime.now().difference(last) < const Duration(days: 1)) {
-      return;
-    }
-    ref
-        .read(syncStatusProvider.notifier)
-        .synchronize(
-          const SyncPlan(
-            targets: {SyncTarget.songs},
-            forceRefresh: false,
-            background: true,
-          ),
-        );
-  };
-});

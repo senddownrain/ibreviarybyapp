@@ -697,7 +697,11 @@ final router = GoRouter(
         child: SecondaryPageScaffold(
           title: 'Налады',
           child: SettingsScreen(
-            scrollToSync: state.uri.queryParameters['section'] == 'sync',
+            // `sync` is the former name of the section (old links).
+            scrollToData: const {
+              'data',
+              'sync',
+            }.contains(state.uri.queryParameters['section']),
           ),
         ),
       ),

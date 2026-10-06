@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/data_log.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 
@@ -24,29 +23,19 @@ typedef ReadingsLoader =
       required String? dateStr,
       required String? liturgicalKey,
       required String? dayId,
-      required bool forceRefresh,
     });
 
-/// Testable boundary around the existing production readings service.
+/// Testable boundary around the readings service (waits for the content to
+/// be decoded; never the network).
 final readingsLoaderProvider = Provider<ReadingsLoader>((ref) {
-  return ({
-    required dateStr,
-    required liturgicalKey,
-    required dayId,
-    required forceRefresh,
-  }) async {
+  return ({required dateStr, required liturgicalKey, required dayId}) async {
     final service = ParsedReadingsService();
     if (liturgicalKey != null) {
       final parts = liturgicalKey.split('/');
       final period = parts[0];
       final week = int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
       final day = int.tryParse(parts.length > 2 ? parts[2] : '1') ?? 1;
-      final readings = await service.fetchByLiturgicalKey(
-        period,
-        week,
-        day,
-        forceRefresh: forceRefresh,
-      );
+      final readings = await service.fetchByLiturgicalKey(period, week, day);
       final today = DateTime.now();
       return ReadingsLoadResult(
         readings: readings,
@@ -57,15 +46,11 @@ final readingsLoaderProvider = Provider<ReadingsLoader>((ref) {
 
     final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
     final calendar = ref.read(calendarServiceProvider);
-    await calendar.ensureYearOptions(date.year);
-    await calendar.ensureYearOptions(date.year + 1);
-    await calendar.ensureDynamicDates(date.year);
     final readings = await service.fetchForDate(
       date,
       calendar.getYearOptionsCached(date.year),
       calendar.getYearOptionsCached(date.year + 1),
       calendar.getDynamicDatesCached(date.year),
-      forceRefresh: forceRefresh,
       includeAlternatives: true,
       dayId: dayId,
     );
@@ -84,14 +69,11 @@ typedef ReadingsLocalLoader =
       required String? dayId,
     });
 
-/// Readings already on the device, synchronously — or null.
-///
-/// The screen asks this first: a cached date is rendered in the same frame,
-/// without a loading state and without the network. Only a miss goes to
-/// [readingsLoaderProvider].
+/// Readings on the device, synchronously — or null while the content is
+/// still being decoded at launch. The screen asks this first; only then it
+/// waits on [readingsLoaderProvider].
 final readingsLocalLoaderProvider = Provider<ReadingsLocalLoader>((ref) {
   return ({required dateStr, required liturgicalKey, required dayId}) {
-    if (!HiveService.isCacheReady) return null;
     final service = ParsedReadingsService();
     if (liturgicalKey != null) {
       final parts = liturgicalKey.split('/');

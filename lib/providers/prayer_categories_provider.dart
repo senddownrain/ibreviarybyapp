@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
+import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
-import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
-import 'package:mybrev_flutter/utils/firestore_cache.dart';
 
 const kPrayerCategoriesCollection = 'prayerCategories';
 
@@ -20,12 +19,9 @@ class PrayerMenuCategory {
     required this.isGlobal,
   });
 
-  factory PrayerMenuCategory.global(
-    QueryDocumentSnapshot<Map<String, dynamic>> document,
-  ) {
-    final data = document.data();
+  factory PrayerMenuCategory.global(String id, Map data) {
     return PrayerMenuCategory(
-      id: document.id,
+      id: id,
       name: data['name']?.toString().trim() ?? '',
       tags: _cleanTags(data['tags']),
       isGlobal: true,
@@ -50,62 +46,33 @@ List<String> _cleanTags(dynamic value) {
       .toList();
 }
 
+/// Categories of the Prayerbook from the app's content (bundled, kept
+/// current by the content update), ordered by `order`, then by name.
 final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
   (ref) async* {
-    if (Hive.isBoxOpen(kPrayerCategoriesCollection)) {
-      final cached = HiveService.boxFor(kPrayerCategoriesCollection).values
-          .whereType<Map>()
-          .map(
-            (data) => PrayerMenuCategory(
-              id: data['id'].toString(),
-              name: data['name']?.toString().trim() ?? '',
-              tags: _cleanTags(data['tags']),
-              isGlobal: true,
-            ),
-          )
-          .where((c) => c.name.isNotEmpty)
-          .toList();
-      if (cached.isNotEmpty) yield cached;
-    }
-    yield* FirebaseFirestore.instance
-        .collection(kPrayerCategoriesCollection)
-        .snapshots()
-        .asyncMap((snapshot) async {
-          if (Hive.isBoxOpen(kPrayerCategoriesCollection)) {
-            for (final doc in snapshot.docs) {
-              await HiveService.putCached(
-                kPrayerCategoriesCollection,
-                doc.id,
-                firestoreToStorable({...doc.data(), 'id': doc.id}),
-              );
-            }
-          }
-          final documents = snapshot.docs.toList()
-            ..sort((left, right) {
-              final leftRawOrder = left.data()['order'];
-              final rightRawOrder = right.data()['order'];
-              final leftOrder = leftRawOrder is num
-                  ? leftRawOrder.toDouble()
-                  : null;
-              final rightOrder = rightRawOrder is num
-                  ? rightRawOrder.toDouble()
-                  : null;
-              final orderComparison = (leftOrder ?? double.maxFinite).compareTo(
-                rightOrder ?? double.maxFinite,
-              );
-              if (orderComparison != 0) return orderComparison;
-              return (left.data()['name']?.toString() ?? '')
-                  .toLowerCase()
-                  .compareTo(
-                    (right.data()['name']?.toString() ?? '').toLowerCase(),
-                  );
-            });
-
-          return documents
-              .map(PrayerMenuCategory.global)
-              .where((category) => category.name.isNotEmpty)
-              .toList(growable: false);
-        });
+    ref.watch(cacheEpochProvider);
+    await ContentStore.instance.ensureLoaded(const [
+      kPrayerCategoriesCollection,
+    ]);
+    final box = HiveService.prayerCategoriesBox;
+    final documents = [
+      for (final key in box.keys)
+        if (box.get(key) case final Map data) (key, data),
+    ];
+    double order(Map data) =>
+        (data['order'] is num ? (data['order'] as num).toDouble() : null) ??
+        double.maxFinite;
+    documents.sort((left, right) {
+      final byOrder = order(left.$2).compareTo(order(right.$2));
+      if (byOrder != 0) return byOrder;
+      return (left.$2['name']?.toString() ?? '').toLowerCase().compareTo(
+        (right.$2['name']?.toString() ?? '').toLowerCase(),
+      );
+    });
+    yield documents
+        .map((item) => PrayerMenuCategory.global(item.$1, item.$2))
+        .where((category) => category.name.isNotEmpty)
+        .toList(growable: false);
   },
 );
 

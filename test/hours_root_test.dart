@@ -7,7 +7,7 @@ import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
+import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
@@ -309,10 +309,9 @@ void main() {
 List<Override> _overrides(DateTime date, List<DayOption> options) => [
   selectedDateProvider.overrideWith((ref) => date),
   dayOptionsProvider.overrideWithValue(options),
-  homeDataLoadingProvider.overrideWithValue(false),
-  homeDataFailedProvider.overrideWithValue(false),
+  selectedDateReadyProvider.overrideWith((ref) async {}),
   isOfflineProvider.overrideWithValue(false),
-  dataBootstrapProvider.overrideWith(_TestBootstrapNotifier.new),
+  contentUpdatesProvider.overrideWith(_TestBootstrapNotifier.new),
 ];
 
 Widget _testApp(GoRouter router, DateTime date, List<DayOption> options) =>
@@ -355,9 +354,9 @@ GoRouter _hoursRouter({
   ],
 );
 
-class _TestBootstrapNotifier extends DataBootstrapNotifier {
+class _TestBootstrapNotifier extends ContentUpdatesNotifier {
   @override
-  DataBootstrapState build() => const DataBootstrapState(initialComplete: true);
+  ContentUpdateState build() => const ContentUpdateState();
 }
 
 DayOption _option(

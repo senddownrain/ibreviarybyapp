@@ -1,5 +1,4 @@
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
 
 class BibleVerse {
   final int verse;
@@ -252,30 +251,12 @@ class BibleRepository {
     if (_versionData(versionId) != null) return Future.value();
     return _loading.putIfAbsent(versionId, () async {
       try {
-        if (HiveService.isSettingsReady &&
-            HiveService.getLastSync('bible_$versionId') != null &&
-            HiveService.boxFor('bible_$versionId').isNotEmpty) {
-          loadCachedVersion(versionId);
-        } else {
-          setData(versionId, await BibleSeedLoader.load(lang: versionId));
-        }
+        // The Bible ships with the app; it is never downloaded.
+        setData(versionId, await BibleSeedLoader.load(lang: versionId));
       } finally {
         _loading.remove(versionId);
       }
     });
-  }
-
-  static void loadCachedVersion(String versionId) {
-    final books =
-        HiveService.boxFor(
-            'bible_$versionId',
-          ).values.map((raw) => Map<String, dynamic>.from(raw as Map)).toList()
-          ..sort(
-            (a, b) => ((a['order'] as num?)?.toInt() ?? 0).compareTo(
-              (b['order'] as num?)?.toInt() ?? 0,
-            ),
-          );
-    if (books.isNotEmpty) setData(versionId, {'books': books});
   }
 
   /// Offline data is decoded lazily, after the first frame.

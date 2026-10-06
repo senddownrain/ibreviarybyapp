@@ -13,7 +13,7 @@ import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
-import 'package:mybrev_flutter/widgets/warmup_bootstrap.dart';
+import 'package:mybrev_flutter/widgets/content_update_scheduler.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({
@@ -120,7 +120,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
           final shellOwnsTop =
               descriptor.topChromeOwner == TopChromeOwner.shell;
           final topPadding = MediaQuery.paddingOf(context).top;
-          return WarmupBootstrap(
+          return ContentUpdateScheduler(
             child: AmbientBackdrop(
               child: Scaffold(
                 key: const Key('production-app-shell'),

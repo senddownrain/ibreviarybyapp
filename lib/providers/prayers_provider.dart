@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:html/parser.dart' show parseFragment;
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -73,17 +74,21 @@ class PrayersFilterNotifier extends Notifier<PrayersFilter> {
 
 // ── Prayers from Hive ─────────────────────────────────────────────────────────
 
+/// The app's prayer texts are loaded (bundled; decoded on first use).
+final prayersContentProvider = FutureProvider<void>(
+  (ref) => ContentStore.instance.ensureLoaded(const ['prayers']),
+);
+
 final allPrayersProvider = Provider<List<Prayer>>((ref) {
   ref.watch(cacheEpochProvider);
+  ref.watch(prayersContentProvider);
   final box = HiveService.prayersBox;
   final prayers = <Prayer>[];
   for (final key in box.keys) {
     final raw = box.get(key);
     if (raw == null) continue;
     try {
-      prayers.add(
-        Prayer.fromMap(Map<String, dynamic>.from(raw), key as String),
-      );
+      prayers.add(Prayer.fromMap(Map<String, dynamic>.from(raw), key));
     } catch (_) {}
   }
   prayers.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));

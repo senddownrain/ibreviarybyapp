@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/models/song.dart';
 import 'package:mybrev_flutter/services/song_repository.dart';
 import 'package:mybrev_flutter/utils/song_chords.dart';
@@ -280,9 +281,9 @@ void main() {
 
   group('bundled seed', () {
     test('contains all 447 songs with unique IDs, text and categories', () {
-      final seed = SongRepository.parseSeed(
-        File('assets/songs_seed.json').readAsStringSync(),
-      );
+      final seed = decodeContentCollection(
+        File('assets/content/songs.json.gz').readAsBytesSync(),
+      ).docs.values.toList();
       final songs = SongRepository.merge(seed, const []);
       expect(songs, hasLength(447));
       expect({for (final s in songs) s.id}, hasLength(447));

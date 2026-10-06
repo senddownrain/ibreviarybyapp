@@ -354,7 +354,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Паспрабуйце сінхранізаваць дадзеныя ў Наладах.',
+                'Магчыма, малітва была выдалена.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
               ),

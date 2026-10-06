@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -345,7 +346,7 @@ class _PeriodPicker extends StatelessWidget {
         for (
           var date = first;
           !date.isAfter(last);
-          date = date.add(const Duration(days: 1))
+          date = addCivilDays(date, 1)
         )
           date,
       ];
@@ -355,7 +356,7 @@ class _PeriodPicker extends StatelessWidget {
           .read(calendarServiceProvider)
           .getDynamicDatesCached(year)?['ashWednesday'];
       if (ash != null) {
-        return [for (var day = 0; day < 4; day++) ash.add(Duration(days: day))];
+        return [for (var day = 0; day < 4; day++) addCivilDays(ash, day)];
       }
     }
     return const [];

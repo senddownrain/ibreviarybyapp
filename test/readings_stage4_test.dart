@@ -38,16 +38,12 @@ ParsedReading _reading(
 );
 
 ReadingsLoader _loader(List<ParsedReading> readings) =>
-    ({
-      required dateStr,
-      required liturgicalKey,
-      required dayId,
-      required forceRefresh,
-    }) async => ReadingsLoadResult(
-      readings: readings,
-      sundayCycle: 'B',
-      weekdayCycle: '2',
-    );
+    ({required dateStr, required liturgicalKey, required dayId}) async =>
+        ReadingsLoadResult(
+          readings: readings,
+          sundayCycle: 'B',
+          weekdayCycle: '2',
+        );
 
 void main() {
   late Directory hiveDirectory;
@@ -181,12 +177,8 @@ void main() {
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(
-            ({
-              required dateStr,
-              required liturgicalKey,
-              required dayId,
-              required forceRefresh,
-            }) => result.future,
+            ({required dateStr, required liturgicalKey, required dayId}) =>
+                result.future,
           ),
         ],
         child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),

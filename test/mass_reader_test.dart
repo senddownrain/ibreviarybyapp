@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
-import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
+import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -73,6 +73,7 @@ Widget _app(
     settingsProvider.overrideWith(_TestSettingsNotifier.new),
     liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
     allPrayersProvider.overrideWithValue(prayers ?? [_belarusian, _latin]),
+    prayersContentProvider.overrideWith((ref) async {}),
     localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
     massBundledTextProvider.overrideWith((ref, asset) async => _englishBundled),
   ],
@@ -246,6 +247,7 @@ void main() {
           settingsProvider.overrideWith(_FavoriteMassSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
           allPrayersProvider.overrideWithValue([_belarusian, _latin]),
+          prayersContentProvider.overrideWith((ref) async {}),
           localPrayersProvider.overrideWith(_TestLocalPrayersNotifier.new),
         ],
         child: const MaterialApp(home: PrayerDetailScreen(prayerId: _massId)),
@@ -625,7 +627,7 @@ void main() {
       ProviderScope(
         overrides: [
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
-          dataBootstrapProvider.overrideWith(_IdleBootstrap.new),
+          contentUpdatesProvider.overrideWith(_IdleBootstrap.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
           liturgicalNavigationSyncProvider.overrideWith((ref) {}),
         ],
@@ -671,9 +673,9 @@ class _FavoriteMassSettingsNotifier extends _TestSettingsNotifier {
   SettingsState build() => const SettingsState(favoriteIds: [_massId]);
 }
 
-class _IdleBootstrap extends DataBootstrapNotifier {
+class _IdleBootstrap extends ContentUpdatesNotifier {
   @override
-  DataBootstrapState build() => const DataBootstrapState(initialComplete: true);
+  ContentUpdateState build() => const ContentUpdateState();
 }
 
 class _TestLocalPrayersNotifier extends LocalPrayersNotifier {

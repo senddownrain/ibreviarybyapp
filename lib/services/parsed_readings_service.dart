@@ -1,80 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
+import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
-import 'package:mybrev_flutter/services/liturgical_day_service.dart';
-import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/reading_content.dart';
 import 'package:mybrev_flutter/utils/reading_groups.dart';
 import 'package:mybrev_flutter/utils/readings_index.dart';
-import 'package:mybrev_flutter/utils/retry.dart';
 
-const _kReadingsCollection = 'readings';
-
-/// Fetches `readings` collection from Hive cache or Firestore on demand.
+/// Readings of a date or a period day from the content on the device
+/// (bundled, plus any newer documents). No network: every date is local.
 class ParsedReadingsService {
-  final FirebaseFirestore _db;
-  final LiturgicalDayService _days;
+  ParsedReadingsService();
 
-  ParsedReadingsService({FirebaseFirestore? db, LiturgicalDayService? days})
-    : _db = db ?? FirebaseFirestore.instance,
-      _days = days ?? LiturgicalDayService();
-
-  CollectionReference<Map<String, dynamic>> _col(String name) =>
-      _db.collection(name);
-
-  Future<Map<String, dynamic>?> getReading(
-    String docId, {
-    bool forceRefresh = false,
-  }) async {
-    final cached = HiveService.readingsBox.get(docId);
-    if (!forceRefresh && cached != null) {
-      return Map<String, dynamic>.from(cached);
-    }
-    final snap = await retryFirestore(
-      () => _col(
-        _kReadingsCollection,
-      ).doc(docId).get(const GetOptions(source: Source.server)),
-    );
-    if (snap.exists) {
-      final data = snap.data()!;
-      await cacheReadingDoc(docId, data);
-      return data;
-    }
-    return cached == null ? null : Map<String, dynamic>.from(cached);
-  }
-
+  /// Loads the readings (and the days they link to), then reads them.
   Future<List<ParsedReading>> fetchByLiturgicalKey(
     String period,
     int week,
-    int day, {
-    bool forceRefresh = false,
-  }) async {
-    if (!forceRefresh) {
-      final cached = _filterWithContent(_getCachedByPeriod(period, week, day));
-      if (cached.isNotEmpty) return cached;
-    }
-
-    final merged = <String, ParsedReading>{};
-    await _mergeFromQueries(
-      _periodQueries(
-        _kReadingsCollection,
-        period,
-        week,
-        day,
-        forceRefresh: forceRefresh,
-      ),
-      merged,
-    );
-    return merged.values.toList();
+    int day,
+  ) async {
+    await ContentStore.instance.ensureLoaded(const ['readings', 'days']);
+    return cachedByLiturgicalKey(period, week, day) ?? const [];
   }
 
-  /// Readings of a date from the device, or null when the date is not
-  /// completely cached. Synchronous: a screen can render without a loading
-  /// frame and without touching the network.
+  /// Readings of a date, or null when the content is not loaded yet.
+  /// Synchronous: a screen renders without a loading frame.
   List<ParsedReading>? cachedForDate(
     DateTime date,
     YearOptions? opts,
@@ -83,7 +35,9 @@ class ParsedReadingsService {
     bool includeAlternatives = false,
     String? dayId,
   }) {
-    if (!HiveService.isDateCached('readings', date)) return null;
+    if (!ContentStore.instance.areLoaded(const ['readings', 'days'])) {
+      return null;
+    }
     final context = computeLiturgicalContext(
       date,
       opts,
@@ -113,113 +67,25 @@ class ParsedReadingsService {
     return cached.isEmpty ? null : cached;
   }
 
+  /// Readings of a date once the content is loaded.
   Future<List<ParsedReading>> fetchForDate(
     DateTime date,
     YearOptions? opts,
     YearOptions? nextYearOpts,
     DynamicDates? dynamicDates, {
-    bool forceRefresh = false,
     bool includeAlternatives = false,
     String? dayId,
   }) async {
-    forceRefresh = forceRefresh || !HiveService.isDateCached('readings', date);
-    final context = computeLiturgicalContext(
-      date,
-      opts,
-      nextYearOpts,
-      dynamicDates,
-    );
-    final ddmm =
-        '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
-    if (!forceRefresh) {
-      final cached = _filterWithContent(
-        _getCachedForDate(context, ddmm, dynamicDates, date, dayId: dayId),
-      );
-      if (cached.isNotEmpty) {
-        return includeAlternatives
-            ? _sortForDate(cached, dayId: dayId)
-            : _selectActiveForDate(
-                cached,
-                date: date,
-                context: context,
-                feastCodes: getDynamicFeastCodesForDate(date, dynamicDates),
-                dayId: dayId,
-              );
-      }
-    }
-
-    final feastCodes = getDynamicFeastCodesForDate(date, dynamicDates);
-    final dayIds = await _collectDayIds(
-      date,
-      context,
-      feastCodes,
-      explicitDayId: dayId,
-      forceRefresh: forceRefresh,
-    );
-
-    final merged = <String, ParsedReading>{};
-    final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[];
-
-    for (final id in dayIds) {
-      queries.add(
-        _getQuery(
-          _col(_kReadingsCollection).where('_dayId', isEqualTo: id),
-          forceRefresh: forceRefresh,
-        ),
-      );
-      queries.add(
-        _getQuery(
-          _col(_kReadingsCollection).where('_dayIds', arrayContains: id),
-          forceRefresh: forceRefresh,
-        ),
-      );
-    }
-
-    for (final code in feastCodes) {
-      for (final variant in _feastVariants(code)) {
-        queries.add(
-          _getQuery(
-            _col(_kReadingsCollection).where('_feast', isEqualTo: variant),
-            forceRefresh: forceRefresh,
-          ),
-        );
-      }
-    }
-
-    queries.add(
-      _getQuery(
-        _col(_kReadingsCollection).where('_date', isEqualTo: ddmm),
-        forceRefresh: forceRefresh,
-      ),
-    );
-    final fixedDateOnly =
-        isSeasonalDateException(date, context.periodType) ||
-        isChristmasDateExceptionExclusion(date);
-    if (!fixedDateOnly) {
-      queries.addAll(
-        _periodQueries(
-          _kReadingsCollection,
-          context.periodType,
-          context.periodWeek,
-          context.dayOfWeek,
-          forceRefresh: forceRefresh,
-        ),
-      );
-    }
-
-    await _mergeFromQueries(queries, merged);
-    await HiveService.markDateCached('readings', date);
-
-    final all = _filterWithContent(merged.values.toList());
-    return includeAlternatives
-        ? _sortForDate(all, dayId: dayId)
-        : _selectActiveForDate(
-            all,
-            date: date,
-            context: context,
-            feastCodes: feastCodes,
-            dayId: dayId,
-          );
+    await ContentStore.instance.ensureLoaded(const ['readings', 'days']);
+    return cachedForDate(
+          date,
+          opts,
+          nextYearOpts,
+          dynamicDates,
+          includeAlternatives: includeAlternatives,
+          dayId: dayId,
+        ) ??
+        const [];
   }
 
   static String currentCycle(DateTime date, {int? dayOfWeek}) {
@@ -228,52 +94,6 @@ class ParsedReadingsService {
       return getCycleForDate(date, dayOfWeek: dayOfWeek);
     }
     return getWeekdayCycleForDate(date);
-  }
-
-  Future<List<String>> _collectDayIds(
-    DateTime date,
-    LiturgicalContext context,
-    List<String> feastCodes, {
-    String? explicitDayId,
-    bool forceRefresh = false,
-  }) async {
-    final ids = <String>{};
-    if (explicitDayId != null && explicitDayId.trim().isNotEmpty) {
-      ids.add(explicitDayId.trim());
-    }
-
-    final canonical = periodDayDocumentId(
-      context.periodType,
-      context.periodWeek,
-      context.dayOfWeek,
-    );
-    if (canonical.isNotEmpty) ids.add(canonical);
-
-    final periodDay = await _days.findDayByPeriod(
-      context.periodType,
-      context.periodWeek,
-      context.dayOfWeek,
-      forceRefresh: forceRefresh,
-    );
-    if (periodDay != null && periodDay.id.isNotEmpty) {
-      ids.add(periodDay.id);
-    }
-
-    for (final code in feastCodes) {
-      final feastDays = await _days.findDaysByFeast(
-        code,
-        forceRefresh: forceRefresh,
-      );
-      ids.addAll(feastDays.map((d) => d.id).where((id) => id.isNotEmpty));
-    }
-
-    final calendarDays = await _days.findDaysByFixedDate(
-      date,
-      forceRefresh: forceRefresh,
-    );
-    ids.addAll(calendarDays.map((d) => d.id).where((id) => id.isNotEmpty));
-
-    return ids.toList();
   }
 
   List<ParsedReading> _getCachedForDate(
@@ -304,128 +124,47 @@ class ParsedReadingsService {
       results[id] = ParsedReading.fromMap(id, Map<String, dynamic>.from(raw));
     }
 
-    if (ReadingsIndex.isBuilt) {
-      // The index also knows the readings linked to a day by `_dayId(s)`.
-      for (final id in [
-        if (dayId != null && dayId.isNotEmpty)
-          ...ReadingsIndex.lookupByDayId(dayId),
-      ]) {
-        final raw = box.get(id);
-        if (raw == null) continue;
-        results[id] = ParsedReading.fromMap(id, Map<String, dynamic>.from(raw));
-      }
-    } else {
-      // Index not built yet (first run after an update): one pass without
-      // copying documents.
-      for (final reading in _scanCachedForDate(
-        context,
-        ddmm,
-        feastSet,
-        dayId: dayId,
-      )) {
-        results[reading.id] = reading;
-      }
+    // Readings linked by `_dayId(s)` to the selected day or to any day
+    // document of this date (period day, feast, fixed date).
+    final dayIds = <String>{
+      if (dayId != null && dayId.isNotEmpty) dayId,
+      periodDayDocumentId(
+        context.periodType,
+        context.periodWeek,
+        context.dayOfWeek,
+      ),
+      ?DaysIndex.idByPeriod(
+        context.periodType,
+        context.periodWeek,
+        context.dayOfWeek,
+      ),
+      ...DaysIndex.idsByFeast(feastSet),
+      ...DaysIndex.idsByDate({'${date.day}.${date.month}', ddmm}),
+    }..remove('');
+    for (final id in [
+      for (final linked in dayIds) ...ReadingsIndex.lookupByDayId(linked),
+    ]) {
+      final raw = box.get(id);
+      if (raw == null) continue;
+      results[id] = ParsedReading.fromMap(id, Map<String, dynamic>.from(raw));
     }
 
-    return results.values.toList();
-  }
-
-  List<ParsedReading> _scanCachedForDate(
-    LiturgicalContext context,
-    String ddmm,
-    Set<String> feastSet, {
-    String? dayId,
-  }) {
-    final box = HiveService.readingsBox;
-    final results = <String, ParsedReading>{};
-
-    // Selector fields are read in place; only a matching document is copied.
-    for (final key in box.keys) {
-      final raw = box.get(key);
-      if (raw is! Map) continue;
-      final feast = raw['_feast'];
-      final matchesFeast = feast is String && feastSet.contains(feast);
-      final matchesDate = raw['_date'] == ddmm;
-      final matchesPeriod =
-          raw['_periodType'] == context.periodType &&
-          _toInt(raw['_periodWeekNumber']) == context.periodWeek &&
-          _toInt(raw['_dayOfWeek']) == context.dayOfWeek;
-      final linked = raw['_dayId']?.toString();
-      final linkedMany = raw['_dayIds'];
-      final matchesDayId =
-          dayId != null &&
-          dayId.isNotEmpty &&
-          (linked == dayId ||
-              (linkedMany is List &&
-                  linkedMany.any((item) => item.toString() == dayId)));
-      if (matchesFeast || matchesDate || matchesPeriod || matchesDayId) {
-        results[key as String] = ParsedReading.fromMap(
-          key,
-          Map<String, dynamic>.from(raw),
-        );
-      }
-    }
     return results.values.toList();
   }
 
   List<ParsedReading> _getCachedByPeriod(String periodType, int week, int day) {
-    final ids = ReadingsIndex.lookupByPeriod(periodType, week, day);
-    if (ids.isNotEmpty) {
-      final box = HiveService.readingsBox;
-      return ids
-          .map((id) => box.get(id))
-          .whereType<Map>()
-          .map(
-            (raw) => ParsedReading.fromMap(
-              raw['id']?.toString() ?? '',
-              Map<String, dynamic>.from(raw),
-            ),
-          )
-          .where((r) => r.id.isNotEmpty)
-          .toList();
-    }
     final box = HiveService.readingsBox;
-    final results = <ParsedReading>[];
-    for (final key in box.keys) {
-      final raw = box.get(key);
-      if (raw is! Map) continue;
-      if (raw['_periodType'] == periodType &&
-          _toInt(raw['_periodWeekNumber']) == week &&
-          _toInt(raw['_dayOfWeek']) == day) {
-        results.add(
-          ParsedReading.fromMap(key as String, Map<String, dynamic>.from(raw)),
-        );
-      }
-    }
-    return results;
-  }
-
-  Future<void> _mergeFromQueries(
-    List<Future<QuerySnapshot<Map<String, dynamic>>>> queries,
-    Map<String, ParsedReading> merged,
-  ) async {
-    if (queries.isEmpty) return;
-    final snaps = await retryFirestore(() => Future.wait(queries));
-    for (final snap in snaps) {
-      for (final r in await _storeDocs(snap.docs)) {
-        if (hasReadingDocumentContent(r)) {
-          merged[r.id] = r;
-        }
-      }
-    }
-  }
-
-  Future<List<ParsedReading>> _storeDocs(
-    Iterable<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
-  ) async {
-    final results = <ParsedReading>[];
-    for (final doc in docs) {
-      final data = {...doc.data(), 'id': doc.id};
-      if (!hasReadingMapContent(data)) continue;
-      await cacheReadingDoc(doc.id, data);
-      results.add(ParsedReading.fromMap(doc.id, data));
-    }
-    return results;
+    return ReadingsIndex.lookupByPeriod(periodType, week, day)
+        .map((id) => box.get(id))
+        .whereType<Map>()
+        .map(
+          (raw) => ParsedReading.fromMap(
+            raw['id']?.toString() ?? '',
+            Map<String, dynamic>.from(raw),
+          ),
+        )
+        .where((r) => r.id.isNotEmpty)
+        .toList();
   }
 
   List<ParsedReading> _filterWithContent(List<ParsedReading> docs) =>
@@ -540,75 +279,5 @@ class ParsedReadingsService {
   static List<String> _feastVariants(String code) {
     final normalized = code.replaceFirst(RegExp(r'^feast-'), '');
     return [normalized, 'feast-$normalized'];
-  }
-
-  /// Firestore may store period fields as strings or ints (web parity).
-  List<Future<QuerySnapshot<Map<String, dynamic>>>> _periodQueries(
-    String collection,
-    String periodType,
-    int week,
-    int day, {
-    bool forceRefresh = false,
-  }) {
-    final weekValues = week == 0
-        ? <Object?>[0, '0', null]
-        : <Object?>[week, '$week'];
-    final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[];
-
-    for (final weekValue in weekValues) {
-      if (weekValue == null) {
-        queries.add(
-          _getQuery(
-            _col(collection)
-                .where('_periodType', isEqualTo: periodType)
-                .where('_periodWeekNumber', isNull: true)
-                .where('_dayOfWeek', isEqualTo: '$day'),
-            forceRefresh: forceRefresh,
-          ),
-        );
-        queries.add(
-          _getQuery(
-            _col(collection)
-                .where('_periodType', isEqualTo: periodType)
-                .where('_periodWeekNumber', isNull: true)
-                .where('_dayOfWeek', isEqualTo: day),
-            forceRefresh: forceRefresh,
-          ),
-        );
-        continue;
-      }
-
-      queries.add(
-        _getQuery(
-          _col(collection)
-              .where('_periodType', isEqualTo: periodType)
-              .where('_periodWeekNumber', isEqualTo: '$weekValue')
-              .where('_dayOfWeek', isEqualTo: '$day'),
-          forceRefresh: forceRefresh,
-        ),
-      );
-      queries.add(
-        _getQuery(
-          _col(collection)
-              .where('_periodType', isEqualTo: periodType)
-              .where('_periodWeekNumber', isEqualTo: weekValue)
-              .where('_dayOfWeek', isEqualTo: day),
-          forceRefresh: forceRefresh,
-        ),
-      );
-    }
-
-    return queries;
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> _getQuery(
-    Query<Map<String, dynamic>> query, {
-    required bool forceRefresh,
-  }) => query.get(const GetOptions(source: Source.server));
-
-  static int? _toInt(dynamic v) {
-    if (v is int) return v;
-    if (v is String) return int.tryParse(v);
-    return null;
   }
 }

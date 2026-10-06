@@ -11,13 +11,12 @@ import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/services/liturgical_day_service.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
-import 'package:mybrev_flutter/services/static_liturgical_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
-import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
@@ -67,11 +66,9 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     }
   }
 
-  /// Cache first: a day that is on the device is shown in the first frame.
+  /// The day is on the device and is shown in the first frame.
   bool _applyLocal() {
-    if (!HiveService.isCacheReady || HiveService.completoriumsBox.isEmpty) {
-      return false;
-    }
+    if (!HiveService.isCacheReady) return false;
     final calendar = ref.read(calendarServiceProvider);
     final opts = calendar.getYearOptionsCached(widget.date.year);
     final nextOpts = calendar.getYearOptionsCached(widget.date.year + 1);
@@ -106,53 +103,14 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
       if (mounted) setState(() {});
       return;
     }
+    // Only at launch: the content is still being decoded.
     try {
-      await _loadDayContent();
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _loadDayContent() async {
-    final calendar = CalendarService();
-    await Future.wait([
-      calendar.ensureYearOptions(widget.date.year),
-      calendar.ensureYearOptions(widget.date.year + 1),
-      calendar.ensureDynamicDates(widget.date.year),
-      StaticLiturgicalService().getCompletoriums(),
-    ]);
-    final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
-    final context = computeLiturgicalContext(
-      widget.date,
-      calendar.getYearOptionsCached(widget.date.year),
-      calendar.getYearOptionsCached(widget.date.year + 1),
-      dynamicDates,
-    );
-    final day = await LiturgicalDayService().resolveDayForDate(
-      widget.date,
-      widget.dayId,
-      context,
-      getDynamicFeastCodesForDate(widget.date, dynamicDates),
-    );
-    final option = LiturgicalContentService()
-        .getContentForDate(
-          widget.date,
-          calendar.getYearOptionsCached(widget.date.year),
-          calendar.getYearOptionsCached(widget.date.year + 1),
-          dynamicDates,
-        )
-        .where(
-          (item) =>
-              item.templates.any((template) => template.id == widget.dayId),
-        )
-        .firstOrNull;
+      await ContentStore.instance.ensureLoaded(kLiturgicalCollections);
+    } catch (_) {}
     if (!mounted) return;
     setState(() {
-      _day = day;
-      _templates = option?.templates ?? const [];
-      _loading = false;
+      if (!_applyLocal()) _loading = false;
     });
-    unawaited(_loadReadingSubtitle(calendar, dynamicDates));
   }
 
   Future<void> _loadReadingSubtitle(
@@ -189,8 +147,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
             : 'Чытанні і Евангелле';
       });
     } catch (_) {
-      // The readings route remains available; offline cache may be populated
-      // later by warmup or manual synchronisation.
+      // The subtitle is secondary; the readings route stays available.
     }
   }
 
@@ -223,7 +180,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
               ),
               children: const [
                 DataLoadingNotice(
-                  label: 'Загружаем літургію дня',
+                  label: 'Адкрываем літургію дня',
                   shape: LoadingShape.tiles,
                 ),
               ],

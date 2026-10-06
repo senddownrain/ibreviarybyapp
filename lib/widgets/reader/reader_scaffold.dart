@@ -256,11 +256,7 @@ class ReaderEdgeProtection extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    surface,
-                    surface,
-                    surface.withValues(alpha: 0),
-                  ],
+                  colors: [surface, surface, surface.withValues(alpha: 0)],
                   stops: [0, safeTop / topFadeHeight, 1],
                 ),
               ),

@@ -24,13 +24,10 @@ final _aliases = readCompendiumAliasFile();
 
 void main() {
   group('root', () {
-    testWidgets('shows the four parts, attribution and requests a refresh', (
-      tester,
-    ) async {
-      var refreshes = 0;
+    testWidgets('shows the four parts and the attribution', (tester) async {
       final router = _router();
       addTearDown(router.dispose);
-      await tester.pumpWidget(_app(router, onRefresh: () => refreshes++));
+      await tester.pumpWidget(_app(router));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('compendium-title')), findsOneWidget);
@@ -62,7 +59,6 @@ void main() {
         findsNothing,
         reason: 'the Compendium dock is search-only',
       );
-      expect(refreshes, 1);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('compendium-source')),
@@ -597,7 +593,6 @@ GoRouter _router({String initialLocation = '/prayers/compendium'}) => GoRouter(
 
 Widget _app(
   GoRouter router, {
-  void Function()? onRefresh,
   bool bundleFails = false,
   double? fontSize,
   Future<bool> Function(Uri)? launcher,
@@ -609,7 +604,6 @@ Widget _app(
     ...compendiumOverrides(
       _dataset,
       aliases: _aliases,
-      onRefresh: onRefresh,
       bundleFails: bundleFails,
     ),
     compendiumLinkLauncherProvider.overrideWithValue(

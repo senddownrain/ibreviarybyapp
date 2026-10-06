@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/utils/civil_date.dart';
+
 int? normalizePsalterWeek(int? week) {
   if (week == null || week < 1) return null;
   return (week - 1) % 4 + 1;
@@ -22,8 +24,8 @@ int? calculatePsalterWeek({
   final daysToSunday = christmas.weekday == DateTime.sunday
       ? 0
       : DateTime.sunday - christmas.weekday;
-  final firstChristmasSunday = christmas.add(Duration(days: daysToSunday));
+  final firstChristmasSunday = addCivilDays(christmas, daysToSunday);
   if (date.isBefore(firstChristmasSunday)) return 4;
-  final christmasWeek = date.difference(firstChristmasSunday).inDays ~/ 7 + 1;
+  final christmasWeek = civilDaysBetween(firstChristmasSunday, date) ~/ 7 + 1;
   return normalizePsalterWeek(christmasWeek);
 }

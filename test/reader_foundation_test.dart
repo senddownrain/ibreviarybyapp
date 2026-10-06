@@ -94,9 +94,13 @@ void main() {
           ),
         ),
       );
-      final decoration = tester
-          .widget<DecoratedBox>(find.byKey(const Key('reader-top-fade')))
-          .decoration as BoxDecoration;
+      final decoration =
+          tester
+                  .widget<DecoratedBox>(
+                    find.byKey(const Key('reader-top-fade')),
+                  )
+                  .decoration
+              as BoxDecoration;
       final gradient = decoration.gradient! as LinearGradient;
       expect(gradient.colors[0].a, 1);
       expect(gradient.colors[1].a, 1);

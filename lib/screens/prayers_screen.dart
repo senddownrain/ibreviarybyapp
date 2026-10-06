@@ -30,7 +30,8 @@ class PrayersScreen extends ConsumerWidget {
       (prayer) => prayer.id == _kMassOrderPrayerId,
     );
     final categoryState = ref.watch(globalPrayerCategoriesProvider);
-    final massLoading = categoryState.isLoading && catalog.isEmpty;
+    // Only at the first opening after launch, for a moment.
+    final massLoading = ref.watch(prayersContentProvider).isLoading;
     final cs = Theme.of(context).colorScheme;
     final top = MediaQuery.paddingOf(context).top + 78;
 
@@ -77,7 +78,7 @@ class PrayersScreen extends ConsumerWidget {
                       key: const Key('holy-mass-destination'),
                       title: 'Святая Імша',
                       subtitle: massLoading && !massAvailable
-                          ? 'Загрузка тэксту…'
+                          ? 'Адкрываем тэкст…'
                           : 'Парадак Імшы',
                       icon: PhosphorIconsRegular.church,
                       busy: massLoading && !massAvailable,
@@ -88,13 +89,8 @@ class PrayersScreen extends ConsumerWidget {
                         }
                         if (massLoading) return;
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('Тэкст пакуль недаступны'),
-                            action: SnackBarAction(
-                              label: 'Сінхранізацыя',
-                              onPressed: () =>
-                                  context.push('/settings?section=sync'),
-                            ),
+                          const SnackBar(
+                            content: Text('Тэкст Імшы недаступны'),
                           ),
                         );
                       },
@@ -1068,7 +1064,7 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
             const SizedBox(height: 12),
             if (_visibleTags.isEmpty)
               Text(
-                'Тэгі з’явяцца пасля сінхранізацыі малітоўніка.',
+                'Тэгаў пакуль няма.',
                 style: TextStyle(color: cs.onSurfaceVariant),
               )
             else

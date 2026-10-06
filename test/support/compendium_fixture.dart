@@ -25,7 +25,6 @@ List<Override> compendiumOverrides(
   CompendiumDataset dataset, {
   Map<String, dynamic>? aliases,
   CompendiumDataset? stored,
-  void Function()? onRefresh,
   bool bundleFails = false,
 }) => [
   compendiumBundledProvider.overrideWith(
@@ -35,5 +34,4 @@ List<Override> compendiumOverrides(
     (ref) async => CompendiumSearchAliases.compile(aliases),
   ),
   compendiumStoredProvider.overrideWithValue(stored),
-  compendiumRefreshProvider.overrideWithValue(onRefresh ?? () {}),
 ];

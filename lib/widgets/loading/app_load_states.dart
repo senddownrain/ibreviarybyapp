@@ -3,11 +3,13 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 /// The loading language of the app: one look for every screen.
 ///
-///   first load, nothing to show   → [AppLoadingState]
-///   content shown, being updated  → [AppRefreshBar] (content stays)
-///   shown from the device         → [AppOfflineNotice]
-///   nothing and the request failed → [AppErrorState]
+///   texts being opened at launch  → [AppLoadingState]
+///   an update next to the content → [AppRefreshBar] (content stays)
+///   nothing could be opened       → [AppErrorState]
 ///   a block that is still coming  → [LoadingPlaceholder]
+///
+/// The texts are on the device, so there is no «offline» state: being
+/// offline changes nothing on a reading screen.
 ///
 /// Everything here is calm on purpose: thin lines, the text colours of the
 /// current theme, no percentages that are not real, no technical wording.
@@ -124,52 +126,6 @@ class AppRefreshBar extends StatelessWidget {
           : const SizedBox.expand(),
     ),
   );
-}
-
-/// «The app works with what it has»: shown with content, never instead of it.
-class AppOfflineNotice extends StatelessWidget {
-  const AppOfflineNotice({
-    super.key,
-    this.message = 'Працуем з захаванымі данымі',
-  });
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Semantics(
-      container: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PhosphorIcon(
-                PhosphorIconsRegular.cloudSlash,
-                size: 15,
-                color: cs.onSurfaceVariant,
-              ),
-              const SizedBox(width: 7),
-              Flexible(
-                child: Text(
-                  message,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelMedium?.copyWith(color: cs.onSurfaceVariant),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 /// Nothing to show and the request failed.

@@ -115,16 +115,12 @@ const _reading = ParsedReading(
 );
 
 ReadingsLoader get _readingsLoader =>
-    ({
-      required dateStr,
-      required liturgicalKey,
-      required dayId,
-      required forceRefresh,
-    }) async => const ReadingsLoadResult(
-      readings: [_reading],
-      sundayCycle: 'B',
-      weekdayCycle: '2',
-    );
+    ({required dateStr, required liturgicalKey, required dayId}) async =>
+        const ReadingsLoadResult(
+          readings: [_reading],
+          sundayCycle: 'B',
+          weekdayCycle: '2',
+        );
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -771,6 +767,7 @@ Widget _prayerApp(
     settingsProvider.overrideWith(_LabSettingsNotifier.new),
     liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
     allPrayersProvider.overrideWithValue(_prayers),
+    prayersContentProvider.overrideWith((ref) async {}),
     localPrayersProvider.overrideWith(_LabLocalPrayersNotifier.new),
     prayerMenuCategoriesProvider.overrideWithValue(_categories),
     globalPrayerCategoriesProvider.overrideWith(
@@ -806,6 +803,7 @@ Widget _massApp({
       settingsProvider.overrideWith(_LabSettingsNotifier.new),
       liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
       allPrayersProvider.overrideWithValue([_massPrayer]),
+      prayersContentProvider.overrideWith((ref) async {}),
       localPrayersProvider.overrideWith(_LabLocalPrayersNotifier.new),
     ],
     child: _themedApp(

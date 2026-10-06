@@ -158,8 +158,6 @@ void main() {
       '_periodWeekNumber': '17',
       '_dayOfWeek': '3',
     });
-    await HiveService.markDateCached('days', date);
-    await HiveService.markDateCached('days', date.add(const Duration(days: 1)));
     await HiveService.invitatoriumsBox.put('one', {
       'title': 'Заклік',
       'invitatoriumPs1': '<p>Прыйдзіце, уславім Пана *</p>',
@@ -687,7 +685,6 @@ void main() {
                   required dateStr,
                   required liturgicalKey,
                   required dayId,
-                  required forceRefresh,
                 }) async => ReadingsLoadResult(
                   readings: [reading],
                   sundayCycle: 'B',

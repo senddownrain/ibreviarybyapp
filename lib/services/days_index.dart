@@ -1,9 +1,6 @@
-import 'dart:async';
-
-import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 
-/// In-memory secondary index of the cached `days` documents.
+/// In-memory secondary index of the `days` documents.
 ///
 /// A liturgical date needs «the documents of 12.11», «the documents of
 /// feast-ascension» and «the period day advent/2/3». Without an index every
@@ -11,14 +8,12 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 /// several times per date change, on the UI isolate. The index reads the
 /// four selector fields once and answers lookups with document ids.
 ///
-/// It is rebuilt lazily after any write to the box (Hive notifies watchers
-/// synchronously), so it can never serve a stale answer.
+/// It is rebuilt lazily after any change of the collection (bundle loaded,
+/// update applied), so it can never serve a stale answer.
 class DaysIndex {
   DaysIndex._();
 
-  static Box? _box;
-  static StreamSubscription<BoxEvent>? _subscription;
-  static bool _dirty = true;
+  static int _builtAt = -1;
   static final Map<String, List<String>> _byDate = {};
   static final Map<String, List<String>> _byFeast = {};
   static final Map<String, String> _byPeriod = {};
@@ -44,13 +39,7 @@ class DaysIndex {
 
   static void _ensure() {
     final box = HiveService.daysBox;
-    if (!identical(box, _box)) {
-      unawaited(_subscription?.cancel());
-      _box = box;
-      _subscription = box.watch().listen((_) => _dirty = true);
-      _dirty = true;
-    }
-    if (!_dirty) return;
+    if (_builtAt == box.changeCount) return;
     _byDate.clear();
     _byFeast.clear();
     _byPeriod.clear();
@@ -76,7 +65,7 @@ class DaysIndex {
         _byPeriod.putIfAbsent('$period|$week|$day', () => id);
       }
     }
-    _dirty = false;
+    _builtAt = box.changeCount;
     rebuilds++;
   }
 }

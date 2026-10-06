@@ -144,34 +144,30 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     _error = null;
   }
 
-  /// Cache first: readings already on the device are shown in the same
-  /// frame. A loader appears only when there is nothing to show; a refresh
-  /// keeps the text on screen.
-  Future<void> _load({bool forceRefresh = false}) async {
+  /// Readings are on the device: they are shown in the same frame. Only
+  /// at launch, while the content is still being decoded, a quiet
+  /// placeholder appears for a moment.
+  Future<void> _load() async {
     if (!mounted) return;
     final generation = ++_loadGeneration;
     final requestedDateStr = widget.dateStr;
     final requestedLiturgicalKey = widget.liturgicalKey;
     final requestedDayId = widget.dayId;
 
-    if (!forceRefresh) {
-      final local = ref.read(readingsLocalLoaderProvider)(
-        dateStr: requestedDateStr,
-        liturgicalKey: requestedLiturgicalKey,
-        dayId: requestedDayId,
-      );
-      if (local != null) {
-        setState(() {
-          _applyResult(local, requestedDayId, requestedDateStr != null);
-        });
-        return;
-      }
+    final local = ref.read(readingsLocalLoaderProvider)(
+      dateStr: requestedDateStr,
+      liturgicalKey: requestedLiturgicalKey,
+      dayId: requestedDayId,
+    );
+    if (local != null) {
+      setState(() {
+        _applyResult(local, requestedDayId, requestedDateStr != null);
+      });
+      return;
     }
 
-    final keepContent = forceRefresh && _readings.isNotEmpty;
-    // Pull-to-refresh shows its own indicator; the text stays where it is.
     setState(() {
-      _loading = !keepContent;
+      _loading = true;
       _error = null;
     });
 
@@ -180,7 +176,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         dateStr: requestedDateStr,
         liturgicalKey: requestedLiturgicalKey,
         dayId: requestedDayId,
-        forceRefresh: forceRefresh,
       );
       // A newer request (another date) owns the screen now.
       if (!mounted || generation != _loadGeneration) return;
@@ -191,19 +186,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       if (!mounted || generation != _loadGeneration) return;
       setState(() {
         _loading = false;
-        // A failed refresh never takes the text off the screen.
-        if (!keepContent) _error = e.toString();
+        _error = e.toString();
       });
-      if (keepContent) _notifyRefreshFailed();
     }
-  }
-
-  void _notifyRefreshFailed() {
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-      const SnackBar(
-        content: Text('Не ўдалося абнавіць. Паказаны захаваныя чытанні.'),
-      ),
-    );
   }
 
   @override
@@ -437,7 +422,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _openRelativeDate(int direction) {
-    final target = _currentDate.add(Duration(days: direction));
+    final target = DateUtils.addDaysToDate(_currentDate, direction);
     if (target.isBefore(kCalendarFirstDate) ||
         target.isAfter(kCalendarLastDate)) {
       return;
@@ -462,11 +447,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         _openDate(DateTime.now());
         return;
       case _ReadingsDateAction.previous:
-        final target = date.subtract(const Duration(days: 1));
+        final target = DateUtils.addDaysToDate(date, -1);
         if (!target.isBefore(kCalendarFirstDate)) _openDate(target);
         return;
       case _ReadingsDateAction.next:
-        final target = date.add(const Duration(days: 1));
+        final target = DateUtils.addDaysToDate(date, 1);
         if (!target.isAfter(kCalendarLastDate)) _openDate(target);
         return;
       case _ReadingsDateAction.calendar:
@@ -527,13 +512,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     if (_loading) {
       document = const _ReadingsStatus(
         icon: null,
-        title: 'Загрузка чытанняў...',
+        title: 'Адкрываем чытанні',
         loading: true,
       );
     } else if (_error != null) {
       document = _ReadingsStatus(
         icon: PhosphorIconsLight.warning,
-        title: 'Памылка загрузкі чытанняў',
+        title: 'Не ўдалося адкрыць чытанні',
         message: _error,
         actionLabel: 'Паўтарыць',
         onAction: _load,
@@ -542,9 +527,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       document = _ReadingsStatus(
         icon: PhosphorIconsLight.bookOpen,
         title: 'Чытанні для гэтага дня не знойдзены',
-        message: 'Магчыма, тэкст яшчэ не загружаны на гэтую прыладу.',
-        actionLabel: 'Абнавіць',
-        onAction: () => _load(forceRefresh: true),
       );
     } else {
       final selection = _selection;
@@ -663,7 +645,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     return _ReadingBody(
       key: ValueKey('reading-document-${reading.id}-${_manualCycle ?? 'auto'}'),
       reading: reading,
-      onRefresh: () => _load(forceRefresh: true),
       highlights: Map.unmodifiable(_highlights),
       selectedSentenceId: _selectedSentenceId,
       onSentenceTap: _toggleSentence,
@@ -1060,7 +1041,7 @@ class _ReadingsStatus extends StatelessWidget {
       ? const SizedBox(
           height: 360,
           child: DataLoadingNotice(
-            label: 'Загружаем чытанні',
+            label: 'Адкрываем чытанні',
             shape: LoadingShape.text,
           ),
         )
@@ -1102,7 +1083,6 @@ class _ReadingsStatus extends StatelessWidget {
 
 class _ReadingBody extends ConsumerWidget {
   final ParsedReading reading;
-  final VoidCallback? onRefresh;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
   final ValueChanged<String> onSentenceTap;
@@ -1112,7 +1092,6 @@ class _ReadingBody extends ConsumerWidget {
     required this.highlights,
     required this.selectedSentenceId,
     required this.onSentenceTap,
-    this.onRefresh,
   });
 
   @override
@@ -1169,7 +1148,7 @@ class _ReadingBody extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Тэкст чытання пакуль не загружаны',
+                    'Тэкст гэтага чытання адсутнічае',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
@@ -1177,24 +1156,13 @@ class _ReadingBody extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Паспрабуйце іншы варыянт дня або абнавіце дадзеныя.',
+                    'Паспрабуйце іншы варыянт дня.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 13,
                     ),
                   ),
-                  if (onRefresh != null) ...[
-                    const SizedBox(height: 16),
-                    FilledButton.icon(
-                      onPressed: onRefresh,
-                      icon: const PhosphorIcon(
-                        PhosphorIconsRegular.arrowsClockwise,
-                        size: 18,
-                      ),
-                      label: const Text('Абнавіць'),
-                    ),
-                  ],
                 ],
               ),
             ),

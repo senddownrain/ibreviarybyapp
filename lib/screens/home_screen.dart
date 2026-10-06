@@ -9,15 +9,12 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
-import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
-import 'package:mybrev_flutter/utils/day_prefetch_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
@@ -35,13 +32,10 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final date = ref.watch(selectedDateProvider);
     final selection = ref.watch(hoursLiturgicalSelectionProvider);
-    final bootstrap = ref.watch(dataBootstrapProvider);
-    final loading = ref.watch(homeDataLoadingProvider);
-    // Content on screen + a request in flight = refresh, never a loader.
-    final refreshing = loading && selection.selected != null;
-    final savedOnly =
-        selection.selected != null && ref.watch(isOfflineProvider);
-    final dateFailed = ref.watch(homeDataFailedProvider);
+    // The texts are on the device; only at launch they are decoded for a
+    // moment. A date is a lookup, never a download.
+    final ready = ref.watch(selectedDateReadyProvider);
+    final loading = ready.isLoading && selection.selected == null;
     final seasonColor = ref.watch(liturgicalSeasonColorProvider);
     final navigationDirection = ref.watch(homeNavDirectionProvider);
     final dayNavigation = ref.read(liturgicalNavigationControllerProvider);
@@ -91,20 +85,7 @@ class HomeScreen extends ConsumerWidget {
                                   ? null
                                   : () => dayNavigation.openDate(today),
                             ),
-                            // Same two pixels whether or not a refresh runs:
-                            // nothing below moves.
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: AppRefreshBar(
-                                active: refreshing,
-                                color: _semanticInk(context, seasonColor),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            if (savedOnly) ...[
-                              const AppOfflineNotice(),
-                              const SizedBox(height: 14),
-                            ],
+                            const SizedBox(height: 28),
                             if (selection.selected case final selected?) ...[
                               _Celebration(
                                 option: selected,
@@ -146,22 +127,21 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ] else if (loading) ...[
                               const _HoursLoading(),
-                            ] else if (bootstrap.error != null ||
-                                dateFailed) ...[
+                            ] else if (ready.hasError) ...[
                               AppErrorState(
-                                title: 'Не ўдалося загрузіць дзень',
+                                title: 'Не ўдалося адкрыць тэксты',
                                 message:
-                                    'Гэты дзень яшчэ не захаваны на прыладзе. '
-                                    'Праверце падключэнне і паўтарыце.',
-                                onRetry: () =>
-                                    ref.invalidate(selectedDateReadyProvider),
+                                    'Тэксты праграмы не прачыталіся. '
+                                    'Паспрабуйце яшчэ раз.',
+                                onRetry: () => ref.invalidate(
+                                  liturgicalContentReadyProvider,
+                                ),
                               ),
                             ] else ...[
                               const _HoursMessage(
                                 icon: PhosphorIconsRegular.calendarX,
-                                title: 'Няма даступнага літургічнага дня',
-                                body:
-                                    'Для гэтай даты не знойдзена змесціва. Праверце сінхранізацыю ў Наладах.',
+                                title: 'Няма літургічнага дня',
+                                body: 'Для гэтай даты тэксты адсутнічаюць.',
                               ),
                             ],
                           ],
@@ -378,7 +358,6 @@ class _HoursList extends StatelessWidget {
               final option = selection.effectiveOption;
               if (dayId == null || option == null) return;
               HapticFeedback.lightImpact();
-              _prefetchDay(date, option);
               context.push(
                 oraRouteForContext(
                   date: date,
@@ -470,7 +449,7 @@ class _HoursLoading extends StatelessWidget {
   Widget build(BuildContext context) => const Padding(
     padding: EdgeInsets.symmetric(vertical: 44),
     child: DataLoadingNotice(
-      label: 'Загружаем літургію дня',
+      label: 'Адкрываем літургію дня',
       shape: LoadingShape.tiles,
     ),
   );
@@ -586,13 +565,13 @@ Future<void> _showDateActions(
       dayNavigation.openDate(DateTime.now());
       return;
     case _DateAction.previous:
-      final target = date.subtract(const Duration(days: 1));
+      final target = DateUtils.addDaysToDate(date, -1);
       if (!target.isBefore(kCalendarFirstDate)) {
         dayNavigation.openDate(target);
       }
       return;
     case _DateAction.next:
-      final target = date.add(const Duration(days: 1));
+      final target = DateUtils.addDaysToDate(date, 1);
       if (!target.isAfter(kCalendarLastDate)) {
         dayNavigation.openDate(target);
       }
@@ -843,11 +822,3 @@ Color _semanticInk(BuildContext context, Color source) {
 
 String _sentenceCase(String value) =>
     value.isEmpty ? value : '${value[0].toUpperCase()}${value.substring(1)}';
-
-void _prefetchDay(DateTime date, DayOption option) {
-  try {
-    unawaited(DayPrefetchService().prefetch(date, option).catchError((_) {}));
-  } catch (_) {
-    // Navigation remains available when optional warmup cannot be constructed.
-  }
-}

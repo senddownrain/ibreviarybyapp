@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1791238882217,
+  "contentDate": "2026-10-05T22:21:22.217Z",
+  "collections": {
+    "days": {
+      "file": "days.json.gz",
+      "count": 735,
+      "digest": "d24a586db44e8804",
+      "storedBytes": 53869832,
+      "bundleBytes": 2298909
+    },
+    "readings": {
+      "file": "readings.json.gz",
+      "count": 815,
+      "digest": "13b4c83fa2cb09d5",
+      "storedBytes": 4517861,
+      "bundleBytes": 858647
+    },
+    "liturgicalTemplates": {
+      "file": "liturgicalTemplates.json.gz",
+      "count": 16,
+      "digest": "ac7c338cc988e4bd",
+      "storedBytes": 1115362,
+      "bundleBytes": 165371
+    },
+    "invitatoriums": {
+      "file": "invitatoriums.json.gz",
+      "count": 4,
+      "digest": "587d64f9ff8e7b0d",
+      "storedBytes": 9678,
+      "bundleBytes": 2710
+    },
+    "completoriums": {
+      "file": "completoriums.json.gz",
+      "count": 35,
+      "digest": "42eb55a0b377d638",
+      "storedBytes": 323076,
+      "bundleBytes": 10381
+    },
+    "prayers": {
+      "file": "prayers.json.gz",
+      "count": 117,
+      "digest": "3545a1b2520f2a5d",
+      "storedBytes": 2087949,
+      "bundleBytes": 251489
+    },
+    "prayerCategories": {
+      "file": "prayerCategories.json.gz",
+      "count": 5,
+      "digest": "7a0834aa4c715956",
+      "storedBytes": 879,
+      "bundleBytes": 580
+    },
+    "songs": {
+      "file": "songs.json.gz",
+      "count": 447,
+      "digest": "9752aef2fd846b49",
+      "storedBytes": 369604,
+      "bundleBytes": 111479
+    }
+  }
+}

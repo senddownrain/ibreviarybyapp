@@ -1,45 +1,21 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/song.dart';
 
-/// Reads the bundled initial songbook and the synced `songs` Hive cache.
-///
-/// The bundled seed is parsed lazily the first time the songbook is opened;
-/// it never runs in the startup path.
+/// The songbook from the app's content (bundled, kept current by the
+/// content update). Decoded the first time the songbook is opened.
 class SongRepository {
   const SongRepository._();
 
-  static const seedAsset = 'assets/songs_seed.json';
-  static const boxName = 'songs';
+  static const collection = 'songs';
 
-  static Future<List<Map<String, dynamic>>> loadSeed([
-    AssetBundle? bundle,
-  ]) async {
-    final raw = await (bundle ?? rootBundle).loadString(seedAsset);
-    return parseSeed(raw);
-  }
-
-  static List<Map<String, dynamic>> parseSeed(String raw) {
-    final decoded = jsonDecode(raw);
-    if (decoded is! List) return const [];
+  static Future<List<Map<String, dynamic>>> loadSeed() async {
+    final store = ContentStore.instance;
+    await store.ensureLoaded(const [collection]);
+    final songs = store.collection(collection);
     return [
-      for (final item in decoded)
-        if (item is Map) Map<String, dynamic>.from(item),
-    ];
-  }
-
-  /// Synced Firestore documents. Returns an empty list when the cache is not
-  /// open (for example in isolated widget tests).
-  static List<Map<String, dynamic>> readCached() {
-    if (!Hive.isBoxOpen(boxName)) return const [];
-    final box = Hive.box(boxName);
-    return [
-      for (final key in box.keys)
-        if (box.get(key) case final Map value)
-          {...Map<String, dynamic>.from(value), 'id': key.toString()},
+      for (final key in songs.keys)
+        if (songs.get(key) case final Map value)
+          {...Map<String, dynamic>.from(value), 'id': key},
     ];
   }
 

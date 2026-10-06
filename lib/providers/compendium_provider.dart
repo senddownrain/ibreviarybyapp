@@ -1,13 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:mybrev_flutter/models/compendium.dart';
-import 'package:mybrev_flutter/models/sync_plan.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
-import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/compendium_repository.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
 import 'package:mybrev_flutter/utils/compendium_search.dart';
 
@@ -31,7 +26,8 @@ final compendiumAliasesProvider = FutureProvider<CompendiumSearchAliases>((
   }
 });
 
-/// Synced copy from the `compendium` SyncTarget, if complete and valid.
+/// A newer Compendium downloaded by the content update, if complete and
+/// valid.
 final compendiumStoredProvider = Provider<CompendiumDataset?>((ref) {
   ref.watch(cacheEpochProvider);
   return CompendiumRepository.readStored();
@@ -165,30 +161,3 @@ final compendiumExpandedProvider =
     NotifierProvider<CompendiumExpandedNotifier, Map<String, Set<int>>>(
       CompendiumExpandedNotifier.new,
     );
-
-// ── Opportunistic refresh ────────────────────────────────────────────────────
-
-/// Called when the Compendium is opened. If the device is online and the
-/// Compendium was not checked during the last day, queue a background,
-/// cancellable `compendium`-only sync (one meta read; units only when newer).
-/// The bundled text stays visible meanwhile.
-final compendiumRefreshProvider = Provider<void Function()>((ref) {
-  return () {
-    if (ref.read(isOfflineProvider)) return;
-    if (!Hive.isBoxOpen('meta')) return;
-    final last = HiveService.getLastSync(SyncTarget.compendium.collection);
-    if (last != null &&
-        DateTime.now().difference(last) < const Duration(days: 1)) {
-      return;
-    }
-    ref
-        .read(syncStatusProvider.notifier)
-        .synchronize(
-          const SyncPlan(
-            targets: {SyncTarget.compendium},
-            forceRefresh: false,
-            background: true,
-          ),
-        );
-  };
-});

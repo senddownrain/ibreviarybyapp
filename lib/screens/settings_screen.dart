@@ -16,9 +16,10 @@ import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 // ignore_for_file: use_build_context_synchronously
 
 class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({super.key, this.scrollToSync = false});
+  const SettingsScreen({super.key, this.scrollToData = false});
 
-  final bool scrollToSync;
+  /// Opened from a «Даныя і афлайн» link: scroll to that section.
+  final bool scrollToData;
 
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
@@ -90,14 +91,14 @@ class SettingsThemeControl extends StatelessWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _syncKey = GlobalKey();
+  final _dataKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    if (widget.scrollToSync) {
+    if (widget.scrollToData) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final target = _syncKey.currentContext;
+        final target = _dataKey.currentContext;
         if (target != null) {
           Scrollable.ensureVisible(
             target,
@@ -239,7 +240,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                DataSettingsSection(key: _syncKey),
+                DataSettingsSection(key: _dataKey),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -535,7 +536,7 @@ class _CategoryDialogState extends ConsumerState<_CategoryDialog> {
             const SizedBox(height: 8),
             if (allTags.isEmpty)
               Text(
-                'Тэгі не знойдзены (патрэбна сінхранізацыя)',
+                'Тэгі не знойдзены',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             Wrap(

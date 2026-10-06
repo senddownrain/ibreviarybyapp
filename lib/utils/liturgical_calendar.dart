@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:mybrev_flutter/constants/liturgical_feasts_map.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
@@ -51,7 +52,7 @@ int _catholicWeekday(DateTime date) => date.weekday % 7 + 1;
 DateTime calculateHolyFamilyDate(int year) {
   final christmas = DateTime(year, 12, 25);
   if (christmas.weekday == DateTime.sunday) return DateTime(year, 12, 30);
-  return christmas.add(Duration(days: DateTime.sunday - christmas.weekday));
+  return addCivilDays(christmas, DateTime.sunday - christmas.weekday);
 }
 
 DateTime calculateBaptismOfLordDate(int year) {
@@ -59,14 +60,14 @@ DateTime calculateBaptismOfLordDate(int year) {
   final days = epiphany.weekday == DateTime.sunday
       ? 7
       : DateTime.sunday - epiphany.weekday;
-  return epiphany.add(Duration(days: days));
+  return addCivilDays(epiphany, days);
 }
 
 DateTime _firstSundayAfterChristmas(DateTime christmas) {
   final days = christmas.weekday == DateTime.sunday
       ? 7
       : DateTime.sunday - christmas.weekday;
-  return christmas.add(Duration(days: days));
+  return addCivilDays(christmas, days);
 }
 
 int calculateChristmasPeriodWeek(DateTime value) {
@@ -77,7 +78,7 @@ int calculateChristmasPeriodWeek(DateTime value) {
   if (date.isBefore(christmas)) return -1;
   final firstSunday = _firstSundayAfterChristmas(christmas);
   if (date.isBefore(firstSunday)) return 1;
-  return date.difference(firstSunday).inDays ~/ 7 + 1;
+  return civilDaysBetween(firstSunday, date) ~/ 7 + 1;
 }
 
 /// Exact port of `mybrev/src/utils/liturgicalCalendar.js`.
@@ -115,7 +116,7 @@ LiturgicalContext computeLiturgicalContext(
   final christmas = DateTime(date.year, 12, 25);
 
   if (!date.isBefore(advent) && date.isBefore(christmas)) {
-    final diff = date.difference(advent).inDays;
+    final diff = civilDaysBetween(advent, date);
     return context.copyWith(
       periodType: 'advent',
       periodWeek: diff ~/ 7 + 1,
@@ -137,10 +138,10 @@ LiturgicalContext computeLiturgicalContext(
   }
 
   if (!date.isBefore(ash) && date.isBefore(easter)) {
-    final firstLentSunday = ash.add(const Duration(days: 4));
-    final palmSunday = easter.subtract(const Duration(days: 7));
-    final startDiff = date.difference(firstLentSunday).inDays;
-    final endDiff = date.difference(palmSunday).inDays;
+    final firstLentSunday = addCivilDays(ash, 4);
+    final palmSunday = addCivilDays(easter, -7);
+    final startDiff = civilDaysBetween(firstLentSunday, date);
+    final endDiff = civilDaysBetween(palmSunday, date);
     if (startDiff < 0) {
       return context.copyWith(
         periodType: 'lent',
@@ -171,7 +172,7 @@ LiturgicalContext computeLiturgicalContext(
   }
 
   if (!date.isBefore(easter) && !date.isAfter(pentecost)) {
-    final diff = date.difference(easter).inDays;
+    final diff = civilDaysBetween(easter, date);
     return context.copyWith(
       periodType: 'easter',
       periodWeek: diff ~/ 7 + 1,
@@ -181,11 +182,9 @@ LiturgicalContext computeLiturgicalContext(
 
   final firstOrdinaryWeeks = _asInt(opts.data['ordintaryWeeks1']);
   if (firstOrdinaryWeeks != null) {
-    final firstOrdinary = ash
-        .subtract(const Duration(days: 3))
-        .subtract(Duration(days: (firstOrdinaryWeeks - 1) * 7));
+    final firstOrdinary = addCivilDays(ash, -3 - (firstOrdinaryWeeks - 1) * 7);
     if (!date.isBefore(firstOrdinary) && date.isBefore(ash)) {
-      final diff = date.difference(firstOrdinary).inDays;
+      final diff = civilDaysBetween(firstOrdinary, date);
       return context.copyWith(
         periodType: 'ordinary',
         periodWeek: diff ~/ 7 + 1,
@@ -195,10 +194,10 @@ LiturgicalContext computeLiturgicalContext(
   }
 
   if (date.isAfter(pentecost) && date.isBefore(advent)) {
-    final lastOrdinarySunday = advent.subtract(const Duration(days: 7));
-    final currentSunday = date.subtract(Duration(days: context.dayOfWeek - 1));
+    final lastOrdinarySunday = addCivilDays(advent, -7);
+    final currentSunday = addCivilDays(date, -(context.dayOfWeek - 1));
     final weeksBefore34 =
-        lastOrdinarySunday.difference(currentSunday).inDays ~/ 7;
+        civilDaysBetween(currentSunday, lastOrdinarySunday) ~/ 7;
     return context.copyWith(
       periodType: 'ordinary',
       periodWeek: 34 - weeksBefore34,
@@ -246,16 +245,17 @@ DateTime? calculateDateForContext(
       if (periodWeek != 1 && periodWeek != 2) return null;
       final targetWeekday = dayOfWeek == 1 ? 7 : dayOfWeek - 1;
       final baptism = calculateBaptismOfLordDate(year + 1);
-      final weekStart = _firstSundayAfterChristmas(
-        christmas,
-      ).add(Duration(days: (periodWeek - 1) * 7));
-      final result = weekStart.add(Duration(days: targetWeekday % 7));
+      final weekStart = addCivilDays(
+        _firstSundayAfterChristmas(christmas),
+        (periodWeek - 1) * 7,
+      );
+      final result = addCivilDays(weekStart, targetWeekday % 7);
       return result.isBefore(baptism) ? result : null;
     case 'lent':
-      base = ash.add(const Duration(days: 4));
+      base = addCivilDays(ash, 4);
       break;
     case 'holyweek':
-      base = easter.subtract(const Duration(days: 7));
+      base = addCivilDays(easter, -7);
       break;
     case 'easter':
       base = easter;
@@ -264,16 +264,12 @@ DateTime? calculateDateForContext(
       final firstLastWeek = _asInt(opts.data['ordintaryWeeks1']);
       final secondFirstWeek = _asInt(opts.data['ordintaryWeeks2']);
       if (firstLastWeek == null || secondFirstWeek == null) return null;
-      final firstOrdinary = ash
-          .subtract(const Duration(days: 3))
-          .subtract(Duration(days: (firstLastWeek - 1) * 7));
+      final firstOrdinary = addCivilDays(ash, -3 - (firstLastWeek - 1) * 7);
       if (periodWeek <= firstLastWeek) {
         base = firstOrdinary;
       } else if (periodWeek >= secondFirstWeek) {
-        final lastOrdinarySunday = advent.subtract(const Duration(days: 7));
-        base = lastOrdinarySunday.subtract(
-          Duration(days: (34 - periodWeek) * 7),
-        );
+        final lastOrdinarySunday = addCivilDays(advent, -7);
+        base = addCivilDays(lastOrdinarySunday, -(34 - periodWeek) * 7);
         adjustedWeek = 1;
       } else {
         return null;
@@ -285,7 +281,7 @@ DateTime? calculateDateForContext(
 
   final baseDay = _catholicWeekday(base);
   final daysToAdd = (adjustedWeek - 1) * 7 + (dayOfWeek - baseDay);
-  return base.add(Duration(days: daysToAdd));
+  return addCivilDays(base, daysToAdd);
 }
 
 int? _asInt(dynamic value) {

@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
@@ -95,16 +96,16 @@ DateTime calculateHolyFamilyDate(int year) {
     return DateTime(year, 12, 30);
   }
   final daysToSunday = DateTime.sunday - christmas.weekday;
-  return christmas.add(Duration(days: daysToSunday));
+  return addCivilDays(christmas, daysToSunday);
 }
 
 DateTime calculateBaptismOfLordDate(int year) {
   final epiphany = DateTime(year, 1, 6);
   if (epiphany.weekday == DateTime.sunday) {
-    return epiphany.add(const Duration(days: 7));
+    return addCivilDays(epiphany, 7);
   }
   final daysToSunday = DateTime.sunday - epiphany.weekday;
-  return epiphany.add(Duration(days: daysToSunday));
+  return addCivilDays(epiphany, daysToSunday);
 }
 
 final calendarServiceProvider = Provider<CalendarService>((ref) {

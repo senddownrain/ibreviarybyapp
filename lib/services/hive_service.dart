@@ -1,169 +1,106 @@
-import 'dart:convert';
+import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:flutter/foundation.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:mybrev_flutter/content/content_migration.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
 
 const kTemplatesBoxName = 'liturgicalTemplates';
 
+/// Local storage.
+///
+/// * Canonical content (Liturgy of the Hours, readings, prayers, songs, …)
+///   ships with the app and is read through [ContentStore]; Hive keeps only
+///   documents updated after the app was built (`content_<collection>`).
+/// * Hive boxes of the reader's own data: `settings` (preferences,
+///   highlights, favourites), `localPrayers`, `meta` (update bookkeeping),
+///   `compendium` (a newer validated Compendium, if one was downloaded).
 class HiveService {
   static const _metaBox = 'meta';
-  static const _prayersBoxName = 'prayers';
-  static const _daysBoxName = 'days';
-  static const _yearOptionsBoxName = 'yearOptions';
-  static const _readingsBoxName = 'readings';
-  static const _readingsIndexBoxName = 'readingsIndex';
   static const _localPrayersBoxName = 'localPrayers';
   static const _settingsBoxName = 'settings';
-  static const _invitatoriumsBoxName = 'invitatoriums';
-  static const _completoriumsBoxName = 'completoriums';
 
   static late Box _meta;
-  static late Box _prayers;
-  static late Box _days;
-  static late Box _yearOptions;
-  static late Box _readings;
-  static late Box _readingsIndex;
   static late Box _localPrayers;
   static Box? _settings;
-  static late Box _invitatoriums;
-  static late Box _completoriums;
 
+  static ContentStore get content => ContentStore.instance;
+
+  /// The liturgical collections are decoded and readable.
   static bool get isCacheReady =>
-      Hive.isBoxOpen(_metaBox) &&
-      Hive.isBoxOpen(_daysBoxName) &&
-      Hive.isBoxOpen(_readingsBoxName);
+      Hive.isBoxOpen(_metaBox) && content.areLoaded(kLiturgicalCollections);
 
-  static Box get prayersBox => _prayers;
-  static Box get daysBox => _days;
-  static Box get yearOptionsBox => _yearOptions;
-  static Box get readingsBox => _readings;
-  static Box get readingsIndexBox => _readingsIndex;
+  static ContentCollection get prayersBox => content.collection('prayers');
+  static ContentCollection get daysBox => content.collection('days');
+  static ContentCollection get readingsBox => content.collection('readings');
+  static ContentCollection get invitatoriumsBox =>
+      content.collection('invitatoriums');
+  static ContentCollection get completoriumsBox =>
+      content.collection('completoriums');
+  static ContentCollection get templatesBox =>
+      content.collection(kTemplatesBoxName);
+  static ContentCollection get prayerCategoriesBox =>
+      content.collection('prayerCategories');
+  static ContentCollection get songsBox => content.collection('songs');
+
+  static Box get metaBox => _meta;
   static Box get localPrayersBox => _localPrayers;
   static bool get isSettingsReady =>
       (_settings?.isOpen ?? false) || Hive.isBoxOpen(_settingsBoxName);
   static Box get settingsBox => _settings ?? Hive.box(_settingsBoxName);
-  static Box get invitatoriumsBox => _invitatoriums;
-  static Box get completoriumsBox => _completoriums;
-
-  static Box boxFor(String collection) => Hive.box(collection);
-
-  static Box get templatesBox => Hive.box(kTemplatesBoxName);
 
   /// `liturgicalTemplates` by id (a handful of documents).
   static Map<String, Map<String, dynamic>> templates() => {
     for (final key in templatesBox.keys)
       if (templatesBox.get(key) case final Map raw)
-        key.toString(): Map<String, dynamic>.from(raw),
+        key: Map<String, dynamic>.from(raw),
   };
 
-  static final cacheRevision = ValueNotifier<int>(0);
-  static int receivedBytes = 0;
-  static int receivedDocuments = 0;
+  /// Writes one entry of a plain Hive box (the Compendium copy).
+  static Future<void> putCached(String box, dynamic key, Object data) =>
+      Hive.box(box).put(key, data);
 
-  static int cachedBytes(String collection) {
-    final value = _meta.get('bytes_$collection');
-    if (value is num) return value.toInt();
-    final bytes = boxFor(
-      collection,
-    ).values.fold<int>(0, (sum, value) => sum + payloadBytes(value));
-    _meta.put('bytes_$collection', bytes);
-    return bytes;
-  }
+  static Future<void> removeCached(String box, dynamic key) =>
+      Hive.box(box).delete(key);
 
-  /// Serialized content size; excludes Firestore/network protocol overhead.
-  static int payloadBytes(Object? value) =>
-      utf8.encode(jsonEncode(value)).length;
-
-  static final Map<String, Future<void>> _writes = {};
-
-  static Future<void> putCached(String collection, dynamic key, Object data) {
-    final next = (_writes[collection] ?? Future<void>.value()).then(
-      (_) => _putCached(collection, key, data),
-    );
-    _writes[collection] = next.catchError((Object _) {});
-    return next;
-  }
-
-  static Future<void> _putCached(
-    String collection,
-    dynamic key,
-    Object data,
-  ) async {
-    final box = boxFor(collection);
-    final previous = box.get(key);
-    final oldTotal = cachedBytes(collection);
-    receivedBytes += payloadBytes(data);
-    receivedDocuments++;
-    final delta =
-        payloadBytes(data) - (previous == null ? 0 : payloadBytes(previous));
-    await box.put(key, data);
-    await _meta.put('bytes_$collection', (oldTotal + delta).clamp(0, 1 << 53));
-    cacheRevision.value++;
-  }
-
-  static Future<void> removeCached(String collection, dynamic key) async {
-    final box = boxFor(collection);
-    final old = box.get(key);
-    if (old == null) return;
-    await box.delete(key);
-    await _meta.put(
-      'bytes_$collection',
-      (cachedBytes(collection) - payloadBytes(old)).clamp(0, 1 << 53),
-    );
-  }
-
-  static String dateCacheKey(String collection, DateTime date) =>
-      'ready_${collection}_${date.year}-${date.month}-${date.day}';
-
+  /// Every date is available once the collection is loaded: the content
+  /// is complete on the device, a date is a lookup, not a download.
   static bool isDateCached(String collection, DateTime date) =>
-      getMetaFlag('fullCache_$collection') == true ||
-      getMetaFlag(dateCacheKey(collection, date)) == true;
+      content.isLoaded(collection);
 
-  /// Marks a date as completely loaded. Re-marking is free: a date that is
-  /// already ready causes no disk write.
-  static Future<void> markDateCached(String collection, DateTime date) async {
-    final key = dateCacheKey(collection, date);
-    if (getMetaFlag(key) == true) return;
-    await setMetaFlag(key, true);
-  }
-
-  static Future<void> init({String? path}) async {
+  /// Opens storage. [loadBundle] false (tests): the content starts empty
+  /// and is seeded through the collections' `put`.
+  static Future<void> init({
+    String? path,
+    AssetBundle? bundle,
+    bool? loadBundle,
+  }) async {
     if (path == null) {
       await Hive.initFlutter();
     } else {
       Hive.init(path);
     }
     _meta = await Hive.openBox(_metaBox);
-    _prayers = await Hive.openBox(_prayersBoxName);
-    _days = await Hive.openBox(_daysBoxName);
-    _yearOptions = await Hive.openBox(_yearOptionsBoxName);
-    _readings = await Hive.openBox(_readingsBoxName);
-    _readingsIndex = await Hive.openBox(_readingsIndexBoxName);
     _localPrayers = await Hive.openBox(_localPrayersBoxName);
     _settings = await Hive.openBox(_settingsBoxName);
-    _invitatoriums = await Hive.openBox(_invitatoriumsBoxName);
-    _completoriums = await Hive.openBox(_completoriumsBoxName);
-    await Hive.openBox('bible_bel');
-    await Hive.openBox('bible_ru');
-    await Hive.openBox('prayerCategories');
-    // Commons and the Sunday week I psalter of sparse feast documents.
-    await Hive.openBox(kTemplatesBoxName);
-    // Opening an empty or small box is cheap; the bundled songbook seed is
-    // parsed lazily when the songbook is first opened.
-    await Hive.openBox('songs');
-    // Synced Compendium copy; the bundled dataset is decoded lazily when the
-    // Compendium is first opened.
+    // A newer Compendium than the bundled one, when it was downloaded.
     await Hive.openBox('compendium');
-  }
-
-  static DateTime? getLastSync(String collection) {
-    final ts = _meta.get('lastSync_$collection');
-    if (ts == null) return null;
-    return DateTime.tryParse(ts as String);
-  }
-
-  static Future<void> setLastSync(String collection, DateTime time) async {
-    await _meta.put('lastSync_$collection', time.toIso8601String());
+    final withBundle = loadBundle ?? path == null;
+    await content.open(bundle: bundle, loadBundle: withBundle);
+    if (withBundle) content.preloadAll();
+    if (path == null) {
+      // The former download cache is read once, after the first screen
+      // has its content (it may be large), then removed.
+      unawaited(
+        Future<void>.delayed(
+          const Duration(seconds: 2),
+        ).then((_) => ContentMigration(_meta).run()).catchError((Object _) {}),
+      );
+    } else if (!withBundle) {
+      // Tests start on the current model.
+      await _meta.put(kContentModelKey, kContentModel);
+    }
   }
 
   static bool? getMetaFlag(String key) => _meta.get(key) as bool?;
@@ -172,49 +109,9 @@ class HiveService {
     await _meta.put(key, value);
   }
 
-  static Future<void> setWarmupCoverage(DateTime from, DateTime to) async {
-    await _meta.put('warmupFrom', from.toIso8601String());
-    await _meta.put('warmupTo', to.toIso8601String());
-  }
+  static DateTime? getMetaTime(String key) =>
+      DateTime.tryParse(_meta.get(key)?.toString() ?? '');
 
-  static (DateTime, DateTime)? getWarmupCoverage() {
-    final from = DateTime.tryParse(_meta.get('warmupFrom')?.toString() ?? '');
-    final to = DateTime.tryParse(_meta.get('warmupTo')?.toString() ?? '');
-    if (from == null || to == null) return null;
-    return (from, to);
-  }
-
-  /// Removes the downloaded liturgical texts (days and readings) together
-  /// with their readiness marks. Settings, own prayers, highlights and the
-  /// bundled content stay. The texts are downloaded again when needed.
-  static Future<void> clearDownloadedTexts() async {
-    await _days.clear();
-    await _readings.clear();
-    await _readingsIndex.clear();
-    final keys = _meta.keys
-        .where(
-          (key) =>
-              key is String &&
-              (key.startsWith('ready_') ||
-                  key.startsWith('fullCache_') ||
-                  key == 'bytes_days' ||
-                  key == 'bytes_readings' ||
-                  key == 'lastSync_days' ||
-                  key == 'lastSync_readings' ||
-                  key == 'warmupFrom' ||
-                  key == 'warmupTo' ||
-                  key == 'readingsIndexBuilt' ||
-                  key == 'readingsIndexBuiltV2'),
-        )
-        .toList();
-    await _meta.deleteAll(keys);
-    cacheRevision.value++;
-  }
-
-  /// True when essential offline data has never been synced. The calendar
-  /// itself is computed on the device and needs no download.
-  static bool needsBootstrap() =>
-      prayersBox.isEmpty ||
-      invitatoriumsBox.isEmpty ||
-      completoriumsBox.isEmpty;
+  static Future<void> setMetaTime(String key, DateTime time) =>
+      _meta.put(key, time.toIso8601String());
 }

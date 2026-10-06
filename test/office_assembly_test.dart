@@ -121,7 +121,6 @@ void main() {
             '_currentVersion': 'pastors',
           },
       });
-      await HiveService.markDateCached('days', date);
     }
 
     List<DayOption> options() => LiturgicalContentService().getContentForDate(
@@ -214,7 +213,7 @@ void main() {
       'without the Commons the Office is still complete, from the day',
       () async {
         await seed(withLegacy: false);
-        await HiveService.templatesBox.clear();
+        await HiveService.templatesBox.clearOverlay();
         final option = options().firstWhere(
           (o) => o.dayId == '01-08-sv-alphonsus-liguori',
         );

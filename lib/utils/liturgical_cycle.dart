@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/utils/civil_date.dart';
+
 /// Base liturgical year used by web (`liturgicalCycle.js`).
 const int kCycleBaseYear = 2025;
 
@@ -27,8 +29,6 @@ DateTime _firstSundayOfAdvent(int year) {
   final christmas = DateTime(year, 12, 25);
   final weekday = christmas.weekday;
   final daysToLastSunday = weekday % 7;
-  final lastSundayBeforeXmas = christmas.subtract(
-    Duration(days: daysToLastSunday),
-  );
-  return lastSundayBeforeXmas.subtract(const Duration(days: 21));
+  final lastSundayBeforeXmas = addCivilDays(christmas, -daysToLastSunday);
+  return addCivilDays(lastSundayBeforeXmas, -21);
 }

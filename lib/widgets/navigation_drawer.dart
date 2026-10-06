@@ -47,12 +47,6 @@ class _SecondaryMenuContent extends StatelessWidget {
           child: Text('Меню', style: Theme.of(context).textTheme.titleLarge),
         ),
         _item(context, PhosphorIconsRegular.gear, 'Налады', '/settings'),
-        _item(
-          context,
-          PhosphorIconsRegular.arrowsClockwise,
-          'Сінхранізацыя',
-          '/settings?section=sync',
-        ),
         _item(context, PhosphorIconsRegular.info, 'Інфармацыя', '/about'),
       ],
     ),

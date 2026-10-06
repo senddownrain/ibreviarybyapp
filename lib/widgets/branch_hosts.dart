@@ -232,12 +232,7 @@ class _BibleBranchHostState extends ConsumerState<BibleBranchHost> {
     if (data.isLoading &&
         BibleRepository.getBooks(widget.version ?? 'bel').isEmpty) {
       return const Scaffold(
-        body: Center(
-          child: DataLoadingNotice(
-            label: 'Адкрываем пераклад Бібліі з лакальных даных',
-            collections: ['bible_bel', 'bible_ru'],
-          ),
-        ),
+        body: Center(child: DataLoadingNotice(label: 'Адкрываем Біблію')),
       );
     }
 

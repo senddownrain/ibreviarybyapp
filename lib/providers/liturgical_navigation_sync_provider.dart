@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,7 +40,7 @@ class LiturgicalNavigationController {
   }
 
   void moveBy(int days) {
-    openDate(ref.read(selectedDateProvider).add(Duration(days: days)));
+    openDate(addCivilDays(ref.read(selectedDateProvider), days));
   }
 
   void selectDay(DateTime value, String dayId) {

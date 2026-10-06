@@ -21,7 +21,8 @@ void main() {
     );
 
     expect(find.text('Налады'), findsOneWidget);
-    expect(find.text('Сінхранізацыя'), findsOneWidget);
+    // Network synchronization is not a product destination any more.
+    expect(find.text('Сінхранізацыя'), findsNothing);
     expect(find.text('Інфармацыя'), findsOneWidget);
     expect(find.text('Святая Імша'), findsNothing);
     expect(find.text('Абраныя малітвы'), findsNothing);

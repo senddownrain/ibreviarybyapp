@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
-import 'package:mybrev_flutter/providers/data_bootstrap_provider.dart';
+import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
@@ -14,9 +14,9 @@ import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
-class _IdleBootstrap extends DataBootstrapNotifier {
+class _IdleBootstrap extends ContentUpdatesNotifier {
   @override
-  DataBootstrapState build() => const DataBootstrapState(initialComplete: true);
+  ContentUpdateState build() => const ContentUpdateState();
 }
 
 class _MemorySettings extends SettingsNotifier {
@@ -51,7 +51,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           settingsProvider.overrideWith(_MemorySettings.new),
-          dataBootstrapProvider.overrideWith(_IdleBootstrap.new),
+          contentUpdatesProvider.overrideWith(_IdleBootstrap.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           // Date restoration is tested independently of remote liturgical data.
           liturgicalNavigationSyncProvider.overrideWith((ref) {}),
@@ -161,7 +161,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           settingsProvider.overrideWith(_MemorySettings.new),
-          dataBootstrapProvider.overrideWith(_IdleBootstrap.new),
+          contentUpdatesProvider.overrideWith(_IdleBootstrap.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           dayOptionsProvider.overrideWithValue(const []),
           readingsLoaderProvider.overrideWithValue(
@@ -169,7 +169,6 @@ void main() {
               required dateStr,
               required liturgicalKey,
               required dayId,
-              required forceRefresh,
             }) async => const ReadingsLoadResult(
               readings: [],
               sundayCycle: 'A',

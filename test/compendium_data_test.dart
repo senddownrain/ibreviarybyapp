@@ -7,10 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
 import 'package:mybrev_flutter/models/compendium.dart';
-import 'package:mybrev_flutter/models/sync_plan.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
-import 'package:mybrev_flutter/providers/connectivity_provider.dart';
-import 'package:mybrev_flutter/providers/sync_provider.dart';
 import 'package:mybrev_flutter/services/compendium_repository.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/compendium_data.dart';
@@ -575,7 +572,6 @@ void main() {
       expect(await sync(remote).run(), CompendiumSyncOutcome.updated);
       final box = Hive.box(CompendiumRepository.boxName);
       expect(box.length, 28, reason: '27 units + meta');
-      expect(HiveService.cachedBytes('compendium'), greaterThan(0));
       final stored = CompendiumRepository.readStored()!;
       expect(stored.meta.contentVersion, 2);
       expect(stored.meta.checksum, 'remote');
@@ -642,103 +638,6 @@ void main() {
       expect(Hive.box(CompendiumRepository.boxName), isEmpty);
     });
 
-    test('SyncTarget: manual only, synced by its own plan', () async {
-      expect(SyncTarget.compendium.collection, 'compendium');
-      expect(SyncTarget.compendium.label, 'Кампендый Катэхізіса');
-      expect(SyncTarget.compendium.automatic, isFalse);
-      expect(kAutomaticSyncTargets, isNot(contains(SyncTarget.compendium)));
-      final (meta, units) = _firestore(raw);
-      final container = ProviderContainer(
-        overrides: [
-          compendiumSyncProvider.overrideWithValue(
-            sync(_Remote(meta: meta, units: units)),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container
-          .read(syncStatusProvider.notifier)
-          .synchronize(const SyncPlan(targets: {SyncTarget.compendium}));
-      expect(container.read(syncStatusProvider).error, isNull);
-      expect(HiveService.getLastSync('compendium'), isNotNull);
-      expect(HiveService.getLastSync('songs'), isNull);
-      expect(container.read(compendiumStoredProvider)!.meta.contentVersion, 2);
-    });
-
-    test('a failed Compendium sync reports an error without success', () async {
-      final container = ProviderContainer(
-        overrides: [
-          compendiumSyncProvider.overrideWithValue(sync(_Remote(fail: true))),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container
-          .read(syncStatusProvider.notifier)
-          .synchronize(const SyncPlan(targets: {SyncTarget.compendium}));
-      expect(
-        container.read(syncStatusProvider).error,
-        contains('Кампендый Катэхізіса'),
-      );
-      expect(HiveService.getLastSync('compendium'), isNull);
-    });
-
-    test(
-      'a fresh background check is skipped even with an empty box',
-      () async {
-        await HiveService.setLastSync('compendium', DateTime.now());
-        final remote = _Remote(fail: true);
-        final container = ProviderContainer(
-          overrides: [compendiumSyncProvider.overrideWithValue(sync(remote))],
-        );
-        addTearDown(container.dispose);
-        await container
-            .read(syncStatusProvider.notifier)
-            .synchronize(
-              const SyncPlan(
-                targets: {SyncTarget.compendium},
-                forceRefresh: false,
-                background: true,
-              ),
-            );
-        expect(remote.metaReads, 0);
-        expect(container.read(syncStatusProvider).error, isNull);
-      },
-    );
-
-    test(
-      'opening the Compendium queues a background check once a day',
-      () async {
-        final recorder = _RecordingSync();
-        final container = ProviderContainer(
-          overrides: [
-            syncStatusProvider.overrideWith(() => recorder),
-            isOfflineProvider.overrideWithValue(false),
-          ],
-        );
-        addTearDown(container.dispose);
-        container.read(compendiumRefreshProvider)();
-        expect(recorder.plans.single.targets, {SyncTarget.compendium});
-        expect(recorder.plans.single.background, isTrue);
-        expect(recorder.plans.single.forceRefresh, isFalse);
-        await HiveService.setLastSync('compendium', DateTime.now());
-        container.read(compendiumRefreshProvider)();
-        expect(recorder.plans, hasLength(1));
-      },
-    );
-
-    test('offline opening does not start a download', () {
-      final recorder = _RecordingSync();
-      final container = ProviderContainer(
-        overrides: [
-          syncStatusProvider.overrideWith(() => recorder),
-          isOfflineProvider.overrideWithValue(true),
-        ],
-      );
-      addTearDown(container.dispose);
-      container.read(compendiumRefreshProvider)();
-      expect(recorder.plans, isEmpty);
-    });
-
     test(
       'dataset provider: bundle, newer copy, or copy when bundle fails',
       () async {
@@ -784,12 +683,4 @@ void main() {
       },
     );
   });
-}
-
-class _RecordingSync extends SyncStatusNotifier {
-  final plans = <SyncPlan>[];
-  @override
-  Future<void> synchronize(SyncPlan plan) async {
-    plans.add(plan);
-  }
 }

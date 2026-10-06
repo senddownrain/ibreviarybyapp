@@ -13,11 +13,9 @@ import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/data_log.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
-import 'package:mybrev_flutter/services/cache_warmup_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
-import 'package:mybrev_flutter/services/liturgical_day_service.dart';
-import 'package:mybrev_flutter/services/static_liturgical_service.dart';
-import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
@@ -202,25 +200,22 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     super.dispose();
   }
 
-  /// Cache first: when the day (and, for Vespers, tomorrow) is already on
-  /// the device the hour is resolved synchronously and rendered in the first
-  /// frame — no loading state, no network.
+  /// The hour is resolved from the content on the device in the first
+  /// frame. Only at launch, while the content is still being decoded, the
+  /// screen waits for it (a fraction of a second).
   Future<LiturgicalDay?> _loadDay() {
     final local = _resolveLocal();
-    if (local != null) {
+    if (local != null || HiveService.isCacheReady) {
       DataLog.cacheHit(() => 'hour ${widget.oraType} ${widget.dayId}');
       return SynchronousFuture(local);
     }
-    DataLog.cacheMiss(() => 'hour ${widget.oraType} ${widget.dayId}');
-    return _loadDayRemote();
+    return ContentStore.instance
+        .ensureLoaded(kLiturgicalCollections)
+        .then((_) => _resolveLocal());
   }
 
   LiturgicalDay? _resolveLocal() {
     if (!HiveService.isCacheReady) return null;
-    if (HiveService.invitatoriumsBox.isEmpty ||
-        HiveService.completoriumsBox.isEmpty) {
-      return null;
-    }
     final calendar = ref.read(calendarServiceProvider);
     final content = LiturgicalContentService();
     final selected = content.resolveDayLocal(
@@ -232,10 +227,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
     if (selected == null || widget.oraType != 'vespers') return selected;
     if (usesOwnVespers(selected)) return selected;
-    // I Vespers may belong to tomorrow: decided locally only when tomorrow
-    // is cached too (it is prefetched with today).
+    // I Vespers may belong to tomorrow's celebration.
     final tomorrow = DateUtils.addDaysToDate(widget.date, 1);
-    if (!HiveService.isDateCached('days', tomorrow)) return null;
     return _vespersFrom(
       selected,
       tomorrow,
@@ -246,60 +239,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         calendar.getDynamicDatesCached(tomorrow.year),
       ),
     );
-  }
-
-  Future<LiturgicalDay?> _loadDayRemote() async {
-    final calendar = CalendarService();
-    final staticContent = StaticLiturgicalService();
-    await Future.wait([
-      calendar.ensureYearOptions(widget.date.year),
-      calendar.ensureYearOptions(widget.date.year + 1),
-      calendar.ensureDynamicDates(widget.date.year),
-      staticContent.getInvitatoriums(),
-      staticContent.getCompletoriums(),
-    ]);
-    final dynamicDates = calendar.getDynamicDatesCached(widget.date.year);
-    final context = computeLiturgicalContext(
-      widget.date,
-      calendar.getYearOptionsCached(widget.date.year),
-      calendar.getYearOptionsCached(widget.date.year + 1),
-      dynamicDates,
-    );
-    final selected = await LiturgicalDayService().resolveDayForDate(
-      widget.date,
-      widget.dayId,
-      context,
-      getDynamicFeastCodesForDate(widget.date, dynamicDates),
-    );
-    if (selected == null || widget.oraType != 'vespers') return selected;
-    return _resolveVespers(selected, calendar);
-  }
-
-  Future<LiturgicalDay> _resolveVespers(
-    LiturgicalDay selected,
-    CalendarService calendar,
-  ) async {
-    if (usesOwnVespers(selected)) return selected;
-    try {
-      final tomorrow = widget.date.add(const Duration(days: 1));
-      await CacheWarmupService().warmupDate(tomorrow);
-      await Future.wait([
-        calendar.ensureYearOptions(tomorrow.year),
-        calendar.ensureYearOptions(tomorrow.year + 1),
-        calendar.ensureDynamicDates(tomorrow.year),
-      ]);
-      final options = LiturgicalContentService().getContentForDate(
-        tomorrow,
-        calendar.getYearOptionsCached(tomorrow.year),
-        calendar.getYearOptionsCached(tomorrow.year + 1),
-        calendar.getDynamicDatesCached(tomorrow.year),
-      );
-      final resolved = _firstVespersOf(tomorrow, options);
-      if (resolved != null) return resolved;
-    } catch (error) {
-      debugPrint('[OraScreen] tomorrow Vespers lookup failed: $error');
-    }
-    return _secondVespers(selected);
   }
 
   /// Vespers of [selected] given tomorrow's options (already on the device).
@@ -394,7 +333,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           // place where the prayer is about to appear.
           children: const [
             DataLoadingNotice(
-              label: 'Загружаем тэкст гадзіны',
+              label: 'Адкрываем тэкст гадзіны',
               shape: LoadingShape.text,
             ),
           ],
@@ -453,7 +392,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             Text('Дзень не знойдзены', style: TextStyle(color: cs.onSurface)),
             const SizedBox(height: 4),
             Text(
-              'Магчыма, трэба сінхранізаваць дадзеныя ў Наладах',
+              'Для гэтай даты тэксты адсутнічаюць',
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
@@ -687,9 +626,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     if (allInvit.isEmpty) {
       items.add(
-        _OraItem.html(
-          '<p><em>Псалом запрашэння не знойдзены. Выканайце сінхранізацыю ў Наладах.</em></p>',
-        ),
+        _OraItem.html('<p><em>Псалом запрашэння не знойдзены.</em></p>'),
       );
       return;
     }
@@ -929,9 +866,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     if (comp == null) {
       items.add(
-        _OraItem.html(
-          '<p><em>Камплета для гэтага дня не знойдзена. Выканайце сінхранізацыю ў Наладах.</em></p>',
-        ),
+        _OraItem.html('<p><em>Камплета для гэтага дня не знойдзена.</em></p>'),
       );
       return items;
     }
