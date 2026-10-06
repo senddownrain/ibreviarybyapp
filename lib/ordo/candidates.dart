@@ -70,9 +70,7 @@ Json temporalReadingsRef(Season season) {
   if (dateOnly) return {'_date': fixedDateKey(season.date), 'dateOnly': true};
   return {
     '_periodType': season.period,
-    '_periodWeekNumber': season.periodWeek == 0
-        ? [0, null]
-        : season.periodWeek,
+    '_periodWeekNumber': season.periodWeek == 0 ? [0, null] : season.periodWeek,
     '_dayOfWeek': season.dayOfWeek,
   };
 }
@@ -132,8 +130,7 @@ Json celebrationCandidate(Placement placement, {String status = 'active'}) {
 }
 
 Json temporalCandidate(Season season) => {
-  'id':
-      'temporal:${season.period}-w${season.periodWeek}-d${season.dayOfWeek}',
+  'id': 'temporal:${season.period}-w${season.periodWeek}-d${season.dayOfWeek}',
   'kind': 'temporal',
   'title': formatLiturgicalPeriodTitle(
     periodType: season.period,

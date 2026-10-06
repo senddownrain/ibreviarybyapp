@@ -88,7 +88,9 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     );
   }
   for (final item in candidates.where((c) => c['status'] == 'removed')) {
-    suppressed.add(_suppress(item, (item['removalReason'] ?? 'removed') as String));
+    suppressed.add(
+      _suppress(item, (item['removalReason'] ?? 'removed') as String),
+    );
   }
 
   final active = candidates.where((c) => c['status'] == 'active').toList();
@@ -168,7 +170,9 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
       );
     } else if (primary['rankKind'] == 'memorial') {
       suppressed.add(_suppress(temporal, 'weekday-under-memorial'));
-      appliedRules.add({'rule': 'weekday-not-alternative-to-obligatory-memorial'});
+      appliedRules.add({
+        'rule': 'weekday-not-alternative-to-obligatory-memorial',
+      });
     } else {
       suppressed.add(_suppress(temporal, 'outranked'));
       if (season.isSunday &&
@@ -206,7 +210,10 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     }
     if (kind == 'feast') {
       suppressed.add(_suppress(candidate, 'impeded-omitted'));
-      appliedRules.add({'rule': 'impeded-feast-omitted', 'id': candidate['id']});
+      appliedRules.add({
+        'rule': 'impeded-feast-omitted',
+        'id': candidate['id'],
+      });
       continue;
     }
     if (!_anyMemorial(candidate)) {

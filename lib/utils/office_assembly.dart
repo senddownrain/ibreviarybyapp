@@ -1,4 +1,7 @@
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/ordo/office.dart';
+
+export 'package:mybrev_flutter/ordo/office.dart' show OfficeSlot;
 
 /// Sparse feast documents (`_schema: 2`) and their assembly — the Flutter
 /// port of `mybrev/src/utils/ordo/officeAssembly.js`.
@@ -68,14 +71,7 @@ const kFirstVesperFields = [
 
 const _teDeum = 'officeOfReadingsTeDeum';
 
-/// One component: an ordered chain of sources, optionally a user choice.
-class OfficeSlot {
-  const OfficeSlot(this.chain, {this.choice = const []});
-  final List<String> chain;
-
-  /// Options the rubrics allow after the chain (memorial: day ↔ Common).
-  final List<String> choice;
-}
+const kComplementaryPsalmodyTemplate = 'complementary-psalmody';
 
 /// Office kind of a sparse celebration from its rank.
 String officeKindOfRank(String? rank) => switch ((rank ?? '').toLowerCase()) {
@@ -202,23 +198,62 @@ String defaultTemplateOf(Map<String, dynamic> proper) {
 
 /// Legal assemblies, default first: memorial `[day, …Commons]`,
 /// solemnity/feast `[default Common, …other Commons]`.
-List<String> assemblyChoices(Map<String, dynamic> proper, String officeKind) {
+List<String> assemblyChoices(
+  Map<String, dynamic> proper,
+  String officeKind, {
+  OfficeDescriptor? office,
+}) {
   final templates = _templatesOf(proper);
   final preferred = defaultTemplateOf(proper);
   final ordered = [
     if (preferred.isNotEmpty) preferred,
     ...templates.where((t) => t != preferred),
   ];
-  if (officeKind == 'memorial') return [kCurrentDayChoice, ...ordered];
+  final dayChoice = office?.hasDayChoice ?? officeKind == 'memorial';
+  if (dayChoice) return [kCurrentDayChoice, ...ordered];
   return ordered.isEmpty ? [kCurrentDayChoice] : ordered;
 }
 
+/// A reusable source the rubric requires and the content lacks: an
+/// integrity error, never a silent current-day text.
+class AssemblyIntegrityError {
+  const AssemblyIntegrityError(this.field, this.source, this.reason);
+  final String field;
+  final String source;
+
+  /// `template-missing` | `field-missing`.
+  final String reason;
+
+  Map<String, String> toJson() => {
+    'field': field,
+    'source': source,
+    'reason': reason,
+  };
+}
+
 class OfficeAssembly {
-  const OfficeAssembly(this.data, this.choice, this.provenance);
+  const OfficeAssembly(
+    this.data,
+    this.choice,
+    this.provenance, {
+    this.missing = const [],
+    this.integrity = const [],
+  });
   final Map<String, dynamic> data;
   final String choice;
   final Map<String, String> provenance;
+
+  /// Office fields left empty (nothing in the prescribed sources).
+  final List<String> missing;
+  final List<AssemblyIntegrityError> integrity;
 }
+
+/// Slots of an engine descriptor keyed `hour.component`.
+Map<String, OfficeSlot> _descriptorSlots(OfficeDescriptor office) => {
+  for (final hour in office.hours.entries)
+    for (final component in hour.value.entries)
+      '${hour.key}.${component.key}': component.value,
+};
 
 const _identity = {
   'id',
@@ -246,17 +281,23 @@ const _identity = {
   '_scaffold',
 };
 
-/// Assemble one legal Office of a sparse document.
+/// Assemble one legal Office of a sparse document. [office] is the engine's
+/// descriptor of the option (office kind, slots, Te Deum); without it the
+/// office kind follows the document's rank (legacy callers, fixtures).
 OfficeAssembly assembleOffice({
   required Map<String, dynamic> proper,
   required Map<String, dynamic> currentDay,
   required Map<String, Map<String, dynamic>> templates,
   required bool isSunday,
   String? choice,
+  OfficeDescriptor? office,
 }) {
-  final officeKind = officeKindOfRank(proper['_rank']?.toString());
-  final slots = officeSlots(officeKind, isSunday: isSunday);
-  final choices = assemblyChoices(proper, officeKind);
+  final officeKind =
+      office?.officeKind ?? officeKindOfRank(proper['_rank']?.toString());
+  final slots = office == null
+      ? officeSlots(officeKind, isSunday: isSunday)
+      : _descriptorSlots(office);
+  final choices = assemblyChoices(proper, officeKind, office: office);
   final selected = choices.contains(choice) ? choice! : choices.first;
   final templateId = selected == kCurrentDayChoice
       ? defaultTemplateOf(proper)
@@ -269,6 +310,8 @@ OfficeAssembly assembleOffice({
   final day = <String, dynamic>{};
   final provenance = <String, String>{};
   final refs = <(String, List<String>)>[];
+  final integrity = <AssemblyIntegrityError>[];
+  const missingRequired = (null, 'missing-required');
 
   currentDay.forEach((key, value) {
     if (!_identity.contains(key) &&
@@ -324,12 +367,25 @@ OfficeAssembly assembleOffice({
         return sunday != null && !_blank(sunday[field])
             ? (sunday[field], kSundayWeek1Template)
             : null;
+      case 'office-for-dead':
+        return fromTemplate(
+          templates['office-for-dead'],
+          field,
+          'common:office-for-dead',
+        );
       case 'complementary':
-        final complementary = templates['complementary-psalmody'];
+        final complementary = templates[kComplementaryPsalmodyTemplate];
         if (complementary != null && !_blank(complementary[field])) {
           return (complementary[field], 'complementary');
         }
-        return fromSource(kCurrentDayChoice, field);
+        integrity.add(
+          AssemblyIntegrityError(
+            field,
+            kComplementaryPsalmodyTemplate,
+            complementary == null ? 'template-missing' : 'field-missing',
+          ),
+        );
+        return missingRequired;
       case kCurrentDayChoice:
         return _blank(currentDay[field])
             ? null
@@ -341,11 +397,16 @@ OfficeAssembly assembleOffice({
   sourceOf = fromSource;
 
   (Object?, String)? firstOf(Iterable<String> sources, String field) {
+    var required = false;
     for (final source in sources) {
       final found = fromSource(source, field);
+      if (found?.$2 == 'missing-required') {
+        required = true;
+        continue;
+      }
       if (found != null) return found;
     }
-    return null;
+    return required ? missingRequired : null;
   }
 
   (Object?, String)? resolve(String field) {
@@ -357,17 +418,24 @@ OfficeAssembly assembleOffice({
       return (null, 'pending');
     }
     if (rule is Map && rule['source'] != null) {
+      if (rule['allowCurrentDay'] == true && selected == kCurrentDayChoice) {
+        final fromDay = fromSource(kCurrentDayChoice, field);
+        if (fromDay != null) return fromDay;
+      }
       final found = fromSource(
         rule['source'].toString(),
         field,
         rule['template']?.toString(),
       );
-      if (found != null) return found;
+      if (found != null && found.$2 != 'missing-required') return found;
     }
     final (hour, component) = kOfficeFieldSlots[field]!;
     final slot = slots['$hour.$component'];
     if (slot == null) return firstOf(['common', kCurrentDayChoice], field);
     final fromChain = firstOf(slot.chain.where((s) => s != 'proper'), field);
+    // A required source (complementary psalmody) is never replaced by the
+    // day: the field stays empty and the integrity error is reported.
+    if (fromChain?.$2 == 'missing-required') return null;
     if (fromChain != null) return fromChain;
     if (slot.choice.isNotEmpty) {
       final order = selected == kCurrentDayChoice
@@ -378,11 +446,41 @@ OfficeAssembly assembleOffice({
     return fromSource(kCurrentDayChoice, field);
   }
 
+  final missing = <String>[];
   for (final field in kOfficeFieldSlots.keys) {
     final found = resolve(field);
     if (found?.$2 == 'pending') continue;
-    day[field] = found?.$1 ?? '';
-    if (found != null) provenance[field] = found.$2;
+    if (found == null || found.$2 == 'missing-required') {
+      day[field] = '';
+      missing.add(field);
+      continue;
+    }
+    day[field] = found.$1;
+    provenance[field] = found.$2;
+  }
+
+  // One antiphon around the whole psalmody: an empty 2nd/3rd antiphon is
+  // the form of the hour, not a gap.
+  for (final hour in const [
+    'officeOfReadings',
+    'laudes',
+    'sext1',
+    'sext2',
+    'sext3',
+    'vesper',
+  ]) {
+    bool has(String name) => !_blank(day['$hour$name']);
+    if (!has('Ant1') ||
+        !has('Ps1') ||
+        !has('Ps2') ||
+        !has('Ps3') ||
+        has('Ant2') ||
+        has('Ant3')) {
+      continue;
+    }
+    missing
+      ..remove('${hour}Ant2')
+      ..remove('${hour}Ant3');
   }
 
   if (proper['_omitFirstVespers'] != true) {
@@ -423,7 +521,11 @@ OfficeAssembly assembleOffice({
     } else {
       final fallback = fromSource(kCurrentDayChoice, field);
       day[field] = fallback?.$1 ?? '';
-      if (fallback != null) provenance[field] = fallback.$2;
+      if (fallback != null) {
+        provenance[field] = fallback.$2;
+      } else if (kOfficeFieldSlots.containsKey(field)) {
+        missing.add(field);
+      }
     }
   }
 
@@ -431,6 +533,8 @@ OfficeAssembly assembleOffice({
     day[_teDeum] = false;
   } else if (proper[_teDeum] != null && proper[_teDeum] != '') {
     day[_teDeum] = proper[_teDeum] == true;
+  } else if (office != null) {
+    day[_teDeum] = office.teDeum ? true : '';
   } else {
     day[_teDeum] = officeKind == 'solemnity' || officeKind == 'feast'
         ? true
@@ -455,8 +559,18 @@ OfficeAssembly assembleOffice({
   day['_assembly'] = {
     'choice': selected,
     'template': selected == kCurrentDayChoice ? '' : templateId,
+    'sparse': true,
   };
-  return OfficeAssembly(day, selected, provenance);
+  if (integrity.isNotEmpty) {
+    day['_integrityErrors'] = [for (final error in integrity) error.toJson()];
+  }
+  return OfficeAssembly(
+    day,
+    selected,
+    provenance,
+    missing: missing,
+    integrity: integrity,
+  );
 }
 
 /// Route id of a choice: the default is the document id; the others are

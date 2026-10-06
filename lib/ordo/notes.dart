@@ -110,9 +110,9 @@ bool matchesSelector(
     case 'exact-date':
       return selector['date'] == day.date;
     case 'months':
-      return ((selector['months'] as List?) ?? const []).map(_num).contains(
-        p.month,
-      );
+      return ((selector['months'] as List?) ?? const [])
+          .map(_num)
+          .contains(p.month);
     case 'celebration':
       final raw = '${selector['celebrationId']}';
       final id = _noteCelebrationAliases[raw] ?? raw;

@@ -126,7 +126,7 @@ void main() {
       final calendar = CalendarService();
       for (final date in [
         DateTime(2026, 10, 7),
-        DateTime(2027, 3, 14), // IV Sunday of Lent, months away
+        DateTime(2027, 3, 7), // III Sunday of Lent, months away
         DateTime(2031, 12, 25), // Christmas, years away
         DateTime(2026, 2, 19), // Thursday after Ash Wednesday (week-less)
       ]) {
@@ -158,6 +158,13 @@ void main() {
         );
         expect(readings, isNotEmpty, reason: '$date');
       }
+      // A content deficit (no `lent-w5-d1` document) never hides the day:
+      // the Ordo still names it and reports the Office as unavailable.
+      final deficit = LiturgicalContentService().contentForDate(
+        DateTime(2027, 3, 14),
+      );
+      expect(deficit.ordo.primary.id, 'temporal:lent-w5-d1');
+      expect(deficit.unavailable.map((u) => u.id), ['temporal:lent-w5-d1']);
       expect(HiveService.invitatoriumsBox, isNotEmpty);
       expect(HiveService.completoriumsBox, isNotEmpty);
       expect(HiveService.prayersBox, isNotEmpty);

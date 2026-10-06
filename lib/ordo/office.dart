@@ -81,7 +81,10 @@ typedef OfficeHours = Map<String, Map<String, OfficeSlot>>;
 const _properCommon = OfficeSlot(['proper', 'common']);
 OfficeSlot _single(String source) => OfficeSlot([source]);
 
-OfficeHours _properHours(OfficeSlot daytimePsalms, OfficeSlot daytimeAntiphons) {
+OfficeHours _properHours(
+  OfficeSlot daytimePsalms,
+  OfficeSlot daytimeAntiphons,
+) {
   Map<String, OfficeSlot> hour() => {
     for (final c in const [
       'hymn',

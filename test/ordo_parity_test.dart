@@ -145,7 +145,9 @@ void main() {
       mismatches,
       isEmpty,
       reason: mismatches.entries
-          .map((e) => '${e.key}: ${e.value.length}\n${e.value.take(4).join('\n')}')
+          .map(
+            (e) => '${e.key}: ${e.value.length}\n${e.value.take(4).join('\n')}',
+          )
           .join('\n\n'),
     );
   });

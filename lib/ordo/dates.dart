@@ -96,7 +96,10 @@ const _belarusianAlphabet = 'абвгґдеёжзіийклмнопрстуўф�
 int compareBelarusian(String a, String b) {
   List<int> key(String value) => [
     for (final rune in value.toLowerCase().runes)
-      if (RegExp(r'[\p{L}\p{N}]', unicode: true).hasMatch(String.fromCharCode(rune)))
+      if (RegExp(
+        r'[\p{L}\p{N}]',
+        unicode: true,
+      ).hasMatch(String.fromCharCode(rune)))
         switch (_belarusianAlphabet.indexOf(String.fromCharCode(rune))) {
           -1 => 1000 + rune,
           final index => index,

@@ -37,8 +37,9 @@ extension type OrdoOption(Json data) {
   String get category => '${data['category'] ?? ''}';
   String get layer => '${data['layer'] ?? ''}';
   String get color => '${data['color'] ?? ''}';
-  List<String> get colorAlternatives =>
-      [...?(data['colorAlternatives'] as List?)?.map((e) => '$e')];
+  List<String> get colorAlternatives => [
+    ...?(data['colorAlternatives'] as List?)?.map((e) => '$e'),
+  ];
   int get precedence => (data['precedence'] as num?)?.toInt() ?? 13;
   bool get isTemporal => data['kind'] == 'temporal';
   bool get temporal => data['temporal'] == true;
@@ -50,8 +51,9 @@ extension type OrdoOption(Json data) {
   String? get demotedFrom => data['demotedFrom'] as String?;
   String? get reason => data['reason'] as String?;
   String? get readingsReference => data['readingsReference'] as String?;
-  List<String> get templates =>
-      [...?(data['templates'] as List?)?.map((e) => '$e')];
+  List<String> get templates => [
+    ...?(data['templates'] as List?)?.map((e) => '$e'),
+  ];
   String? get defaultTemplate => data['defaultTemplate'] as String?;
   Json? get daysRef => (data['daysRef'] as Map?)?.cast<String, dynamic>();
   Json? get readingsRef =>
@@ -283,7 +285,12 @@ class OrdoEngine {
     if (cached != null) return cached;
     final plan = this.plan(parseIso(iso).year, diocese);
     final (season, candidates) = collectCandidates(iso, plan);
-    final core = _Core(plan, season, candidates, resolveDisplay(candidates, season));
+    final core = _Core(
+      plan,
+      season,
+      candidates,
+      resolveDisplay(candidates, season),
+    );
     _cores[key] = core;
     if (_cores.length > _dayCacheLimit * 3) _cores.remove(_cores.keys.first);
     return core;
@@ -393,12 +400,7 @@ class OrdoEngine {
   /// The civil date of a liturgical position in [year], found by the engine
   /// itself; null when the position does not exist that year (never a date
   /// of another period).
-  String? dateForPosition(
-    int year,
-    String period,
-    int week,
-    int dayOfWeek,
-  ) {
+  String? dateForPosition(int year, String period, int week, int dayOfWeek) {
     for (final iso in daysOfYear(year)) {
       final season = computeSeason(iso);
       if (season.period == period &&

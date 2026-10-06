@@ -1,0 +1,13 @@
+{
+  "daysCompared": 11688,
+  "assembliesCompared": 27432,
+  "structureMismatches": 0,
+  "officeTextMismatches": 0,
+  "structureExamples": [],
+  "officeTextExamples": [],
+  "optionsByProperSource": {
+    "liturgicalProperTexts": 5819,
+    "-": 13751,
+    "none": 665
+  }
+}

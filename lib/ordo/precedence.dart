@@ -82,7 +82,9 @@ int compareCandidates(Json a, Json b) {
     _categoryOrder[b['category']] ?? 4,
   );
   if (result != 0) return result;
-  result = (_layerOrder[a['layer']] ?? 4).compareTo(_layerOrder[b['layer']] ?? 4);
+  result = (_layerOrder[a['layer']] ?? 4).compareTo(
+    _layerOrder[b['layer']] ?? 4,
+  );
   if (result != 0) return result;
   return n(a['order']).compareTo(n(b['order']));
 }

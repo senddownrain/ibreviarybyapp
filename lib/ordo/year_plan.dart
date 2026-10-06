@@ -176,7 +176,8 @@ List<String> validateYearOverride(Json override) {
         override['rank'] == null &&
         override['to'] == null)
       'changeRank requires `rank`',
-    if (action == 'changeColor' && !kLiturgicalColors.contains(override['color']))
+    if (action == 'changeColor' &&
+        !kLiturgicalColors.contains(override['color']))
       'changeColor requires a liturgical `color`',
     if (action == 'replace' && override['celebration'] == null)
       'replace requires `celebration` changes',
@@ -190,11 +191,7 @@ List<String> validateYearOverride(Json override) {
 }
 
 /// Overrides of [year] for [diocese], in application order.
-List<Json> selectYearOverrides(
-  List<Json> overrides,
-  int year,
-  String diocese,
-) {
+List<Json> selectYearOverrides(List<Json> overrides, int year, String diocese) {
   final indexed = [
     for (var i = 0; i < overrides.length; i++)
       if (_intOf(overrides[i]['year']) == year &&
@@ -240,9 +237,7 @@ void _applyYearOverrides(
         }
       case 'suppress':
         for (final placement in placements.where(matches).toList()) {
-          removed.add(
-            placement.copy()..reason = 'suppressed-by-year-override',
-          );
+          removed.add(placement.copy()..reason = 'suppressed-by-year-override');
           placements.remove(placement);
         }
       case 'add':
@@ -310,7 +305,12 @@ void _applyYearOverrides(
 // ── Transfers ───────────────────────────────────────────────────────────
 
 class _SpecialTransfer {
-  const _SpecialTransfer(this.celebrationId, this.id, this.applies, this.target);
+  const _SpecialTransfer(
+    this.celebrationId,
+    this.id,
+    this.applies,
+    this.target,
+  );
   final String celebrationId;
   final String id;
   final bool Function(Season) applies;
@@ -483,7 +483,8 @@ YearPlan buildYearPlan(
   }
 
   final seasons = <String, Season>{};
-  Season seasonOf(String iso) => seasons.putIfAbsent(iso, () => computeSeason(iso));
+  Season seasonOf(String iso) =>
+      seasons.putIfAbsent(iso, () => computeSeason(iso));
   final transfers = _resolveTransfers(byDate, seasonOf);
 
   final removedByDate = <String, List<Placement>>{};
