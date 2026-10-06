@@ -26,15 +26,35 @@ const kContentCollections = [
   // Compendium of the Catechism: units, and `current` (meta and parts).
   'compendium',
   'compendiumMeta',
+  // Ordo (liturgical calendar) and the canonical sparse Propers.
+  ...kOrdoCalendarCollections,
+  'liturgicalProperTexts',
+  ...kOrdoNotesCollections,
 ];
 
-/// What the Liturgy of the Hours and the Readings need before a day opens.
+/// The calendar definitions the Ordo engine is built from. One publication
+/// of the calendar is activated as one generation ([ContentStore.commit]).
+const kOrdoCalendarCollections = [
+  'liturgicalCalendarMeta',
+  'liturgicalCelebrations',
+  'liturgicalDioceseOverrides',
+  'liturgicalYearOverrides',
+];
+
+/// Ordo notes: only the Ordo day shows them, so they are decoded after the
+/// Hours core (lazy), never on the first-frame path.
+const kOrdoNotesCollections = ['liturgicalOrdoNotes'];
+
+/// What the Liturgy of the Hours and the Readings need before a day opens:
+/// the texts, the calendar definitions and the canonical Propers.
 const kLiturgicalCollections = [
   'days',
   'readings',
   'liturgicalTemplates',
   'invitatoriums',
   'completoriums',
+  ...kOrdoCalendarCollections,
+  'liturgicalProperTexts',
 ];
 
 /// One decoded collection of the bundle.

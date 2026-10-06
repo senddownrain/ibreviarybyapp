@@ -38,6 +38,48 @@
       "storedBytes": 323076,
       "bundleBytes": 10381
     },
+    "liturgicalCalendarMeta": {
+      "file": "liturgicalCalendarMeta.json.gz",
+      "count": 1,
+      "digest": "dd45e88163806c04",
+      "storedBytes": 139,
+      "bundleBytes": 198
+    },
+    "liturgicalCelebrations": {
+      "file": "liturgicalCelebrations.json.gz",
+      "count": 241,
+      "digest": "df8553ed18c25bce",
+      "storedBytes": 132883,
+      "bundleBytes": 22598
+    },
+    "liturgicalDioceseOverrides": {
+      "file": "liturgicalDioceseOverrides.json.gz",
+      "count": 74,
+      "digest": "b09f0944086195b5",
+      "storedBytes": 52276,
+      "bundleBytes": 7549
+    },
+    "liturgicalYearOverrides": {
+      "file": "liturgicalYearOverrides.json.gz",
+      "count": 4,
+      "digest": "18e6786c5967ac56",
+      "storedBytes": 1415,
+      "bundleBytes": 633
+    },
+    "liturgicalProperTexts": {
+      "file": "liturgicalProperTexts.json.gz",
+      "count": 290,
+      "digest": "b7775a9f4f5b1503",
+      "storedBytes": 3178232,
+      "bundleBytes": 587214
+    },
+    "liturgicalOrdoNotes": {
+      "file": "liturgicalOrdoNotes.json.gz",
+      "count": 1204,
+      "digest": "5b77dfbf515b4c44",
+      "storedBytes": 676221,
+      "bundleBytes": 97265
+    },
     "prayers": {
       "file": "prayers.json.gz",
       "count": 117,

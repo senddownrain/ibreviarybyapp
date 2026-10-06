@@ -1,0 +1,39 @@
+{
+  "generatedFrom": {
+    "snapshot": "2026-10-05T22:21:22.217Z",
+    "fixtureGeneratedAt": "2026-10-06T21:19:48.133Z"
+  },
+  "years": [
+    2025,
+    2032
+  ],
+  "dioceses": [
+    "minsk-mohilev",
+    "grodno",
+    "pinsk",
+    "vitebsk"
+  ],
+  "daysCompared": 11688,
+  "fieldsCompared": [
+    "period",
+    "periodPhase",
+    "week",
+    "dayOfWeek",
+    "psalterWeek",
+    "cycle",
+    "color",
+    "colorAlternatives",
+    "primary",
+    "alternatives",
+    "commemorations",
+    "suppressed",
+    "transfers",
+    "evening",
+    "office",
+    "notes"
+  ],
+  "mismatches": {},
+  "mismatchExamples": {},
+  "intentionalDifferences": {},
+  "engineMilliseconds": 5363
+}
