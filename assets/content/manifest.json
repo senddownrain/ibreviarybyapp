@@ -50,6 +50,8 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 1,
       "digest": "dd45e88163806c04",
       "storedBytes": 139,
@@ -57,6 +59,8 @@
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 241,
       "digest": "df8553ed18c25bce",
       "storedBytes": 132883,
@@ -64,6 +68,8 @@
     },
     "liturgicalDioceseOverrides": {
       "file": "liturgicalDioceseOverrides.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 74,
       "digest": "b09f0944086195b5",
       "storedBytes": 52276,
@@ -71,6 +77,8 @@
     },
     "liturgicalYearOverrides": {
       "file": "liturgicalYearOverrides.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 4,
       "digest": "18e6786c5967ac56",
       "storedBytes": 1415,
@@ -78,6 +86,8 @@
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 290,
       "digest": "b7775a9f4f5b1503",
       "storedBytes": 3178232,
@@ -85,6 +95,8 @@
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",
+      "contentVersion": 1791238882217,
+      "contentDate": "2026-10-05T22:21:22.217Z",
       "count": 1204,
       "digest": "5b77dfbf515b4c44",
       "storedBytes": 676221,
