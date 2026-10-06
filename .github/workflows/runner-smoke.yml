@@ -1,0 +1,29 @@
+# Proves the self-hosted Mac runner before any store release: it is online,
+# picks up a job, and sees the same tools as the developer Terminal.
+name: Release runner smoke test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: [self-hosted, macOS, mybrev-release]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools on the runner PATH
+        shell: bash -l {0}
+        run: |
+          set -euo pipefail
+          echo "runner: $(hostname) as $(whoami)"
+          df -h / | tail -1
+          flutter --version
+          dart --version
+          xcodebuild -version
+          java -version 2>&1 | head -1
+          export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+          ruby --version
+          bundle --version

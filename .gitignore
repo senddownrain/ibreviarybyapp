@@ -23,3 +23,18 @@ ios/Flutter/Flutter.podspec
 # IDE
 .idea/
 .DS_Store
+
+# Release tooling (docs/RELEASE_BETA.md): secrets never live in the repository.
+*.jks
+*.keystore
+AuthKey_*.p8
+service-account*.json
+google-play-key*.json
+/vendor/bundle/
+/.bundle/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/release-result-*.env
+/build-release-tmp/

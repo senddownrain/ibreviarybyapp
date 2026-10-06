@@ -9,6 +9,7 @@
 #   ios-testflight    — signed App Store build of «MyBrev Test»
 #                       (by.mybrev.testflight2026), uploaded to App Store
 #                       Connect for TestFlight. Started manually only.
+#                       Fallback: the main path is fastlane (docs/RELEASE_BETA.md).
 
 workflows:
   ios-simulator:
@@ -152,10 +153,6 @@ workflows:
           pod install
       - name: Use the App Store profile
         script: xcode-project use-profiles
-      - name: Name on the device for the test build
-        # Only this build is «MyBrev Test»; the project keeps its name.
-        script: |
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName MyBrev Test" ios/Runner/Info.plist
       - name: Analyze and test
         script: |
           flutter analyze --no-pub

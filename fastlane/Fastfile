@@ -1,0 +1,314 @@
+# MyBrev beta releases — one release layer for the developer Mac and the
+# self-hosted GitHub runner (docs/RELEASE_BETA.md).
+#
+#   bundle exec fastlane ios beta            TestFlight
+#   bundle exec fastlane android internal    Google Play internal testing
+#   bundle exec fastlane android beta        Google Play closed testing (ANDROID_BETA_TRACK)
+#   bundle exec fastlane android check       credentials + track version codes only
+#   bundle exec fastlane android tracks      track ids of the app
+#   bundle exec fastlane ios check           App Store Connect access + latest build
+#
+# Never production: no lane here submits to App Store review or rolls out to
+# the Google Play production track.
+
+require "base64"
+require "fileutils"
+require "tmpdir"
+
+ROOT = File.expand_path("..", __dir__)
+IOS_BUNDLE_ID = "by.mybrev.testflight2026"
+IOS_TEAM_ID = "QYGFV6QH5U"
+ANDROID_PACKAGE = "by.mybrev.playtest2026"
+# Every track a version code may already be used on.
+PLAY_STANDARD_TRACKS = %w[internal alpha beta production].freeze
+
+FLUTTER = ENV.fetch("FLUTTER", "flutter")
+
+# ── Shared ────────────────────────────────────────────────────────────────────
+
+# [version name, build number] from pubspec.yaml («1.0.0+6»).
+def pubspec_version
+  line = File.read(File.join(ROOT, "pubspec.yaml"))[/^version:\s*(\S+)/, 1]
+  UI.user_error!("pubspec.yaml has no version") unless line
+  name, build = line.split("+")
+  [name, build.to_i]
+end
+
+def git_sha
+  sh("git", "-C", ROOT, "rev-parse", "--short=12", "HEAD", log: false).strip
+end
+
+# A store build must map to a commit: refuse a dirty tree unless the caller
+# says otherwise on purpose (ALLOW_DIRTY=1).
+def require_clean_tree
+  return UI.important("ALLOW_DIRTY=1: building with uncommitted changes") if ENV["ALLOW_DIRTY"] == "1"
+
+  ensure_git_status_clean(show_uncommitted_changes: true)
+end
+
+# Fails before any build when a required variable is missing (names only).
+def require_env(*names)
+  missing = names.reject { |name| ENV[name].to_s.strip != "" }
+  UI.user_error!("Missing environment: #{missing.join(', ')} (see docs/RELEASE_BETA.md)") unless missing.empty?
+end
+
+def release_notes(label)
+  notes = ENV["RELEASE_NOTES"].to_s.strip
+  notes.empty? ? "MyBrev beta build #{label} (#{git_sha})." : notes
+end
+
+# A secret given as base64 becomes a temporary file (0600) for the run.
+def secret_file(path_var:, base64_var:, name:)
+  path = ENV[path_var].to_s
+  return path if path != "" && File.exist?(path)
+
+  require_env(base64_var)
+  dir = Dir.mktmpdir("mybrev-release-")
+  file = File.join(dir, name)
+  File.write(file, Base64.decode64(ENV.fetch(base64_var)))
+  File.chmod(0o600, file)
+  at_exit { FileUtils.rm_rf(dir) }
+  file
+end
+
+# Release trace for the workflow summary and the job outputs.
+def report(platform, values)
+  lines = values.map { |key, value| "#{key}=#{value}" }
+  File.write(File.join(__dir__, "release-result-#{platform}.env"), lines.join("\n") + "\n")
+  UI.success("#{platform} release: #{values.map { |k, v| "#{k}=#{v}" }.join(', ')}")
+end
+
+# ── iOS ──────────────────────────────────────────────────────────────────────
+
+platform :ios do
+  def asc_api_key
+    require_env("APP_STORE_CONNECT_KEY_ID", "APP_STORE_CONNECT_ISSUER_ID")
+    key_file = secret_file(
+      path_var: "APP_STORE_CONNECT_KEY_PATH",
+      base64_var: "APP_STORE_CONNECT_PRIVATE_KEY_BASE64",
+      name: "AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8",
+    )
+    ENV["MYBREV_ASC_KEY_FILE"] = key_file
+    app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+      key_filepath: key_file,
+    )
+  end
+
+  # The IPA is the test identity, nothing else.
+  def verify_ipa(ipa)
+    Dir.mktmpdir("mybrev-ipa-") do |dir|
+      sh("unzip", "-q", "-o", ipa, "Payload/*.app/Info.plist", "-d", dir, log: false)
+      plist = Dir[File.join(dir, "Payload/*.app/Info.plist")].first
+      id = sh("/usr/libexec/PlistBuddy", "-c", "Print :CFBundleIdentifier", plist, log: false).strip
+      UI.user_error!("IPA bundle id #{id}, expected #{IOS_BUNDLE_ID}") unless id == IOS_BUNDLE_ID
+    end
+    UI.success("IPA OK: #{IOS_BUNDLE_ID}")
+  end
+
+  def latest_build(api_key)
+    latest_testflight_build_number(api_key: api_key, app_identifier: IOS_BUNDLE_ID, initial_build_number: 0).to_i
+  end
+
+  desc "App Store Connect access and the latest TestFlight build (nothing is built)"
+  lane :check do
+    api_key = asc_api_key
+    UI.success("App Store Connect: latest TestFlight build #{latest_build(api_key)} of #{IOS_BUNDLE_ID}")
+  end
+
+  desc "Signed IPA → App Store Connect → TestFlight (never App Store review)"
+  lane :beta do
+    require_clean_tree
+    api_key = asc_api_key
+    name, pubspec_build = pubspec_version
+    build = [latest_build(api_key) + 1, pubspec_build].max
+    sha = git_sha
+    UI.message("iOS #{name} (#{build}) from #{sha}")
+
+    Dir.chdir(ROOT) do
+      sh(FLUTTER, "build", "ios", "--release", "--no-codesign",
+         "--build-name=#{name}", "--build-number=#{build}")
+    end
+    # Automatic signing with the API key: Xcode fetches or creates the
+    # Apple Distribution certificate and the App Store profile of the team.
+    ipa = build_app(
+      workspace: File.join(ROOT, "ios/Runner.xcworkspace"),
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: File.join(ROOT, "build/ios/fastlane"),
+      skip_package_dependencies_resolution: true,
+      xcargs: [
+        "-allowProvisioningUpdates",
+        "-authenticationKeyPath #{ENV.fetch('MYBREV_ASC_KEY_FILE').shellescape}",
+        "-authenticationKeyID #{ENV.fetch('APP_STORE_CONNECT_KEY_ID')}",
+        "-authenticationKeyIssuerID #{ENV.fetch('APP_STORE_CONNECT_ISSUER_ID')}",
+        "DEVELOPMENT_TEAM=#{IOS_TEAM_ID}",
+        "CODE_SIGN_STYLE=Automatic",
+      ].join(" "),
+      export_options: { signingStyle: "automatic", teamID: IOS_TEAM_ID },
+    )
+    verify_ipa(ipa)
+    groups = ENV["IOS_TESTFLIGHT_GROUPS"].to_s.split(",").map(&:strip).reject(&:empty?)
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: ipa,
+      app_identifier: IOS_BUNDLE_ID,
+      changelog: release_notes("#{name} (#{build})"),
+      # Groups need the processed build; without groups the upload is enough.
+      skip_waiting_for_build_processing: groups.empty?,
+      groups: groups.empty? ? nil : groups,
+      distribute_external: ENV["IOS_DISTRIBUTE_EXTERNAL"] == "true",
+      submit_beta_review: ENV["IOS_DISTRIBUTE_EXTERNAL"] == "true",
+    )
+    report("ios", {
+      "IOS_VERSION" => name, "IOS_BUILD" => build, "IOS_COMMIT" => sha,
+      "IOS_GROUPS" => groups.empty? ? "(upload only)" : groups.join(" + "),
+    })
+  end
+end
+
+# ── Android ──────────────────────────────────────────────────────────────────
+
+platform :android do
+  def play_json_key
+    secret_file(
+      path_var: "GOOGLE_PLAY_JSON_KEY_PATH",
+      base64_var: "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64",
+      name: "google-play-key.json",
+    )
+  end
+
+  def used_version_codes(json_key, extra_tracks = [])
+    (PLAY_STANDARD_TRACKS + extra_tracks).uniq.flat_map do |track|
+      google_play_track_version_codes(track: track, json_key: json_key, package_name: ANDROID_PACKAGE)
+    rescue StandardError => e
+      UI.verbose("track #{track}: #{e.message}")
+      []
+    end
+  end
+
+  # The upload key: a CI secret materialized for this run, or the local
+  # android/key.properties (developer Mac).
+  def prepare_upload_key
+    if ENV["ANDROID_KEYSTORE_BASE64"].to_s != "" && ENV["ANDROID_KEYSTORE_PATH"].to_s == ""
+      require_env("ANDROID_KEYSTORE_PASSWORD", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD")
+      ENV["ANDROID_KEYSTORE_PATH"] = secret_file(
+        path_var: "ANDROID_KEYSTORE_PATH", base64_var: "ANDROID_KEYSTORE_BASE64", name: "upload-keystore.jks",
+      )
+    end
+    return if ENV["ANDROID_KEYSTORE_PATH"].to_s != "" || File.exist?(File.join(ROOT, "android/key.properties"))
+
+    UI.user_error!("No upload key: android/key.properties or ANDROID_KEYSTORE_* (see docs/RELEASE_BETA.md)")
+  end
+
+  # Flutter verifies the stripping of native debug symbols with apkanalyzer
+  # (Android cmdline-tools). When apkanalyzer itself cannot run (a broken
+  # local SDK registry), Flutter reports a failed strip although the bundle is
+  # fine. The same check is done here directly: the symbols must have been
+  # moved to BUNDLE-METADATA. Any other build failure stays a failure.
+  def accept_unverified_strip(output, aab)
+    stripped = File.exist?(aab) &&
+               sh("unzip", "-l", aab, log: false).include?("libflutter.so.sym")
+    if output.include?("failed to strip debug symbols") && stripped
+      UI.important("apkanalyzer unavailable; symbols verified directly (libflutter.so.sym in BUNDLE-METADATA)")
+      return
+    end
+    UI.user_error!("flutter build appbundle failed")
+  end
+
+  # The bundle must be ours, for this package and this version code, and
+  # signed with the upload key — never with a debug key.
+  def verify_bundle(aab, version_code)
+    UI.user_error!("No bundle at #{aab}") unless File.exist?(aab)
+    certs = sh("jarsigner", "-verify", "-verbose", "-certs", aab, log: false)
+    UI.user_error!("#{aab} is not signed") unless certs.include?("jar verified")
+    UI.user_error!("#{aab} is signed with a debug key") if certs.include?("CN=Android Debug")
+    manifest = sh("unzip", "-p", aab, "base/manifest/AndroidManifest.xml", log: false)
+    UI.user_error!("#{aab} is not #{ANDROID_PACKAGE}") unless manifest.b.include?(ANDROID_PACKAGE.b)
+    UI.success("Bundle OK: #{ANDROID_PACKAGE}, versionCode #{version_code}, upload-signed")
+  end
+
+  def release(track)
+    require_clean_tree
+    json_key = play_json_key
+    validate_play_store_json_key(json_key: json_key)
+    name, pubspec_build = pubspec_version
+    codes = used_version_codes(json_key, [track])
+    version_code = [codes.max.to_i + 1, pubspec_build].max
+    sha = git_sha
+    UI.message("Android #{name} (#{version_code}) → #{track} from #{sha}; codes in use: #{codes.sort.last(5).inspect}")
+
+    prepare_upload_key
+    aab = File.join(ROOT, "build/app/outputs/bundle/release/app-release.aab")
+    FileUtils.rm_f(aab)
+    Dir.chdir(ROOT) do
+      sh(FLUTTER, "build", "appbundle", "--release",
+         "--build-name=#{name}", "--build-number=#{version_code}",
+         error_callback: ->(output) { accept_unverified_strip(output, aab) })
+    end
+    verify_bundle(aab, version_code)
+
+    # Release notes as a changelog of this version code.
+    metadata = Dir.mktmpdir("mybrev-play-")
+    language = ENV.fetch("PLAY_LANGUAGE", "en-US")
+    FileUtils.mkdir_p(File.join(metadata, language, "changelogs"))
+    File.write(File.join(metadata, language, "changelogs", "#{version_code}.txt"),
+               release_notes("#{name} (#{version_code})")[0, 500])
+
+    upload_to_play_store(
+      package_name: ANDROID_PACKAGE,
+      json_key: json_key,
+      track: track,
+      aab: aab,
+      # A new app stays «draft» until Google reviews it the first time
+      # (PLAY_RELEASE_STATUS=draft); afterwards releases go out at once.
+      release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
+      metadata_path: metadata,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: true,
+    )
+    report("android", {
+      "ANDROID_VERSION" => name, "ANDROID_VERSION_CODE" => version_code,
+      "ANDROID_TRACK" => track, "ANDROID_COMMIT" => sha,
+    })
+  end
+
+  desc "Service account access and the version codes in use (nothing is built)"
+  lane :check do
+    json_key = play_json_key
+    validate_play_store_json_key(json_key: json_key)
+    codes = used_version_codes(json_key)
+    UI.success("Google Play: #{ANDROID_PACKAGE}, highest version code #{codes.max || 'none'}")
+  end
+
+  desc "Track ids of the app (closed testing tracks have their own ids)"
+  lane :tracks do
+    require "supply"
+    json_key = play_json_key
+    Supply.config = FastlaneCore::Configuration.create(
+      Supply::Options.available_options, { json_key: json_key, package_name: ANDROID_PACKAGE },
+    )
+    client = Supply::Client.make_from_config
+    client.begin_edit(package_name: ANDROID_PACKAGE)
+    client.tracks.each { |track| UI.message("track: #{track.track}") }
+    client.abort_current_edit
+  end
+
+  desc "Signed AAB → Google Play internal testing"
+  lane :internal do
+    release("internal")
+  end
+
+  desc "Signed AAB → Google Play closed testing «MyBrev Beta» (ANDROID_BETA_TRACK)"
+  lane :beta do
+    # The closed track id comes from `fastlane android tracks`, never guessed.
+    require_env("ANDROID_BETA_TRACK")
+    track = ENV.fetch("ANDROID_BETA_TRACK")
+    UI.user_error!("Not on production") if track == "production"
+    release(track)
+  end
+end

@@ -1,0 +1,6 @@
+# Temporary test identities (docs/RELEASE_BETA.md). Bound to their store
+# entries after the first upload: never rename.
+app_identifier("by.mybrev.testflight2026") # iOS: App Store Connect «MyBrev Test»
+team_id("QYGFV6QH5U")                      # Apple Developer team
+
+package_name("by.mybrev.playtest2026")     # Android: Google Play «MyBrev Test»

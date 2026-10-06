@@ -27,7 +27,7 @@ class DefaultFirebaseOptions {
 
   static const android = FirebaseOptions(
     apiKey: 'AIzaSyBqZtw0FW1n9TELjTUHQ5Z-VGx3Sb98alg',
-    appId: '1:344097781816:android:87ccd0e0b2d2ce93fd8ecd',
+    appId: '1:344097781816:android:92f6c24311cce114fd8ecd',
     messagingSenderId: '344097781816',
     projectId: 'ibreviaryby',
     storageBucket: 'ibreviaryby.firebasestorage.app',
