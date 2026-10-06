@@ -155,6 +155,10 @@ platform :ios do
         "-authenticationKeyIssuerID #{ENV.fetch('APP_STORE_CONNECT_ISSUER_ID')}",
         "DEVELOPMENT_TEAM=#{IOS_TEAM_ID}",
         "CODE_SIGN_STYLE=Automatic",
+        # Sign the archive for distribution: an App Store profile needs no
+        # registered devices (a development profile does, and the team has
+        # none). The project's own settings stay unchanged.
+        "CODE_SIGN_IDENTITY='Apple Distribution'",
       ].join(" "),
       export_options: { signingStyle: "automatic", teamID: IOS_TEAM_ID },
     )
