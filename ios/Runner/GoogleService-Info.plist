@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.ibrevapp</string>
+	<string>by.mybrev.testflight2026</string>
 	<key>PROJECT_ID</key>
 	<string>ibreviaryby</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:344097781816:ios:334d00a443310e57fd8ecd</string>
+	<string>1:344097781816:ios:e3feba9d3a782b7dfd8ecd</string>
 </dict>
 </plist>
