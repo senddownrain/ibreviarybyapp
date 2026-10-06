@@ -6,7 +6,7 @@ Test identities (temporary, bound to their store entries — never rename):
 |---|---|---|
 | Store app | App Store Connect «MyBrev Test» | Google Play «MyBrev Test» |
 | Id | `by.mybrev.testflight2026` | `by.mybrev.playtest2026` |
-| Team / signing | `QYGFV6QH5U`, automatic signing via the API key | upload key → Play App Signing |
+| Team / signing | `QYGFV6QH5U`; Apple Distribution certificate + App Store profile from the API key (no devices needed), Runner only, per build | upload key → Play App Signing |
 | Firebase app | `1:344097781816:ios:e3feba9d3a782b7dfd8ecd` | `1:344097781816:android:92f6c24311cce114fd8ecd` |
 | Destination | TestFlight (never App Store review) | `internal`, then closed testing «MyBrev Beta» (never production) |
 
