@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/screens/liturgical_day_options_screen.dart';
 import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
 import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
+import 'package:mybrev_flutter/screens/ordo_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
 import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
@@ -78,6 +79,12 @@ const _bibleSearchResultRoute = AppRouteDescriptor(
 
 const _hoursPickerRoute = AppRouteDescriptor(
   id: 'hours.picker',
+  branch: AppBranch.hours,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+);
+const _ordoRoute = AppRouteDescriptor(
+  id: 'hours.ordo',
   branch: AppBranch.hours,
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.legacy,
@@ -251,6 +258,18 @@ final router = GoRouter(
                       ),
                     ),
                   ],
+                ),
+                GoRoute(
+                  path: 'ordo',
+                  pageBuilder: (context, state) => _branchPage(
+                    state,
+                    _ordoRoute,
+                    OrdoScreen(
+                      initialDate:
+                          _parseDate(state.uri.queryParameters['date']) ??
+                          DateUtils.dateOnly(DateTime.now()),
+                    ),
+                  ),
                 ),
                 GoRoute(
                   path: 'hora/:date/:dayId',

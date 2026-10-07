@@ -146,6 +146,9 @@ void main() {
     expect(find.text('Чытанне'), findsOneWidget);
     expect(find.textContaining('Тэкст чытання'), findsWidgets);
     expect(find.byKey(const Key('readings-options-action')), findsNothing);
+    // Readings stay simple: no Ordo / calendar entry on the Readings root.
+    expect(find.byKey(const Key('hours-calendar-action')), findsNothing);
+    expect(find.text('Каляндар'), findsNothing);
 
     ScrollUpdateNotification(
       metrics: FixedScrollMetrics(

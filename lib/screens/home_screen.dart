@@ -72,9 +72,30 @@ class HomeScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Літургія гадзін',
-                              style: ReaderTheme.of(context).displayTitle(36),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Літургія гадзін',
+                                    style: ReaderTheme.of(
+                                      context,
+                                    ).displayTitle(36),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                _CalendarAction(
+                                  color: seasonColor,
+                                  onTap: () => context.push(
+                                    Uri(
+                                      path: '/hours/ordo',
+                                      queryParameters: {
+                                        'date': liturgicalDateKey(date),
+                                      },
+                                    ).toString(),
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 22),
                             _DateHeader(
@@ -155,6 +176,68 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Top-right entry to the liturgical calendar (Ordo) of the selected date:
+/// a compact capsule, glyph + word, so it is found without guessing.
+class _CalendarAction extends StatelessWidget {
+  const _CalendarAction({required this.color, required this.onTap});
+
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final ink = _semanticInk(context, color);
+    // The word stays while it fits beside the title; at a large text scale
+    // on a narrow phone the capsule keeps only its glyph (same target).
+    final media = MediaQuery.of(context);
+    final showLabel =
+        media.textScaler.scale(1) <= 1.3 && media.size.width >= 340;
+    return Semantics(
+      button: true,
+      label: 'Каляндар: літургічны каляндар дня',
+      excludeSemantics: true,
+      child: Material(
+        color: Color.alphaBlend(color.withValues(alpha: 0.14), cs.surface),
+        shape: StadiumBorder(
+          side: BorderSide(color: color.withValues(alpha: 0.35)),
+        ),
+        child: InkWell(
+          key: const Key('hours-calendar-action'),
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44, minWidth: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  PhosphorIcon(
+                    PhosphorIconsRegular.calendarDots,
+                    size: 19,
+                    color: ink,
+                  ),
+                  if (showLabel) ...[
+                    const SizedBox(width: 6),
+                    Text(
+                      'Каляндар',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: ink,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -285,6 +368,23 @@ class _Celebration extends StatelessWidget {
                       .displayTitle(29)
                       .copyWith(color: cs.onSurface, height: 1.18),
                 ),
+                if (option.badges.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    key: const Key('hours-celebration-badges'),
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      for (final badge in option.badges)
+                        Chip(
+                          label: Text(badge),
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                    ],
+                  ),
+                ],
                 if (placeLabel.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Row(
@@ -363,6 +463,7 @@ class _HoursList extends StatelessWidget {
                   date: date,
                   dayId: dayId,
                   oraType: available[index].type,
+                  diocese: selection.diocese,
                 ),
               );
             },
@@ -709,7 +810,11 @@ class _AlternativesSheet extends ConsumerWidget {
                           if (option?.dayId case final dayId?) {
                             ref
                                 .read(liturgicalNavigationControllerProvider)
-                                .selectDay(date, dayId);
+                                .selectDay(
+                                  date,
+                                  dayId,
+                                  diocese: option!.contextDiocese,
+                                );
                           }
                         },
                         child: Column(
@@ -718,9 +823,9 @@ class _AlternativesSheet extends ConsumerWidget {
                               RadioListTile<String>(
                                 value: option.key,
                                 title: Text(option.title),
-                                subtitle: option.displaySubtitle == null
+                                subtitle: _optionSubtitle(option) == null
                                     ? null
-                                    : Text(option.displaySubtitle!),
+                                    : Text(_optionSubtitle(option)!),
                               ),
                           ],
                         ),
@@ -772,7 +877,11 @@ class _AlternativesSheet extends ConsumerWidget {
                                       .read(
                                         liturgicalNavigationControllerProvider,
                                       )
-                                      .selectDay(date, template.id),
+                                      .selectDay(
+                                        date,
+                                        template.id,
+                                        diocese: selected.contextDiocese,
+                                      ),
                                 ),
                               ),
                           ],
@@ -801,6 +910,14 @@ class _AlternativesSheet extends ConsumerWidget {
       ),
     );
   }
+}
+
+String? _optionSubtitle(DayOption option) {
+  final parts = [
+    ?option.displaySubtitle,
+    if (option.badges.isNotEmpty) option.badges.join(', '),
+  ];
+  return parts.isEmpty ? null : parts.join(' · ');
 }
 
 String _groupKey(DayOption option) {
