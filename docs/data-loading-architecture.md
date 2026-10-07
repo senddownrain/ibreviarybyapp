@@ -171,7 +171,12 @@ Hive. В C читатель с первого запуска имеет всё, 
 `completoriums`, `prayers`, `prayerCategories`, `songs` (3.53 МБ), плюс
 `manifest.json` (дата контента, число документов и digest каждой коллекции).
 С октября 2026 сюда же входит Кампендый: `compendium` (27 разделов) и
-`compendiumMeta` (`current`: meta и parts), +0.11 МБ. Отдельно, как и раньше:
+`compendiumMeta` (`current`: meta и parts), +0.11 МБ. С переносом Ordo —
+календарь и канонические Proper: `liturgicalCalendarMeta`,
+`liturgicalCelebrations`, `liturgicalDioceseOverrides`,
+`liturgicalYearOverrides`, `liturgicalProperTexts` (ядро Гадзін, декод с
+литургией) и `liturgicalOrdoNotes` (лениво, только для Ordo), +0.72 МБ
+(APK arm64 +1.05 МБ), см. `docs/ordo-flutter-port.md`. Отдельно, как и раньше:
 Біблія (bel, ru), чин Імшы, шрифты.
 
 Формат файла коллекции: `{schemaVersion, collection, contentVersion, strings,
