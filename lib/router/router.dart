@@ -88,6 +88,14 @@ const _ordoRoute = AppRouteDescriptor(
   branch: AppBranch.hours,
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.legacy,
+  showsNavigationDock: false,
+);
+const _ordoMonthRoute = AppRouteDescriptor(
+  id: 'hours.ordo.month',
+  branch: AppBranch.hours,
+  defaultChromeMode: ReaderChromeMode.full,
+  topChromeOwner: TopChromeOwner.legacy,
+  showsNavigationDock: false,
 );
 const _hoursPickerOptionsRoute = AppRouteDescriptor(
   id: 'hours.picker.options',
@@ -100,6 +108,7 @@ const _horaRoute = AppRouteDescriptor(
   branch: AppBranch.hours,
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.legacy,
+  showsNavigationDock: false,
 );
 const _oraRoute = AppRouteDescriptor(
   id: 'hours.ora',
@@ -265,11 +274,28 @@ final router = GoRouter(
                     state,
                     _ordoRoute,
                     OrdoScreen(
+                      dayId: state.uri.queryParameters['dayId'],
+                      diocese: state.uri.queryParameters['diocese'],
                       initialDate:
                           _parseDate(state.uri.queryParameters['date']) ??
                           DateUtils.dateOnly(DateTime.now()),
                     ),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'month',
+                      pageBuilder: (context, state) => _branchPage(
+                        state,
+                        _ordoMonthRoute,
+                        OrdoMonthScreen(
+                          initialDate:
+                              _parseDate(state.uri.queryParameters['date']) ??
+                              DateTime.now(),
+                          diocese: state.uri.queryParameters['diocese'],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 GoRoute(
                   path: 'hora/:date/:dayId',

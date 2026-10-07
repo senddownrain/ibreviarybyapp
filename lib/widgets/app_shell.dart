@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/content_update_scheduler.dart';
 
@@ -146,6 +147,31 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                           onTap: () => showSecondaryMenu(context),
                         ),
                       ),
+                    if (shellOwnsTop &&
+                        descriptor.isBranchRoot &&
+                        widget.activeBranch == AppBranch.hours)
+                      Positioned(
+                        top: topPadding + 8,
+                        right: 12,
+                        child: _FloatingDayButton(
+                          onTap: () {
+                            final date = ref.read(selectedDateProvider);
+                            final selection = ref.read(
+                              hoursLiturgicalSelectionProvider,
+                            );
+                            if (selection.dayId case final id?) {
+                              context.push(
+                                horaRouteForContext(
+                                  date: date,
+                                  dayId: id,
+                                  diocese: selection.diocese,
+                                  optionId: selection.selected?.optionId,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
                   ],
                 ),
                 bottomNavigationBar: AppNavigationDock(
@@ -199,4 +225,23 @@ class _FloatingMenuButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class _FloatingDayButton extends StatelessWidget {
+  const _FloatingDayButton({required this.onTap});
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => AdaptiveChromeSurface(
+    role: ChromeSurfaceRole.control,
+    borderRadius: BorderRadius.circular(24),
+    child: SizedBox.square(
+      dimension: 48,
+      child: IconButton(
+        key: const Key('hours-calendar-action'),
+        tooltip: 'Літургічны дзень',
+        onPressed: onTap,
+        icon: const PhosphorIcon(PhosphorIconsRegular.calendarDots, size: 24),
+      ),
+    ),
+  );
 }

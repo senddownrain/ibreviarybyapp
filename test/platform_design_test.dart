@@ -1,4 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +13,7 @@ import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 
 void main() {
+  setUpAll(() => initializeDateFormatting('be'));
   testWidgets('chrome uses Liquid Glass only on Apple platforms', (
     tester,
   ) async {
@@ -34,39 +38,43 @@ void main() {
     expect(find.byKey(const Key('adaptive-chrome-glass')), findsNothing);
   });
 
-  testWidgets('date picker is Cupertino on iOS and Material on Android', (
-    tester,
-  ) async {
-    Widget app(TargetPlatform platform) => MaterialApp(
-      key: ValueKey(platform),
-      theme: ThemeData(platform: platform),
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: TextButton(
-            onPressed: () => showAmbientDatePicker(
-              context: context,
-              initialDate: DateTime(2026, 9, 7),
+  testWidgets(
+    'date picker uses the shared liturgical calendar on iOS and Android',
+    (tester) async {
+      Widget app(TargetPlatform platform) => ProviderScope(
+        overrides: [
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+        ],
+        child: MaterialApp(
+          key: ValueKey(platform),
+          theme: ThemeData(platform: platform),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => showAmbientDatePicker(
+                  context: context,
+                  initialDate: DateTime(2026, 9, 7),
+                ),
+                child: const Text('open'),
+              ),
             ),
-            child: const Text('open'),
           ),
         ),
-      ),
-    );
-
-    await tester.pumpWidget(app(TargetPlatform.iOS));
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-    expect(find.byType(CupertinoDatePicker), findsOneWidget);
-    expect(find.byType(CalendarDatePicker), findsNothing);
-
-    await tester.tap(find.text('Скасаваць'));
-    await tester.pumpAndSettle();
-    await tester.pumpWidget(app(TargetPlatform.android));
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-    expect(find.byType(CalendarDatePicker), findsOneWidget);
-    expect(find.byType(CupertinoDatePicker), findsNothing);
-  });
+      );
+      for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
+        await tester.pumpWidget(app(platform));
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);
+        expect(find.byType(CalendarDatePicker), findsNothing);
+        expect(find.byType(CupertinoDatePicker), findsNothing);
+        await tester.tap(find.byTooltip('Закрыць'));
+        await tester.pumpAndSettle();
+        expect(find.byType(Dialog), findsNothing);
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
 
   testWidgets('segmented choices follow the target platform', (tester) async {
     Widget app(TargetPlatform platform) => MaterialApp(

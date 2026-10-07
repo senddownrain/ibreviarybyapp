@@ -41,6 +41,11 @@ class HoursLiturgicalSelection {
   String? get diocese => selected?.contextDiocese ?? selected?.ordo?.diocese;
   int get alternativesCount => primary == null ? 0 : sortedOptions.length - 1;
 
+  bool get hasCelebrationAlternatives => alternativesCount > 0;
+  bool get hasOfficeTemplates => (selected?.templates.length ?? 0) > 1;
+  bool get hasLiturgicalChoices =>
+      hasCelebrationAlternatives || hasOfficeTemplates;
+
   DayOption? get effectiveOption {
     final option = selected;
     final effectiveDay = day;

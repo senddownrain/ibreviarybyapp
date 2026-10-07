@@ -22,16 +22,13 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 
-/// Compatibility/fallback screen showing liturgical hours for a day.
-///
-/// Stage 3 keeps this route for old links and transitional navigation. The
-/// normal daily flow now opens an hour directly from the Hours root.
-/// Status: KEEP / DEPRECATE / REMOVE LATER.
+/// The selected liturgical day, its Office variants and available hours.
 class HoraPickerScreen extends ConsumerStatefulWidget {
   final String dayId;
   final DateTime date;
@@ -65,7 +62,9 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
   @override
   void didUpdateWidget(covariant HoraPickerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.dayId != widget.dayId || oldWidget.date != widget.date) {
+    if (oldWidget.dayId != widget.dayId ||
+        oldWidget.date != widget.date ||
+        oldWidget.diocese != widget.diocese) {
       setState(() {
         _loading = true;
         _day = null;
@@ -142,6 +141,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
         dynamicDates,
         includeAlternatives: true,
         dayId: widget.dayId,
+        diocese: _diocese,
       );
       final references = <String>{};
       for (final reading in readings) {
@@ -168,6 +168,15 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     }
   }
 
+  String get _ordoRoute => Uri(
+    path: '/hours/ordo',
+    queryParameters: {
+      'date': liturgicalDateKey(widget.date),
+      'dayId': widget.dayId,
+      'diocese': _diocese,
+    },
+  ).toString();
+
   bool _isHoraAvailable(HoraItem hora) {
     return isHourAvailable(_day, hora);
   }
@@ -180,7 +189,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     if (_loading) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar.text('Літургія гадзін'),
+        appBar: AdaptiveAppBar.text('Літургічны дзень'),
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
@@ -189,7 +198,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                 0,
                 MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
                 0,
-                MediaQuery.paddingOf(context).bottom + 24,
+                MediaQuery.viewPaddingOf(context).bottom + 24,
               ),
               children: const [
                 DataLoadingNotice(
@@ -207,7 +216,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     if (day == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar.text('Літургія гадзін'),
+        appBar: AdaptiveAppBar.text('Літургічны дзень'),
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
@@ -235,18 +244,13 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar(
-        title: const Text('Літургія гадзін'),
+        title: const Text('Літургічны дзень'),
         actions: [
           IconButton(
-            tooltip: 'Чытанні',
-            icon: const PhosphorIcon(PhosphorIconsRegular.bookOpen, size: 22),
-            onPressed: () => context.go(
-              readingsRouteForContext(
-                date: widget.date,
-                dayId: widget.dayId,
-                diocese: widget.diocese,
-              ),
-            ),
+            key: const Key('day-open-ordo'),
+            tooltip: 'Ordo гэтага дня',
+            icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 22),
+            onPressed: () => context.push(_ordoRoute),
           ),
         ],
       ),
@@ -263,8 +267,8 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                   MediaQuery.paddingOf(context).top +
                       kFloatingAppBarContentInset,
                   12,
-                  // Keep the final hour clear of the floating app dock.
-                  MediaQuery.paddingOf(context).bottom + 24,
+                  // System navigation / home indicator inset.
+                  MediaQuery.viewPaddingOf(context).bottom + 24,
                 ),
                 children: [
                   GlassSurface(
@@ -370,8 +374,8 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                           if (_templates.length > 1) ...[
                             const SizedBox(height: 14),
                             Text(
-                              'ШАБЛОН ЛІТУРГІІ ДНЯ',
-                              style: Theme.of(context).textTheme.labelSmall
+                              'Варыянт Літургіі гадзін',
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     color: cs.onSurfaceVariant,
                                     fontWeight: FontWeight.w700,
@@ -379,19 +383,22 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                                   ),
                             ),
                             const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                            Column(
                               children: [
                                 for (final template in _templates)
-                                  ChoiceChip(
-                                    label: Text(template.label),
-                                    selected: template.id == widget.dayId,
-                                    onSelected: (_) => context.replace(
-                                      horaRouteForContext(
-                                        date: widget.date,
-                                        dayId: template.id,
-                                        diocese: widget.diocese,
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: SelectionOptionCard(
+                                      key: Key('day-template-${template.id}'),
+                                      title: template.label,
+                                      selected: template.answers(widget.dayId),
+                                      accentColor: dayColor,
+                                      onTap: () => context.replace(
+                                        horaRouteForContext(
+                                          date: widget.date,
+                                          dayId: template.id,
+                                          diocese: _diocese,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -448,6 +455,15 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                     ),
                     const SizedBox(height: 12),
                   ],
+                  TextButton(
+                    onPressed: () => context.push(_ordoRoute),
+                    child: const Row(
+                      children: [
+                        Expanded(child: Text('Падрабязны Ordo гэтага дня')),
+                        PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
