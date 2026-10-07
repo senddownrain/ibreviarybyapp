@@ -49,6 +49,22 @@ extension type OrdoOption(Json data) {
   String? get transferredTo => data['transferredTo'] as String?;
   String? get movedFrom => data['movedFrom'] as String?;
   String? get demotedFrom => data['demotedFrom'] as String?;
+
+  /// A temporary product decision, source-dependent (Christ the High
+  /// Priest meeting another feast, §11.4).
+  bool get provisional => data['provisional'] == true;
+
+  /// The Office source of a split day (the Sunday on All Souls Sunday).
+  bool get officeOnly => data['officeOnly'] == true;
+
+  /// `rank-not-source-confirmed`: an impeded diocesan solemnity kept
+  /// without transfer.
+  String? get transferBlocked => data['transferBlocked'] as String?;
+
+  /// Provenance of the stored transfer override that placed the option
+  /// (`{id?, source, status, computedDate}`).
+  Json? get transferOverride =>
+      (data['transferOverride'] as Map?)?.cast<String, dynamic>();
   String? get reason => data['reason'] as String?;
   String? get readingsReference => data['readingsReference'] as String?;
   List<String> get templates => [
@@ -68,6 +84,60 @@ extension type OrdoOption(Json data) {
   bool get isSuppressed => role == 'suppressed';
 }
 
+/// Where one side of the day comes from (port of `sources.office` /
+/// `sources.mass` of the web `ResolvedLiturgicalDay`).
+class OrdoSource {
+  const OrdoSource({
+    required this.optionId,
+    required this.celebrationId,
+    required this.kind,
+    required this.officeKind,
+    required this.title,
+  });
+
+  factory OrdoSource.of(OrdoOption option) => OrdoSource(
+    optionId: option.id,
+    celebrationId: option.isTemporal ? null : option.id,
+    kind: option.kind,
+    officeKind: option.officeKind,
+    title: option.title,
+  );
+
+  final String optionId;
+
+  /// Null for the temporal day.
+  final String? celebrationId;
+  final String kind;
+  final String officeKind;
+  final String title;
+}
+
+/// Office (Liturgy of the Hours) and Mass (Mass texts and readings)
+/// sources of a date. They are the same option except where a rule splits
+/// them: All Souls on a Sunday (§11.1) — Office of the Sunday, Mass and
+/// readings of All Souls.
+class OrdoSources {
+  const OrdoSources({
+    required this.office,
+    required this.mass,
+    required this.split,
+  });
+  final OrdoSource office;
+  final OrdoSource mass;
+  final bool split;
+}
+
+/// One Mass of a celebration with several Masses (All Souls: three reading
+/// sets of the one celebration, `all-souls-mass-1…3`). The reading sets
+/// themselves come from the readings model.
+class OrdoMassVariant {
+  const OrdoMassVariant(this.id, this.ordinal);
+  final String id;
+  final int ordinal;
+}
+
+const _allSoulsMasses = [1, 2, 3];
+
 /// One civil date resolved for one diocese.
 class OrdoDay {
   OrdoDay._({
@@ -75,6 +145,7 @@ class OrdoDay {
     required this.diocese,
     required this.candidates,
     required this.primary,
+    required this.officePrimary,
     required this.alternatives,
     required this.commemorations,
     required this.suppressed,
@@ -87,7 +158,12 @@ class OrdoDay {
   final Season season;
   final String diocese;
   final List<Json> candidates;
+  /// The primary celebration: Mass, readings, colour, title of the day.
   final OrdoOption primary;
+
+  /// The Office (Hours) source: [primary], except on a split day (All Souls
+  /// on a Sunday: the Sunday, `officeOnly`).
+  final OrdoOption officePrimary;
   final List<OrdoOption> alternatives;
   final List<OrdoOption> commemorations;
   final List<OrdoOption> suppressed;
@@ -106,11 +182,39 @@ class OrdoDay {
   String get color => primary.color;
   List<String> get colorAlternatives => primary.colorAlternatives;
 
-  /// PRIMARY + LEGAL ALTERNATIVES.
+  /// PRIMARY + LEGAL ALTERNATIVES (Mass / readings / calendar options).
   List<OrdoOption> get options => [primary, ...alternatives];
 
+  /// Office and Mass may come from different sources on one date (§11.1).
+  bool get isSplit => officePrimary.id != primary.id;
+
+  /// Legal Offices of the Liturgy of the Hours: [options], or only the
+  /// Sunday on a split day. The Hours iterate these, never [options].
+  List<OrdoOption> get officeOptions => isSplit ? [officePrimary] : options;
+
+  /// Office / Mass sources of the day. The readings side reads
+  /// `sources.mass` (= [primary]); the Hours read `sources.office`.
+  OrdoSources get sources => OrdoSources(
+    office: OrdoSource.of(officePrimary),
+    mass: OrdoSource.of(primary),
+    split: isSplit,
+  );
+
+  /// A legal option (Mass side) or legal Office by id.
   OrdoOption? option(String? id) =>
-      options.where((option) => option.id == id).firstOrNull;
+      options.where((option) => option.id == id).firstOrNull ??
+      officeOptions.where((option) => option.id == id).firstOrNull;
+
+  /// Several Masses of the primary celebration (All Souls: three reading
+  /// sets, also when 2 November is a Sunday); empty otherwise. Mirrors
+  /// web `readingResolution.primary.variants` with
+  /// `variantsKind: 'reading-sets'`.
+  List<OrdoMassVariant> get massVariants => primary.officeKind == 'all-souls'
+      ? [
+          for (final ordinal in _allSoulsMasses)
+            OrdoMassVariant('all-souls-mass-$ordinal', ordinal),
+        ]
+      : const [];
 
   OrdoOption get temporal => OrdoOption(
     candidates.firstWhere((candidate) => candidate['kind'] == 'temporal'),
@@ -118,9 +222,12 @@ class OrdoDay {
 
   final Map<String, OfficeDescriptor> _office = {};
 
-  /// Office descriptor of a legal option (null for an unknown id).
+  /// Office descriptor of a legal Office (null for an unknown id; on a
+  /// split day only the Sunday has one, as on the web).
   OfficeDescriptor? office(String optionId) {
-    final option = this.option(optionId);
+    final option = officeOptions
+        .where((option) => option.id == optionId)
+        .firstOrNull;
     if (option == null) return null;
     return _office.putIfAbsent(
       optionId,
@@ -254,10 +361,17 @@ class _Core {
 
 /// The engine of one publication of the calendar definitions (+ notes).
 class OrdoEngine {
-  OrdoEngine(this.definitions, {Iterable<Json> notes = const []})
-    : _notes = notes.toList();
+  OrdoEngine(
+    this.definitions, {
+    Iterable<Json> notes = const [],
+    this.ignoreTransferOverrides = false,
+  }) : _notes = notes.toList();
 
   final OrdoDefinitions definitions;
+
+  /// The pure transfer algorithm: stored transfer overrides (materialized
+  /// auto transfers and their manual corrections) are not used.
+  final bool ignoreTransferOverrides;
   final List<Json> _notes;
 
   final Map<String, YearPlan> _plans = {};
@@ -273,7 +387,12 @@ class OrdoEngine {
     final key = '$year|$dioceseId';
     final cached = _plans.remove(key);
     if (cached != null) return _plans[key] = cached;
-    final built = buildYearPlan(year, definitions, diocese: dioceseId);
+    final built = buildYearPlan(
+      year,
+      definitions,
+      diocese: dioceseId,
+      ignoreTransferOverrides: ignoreTransferOverrides,
+    );
     _plans[key] = built;
     if (_plans.length > _planCacheLimit) _plans.remove(_plans.keys.first);
     return built;
@@ -309,16 +428,18 @@ class OrdoEngine {
     final tomorrow = _core(addDays(iso, 1), dioceseId);
     final yesterday = _core(addDays(iso, -1), dioceseId);
     final display = today.display;
+    // The evening follows the Office source (All Souls on a Sunday: the
+    // Sunday, §11.1).
     final evening = resolveEvening(
-      display.primary,
+      display.officePrimary,
       today.season,
-      tomorrow.display.primary,
+      tomorrow.display.officePrimary,
       tomorrow.season,
     );
     final eve = resolveEvening(
-      yesterday.display.primary,
+      yesterday.display.officePrimary,
       yesterday.season,
-      display.primary,
+      display.officePrimary,
       today.season,
     );
     final day = OrdoDay._(
@@ -326,6 +447,7 @@ class OrdoEngine {
       diocese: dioceseId,
       candidates: today.candidates,
       primary: OrdoOption(display.primary),
+      officePrimary: OrdoOption(display.officePrimary),
       alternatives: [for (final item in display.alternatives) OrdoOption(item)],
       commemorations: [
         for (final item in display.commemorations) OrdoOption(item),
@@ -339,7 +461,7 @@ class OrdoEngine {
       evening: evening,
       firstVespersCelebratedOnEve:
           eve.vespersType == 'first' &&
-          eve.celebrationId == display.primary['id'],
+          eve.celebrationId == display.officePrimary['id'],
     );
     _days[key] = day;
     if (_days.length > _dayCacheLimit) _days.remove(_days.keys.first);
@@ -385,17 +507,28 @@ class OrdoEngine {
     return result;
   }
 
-  /// Canonical Ordo notes of a resolved day (layer notes are part of the
-  /// notes collection).
-  List<Json> notesOf(OrdoDay day) {
+  final Expando<List<Json>> _selectedNotes = Expando();
+
+  List<Json> _notesSelected(OrdoDay day) {
     if (_notes.isEmpty) return const [];
-    return selectOrdoNotes(
+    return _selectedNotes[day] ??= selectOrdoNotes(
       _notes,
       day.noteView,
       diocese: day.diocese,
       dateOfCelebration: (id) => datesOfCelebration(id, day.date, day.diocese),
     );
   }
+
+  /// Canonical Ordo notes of a resolved day (layer notes are part of the
+  /// notes collection), without the `books` volume markers (§13.1).
+  List<Json> notesOf(OrdoDay day) => [
+    for (final note in _notesSelected(day))
+      if (!isBooksNote(note)) note,
+  ];
+
+  /// Lectionary / Liturgy of the Hours volumes of a resolved day (notes of
+  /// the category `books`; most specific selector wins), or null.
+  OrdoBooks? booksOf(OrdoDay day) => booksFromNotes(_notesSelected(day));
 
   /// The civil date of a liturgical position in [year], found by the engine
   /// itself; null when the position does not exist that year (never a date

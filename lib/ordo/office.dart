@@ -283,6 +283,8 @@ OfficeDescriptor buildOfficeDescriptor(Json candidate, Season season) {
         'Нешпары адмаўляюць толькі тыя, хто не ўдзельнічае ў вячэрняй Імшы Апошняй Вячэры.',
       if (officeKind == 'triduum' && season.date == a.goodFriday)
         'Нешпары адмаўляюць толькі тыя, хто не ўдзельнічае ў Літургіі Мукі Пана.',
+      if (candidate['officeOnly'] == true)
+        'Успамін усіх памерлых у нядзелю: Літургія гадзін — з нядзелі; Імша і чытанні — Успаміну ўсіх памерлых.',
     ],
   );
 }

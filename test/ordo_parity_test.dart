@@ -36,6 +36,7 @@ void main() {
     'transferredFrom': ?item.transferredFrom,
     'movedFrom': ?item.movedFrom,
     'demotedFrom': ?item.demotedFrom,
+    if (item.provisional) 'provisional': true,
   };
 
   Map<String, dynamic> actualOf(OrdoDay day) => {
@@ -57,13 +58,27 @@ void main() {
       for (final item in day.suppressed) {'id': item.id, 'reason': item.reason},
     ],
     'transfers': [for (final item in day.transfers) item.toJson()],
+    'sources': day.sources.split
+        ? {
+            'office': day.sources.office.optionId,
+            'mass': day.sources.mass.optionId,
+          }
+        : null,
+    'books': switch (engine.booksOf(day)) {
+      final books? => {
+        'lectionaryVolume': books.lectionaryVolume,
+        'hoursVolume': books.hoursVolume,
+      },
+      null => null,
+    },
     'evening': {
       'type': day.evening.vespersType,
       'celebrationId': day.evening.celebrationId,
       'compline': day.evening.compline,
     },
     'office': [
-      for (final option in day.options)
+      // Legal Offices of the Hours (the Sunday on All Souls Sunday).
+      for (final option in day.officeOptions)
         () {
           final descriptor = optionDescriptor(day, option);
           return {
@@ -93,6 +108,8 @@ void main() {
     'commemorations',
     'suppressed',
     'transfers',
+    'sources',
+    'books',
     'evening',
     'office',
     'notes',

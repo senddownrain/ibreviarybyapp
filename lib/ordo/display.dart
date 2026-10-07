@@ -16,6 +16,15 @@ import 'package:mybrev_flutter/ordo/precedence.dart';
 import 'package:mybrev_flutter/ordo/season.dart';
 
 bool _obligatory(Json c) => c['rankKind'] == 'memorial';
+
+/// `concurrentObligatoryMemorials` values that open a memorial choice
+/// ('legal-choice'; the legacy 'both-optional' of published definitions
+/// revision 2 means the same).
+const _concurrentChoiceValues = {'legal-choice', 'both-optional'};
+
+/// Jesus Christ, the High and Eternal Priest (national feast, Thursday after
+/// Pentecost).
+const kChristHighPriestId = 'christ-the-high-priest';
 bool _anyMemorial(Json c) =>
     c['rankKind'] == 'memorial' || c['rankKind'] == 'optional-memorial';
 
@@ -57,12 +66,18 @@ String officeKindOf(Json candidate, Season season) {
 class DisplayResult {
   const DisplayResult({
     required this.primary,
+    required this.officePrimary,
     required this.alternatives,
     required this.commemorations,
     required this.suppressed,
     required this.appliedRules,
   });
   final Json primary;
+
+  /// Office (Hours) source of the day: [primary], except where a rule
+  /// splits the Office from the Mass (All Souls on a Sunday: the Sunday,
+  /// marked `officeOnly`).
+  final Json officePrimary;
   final List<Json> alternatives;
   final List<Json> commemorations;
   final List<Json> suppressed;
@@ -98,47 +113,24 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
   var celebrations = active.where((c) => c['kind'] != 'temporal').toList();
   stableSort(celebrations, compareCandidates);
 
-  // Concurrent obligatory memorials become optional (Immaculate Heart).
+  // Product rule (Belarus, final phase §11.2–11.3): when the Immaculate
+  // Heart or Mary, Mother of the Church meets another obligatory memorial,
+  // both obligatory memorials are legal choices (Marian first) and the
+  // weekday is NOT a third option.
   final obligatory = celebrations.where(_obligatory).toList();
-  if (obligatory.length > 1 &&
+  final memorialChoice =
+      obligatory.length > 1 &&
       obligatory.any(
-        (c) =>
-            (c['rules'] as Map?)?['concurrentObligatoryMemorials'] ==
-            'both-optional',
-      )) {
-    celebrations = [
-      for (final item in celebrations)
-        _obligatory(item)
-            ? {
-                ...item,
-                'rankKind': 'optional-memorial',
-                'precedence': 12,
-                'demotedFrom': 'memorial',
-              }
-            : item,
-    ];
-    appliedRules.add({
-      'rule': 'concurrent-obligatory-memorials-optional',
-      'ids': [for (final c in obligatory) c['id']],
-    });
-    // Co-equal choices: a neutral, stable order (title), not a hidden
-    // priority; `manualTieBreakPriority` may set one.
-    final demoted = celebrations
-        .where((c) => c['demotedFrom'] == 'memorial')
-        .toList();
-    stableSort(demoted, (a, b) {
-      final priority = ((b['manualTieBreakPriority'] as num?) ?? 0).compareTo(
-        (a['manualTieBreakPriority'] as num?) ?? 0,
+        (c) => _concurrentChoiceValues.contains(
+          (c['rules'] as Map?)?['concurrentObligatoryMemorials'],
+        ),
       );
-      if (priority != 0) return priority;
-      final title = compareBelarusian('${a['title']}', '${b['title']}');
-      return title != 0 ? title : '${a['id']}'.compareTo('${b['id']}');
+  if (memorialChoice) {
+    appliedRules.add({
+      'rule': 'concurrent-obligatory-memorials-legal-choice',
+      'ids': [for (final c in obligatory) c['id']],
+      'basis': 'product-decision',
     });
-    var index = 0;
-    celebrations = [
-      for (final item in celebrations)
-        item['demotedFrom'] == 'memorial' ? demoted[index++] : item,
-    ];
   }
 
   // Optional memorials are never the primary office.
@@ -163,6 +155,7 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     primary = temporal;
   }
 
+  Json? officePrimary;
   if (!identical(primary, temporal)) {
     if (primary['temporal'] == true) {
       suppressed.add(
@@ -172,6 +165,17 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
       suppressed.add(_suppress(temporal, 'weekday-under-memorial'));
       appliedRules.add({
         'rule': 'weekday-not-alternative-to-obligatory-memorial',
+      });
+    } else if (primary['rankKind'] == 'all-souls' && season.isSunday) {
+      // Product rule (§11.1): All Souls on a Sunday — the Mass (and
+      // readings) are of All Souls, the Liturgy of the Hours is of the
+      // Sunday. The Sunday is not suppressed: it is the Office source.
+      officePrimary = temporal;
+      appliedRules.add({
+        'rule': 'all-souls-sunday-split',
+        'office': temporal['id'],
+        'mass': primary['id'],
+        'basis': 'product-decision',
       });
     } else {
       suppressed.add(_suppress(temporal, 'outranked'));
@@ -205,10 +209,35 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     }
     final kind = candidate['rankKind'];
     if (kind == 'solemnity' || kind == 'all-souls') {
-      suppressed.add(_suppress(candidate, 'outranked'));
+      suppressed.add(
+        _suppress(
+          candidate,
+          candidate['impededWithoutTransfer'] == true
+              ? 'impeded-without-transfer'
+              : 'outranked',
+        ),
+      );
       continue;
     }
     if (kind == 'feast') {
+      // Provisional product rule (§11.4): Christ the High Priest meeting
+      // another feast keeps both as legal options.
+      if (primary['rankKind'] == 'feast' &&
+          (candidate['id'] == kChristHighPriestId ||
+              primary['id'] == kChristHighPriestId)) {
+        alternatives.add({
+          ...candidate,
+          'role': 'alternative',
+          'provisional': true,
+        });
+        appliedRules.add({
+          'rule': 'christ-high-priest-collision-both-options',
+          'id': candidate['id'],
+          'with': primary['id'],
+          'status': 'provisional',
+        });
+        continue;
+      }
       suppressed.add(_suppress(candidate, 'impeded-omitted'));
       appliedRules.add({
         'rule': 'impeded-feast-omitted',
@@ -240,7 +269,8 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     }
     if (primary['rankKind'] == 'memorial') {
       if (_obligatory(candidate) &&
-          candidate['precedence'] == primary['precedence']) {
+          (candidate['precedence'] == primary['precedence'] ||
+              memorialChoice)) {
         alternatives.add({...candidate, 'role': 'alternative'});
         appliedRules.add({
           'rule': 'concurrent-obligatory-memorials-choice',
@@ -254,12 +284,21 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     suppressed.add(_suppress(candidate, 'impeded-omitted'));
   }
 
+  final resolvedPrimary = {
+    ...primary,
+    'role': 'primary',
+    'officeKind': officeKindOf(primary, season),
+  };
   return DisplayResult(
-    primary: {
-      ...primary,
-      'role': 'primary',
-      'officeKind': officeKindOf(primary, season),
-    },
+    primary: resolvedPrimary,
+    officePrimary: officePrimary == null
+        ? resolvedPrimary
+        : {
+            ...officePrimary,
+            'role': 'primary',
+            'officeKind': officeKindOf(officePrimary, season),
+            'officeOnly': true,
+          },
     alternatives: [
       for (final item in alternatives)
         {...item, 'officeKind': officeKindOf(item, season)},

@@ -25,8 +25,35 @@ OrdoEngine bundledOrdoEngine() => _engine ??= OrdoEngine(
   notes: bundledCollection('liturgicalOrdoNotes').values,
 );
 
-/// The web-generated parity fixture (mybrev `npm run ordo:flutter-fixture`).
-Map<String, dynamic> ordoParityFixture() =>
+/// Schema of the parity fixture this port is tested against (mybrev
+/// `PARITY_SCHEMA_VERSION`). 2 = final phase: `sources` (Office/Mass split,
+/// present only when split), `office` of `officeOptions`, `provisional`
+/// options, `books` (present only when the day has volumes), transfers with
+/// `computedDate`, `fieldRuleKinds`.
+const kOrdoParitySchemaVersion = 2;
+
+Map<String, dynamic>? _fixture;
+
+/// The web-generated parity fixture (mybrev `npm run ordo:flutter-fixture`),
+/// decoded once per test isolate.
+Map<String, dynamic> ordoParityFixture() {
+  final fixture = _fixture ??= _decodeFixture();
+  final schema = fixture['schemaVersion'];
+  if (schema != kOrdoParitySchemaVersion) {
+    throw StateError(
+      'ordo_parity.json.gz has schema $schema, '
+      'the port expects $kOrdoParitySchemaVersion',
+    );
+  }
+  return fixture;
+}
+
+/// `_fieldRules` kinds the fixture's Office hashes rely on (schema 2).
+List<String> ordoParityFieldRuleKinds() => [
+  ...?(ordoParityFixture()['fieldRuleKinds'] as List?)?.map((e) => '$e'),
+];
+
+Map<String, dynamic> _decodeFixture() =>
     jsonDecode(
           utf8.decode(
             GZipDecoder().decodeBytes(

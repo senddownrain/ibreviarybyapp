@@ -200,3 +200,78 @@ List<Json> selectOrdoNotes(
         matchesSelector(note['selector'], day, dateOfCelebration))
       {...note, 'displayOnly': note['displayOnly'] ?? note['effect'] == null},
 ];
+
+// ── Books (final phase §13.1) ───────────────────────────────────────────
+
+/// Lectionary / Liturgy of the Hours volumes of a day: notes of the
+/// category `books` carry `books: {lectionaryVolume?, hoursVolume?}`; they
+/// are day metadata, not «Асаблівыя заўвагі».
+class OrdoBooks {
+  const OrdoBooks({this.lectionaryVolume, this.hoursVolume, this.noteIds = const []});
+
+  /// Roman numeral of the Lectionary volume («III»), or null.
+  final String? lectionaryVolume;
+
+  /// Roman numeral of the Liturgy of the Hours volume, or null.
+  final String? hoursVolume;
+
+  /// The notes the volumes come from.
+  final List<String> noteIds;
+
+  /// «Лекцыянарый т. III · Літургія гадзін т. III» (mybrev `booksLabel`).
+  String get label => [
+    if (lectionaryVolume != null) 'Лекцыянарый т. $lectionaryVolume',
+    if (hoursVolume != null) 'Літургія гадзін т. $hoursVolume',
+  ].join(' · ');
+
+  Json toJson() => {
+    'lectionaryVolume': lectionaryVolume,
+    'hoursVolume': hoursVolume,
+    'noteIds': noteIds,
+  };
+}
+
+/// The most specific selector wins per field (celebration → day → period
+/// phase → period).
+const _bookSelectorRank = {
+  'celebration': 0,
+  'exact-date': 1,
+  'fixed-date': 1,
+  'period-day': 1,
+  'relative': 1,
+  'all': 2,
+  'period-phase': 3,
+  'period': 4,
+};
+
+bool isBooksNote(Json note) =>
+    note['category'] == 'books' && note['books'] is Map;
+
+/// The volumes of the selected notes, or null (port of `booksFromNotes`).
+OrdoBooks? booksFromNotes(Iterable<Json> notes) {
+  final ranked = [
+    for (final note in notes.where(isBooksNote))
+      (note, _bookSelectorRank[(note['selector'] as Map?)?['type']] ?? 5),
+  ];
+  stableSort(ranked, (a, b) {
+    final rank = a.$2.compareTo(b.$2);
+    return rank != 0 ? rank : '${a.$1['id']}'.compareTo('${b.$1['id']}');
+  });
+  final values = <String, String>{};
+  final ids = <String>[];
+  for (final field in const ['lectionaryVolume', 'hoursVolume']) {
+    for (final (note, _) in ranked) {
+      final value = (note['books'] as Map)[field];
+      if (value == null || value == '' || value == false) continue;
+      values[field] = '$value';
+      if (!ids.contains('${note['id']}')) ids.add('${note['id']}');
+      break;
+    }
+  }
+  if (ids.isEmpty) return null;
+  return OrdoBooks(
+    lectionaryVolume: values['lectionaryVolume'],
+    hoursVolume: values['hoursVolume'],
+    noteIds: ids,
+  );
+}

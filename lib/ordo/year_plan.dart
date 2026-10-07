@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/movable_feasts.dart';
 import 'package:mybrev_flutter/ordo/precedence.dart';
 import 'package:mybrev_flutter/ordo/season.dart';
+import 'package:mybrev_flutter/ordo/transfer_rank_evidence.dart';
 
 /// A celebration on a date of the year.
 class Placement {
@@ -41,6 +42,13 @@ class Placement {
   String? transferRule;
   bool impededWithoutTransfer = false;
 
+  /// `rank-not-source-confirmed`: a diocesan solemnity kept impeded.
+  String? transferBlocked;
+
+  /// Provenance of a stored transfer override that placed this celebration
+  /// (`{id?, source, status, computedDate}`).
+  Json? transferOverride;
+
   /// Why a removed placement is not celebrated.
   String? reason;
 
@@ -60,23 +68,44 @@ class Placement {
         )
         ..transferredOut = transferredOut
         ..transferredTo = transferredTo
-        ..impededWithoutTransfer = impededWithoutTransfer;
+        ..impededWithoutTransfer = impededWithoutTransfer
+        ..transferBlocked = transferBlocked
+        ..transferOverride = transferOverride;
 
   String get id => celebration['id'].toString();
 }
 
 class TransferRecord {
-  const TransferRecord(this.celebrationId, this.from, this.to, this.rule);
+  const TransferRecord(
+    this.celebrationId,
+    this.from,
+    this.to,
+    this.rule, {
+    String? computedDate,
+    this.override,
+  }) : computedDate = computedDate ?? to;
   final String celebrationId;
   final String from;
+
+  /// Effective date (where the celebration is kept).
   final String to;
   final String rule;
 
+  /// The date the transfer algorithm computed; differs from [to] only when
+  /// a stored (manual) transfer override corrects it.
+  final String computedDate;
+
+  /// Provenance of the stored transfer override used (`{id?, source,
+  /// status}`), or null for the pure algorithm.
+  final Json? override;
+
+  /// Fixture shape (mybrev `build-flutter-parity-fixture.mjs`, schema 2).
   Json toJson() => {
     'celebrationId': celebrationId,
     'from': from,
     'to': to,
     'rule': rule,
+    'computedDate': computedDate,
   };
 }
 
@@ -90,6 +119,8 @@ class YearPlan {
     required this.removedByDate,
     required this.transfers,
     required this.celebrationDates,
+    required this.appliedOverrides,
+    required this.staleTransferOverrides,
   });
 
   final int year;
@@ -99,6 +130,14 @@ class YearPlan {
   final Map<String, List<Placement>> byDate;
   final Map<String, List<Placement>> removedByDate;
   final List<TransferRecord> transfers;
+
+  /// Year overrides applied (normalized): plain overrides and confirmed
+  /// transfer overrides the algorithm no longer produces (applied as moves).
+  final List<Json> appliedOverrides;
+
+  /// Pending auto transfer overrides the algorithm no longer produces
+  /// (reported only, never applied).
+  final List<Json> staleTransferOverrides;
 
   /// celebration id → final (post-transfer) date.
   final Map<String, String> celebrationDates;
@@ -145,14 +184,61 @@ const kYearOverrideActions = [
   'changeColor',
   'changeRule',
 ];
+const kYearOverrideSources = ['auto-transfer', 'manual'];
+const kYearOverrideStatuses = ['needs-review', 'confirmed'];
 const _scopeOrder = {'universal': 0, 'belarus': 1, 'diocese': 2};
 final _isoDate = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+bool _isIso(Object? value) => _isoDate.hasMatch('${value ?? ''}');
 
 int? _intOf(Object? value) => value is num
     ? (value == value.toInt() ? value.toInt() : null)
     : int.tryParse(value?.toString() ?? '');
 
-List<String> validateYearOverride(Json override) {
+bool _present(Object? value) =>
+    value != null && value != '' && value != false && value != 0;
+
+/// Canonical form of a stored Year Override (port of
+/// `normalizeYearOverride`, final phase §12). Pure; never mutates.
+///  - `originalDate` ← `from`, `effectiveDate` ← `to` (move / add);
+///  - a free-text legacy `source` becomes `sourceNote`;
+///  - `source` / `status` get their defaults (manual + confirmed, or
+///    auto-transfer + needs-review);
+///  - `from` / `to` are kept as mirrors of the canonical dates.
+Json normalizeYearOverride(Json override) {
+  final result = Json.from(override);
+  final usesTarget =
+      override['action'] == 'move' || override['action'] == 'add';
+  final originalDate = override['originalDate'] ?? override['from'];
+  final effectiveDate = usesTarget
+      ? (override['effectiveDate'] ?? override['to'])
+      : override['effectiveDate'];
+  if (_present(originalDate)) result['originalDate'] = originalDate;
+  if (_present(effectiveDate)) result['effectiveDate'] = effectiveDate;
+  if (_present(originalDate)) result['from'] = originalDate;
+  if (usesTarget && _present(effectiveDate)) result['to'] = effectiveDate;
+  final source = override['source'];
+  if (_present(source) && !kYearOverrideSources.contains(source)) {
+    if (!_present(override['sourceNote'])) result['sourceNote'] = source;
+    result['source'] = 'manual';
+  }
+  if (!_present(result['source'])) result['source'] = 'manual';
+  if (!kYearOverrideStatuses.contains(result['status'])) {
+    result['status'] = result['source'] == 'auto-transfer'
+        ? 'needs-review'
+        : 'confirmed';
+  }
+  return result;
+}
+
+/// Materialized record of a computed transfer (auto or manually corrected):
+/// applied by the transfer step, not by the plain Year Override step.
+bool isTransferOverride(Json override) =>
+    override['action'] == 'move' &&
+    (override['source'] == 'auto-transfer' ||
+        _present(override['computedDate']));
+
+List<String> validateYearOverride(Json raw) {
+  final override = normalizeYearOverride(raw);
   final year = _intOf(override['year']);
   final action = override['action'];
   return [
@@ -166,11 +252,11 @@ List<String> validateYearOverride(Json override) {
     if (action != 'add' &&
         (override['targetCelebrationId'] ?? '').toString().isEmpty)
       'targetCelebrationId is required',
-    if (action == 'move' && !_isoDate.hasMatch('${override['to'] ?? ''}'))
+    if (action == 'move' && !_isIso(override['effectiveDate']))
       'move requires ISO `to`',
     if (action == 'add' &&
         ((override['celebration'] as Map?)?['id'] == null ||
-            !_isoDate.hasMatch('${override['to'] ?? ''}')))
+            !_isIso(override['effectiveDate'])))
       'add requires `celebration.id` and ISO `to`',
     if (action == 'changeRank' &&
         override['rank'] == null &&
@@ -181,16 +267,28 @@ List<String> validateYearOverride(Json override) {
       'changeColor requires a liturgical `color`',
     if (action == 'replace' && override['celebration'] == null)
       'replace requires `celebration` changes',
-    for (final field in const ['from', 'to'])
-      if (override[field] != null &&
-          _isoDate.hasMatch('${override[field]}') &&
+    if (_present(override['computedDate']) &&
+        !_isIso(override['computedDate']))
+      'computedDate must be an ISO date',
+    if (_present(override['originalDate']) &&
+        !_isIso(override['originalDate']))
+      'originalDate must be an ISO date',
+    if (!kYearOverrideSources.contains(override['source']))
+      'unknown source ${override['source']}',
+    if (!kYearOverrideStatuses.contains(override['status']))
+      'unknown status ${override['status']}',
+    if (override['source'] == 'auto-transfer' && action != 'move')
+      'auto-transfer overrides must be moves',
+    for (final field in const ['originalDate', 'effectiveDate'])
+      if (_present(override[field]) &&
+          _isIso(override[field]) &&
           int.parse('${override[field]}'.substring(0, 4)) != year &&
           action != 'changeRank')
-        '`$field` must be a date of $year',
+        '`${field == 'originalDate' ? 'from' : 'to'}` must be a date of $year',
   ];
 }
 
-/// Overrides of [year] for [diocese], in application order.
+/// Overrides of [year] for [diocese], in application order (normalized).
 List<Json> selectYearOverrides(List<Json> overrides, int year, String diocese) {
   final indexed = [
     for (var i = 0; i < overrides.length; i++)
@@ -207,31 +305,41 @@ List<Json> selectYearOverrides(List<Json> overrides, int year, String diocese) {
     );
     return scope != 0 ? scope : a.$1.compareTo(b.$1);
   });
-  return [for (final item in indexed) item.$2];
+  return [for (final item in indexed) normalizeYearOverride(item.$2)];
 }
 
-void _applyYearOverrides(
+/// `yearOverride` tag of a placement changed by [override].
+Json _overrideTag(Json override) => {
+  'action': override['action'],
+  'scope': override['scope'],
+  'reason': override['reason'] ?? '',
+  'source': override['source'],
+  'status': override['status'],
+  if (_present(override['id'])) 'overrideId': override['id'],
+};
+
+List<Json> _applyYearOverrides(
   List<Placement> placements,
   List<Placement> removed,
   List<Json> overrides,
   Map<String, Json> celebrations,
 ) {
-  for (final override in overrides) {
+  final applied = <Json>[];
+  for (final raw in overrides) {
+    final override = normalizeYearOverride(raw);
     if (validateYearOverride(override).isNotEmpty) continue;
+    applied.add(override);
     bool matches(Placement placement) =>
         placement.id == override['targetCelebrationId'] &&
-        (override['from'] == null || placement.date == override['from']);
-    final tag = {
-      'action': override['action'],
-      'scope': override['scope'],
-      'reason': override['reason'] ?? '',
-    };
+        (!_present(override['originalDate']) ||
+            placement.date == override['originalDate']);
+    final tag = _overrideTag(override);
     switch (override['action']) {
       case 'move':
         for (final placement in placements.where(matches)) {
           placement
             ..movedFrom = placement.date
-            ..date = override['to'] as String
+            ..date = override['effectiveDate'] as String
             ..yearOverride = tag
             ..noAutoTransfer = true;
         }
@@ -248,7 +356,7 @@ void _applyYearOverrides(
         placements.add(
           Placement(
             celebration: celebration,
-            date: override['to'] as String,
+            date: override['effectiveDate'] as String,
             yearOverride: tag,
           ),
         );
@@ -300,6 +408,7 @@ void _applyYearOverrides(
         }
     }
   }
+  return applied;
 }
 
 // ── Transfers ───────────────────────────────────────────────────────────
@@ -344,11 +453,36 @@ Json _comparable(Placement placement) => {
 int _comparePlacements(Placement a, Placement b) =>
     compareCandidates(_comparable(a), _comparable(b));
 
-List<TransferRecord> _resolveTransfers(
+/// Diocesan solemnity whose transferable rank no published calendar
+/// confirms (final phase §12): impeded without transfer.
+bool unconfirmedDiocesanSolemnity(Json celebration) {
+  final dioceseId = celebration['dioceseId'];
+  if (celebration['layer'] != 'diocese' || dioceseId == null) return false;
+  return rankEvidenceOf('$dioceseId', '${celebration['id']}').isEmpty;
+}
+
+/// The stored transfer override of a placement impeded on [iso], if any.
+Json? _overrideFor(List<Json> overrides, Placement placement, String iso) =>
+    overrides
+        .where(
+          (item) =>
+              item['targetCelebrationId'] == placement.id &&
+              (!_present(item['originalDate']) || item['originalDate'] == iso),
+        )
+        .firstOrNull;
+
+/// Transfers of impeded solemnities (port of `resolveTransfers`). The
+/// algorithm date is `computedDate`; a stored transfer override matching
+/// the celebration and its original date sets the effective date
+/// (`effectiveDate` equal to the original date = impeded without transfer).
+/// Returns the transfer records and the overrides that were used.
+(List<TransferRecord>, Set<Json>) _resolveTransfers(
   Map<String, List<Placement>> byDate,
-  Season Function(String) seasonOf,
-) {
+  Season Function(String) seasonOf, {
+  List<Json> overrides = const [],
+}) {
   final transfers = <TransferRecord>[];
+  final usedOverrides = Set<Json>.identity();
   int? strongestOn(String iso, Placement exclude) {
     int? best;
     for (final item in byDate[iso] ?? const <Placement>[]) {
@@ -404,44 +538,122 @@ List<TransferRecord> _resolveTransfers(
         placement.impededWithoutTransfer = true;
         continue;
       }
+      if (unconfirmedDiocesanSolemnity(placement.celebration)) {
+        placement
+          ..impededWithoutTransfer = true
+          ..transferBlocked = 'rank-not-source-confirmed';
+        continue;
+      }
       final special = _specialTransfers
           .where(
             (rule) =>
                 rule.celebrationId == placement.id && rule.applies(season),
           )
           .firstOrNull;
-      String? target = special != null
+      String? computed = special != null
           ? special.target(season.anchors)
           : nextFreeDay(iso, placement);
-      if (special != null && !isFree(target!, placement)) {
-        target = nextFreeDay(target, placement);
+      if (special != null && !isFree(computed!, placement)) {
+        computed = nextFreeDay(computed, placement);
+      }
+      final override = _overrideFor(overrides, placement, iso);
+      var target = computed;
+      if (override != null) {
+        usedOverrides.add(override);
+        if (_isIso(override['effectiveDate'])) {
+          target = override['effectiveDate'] as String;
+        }
       }
       if (target == null) continue;
-      placement
-        ..transferredOut = true
-        ..transferredTo = target;
+      if (target == iso) {
+        // A Year Override keeps the impeded celebration where it is.
+        placement.impededWithoutTransfer = true;
+        continue;
+      }
       final rule =
           special?.id ??
           (beatenByBase ? 'impeded-by-day' : 'impeded-by-celebration');
+      final provenance = override == null
+          ? null
+          : <String, dynamic>{
+              if (_present(override['id'])) 'id': override['id'],
+              'source': override['source'],
+              'status': override['status'],
+            };
+      placement
+        ..transferredOut = true
+        ..transferredTo = target;
       final moved = placement.copy()
         ..transferredOut = false
         ..transferredTo = null
         ..date = target
         ..transferredFrom = iso
-        ..transferRule = rule;
+        ..transferRule = rule
+        ..transferOverride = provenance == null
+            ? null
+            : {...provenance, 'computedDate': computed};
       byDate.putIfAbsent(target, () => []).add(moved);
-      transfers.add(TransferRecord(placement.id, iso, target, rule));
+      transfers.add(
+        TransferRecord(
+          placement.id,
+          iso,
+          target,
+          rule,
+          computedDate: computed,
+          override: provenance,
+        ),
+      );
     }
   }
-  return transfers;
+  return (transfers, usedOverrides);
+}
+
+/// Transfer overrides the algorithm no longer produces: a confirmed
+/// (manual) one is still the administrator's decision and is applied as a
+/// plain move; an auto one awaiting review is stale and only reported.
+(List<Json>, List<Json>) _applyUnusedTransferOverrides(
+  Map<String, List<Placement>> byDate,
+  Iterable<Json> unused,
+) {
+  final applied = <Json>[];
+  final stale = <Json>[];
+  for (final override in unused) {
+    if (override['status'] != 'confirmed') {
+      stale.add(override);
+      continue;
+    }
+    final originalDate = '${override['originalDate'] ?? ''}';
+    final effectiveDate = override['effectiveDate'];
+    final list = byDate[originalDate] ?? <Placement>[];
+    final index = list.indexWhere(
+      (item) =>
+          item.id == override['targetCelebrationId'] && !item.transferredOut,
+    );
+    if (index < 0 || !_present(effectiveDate) || effectiveDate == originalDate) {
+      stale.add(override);
+      continue;
+    }
+    final placement = list.removeAt(index);
+    final moved = placement.copy()
+      ..date = '$effectiveDate'
+      ..movedFrom = originalDate
+      ..noAutoTransfer = true
+      ..yearOverride = {..._overrideTag(override), 'action': 'move'};
+    byDate.putIfAbsent('$effectiveDate', () => []).add(moved);
+    applied.add(override);
+  }
+  return (applied, stale);
 }
 
 // ── Plan ────────────────────────────────────────────────────────────────
 
+/// [ignoreTransferOverrides] gives the pure transfer algorithm (stored
+/// transfer overrides are not used).
 YearPlan buildYearPlan(
   int year,
   OrdoDefinitions definitions, {
   String diocese = '',
+  bool ignoreTransferOverrides = false,
 }) {
   final dioceseId = normalizeDioceseId(diocese);
   final anchors = yearAnchors(year);
@@ -465,7 +677,7 @@ YearPlan buildYearPlan(
     }
   }
 
-  final overrides = selectYearOverrides(
+  final selected = selectYearOverrides(
     [
       for (final item in definitions.yearOverrides)
         if (item['enabled'] != false) item,
@@ -473,7 +685,17 @@ YearPlan buildYearPlan(
     year,
     dioceseId,
   );
-  _applyYearOverrides(placements, removed, overrides, celebrations);
+  // Materialized transfers are applied by the transfer step (they keep the
+  // computed date).
+  final transferOverrides = ignoreTransferOverrides
+      ? const <Json>[]
+      : selected.where(isTransferOverride).toList();
+  final appliedOverrides = _applyYearOverrides(
+    placements,
+    removed,
+    selected.where((item) => !isTransferOverride(item)).toList(),
+    celebrations,
+  );
 
   final byDate = <String, List<Placement>>{};
   for (final placement in placements) {
@@ -485,7 +707,15 @@ YearPlan buildYearPlan(
   final seasons = <String, Season>{};
   Season seasonOf(String iso) =>
       seasons.putIfAbsent(iso, () => computeSeason(iso));
-  final transfers = _resolveTransfers(byDate, seasonOf);
+  final (transfers, usedOverrides) = _resolveTransfers(
+    byDate,
+    seasonOf,
+    overrides: transferOverrides,
+  );
+  final (lateMoves, staleTransferOverrides) = _applyUnusedTransferOverrides(
+    byDate,
+    transferOverrides.where((item) => !usedOverrides.contains(item)),
+  );
 
   final removedByDate = <String, List<Placement>>{};
   for (final item in removed) {
@@ -509,6 +739,8 @@ YearPlan buildYearPlan(
     removedByDate: removedByDate,
     transfers: transfers,
     celebrationDates: celebrationDates,
+    appliedOverrides: [...appliedOverrides, ...lateMoves],
+    staleTransferOverrides: staleTransferOverrides,
   );
   plan._seasons.addAll(seasons);
   return plan;

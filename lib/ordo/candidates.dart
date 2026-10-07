@@ -120,6 +120,11 @@ Json celebrationCandidate(Placement placement, {String status = 'active'}) {
       'transferredFrom': placement.transferredFrom,
       'transferRule': placement.transferRule,
     },
+    if (placement.transferOverride != null)
+      'transferOverride': placement.transferOverride,
+    if (placement.transferBlocked != null)
+      'transferBlocked': placement.transferBlocked,
+    if (placement.impededWithoutTransfer) 'impededWithoutTransfer': true,
     if (placement.transferredTo != null)
       'transferredTo': placement.transferredTo,
     if (placement.movedFrom != null) 'movedFrom': placement.movedFrom,
