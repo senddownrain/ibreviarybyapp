@@ -714,7 +714,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     _loadHighlights(reading.id);
     final body = _ReadingBody(
       key: ValueKey(
-        'reading-document-${reading.id}-${massSet?.set.id ?? ''}-'
+        'reading-document-${reading.id}-'
+        '${massSet == null ? '' : '${massSet.set.id}-'}'
         '${_manualCycle ?? 'auto'}',
       ),
       reading: reading,
