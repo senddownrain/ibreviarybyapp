@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/mass_reading_sets.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 
 bool hasReadingSectionContent(ParsedSection? section) {
@@ -11,7 +12,11 @@ bool hasReadingSectionContent(ParsedSection? section) {
   return chorus.length > 5;
 }
 
+/// Structured Mass reading sets (also reference-only ones) are shown by the
+/// Readings screen even without flat fields (mybrev
+/// `hasReadingDocumentContent`).
 bool hasReadingDocumentContent(ParsedReading reading) {
+  if (reading.hasMassReadingSets) return true;
   return hasReadingSectionContent(reading.reading) ||
       hasReadingSectionContent(reading.reading1) ||
       hasReadingSectionContent(reading.reading2) ||
@@ -24,6 +29,7 @@ bool readingHasVisibleContent(ParsedReading reading) =>
     hasReadingDocumentContent(reading);
 
 bool hasReadingMapContent(Map<String, dynamic> map) {
+  if (MassReadings.fromMap(map['massReadings']) != null) return true;
   ParsedSection? section(String key) {
     final raw = map[key];
     if (raw is! Map) return null;

@@ -5,7 +5,10 @@ import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/models/mass_reading_sets.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
+import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
+import 'package:mybrev_flutter/widgets/reader/mass_set_selector.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
@@ -55,11 +58,20 @@ class ReadingsScreen extends ConsumerStatefulWidget {
   final String? liturgicalKey;
   final String? dayId;
 
+  /// Mass reading set asked by the route (`?set=`); the set chosen on the
+  /// screen (session state) wins over it.
+  final String? requestedSetId;
+
+  /// Lectionary cycle asked by the route (`?year=`).
+  final String? requestedCycle;
+
   const ReadingsScreen({
     super.key,
     this.dateStr,
     this.liturgicalKey,
     this.dayId,
+    this.requestedSetId,
+    this.requestedCycle,
   }) : assert(
          dateStr != null || liturgicalKey != null,
          'Either dateStr or liturgicalKey must be provided',
@@ -105,6 +117,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   @override
   void initState() {
     super.initState();
+    final cycle = normalizeReadingCycle(widget.requestedCycle);
+    if (cycle.isNotEmpty) _manualCycle = cycle;
     _load();
   }
 
@@ -278,7 +292,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       final group = _groups.where((group) => group.key == key).firstOrNull;
       if (group != null &&
           _manualCycle != null &&
-          !availableCyclesForGroup(group.documents).contains(_manualCycle)) {
+          !_cyclesOfGroup(group).contains(_manualCycle)) {
         _manualCycle = null;
       }
       selectedDayId = group == null ? null : readingCelebrationDayId(group);
@@ -298,8 +312,44 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     dayId: widget.dayId,
     groupKey: _activeGroupKey,
     manualCycle: _manualCycle,
+    requestedSetId: widget.requestedSetId,
+    setChoices: _setChoices(),
     groupByCelebration: widget.dateStr != null,
   );
+
+  /// Readings context of the set choices (the date or the liturgical key).
+  String get _setContext => widget.dateStr ?? widget.liturgicalKey ?? '';
+
+  /// Sets chosen on this screen for the documents of its context.
+  Map<String, String> _setChoices() {
+    final prefix = '$_setContext|';
+    return {
+      for (final entry in ref.read(readingsMassSetSelectionProvider).entries)
+        if (entry.key.startsWith(prefix))
+          entry.key.substring(prefix.length): entry.value,
+    };
+  }
+
+  /// Another Mass reading set of the same celebration (vigil / day, …).
+  /// Kept in the session state: returning to the date shows it again.
+  void _selectMassSet(MassSetSelection current, String setId) {
+    if (setId == current.set.id) return;
+    _clearSentenceSelection();
+    final next = current.sets.where((set) => set.id == setId).firstOrNull;
+    final notifier = ref.read(readingsMassSetSelectionProvider.notifier);
+    setState(() {
+      notifier.state = {
+        ...notifier.state,
+        '$_setContext|${current.document.id}': setId,
+      };
+      if (_manualCycle != null &&
+          next != null &&
+          !next.cycles.contains(_manualCycle)) {
+        _manualCycle = null;
+      }
+    });
+    _resetDocumentScroll();
+  }
 
   void _resetDocumentScroll() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -469,15 +519,27 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     }
   }
 
+  /// Cycles of a group: of its Mass reading sets, else of its documents.
+  List<String> _cyclesOfGroup(ReadingCelebrationGroup group) {
+    final sets = group.documents
+        .where((reading) => reading.hasMassReadingSets)
+        .firstOrNull
+        ?.massReadings
+        ?.sets;
+    if (sets != null) {
+      return {for (final set in sets) ...set.cycles}.toList()..sort();
+    }
+    return availableCyclesForGroup(group.documents);
+  }
+
   bool get _hasOptions {
     final selection = _selection;
-    return selection.groups.length > 1 ||
-        availableCyclesForGroup(selection.documents).length > 1;
+    return selection.groups.length > 1 || selection.cycles.length > 1;
   }
 
   Future<void> _showOptions() async {
     final selection = _selection;
-    final cycles = availableCyclesForGroup(selection.documents);
+    final cycles = selection.cycles;
     await showModalBottomSheet<void>(
       context: context,
       useRootNavigator: true,
@@ -536,7 +598,10 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           .where((group) => group.key == selection.activeGroupKey)
           .firstOrNull;
       contextTitle = _contextTitleFor(activeGroup, reading);
-      final cycle = normalizeReadingCycle(reading?.year);
+      final massSet = selection.massSet;
+      final cycle = massSet != null
+          ? massSet.cycle
+          : normalizeReadingCycle(reading?.year);
       if (cycle.isNotEmpty) cycleLabel = _cycleLabel(cycle);
       contextTitle = contextTitle
           .replaceAll(
@@ -552,7 +617,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
               icon: PhosphorIconsLight.bookOpen,
               title: 'Тэкст чытання не знойдзены',
             )
-          : _buildReadingBody(reading);
+          : _buildReadingBody(reading, selection.massSet, seasonColor);
     }
 
     final manualGroup = _activeGroupKey != _automaticGroupKey;
@@ -641,14 +706,35 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     );
   }
 
-  Widget _buildReadingBody(ParsedReading reading) {
+  Widget _buildReadingBody(
+    ParsedReading reading,
+    MassSetSelection? massSet,
+    Color seasonColor,
+  ) {
     _loadHighlights(reading.id);
-    return _ReadingBody(
-      key: ValueKey('reading-document-${reading.id}-${_manualCycle ?? 'auto'}'),
+    final body = _ReadingBody(
+      key: ValueKey(
+        'reading-document-${reading.id}-${massSet?.set.id ?? ''}-'
+        '${_manualCycle ?? 'auto'}',
+      ),
       reading: reading,
+      massSet: massSet,
       highlights: Map.unmodifiable(_highlights),
       selectedSentenceId: _selectedSentenceId,
       onSentenceTap: _toggleSentence,
+    );
+    if (massSet == null || massSet.sets.length < 2) return body;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MassSetSelector(
+          sets: massSet.sets,
+          selectedId: massSet.set.id,
+          accentColor: seasonColor,
+          onSelected: (id) => _selectMassSet(massSet, id),
+        ),
+        body,
+      ],
     );
   }
 
@@ -1084,12 +1170,16 @@ class _ReadingsStatus extends StatelessWidget {
 
 class _ReadingBody extends ConsumerWidget {
   final ParsedReading reading;
+
+  /// The structured Mass reading set to render (else the flat fields).
+  final MassSetSelection? massSet;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
   final ValueChanged<String> onSentenceTap;
   const _ReadingBody({
     super.key,
     required this.reading,
+    this.massSet,
     required this.highlights,
     required this.selectedSentenceId,
     required this.onSentenceTap,
@@ -1098,6 +1188,18 @@ class _ReadingBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reader = ReaderTheme.of(context);
+    if (massSet case final selection?) {
+      return ReadingScaffold(
+        builder: (context, textStyle) => _MassSetContent(
+          selection: selection,
+          textStyle: textStyle,
+          reader: reader,
+          highlights: highlights,
+          selectedSentenceId: selectedSentenceId,
+          onSentenceTap: onSentenceTap,
+        ),
+      );
+    }
     final hasContent = readingHasVisibleContent(reading);
 
     return ReadingScaffold(
@@ -1196,6 +1298,12 @@ class _ReadingBody extends ConsumerWidget {
               selectedSentenceId: selectedSentenceId,
               onSentenceTap: onSentenceTap,
             ),
+          if ((reading.sequence?.text ?? '').trim().isNotEmpty)
+            _SequenceSection(
+              text: reading.sequence!.text!,
+              textStyle: textStyle,
+              reader: reader,
+            ),
           if (reading.alleluia != null)
             _AlleluiaSection(
               alleluia: reading.alleluia!,
@@ -1214,6 +1322,437 @@ class _ReadingBody extends ConsumerWidget {
               onSentenceTap: onSentenceTap,
             ),
           const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Structured Mass reading sets (mybrev ParsedReadingCard `_sections`).
+
+ParsedSection _flatSection(MassReadingSection section) => ParsedSection(
+  bible: section.bible,
+  comment: section.comment,
+  title: section.title,
+  text: section.text,
+  chorus: section.chorus,
+  altChorus: section.altChorus,
+  verses: section.verses,
+  verse: section.verse,
+);
+
+/// One set in source order: readings, psalms, acclamation, sequence,
+/// Gospel (Passion by roles), rubrics; a reference-only set shows its
+/// citations only.
+class _MassSetContent extends StatelessWidget {
+  const _MassSetContent({
+    required this.selection,
+    required this.textStyle,
+    required this.reader,
+    required this.highlights,
+    required this.selectedSentenceId,
+    required this.onSentenceTap,
+  });
+
+  final MassSetSelection selection;
+  final TextStyle textStyle;
+  final ReaderTheme reader;
+  final Map<String, String> highlights;
+  final String? selectedSentenceId;
+  final ValueChanged<String> onSentenceTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final set = selection.set;
+    final base = textStyle.fontSize ?? 16.0;
+    final sections = selection.sections;
+    return Column(
+      key: ValueKey('mass-set-${set.id}-${selection.cycle}'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          key: const Key('mass-set-meta'),
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(
+            set.label,
+            style: reader
+                .serviceHeading(base)
+                .copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        if (set.note != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              set.note!,
+              key: const Key('mass-set-note'),
+              style: reader.metadata(base, italic: true),
+            ),
+          ),
+        if (set.referenceOnly)
+          _ReferenceOnlyCitations(
+            citations: set.citations(selection.cycle),
+            textStyle: textStyle,
+            reader: reader,
+          )
+        else ...[
+          for (final (index, section) in sections.indexed)
+            _section(section, '${set.id}-${section.cycle ?? ''}-$index'),
+          const SizedBox(height: 32),
+        ],
+      ],
+    );
+  }
+
+  Widget _section(MassReadingSection section, String namespace) {
+    final label = section.displayLabel;
+    switch (section.kind) {
+      case 'rubric':
+        return _RubricText(
+          section.text ?? '',
+          textStyle: textStyle,
+          reader: reader,
+          block: true,
+        );
+      case 'psalm':
+        return _PsalmSection(
+          psalm: _flatSection(section),
+          textStyle: textStyle,
+          reader: reader,
+          structured: true,
+          label: label,
+        );
+      case 'acclamation':
+        return _AlleluiaSection(
+          alleluia: _flatSection(section),
+          textStyle: textStyle,
+          reader: reader,
+          acclamation: section.acclamation,
+        );
+      case 'sequence':
+        return _SequenceSection(
+          text: section.text ?? '',
+          textStyle: textStyle,
+          reader: reader,
+        );
+      case 'reading':
+      case 'gospel':
+        return _ReadingSection(
+          key: ValueKey('mass-section-$namespace'),
+          label: label,
+          highlightNamespace: namespace,
+          section: _flatSection(section),
+          textStyle: textStyle,
+          reader: reader,
+          highlights: highlights,
+          selectedSentenceId: selectedSentenceId,
+          onSentenceTap: onSentenceTap,
+          gospel: section.kind == 'gospel',
+          conclusion: section.conclusion,
+          rubrics: section.rubrics,
+          alternatives: [
+            for (final alternative in section.alternatives)
+              _flatSection(alternative),
+          ],
+          passion: section.passion,
+        );
+      default:
+        final text = section.text ?? '';
+        if (text.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: LiturgicalSpacing.sectionBefore),
+          child: _ReadingText(text: text, textStyle: textStyle),
+        );
+    }
+  }
+}
+
+/// A rubric in rubric style (red/accent, italic): the instructions of the
+/// Easter Vigil, Palm Sunday, the legend of the Passion roles.
+class _RubricText extends StatelessWidget {
+  const _RubricText(
+    this.text, {
+    required this.textStyle,
+    required this.reader,
+    this.block = false,
+  });
+
+  final String text;
+  final TextStyle textStyle;
+  final ReaderTheme reader;
+
+  /// A rubric section of its own (spaced as a section).
+  final bool block;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = textStyle.fontSize ?? 16.0;
+    final clean = text
+        .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'<[^>]+>'), '')
+        .trim();
+    if (clean.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: EdgeInsets.only(top: block ? 18 : 10),
+      child: Text(
+        clean,
+        key: const ValueKey('reading-rubric'),
+        style: reader
+            .rubricBlock(base, family: textStyle.fontFamily)
+            .copyWith(fontStyle: FontStyle.italic),
+      ),
+    );
+  }
+}
+
+/// «Або …»: an alternative reading of a section.
+class _AlternativeReading extends StatelessWidget {
+  const _AlternativeReading({
+    super.key,
+    required this.section,
+    required this.textStyle,
+    required this.reader,
+    required this.cleanText,
+  });
+
+  final ParsedSection section;
+  final TextStyle textStyle;
+  final ReaderTheme reader;
+  final String Function(String text, String? bible) cleanText;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = textStyle.fontSize ?? 16.0;
+    final text = cleanText(section.text ?? '', section.bible).trim();
+    final hasAcclamation = RegExp(
+      r'Гэта\s+слова\s+(Пана|Бога|Божае)',
+      caseSensitive: false,
+    ).hasMatch(text);
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Або',
+                  style: reader
+                      .serviceHeading(base)
+                      .copyWith(fontWeight: FontWeight.w800),
+                ),
+                if (section.bible != null)
+                  TextSpan(
+                    text: '  ${section.bible}',
+                    style: reader.referenceStyle(
+                      base,
+                      family: textStyle.fontFamily,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (section.comment != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                section.comment!,
+                style: reader.metadata(base, italic: true),
+              ),
+            ),
+          if (section.title != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 4),
+              child: Text(
+                section.title!,
+                style: textStyle.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+          if (text.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            _ReadingText(text: text, textStyle: textStyle),
+            if (!hasAcclamation) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Гэта слова Божае.',
+                style: textStyle.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Sequence: a first-class section (Easter Sunday, Pentecost).
+class _SequenceSection extends StatelessWidget {
+  const _SequenceSection({
+    required this.text,
+    required this.textStyle,
+    required this.reader,
+  });
+
+  final String text;
+  final TextStyle textStyle;
+  final ReaderTheme reader;
+
+  @override
+  Widget build(BuildContext context) {
+    final strophes = text
+        .split(RegExp(r'\n[ \t]*\n+'))
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
+    return Column(
+      key: const Key('reading-sequence'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionLabel('Секвенцыя', textStyle: textStyle, reader: reader),
+        for (final strophe in strophes)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _ReadingText(text: strophe, textStyle: textStyle),
+          ),
+      ],
+    );
+  }
+}
+
+/// The Passion read by roles, as the liturgical books print it: the role
+/// marker in rubric colour before each part (Ев. evangelist, Е. Christ,
+/// І. one person, Л. several persons), the words of Christ in bold, the
+/// words of the crowd in italics; headings and rubrics of the source.
+class _PassionView extends StatelessWidget {
+  const _PassionView({
+    required this.passion,
+    required this.textStyle,
+    required this.reader,
+  });
+
+  final PassionText passion;
+  final TextStyle textStyle;
+  final ReaderTheme reader;
+
+  static TextStyle runStyle(TextStyle base, PassionRole? role) =>
+      switch (role) {
+        PassionRole.christ => base.copyWith(fontWeight: FontWeight.w700),
+        PassionRole.crowd => base.copyWith(fontStyle: FontStyle.italic),
+        _ => base,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final base = textStyle.fontSize ?? 16.0;
+    final body = textStyle.copyWith(height: ReaderTheme.bodyHeight);
+    final marker = body.copyWith(
+      color: reader.rubric,
+      fontWeight: FontWeight.w800,
+      fontStyle: FontStyle.normal,
+    );
+    return Column(
+      key: const Key('passion-by-roles'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final block in passion.blocks)
+          switch (block.type) {
+            'heading' => Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 6),
+              child: Text(
+                block.text,
+                style: reader
+                    .serviceHeading(base, family: textStyle.fontFamily)
+                    .copyWith(
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+            'rubric' => _RubricText(
+              block.text,
+              textStyle: textStyle,
+              reader: reader,
+            ),
+            _ => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    for (final run in block.runs) ...[
+                      if (run.role != null)
+                        TextSpan(
+                          text: '${run.role!.marker} ',
+                          style: marker,
+                          semanticsLabel: '${run.role!.label}: ',
+                        ),
+                      TextSpan(
+                        text: '${run.text} ',
+                        style: runStyle(body, run.role),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          },
+      ],
+    );
+  }
+}
+
+/// A set without texts: its citations, and that the full text is not
+/// loaded yet (the celebration is still shown, never hidden).
+class _ReferenceOnlyCitations extends StatelessWidget {
+  const _ReferenceOnlyCitations({
+    required this.citations,
+    required this.textStyle,
+    required this.reader,
+  });
+
+  final List<MassReadingCitation> citations;
+  final TextStyle textStyle;
+  final ReaderTheme reader;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = textStyle.fontSize ?? 16.0;
+    return Padding(
+      key: const Key('reading-reference-only'),
+      padding: const EdgeInsets.only(top: 18, bottom: 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Поўны тэкст чытанняў пакуль не загружаны. Цытаты:',
+            style: reader.metadata(base, italic: true),
+          ),
+          const SizedBox(height: 10),
+          for (final citation in citations)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    citation.label,
+                    style: reader
+                        .serviceHeading(base)
+                        .copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    [
+                      citation.bible,
+                      for (final alternative in citation.alternatives)
+                        'або $alternative',
+                    ].join(' '),
+                    style: textStyle.copyWith(height: ReaderTheme.bodyHeight),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -1424,7 +1963,24 @@ class _ReadingSection extends StatefulWidget {
   final Map<String, String> highlights;
   final String? selectedSentenceId;
   final ValueChanged<String> onSentenceTap;
+
+  /// Gospel (closing «Гэта слова Пана.»); by default from the label.
+  final bool? gospel;
+
+  /// Structured closing acclamation: null = the default one, '' = none.
+  final String? conclusion;
+
+  /// Rubrics after the text (e.g. «Не гаворыцца: Гэта слова Божае.»).
+  final List<String> rubrics;
+
+  /// «Або …» alternative readings.
+  final List<ParsedSection> alternatives;
+
+  /// Passion read by roles (instead of the plain text).
+  final PassionText? passion;
+
   const _ReadingSection({
+    super.key,
     required this.label,
     required this.highlightNamespace,
     required this.section,
@@ -1433,6 +1989,11 @@ class _ReadingSection extends StatefulWidget {
     required this.highlights,
     required this.selectedSentenceId,
     required this.onSentenceTap,
+    this.gospel,
+    this.conclusion,
+    this.rubrics = const [],
+    this.alternatives = const [],
+    this.passion,
   });
 
   @override
@@ -1485,7 +2046,10 @@ class _ReadingSectionState extends State<_ReadingSection> {
     }
 
     final display = bodyText;
-    final isGospel = widget.label == 'ЕВАНГЕЛЛЕ';
+    final isGospel = widget.gospel ?? widget.label == 'ЕВАНГЕЛЛЕ';
+    final passion = widget.passion;
+    final hasPassion = passion != null && passion.blocks.isNotEmpty;
+    final structuredConclusion = widget.conclusion;
     final hasAcclamation = RegExp(
       r'Гэта\s+слова\s+(Пана|Бога|Божае|Пана\s+Бога)',
       caseSensitive: false,
@@ -1526,7 +2090,14 @@ class _ReadingSectionState extends State<_ReadingSection> {
               style: widget.textStyle.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-        if (display.isNotEmpty) ...[
+        if (hasPassion) ...[
+          const SizedBox(height: 6),
+          _PassionView(
+            passion: passion,
+            textStyle: widget.textStyle,
+            reader: widget.reader,
+          ),
+        ] else if (display.isNotEmpty) ...[
           const SizedBox(height: 6),
           _ReadingText(
             text: display,
@@ -1537,6 +2108,12 @@ class _ReadingSectionState extends State<_ReadingSection> {
             onSentenceTap: widget.onSentenceTap,
           ),
         ],
+        for (final rubric in widget.rubrics)
+          _RubricText(
+            rubric,
+            textStyle: widget.textStyle,
+            reader: widget.reader,
+          ),
         // Closing phrase bold + separated
         if (closingPhrase != null) ...[
           const SizedBox(height: 8),
@@ -1544,13 +2121,30 @@ class _ReadingSectionState extends State<_ReadingSection> {
             closingPhrase,
             style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
-        ] else if (display.isNotEmpty && !hasAcclamation) ...[
+        ] else if (structuredConclusion != null) ...[
+          if (structuredConclusion.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              structuredConclusion,
+              key: const ValueKey('reading-conclusion'),
+              style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ] else if ((display.isNotEmpty || hasPassion) && !hasAcclamation) ...[
           const SizedBox(height: 12),
           Text(
             isGospel ? 'Гэта слова Пана.' : 'Гэта слова Божае.',
             style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
+        for (final (index, alternative) in widget.alternatives.indexed)
+          _AlternativeReading(
+            key: ValueKey('reading-alternative-$index'),
+            section: alternative,
+            textStyle: widget.textStyle,
+            reader: widget.reader,
+            cleanText: _cleanText,
+          ),
       ],
     );
   }
@@ -1572,10 +2166,17 @@ class _PsalmSection extends StatelessWidget {
   final ParsedSection psalm;
   final TextStyle textStyle;
   final ReaderTheme reader;
+
+  /// Structured set psalm: the alternative refrain follows the opening one
+  /// and the last strophe closes with the refrain (as the web).
+  final bool structured;
+  final String label;
   const _PsalmSection({
     required this.psalm,
     required this.textStyle,
     required this.reader,
+    this.structured = false,
+    this.label = 'РЭСПАНСАРЫЙНЫ ПСАЛЬМ',
   });
 
   @override
@@ -1588,11 +2189,7 @@ class _PsalmSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel(
-          'РЭСПАНСАРЫЙНЫ ПСАЛЬМ',
-          textStyle: textStyle,
-          reader: reader,
-        ),
+        _SectionLabel(label, textStyle: textStyle, reader: reader),
         if (psalm.bible != null)
           _BibleRef(psalm.bible!, textStyle: textStyle, reader: reader),
 
@@ -1627,6 +2224,13 @@ class _PsalmSection extends StatelessWidget {
             const SizedBox(height: 10),
             _ChorusBox(label: 'Рэфрэн', chorus: chorus, textStyle: textStyle),
           ],
+          if (structured && psalm.altChorus?.isNotEmpty == true)
+            _ChorusBox(
+              label: 'Або',
+              chorus: _cleanChorus(psalm.altChorus!),
+              textStyle: textStyle,
+              alternate: true,
+            ),
           for (var i = 0; i < psalm.verses.length; i++) ...[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1645,9 +2249,10 @@ class _PsalmSection extends StatelessWidget {
               ),
           ],
           // After last verse: altChorus or chorus again
-          if (hasChorus || psalm.altChorus?.isNotEmpty == true) ...[
+          if (hasChorus ||
+              (!structured && psalm.altChorus?.isNotEmpty == true)) ...[
             const SizedBox(height: 8),
-            if (psalm.altChorus?.isNotEmpty == true)
+            if (!structured && psalm.altChorus?.isNotEmpty == true)
               _ChorusBox(
                 label: 'Або',
                 chorus: psalm.altChorus!,
@@ -1737,13 +2342,18 @@ class _AlleluiaSection extends StatelessWidget {
   final ParsedSection alleluia;
   final TextStyle textStyle;
   final ReaderTheme reader;
+
+  /// The acclamation of the source (Lent: «Хвала Табе, Валадар вякоў.»).
+  final String? acclamation;
   const _AlleluiaSection({
     required this.alleluia,
     required this.textStyle,
     required this.reader,
+    this.acclamation,
   });
 
-  static const _acclamation = 'Аллелюя, аллелюя, аллелюя.';
+  static const _defaultAcclamation = 'Аллелюя, аллелюя, аллелюя.';
+  String get _acclamation => acclamation ?? _defaultAcclamation;
 
   Widget _acclamationLine(BuildContext context) {
     return Padding(

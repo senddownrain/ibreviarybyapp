@@ -2,6 +2,7 @@ import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
+import 'package:mybrev_flutter/ordo/engine.dart';
 import 'package:mybrev_flutter/ordo/reading_references.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/days_index.dart';
@@ -101,7 +102,10 @@ class ParsedReadingsService {
 
   /// The legal option of the date a Readings route stands for: the option
   /// owning [dayId] (Hours / Ordo identity), else the primary.
-  ({String optionId, bool memorial})? ordoSelection(
+  ///
+  /// `officeOnly`: [dayId] is an Office that is not a legal Mass option of
+  /// the date — see [isOfficeOnlySource].
+  ({String optionId, bool memorial, bool officeOnly})? ordoSelection(
     DateTime date, {
     String? dayId,
     String diocese = kDefaultDiocese,
@@ -113,15 +117,32 @@ class ParsedReadingsService {
       date,
       diocese: diocese,
     );
-    final option = dayId == null || dayId.isEmpty
+    final owning = dayId == null || dayId.isEmpty
         ? null
         : content.optionOwning(dayId)?.ordo;
-    final optionId = option?.optionId ?? content.ordo.primary.id;
+    final officeOnly = isOfficeOnlySource(content.ordo, owning?.optionId);
+    final optionId =
+        (officeOnly ? null : owning?.optionId) ?? content.ordo.primary.id;
     final kind = content.ordo.option(optionId)?.officeKind ?? '';
     return (
       optionId: optionId,
       memorial: kind == 'memorial' || kind == 'optional-memorial',
+      officeOnly: officeOnly,
     );
+  }
+
+  /// Readings hook for split Office / Mass sources (mybrev Ordo
+  /// `sources.office` / `sources.mass`, final phase §11.1): on 2 November
+  /// falling on a Sunday the Hours are of the Sunday, the Mass and its
+  /// readings of All Souls. An Office option that is not a legal Mass
+  /// option of the date ([OrdoDay.options] = the Mass options) never chooses
+  /// the readings: they follow the engine's primary (the Mass source).
+  ///
+  /// Uses only what the engine exposes today; when the engine reports
+  /// `sources` explicitly, this is the one place to read them.
+  static bool isOfficeOnlySource(OrdoDay day, String? officeOptionId) {
+    if (officeOptionId == null || officeOptionId.isEmpty) return false;
+    return !day.options.any((option) => option.id == officeOptionId);
   }
 
   /// The readings of the selected option first, in the engine's order

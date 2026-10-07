@@ -26,6 +26,13 @@ class ReadingsLoadResult {
   final bool linkDayId;
 }
 
+/// Whether the readings linked to the route's day id open first: not for a
+/// memorial (its default readings are the weekday's), not for an Office
+/// that is not a Mass source of the date (2 November on a Sunday: the
+/// Hours of the Sunday, the readings of All Souls).
+bool _linksDayId(({String optionId, bool memorial, bool officeOnly})? s) =>
+    s == null || !(s.memorial || s.officeOnly);
+
 /// The diocese the Readings resolve in: the context of the Hours choice,
 /// else the primary of Settings.
 String readingsDiocese(Ref ref) =>
@@ -74,11 +81,9 @@ final readingsLoaderProvider = Provider<ReadingsLoader>((ref) {
       readings: readings,
       sundayCycle: getCycleForDate(date, dayOfWeek: 1),
       weekdayCycle: getWeekdayCycleForDate(date),
-      linkDayId:
-          !(service
-                  .ordoSelection(date, dayId: dayId, diocese: diocese)
-                  ?.memorial ??
-              false),
+      linkDayId: _linksDayId(
+        service.ordoSelection(date, dayId: dayId, diocese: diocese),
+      ),
     );
   };
 });
@@ -129,11 +134,9 @@ final readingsLocalLoaderProvider = Provider<ReadingsLocalLoader>((ref) {
       readings: readings,
       sundayCycle: getCycleForDate(date, dayOfWeek: 1),
       weekdayCycle: getWeekdayCycleForDate(date),
-      linkDayId:
-          !(service
-                  .ordoSelection(date, dayId: dayId, diocese: diocese)
-                  ?.memorial ??
-              false),
+      linkDayId: _linksDayId(
+        service.ordoSelection(date, dayId: dayId, diocese: diocese),
+      ),
     );
   };
 });

@@ -31,3 +31,11 @@ class ReadingsBranchState {
 final readingsBranchStateProvider = StateProvider<ReadingsBranchState>(
   (ref) => ReadingsBranchState(date: DateUtils.dateOnly(DateTime.now())),
 );
+
+/// Mass reading set chosen on the Readings screen, per document of a
+/// Readings context (`'<date or liturgical key>|<document id>'` → set id).
+/// Kept for the session: returning to a date shows the same set. Not the
+/// Office option / Common choice of the Hours.
+final readingsMassSetSelectionProvider = StateProvider<Map<String, String>>(
+  (ref) => const {},
+);
