@@ -12,6 +12,34 @@ export 'package:mybrev_flutter/ordo/office.dart' show OfficeSlot;
 /// The Commons and the Sunday week I psalter are `liturgicalTemplates`.
 
 const kSparseDaySchema = 2;
+
+/// `_fieldRules` kinds the assembler supports (mybrev
+/// `src/utils/ordo/fieldRules.js`; the parity fixture lists the kinds its
+/// hashes rely on as `fieldRuleKinds`):
+///
+///   {ref: 'laudesHymn'} / {ref: [...]}   another field of the same Office
+///   {source: 'current-day'}              the temporal day of the date
+///   {source: 'sunday-week-1'}            psalter template `sunday-week-1`
+///   {source: 'common'}                   the chosen Common
+///   {source: 'template', template: x}    a named Common
+///   {source: 'proper'}                   the celebration's own text; missing
+///                                        → empty + `proper-text-missing`
+///   {source: 'complementary'}            complementary psalmody (required)
+///   {source: 'office-for-dead'}          the Office for the Dead
+///   {omit: true}                         intentionally empty
+///   {…, allowCurrentDay: true}           «… або з будня»
+const kFieldRuleKinds = [
+  'ref',
+  'omit',
+  'source:current-day',
+  'source:sunday-week-1',
+  'source:common',
+  'source:template',
+  'source:proper',
+  'source:complementary',
+  'source:office-for-dead',
+  'allowCurrentDay',
+];
 const kSundayWeek1Template = 'sunday-week-1';
 const kCurrentDayChoice = 'current-day';
 
@@ -221,7 +249,7 @@ class AssemblyIntegrityError {
   final String field;
   final String source;
 
-  /// `template-missing` | `field-missing`.
+  /// `template-missing` | `field-missing` | `proper-text-missing`.
   final String reason;
 
   Map<String, String> toJson() => {
@@ -384,6 +412,15 @@ OfficeAssembly assembleOffice({
             kComplementaryPsalmodyTemplate,
             complementary == null ? 'template-missing' : 'field-missing',
           ),
+        );
+        return missingRequired;
+      case 'proper':
+        // `{source: 'proper'}` — a Common that defers to the celebration's
+        // own text («Гімн з Уласных тэкстаў пра святых»): never filled from
+        // the weekday when the Proper has none (reported instead).
+        if (!_blank(proper[field])) return (proper[field], 'proper');
+        integrity.add(
+          AssemblyIntegrityError(field, 'proper', 'proper-text-missing'),
         );
         return missingRequired;
       case kCurrentDayChoice:

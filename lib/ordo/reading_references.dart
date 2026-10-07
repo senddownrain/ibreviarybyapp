@@ -97,21 +97,34 @@ class ReadingReferenceIndex {
       if (raw is! Map || raw['_obsolete'] == true) continue;
       final data = Map<String, dynamic>.from(raw);
       final reading = ParsedReading.fromMap(key, data);
-      final hasContent = _sections.any(
-        (name) => hasReadingSectionContent(switch (name) {
-          'reading1' => reading.reading1,
-          'reading2' => reading.reading2,
-          'psalm' => reading.psalm,
-          'alleluia' => reading.alleluia,
-          _ => reading.gospel,
-        }),
-      );
+      // Structured Mass reading sets (also reference-only ones) count as
+      // content even without flat fields (mybrev
+      // `hasReadingDocumentContent`).
+      final hasContent =
+          _hasMassReadingSets(data) ||
+          _sections.any(
+            (name) => hasReadingSectionContent(switch (name) {
+              'reading1' => reading.reading1,
+              'reading2' => reading.reading2,
+              'psalm' => reading.psalm,
+              'alleluia' => reading.alleluia,
+              _ => reading.gospel,
+            }),
+          );
       if (hasContent) entries.add(reading);
     }
     entries.sort((a, b) => a.id.compareTo(b.id));
     _builtAt = collection.changeCount;
     return _cached = ReadingReferenceIndex(entries);
   }
+}
+
+/// mybrev `hasMassReadingSets`: `massReadings.sets` holds a set with an id.
+bool _hasMassReadingSets(Map<String, dynamic> doc) {
+  final massReadings = doc['massReadings'];
+  final sets = massReadings is Map ? massReadings['sets'] : null;
+  return sets is List &&
+      sets.any((set) => set is Map && '${set['id'] ?? ''}'.trim().isNotEmpty);
 }
 
 String _clean(String? value) => (value ?? '')

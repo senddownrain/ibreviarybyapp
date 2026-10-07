@@ -207,7 +207,11 @@ List<Json> selectOrdoNotes(
 /// category `books` carry `books: {lectionaryVolume?, hoursVolume?}`; they
 /// are day metadata, not «Асаблівыя заўвагі».
 class OrdoBooks {
-  const OrdoBooks({this.lectionaryVolume, this.hoursVolume, this.noteIds = const []});
+  const OrdoBooks({
+    this.lectionaryVolume,
+    this.hoursVolume,
+    this.noteIds = const [],
+  });
 
   /// Roman numeral of the Lectionary volume («III»), or null.
   final String? lectionaryVolume;

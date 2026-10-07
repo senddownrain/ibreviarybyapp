@@ -158,6 +158,7 @@ class OrdoDay {
   final Season season;
   final String diocese;
   final List<Json> candidates;
+
   /// The primary celebration: Mass, readings, colour, title of the day.
   final OrdoOption primary;
 

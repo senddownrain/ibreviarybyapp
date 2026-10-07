@@ -267,11 +267,9 @@ List<String> validateYearOverride(Json raw) {
       'changeColor requires a liturgical `color`',
     if (action == 'replace' && override['celebration'] == null)
       'replace requires `celebration` changes',
-    if (_present(override['computedDate']) &&
-        !_isIso(override['computedDate']))
+    if (_present(override['computedDate']) && !_isIso(override['computedDate']))
       'computedDate must be an ISO date',
-    if (_present(override['originalDate']) &&
-        !_isIso(override['originalDate']))
+    if (_present(override['originalDate']) && !_isIso(override['originalDate']))
       'originalDate must be an ISO date',
     if (!kYearOverrideSources.contains(override['source']))
       'unknown source ${override['source']}',
@@ -629,7 +627,9 @@ Json? _overrideFor(List<Json> overrides, Placement placement, String iso) =>
       (item) =>
           item.id == override['targetCelebrationId'] && !item.transferredOut,
     );
-    if (index < 0 || !_present(effectiveDate) || effectiveDate == originalDate) {
+    if (index < 0 ||
+        !_present(effectiveDate) ||
+        effectiveDate == originalDate) {
       stale.add(override);
       continue;
     }

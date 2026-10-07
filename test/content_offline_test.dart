@@ -158,13 +158,18 @@ void main() {
         );
         expect(readings, isNotEmpty, reason: '$date');
       }
-      // A content deficit (no `lent-w5-d1` document) never hides the day:
-      // the Ordo still names it and reports the Office as unavailable.
-      final deficit = LiturgicalContentService().contentForDate(
+      // The former content deficit (no `lent-w5-d1` document) is closed in
+      // the final-phase bundle: the Ordo names the day and the Office of the
+      // V Sunday of Lent is available.
+      final lentSunday = LiturgicalContentService().contentForDate(
         DateTime(2027, 3, 14),
       );
-      expect(deficit.ordo.primary.id, 'temporal:lent-w5-d1');
-      expect(deficit.unavailable.map((u) => u.id), ['temporal:lent-w5-d1']);
+      expect(lentSunday.ordo.primary.id, 'temporal:lent-w5-d1');
+      expect(lentSunday.unavailable, isEmpty);
+      expect(
+        lentSunday.options.map((o) => o.ordo?.optionId),
+        contains('temporal:lent-w5-d1'),
+      );
       expect(HiveService.invitatoriumsBox, isNotEmpty);
       expect(HiveService.completoriumsBox, isNotEmpty);
       expect(HiveService.prayersBox, isNotEmpty);

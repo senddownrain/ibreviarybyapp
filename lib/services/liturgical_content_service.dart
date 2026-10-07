@@ -600,7 +600,9 @@ class LiturgicalContentService {
       ];
     }
 
-    for (final candidate in ordo.options) {
+    // Legal Offices of the Hours (`officeOptions`: the Sunday on All Souls
+    // Sunday, §11.1).
+    for (final candidate in ordo.officeOptions) {
       final descriptor = optionDescriptor(ordo, candidate);
 
       if (candidate.isTemporal) {
@@ -876,6 +878,8 @@ class LiturgicalContentService {
   }
 
   bool _allowsOfficeForDead(OrdoDay ordo) {
+    // All Souls on a Sunday: the Hours are of the Sunday (§11.1).
+    if (ordo.isSplit) return false;
     final primary = ordo.primary;
     if (primary.rankKind == 'all-souls') return true;
     return primary.isTemporal && primary.precedence == 13;
