@@ -809,7 +809,11 @@ Widget _readingsHost(GoRouterState state) {
       invalidContext: 'Некарэктная дата чытанняў.',
     );
   }
-  return ReadingsBranchHost(date: date, dayId: query['dayId']);
+  return ReadingsBranchHost(
+    date: date,
+    dayId: query['dayId'],
+    diocese: query['diocese'],
+  );
 }
 
 Widget _bibleHost(GoRouterState state) {

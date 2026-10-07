@@ -131,7 +131,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       readings: result.readings,
       sundayCycle: result.sundayCycle,
       weekdayCycle: result.weekdayCycle,
-      dayId: dayId,
+      // A memorial opens with the weekday readings (engine order first).
+      dayId: result.linkDayId ? dayId : null,
       groupByCelebration: byDate,
     );
     _readings = result.readings;

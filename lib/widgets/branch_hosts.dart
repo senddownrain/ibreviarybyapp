@@ -65,12 +65,16 @@ class ReadingsBranchHost extends ConsumerStatefulWidget {
     super.key,
     this.date,
     this.dayId,
+    this.diocese,
     this.liturgicalKey,
     this.invalidContext,
   });
 
   final DateTime? date;
   final String? dayId;
+
+  /// Diocese context of the route (`?diocese=`), never written to Settings.
+  final String? diocese;
   final String? liturgicalKey;
   final String? invalidContext;
 
@@ -92,6 +96,7 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.date != widget.date ||
         oldWidget.dayId != widget.dayId ||
+        oldWidget.diocese != widget.diocese ||
         oldWidget.liturgicalKey != widget.liturgicalKey) {
       _applyExplicitContext();
     }
@@ -128,7 +133,7 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
     if (widget.date != null) {
       ref
           .read(liturgicalNavigationControllerProvider)
-          .openDate(widget.date!, dayId: widget.dayId);
+          .openDate(widget.date!, dayId: widget.dayId, diocese: widget.diocese);
     }
   }
 

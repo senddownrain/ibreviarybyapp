@@ -256,6 +256,39 @@ List<ParsedReading> selectReadingDocuments(
   return const [];
 }
 
+/// Ids of the readings the Readings open for [optionId] of [day], in the
+/// engine's lookup order (mybrev `orderReadingsByPlan` without alternatives):
+/// the option's first lookup that has documents; from the other options only
+/// weekday readings may stand in.
+List<String> orderedReadingIdsForOption(
+  OrdoDay day,
+  String optionId,
+  List<ParsedReading> pool,
+) {
+  final plan = day.readingsPlan;
+  final selected =
+      plan.where((option) => option.optionId == optionId).firstOrNull ??
+      plan.first;
+  final isSunday = day.dayOfWeek == 1;
+  final cycle = isSunday ? day.readingCycle.sunday : day.readingCycle.weekday;
+  for (final option in [selected, ...plan.where((o) => o != selected)]) {
+    for (final entry in option.lookup) {
+      if (option != selected && entry.purpose != 'weekday') continue;
+      var found = selectReadingDocuments(entry, option.option, pool);
+      if (entry.where['_date'] != null) {
+        found = _calendarDayVariants(found, day.dayOfWeek);
+      }
+      final picked = selectLectionaryVariants(
+        found,
+        cycle: cycle,
+        sundayCycle: day.readingCycle.sunday,
+      );
+      if (picked.isNotEmpty) return [for (final doc in picked) doc.id];
+    }
+  }
+  return const [];
+}
+
 /// Reading references of every legal option of [day].
 List<OptionReadingReferences> readingReferencesForDay(
   OrdoDay day,

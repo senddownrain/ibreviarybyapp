@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/data_log.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
@@ -11,12 +13,24 @@ class ReadingsLoadResult {
     required this.readings,
     required this.sundayCycle,
     required this.weekdayCycle,
+    this.linkDayId = true,
   });
 
   final List<ParsedReading> readings;
   final String sundayCycle;
   final String weekdayCycle;
+
+  /// Whether the readings linked to the route's day id open first. False
+  /// for a memorial: its default readings are the weekday's (the engine
+  /// order); its own readings stay a choice.
+  final bool linkDayId;
 }
+
+/// The diocese the Readings resolve in: the context of the Hours choice,
+/// else the primary of Settings.
+String readingsDiocese(Ref ref) =>
+    ref.read(hoursLiturgicalSelectionProvider).diocese ??
+    ref.read(dioceseSelectionProvider).primary;
 
 typedef ReadingsLoader =
     Future<ReadingsLoadResult> Function({
@@ -46,6 +60,7 @@ final readingsLoaderProvider = Provider<ReadingsLoader>((ref) {
 
     final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
     final calendar = ref.read(calendarServiceProvider);
+    final diocese = readingsDiocese(ref);
     final readings = await service.fetchForDate(
       date,
       calendar.getYearOptionsCached(date.year),
@@ -53,11 +68,17 @@ final readingsLoaderProvider = Provider<ReadingsLoader>((ref) {
       calendar.getDynamicDatesCached(date.year),
       includeAlternatives: true,
       dayId: dayId,
+      diocese: diocese,
     );
     return ReadingsLoadResult(
       readings: readings,
       sundayCycle: getCycleForDate(date, dayOfWeek: 1),
       weekdayCycle: getWeekdayCycleForDate(date),
+      linkDayId:
+          !(service
+                  .ordoSelection(date, dayId: dayId, diocese: diocese)
+                  ?.memorial ??
+              false),
     );
   };
 });
@@ -92,6 +113,7 @@ final readingsLocalLoaderProvider = Provider<ReadingsLocalLoader>((ref) {
     }
     final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
     final calendar = ref.read(calendarServiceProvider);
+    final diocese = readingsDiocese(ref);
     final readings = service.cachedForDate(
       date,
       calendar.getYearOptionsCached(date.year),
@@ -99,6 +121,7 @@ final readingsLocalLoaderProvider = Provider<ReadingsLocalLoader>((ref) {
       calendar.getDynamicDatesCached(date.year),
       includeAlternatives: true,
       dayId: dayId,
+      diocese: diocese,
     );
     if (readings == null) return null;
     DataLog.cacheHit(() => 'readings $dateStr');
@@ -106,6 +129,11 @@ final readingsLocalLoaderProvider = Provider<ReadingsLocalLoader>((ref) {
       readings: readings,
       sundayCycle: getCycleForDate(date, dayOfWeek: 1),
       weekdayCycle: getWeekdayCycleForDate(date),
+      linkDayId:
+          !(service
+                  .ordoSelection(date, dayId: dayId, diocese: diocese)
+                  ?.memorial ??
+              false),
     );
   };
 });

@@ -1,6 +1,9 @@
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
+import 'package:mybrev_flutter/ordo/definitions.dart';
+import 'package:mybrev_flutter/ordo/reading_references.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_calendar.dart';
@@ -34,6 +37,7 @@ class ParsedReadingsService {
     DynamicDates? dynamicDates, {
     bool includeAlternatives = false,
     String? dayId,
+    String diocese = kDefaultDiocese,
   }) {
     if (!ContentStore.instance.areLoaded(const ['readings', 'days'])) {
       return null;
@@ -51,7 +55,12 @@ class ParsedReadingsService {
     );
     if (cached.isEmpty) return null;
     return includeAlternatives
-        ? _sortForDate(cached, dayId: dayId)
+        ? _orderByOrdo(
+            _sortForDate(cached, dayId: dayId),
+            date,
+            dayId: dayId,
+            diocese: diocese,
+          )
         : _selectActiveForDate(
             cached,
             date: date,
@@ -75,6 +84,7 @@ class ParsedReadingsService {
     DynamicDates? dynamicDates, {
     bool includeAlternatives = false,
     String? dayId,
+    String diocese = kDefaultDiocese,
   }) async {
     await ContentStore.instance.ensureLoaded(const ['readings', 'days']);
     return cachedForDate(
@@ -84,8 +94,64 @@ class ParsedReadingsService {
           dynamicDates,
           includeAlternatives: includeAlternatives,
           dayId: dayId,
+          diocese: diocese,
         ) ??
         const [];
+  }
+
+  /// The legal option of the date a Readings route stands for: the option
+  /// owning [dayId] (Hours / Ordo identity), else the primary.
+  ({String optionId, bool memorial})? ordoSelection(
+    DateTime date, {
+    String? dayId,
+    String diocese = kDefaultDiocese,
+  }) {
+    if (!ContentStore.instance.areLoaded(const ['liturgicalCelebrations'])) {
+      return null;
+    }
+    final content = LiturgicalContentService().contentForDate(
+      date,
+      diocese: diocese,
+    );
+    final option = dayId == null || dayId.isEmpty
+        ? null
+        : content.optionOwning(dayId)?.ordo;
+    final optionId = option?.optionId ?? content.ordo.primary.id;
+    final kind = content.ordo.option(optionId)?.officeKind ?? '';
+    return (
+      optionId: optionId,
+      memorial: kind == 'memorial' || kind == 'optional-memorial',
+    );
+  }
+
+  /// The readings of the selected option first, in the engine's order
+  /// (mybrev `orderReadingsByPlan`); the others keep their order.
+  List<ParsedReading> _orderByOrdo(
+    List<ParsedReading> docs,
+    DateTime date, {
+    String? dayId,
+    required String diocese,
+  }) {
+    final selection = ordoSelection(date, dayId: dayId, diocese: diocese);
+    if (selection == null) return docs;
+    final content = LiturgicalContentService().contentForDate(
+      date,
+      diocese: diocese,
+    );
+    final first = orderedReadingIdsForOption(
+      content.ordo,
+      selection.optionId,
+      docs,
+    );
+    if (first.isEmpty) return docs;
+    final rank = {for (final (i, id) in first.indexed) id: i};
+    final indexed = docs.indexed.toList()
+      ..sort((a, b) {
+        final left = rank[a.$2.id] ?? first.length + a.$1;
+        final right = rank[b.$2.id] ?? first.length + b.$1;
+        return left.compareTo(right);
+      });
+    return [for (final item in indexed) item.$2];
   }
 
   static String currentCycle(DateTime date, {int? dayOfWeek}) {
