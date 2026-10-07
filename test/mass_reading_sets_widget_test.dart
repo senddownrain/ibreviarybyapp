@@ -224,6 +224,32 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('three sets fit a 320 px phone at double text size', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 720);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(
+        _screen(_result(['25-12-naradzhenne-pana']), dateStr: '2026-12-25'),
+      );
+      await tester.pumpAndSettle();
+      await _scrollTo(
+        tester,
+        find.byKey(const ValueKey('readings-mass-set-day')),
+      );
+      expect(_chip(tester, 'day').selected, isTrue);
+      for (final id in ['night', 'dawn', 'day']) {
+        final rect = tester.getRect(
+          find.byKey(ValueKey('readings-mass-set-$id')),
+        );
+        expect(rect.right, lessThanOrEqualTo(320), reason: id);
+      }
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('the route can ask for a set (?set=vigil)', (tester) async {
       await tester.pumpWidget(
         _screen(_result(assumption), requestedSetId: 'vigil'),
