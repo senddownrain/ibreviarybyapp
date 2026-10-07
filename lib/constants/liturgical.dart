@@ -42,4 +42,5 @@ enum LiturgicalOptionSource { period, dynamic, fixed, officeForDead }
 
 /// Shared date-picker bounds used across the app.
 final kCalendarFirstDate = DateTime(2019);
-final kCalendarLastDate = DateTime(2030, 12, 31);
+// The Ordo engine computes any year; the bound only keeps pickers usable.
+final kCalendarLastDate = DateTime(2050, 12, 31);

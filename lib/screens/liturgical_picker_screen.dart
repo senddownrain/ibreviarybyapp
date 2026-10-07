@@ -1,17 +1,68 @@
-import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
-import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/ordo/definitions.dart';
+import 'package:mybrev_flutter/ordo/dates.dart';
+import 'package:mybrev_flutter/ordo/day_union.dart';
+import 'package:mybrev_flutter/ordo/ordo_picker.dart';
+import 'package:mybrev_flutter/ordo/runtime.dart';
+import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
-import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/utils/liturgical_calendar.dart' as lit_calendar;
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/utils/liturgical_visual.dart';
+import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
+
+/// Celebrations of a year for the selected dioceses (computed once).
+final pickerFeastsProvider =
+    Provider.family<List<PickerFeast>, (int, List<String>)>((ref, key) {
+      ref.watch(cacheEpochProvider);
+      return pickerFeastsOfYear(OrdoRuntime.engine, key.$1, key.$2);
+    });
+
+/// Opens [date] (optionally one celebration) in the Hours or the Readings.
+void openPickedDate(
+  BuildContext context,
+  WidgetRef ref,
+  DateTime date, {
+  required bool readingsMode,
+  String? optionId,
+  String? diocese,
+}) {
+  String? dayId;
+  if (optionId != null) {
+    dayId = LiturgicalContentService()
+        .contentForDate(date, diocese: diocese ?? kDioceses.first)
+        .options
+        .where((option) => option.ordo?.optionId == optionId)
+        .firstOrNull
+        ?.dayId;
+  }
+  if (readingsMode) {
+    AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
+    context.go(
+      readingsRouteForContext(
+        date: date,
+        dayId: dayId,
+        diocese: dayId == null ? null : diocese,
+        optionId: optionId,
+      ),
+    );
+    return;
+  }
+  ref
+      .read(liturgicalNavigationControllerProvider)
+      .openDate(date, dayId: dayId, diocese: dayId == null ? null : diocese);
+  context.go('/hours');
+}
 
 class LiturgicalPickerScreen extends ConsumerStatefulWidget {
   const LiturgicalPickerScreen({super.key, this.mode = 'hours'});
@@ -109,22 +160,10 @@ class _LiturgicalPickerScreenState
                                   ),
                                 ),
                               ),
-                              DropdownButtonHideUnderline(
-                                child: DropdownButton<int>(
-                                  value: _year,
-                                  borderRadius: BorderRadius.circular(18),
-                                  items: [
-                                    for (var year = 2030; year >= 2019; year--)
-                                      DropdownMenuItem(
-                                        value: year,
-                                        child: Text('$year'),
-                                      ),
-                                  ],
-                                  onChanged: (year) {
-                                    if (year == null || year == _year) return;
-                                    setState(() => _year = year);
-                                  },
-                                ),
+                              _YearSelector(
+                                year: _year,
+                                onChanged: (year) =>
+                                    setState(() => _year = year),
                               ),
                             ],
                           ),
@@ -219,34 +258,21 @@ class _PeriodPicker extends StatelessWidget {
     required this.readingsMode,
   });
 
-  static const _maxWeeks = {
-    'advent': 3,
-    'christmas': 0,
-    'lent': 5,
-    'holyweek': 1,
-    'easter': 7,
-    'ordinary': 34,
-  };
-
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return ListView(
       padding: EdgeInsets.fromLTRB(16, 16, 16, 104 + bottomInset),
       children: periodLabelMap.entries.map((entry) {
-        final color = periodColors[entry.key] ?? Colors.green;
+        final vestment = kPeriodVestment[entry.key] ?? 'viridis';
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: color.withValues(alpha: 0.2),
-              child: PhosphorIcon(
-                PhosphorIconsRegular.calendarBlank,
-                color: color,
-                size: 22,
-              ),
-            ),
+            key: Key('picker-period-${entry.key}'),
+            minTileHeight: 56,
+            leading: VestmentMarker(colors: [vestment], size: 20),
             title: Text(entry.value),
+            subtitle: Text(vestmentLabel(vestment)),
             trailing: const PhosphorIcon(
               PhosphorIconsRegular.caretRight,
               size: 18,
@@ -263,9 +289,19 @@ class _PeriodPicker extends StatelessWidget {
     String period,
     String periodLabel,
   ) {
-    final maxWeeks = _maxWeeks[period] ?? 8;
-    final startDay = period == 'holyweek' ? 2 : 1;
-    final exactDates = _exactDates(period);
+    final positions = pickerPositions(year, period);
+    final exactDates = pickerExactDates(year, period);
+    final dioceses = ref.read(dioceseSelectionProvider).ordered;
+    final engine = OrdoRuntime.engine;
+    List<String> colorsOf(String iso) {
+      final colors = <String>[];
+      for (final diocese in dioceses) {
+        for (final color in engine.resolve(iso, diocese: diocese).legalColors) {
+          if (!colors.contains(color)) colors.add(color);
+        }
+      }
+      return colors.take(3).toList();
+    }
 
     showModalBottomSheet(
       context: context,
@@ -277,97 +313,45 @@ class _PeriodPicker extends StatelessWidget {
       ),
       builder: (ctx) => _WeekDaySheet(
         periodLabel: periodLabel,
-        maxWeeks: maxWeeks,
-        startDay: startDay,
+        // Christmas and the days after Ash Wednesday are found by date.
+        positions: period == 'christmas'
+            ? const {}
+            : {
+                for (final entry in positions.entries)
+                  if (entry.key > 0) entry.key: entry.value,
+              },
         exactDates: exactDates,
-        exactDatesFirst: period == 'lent',
-        onExactDateSelected: (date) {
+        exactDatesFirst: period == 'lent' || period == 'christmas',
+        colorsOf: colorsOf,
+        onSelected: (iso) {
           Navigator.of(ctx).pop();
-          _openDate(context, date);
-        },
-        onSelected: (week, day) {
-          Navigator.of(ctx).pop();
-          final calendar = ref.read(calendarServiceProvider);
-          final date = lit_calendar.calculateDateForContext(
-            year,
-            period,
-            week,
-            day,
-            calendar.getYearOptionsCached(year),
-            calendar.getYearOptionsCached(year + 1),
+          openPickedDate(
+            context,
+            ref,
+            dateOfIso(iso),
+            readingsMode: readingsMode,
           );
-          if (date == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Дата для гэтага дня не знойдзена')),
-            );
-            return;
-          }
-          _openDate(context, date);
         },
       ),
     );
-  }
-
-  void _openDate(BuildContext context, DateTime date) {
-    if (readingsMode) {
-      AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
-      context.go('/readings?date=${_dateKey(date)}');
-      return;
-    }
-    ref.read(selectedDateProvider.notifier).state = DateUtils.dateOnly(date);
-    context.go('/hours');
-  }
-
-  static String _dateKey(DateTime date) =>
-      '${date.year.toString().padLeft(4, '0')}-'
-      '${date.month.toString().padLeft(2, '0')}-'
-      '${date.day.toString().padLeft(2, '0')}';
-
-  List<DateTime> _exactDates(String period) {
-    if (period == 'advent') {
-      return [for (var day = 17; day <= 24; day++) DateTime(year, 12, day)];
-    }
-    if (period == 'christmas') {
-      final first = DateTime(year, 12, 25);
-      final last = lit_calendar.calculateBaptismOfLordDate(year + 1);
-      return [
-        for (
-          var date = first;
-          !date.isAfter(last);
-          date = addCivilDays(date, 1)
-        )
-          date,
-      ];
-    }
-    if (period == 'lent') {
-      final ash = ref
-          .read(calendarServiceProvider)
-          .getDynamicDatesCached(year)?['ashWednesday'];
-      if (ash != null) {
-        return [for (var day = 0; day < 4; day++) addCivilDays(ash, day)];
-      }
-    }
-    return const [];
   }
 }
 
 class _WeekDaySheet extends StatefulWidget {
   final String periodLabel;
-  final int maxWeeks;
-  final int startDay;
-  final List<DateTime> exactDates;
+  final Map<int, Map<int, String>> positions;
+  final List<String> exactDates;
   final bool exactDatesFirst;
-  final void Function(int week, int day) onSelected;
-  final ValueChanged<DateTime> onExactDateSelected;
+  final List<String> Function(String iso) colorsOf;
+  final ValueChanged<String> onSelected;
 
   const _WeekDaySheet({
     required this.periodLabel,
-    required this.maxWeeks,
-    required this.startDay,
+    required this.positions,
     required this.exactDates,
     required this.exactDatesFirst,
+    required this.colorsOf,
     required this.onSelected,
-    required this.onExactDateSelected,
   });
 
   @override
@@ -375,7 +359,8 @@ class _WeekDaySheet extends StatefulWidget {
 }
 
 class _WeekDaySheetState extends State<_WeekDaySheet> {
-  int _selectedWeek = 1;
+  late int _selectedWeek =
+      (widget.positions.keys.toList()..sort()).firstOrNull ?? 1;
 
   static const _dayLabels = {
     1: 'Нядз',
@@ -390,6 +375,9 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final weeks = widget.positions.keys.toList()..sort();
+    final days = widget.positions[_selectedWeek] ?? const <int, String>{};
+    final dayKeys = days.keys.toList()..sort();
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -428,29 +416,26 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
             if (widget.exactDatesFirst) ...[
               _ExactDateChoices(
                 dates: widget.exactDates,
-                onSelected: widget.onExactDateSelected,
+                colorsOf: widget.colorsOf,
+                onSelected: widget.onSelected,
               ),
-              if (widget.maxWeeks > 0) const Divider(height: 28),
+              if (weeks.isNotEmpty) const Divider(height: 28),
             ],
-            if (widget.maxWeeks > 0) ...[
+            if (weeks.isNotEmpty) ...[
               Text('Тыдзень', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
-              SizedBox(
-                height: 40,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: widget.maxWeeks,
-                  separatorBuilder: (_, _) => const SizedBox(width: 8),
-                  itemBuilder: (_, i) {
-                    final w = i + 1;
-                    final selected = w == _selectedWeek;
-                    return ChoiceChip(
-                      label: Text('$w'),
-                      selected: selected,
-                      onSelected: (_) => setState(() => _selectedWeek = w),
-                    );
-                  },
-                ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final week in weeks)
+                    ChoiceChip(
+                      key: Key('picker-week-$week'),
+                      label: Text(toRomanWeek(week)),
+                      selected: week == _selectedWeek,
+                      onSelected: (_) => setState(() => _selectedWeek = week),
+                    ),
+                ],
               ),
               const SizedBox(height: 20),
               Text('Дзень', style: Theme.of(context).textTheme.labelLarge),
@@ -458,20 +443,32 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: List.generate(7 - widget.startDay + 1, (i) {
-                  final d = widget.startDay + i;
-                  return FilledButton.tonal(
-                    onPressed: () => widget.onSelected(_selectedWeek, d),
-                    child: Text(_dayLabels[d] ?? '$d'),
-                  );
-                }),
+                children: [
+                  for (final day in dayKeys)
+                    FilledButton.tonalIcon(
+                      key: Key('picker-day-$day'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () => widget.onSelected(days[day]!),
+                      icon: VestmentMarker(
+                        colors: widget.colorsOf(days[day]!),
+                        size: 12,
+                      ),
+                      label: Text(
+                        '${_dayLabels[day] ?? '$day'} · '
+                        '${DateFormat('d.MM', 'be').format(dateOfIso(days[day]!))}',
+                      ),
+                    ),
+                ],
               ),
             ],
             if (!widget.exactDatesFirst && widget.exactDates.isNotEmpty) ...[
-              if (widget.maxWeeks > 0) const Divider(height: 28),
+              if (weeks.isNotEmpty) const Divider(height: 28),
               _ExactDateChoices(
                 dates: widget.exactDates,
-                onSelected: widget.onExactDateSelected,
+                colorsOf: widget.colorsOf,
+                onSelected: widget.onSelected,
               ),
             ],
           ],
@@ -481,11 +478,29 @@ class _WeekDaySheetState extends State<_WeekDaySheet> {
   }
 }
 
-class _ExactDateChoices extends StatelessWidget {
-  const _ExactDateChoices({required this.dates, required this.onSelected});
+String toRomanWeek(int week) {
+  const numerals = [(10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')];
+  var rest = week;
+  final out = StringBuffer();
+  for (final (value, numeral) in numerals) {
+    while (rest >= value) {
+      out.write(numeral);
+      rest -= value;
+    }
+  }
+  return out.toString();
+}
 
-  final List<DateTime> dates;
-  final ValueChanged<DateTime> onSelected;
+class _ExactDateChoices extends StatelessWidget {
+  const _ExactDateChoices({
+    required this.dates,
+    required this.colorsOf,
+    required this.onSelected,
+  });
+
+  final List<String> dates;
+  final List<String> Function(String iso) colorsOf;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -498,16 +513,134 @@ class _ExactDateChoices extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: dates
-              .map(
-                (date) => OutlinedButton(
-                  onPressed: () => onSelected(date),
-                  child: Text(DateFormat('d MMM', 'be').format(date)),
+          children: [
+            for (final iso in dates)
+              OutlinedButton.icon(
+                key: Key('picker-date-$iso'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(48, 48),
                 ),
-              )
-              .toList(),
+                onPressed: () => onSelected(iso),
+                icon: VestmentMarker(colors: colorsOf(iso), size: 12),
+                label: Text(DateFormat('d MMM', 'be').format(dateOfIso(iso))),
+              ),
+          ],
         ),
       ],
+    );
+  }
+}
+
+/// Year: «‹ 2027 ›» with a grid of years in numeric order (the selected
+/// one highlighted and scrolled into view).
+class _YearSelector extends StatelessWidget {
+  const _YearSelector({required this.year, required this.onChanged});
+
+  final int year;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          key: const Key('picker-year-previous'),
+          tooltip: 'Папярэдні год',
+          onPressed: () => onChanged(year - 1),
+          icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft, size: 18),
+        ),
+        TextButton(
+          key: const Key('picker-year'),
+          style: TextButton.styleFrom(minimumSize: const Size(64, 48)),
+          onPressed: () async {
+            final picked = await showModalBottomSheet<int>(
+              context: context,
+              useRootNavigator: true,
+              useSafeArea: true,
+              isScrollControlled: true,
+              builder: (_) => _YearGrid(selected: year),
+            );
+            if (picked != null) onChanged(picked);
+          },
+          child: Text(
+            '$year',
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+          ),
+        ),
+        IconButton(
+          key: const Key('picker-year-next'),
+          tooltip: 'Наступны год',
+          onPressed: () => onChanged(year + 1),
+          icon: const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
+        ),
+      ],
+    );
+  }
+}
+
+class _YearGrid extends StatelessWidget {
+  const _YearGrid({required this.selected});
+  final int selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final years = pickerYears(selected);
+    const columns = 4;
+    const rowHeight = 56.0;
+    final row = years.indexOf(selected) ~/ columns;
+    final controller = ScrollController(
+      initialScrollOffset: (row - 1).clamp(0, 1000) * rowHeight,
+    );
+    final cs = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Год', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: rowHeight * 5),
+              child: GridView.builder(
+                key: const Key('picker-year-grid'),
+                controller: controller,
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisExtent: rowHeight,
+                ),
+                itemCount: years.length,
+                itemBuilder: (context, index) {
+                  final year = years[index];
+                  final isSelected = year == selected;
+                  return Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: isSelected
+                        ? FilledButton(
+                            key: Key('picker-year-$year'),
+                            onPressed: () => Navigator.pop(context, year),
+                            child: Text('$year'),
+                          )
+                        : OutlinedButton(
+                            key: Key('picker-year-$year'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: year == DateTime.now().year
+                                  ? cs.primary
+                                  : null,
+                            ),
+                            onPressed: () => Navigator.pop(context, year),
+                            child: Text('$year'),
+                          ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -537,48 +670,25 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
 
   @override
   Widget build(BuildContext context) {
-    final calSvc = ref.read(calendarServiceProvider);
-    final dynamicDates = calSvc.getDynamicDatesCached(widget.year);
-
-    // Build dynamic feasts list
-    final dynamicFeasts = _feastLabels.entries.map((entry) {
-      final display = dynamicDates?[entry.key];
-      return _FeastItem(
-        name: entry.value,
-        dateLabel: display != null
-            ? DateFormat('d MMMM yyyy', 'be').format(display)
-            : null,
-        date: display,
-        isDynamic: true,
-      );
-    }).toList();
-
-    // Build fixed feasts from Hive days
-    final fixedFeasts = _loadFixedFeasts(widget.year);
-
-    // Merge and filter
-    final all = [...dynamicFeasts, ...fixedFeasts];
-    final filtered = _query.isEmpty
+    final dioceses = ref.watch(dioceseSelectionProvider).ordered;
+    final all = ref.watch(pickerFeastsProvider((widget.year, dioceses)));
+    final query = _query.trim().toLowerCase();
+    final filtered = query.isEmpty
         ? all
-        : all.where((f) {
-            final q = _query.toLowerCase();
-            return f.name.toLowerCase().contains(q) ||
-                (f.dateLabel ?? '').toLowerCase().contains(q);
-          }).toList();
-
-    // Keep the chosen calendar year in chronological order.
-    filtered.sort((a, b) {
-      if (a.date == null && b.date == null) return a.name.compareTo(b.name);
-      if (a.date == null) return 1;
-      if (b.date == null) return -1;
-      return a.date!.compareTo(b.date!);
-    });
+        : all
+              .where(
+                (f) =>
+                    f.title.toLowerCase().contains(query) ||
+                    dayMonthLabel(f.date).contains(query),
+              )
+              .toList();
 
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: TextField(
+            key: const Key('picker-feast-search'),
             controller: _searchCtrl,
             decoration: InputDecoration(
               hintText: 'Пошук свята...',
@@ -615,6 +725,7 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                   ),
                 )
               : ListView.builder(
+                  key: const Key('picker-feasts'),
                   padding: EdgeInsets.fromLTRB(
                     16,
                     0,
@@ -622,142 +733,111 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                     104 + MediaQuery.viewPaddingOf(context).bottom,
                   ),
                   itemCount: filtered.length,
-                  itemBuilder: (context, i) {
-                    final feast = filtered[i];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        leading: PhosphorIcon(
-                          feast.isDynamic
-                              ? PhosphorIconsRegular.sparkle
-                              : PhosphorIconsRegular.calendarBlank,
-                          size: 22,
-                          color: feast.isDynamic
-                              ? Theme.of(context).colorScheme.tertiary
-                              : Theme.of(context).colorScheme.primary,
-                        ),
-                        title: Text(feast.name),
-                        subtitle: feast.dateLabel != null
-                            ? Text(feast.dateLabel!)
-                            : null,
-                        trailing: feast.date != null
-                            ? const PhosphorIcon(
-                                PhosphorIconsRegular.caretRight,
-                                size: 18,
-                              )
-                            : PhosphorIcon(
-                                PhosphorIconsRegular.lock,
-                                size: 16,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                        onTap: feast.date == null
-                            ? () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Дата свята не знойдзена'),
-                                  ),
-                                );
-                              }
-                            : () {
-                                final date = feast.date!;
-                                if (widget.readingsMode) {
-                                  AppNavigationScope.maybeOf(
-                                    context,
-                                  )?.shellState.clearOraReturn();
-                                  context.go(
-                                    '/readings?date=${_dateKey(date)}',
-                                  );
-                                } else {
-                                  ref
-                                          .read(selectedDateProvider.notifier)
-                                          .state =
-                                      date;
-                                  context.go('/hours');
-                                }
-                              },
-                      ),
-                    );
-                  },
+                  itemBuilder: (context, i) => _FeastRow(
+                    feast: filtered[i],
+                    onTap: () => openPickedDate(
+                      context,
+                      ref,
+                      dateOfIso(filtered[i].date),
+                      readingsMode: widget.readingsMode,
+                      optionId: filtered[i].id,
+                      diocese: filtered[i].dioceses.first,
+                    ),
+                  ),
                 ),
         ),
       ],
     );
   }
-
-  /// Load fixed feasts from Hive days (those with _date field + _feastName).
-  List<_FeastItem> _loadFixedFeasts(int year) {
-    final box = HiveService.daysBox;
-    final seen = <String>{};
-    final result = <_FeastItem>[];
-
-    for (final key in box.keys) {
-      final raw = box.get(key);
-      if (raw == null) continue;
-      final data = Map<String, dynamic>.from(raw);
-      final dateStr = data['_date'] as String?;
-      final feastName = data['_feastName'] as String?;
-      if (dateStr == null || feastName == null || feastName.isEmpty) continue;
-
-      // Dedupe by feastName
-      if (seen.contains(feastName)) continue;
-      seen.add(feastName);
-
-      // Parse "D.M" format
-      final parts = dateStr.split('.');
-      if (parts.length < 2) continue;
-      final day = int.tryParse(parts[0]);
-      final month = int.tryParse(parts[1]);
-      if (day == null || month == null) continue;
-
-      final date = DateTime(year, month, day);
-
-      result.add(
-        _FeastItem(
-          name: feastName,
-          dateLabel: DateFormat('d MMMM', 'be').format(date),
-          date: date,
-          isDynamic: false,
-        ),
-      );
-    }
-
-    return result;
-  }
-
-  static String _dateKey(DateTime date) =>
-      '${date.year.toString().padLeft(4, '0')}-'
-      '${date.month.toString().padLeft(2, '0')}-'
-      '${date.day.toString().padLeft(2, '0')}';
-
-  static const _feastLabels = {
-    'easterSunday': 'Вялікдзень',
-    'pentecost': 'Спасланне Святога Духа',
-    'ashWednesday': 'Попельная серада',
-    'palmSunday': 'Нядзеля Пальмовая',
-    'ascension': 'Узнясенне',
-    'holyTrinity': 'Найсвяцейшая Тройца',
-    'corpusChristi': 'Божае Цела',
-    'sacredHeartOfJesus': 'Найсвяцейшае Сэрца Езуса',
-    'immaculateHeartOfMary': 'Беззаганнае Сэрца Марыі',
-    'christKing': 'Хрыстус Кароль',
-    'christTheHighPriest': 'Хрыстус Вялікі Святар',
-    'holyFamily': 'Святая Сям\'я',
-    'baptismOfLord': 'Хрышчэнне Пана',
-  };
 }
 
-class _FeastItem {
-  final String name;
-  final String? dateLabel;
-  final DateTime? date;
-  final bool isDynamic;
+/// A celebration of the year: its real vestment colour as a quiet marker,
+/// title, final date and rank; transfers and dioceses as small badges.
+class _FeastRow extends StatelessWidget {
+  const _FeastRow({required this.feast, required this.onTap});
 
-  const _FeastItem({
-    required this.name,
-    required this.dateLabel,
-    required this.date,
-    required this.isDynamic,
-  });
+  final PickerFeast feast;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final weekday = DateFormat('EEEE', 'be').format(dateOfIso(feast.date));
+    final rank = ordoRankLabel(feast.option);
+    final badges = [...feast.badges, ...ordoOptionNotes(feast.option)];
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        key: Key('picker-feast-${feast.id}-${feast.date}'),
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+            child: Row(
+              children: [
+                VestmentMarker(colors: feast.colors, size: 16),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        feast.title,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        [
+                          '${dayMonthLabel(feast.date)}, $weekday',
+                          if (rank.isNotEmpty) rank,
+                          vestmentColorsLabel(feast.option),
+                        ].join(' · '),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                      if (badges.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            for (final badge in badges)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: cs.secondaryContainer.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: Text(
+                                  badge,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: cs.onSecondaryContainer,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
