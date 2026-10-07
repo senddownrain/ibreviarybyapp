@@ -140,32 +140,59 @@ class _LiturgicalPickerScreenState
                           style: GlassStyle.soft,
                           borderRadius: BorderRadius.circular(20),
                           padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
-                          child: Row(
-                            children: [
-                              PhosphorIcon(
-                                widget.isReadingsMode
-                                    ? PhosphorIconsRegular.bookOpenText
-                                    : PhosphorIconsRegular.handsPraying,
-                                color: seasonColor,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 9),
-                              Expanded(
-                                child: Text(
-                                  widget.isReadingsMode
-                                      ? 'Рэжым чытанняў'
-                                      : 'Рэжым літургічных гадзін',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final label = Row(
+                                children: [
+                                  PhosphorIcon(
+                                    widget.isReadingsMode
+                                        ? PhosphorIconsRegular.bookOpenText
+                                        : PhosphorIconsRegular.handsPraying,
+                                    color: seasonColor,
+                                    size: 20,
                                   ),
-                                ),
-                              ),
-                              _YearSelector(
+                                  const SizedBox(width: 9),
+                                  Expanded(
+                                    child: Text(
+                                      widget.isReadingsMode
+                                          ? 'Рэжым чытанняў'
+                                          : 'Рэжым літургічных гадзін',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                              final years = _YearSelector(
                                 year: _year,
                                 onChanged: (year) =>
                                     setState(() => _year = year),
-                              ),
-                            ],
+                              );
+                              final scale = MediaQuery.textScalerOf(
+                                context,
+                              ).scale(1);
+                              // Narrow or large text: the year gets its own
+                              // line, never squeezed.
+                              if (constraints.maxWidth < 300 * scale) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    label,
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: years,
+                                    ),
+                                  ],
+                                );
+                              }
+                              return Row(
+                                children: [
+                                  Expanded(child: label),
+                                  years,
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ],
