@@ -2,10 +2,10 @@
   "daysCompared": 11688,
   "mismatches": 0,
   "optionsByStatus": {
-    "proper": 1593,
-    "weekday": 13453,
-    "missing": 23,
-    "reference-only": 16
+    "proper": 1617,
+    "weekday": 13438,
+    "reference-only": 8,
+    "missing": 7
   },
   "examples": []
 }

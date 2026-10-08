@@ -51,13 +51,58 @@ backups/firestore-snapshot --out ../ibreviarybyapp/test/fixtures/ordo_parity.jso
 | Тест | Что сверяется | Расхождений |
 |---|---|---|
 | `test/ordo_parity_test.dart` | period, phase, week, day, psalter week, цыклы, колер (+альтэрнатывы), primary/alternatives (id, kind, rank, rankKind, color, officeKind, precedence, category, dioceseId, transfers), commemorations, suppressed (+reason), transfers, вечар (I/II Vespers, Compline), Te Deum / Compline / Vespers для кожнай опцыі, Ordo notes | 0 |
-| `test/hours_parity_test.dart` | карткі Гадзін (key, option, source, properSource, missingProper), зборкі (id, label, choice, integrity) і хэш тэксту Office кожнай зборкі (27 432) | 0 |
+| `test/hours_parity_test.dart` | карткі Гадзін (key, option, source, properSource, missingProper), зборкі (id, label, choice, integrity) і хэш тэксту Office кожнай зборкі (27 454) | 0 |
 | `test/reading_references_parity_test.dart` | статус і дакументы чытанняў кожнай опцыі | 0 |
 
-Наўмысных адрозненняў няма (`kIntentionalDifferences` пусты). Адзінае
-прыбліжэнне: `localeCompare(…, 'be')` для назваў раўназначных
-дэмотаваных успамінаў замешчана беларускім алфавітным парадкам
-(`compareBelarusian`); на фікстуры адрозненняў не дае.
+Наўмысных адрозненняў няма (`kIntentionalDifferences` пусты). Фікстура —
+schema **2** (фінальны этап web, гл. ніжэй); `test/support/ordo_fixture.dart`
+правярае `schemaVersion == 2` (`kOrdoParitySchemaVersion`). Ранейшае
+прыбліжэнне `localeCompare(…, 'be')` (`compareBelarusian`) больш не
+ўжываецца: дэмоцыі ўспамінаў няма.
+
+## Фінальны этап web (mybrev c1045b2)
+
+Крыніца: mybrev `docs/ordo-final-phase-engine-changes.md`,
+`docs/liturgical-data-architecture.md`, дыф `07b4d27..c1045b2`. Перанесена 1:1:
+
+| Змена | Dart |
+|---|---|
+| Беззаганнае Сэрца / Маці Касцёла + абавязковы ўспамін: **два ўспаміны на выбар**, марыйны першы, будзень — не опцыя; `demotedFrom` больш не ўзнікае; `'both-optional'` чытаецца як `'legal-choice'` | `display.dart` (`concurrent-obligatory-memorials-legal-choice`) |
+| Хрыстос Найвышэйшы Святар + іншае свята: абедзве опцыі, альтэрнатыва `provisional: true` | `display.dart`, `OrdoOption.provisional`, бэйдж «Часовае рашэнне: абодва варыянты» |
+| Успамін усіх памерлых у нядзелю (2025, 2031): `primary` (Імша, чытанні, колер) = All Souls, `officePrimary` = нядзеля (`officeOnly`); нядзеля не ў `suppressed`; вечар і I Нешпары — па крыніцы Афіцыя | `display.dart`, `engine.dart`, `office.dart` |
+| Year Overrides: канонічны запіс `originalDate / computedDate / effectiveDate / source / status` (+ `from`/`to` люстэркі, `sourceNote`) | `normalizeYearOverride`, `isTransferOverride`, `validateYearOverride` (`year_plan.dart`) |
+| Пераносы: дата алгарытму = `computedDate`; захаваны transfer override (`targetCelebrationId` + `originalDate`) задае `effectiveDate` (= `originalDate` → `impeded-without-transfer`); невыкарыстаныя: `confirmed` → звычайны move, `needs-review` → `plan.staleTransferOverrides` | `_resolveTransfers`, `_applyUnusedTransferOverrides`, `TransferRecord.computedDate/override`, `OrdoEngine(ignoreTransferOverrides:)` |
+| Дыяцэзіяльная ўрачыстасць пераносіцца толькі з доказам рангу | `lib/ordo/transfer_rank_evidence.dart`, `unconfirmedDiocesanSolemnity`, `transferBlocked: 'rank-not-source-confirmed'` |
+| Notes revision 4: катэгорыя `books` — метаданыя дня, не нататкі (найбольш канкрэтны селектар) | `booksFromNotes`, `OrdoEngine.booksOf`, `notesOf` без `books` |
+| `{source: 'proper'}` у `_fieldRules`: уласны тэкст; калі яго няма — поле пустое + `_integrityErrors` (`proper-text-missing`), ніколі не будзень | `office_assembly.dart` (`kFieldRuleKinds` = `fieldRuleKinds` фікстуры) |
+| `readings` з `massReadings.sets` (у т.л. без плоскіх палёў) — змест для reading references | `reading_references.dart` |
+
+`test/fixtures/office_assembly_parity.json` не перагенераваны: у web няма
+генератара для яго; тэст праходзіць без змен. Новыя тэсты:
+`test/ordo_final_phase_test.dart` (IH + Антоні 13.06.2026, All Souls
+2025-11-02, CHP, нармалізацыя, auto / ручны перанос з `computedDate` /
+`effectiveDate`, impeded-without-transfer, stale, доказ рангу, books,
+`{source:'proper'}`), `hours_regression_test` (Гадзіны All Souls у нядзелю
+= нядзеля, без Афіцыя за памерлых; IH — дзве карткі, без «З дня» і без
+будня), `ordo_screen_test` (радок тамоў над нататкамі, Афіцый нядзелі).
+
+### API для Чытанняў (Імша ≠ Афіцый)
+
+```dart
+final day = OrdoRuntime.engine.resolve(date, diocese: diocese);
+day.sources.mass      // OrdoSource {optionId, celebrationId?, kind, officeKind, title}
+day.sources.office    // крыніца Літургіі гадзін
+day.sources.split     // true толькі для All Souls у нядзелю
+day.options           // опцыі Імшы / чытанняў (primary + alternatives) — як раней
+day.officeOptions     // законныя Афіцыі Гадзін ([нядзеля] пры split)
+day.massVariants      // All Souls: all-souls-mass-1…3 (= web variantsKind 'reading-sets')
+day.readingsPlan      // па `options`, г.зн. па Імшы (All Souls на 2.11 і ў нядзелю)
+OrdoRuntime.engine.booksOf(day)  // OrdoBooks? {lectionaryVolume, hoursVolume, label}
+```
+
+Чытанні павінны браць `sources.mass` (= `primary`), Гадзіны — `officeOptions`
+/ `sources.office`. Самі камплекты чытанняў (Mass reading sets) — у мадэлі
+readings (паралельная задача); рухавік толькі называе колькасць і id.
 
 ## Калекцыі і бандл
 
@@ -124,8 +169,8 @@ backups/firestore-snapshot --out ../ibreviarybyapp/test/fixtures/ordo_parity.jso
   (`_integrityErrors`, поле пустое), ніколі не «з дня»; 0 такіх на бандле.
 - Без уласнага дакумента (scaffold, `missingProper`): `mary-mother-church`,
   `saturday-blessed-virgin-mary` — Office збіраецца з Common/дня.
-- Office недаступны: `temporal:lent-w5-d1` (няма дакумента `lent-w5-d1` у
-  `days`) — дзень бачны ў Ordo і Гадзінах як «няма тэкстаў».
+- `temporal:lent-w5-d1`: дэфіцыт закрыты ў бандле фінальнага этапу
+  (дакумент `lent-w5-d1` ёсць у `days`).
 - Чытанні reference-only: `dedication-cathedral`, `sv-maximilian-kolbe`;
   missing: `our-lady-budslav`, `our-lady-lahishyn`, `our-lady-trakai`
   («Тэкст / спасылкі пакуль недаступныя»). Тэксты не выдумваліся.

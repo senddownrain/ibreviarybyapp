@@ -13,53 +13,48 @@
   },
   "counts": {
     "days": 11688,
-    "options": 20235,
+    "options": 20224,
     "legacyFixedDays": 0,
-    "properTexts": 5819,
+    "properTexts": 5816,
     "missingProper": 665,
-    "commonOnly": 1075,
-    "dayFallback": 56,
-    "unavailableOffices": 32,
+    "commonOnly": 1103,
+    "dayFallback": 28,
+    "unavailableOffices": 0,
     "integrityErrors": 0,
-    "readingsReferenceOnly": 16,
-    "readingsMissing": 23
+    "readingsReferenceOnly": 8,
+    "readingsMissing": 7
   },
   "legacyFixedDaysDependencies": 0,
   "missingProperCelebrations": [
     "mary-mother-church",
     "saturday-blessed-virgin-mary"
   ],
-  "unavailableOffices": [
-    "temporal:lent-w5-d1"
-  ],
+  "unavailableOffices": [],
   "referenceOnlyReadings": [
-    "dedication-cathedral",
     "sv-maximilian-kolbe"
   ],
   "missingReadings": [
-    "our-lady-budslav",
-    "our-lady-lahishyn",
-    "our-lady-trakai"
+    "our-lady-budslav"
   ],
   "engineParityMismatches": "see reports/flutter-ordo-parity.json (0)",
   "bundle": {
-    "totalBytes": 4530127,
-    "ordoBytes": 715457,
+    "totalBytes": 4593007,
+    "ordoBytes": 735309,
     "collections": {
       "days": {
-        "count": 735,
-        "storedBytes": 53869832,
-        "bundleBytes": 2298909
+        "count": 736,
+        "storedBytes": 53966736,
+        "bundleBytes": 2318503
       },
       "readings": {
-        "count": 815,
-        "storedBytes": 4517861,
-        "bundleBytes": 858647
+        "count": 822,
+        "storedBytes": 4777430,
+        "bundleBytes": 880277
       },
       "liturgicalTemplates": {
         "count": 16,
-        "storedBytes": 1115362,
-        "bundleBytes": 165371
+        "storedBytes": 1137473,
+        "bundleBytes": 167182
       },
       "invitatoriums": {
         "count": 4,
@@ -74,84 +69,84 @@
       "liturgicalCalendarMeta": {
         "count": 1,
         "storedBytes": 139,
-        "bundleBytes": 198
+        "bundleBytes": 201
       },
       "liturgicalCelebrations": {
         "count": 241,
-        "storedBytes": 132883,
-        "bundleBytes": 22598
+        "storedBytes": 132977,
+        "bundleBytes": 22601
       },
       "liturgicalDioceseOverrides": {
-        "count": 74,
-        "storedBytes": 52276,
-        "bundleBytes": 7549
+        "count": 75,
+        "storedBytes": 53313,
+        "bundleBytes": 7768
       },
       "liturgicalYearOverrides": {
-        "count": 4,
-        "storedBytes": 1415,
-        "bundleBytes": 633
+        "count": 15,
+        "storedBytes": 8111,
+        "bundleBytes": 1728
       },
       "liturgicalProperTexts": {
-        "count": 290,
-        "storedBytes": 3178232,
-        "bundleBytes": 587214
+        "count": 291,
+        "storedBytes": 3192409,
+        "bundleBytes": 590354
       },
       "liturgicalOrdoNotes": {
-        "count": 1204,
-        "storedBytes": 676221,
-        "bundleBytes": 97265
+        "count": 1337,
+        "storedBytes": 780774,
+        "bundleBytes": 112657
       },
       "prayers": {
         "count": 117,
         "storedBytes": 2087949,
-        "bundleBytes": 251526
+        "bundleBytes": 251525
       },
       "prayerCategories": {
         "count": 5,
         "storedBytes": 879,
-        "bundleBytes": 579
+        "bundleBytes": 577
       },
       "songs": {
         "count": 447,
         "storedBytes": 369604,
-        "bundleBytes": 111480
+        "bundleBytes": 111477
       },
       "compendium": {
         "count": 27,
         "storedBytes": 536467,
-        "bundleBytes": 113290
+        "bundleBytes": 113291
       },
       "compendiumMeta": {
         "count": 1,
         "storedBytes": 6072,
-        "bundleBytes": 1777
+        "bundleBytes": 1775
       }
     }
   },
   "timingsHostJit": {
-    "decode.days.ms": 118.497,
-    "decode.readings.ms": 34.701,
-    "decode.liturgicalTemplates.ms": 7.31,
-    "decode.invitatoriums.ms": 1.18,
-    "decode.completoriums.ms": 2.358,
-    "decode.prayers.ms": 6.789,
-    "decode.prayerCategories.ms": 0.04,
-    "decode.songs.ms": 5.731,
-    "decode.compendium.ms": 3.637,
-    "decode.compendiumMeta.ms": 0.099,
-    "decode.liturgicalCalendarMeta.ms": 0.017,
-    "decode.liturgicalCelebrations.ms": 1.869,
-    "decode.liturgicalDioceseOverrides.ms": 0.706,
-    "decode.liturgicalYearOverrides.ms": 0.039,
-    "decode.liturgicalProperTexts.ms": 17.568,
-    "decode.liturgicalOrdoNotes.ms": 8.012,
-    "liturgicalCore.ready.ms": 130,
-    "allContent.ready.ms": 143,
-    "engine.build.ms": 5,
-    "engine.firstDay.ms": 16,
+    "decode.days.ms": 179.303,
+    "decode.readings.ms": 57.415,
+    "decode.liturgicalTemplates.ms": 6.443,
+    "decode.invitatoriums.ms": 1.343,
+    "decode.completoriums.ms": 1.786,
+    "decode.prayers.ms": 11.63,
+    "decode.prayerCategories.ms": 0.095,
+    "decode.songs.ms": 5.421,
+    "decode.compendium.ms": 5.54,
+    "decode.compendiumMeta.ms": 0.139,
+    "decode.liturgicalCalendarMeta.ms": 0.036,
+    "decode.liturgicalCelebrations.ms": 2.14,
+    "decode.liturgicalDioceseOverrides.ms": 0.748,
+    "decode.liturgicalYearOverrides.ms": 0.293,
+    "decode.liturgicalProperTexts.ms": 22.535,
+    "decode.liturgicalOrdoNotes.ms": 8.564,
+    "liturgicalCore.ready.ms": 233,
+    "allContent.ready.ms": 248,
+    "engine.build.ms": 7,
+    "engine.firstDay.ms": 31,
     "engine.year2027.ms": 27,
-    "hours.firstContent.ms": 22,
-    "hours.sameDayAgain.ms": 6,
-    "ordo.notesOfDay.ms": 4
+    "hours.firstContent.ms": 38,
+    "hours.sameDayAgain.ms": 9,
+    "ordo.notesOfDay.ms": 8
   }
 }
