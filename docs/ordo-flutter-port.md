@@ -199,21 +199,37 @@ readings (паралельная задача); рухавік толькі на
 
 ## Ordo UI
 
-- Уваход: кампактная капсула «Каляндар» справа ад «Літургія гадзін» (гліф +
-  слова; пры вялікім тэксце на вузкім экране — толькі гліф, мэта ≥ 44 pt).
-  Другі ўваход — «Знайсці дзень» (picker). На Чытаннях уваходу няма.
-- Адзін экран: месяц (сегментаванае кольца/кропка законных колераў; белы з
-  залатым кантам) + дэталь выбранага дня пад сеткай: дата, перыяд/тыдзень,
-  псалтыр, цыкл, «Колер літургічнага адзення», «Святкаванні дня»
-  (асноўнае / па выбары / commemoratio — словамі, не толькі колерам),
-  бэйджы дыяцэзій і пераносаў, спасылкі на чытанні, хуткія дзеянні
-  «Гадзіны» / «Чытанні», нататкі Ordo. Розныя вынікі дыяцэзій тлумачацца.
+- Уваход: круглая кнопка `calendarDots` (48 pt) у верхняй панэлі справа,
+  сіметрычная меню. Адкрывае выбраны дзень (`HoraPickerScreen`), а з яго
+  `listChecks` / «Падрабязны Ordo гэтага дня» адкрывае Ordo даты.
+- `OrdoScreen` — асобная дэталь дня: hero з датай, перыядам, псалтыром,
+  цыклам і колерам; карткі святкаванняў, Імшы/чытанняў, Гадзін, указанняў
+  і заўваг. Дзённыя літургічныя ўказанні адкрытыя, іншыя групы і агульныя
+  ўказанні перыяду згорнутыя. Святкаванні, якія саступаюць месца, таксама згорнутыя.
+- `OrdoMonthScreen` (`/hours/ordo/month?date=`) адкрываецца спасылкай
+  «увесь каляндар» унізе дня; націск даты адкрывае Ordo гэтай даты,
+  Back вяртае месяц з захаваным курсорам. Экран дня і абодва Ordo экраны
+  маюць `showsNavigationDock: false` і ўлічваюць system/home-indicator inset.
+- `LiturgicalMonthCalendar` — адзіная каляровая сетка для месяца Ordo
+  і `showAmbientDatePicker` на Android/iOS. Выбар у modal адразу вяртае
+  дату ў `liturgicalNavigationController.openDate()`. Колеры (уключаючы
+  альтэрнатывы), святкаванні і дыяцэзіі чытаюцца з `OrdoRuntime.engine`.
+- Выбар Office аддзелены ад выбару святкавання: `hasOfficeTemplates`
+  і `hasCelebrationAlternatives` разам утвараюць `hasLiturgicalChoices`.
+  07.10.2026, `our-lady-rosary`: «З дня» па змаўчанні і
+  «Пра Найсвяцейшую Панну Марыю» (`blessed-virgin-mary`). Абодва
+  адкрываюцца ў Гадзінах і Ora; чытанні належаць святкаванню, абодва
+  варыянты захоўваюць weekday-first план Ordo. Маршруты нясуць date,
+  dayId, option і diocese, не мяняючы асноўную дыяцэзію Налад.
+- Рэгрэсіі: `test/ordo_day_flow_test.dart` (рухавік, UI выбару, Ora,
+  месяца/Back, чытанні, date picker, згорнутыя заўвагі, вузкі экран і вялікі тэкст).
 - Адзін рэзолвер колеру `lib/utils/liturgical_visual.dart`: albus, ruber,
   viridis, violaceus, rosaceus, niger; марыйны блакітны — толькі акцэнт
   марыйнага белага свята. Дакументы Гадзін маюць штамп `_vestmentColor`,
   `liturgicalColorForDay` бярэ яго першым (эўрыстыкі — толькі для старых
   дакументаў без Ordo).
-- 320 px: 7 клетак па ~43 pt (крыху менш за 44 pt; ад 360 px — ≥ 44 pt).
+- Мэты дат ≥ 44 pt; калі шырыні недастаткова для 7 клетак, сетка
+  мае невялікую гарызантальную пракрутку. Тэкст маштабуецца без overflow.
 
 ## Picker
 
@@ -235,3 +251,24 @@ readings (паралельная задача); рухавік толькі на
 `route_identity_test`, `ordo_visual_test`, `ordo_content_update_test`,
 `liturgy_runtime_report_test`. Справаздачы:
 `ORDO_PARITY_REPORT=1`, `HOURS_PARITY_REPORT=1`, `ORDO_RUNTIME_REPORT=1`.
+
+### Завяршэнне UI-пераносу (07.10.2026)
+
+Змененыя файлы:
+
+- Экраны: `lib/screens/home_screen.dart`, `lib/screens/hora_picker_screen.dart`,
+  `lib/screens/ordo_screen.dart`.
+- Навігацыя: `lib/router/router.dart`, `lib/widgets/app_shell.dart`.
+- Каляндар і выбар даты: `lib/widgets/ordo/liturgical_month_calendar.dart`,
+  `lib/widgets/ambient_date_picker.dart`.
+- Даныя і выбар Office: `lib/providers/ordo_provider.dart`,
+  `lib/utils/hours_liturgical_options.dart`.
+- Тэсты: `test/ordo_day_flow_test.dart`, `test/hours_root_test.dart`,
+  `test/ordo_screen_test.dart`, `test/ordo_visual_test.dart`,
+  `test/platform_design_test.dart`.
+- Дакументацыя: `docs/ordo-flutter-port.md`.
+
+На Flutter 3.38.9: `flutter analyze` — без заўваг;
+`flutter test --concurrency=2 --timeout=2m --reporter expanded` — усе 635 тэстаў
+прайшлі, уключаючы ORDO/Hours/readings parity, route identity, office assembly
+і Hours regression. Новы файл дадае 19 рэгрэсійных тэстаў.

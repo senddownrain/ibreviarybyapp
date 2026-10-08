@@ -100,10 +100,7 @@ void main() {
           );
           await tester.pump();
           expect(tester.takeException(), isNull);
-          final action = find.byKey(const Key('hours-calendar-action'));
-          expect(action, findsOneWidget);
-          expect(tester.getSize(action).height, greaterThanOrEqualTo(44));
-          expect(tester.getSize(action).width, greaterThanOrEqualTo(44));
+          expect(find.text('Каляндар'), findsNothing);
 
           await tester.pumpWidget(
             frame(

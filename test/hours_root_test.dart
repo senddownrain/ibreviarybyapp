@@ -174,29 +174,15 @@ void main() {
     expect(find.text('2026-09-08 / primary / laudes'), findsOneWidget);
   });
 
-  testWidgets('the top-right «Каляндар» opens the Ordo of the date', (
-    tester,
-  ) async {
+  testWidgets('Hours title has no calendar capsule', (tester) async {
     final date = DateTime(2026, 9, 8);
     final option = _option('primary', fields: {'laudesAnt1': 'available'});
     final router = _hoursRouter(date: date, options: [option]);
     addTearDown(router.dispose);
     await tester.pumpWidget(_testApp(router, date, [option]));
     await tester.pumpAndSettle();
-
-    final action = find.byKey(const Key('hours-calendar-action'));
-    expect(action, findsOneWidget);
-    expect(find.text('Каляндар'), findsOneWidget);
-    final size = tester.getSize(action);
-    expect(size.height, greaterThanOrEqualTo(44));
-    // Top-right: right of the title, above the date.
-    expect(
-      tester.getCenter(action).dx,
-      greaterThan(tester.getCenter(find.text('Літургія гадзін')).dx),
-    );
-    await tester.tap(action);
-    await tester.pumpAndSettle();
-    expect(find.text('ordo 2026-09-08'), findsOneWidget);
+    expect(find.text('Каляндар'), findsNothing);
+    expect(find.text('Літургія гадзін'), findsOneWidget);
   });
 
   testWidgets('local celebration shows its Belarusian diocese name', (
@@ -237,7 +223,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Іншыя літургічныя варыянты · 1'), findsOneWidget);
+    expect(find.text('Іншыя літургічныя варыянты'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('hours-alternatives-control')));
     await tester.pumpAndSettle();
@@ -320,7 +306,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.byKey(const Key('hours-calendar-action')), findsOneWidget);
+    expect(find.text('Каляндар'), findsNothing);
     expect(find.text(option.title), findsOneWidget);
     expect(
       find.text('Гэты каментар павінен быць толькі ўнутры гадзіны.'),

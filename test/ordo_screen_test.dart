@@ -76,8 +76,8 @@ void main() {
     addTearDown(tester.view.reset);
     await pump(tester, app(DateTime(2026, 10, 2)));
     expect(tester.takeException(), isNull);
-    expect(find.byKey(const Key('ordo-month-label')), findsOneWidget);
-    expect(find.byKey(const Key('ordo-day-2026-10-02')), findsOneWidget);
+    expect(find.byKey(const Key('ordo-month-label')), findsNothing);
+    expect(find.byType(CalendarDatePicker), findsNothing);
     await tester.scrollUntilVisible(
       find.byKey(const Key('ordo-vestment-color')),
       300,
@@ -88,8 +88,19 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('Белы', findRichText: true), findsWidgets);
-    expect(find.text('СВЯТКАВАННІ ДНЯ'), findsOneWidget);
-    expect(find.text('Св. Анёлаў Ахоўнікаў'), findsOneWidget);
+    expect(find.text('Святкаванне дня'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('ordo-row-holy-guardian-angels-primary')),
+        matching: find.text('Св. Анёлаў Ахоўнікаў'),
+      ),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('ordo-open-hours')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.byKey(const Key('ordo-open-hours')), findsOneWidget);
   });
 
@@ -110,12 +121,16 @@ void main() {
     // Facts line, above the celebrations and the notes.
     expect(
       tester.getTopLeft(books).dy,
-      lessThan(tester.getTopLeft(find.text('СВЯТКАВАННІ ДНЯ')).dy),
+      lessThan(
+        tester.getTopLeft(find.text('Святкаванне дня', skipOffstage: false)).dy,
+      ),
     );
     expect(
       tester.getTopLeft(books).dy,
       lessThan(
-        tester.getTopLeft(find.text('НАТАТКІ ORDO', skipOffstage: false)).dy,
+        tester
+            .getTopLeft(find.text('Асаблівыя ўказанні', skipOffstage: false))
+            .dy,
       ),
     );
     // The books note is not repeated among the notes.
@@ -222,12 +237,6 @@ void main() {
             tester,
             app(DateTime(2026, 11, 2), mode: mode, textScale: scale),
           );
-          // Touch targets of the month stay at least 44 × 44.
-          final cell = tester.getSize(
-            find.byKey(const Key('ordo-day-2026-11-01'), skipOffstage: false),
-          );
-          expect(cell.height, greaterThanOrEqualTo(44));
-          expect(cell.width, greaterThanOrEqualTo(width < 360 ? 40 : 44));
           final scrollable = find.byType(Scrollable).first;
           for (var i = 0; i < 12; i++) {
             await tester.drag(scrollable, const Offset(0, -400));

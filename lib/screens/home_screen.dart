@@ -72,30 +72,9 @@ class HomeScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Літургія гадзін',
-                                    style: ReaderTheme.of(
-                                      context,
-                                    ).displayTitle(36),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                _CalendarAction(
-                                  color: seasonColor,
-                                  onTap: () => context.push(
-                                    Uri(
-                                      path: '/hours/ordo',
-                                      queryParameters: {
-                                        'date': liturgicalDateKey(date),
-                                      },
-                                    ).toString(),
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              'Літургія гадзін',
+                              style: ReaderTheme.of(context).displayTitle(36),
                             ),
                             const SizedBox(height: 22),
                             _DateHeader(
@@ -114,7 +93,7 @@ class HomeScreen extends ConsumerWidget {
                                     selected.key != selection.primary?.key,
                                 color: seasonColor,
                               ),
-                              if (selection.alternativesCount > 0) ...[
+                              if (selection.hasLiturgicalChoices) ...[
                                 const SizedBox(height: 14),
                                 TextButton.icon(
                                   key: const Key('hours-alternatives-control'),
@@ -134,9 +113,8 @@ class HomeScreen extends ConsumerWidget {
                                     PhosphorIconsRegular.stack,
                                     size: 19,
                                   ),
-                                  label: Text(
-                                    'Іншыя літургічныя варыянты · '
-                                    '${selection.alternativesCount}',
+                                  label: const Text(
+                                    'Іншыя літургічныя варыянты',
                                   ),
                                 ),
                               ],
@@ -176,68 +154,6 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Top-right entry to the liturgical calendar (Ordo) of the selected date:
-/// a compact capsule, glyph + word, so it is found without guessing.
-class _CalendarAction extends StatelessWidget {
-  const _CalendarAction({required this.color, required this.onTap});
-
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final ink = _semanticInk(context, color);
-    // The word stays while it fits beside the title; at a large text scale
-    // on a narrow phone the capsule keeps only its glyph (same target).
-    final media = MediaQuery.of(context);
-    final showLabel =
-        media.textScaler.scale(1) <= 1.3 && media.size.width >= 340;
-    return Semantics(
-      button: true,
-      label: 'Каляндар: літургічны каляндар дня',
-      excludeSemantics: true,
-      child: Material(
-        color: Color.alphaBlend(color.withValues(alpha: 0.14), cs.surface),
-        shape: StadiumBorder(
-          side: BorderSide(color: color.withValues(alpha: 0.35)),
-        ),
-        child: InkWell(
-          key: const Key('hours-calendar-action'),
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 44, minWidth: 48),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PhosphorIcon(
-                    PhosphorIconsRegular.calendarDots,
-                    size: 19,
-                    color: ink,
-                  ),
-                  if (showLabel) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      'Каляндар',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: ink,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -836,7 +752,7 @@ class _AlternativesSheet extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
-                          'ШАБЛОН СВЯТКАВАННЯ',
+                          'Варыянт Літургіі гадзін',
                           style: Theme.of(context).textTheme.labelSmall
                               ?.copyWith(
                                 fontWeight: FontWeight.w800,
@@ -851,7 +767,7 @@ class _AlternativesSheet extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'Выберыце набор агульных тэкстаў для гэтага святкавання.',
+                              'Выберыце дапушчальны варыянт малітвы гэтага дня.',
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: Theme.of(
