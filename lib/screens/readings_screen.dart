@@ -1,10 +1,10 @@
+import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/models/mass_reading_sets.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
@@ -575,7 +575,13 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
               icon: PhosphorIconsLight.bookOpen,
               title: 'Тэкст чытання не знойдзены',
             )
-          : _buildReadingBody(reading, selection.massSet, seasonColor);
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildReadingBody(reading, selection.massSet, seasonColor),
+                const SourceFooter(key: Key('readings-source-footer')),
+              ],
+            );
     }
 
     final manualGroup = _activeGroupKey != _automaticGroupKey;
@@ -623,6 +629,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         scrollController: _scrollController,
         scrollKey: const PageStorageKey('readings-root-scroll'),
         semanticLabel: 'Чытанні дня',
+        showScrollToTop: _selectedSentenceId == null,
         seasonColor: seasonColor,
         chromeMode: ReaderChromeMode.full,
         leading: _menuLeading(),

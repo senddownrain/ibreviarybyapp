@@ -1,0 +1,190 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: (setUpAll)
+[ContentStore] invitatoriums: 4 docs in 183 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 190 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 183 ms
+[ContentStore] completoriums: 35 docs in 195 ms
+[ContentStore] prayerCategories: 5 docs in 147 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 187 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 189 ms
+[ContentStore] compendiumMeta: 1 docs in 125 ms
+[ContentStore] liturgicalTemplates: 16 docs in 207 ms
+[ContentStore] prayers: 117 docs in 160 ms
+[ContentStore] songs: 447 docs in 141 ms
+[ContentStore] compendium: 27 docs in 162 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 166 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 234 ms
+[ContentStore] readings: 822 docs in 316 ms
+[ContentStore] days: 736 docs in 510 ms
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 1.0
+00:03 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 2.0
+00:04 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 1.0
+00:05 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 2.0
+00:07 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (setUpAll)
+[ContentStore] invitatoriums: 4 docs in 105 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 114 ms
+[ContentStore] prayerCategories: 5 docs in 81 ms
+[ContentStore] completoriums: 35 docs in 117 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 209 ms
+[ContentStore] compendiumMeta: 1 docs in 149 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 216 ms
+[ContentStore] liturgicalTemplates: 16 docs in 224 ms
+[ContentStore] prayers: 117 docs in 192 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 213 ms
+[ContentStore] songs: 447 docs in 210 ms
+[ContentStore] compendium: 27 docs in 207 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 220 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 326 ms
+[ContentStore] readings: 822 docs in 381 ms
+[ContentStore] days: 736 docs in 621 ms
+00:07 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:07 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: (setUpAll)
+[ContentStore] invitatoriums: 4 docs in 146 ms
+[ContentStore] completoriums: 35 docs in 163 ms
+[ContentStore] prayerCategories: 5 docs in 102 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 263 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 262 ms
+[ContentStore] liturgicalTemplates: 16 docs in 282 ms
+[ContentStore] prayers: 117 docs in 212 ms
+[ContentStore] compendiumMeta: 1 docs in 190 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 267 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 271 ms
+[ContentStore] songs: 447 docs in 209 ms
+[ContentStore] compendium: 27 docs in 212 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 309 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 248 ms
+[ContentStore] readings: 822 docs in 428 ms
+00:08 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:08 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: (setUpAll)
+[ContentStore] days: 736 docs in 685 ms
+00:08 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:08 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:08 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 89 ms
+[ContentStore] invitatoriums: 4 docs in 126 ms
+[ContentStore] prayerCategories: 5 docs in 109 ms
+[ContentStore] compendiumMeta: 1 docs in 84 ms
+[ContentStore] completoriums: 35 docs in 246 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 245 ms
+[ContentStore] songs: 447 docs in 222 ms
+[ContentStore] prayers: 117 docs in 239 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 246 ms
+[ContentStore] liturgicalTemplates: 16 docs in 257 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 251 ms
+[ContentStore] compendium: 27 docs in 227 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 285 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 279 ms
+[ContentStore] readings: 822 docs in 380 ms
+[ContentStore] days: 736 docs in 582 ms
+00:09 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:09 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:10 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:10 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: Guardian Angels: vestment colour named, celebrations, notes and reading references
+00:11 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:11 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:11 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:11 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:12 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:12 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:12 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:13 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:13 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:14 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:14 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:14 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:15 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: both headers retain title and blue accent after Office selection
+[data] CACHE HIT  readings 2026-10-07
+00:15 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:15 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:16 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:16 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:17 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:17 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:18 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:18 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:18 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:19 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:19 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:19 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:19 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+00:19 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:19 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: shell calendar shortcut opens the liturgical day
+00:20 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: shell calendar shortcut opens the liturgical day
+00:20 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: shell calendar shortcut opens the liturgical day
+00:20 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: shell calendar shortcut opens the liturgical day
+00:20 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:20 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:20 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:21 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:21 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:21 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:21 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:21 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:22 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: headers and variants allow 200 percent text
+[data] CACHE HIT  readings 2026-10-07
+00:22 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:22 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:23 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:23 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:23 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+00:23 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+00:24 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+00:24 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+00:24 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-06
+00:25 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:25 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:26 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:26 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:26 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:26 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:27 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:27 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.5
+00:27 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×1.0, dark
+00:27 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:28 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:28 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:28 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:28 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:29 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:29 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+00:29 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:29 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.0
+00:30 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:31 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.5
+00:31 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+00:31 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+00:32 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:32 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month lists all days, crosses year and respects calendar bounds
+00:33 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours date action updates the visible selected day
+00:33 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0
+00:34 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar icon opens the day; arrows keep one route
+00:35 +84: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5
+00:35 +85: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day calendar applies dates and Common without dismissing the sheet
+00:36 +86: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day calendar applies dates and Common without dismissing the sheet
+00:37 +87: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day calendar applies dates and Common without dismissing the sheet
+[data] CACHE HIT  readings 2026-10-09
+00:39 +88: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: calendar search reaches the existing period and feast picker
+00:41 +89: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+00:43 +90: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+00:45 +91: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Period notes are collapsed and can be opened
+00:45 +92: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.android
+00:45 +93: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.iOS
+00:46 +94: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.0
+00:48 +95: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.3
+00:49 +96: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.5
+00:51 +97: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 2.0
+00:53 +98: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+00:53 +99: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+00:53 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+00:53 +101: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+00:53 +102: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (tearDownAll)
+00:54 +102: All tests passed!

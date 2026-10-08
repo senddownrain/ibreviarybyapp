@@ -1,0 +1,1818 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/alternative_text_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/alternative_text_test.dart: shared controller synchronizes repeated antiphons
+00:02 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_navigation_dock_test.dart: Full dock renders four destinations on iOS and Android
+00:02 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/alternative_text_test.dart: seven long alternatives fit a narrow 200 percent sheet
+00:02 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_navigation_dock_test.dart: dock labels stay complete across widths and text scales
+00:03 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_navigation_dock_test.dart: Compact expands without acting as a repeated tab
+00:04 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_navigation_dock_test.dart: Hidden removes the primary dock
+00:05 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: Bible selection temporarily owns the bottom slot
+00:05 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+00:06 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+00:06 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+00:06 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+00:06 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+00:06 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+00:08 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:08 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:08 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:09 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_theme_test.dart: app theme controller updates the running MaterialApp
+00:10 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_repository_test.dart: (setUpAll)
+00:11 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_repository_test.dart: testament boundary accounts for Russian additional books
+00:11 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_repository_test.dart: Belarusian testaments: 46 OT books, 27 NT books from mt to rev
+00:11 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_repository_test.dart: Belarusian attribution depends on the testament
+00:11 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_repository_test.dart: Belarusian New Testament text is Catholic.by, not Chernyavski
+00:11 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:11 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:11 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:11 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:11 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:11 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:12 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation first run uses a sensible first-book default
+00:12 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation root restores last location and clamps a corrupt chapter
+00:12 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation translation switch preserves the canonical book and chapter
+00:12 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation translation fallback uses the saved target location
+00:12 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation previous and next cross book boundaries
+00:12 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation first and last chapter boundaries disable navigation
+00:12 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation canonical and search-result routes preserve a verse target
+00:12 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation missing and corrupt local data produce an empty graceful state
+00:12 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:13 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:14 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: A has previous/current/next and outline selection
+00:15 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: A has previous/current/next and outline selection
+00:16 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:17 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:18 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:19 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:20 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:22 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:23 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:24 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:24 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:25 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:26 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:26 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:27 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:28 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:30 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:30 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:30 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:31 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:32 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:33 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+00:34 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: targets are at least 48 and content clears measured bar
+00:34 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+00:35 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+00:35 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+00:35 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+00:35 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+00:35 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+00:35 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: lab uses semantic neutral chrome on android
+00:35 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bottom_navigation_lab_test.dart: lab uses semantic neutral chrome on iOS
+00:37 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:37 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_data_test.dart: validation rejects incomplete or inconsistent datasets
+00:38 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in light
+00:38 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in light
+00:38 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: non-liturgical screens do not subscribe to calendar color
+00:38 +84: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: android dark dock, top and reader chrome stay neutral
+00:38 +85: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: android light dock, top and reader chrome stay neutral
+00:38 +86: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: iOS dark dock, top and reader chrome stay neutral
+00:39 +87: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/color_foundations_test.dart: iOS light dock, top and reader chrome stay neutral
+00:40 +88: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_flat_outline_test.dart: all four cached streams contain exactly the canonical 598 questions
+00:40 +89: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_flat_outline_test.dart: Part I starts with section, q1, subsection, citation, q2–5, topic
+00:40 +90: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_flat_outline_test.dart: edge placements and inline headings match source order
+00:41 +91: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:43 +92: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:43 +93: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:43 +94: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:43 +95: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:44 +96: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:44 +97: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:44 +98: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:44 +99: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root shows the four parts and the attribution
+00:46 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root source attribution opens Catholic.by externally
+00:47 +101: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: root bundle failure without a synced copy shows a retry
+00:47 +102: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/computed_year_options_test.dart: computed year options equal the web Ordo engine
+00:47 +103: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: search results open a question and the query survives Back
+00:47 +104: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: search results open a question and the query survives Back
+00:47 +105: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: search results open a question and the query survives Back
+00:49 +106: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: search an exact number jumps to the question on submit
+00:50 +107: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution every collection ships with the app and matches its manifest
+[ContentStore] invitatoriums: 4 docs in 181 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 180 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 170 ms
+[ContentStore] prayerCategories: 5 docs in 151 ms
+[ContentStore] completoriums: 35 docs in 186 ms
+[ContentStore] compendiumMeta: 1 docs in 136 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 178 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 182 ms
+[ContentStore] compendium: 27 docs in 142 ms
+[ContentStore] liturgicalTemplates: 16 docs in 198 ms
+[ContentStore] prayers: 117 docs in 179 ms
+[ContentStore] songs: 447 docs in 191 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 195 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 266 ms
+[ContentStore] readings: 822 docs in 348 ms
+00:50 +108: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution every collection ships with the app and matches its manifest
+[ContentStore] days: 736 docs in 605 ms
+00:50 +109: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: flat Part navigation root → Part I shows section, q1, subsection and q2–5 inline
+00:50 +109: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution a fresh install opens the Hours and the Readings offline, far outside the former ±7-day window
+[ContentStore] invitatoriums: 4 docs in 58 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 59 ms
+[ContentStore] completoriums: 35 docs in 60 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 56 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 57 ms
+[ContentStore] prayerCategories: 5 docs in 44 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 59 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] liturgicalTemplates: 16 docs in 65 ms
+[ContentStore] prayers: 117 docs in 72 ms
+[ContentStore] songs: 447 docs in 58 ms
+[ContentStore] compendium: 27 docs in 49 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 89 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 142 ms
+[ContentStore] readings: 822 docs in 222 ms
+00:51 +110: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution a fresh install opens the Hours and the Readings offline, far outside the former ±7-day window
+[ContentStore] days: 736 docs in 663 ms
+00:52 +111: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: flat Part navigation reader has canonical neighbours and returns to its question in Part
+00:52 +112: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: flat Part navigation reader has canonical neighbours and returns to its question in Part
+00:53 +112: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution the Compendium is content: validated from the store, patched with the rest
+[ContentStore] invitatoriums: 4 docs in 81 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 79 ms
+[ContentStore] completoriums: 35 docs in 80 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 72 ms
+00:53 +113: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution the Compendium is content: validated from the store, patched with the rest
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 77 ms
+[ContentStore] prayerCategories: 5 docs in 55 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 81 ms
+[ContentStore] songs: 447 docs in 57 ms
+[ContentStore] compendiumMeta: 1 docs in 51 ms
+[ContentStore] liturgicalTemplates: 16 docs in 87 ms
+[ContentStore] prayers: 117 docs in 93 ms
+[ContentStore] compendium: 27 docs in 84 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 124 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 222 ms
+[ContentStore] readings: 822 docs in 326 ms
+[ContentStore] days: 736 docs in 759 ms
+00:54 +114: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: flat Part navigation cold Part target and legacy links land on stable items
+00:54 +114: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution Hive holds no copy of the bundled corpus
+[ContentStore] invitatoriums: 4 docs in 72 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 71 ms
+[ContentStore] completoriums: 35 docs in 72 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 63 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 68 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 70 ms
+[ContentStore] prayerCategories: 5 docs in 36 ms
+[ContentStore] compendiumMeta: 1 docs in 13 ms
+[ContentStore] liturgicalTemplates: 16 docs in 110 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 82 ms
+[ContentStore] compendium: 27 docs in 105 ms
+[ContentStore] songs: 447 docs in 138 ms
+[ContentStore] prayers: 117 docs in 169 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 229 ms
+[ContentStore] readings: 822 docs in 417 ms
+[ContentStore] days: 736 docs in 1030 ms
+00:55 +115: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/compendium_screens_test.dart: flat Part navigation cold Part target and legacy links land on stable items
+00:55 +115: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+[ContentStore] invitatoriums: 4 docs in 79 ms
+[ContentStore] completoriums: 35 docs in 88 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 87 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 80 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 82 ms
+[ContentStore] prayerCategories: 5 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 43 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 91 ms
+[ContentStore] liturgicalTemplates: 16 docs in 99 ms
+[ContentStore] songs: 447 docs in 55 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] prayers: 117 docs in 140 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 207 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 312 ms
+[ContentStore] readings: 822 docs in 423 ms
+00:58 +116: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+00:59 +117: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+01:01 +118: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+01:01 +119: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+[ContentStore] days: 736 docs in 933 ms
+01:01 +120: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+[ContentStore] invitatoriums: 4 docs in 53 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 52 ms
+[ContentStore] completoriums: 35 docs in 53 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 66 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 67 ms
+[ContentStore] prayerCategories: 5 docs in 63 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 68 ms
+[ContentStore] compendiumMeta: 1 docs in 56 ms
+[ContentStore] songs: 447 docs in 59 ms
+[ContentStore] liturgicalTemplates: 16 docs in 72 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] prayers: 117 docs in 72 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 81 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 149 ms
+[ContentStore] readings: 822 docs in 201 ms
+01:03 +121: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:06 +122: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+[ContentStore] days: 736 docs in 445 ms
+01:07 +122: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/diocese_settings_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 213 ms
+[ContentStore] invitatoriums: 4 docs in 229 ms
+[ContentStore] prayerCategories: 5 docs in 187 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 215 ms
+[ContentStore] completoriums: 35 docs in 229 ms
+[ContentStore] compendiumMeta: 1 docs in 177 ms
+[ContentStore] liturgicalTemplates: 16 docs in 236 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 225 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 220 ms
+[ContentStore] songs: 447 docs in 187 ms
+[ContentStore] compendium: 27 docs in 182 ms
+[ContentStore] prayers: 117 docs in 206 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 225 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 195 ms
+[ContentStore] readings: 822 docs in 301 ms
+[ContentStore] days: 736 docs in 518 ms
+01:07 +122: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:07 +123: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:07 +124: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:07 +125: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:07 +126: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:08 +127: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:08 +128: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:08 +129: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:08 +130: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+01:10 +131: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/horizontal_swipe_navigation_test.dart: left and right swipes navigate next and previous
+01:10 +132: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+01:10 +133: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+[ContentStore] invitatoriums: 4 docs in 41 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 39 ms
+[ContentStore] completoriums: 35 docs in 41 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 36 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 38 ms
+[ContentStore] prayerCategories: 5 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 39 ms
+[ContentStore] compendiumMeta: 1 docs in 29 ms
+[ContentStore] songs: 447 docs in 31 ms
+[ContentStore] liturgicalTemplates: 16 docs in 54 ms
+[ContentStore] compendium: 27 docs in 42 ms
+[ContentStore] prayers: 117 docs in 71 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 83 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 123 ms
+[ContentStore] readings: 822 docs in 187 ms
+01:11 +134: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+01:13 +134: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 204 ms
+[ContentStore] invitatoriums: 4 docs in 234 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 203 ms
+[ContentStore] prayerCategories: 5 docs in 169 ms
+[ContentStore] completoriums: 35 docs in 234 ms
+[ContentStore] compendiumMeta: 1 docs in 158 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 219 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 224 ms
+[ContentStore] liturgicalTemplates: 16 docs in 243 ms
+[ContentStore] songs: 447 docs in 167 ms
+[ContentStore] prayers: 117 docs in 191 ms
+[ContentStore] compendium: 27 docs in 212 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 232 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 211 ms
+[ContentStore] readings: 822 docs in 364 ms
+[ContentStore] days: 736 docs in 576 ms
+01:13 +134: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+[ContentStore] days: 736 docs in 537 ms
+01:14 +135: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:14 +135: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a document that does not match the manifest is rejected; nothing changes
+[ContentStore] invitatoriums: 4 docs in 68 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 66 ms
+[ContentStore] completoriums: 35 docs in 67 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 64 ms
+[ContentStore] prayerCategories: 5 docs in 58 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 70 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 69 ms
+[ContentStore] liturgicalTemplates: 16 docs in 75 ms
+[ContentStore] compendiumMeta: 1 docs in 59 ms
+[ContentStore] songs: 447 docs in 61 ms
+[ContentStore] compendium: 27 docs in 67 ms
+[ContentStore] prayers: 117 docs in 88 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 110 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 162 ms
+[ContentStore] readings: 822 docs in 215 ms
+[ContentStore] days: 736 docs in 548 ms
+01:22 +136: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:22 +136: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a missing document rejects the update
+[ContentStore] invitatoriums: 4 docs in 15 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 57 ms
+[ContentStore] completoriums: 35 docs in 58 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 56 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 57 ms
+[ContentStore] prayerCategories: 5 docs in 59 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 64 ms
+[ContentStore] compendiumMeta: 1 docs in 58 ms
+[ContentStore] songs: 447 docs in 59 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] liturgicalTemplates: 16 docs in 72 ms
+[ContentStore] prayers: 117 docs in 77 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 88 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 148 ms
+[ContentStore] readings: 822 docs in 234 ms
+[ContentStore] days: 736 docs in 537 ms
+01:26 +137: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:27 +137: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a newer local update survives a restart
+[ContentStore] invitatoriums: 4 docs in 69 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 68 ms
+[ContentStore] completoriums: 35 docs in 69 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 66 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 67 ms
+[ContentStore] prayerCategories: 5 docs in 64 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 69 ms
+[ContentStore] compendiumMeta: 1 docs in 61 ms
+[ContentStore] compendium: 27 docs in 63 ms
+[ContentStore] songs: 447 docs in 74 ms
+[ContentStore] prayers: 117 docs in 78 ms
+[ContentStore] liturgicalTemplates: 16 docs in 100 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 115 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 167 ms
+[ContentStore] readings: 822 docs in 281 ms
+[ContentStore] days: 736 docs in 550 ms
+[ContentStore] invitatoriums: 4 docs in 29 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 44 ms
+[ContentStore] completoriums: 35 docs in 46 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 42 ms
+[ContentStore] prayerCategories: 5 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 35 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 45 ms
+[ContentStore] songs: 447 docs in 39 ms
+[ContentStore] liturgicalTemplates: 16 docs in 52 ms
+[ContentStore] compendium: 27 docs in 44 ms
+[ContentStore] prayers: 117 docs in 76 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 84 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 155 ms
+[ContentStore] readings: 822 docs in 240 ms
+[ContentStore] days: 736 docs in 577 ms
+01:28 +138: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:28 +138: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions an app update with a newer bundle supersedes an older local update
+[ContentStore] invitatoriums: 4 docs in 49 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 49 ms
+[ContentStore] completoriums: 35 docs in 50 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 48 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 48 ms
+[ContentStore] prayerCategories: 5 docs in 45 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 51 ms
+[ContentStore] compendiumMeta: 1 docs in 45 ms
+[ContentStore] songs: 447 docs in 46 ms
+[ContentStore] compendium: 27 docs in 55 ms
+[ContentStore] liturgicalTemplates: 16 docs in 72 ms
+[ContentStore] prayers: 117 docs in 74 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 90 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 174 ms
+[ContentStore] readings: 822 docs in 238 ms
+[ContentStore] days: 736 docs in 499 ms
+[ContentStore] invitatoriums: 4 docs in 41 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] completoriums: 35 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] prayerCategories: 5 docs in 33 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] compendiumMeta: 1 docs in 31 ms
+[ContentStore] songs: 447 docs in 33 ms
+[ContentStore] liturgicalTemplates: 16 docs in 45 ms
+[ContentStore] compendium: 27 docs in 35 ms
+[ContentStore] prayers: 117 docs in 53 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 87 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 141 ms
+[ContentStore] readings: 822 docs in 221 ms
+[ContentStore] days: 736 docs in 475 ms
+01:29 +139: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:29 +139: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: former download cache newer documents are kept, older ones dropped, the cache removed, user data untouched — and running again changes nothing
+[ContentStore] invitatoriums: 4 docs in 57 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 57 ms
+[ContentStore] completoriums: 35 docs in 57 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 55 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 56 ms
+[ContentStore] prayerCategories: 5 docs in 51 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 57 ms
+[ContentStore] songs: 447 docs in 50 ms
+[ContentStore] compendiumMeta: 1 docs in 49 ms
+[ContentStore] compendium: 27 docs in 62 ms
+[ContentStore] liturgicalTemplates: 16 docs in 76 ms
+[ContentStore] prayers: 117 docs in 74 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 99 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 145 ms
+[ContentStore] readings: 822 docs in 225 ms
+[ContentStore] days: 736 docs in 487 ms
+[ContentMigration] done, 1 newer documents kept
+01:29 +140: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:30 +140: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy 100 new prayers: only those are downloaded, by themselves
+[ContentStore] invitatoriums: 4 docs in 53 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 49 ms
+[ContentStore] completoriums: 35 docs in 53 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 46 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 47 ms
+[ContentStore] prayerCategories: 5 docs in 35 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 49 ms
+[ContentStore] compendiumMeta: 1 docs in 33 ms
+[ContentStore] songs: 447 docs in 35 ms
+[ContentStore] liturgicalTemplates: 16 docs in 60 ms
+[ContentStore] compendium: 27 docs in 42 ms
+[ContentStore] prayers: 117 docs in 61 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 71 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 158 ms
+[ContentStore] readings: 822 docs in 261 ms
+[ContentStore] days: 736 docs in 579 ms
+01:34 +141: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:34 +141: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a rebuild-sized diff is left to the next app release
+[ContentStore] invitatoriums: 4 docs in 68 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 67 ms
+[ContentStore] completoriums: 35 docs in 68 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 66 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 67 ms
+[ContentStore] prayerCategories: 5 docs in 59 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 68 ms
+[ContentStore] songs: 447 docs in 58 ms
+[ContentStore] compendiumMeta: 1 docs in 57 ms
+[ContentStore] liturgicalTemplates: 16 docs in 72 ms
+[ContentStore] compendium: 27 docs in 63 ms
+[ContentStore] prayers: 117 docs in 82 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 99 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 168 ms
+[ContentStore] readings: 822 docs in 229 ms
+[ContentStore] days: 736 docs in 521 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+01:40 +142: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:40 +142: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a newer schema is never installed as a patch
+[ContentStore] invitatoriums: 4 docs in 68 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 66 ms
+[ContentStore] completoriums: 35 docs in 67 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 64 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 65 ms
+[ContentStore] prayerCategories: 5 docs in 57 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 66 ms
+[ContentStore] compendiumMeta: 1 docs in 47 ms
+[ContentStore] songs: 447 docs in 54 ms
+[ContentStore] liturgicalTemplates: 16 docs in 77 ms
+[ContentStore] compendium: 27 docs in 58 ms
+[ContentStore] prayers: 117 docs in 80 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 102 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 177 ms
+[ContentStore] readings: 822 docs in 254 ms
+[ContentStore] days: 736 docs in 594 ms
+01:44 +143: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:44 +143: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy new schema: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] invitatoriums: 4 docs in 59 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 59 ms
+[ContentStore] completoriums: 35 docs in 60 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 58 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 59 ms
+[ContentStore] prayerCategories: 5 docs in 54 ms
+[ContentStore] compendiumMeta: 1 docs in 49 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 60 ms
+[ContentStore] songs: 447 docs in 53 ms
+[ContentStore] liturgicalTemplates: 16 docs in 75 ms
+[ContentStore] compendium: 27 docs in 68 ms
+[ContentStore] prayers: 117 docs in 85 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 88 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 146 ms
+[ContentStore] readings: 822 docs in 180 ms
+[ContentStore] days: 736 docs in 478 ms
+[ContentUpdates] schema: content 1893445200000 needs the next app release
+01:48 +144: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:48 +144: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy mass rebuild: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] invitatoriums: 4 docs in 51 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 51 ms
+[ContentStore] completoriums: 35 docs in 52 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 50 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 50 ms
+[ContentStore] prayerCategories: 5 docs in 45 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 51 ms
+[ContentStore] compendiumMeta: 1 docs in 43 ms
+[ContentStore] songs: 447 docs in 45 ms
+[ContentStore] compendium: 27 docs in 49 ms
+[ContentStore] liturgicalTemplates: 16 docs in 64 ms
+[ContentStore] prayers: 117 docs in 71 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 85 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 145 ms
+[ContentStore] readings: 822 docs in 217 ms
+[ContentStore] days: 736 docs in 470 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+01:56 +145: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+01:56 +145: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a compatible current check clears the status — at the next launch, even within the day
+[ContentStore] invitatoriums: 4 docs in 64 ms
+[ContentStore] completoriums: 35 docs in 63 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 61 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 59 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 47 ms
+[ContentStore] prayerCategories: 5 docs in 38 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 60 ms
+[ContentStore] songs: 447 docs in 37 ms
+[ContentStore] compendiumMeta: 1 docs in 36 ms
+[ContentStore] liturgicalTemplates: 16 docs in 66 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] prayers: 117 docs in 69 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 99 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 188 ms
+[ContentStore] readings: 822 docs in 265 ms
+[ContentStore] days: 736 docs in 574 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+02:06 +146: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:06 +146: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy the daily check runs once a day
+[ContentStore] invitatoriums: 4 docs in 70 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 69 ms
+[ContentStore] completoriums: 35 docs in 69 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 65 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 67 ms
+[ContentStore] prayerCategories: 5 docs in 58 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 68 ms
+[ContentStore] compendiumMeta: 1 docs in 56 ms
+[ContentStore] songs: 447 docs in 58 ms
+[ContentStore] liturgicalTemplates: 16 docs in 77 ms
+[ContentStore] compendium: 27 docs in 64 ms
+[ContentStore] prayers: 117 docs in 86 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 119 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 191 ms
+[ContentStore] readings: 822 docs in 278 ms
+[ContentStore] days: 736 docs in 518 ms
+02:13 +147: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:14 +148: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:14 +149: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:14 +150: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:15 +151: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:15 +151: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation a completed update is new in every collection
+[ContentStore] invitatoriums: 4 docs in 33 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 33 ms
+[ContentStore] completoriums: 35 docs in 33 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 32 ms
+[ContentStore] prayerCategories: 5 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 33 ms
+[ContentStore] compendiumMeta: 1 docs in 24 ms
+[ContentStore] songs: 447 docs in 27 ms
+[ContentStore] compendium: 27 docs in 36 ms
+[ContentStore] liturgicalTemplates: 16 docs in 57 ms
+[ContentStore] prayers: 117 docs in 54 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 90 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 168 ms
+[ContentStore] readings: 822 docs in 237 ms
+[ContentStore] days: 736 docs in 516 ms
+02:15 +152: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:15 +152: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash while staging: old content, before and after a restart
+[ContentStore] invitatoriums: 4 docs in 48 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 48 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 46 ms
+[ContentStore] completoriums: 35 docs in 48 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 47 ms
+[ContentStore] prayerCategories: 5 docs in 42 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 48 ms
+[ContentStore] songs: 447 docs in 41 ms
+[ContentStore] compendium: 27 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 42 ms
+[ContentStore] liturgicalTemplates: 16 docs in 58 ms
+[ContentStore] prayers: 117 docs in 59 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 80 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 135 ms
+[ContentStore] readings: 822 docs in 187 ms
+[ContentStore] days: 736 docs in 448 ms
+[ContentStore] dropping an unfinished update
+[ContentStore] invitatoriums: 4 docs in 79 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 79 ms
+[ContentStore] completoriums: 35 docs in 80 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 74 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 78 ms
+[ContentStore] prayerCategories: 5 docs in 63 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 81 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] compendiumMeta: 1 docs in 57 ms
+[ContentStore] liturgicalTemplates: 16 docs in 86 ms
+[ContentStore] songs: 447 docs in 65 ms
+[ContentStore] prayers: 117 docs in 100 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 94 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 158 ms
+[ContentStore] readings: 822 docs in 229 ms
+[ContentStore] days: 736 docs in 562 ms
+02:16 +153: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:17 +153: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash after READY: old until restart, then new everywhere
+[ContentStore] invitatoriums: 4 docs in 42 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] completoriums: 35 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 40 ms
+[ContentStore] prayerCategories: 5 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 28 ms
+[ContentStore] liturgicalTemplates: 16 docs in 44 ms
+[ContentStore] compendium: 27 docs in 33 ms
+[ContentStore] songs: 447 docs in 37 ms
+[ContentStore] prayers: 117 docs in 55 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 54 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 116 ms
+[ContentStore] readings: 822 docs in 182 ms
+[ContentStore] days: 736 docs in 538 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] invitatoriums: 4 docs in 43 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] completoriums: 35 docs in 43 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 41 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 42 ms
+[ContentStore] prayerCategories: 5 docs in 37 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 34 ms
+[ContentStore] songs: 447 docs in 36 ms
+[ContentStore] compendium: 27 docs in 41 ms
+[ContentStore] liturgicalTemplates: 16 docs in 59 ms
+[ContentStore] prayers: 117 docs in 55 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 70 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 131 ms
+[ContentStore] readings: 822 docs in 229 ms
+[ContentStore] days: 736 docs in 513 ms
+02:18 +154: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:18 +154: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation a READY generation left by a failed commit is finished before the next one starts
+[ContentStore] invitatoriums: 4 docs in 42 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] completoriums: 35 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] prayerCategories: 5 docs in 35 ms
+[ContentStore] compendiumMeta: 1 docs in 33 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] songs: 447 docs in 35 ms
+[ContentStore] liturgicalTemplates: 16 docs in 70 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] prayers: 117 docs in 84 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 91 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 132 ms
+[ContentStore] readings: 822 docs in 236 ms
+[ContentStore] days: 736 docs in 521 ms
+[ContentStore] finishing an interrupted update
+02:18 +155: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:18 +155: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash while writing overlays: readers never see a mix; the restart finishes it
+[ContentStore] invitatoriums: 4 docs in 51 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 51 ms
+[ContentStore] completoriums: 35 docs in 51 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 49 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 50 ms
+[ContentStore] prayerCategories: 5 docs in 47 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 51 ms
+[ContentStore] songs: 447 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 45 ms
+[ContentStore] liturgicalTemplates: 16 docs in 60 ms
+[ContentStore] compendium: 27 docs in 80 ms
+[ContentStore] prayers: 117 docs in 93 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 96 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 154 ms
+[ContentStore] readings: 822 docs in 219 ms
+[ContentStore] days: 736 docs in 476 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] invitatoriums: 4 docs in 76 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 75 ms
+[ContentStore] completoriums: 35 docs in 76 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 74 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 75 ms
+[ContentStore] prayerCategories: 5 docs in 71 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 76 ms
+[ContentStore] compendiumMeta: 1 docs in 69 ms
+[ContentStore] compendium: 27 docs in 70 ms
+[ContentStore] songs: 447 docs in 78 ms
+[ContentStore] prayers: 117 docs in 86 ms
+[ContentStore] liturgicalTemplates: 16 docs in 94 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 107 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 154 ms
+[ContentStore] readings: 822 docs in 228 ms
+[ContentStore] days: 736 docs in 525 ms
+02:19 +156: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:20 +156: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left
+[ContentStore] invitatoriums: 4 docs in 15 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 14 ms
+[ContentStore] completoriums: 35 docs in 15 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 36 ms
+[ContentStore] prayerCategories: 5 docs in 29 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 38 ms
+[ContentStore] compendiumMeta: 1 docs in 27 ms
+[ContentStore] songs: 447 docs in 29 ms
+[ContentStore] liturgicalTemplates: 16 docs in 46 ms
+[ContentStore] compendium: 27 docs in 35 ms
+[ContentStore] prayers: 117 docs in 51 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 65 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 125 ms
+[ContentStore] readings: 822 docs in 189 ms
+[ContentStore] days: 736 docs in 494 ms
+02:32 +157: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:32 +157: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text
+[ContentStore] invitatoriums: 4 docs in 36 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 35 ms
+[ContentStore] completoriums: 35 docs in 36 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 34 ms
+[ContentStore] prayerCategories: 5 docs in 29 ms
+[ContentStore] compendiumMeta: 1 docs in 25 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 35 ms
+[ContentStore] songs: 447 docs in 27 ms
+[ContentStore] liturgicalTemplates: 16 docs in 54 ms
+[ContentStore] compendium: 27 docs in 43 ms
+[ContentStore] prayers: 117 docs in 68 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 77 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 131 ms
+[ContentStore] readings: 822 docs in 214 ms
+[ContentStore] days: 736 docs in 493 ms
+02:47 +158: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:47 +158: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases every collection keeps the version of its own snapshot
+[ContentStore] invitatoriums: 4 docs in 34 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 33 ms
+[ContentStore] completoriums: 35 docs in 34 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 32 ms
+[ContentStore] prayerCategories: 5 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 33 ms
+[ContentStore] songs: 447 docs in 26 ms
+[ContentStore] compendiumMeta: 1 docs in 23 ms
+[ContentStore] liturgicalTemplates: 16 docs in 47 ms
+[ContentStore] compendium: 27 docs in 39 ms
+[ContentStore] prayers: 117 docs in 46 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 75 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 147 ms
+[ContentStore] readings: 822 docs in 195 ms
+[ContentStore] days: 736 docs in 453 ms
+02:48 +159: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+02:48 +159: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+[ContentStore] invitatoriums: 4 docs in 45 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 44 ms
+[ContentStore] completoriums: 35 docs in 45 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 43 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] prayerCategories: 5 docs in 40 ms
+[ContentStore] compendiumMeta: 1 docs in 38 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 45 ms
+[ContentStore] songs: 447 docs in 40 ms
+[ContentStore] liturgicalTemplates: 16 docs in 48 ms
+[ContentStore] compendium: 27 docs in 40 ms
+[ContentStore] prayers: 117 docs in 74 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 103 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 160 ms
+[ContentStore] readings: 822 docs in 213 ms
+[ContentStore] days: 736 docs in 530 ms
+03:04 +160: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:04 +160: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases a new app bundle absorbs the patches it contains
+[ContentStore] invitatoriums: 4 docs in 43 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] completoriums: 35 docs in 43 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] prayerCategories: 5 docs in 35 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 33 ms
+[ContentStore] songs: 447 docs in 35 ms
+[ContentStore] liturgicalTemplates: 16 docs in 50 ms
+[ContentStore] compendium: 27 docs in 43 ms
+[ContentStore] prayers: 117 docs in 64 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 77 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 139 ms
+[ContentStore] readings: 822 docs in 211 ms
+[ContentStore] days: 736 docs in 501 ms
+03:25 +161: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:25 +161: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: former download cache at full size an almost complete old database: newer kept, the rest freed, user data intact
+[ContentStore] invitatoriums: 4 docs in 43 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] completoriums: 35 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] prayerCategories: 5 docs in 37 ms
+[ContentStore] compendiumMeta: 1 docs in 34 ms
+[ContentStore] songs: 447 docs in 36 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] liturgicalTemplates: 16 docs in 52 ms
+[ContentStore] compendium: 27 docs in 43 ms
+[ContentStore] prayers: 117 docs in 56 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 77 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 132 ms
+[ContentStore] readings: 822 docs in 179 ms
+[ContentStore] days: 736 docs in 432 ms
+[ContentMigration] done, 1 newer documents kept
+MIGRATION 2122 documents, 58.0 MB → 0.1 MB in 41 ms
+03:28 +162: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:29 +162: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 110 ms
+[ContentStore] invitatoriums: 4 docs in 126 ms
+[ContentStore] prayerCategories: 5 docs in 71 ms
+[ContentStore] completoriums: 35 docs in 125 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 161 ms
+[ContentStore] liturgicalTemplates: 16 docs in 177 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 164 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 167 ms
+[ContentStore] songs: 447 docs in 120 ms
+[ContentStore] compendium: 27 docs in 116 ms
+[ContentStore] compendiumMeta: 1 docs in 110 ms
+[ContentStore] prayers: 117 docs in 138 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 148 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 226 ms
+[ContentStore] readings: 822 docs in 270 ms
+[ContentStore] days: 736 docs in 424 ms
+03:29 +162: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:29 +163: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:29 +164: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:29 +165: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:30 +166: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:30 +167: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:30 +168: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:30 +169: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:30 +170: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:31 +171: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:31 +172: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:36 +173: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:37 +174: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:37 +175: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:37 +176: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:37 +177: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:37 +178: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:38 +179: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:38 +180: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:39 +181: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:39 +182: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:39 +183: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:39 +184: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:40 +185: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:40 +186: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:41 +187: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:41 +188: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:42 +189: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:42 +190: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:43 +190: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: window geometry is distinct from the app dock reserve Prayerbook 390x840 3-button
+LAYOUT_LAB prayerbook 390x840 3-button: system=48.0, localViewPadding=0.0, localPadding=126.0, dockTop=720.0, lastBottom=690.0, gap=30.0, scroll=388.0 CORRECT
+03:43 +191: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:43 +191: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: window geometry is distinct from the app dock reserve Prayerbook 390x840 gesture
+LAYOUT_LAB prayerbook 390x840 gesture: system=24.0, localViewPadding=0.0, localPadding=102.0, dockTop=744.0, lastBottom=714.0, gap=30.0, scroll=364.0 CORRECT
+03:43 +192: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:43 +192: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: window geometry is distinct from the app dock reserve Prayerbook 320x720 3-button
+LAYOUT_LAB prayerbook 320x720 3-button: system=48.0, localViewPadding=0.0, localPadding=126.0, dockTop=600.0, lastBottom=570.0, gap=30.0, scroll=766.0 CORRECT
+03:43 +193: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:43 +193: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: window geometry is distinct from the app dock reserve Prayerbook 320x720 gesture
+LAYOUT_LAB prayerbook 320x720 gesture: system=24.0, localViewPadding=0.0, localPadding=102.0, dockTop=624.0, lastBottom=594.0, gap=30.0, scroll=742.0 CORRECT
+03:43 +194: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:44 +194: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Prayer search 3-button closed and open keyboard
+LAYOUT_LAB prayer-search 3-button: closedGap=12.0 CORRECT, imeGap=12.0 CORRECT
+03:44 +195: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:44 +195: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Prayer search gesture closed and open keyboard
+LAYOUT_LAB prayer-search gesture: closedGap=12.0 CORRECT, imeGap=12.0 CORRECT
+03:44 +196: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:44 +197: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:45 +197: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: selection palettes Readings 3-button
+LAYOUT_LAB readings 3-button: safeGap=16.0, selectionReserve=63.599999999999994, tail=23.999999999999886, scroll=1148.6 CORRECT
+03:45 +198: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:46 +198: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: selection palettes Bible 3-button
+LAYOUT_LAB bible 3-button: safeGap=16.0, selectionReserve=63.599999999999994, tail=24.000000000000682, scroll=4074.2000000000007 CORRECT
+03:46 +199: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:46 +199: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: selection palettes Readings gesture
+LAYOUT_LAB readings gesture: safeGap=16.0, selectionReserve=63.599999999999994, tail=23.999999999999886, scroll=1124.6 CORRECT
+03:46 +200: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:47 +200: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: selection palettes Bible gesture
+LAYOUT_LAB bible gesture: safeGap=16.0, selectionReserve=63.599999999999994, tail=24.000000000000682, scroll=4050.2000000000007 CORRECT
+03:47 +201: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:48 +202: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:48 +203: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:49 +203: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Holy Mass section bar Android 3-button 390x840
+LAYOUT_LAB mass 390x840 3-button: barTop=720.4, barBottom=778.0, contentEnd=696.4000000000001 CORRECT
+03:49 +204: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:50 +205: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:50 +205: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Holy Mass section bar Android gesture 390x840
+LAYOUT_LAB mass 390x840 gesture: barTop=744.4, barBottom=802.0, contentEnd=720.4000000000001 CORRECT
+03:50 +206: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:50 +207: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:51 +207: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Holy Mass section bar Android 3-button 320x720
+LAYOUT_LAB mass 320x720 3-button: barTop=600.4, barBottom=658.0, contentEnd=576.3999999999996 CORRECT
+03:51 +208: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:51 +209: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:52 +209: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Holy Mass section bar Android gesture 320x720
+LAYOUT_LAB mass 320x720 gesture: barTop=624.4, barBottom=682.0, contentEnd=600.3999999999996 CORRECT
+03:52 +210: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:52 +211: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:52 +212: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:53 +213: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:53 +213: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/layout/android_layout_lab_test.dart: Full Compact Hidden use their actual dock reserve
+LAYOUT_LAB reader full: contentPadding=102.0, lastBottom=696.0, scroll=1105.0 CORRECT
+LAYOUT_LAB reader compact: contentPadding=96.0, lastBottom=702.0, scroll=1099.0 CORRECT
+LAYOUT_LAB reader hidden: contentPadding=0.0, lastBottom=798.0, scroll=943.0 CORRECT no dock reserve
+03:53 +214: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:53 +215: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:53 +216: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:53 +217: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:53 +218: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:54 +219: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:54 +220: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:54 +221: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:54 +222: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:54 +223: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:54 +224: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:55 +225: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:55 +226: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:55 +227: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:55 +228: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:55 +229: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:57 +229: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 105 ms
+[ContentStore] invitatoriums: 4 docs in 122 ms
+[ContentStore] prayerCategories: 5 docs in 74 ms
+[ContentStore] completoriums: 35 docs in 126 ms
+[ContentStore] compendiumMeta: 1 docs in 134 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 211 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 216 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 207 ms
+[ContentStore] liturgicalTemplates: 16 docs in 225 ms
+[ContentStore] prayers: 117 docs in 184 ms
+[ContentStore] compendium: 27 docs in 162 ms
+[ContentStore] songs: 447 docs in 169 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 184 ms
+[ContentStore] readings: 822 docs in 328 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 300 ms
+[ContentStore] days: 736 docs in 513 ms
+03:57 +229: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:57 +230: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+03:58 +231: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:01 +231: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: both headers retain title and blue accent after Office selection
+[data] CACHE HIT  readings 2026-10-07
+04:01 +232: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:03 +233: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:05 +234: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:05 +234: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: headers and variants allow 200 percent text
+[data] CACHE HIT  readings 2026-10-07
+04:05 +235: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:07 +235: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-06
+04:07 +236: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +237: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +238: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +239: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +240: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +241: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +242: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +243: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +244: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +245: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +246: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +247: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +248: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +249: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +250: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +251: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +252: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +253: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +254: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +255: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +256: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:08 +257: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:09 +258: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:09 +259: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:09 +260: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:09 +261: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:09 +262: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:09 +263: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:13 +263: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: Ora day color reaches context without recoloring Reader or Aa
+[data] CACHE HIT  hour laudes ordinary-smoke
+[data] CACHE HIT  hour laudes smoke
+04:13 +264: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:13 +264: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: ordinary-smoke laudes light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour laudes ordinary-smoke
+04:13 +265: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:14 +265: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: sunday-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes sunday-smoke
+04:14 +266: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:15 +266: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke laudes light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour laudes smoke
+04:15 +267: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:15 +267: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke laudes dark 24.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour laudes smoke
+04:15 +268: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:16 +268: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke vespers light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour vespers smoke
+04:16 +269: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:16 +269: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke lectionis light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour lectionis smoke
+04:16 +270: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:17 +270: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke morning light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour morning smoke
+04:17 +271: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:17 +271: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke terz light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour terz smoke
+04:17 +272: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:17 +272: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke sext light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour sext smoke
+04:17 +273: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:18 +273: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke non light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour non smoke
+04:18 +274: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:18 +274: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke completorium light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour completorium smoke
+04:18 +275: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:18 +275: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke completorium dark 24.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour completorium smoke
+04:18 +276: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:18 +276: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke laudes light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour laudes smoke
+04:18 +277: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:19 +277: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke lectionis light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour lectionis smoke
+04:19 +278: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:19 +278: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke terz light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour terz smoke
+04:19 +279: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:19 +279: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke completorium light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour completorium smoke
+04:19 +280: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:19 +280: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes smoke
+04:19 +281: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:20 +281: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke lectionis light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour lectionis smoke
+04:20 +282: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:20 +282: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke sext light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour sext smoke
+04:20 +283: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:20 +283: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke completorium dark 24.0 390.0x844.0 builds document
+[data] CACHE HIT  hour completorium smoke
+04:20 +284: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:21 +284: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke morning light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour morning smoke
+04:21 +285: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:22 +285: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke morning dark 24.0 390.0x844.0 builds document
+[data] CACHE HIT  hour morning smoke
+04:22 +286: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:22 +286: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: smoke non light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour non smoke
+04:22 +287: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:22 +287: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: structured-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes structured-smoke
+04:22 +288: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:22 +288: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: single-ant-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes single-ant-smoke
+04:22 +289: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:23 +289: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: plain-ant-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes plain-ant-smoke
+04:23 +290: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:23 +290: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: Laudes, Sext and structured psalms have equal geometry
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour terz smoke
+[data] CACHE HIT  hour laudes structured-smoke
+04:23 +291: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:26 +291: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: hymn, prayer and intercession roles keep one geometry
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour lectionis smoke
+[data] CACHE HIT  hour terz smoke
+[data] CACHE HIT  hour sext smoke
+[data] CACHE HIT  hour non smoke
+[data] CACHE HIT  hour vespers smoke
+[data] CACHE HIT  hour completorium smoke
+[data] CACHE HIT  hour morning smoke
+04:26 +292: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:27 +292: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: Gospel canticle metadata stays centered at 360.0 px
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour vespers smoke
+[data] CACHE HIT  hour completorium smoke
+[data] CACHE HIT  hour morning smoke
+04:27 +293: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:28 +293: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: Gospel canticle metadata stays centered at 390.0 px
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour vespers smoke
+[data] CACHE HIT  hour completorium smoke
+[data] CACHE HIT  hour morning smoke
+04:28 +294: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:28 +294: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart: single antiphon has one opening and one repeat
+[data] CACHE HIT  hour laudes single-ant-smoke
+04:28 +295: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:30 +296: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:31 +297: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:31 +298: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:32 +299: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +300: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +301: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +302: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +303: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +304: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +305: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:33 +306: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +307: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +308: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +309: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +310: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +311: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +312: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:35 +313: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +314: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +315: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +316: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +317: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +318: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +319: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +320: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +321: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +322: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +323: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +324: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +325: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +326: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:36 +327: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+04:38 +327: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: (setUpAll)
+[ContentStore] invitatoriums: 4 docs in 19 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms
+[ContentStore] completoriums: 35 docs in 32 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 26 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 28 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 30 ms
+[ContentStore] liturgicalTemplates: 16 docs in 68 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 173 ms
+[ContentStore] readings: 822 docs in 237 ms
+[ContentStore] days: 736 docs in 489 ms
+[ContentStore] prayerCategories: 5 docs in 10 ms
+[ContentStore] compendiumMeta: 1 docs in 8 ms
+[ContentStore] songs: 447 docs in 36 ms
+[ContentStore] compendium: 27 docs in 36 ms
+[ContentStore] prayers: 117 docs in 46 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 55 ms
+04:39 +327: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses
+06:39 +328: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:44 +329: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:45 +330: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:46 +331: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:48 +332: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:49 +333: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:50 +334: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:51 +335: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:52 +336: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:52 +337: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:53 +338: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:54 +339: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:54 +340: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:54 +341: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:54 +342: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:54 +343: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:54 +344: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:55 +345: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:56 +345: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 75 ms
+[ContentStore] invitatoriums: 4 docs in 92 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 85 ms
+[ContentStore] completoriums: 35 docs in 99 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 123 ms
+[ContentStore] liturgicalTemplates: 16 docs in 148 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 139 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 168 ms
+[ContentStore] readings: 822 docs in 248 ms
+[ContentStore] days: 736 docs in 397 ms
+06:57 +345: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:57 +345: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 11 ms
+[ContentStore] compendiumMeta: 1 docs in 10 ms
+06:57 +346: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:57 +346: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_test.dart: (setUpAll)
+[ContentStore] songs: 447 docs in 316 ms
+[ContentStore] compendium: 27 docs in 315 ms
+[ContentStore] prayers: 117 docs in 317 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 311 ms
+06:57 +347: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:57 +348: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:57 +349: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:57 +350: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:57 +351: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +352: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +353: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +354: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +355: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +356: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +357: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +358: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +359: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +360: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +361: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +362: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +363: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:58 +364: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+06:59 +365: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:01 +366: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:01 +367: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:01 +368: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:02 +369: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:03 +370: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:03 +371: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:03 +372: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:03 +373: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:03 +374: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:04 +375: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:04 +376: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:04 +377: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:05 +378: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +379: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +380: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +381: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +382: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +383: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +384: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +385: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +386: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +387: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +388: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +389: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:06 +390: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +391: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +392: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +393: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +394: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +395: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +396: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +397: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +398: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +399: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +400: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:08 +401: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:09 +402: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:09 +403: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:09 +404: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:09 +405: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:10 +406: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:10 +407: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:11 +408: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:11 +409: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:11 +410: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:11 +411: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:11 +412: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:13 +412: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: a completed publication: definitions and Proper together
+[ContentStore] invitatoriums: 4 docs in 210 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 213 ms
+[ContentStore] prayerCategories: 5 docs in 187 ms
+[ContentStore] completoriums: 35 docs in 216 ms
+[ContentStore] compendiumMeta: 1 docs in 160 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 211 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 213 ms
+[ContentStore] prayers: 117 docs in 194 ms
+[ContentStore] compendium: 27 docs in 168 ms
+[ContentStore] liturgicalTemplates: 16 docs in 227 ms
+[ContentStore] songs: 447 docs in 185 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 210 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 180 ms
+[ContentStore] readings: 822 docs in 314 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 300 ms
+[ContentStore] days: 736 docs in 594 ms
+07:14 +413: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:14 +413: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: crash after staged: never new colour with old text
+[ContentStore] invitatoriums: 4 docs in 26 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 46 ms
+[ContentStore] completoriums: 35 docs in 47 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 45 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 42 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] prayerCategories: 5 docs in 33 ms
+[ContentStore] compendiumMeta: 1 docs in 30 ms
+[ContentStore] liturgicalTemplates: 16 docs in 52 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] songs: 447 docs in 62 ms
+[ContentStore] prayers: 117 docs in 89 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 102 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 162 ms
+[ContentStore] readings: 822 docs in 234 ms
+[ContentStore] days: 736 docs in 494 ms
+[ContentStore] dropping an unfinished update
+[ContentStore] liturgicalCalendarMeta: 1 docs in 47 ms
+[ContentStore] invitatoriums: 4 docs in 50 ms
+[ContentStore] completoriums: 35 docs in 49 ms
+[ContentStore] prayerCategories: 5 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 47 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 47 ms
+[ContentStore] songs: 447 docs in 39 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 49 ms
+[ContentStore] compendiumMeta: 1 docs in 38 ms
+[ContentStore] compendium: 27 docs in 39 ms
+[ContentStore] liturgicalTemplates: 16 docs in 61 ms
+[ContentStore] prayers: 117 docs in 80 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 91 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 194 ms
+[ContentStore] readings: 822 docs in 238 ms
+[ContentStore] days: 736 docs in 511 ms
+07:15 +414: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:15 +414: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: crash after ready: never new colour with old text
+[ContentStore] invitatoriums: 4 docs in 80 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 92 ms
+[ContentStore] completoriums: 35 docs in 93 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 88 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 89 ms
+[ContentStore] prayerCategories: 5 docs in 77 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 92 ms
+[ContentStore] liturgicalTemplates: 16 docs in 103 ms
+[ContentStore] compendiumMeta: 1 docs in 70 ms
+[ContentStore] songs: 447 docs in 77 ms
+[ContentStore] compendium: 27 docs in 76 ms
+[ContentStore] prayers: 117 docs in 86 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 127 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 183 ms
+[ContentStore] readings: 822 docs in 272 ms
+[ContentStore] days: 736 docs in 556 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] invitatoriums: 4 docs in 68 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 64 ms
+[ContentStore] completoriums: 35 docs in 68 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 61 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 63 ms
+[ContentStore] prayerCategories: 5 docs in 37 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 68 ms
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] liturgicalTemplates: 16 docs in 75 ms
+[ContentStore] compendium: 27 docs in 58 ms
+[ContentStore] songs: 447 docs in 70 ms
+[ContentStore] prayers: 117 docs in 114 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 145 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 207 ms
+[ContentStore] readings: 822 docs in 273 ms
+[ContentStore] days: 736 docs in 575 ms
+07:17 +415: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:17 +415: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: crash after written: never new colour with old text
+[ContentStore] invitatoriums: 4 docs in 61 ms
+[ContentStore] completoriums: 35 docs in 61 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 59 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 46 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 47 ms
+[ContentStore] prayerCategories: 5 docs in 30 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 50 ms
+[ContentStore] liturgicalTemplates: 16 docs in 66 ms
+[ContentStore] compendiumMeta: 1 docs in 26 ms
+[ContentStore] songs: 447 docs in 33 ms
+[ContentStore] compendium: 27 docs in 43 ms
+[ContentStore] prayers: 117 docs in 130 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 128 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 197 ms
+[ContentStore] readings: 822 docs in 279 ms
+[ContentStore] days: 736 docs in 531 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] invitatoriums: 4 docs in 41 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] completoriums: 35 docs in 43 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 42 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 43 ms
+[ContentStore] prayerCategories: 5 docs in 34 ms
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 45 ms
+[ContentStore] songs: 447 docs in 34 ms
+[ContentStore] compendium: 27 docs in 47 ms
+[ContentStore] liturgicalTemplates: 16 docs in 66 ms
+[ContentStore] prayers: 117 docs in 91 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 92 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 139 ms
+[ContentStore] readings: 822 docs in 210 ms
+[ContentStore] days: 736 docs in 444 ms
+07:18 +416: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:20 +416: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 88 ms
+[ContentStore] invitatoriums: 4 docs in 159 ms
+[ContentStore] prayerCategories: 5 docs in 132 ms
+[ContentStore] completoriums: 35 docs in 158 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 171 ms
+[ContentStore] compendiumMeta: 1 docs in 130 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 174 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 177 ms
+[ContentStore] liturgicalTemplates: 16 docs in 192 ms
+[ContentStore] compendium: 27 docs in 152 ms
+[ContentStore] songs: 447 docs in 162 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 182 ms
+[ContentStore] prayers: 117 docs in 220 ms
+[ContentStore] readings: 822 docs in 300 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 286 ms
+[ContentStore] days: 736 docs in 537 ms
+07:20 +416: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:20 +417: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:21 +418: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:28 +418: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+07:28 +419: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:30 +420: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:32 +421: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:34 +421: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+07:34 +422: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:35 +422: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+07:35 +423: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:36 +423: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+07:36 +424: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:37 +425: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:38 +426: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:41 +426: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day calendar applies dates and Common without dismissing the sheet
+[data] CACHE HIT  readings 2026-10-09
+07:42 +427: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:43 +428: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:45 +428: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+07:45 +429: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:46 +429: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+07:46 +430: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:46 +431: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:47 +432: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:47 +433: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:48 +434: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:49 +435: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:50 +436: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:51 +437: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:52 +438: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:52 +439: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:52 +440: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:52 +441: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +442: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +443: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +444: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +445: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +446: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +447: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +448: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +449: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +450: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:53 +451: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +452: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +453: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +454: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +455: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +456: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +457: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +458: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: runtime audit
+07:54 +459: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgy_runtime_report_test.dart: (tearDownAll)
+07:56 +459: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: (setUpAll)
+07:56 +459: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: years strictly ascending, 2027 included, the selected year added
+07:56 +460: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: years the year grid is numeric, shows the selected year, and 2027 is one tap away
+07:58 +461: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+07:58 +462: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+07:58 +463: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+07:58 +464: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+07:58 +465: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:00 +465: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 201 ms
+[ContentStore] invitatoriums: 4 docs in 212 ms
+[ContentStore] prayerCategories: 5 docs in 164 ms
+[ContentStore] completoriums: 35 docs in 212 ms
+[ContentStore] compendiumMeta: 1 docs in 146 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 199 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 203 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 208 ms
+[ContentStore] liturgicalTemplates: 16 docs in 221 ms
+[ContentStore] prayers: 117 docs in 176 ms
+[ContentStore] songs: 447 docs in 156 ms
+[ContentStore] compendium: 27 docs in 178 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 177 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 275 ms
+[ContentStore] readings: 822 docs in 308 ms
+[ContentStore] days: 736 docs in 535 ms
+08:00 +465: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:02 +466: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:02 +467: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:03 +468: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:03 +469: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:04 +470: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:04 +471: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:05 +472: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:05 +473: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:06 +474: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:06 +475: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:07 +476: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:07 +477: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:08 +478: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:08 +479: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:08 +480: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:09 +481: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:09 +482: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:10 +483: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:10 +484: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:10 +485: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:11 +486: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:11 +487: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:11 +488: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:12 +489: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:12 +490: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:12 +491: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:13 +492: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:13 +493: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:13 +494: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:14 +495: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:14 +496: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:14 +497: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:15 +498: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:15 +499: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:15 +500: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:15 +501: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:17 +501: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 170 ms
+[ContentStore] invitatoriums: 4 docs in 179 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 167 ms
+[ContentStore] completoriums: 35 docs in 179 ms
+[ContentStore] compendiumMeta: 1 docs in 126 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 169 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 172 ms
+[ContentStore] liturgicalTemplates: 16 docs in 185 ms
+[ContentStore] compendium: 27 docs in 137 ms
+[ContentStore] prayers: 117 docs in 159 ms
+[ContentStore] prayerCategories: 5 docs in 156 ms
+[ContentStore] songs: 447 docs in 181 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 164 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 213 ms
+[ContentStore] readings: 822 docs in 269 ms
+[ContentStore] days: 736 docs in 419 ms
+08:17 +501: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:19 +502: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:20 +503: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:21 +504: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_parity_test.dart: the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses
+08:22 +505: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 2.0
+08:22 +506: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+08:24 +506: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: (setUpAll)
+[ContentStore] invitatoriums: 4 docs in 96 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 164 ms
+[ContentStore] prayerCategories: 5 docs in 128 ms
+[ContentStore] liturgicalTemplates: 16 docs in 175 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 156 ms
+[ContentStore] compendiumMeta: 1 docs in 112 ms
+[ContentStore] prayers: 117 docs in 146 ms
+[ContentStore] completoriums: 35 docs in 169 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 161 ms
+[ContentStore] compendium: 27 docs in 121 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 164 ms
+[ContentStore] songs: 447 docs in 130 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 171 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 232 ms
+[ContentStore] readings: 822 docs in 289 ms
+[ContentStore] days: 736 docs in 443 ms
+08:24 +506: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+08:24 +507: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, light
+08:24 +508: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, light
+08:25 +509: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, light
+08:25 +510: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, light
+08:25 +511: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, light
+08:27 +512: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, light
+08:27 +513: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: diocesan differences remain visible and identical readings appear once
+08:28 +514: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, dark
+08:28 +515: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, dark
+08:28 +516: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.0, dark
+08:28 +517: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.light, scale 1.0
+08:28 +518: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.4, light
+08:28 +519: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.4, light
+08:29 +520: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.4, light
+08:29 +521: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.4, light
+08:29 +522: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.light, scale 1.0
+08:29 +523: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.4, dark
+08:29 +524: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×1.4, dark
+08:30 +525: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.0
+08:30 +526: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 320 px, ×2.0, light
+08:30 +527: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.5
+08:31 +528: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.5
+08:31 +529: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 360 px, ×1.0, light
+08:32 +530: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.0
+08:32 +531: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 360 px, ×1.0, dark
+08:32 +532: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.5
+08:33 +533: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.5
+08:33 +534: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 360 px, ×1.4, dark
+08:34 +535: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.0
+08:34 +536: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 360 px, ×2.0, light
+08:34 +537: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.5
+08:35 +538: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.5
+08:35 +539: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 390 px, ×1.0, light
+08:35 +540: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.0
+08:36 +541: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 390 px, ×1.0, dark
+08:36 +542: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.5
+08:36 +543: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.5
+08:36 +544: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 390 px, ×1.4, dark
+08:37 +545: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 390 px, ×1.4, dark
+08:37 +546: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 390 px, ×1.4, dark
+08:37 +547: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month lists all days, crosses year and respects calendar bounds
+08:37 +548: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month lists all days, crosses year and respects calendar bounds
+08:38 +549: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month lists all days, crosses year and respects calendar bounds
+08:38 +550: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 430 px, ×1.0, light
+08:39 +551: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0
+08:39 +552: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 430 px, ×1.0, dark
+08:39 +553: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5
+08:40 +554: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 430 px, ×1.4, light
+08:40 +555: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.0
+08:40 +556: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.0
+08:41 +557: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 430 px, ×2.0, light
+08:41 +558: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.5
+08:41 +559: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 430 px, ×2.0, dark
+08:41 +560: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 834 px, ×1.0, light
+08:42 +561: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 834 px, ×1.0, dark
+08:42 +562: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 834 px, ×1.4, light
+08:43 +563: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: chrome uses Liquid Glass only on Apple platforms
+08:43 +564: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: chrome uses Liquid Glass only on Apple platforms
+08:43 +565: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_visual_test.dart: Hours root, picker and Settings: 834 px, ×2.0, light
+08:43 +566: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: date picker uses the shared liturgical calendar on iOS and Android
+08:44 +567: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: date picker uses the shared liturgical calendar on iOS and Android
+08:44 +568: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: date picker uses the shared liturgical calendar on iOS and Android
+08:44 +569: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: segmented choices follow the target platform
+08:44 +570: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: segmented labels stay on one line on narrow Android screens
+08:45 +571: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: theme choices keep full labels at 320 dp and 200% text
+08:45 +572: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/platform_design_test.dart: theme choice labels fit the width and text-scale matrix
+08:45 +573: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+08:46 +574: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+08:46 +575: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+08:46 +576: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+08:47 +577: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+08:47 +578: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+08:47 +579: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+08:47 +580: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+08:47 +581: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: My Prayers add button stays above the app dock
+08:47 +582: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category grouping uses tags and explicit persisted membership
+08:47 +583: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: root order is Favorites, Holy Mass, Categories, All Prayers
+08:47 +584: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+08:48 +585: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+08:48 +586: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+08:48 +587: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: empty favorites is compact and categories remain visible
+08:48 +588: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: missing Holy Mass stays recognizable
+08:48 +589: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: favorite toggle is shared by catalog and root providers
+08:49 +590: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: All Prayers contains built-in and user prayers
+08:49 +591: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer catalog owns the contextual bottom slot
+08:49 +592: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+08:49 +593: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+08:49 +594: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+08:49 +595: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+08:49 +596: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search focuses, filters title/body, and keeps query state
+08:49 +597: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: All Prayers re-entry keeps query and results synchronized
+08:49 +598: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category page includes tag and explicit members
+08:50 +599: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category management hides and shows defaults
+08:50 +600: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: user category can be created, renamed, and deleted
+08:50 +601: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/psalm_choir_html_test.dart: tap selects a choir and a second tap clears it
+08:51 +602: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/psalm_choir_html_test.dart: tap selects a choir and a second tap clears it
+08:51 +603: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayer Detail uses shared reader and only local has edit
+08:51 +604: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer reader shows scroll-to-top only outside fullscreen
+08:52 +605: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Holy Mass exposes section navigation without sharing
+08:52 +606: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: built-in prayer cannot be opened as a destructive edit
+08:52 +607: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer keeps editable form and detail edit action
+08:52 +608: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer editor formats text and shows preview
+08:52 +609: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: shell controller drives full compact and hidden chrome
+08:52 +610: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: shell controller drives full compact and hidden chrome
+08:53 +611: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: shell controller drives full compact and hidden chrome
+08:53 +612: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader document uses opaque neutral light and dark surfaces
+08:53 +613: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader masks scrolling text throughout the status bar
+08:53 +614: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader reserves space for floating bottom navigation
+08:53 +615: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader reserves the safe area above floating chrome
+08:53 +616: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scroll position survives a pushed route and back navigation
+08:53 +617: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: context actions stay outside the document surface
+08:54 +618: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: long reader content has no overflow at 180% on iOS and Android
+08:54 +619: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: readings route preserves the Ora date and selected day context
+08:54 +620: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: document title and body fit the 200% system text matrix
+08:54 +621: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: document title and body fit the 200% system text matrix
+08:54 +622: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: document title and body fit the 200% system text matrix
+08:54 +623: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: document title and body fit the 200% system text matrix
+08:55 +624: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_theme_test.dart: book and system reader preferences resolve differently
+08:55 +625: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_theme_test.dart: book and system reader preferences resolve differently
+08:56 +626: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_theme_test.dart: liturgical block headings are larger than reader body text
+08:56 +627: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_theme_test.dart: document roles keep meaning in light and dark themes
+08:57 +628: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (setUpAll)
+08:57 +628: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter keeps first sorted group and calendar cycle fallback
+08:57 +629: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter linked dayId wins and manual cycle can return to automatic
+08:57 +630: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter weekday and non-cycle groups expose only real cycles
+08:57 +631: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+08:57 +632: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+08:57 +633: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+08:57 +634: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+08:57 +635: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+08:57 +636: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+08:59 +636: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 110 ms
+[ContentStore] invitatoriums: 4 docs in 141 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 125 ms
+[ContentStore] completoriums: 35 docs in 146 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 154 ms
+[ContentStore] liturgicalTemplates: 16 docs in 216 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 204 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 247 ms
+[ContentStore] readings: 822 docs in 362 ms
+08:59 +637: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: (setUpAll)
+[ContentStore] days: 736 docs in 637 ms
+09:00 +637: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load
+09:00 +637: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 16 ms
+09:00 +638: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:00 +639: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:00 +640: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:00 +641: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:01 +642: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:01 +643: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:02 +644: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:03 +645: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:05 +646: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:05 +647: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:05 +648: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:05 +649: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:05 +650: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:06 +651: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:06 +652: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:07 +652: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 108 ms
+[ContentStore] invitatoriums: 4 docs in 162 ms
+[ContentStore] prayerCategories: 5 docs in 125 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 153 ms
+[ContentStore] completoriums: 35 docs in 167 ms
+[ContentStore] compendiumMeta: 1 docs in 95 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 160 ms
+[ContentStore] liturgicalTemplates: 16 docs in 239 ms
+[ContentStore] prayers: 117 docs in 208 ms
+[ContentStore] songs: 447 docs in 193 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 239 ms
+[ContentStore] compendium: 27 docs in 185 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 203 ms
+[ContentStore] readings: 822 docs in 331 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 343 ms
+[ContentStore] days: 736 docs in 593 ms
+09:08 +652: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:08 +653: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:08 +654: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:08 +655: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:08 +655: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: Ora/Ordo → Readings: a memorial opens the weekday readings first; its own readings stay a choice
+[data] CACHE HIT  readings 2026-10-06
+09:08 +656: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:08 +657: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: reading references equal the web
+09:10 +657: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: (setUpAll)
+[ContentStore] compendiumMeta: 1 docs in 14 ms
+09:10 +658: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: (tearDownAll)
+09:10 +658: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reading_references_parity_test.dart: (setUpAll)
+[ContentStore] songs: 447 docs in 9912 ms
+[ContentStore] compendium: 27 docs in 9911 ms
+[ContentStore] prayers: 117 docs in 9914 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 9906 ms
+09:10 +658: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary menu contains only product-level destinations
+09:11 +659: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary bottom sheet stays above system navigation
+09:11 +660: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary menu remains reachable at 320 dp and 200% text
+09:11 +661: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song filter state search and tags alone determine activity and badge count
+09:11 +662: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary menu is shown above the app navigation dock
+09:11 +663: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +664: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +665: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +666: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +667: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +668: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +669: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +670: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +671: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +672: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +673: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +674: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +675: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +676: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +677: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +678: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +679: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +680: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +681: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +682: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +683: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +684: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +685: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:12 +686: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+09:13 +687: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: bundled seed contains all 447 songs with unique IDs, text and categories
+09:13 +688: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections section tiles open Mass, Songbook, Compendium, placeholder
+09:13 +689: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections section tiles open Mass, Songbook, Compendium, placeholder
+09:14 +690: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+09:14 +691: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+09:14 +692: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+09:15 +693: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+09:15 +694: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+09:15 +695: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list filter sheet supports tags, removal and reset
+09:15 +696: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list filter sheet supports tags, removal and reset
+09:16 +697: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.android)
+09:16 +698: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.iOS)
+09:17 +699: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.iOS)
+09:17 +700: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: opens the slider panel and respects reader-size limits
+09:17 +701: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: opens the slider panel and respects reader-size limits
+09:17 +702: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: opens the slider panel and respects reader-size limits
+09:17 +703: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: opens the slider panel and respects reader-size limits
+09:18 +704: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail transpose changes displayed chords only and resets
+09:19 +705: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail transpose changes displayed chords only and resets
+09:19 +706: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail song without chords shows no chord control
+09:19 +707: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord toggle shows and hides chords and persists choice
+09:19 +708: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail layout toggle switches between above and right
+09:19 +709: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right falls back above on narrow width and keeps preference
+09:20 +710: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control semantics name the state and the actions
+09:20 +711: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/widgets/floating_top_actions_test.dart: single floating action icon is centred in its circle (android)
+09:21 +712: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.android)
+09:21 +713: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.android)
+09:21 +714: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.iOS)
+09:23 +715: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control scales down instead of overflowing
+09:23 +716: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap beside the chords in landscape and on tablets (variant: TargetPlatform.android)
+09:23 +717: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap beside the chords in landscape and on tablets (variant: TargetPlatform.iOS)
+09:23 +718: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap without overflow on a 320 dp phone
+09:24 +719: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.android)
+09:27 +720: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+09:30 +721: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail layout button uses distinct above and right glyphs
+09:31 +722: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.android)
+09:31 +723: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.iOS)
+09:32 +724: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right layout rule uses real constraints
+09:32 +725: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.android)
+09:33 +726: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.iOS)
+09:34 +727: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.android)
+09:35 +728: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.iOS)
+09:36 +729: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail unknown song shows a not found state
+09:36 +730: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence favorites, chords and layout survive restart
+09:36 +731: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence song favorites are independent from prayer favorites
+09:36 +732: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored left layout migrates to right
+09:36 +733: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored right and unknown layouts are read safely
+09:36 +734: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence migration is idempotent and writes nothing once applied
+09:36 +735: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence old compact list setting is ignored and removed
+09:36 +736: All tests passed!

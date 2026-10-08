@@ -274,7 +274,8 @@ String formatPsalmHtml(String html) {
     return strophes.map((strophe) {
       stropheIndex += 1;
       final parity = stropheIndex.isEven ? ' psalm-strophe-even' : '';
-      return '<p${_withClass(attributes, 'psalm-strophe$parity')}>$strophe</p>';
+      final choir = stropheIndex.isEven ? 2 : 1;
+      return '<p data-psalm-choir="$choir"${_withClass(attributes, 'psalm-strophe$parity')}>$strophe</p>';
     }).join();
   });
 
@@ -360,8 +361,12 @@ String formatReadingPsalmHtml(String html) {
 /// Adds tap targets to the already formatted strophes of a psalm.
 ///
 /// Odd and even strophes represent the two choirs. When [selectedChoir] is
-/// set, strophes belonging to the other choir receive a muted style hook.
-String preparePsalmChoirHtml(String html, {int? selectedChoir}) {
+/// set, strophes belonging to that choir receive a muted style hook.
+String preparePsalmChoirHtml(
+  String html, {
+  int? selectedChoir,
+  bool breakAfterMarker = false,
+}) {
   return html.replaceAllMapped(_paragraphPattern, (match) {
     final attributes = match.group(1) ?? '';
     final content = match.group(2) ?? '';
@@ -372,19 +377,23 @@ String preparePsalmChoirHtml(String html, {int? selectedChoir}) {
       return match.group(0)!;
     }
 
+    final semanticChoir = int.tryParse(
+      RegExp(r'data-psalm-choir="([12])"').firstMatch(attributes)?.group(1) ??
+          '',
+    );
     final choir =
-        RegExp(
-          r'\bpsalm-strophe-even\b',
-          caseSensitive: false,
-        ).hasMatch(attributes)
-        ? 2
-        : 1;
-    final mutedClass = selectedChoir != null && selectedChoir != choir
-        ? ' psalm-choir-muted'
-        : '';
+        semanticChoir ??
+        (RegExp(
+              r'\bpsalm-strophe-even\b',
+              caseSensitive: false,
+            ).hasMatch(attributes)
+            ? 2
+            : 1);
+    final mutedClass = selectedChoir == choir ? ' psalm-choir-muted' : '';
 
     final pieces = parseFragment(content).nodes.expand(_choirPieces);
     final rendered = StringBuffer();
+    final segments = <String>[];
     final linked = StringBuffer();
     void flushLink() {
       if (linked.isEmpty) return;
@@ -399,11 +408,31 @@ String preparePsalmChoirHtml(String html, {int? selectedChoir}) {
       if (piece.isMarker) {
         flushLink();
         rendered.write(piece.html);
+        if (breakAfterMarker &&
+            parseFragment(piece.html).querySelector('.psalm-marker') != null) {
+          segments.add(rendered.toString());
+          rendered.clear();
+        }
       } else {
         linked.write(piece.html);
       }
     }
     flushLink();
+    if (breakAfterMarker && segments.isNotEmpty) {
+      if (parseFragment(rendered.toString()).text!.trim().isNotEmpty) {
+        segments.add(rendered.toString());
+      }
+      final lines = StringBuffer();
+      for (var i = 0; i < segments.length; i++) {
+        // Source breaks inside a segment remain intact. Cadence signs stay
+        // with the preceding line; only continuations get an em-based inset.
+        final segment = segments[i].replaceFirst(RegExp(r'^(\s|&nbsp;)+'), '');
+        lines.write(
+          '<span class="psalm-line${i == 0 ? '' : ' psalm-continuation'}">$segment</span>',
+        );
+      }
+      return '<p$attributes>$lines</p>';
+    }
     return '<p$attributes>$rendered</p>';
   });
 }
@@ -411,7 +440,10 @@ String preparePsalmChoirHtml(String html, {int? selectedChoir}) {
 /// Lift cadence marks out of the choir link while preserving their inline
 /// ancestors. flutter_html applies a link's color after descendant classes.
 Iterable<({String html, bool isMarker})> _choirPieces(dom.Node node) sync* {
-  if (node is dom.Element && node.classes.contains('psalm-marker')) {
+  if (node is dom.Element &&
+      (node.classes.contains('psalm-marker') ||
+          node.classes.contains('liturgical-rubric-inline') ||
+          node.classes.contains('liturgical-rubric'))) {
     yield (html: node.outerHtml, isMarker: true);
     return;
   }

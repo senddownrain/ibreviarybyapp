@@ -248,7 +248,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
         actions: [
           IconButton(
             key: const Key('day-open-ordo'),
-            tooltip: 'Ordo гэтага дня',
+            tooltip: 'Літургічны дзень',
             icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 22),
             onPressed: () => context.push(_ordoRoute),
           ),
@@ -456,10 +456,11 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                     const SizedBox(height: 12),
                   ],
                   TextButton(
+                    key: const Key('hora-open-ordo'),
                     onPressed: () => context.push(_ordoRoute),
                     child: const Row(
                       children: [
-                        Expanded(child: Text('Падрабязны Ordo гэтага дня')),
+                        Expanded(child: Text('Літургічны дзень')),
                         PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
                       ],
                     ),

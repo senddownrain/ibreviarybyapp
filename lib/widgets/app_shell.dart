@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -154,10 +153,23 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                         top: topPadding + 8,
                         right: 12,
                         child: _FloatingDayButton(
-                          onTap: () => showLiturgicalCalendarSheet(
-                            context: context,
-                            pickerRoute: '/hours/picker',
-                          ),
+                          onTap: () {
+                            final selection = ref.read(
+                              hoursLiturgicalSelectionProvider,
+                            );
+                            context.push(
+                              Uri(
+                                path: '/hours/ordo',
+                                queryParameters: {
+                                  'date': liturgicalDateKey(
+                                    ref.read(selectedDateProvider),
+                                  ),
+                                  'dayId': ?selection.dayId,
+                                  'diocese': ?selection.diocese,
+                                },
+                              ).toString(),
+                            );
+                          },
                         ),
                       ),
                   ],
@@ -226,7 +238,7 @@ class _FloatingDayButton extends StatelessWidget {
       dimension: 48,
       child: IconButton(
         key: const Key('hours-calendar-action'),
-        tooltip: 'Выбраць дату',
+        tooltip: 'Літургічны дзень',
         onPressed: onTap,
         icon: const PhosphorIcon(PhosphorIconsRegular.calendarDots, size: 24),
       ),

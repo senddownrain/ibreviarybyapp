@@ -50,14 +50,8 @@ void main() {
     expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
     expect(find.byKey(const Key('text-scale-value')), findsOneWidget);
     expect(find.text('100%'), findsOneWidget);
-    expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('reader-font-system')));
-    await tester.pump();
-    expect(
-      container.read(settingsProvider).fontFamily,
-      ReaderFontFamily.system,
-    );
+    expect(find.byKey(const Key('reader-font-literata')), findsNothing);
+    expect(find.byKey(const Key('psalm-marker-break')), findsNothing);
 
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pump();
@@ -121,7 +115,7 @@ void main() {
       await tester.tap(find.byKey(const Key('text-scale-open')));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
+      expect(find.byKey(const Key('reader-font-literata')), findsNothing);
       expect(tester.takeException(), isNull, reason: platform.name);
       await tester.tap(find.byTooltip('Закрыць'));
       await tester.pumpAndSettle();

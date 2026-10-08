@@ -5,6 +5,8 @@ import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/utils/liturgical_visual.dart';
+import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 
 /// Standalone selector entry point. Calendar callers can keep their own API.
 Future<void> showHoursOptionsSheet({
@@ -54,10 +56,7 @@ class HoursOptionsSheet extends ConsumerWidget {
 
     Widget variants(DayOption option) => Padding(
       key: ValueKey('hours-variants-${option.key}'),
-      padding: EdgeInsets.only(
-        left: celebrations.length > 1 ? 16 : 0,
-        bottom: 12,
-      ),
+      padding: const EdgeInsets.only(left: 32, bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -75,7 +74,7 @@ class HoursOptionsSheet extends ConsumerWidget {
                     value: template.id,
                     contentPadding: EdgeInsets.zero,
                     title: Text(
-                      template.label,
+                      template.label == 'Перыяд' ? 'З дня' : template.label,
                       style: theme.textTheme.bodyLarge,
                     ),
                   ),
@@ -86,18 +85,45 @@ class HoursOptionsSheet extends ConsumerWidget {
       ),
     );
 
-    Widget optionRow(DayOption option) => RadioListTile<String>(
-      key: ValueKey('hours-celebration-${option.key}'),
-      value: option.key,
-      contentPadding: EdgeInsets.zero,
-      title: Text(
-        option.title,
-        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-      ),
-      subtitle: _metadata(option).isEmpty
-          ? null
-          : Text(_metadata(option), style: theme.textTheme.bodyMedium),
-    );
+    Widget optionRow(DayOption option) {
+      final ordo = option.ordo;
+      final colors = <String>{
+        if (ordo != null) ordo.color,
+        ...?ordo?.colorAlternatives,
+      }.toList();
+      final accent =
+          liturgicalVisual(
+            color: ordo?.color,
+            category: ordo?.category,
+            rank: ordo?.rank,
+          )?.accent ??
+          color;
+      return Material(
+        color: selected?.key == option.key
+            ? accent.withValues(alpha: .08)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: RadioListTile<String>(
+          key: ValueKey('hours-celebration-${option.key}'),
+          value: option.key,
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          secondary: SizedBox(
+            width: 32,
+            child: Center(child: VestmentMarker(colors: colors, size: 16)),
+          ),
+          title: Text(
+            option.title,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: _metadata(option).isEmpty
+              ? null
+              : Text(_metadata(option), style: theme.textTheme.bodyMedium),
+        ),
+      );
+    }
 
     final optionsList = RadioGroup<String>(
       groupValue: selected?.key,
@@ -108,36 +134,9 @@ class HoursOptionsSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (celebrations.length > 1) const _Label('СВЯТКАВАННЕ'),
+          const _Label('СВЯТКАВАННЕ'),
           for (final option in celebrations) ...[
-            if (celebrations.length == 1 && selected?.key == option.key)
-              Padding(
-                key: const Key('hours-single-celebration'),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      option.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (_metadata(option).isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        _metadata(option),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              )
-            else
-              optionRow(option),
+            optionRow(option),
             if (selected?.key == option.key && option.templates.length > 1)
               variants(option),
           ],
@@ -224,6 +223,11 @@ String _metadata(DayOption option) => <String>{
     kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind)
   else if (option.subtitle != null)
     option.subtitle!,
+  if (option.ordo case final ordo?)
+    [
+      ordo.color,
+      ...ordo.colorAlternatives,
+    ].map(vestmentLabel).where((label) => label.isNotEmpty).join(' або '),
   if (option.placeLabel != null) option.placeLabel!,
   ...option.badges,
 }.where((s) => s.isNotEmpty).join(' · ');

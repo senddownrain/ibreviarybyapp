@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/psalmody_settings_section.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -153,7 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ref.read(settingsProvider.notifier).setFontSize(val),
                 ),
                 Text(
-                  'Прыклад: Госпадзе, памілуй нас.',
+                  'Пан — маё святло і маё збаўленне.',
                   style: ReaderTheme.of(
                     context,
                   ).body(settings.fontSize, family: settings.fontFamily),
@@ -168,11 +169,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   key: const Key('settings-reader-font'),
                   initialValue: settings.fontFamily,
                   isExpanded: true,
+                  selectedItemBuilder: (context) => [
+                    for (final option in kAvailableReaderFonts)
+                      Text(option.label),
+                  ],
                   items: [
                     for (final option in kAvailableReaderFonts)
                       DropdownMenuItem(
                         value: option.id,
-                        child: Text(option.label),
+                        child: Text(
+                          '${option.label}: Пан — маё святло і маё збаўленне.',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: ReaderTheme.of(
+                            context,
+                          ).body(16, family: option.id),
+                        ),
                       ),
                   ],
                   onChanged: (family) {
@@ -192,6 +204,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
+                const PsalmodySettingsSection(),
+                const SizedBox(height: 24),
                 Text(
                   'Стартовы раздзел',
                   style: Theme.of(context).textTheme.titleMedium,

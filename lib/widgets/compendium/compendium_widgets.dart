@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:mybrev_flutter/widgets/source_footer.dart';
 
 import 'package:mybrev_flutter/constants/compendium.dart';
 import 'package:mybrev_flutter/models/compendium.dart';
@@ -15,10 +15,7 @@ import 'package:mybrev_flutter/utils/compendium_data.dart';
 
 /// Opens the source page in the external browser (the same mechanism as the
 /// About screen). Overridable in tests.
-final compendiumLinkLauncherProvider = Provider<Future<bool> Function(Uri)>(
-  (ref) =>
-      (uri) => launchUrl(uri, mode: LaunchMode.externalApplication),
-);
+final compendiumLinkLauncherProvider = sourceLinkLauncherProvider;
 
 /// Visible attribution with a link to the Catholic.by source page, shown on
 /// every Compendium screen.
@@ -50,75 +47,24 @@ class CompendiumSourceAttribution extends ConsumerWidget {
             .copyright
             .join('. ') ??
         '';
-    final text = Text.rich(
-      TextSpan(
-        children: [
-          const TextSpan(
-            text: 'Крыніца: ',
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          TextSpan(
-            text: '$kCompendiumFullTitle, $kCompendiumSourceHost',
-            style: TextStyle(
-              color: link,
-              decoration: TextDecoration.underline,
-              decorationColor: link,
-            ),
-          ),
-          if (copyright.isNotEmpty) TextSpan(text: '. $copyright'),
-        ],
-      ),
-      style: onReader && readerTextStyle != null
+    return SourceFooter(
+      sourceName: '$kCompendiumFullTitle, $kCompendiumSourceHost',
+      sourceUrl: kCompendiumSourceUrl,
+      copyright: copyright,
+      textStyle: onReader && readerTextStyle != null
           ? reader
                 .sourceStyle(readerTextStyle!.fontSize ?? 16)
                 .copyWith(fontFamily: readerTextStyle!.fontFamily)
           : reader
                 .sourceStyle(settings.fontSize, family: settings.fontFamily)
                 .copyWith(color: muted),
+      linkColor: link,
+      topSpacing: onReader ? 28 : 20,
+      verticalPadding: 12,
+      borderColor: onReader ? reader.border : cs.outlineVariant,
+      linkKey: const Key('compendium-source'),
+      semanticLabel: 'Крыніца: $kCompendiumFullTitle на $kCompendiumSourceHost',
     );
-    return Padding(
-      padding: EdgeInsets.only(top: onReader ? 28 : 20),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: onReader ? reader.border : cs.outlineVariant,
-            ),
-          ),
-        ),
-        child: Semantics(
-          link: true,
-          label: 'Крыніца: $kCompendiumFullTitle на $kCompendiumSourceHost',
-          excludeSemantics: true,
-          child: InkWell(
-            key: const Key('compendium-source'),
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => _open(context, ref),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: text,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _open(BuildContext context, WidgetRef ref) async {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    var opened = false;
-    try {
-      opened = await ref.read(compendiumLinkLauncherProvider)(
-        Uri.parse(kCompendiumSourceUrl),
-      );
-    } catch (_) {
-      opened = false;
-    }
-    if (!opened) {
-      messenger?.showSnackBar(
-        const SnackBar(content: Text('Не ўдалося адкрыць сайт')),
-      );
-    }
   }
 }
 

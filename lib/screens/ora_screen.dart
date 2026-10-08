@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -179,6 +181,8 @@ class OraScreen extends ConsumerStatefulWidget {
 }
 
 class _OraScreenState extends ConsumerState<OraScreen> {
+  final _psalmodyController = ValueNotifier<int?>(null);
+  final _hourTitleAnchor = GlobalKey();
   int? _selectedInvitIndex;
   String? _vespersRubric;
   late final Future<LiturgicalDay?> _dayFuture;
@@ -198,6 +202,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   @override
   void dispose() {
+    _psalmodyController.dispose();
     _scrollController.dispose();
     for (final controller in _alternativeControllers.values) {
       controller.dispose();
@@ -366,19 +371,29 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ? Map<String, dynamic>.from(compRaw as Map)
         : null;
 
-    return ReadingScaffold(
-      builder: (context, textStyle) => ReaderScaffold(
-        seasonColor: seasonColor,
-        chromeMode: _chromeMode,
-        onChromeModeChanged: (mode) => setState(() => _chromeMode = mode),
-        scrollController: _scrollController,
-        scrollKey: PageStorageKey(
-          'ora-${widget.date.toIso8601String()}-${widget.dayId}-${widget.oraType}',
+    final settings = ref.watch(settingsProvider);
+    return PsalmodyScope(
+      controller: _psalmodyController,
+      verseLayout: settings.psalmVerseLayout,
+      markerBreakMode: settings.psalmMarkerBreakMode,
+      child: ReadingScaffold(
+        builder: (context, textStyle) => ReaderScaffold(
+          seasonColor: seasonColor,
+          chromeMode: _chromeMode,
+          onChromeModeChanged: (mode) => setState(() => _chromeMode = mode),
+          scrollController: _scrollController,
+          scrollKey: PageStorageKey(
+            'ora-${widget.date.toIso8601String()}-${widget.dayId}-${widget.oraType}',
+          ),
+          semanticLabel: 'Тэкст Ora',
+          showScrollToTop: true,
+          hourTitle: _oraTitle(widget.oraType),
+          hourTitleAnchor: _hourTitleAnchor,
+          onChangeHour: () => _changeHour(day),
+          actions: const [TextScaleControl(showPsalmodySettings: true)],
+          contextHeader: _buildReaderContext(context, day),
+          content: _buildContent(context, day, allInvit, comp, textStyle),
         ),
-        semanticLabel: 'Тэкст Ora',
-        actions: const [TextScaleControl()],
-        contextHeader: _buildReaderContext(context, day),
-        content: _buildContent(context, day, allInvit, comp, textStyle),
       ),
     );
   }
@@ -473,6 +488,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       return const Center(child: Text('Няма зместу'));
     }
 
+    final next = nextAvailableHour(day, widget.oraType);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -487,6 +503,26 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             ),
           ),
         ),
+        const SourceFooter(key: Key('ora-source-footer')),
+        if (next != null) ...[
+          const SizedBox(height: 28),
+          Center(
+            child: Padding(
+              // Keep the document action clear of the small side arrow even
+              // when a long hour name wraps on a narrow screen.
+              padding: const EdgeInsets.symmetric(horizontal: 44),
+              child: OutlinedButton.icon(
+                key: const Key('ora-next-hour'),
+                onPressed: () => _openHour(next.type),
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: Text(
+                  'Далей: ${next.label}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -509,6 +545,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       if (rankLabel.isNotEmpty) rankLabel,
     ].join(' · ');
     final header = ReaderContextHeader(
+      titleAnchorKey: _hourTitleAnchor,
       accentColor: accent,
       eyebrow: '${DateFormat('d MMMM y', 'be').format(widget.date)} г.',
       subtitle: dayTitle,
@@ -590,13 +627,23 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       ],
     );
     if (!mounted || selected == null || selected == widget.oraType) return;
-    context.replace(
+    _openHour(selected);
+  }
+
+  void _openHour(String type) {
+    final currentQuery = GoRouterState.of(context).uri.queryParameters;
+    final route = Uri.parse(
       oraRouteForContext(
         date: widget.date,
         dayId: widget.dayId,
-        oraType: selected,
+        oraType: type,
         diocese: widget.diocese,
       ),
+    );
+    context.replace(
+      route
+          .replace(queryParameters: {...currentQuery, ...route.queryParameters})
+          .toString(),
     );
   }
 

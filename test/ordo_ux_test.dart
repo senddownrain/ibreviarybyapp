@@ -17,6 +17,18 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/hours_options_sheet.dart';
 import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
+import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/ordo/reading_references.dart';
+
+class _Dioceses extends DioceseSelectionNotifier {
+  @override
+  DioceseSelection build() => const DioceseSelection(
+    selected: ['grodno', 'vitebsk'],
+    primary: 'vitebsk',
+  );
+}
 
 void main() {
   late Directory directory;
@@ -109,6 +121,398 @@ void main() {
     });
   }
 
+  for (final brightness in Brightness.values) {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets(
+        'calendar sheet keeps radio geometry, real colours and nested Office $brightness $scale',
+        (tester) async {
+          final container = await frame(
+            tester,
+            DateTime(2026, 10, 6),
+            Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    showDragHandle: true,
+                    builder: (_) => const LiturgicalCalendarSheet(),
+                  ),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+            width: scale == 2 ? 320 : 360,
+            brightness: brightness,
+            scale: scale,
+          );
+          await tester.tap(find.text('open'));
+          await tester.pumpAndSettle();
+          final first = container
+              .read(hoursLiturgicalSelectionProvider)
+              .sortedOptions
+              .first;
+          final row = find.byKey(ValueKey('hours-celebration-${first.key}'));
+          expect(
+            tester.widget<RadioListTile<String>>(row).contentPadding,
+            EdgeInsets.zero,
+          );
+          final radioX = tester
+              .getTopLeft(
+                find.descendant(of: row, matching: find.byType(Radio<String>)),
+              )
+              .dx;
+          final titleX = tester
+              .getTopLeft(
+                find.descendant(of: row, matching: find.text(first.title)),
+              )
+              .dx;
+          await capture(tester, 'calendar-6-${brightness.name}-$scale');
+          await tester.ensureVisible(
+            find.byKey(const Key('ordo-day-2026-10-07')),
+          );
+          await tester.tap(find.byKey(const Key('ordo-day-2026-10-07')));
+          await tester.pumpAndSettle();
+          final rosary = container
+              .read(hoursLiturgicalSelectionProvider)
+              .selected!;
+          final single = find.byKey(
+            ValueKey('hours-celebration-${rosary.key}'),
+          );
+          expect(
+            tester
+                .getTopLeft(
+                  find.descendant(
+                    of: single,
+                    matching: find.byType(Radio<String>),
+                  ),
+                )
+                .dx,
+            radioX,
+          );
+          expect(
+            tester
+                .getTopLeft(
+                  find.descendant(
+                    of: single,
+                    matching: find.text(rosary.title),
+                  ),
+                )
+                .dx,
+            titleX,
+          );
+          expect(
+            tester
+                .widget<VestmentMarker>(
+                  find.descendant(
+                    of: single,
+                    matching: find.byType(VestmentMarker),
+                  ),
+                )
+                .colors,
+            ['albus'],
+          );
+          expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
+          await tester.ensureVisible(single);
+          await tester.pumpAndSettle();
+          await capture(tester, 'calendar-7-${brightness.name}-$scale');
+          final template = find.byKey(
+            ValueKey('hours-template-${rosary.templates.last.id}'),
+          );
+          await tester.ensureVisible(template);
+          await tester.tap(template);
+          await tester.pumpAndSettle();
+          expect(
+            container.read(hoursLiturgicalSelectionProvider).dayId,
+            rosary.templates.last.id,
+          );
+          expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
+          await capture(tester, 'calendar-7-common-${brightness.name}-$scale');
+          await tester.ensureVisible(
+            find.byKey(const Key('ordo-day-2026-10-09')),
+          );
+          await tester.tap(find.byKey(const Key('ordo-day-2026-10-09')));
+          await tester.pumpAndSettle();
+          final options = container
+              .read(hoursLiturgicalSelectionProvider)
+              .sortedOptions;
+          for (final option in options.where((o) => o.ordo != null)) {
+            final marker = tester.widget<VestmentMarker>(
+              find.descendant(
+                of: find.byKey(ValueKey('hours-celebration-${option.key}')),
+                matching: find.byType(VestmentMarker),
+              ),
+            );
+            expect(
+              marker.colors,
+              <String>{
+                option.ordo!.color,
+                ...option.ordo!.colorAlternatives,
+              }.toList(),
+            );
+          }
+          await tester.ensureVisible(
+            find.byKey(ValueKey('hours-celebration-${options.first.key}')),
+          );
+          await tester.pumpAndSettle();
+          await capture(tester, 'calendar-9-${brightness.name}-$scale');
+          expect(find.text('Пошук паводле перыяду або свята'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
+  testWidgets(
+    'month/year jump browses independently, supports keyboard and calendar bounds',
+    (tester) async {
+      final date = DateTime(2026, 10, 7);
+      DateTime? picked;
+      final semantics = tester.ensureSemantics();
+      await frame(
+        tester,
+        date,
+        Scaffold(
+          body: SingleChildScrollView(
+            child: LiturgicalMonthCalendar(
+              initialDate: date,
+              onSelected: (d) => picked = d,
+            ),
+          ),
+        ),
+      );
+      Future<void> jump(int year, int month) async {
+        await tester.tap(find.byKey(const Key('ordo-jump-month')));
+        await tester.pumpAndSettle();
+        final yearField = find.byWidgetPredicate(
+          (w) =>
+              w is DropdownButtonFormField<int> &&
+              w.decoration.labelText == 'Год',
+        );
+        tester.widget<DropdownButtonFormField<int>>(yearField).onChanged!(year);
+        await tester.pumpAndSettle();
+        final monthField = find.byWidgetPredicate(
+          (w) =>
+              w is DropdownButtonFormField<int> &&
+              w.decoration.labelText == 'Месяц',
+        );
+        tester.widget<DropdownButtonFormField<int>>(monthField).onChanged!(
+          month,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('ordo-jump-apply')));
+        await tester.pumpAndSettle();
+        expect(picked, isNull);
+      }
+
+      await jump(2031, 11);
+      expect(find.byKey(const Key('ordo-day-2031-11-02')), findsOneWidget);
+      await jump(kCalendarFirstDate.year, kCalendarFirstDate.month);
+      expect(
+        tester
+            .widget<IconButton>(find.byKey(const Key('ordo-previous-month')))
+            .onPressed,
+        isNull,
+      );
+      await jump(kCalendarLastDate.year, kCalendarLastDate.month);
+      expect(
+        tester
+            .widget<IconButton>(find.byKey(const Key('ordo-next-month')))
+            .onPressed,
+        isNull,
+      );
+      await jump(2026, 10);
+      await tester.tap(find.byKey(const Key('ordo-jump-month')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'month-year-jump');
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(picked, isNull);
+      await tester.tap(find.byKey(const Key('ordo-day-2026-10-09')));
+      await tester.pumpAndSettle();
+      expect(picked, DateTime(2026, 10, 9));
+      expect(
+        tester
+            .getSemantics(find.byKey(const Key('ordo-day-2026-10-07')))
+            .getSemanticsData()
+            .hasAction(ui.SemanticsAction.tap),
+        isTrue,
+      );
+      semantics.dispose();
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  for (final year in [2025, 2031]) {
+    testWidgets(
+      'All Souls $year displays three Mass sets and Sunday Office once',
+      (tester) async {
+        final date = DateTime(year, 11, 2);
+        await frame(tester, date, OrdoScreen(initialDate: date));
+        expect(find.byKey(const Key('ordo-office-split')), findsOneWidget);
+        for (final id in ['first', 'second', 'third']) {
+          expect(find.byKey(ValueKey('ordo-mass-set-$id')), findsOneWidget);
+        }
+        await capture(tester, 'all-souls-$year-header');
+        await tester.ensureVisible(
+          find.byKey(const ValueKey('ordo-mass-set-first')),
+        );
+        await tester.pumpAndSettle();
+        await capture(tester, 'all-souls-$year-readings');
+        await tester.ensureVisible(find.byKey(const Key('ordo-office-split')));
+        await tester.pumpAndSettle();
+        await capture(tester, 'all-souls-$year-office');
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  for (final brightness in Brightness.values) {
+    testWidgets(
+      'month/year dialog stays usable at 320px, text x2, $brightness',
+      (tester) async {
+        await frame(
+          tester,
+          DateTime(2026, 10, 7),
+          Scaffold(
+            body: SingleChildScrollView(
+              child: LiturgicalMonthCalendar(
+                initialDate: DateTime(2026, 10, 7),
+                onSelected: (_) {},
+              ),
+            ),
+          ),
+          width: 320,
+          scale: 2,
+          brightness: brightness,
+        );
+        await tester.tap(find.byKey(const Key('ordo-jump-month')));
+        await tester.pumpAndSettle();
+        await capture(tester, 'month-year-jump-${brightness.name}-2.0');
+        expect(tester.takeException(), isNull);
+        await tester.tap(
+          find.byWidgetPredicate(
+            (w) =>
+                w is DropdownButtonFormField<int> &&
+                w.decoration.labelText == 'Месяц',
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('ordo-jump-apply')));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('ordo-day-2026-10-07')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets(
+    'selected alternative and competing memorials keep one heading and collapsed details',
+    (tester) async {
+      for (final date in [
+        DateTime(2026, 10, 6),
+        DateTime(2026, 10, 9),
+        DateTime(2026, 6, 13),
+      ]) {
+        final option = LiturgicalContentService()
+            .contentForDate(date)
+            .options
+            .where((o) => o.ordo?.role == 'alternative')
+            .first;
+        await frame(
+          tester,
+          date,
+          OrdoScreen(initialDate: date, dayId: option.templates.last.id),
+        );
+        expect(find.text(option.title), findsOneWidget);
+        if (date.month == 6 && date.day == 13) {
+          final refs = readingReferencesForDay(
+            LiturgicalContentService().contentForDate(date).ordo,
+            ReadingReferenceIndex.current(),
+          ).singleWhere((r) => r.optionId == 'sv-anthony-padua');
+          expect(refs.reference, isNotNull);
+          expect(find.text('Чытанні: ${refs.reference}'), findsOneWidget);
+          expect(
+            find.text('Поўны тэкст гэтых чытанняў пакуль недаступны'),
+            findsOneWidget,
+          );
+        }
+        expect(find.text('Абрана'), findsNWidgets(2));
+        final directions = find.ancestor(
+          of: find.text('Асаблівыя ўказанні'),
+          matching: find.byType(ExpansionTile),
+        );
+        final notes = find.ancestor(
+          of: find.text('Літургічныя заўвагі'),
+          matching: find.byType(ExpansionTile),
+        );
+        expect(
+          tester.widget<ExpansionTile>(directions).initiallyExpanded,
+          isFalse,
+        );
+        expect(tester.widget<ExpansionTile>(notes).initiallyExpanded, isFalse);
+        await capture(tester, 'selected-${date.month}-${date.day}-header');
+        await tester.ensureVisible(find.byKey(const Key('ordo-open-hours')));
+        await tester.pumpAndSettle();
+        await capture(tester, 'selected-${date.month}-${date.day}-office');
+        await tester.ensureVisible(find.text('Асаблівыя ўказанні'));
+        await tester.tap(find.text('Асаблівыя ўказанні'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Камплета:'), findsOneWidget);
+        await capture(tester, 'selected-${date.month}-${date.day}-directions');
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      }
+    },
+  );
+
+  testWidgets(
+    'diocesan differences remain visible and identical readings appear once',
+    (tester) async {
+      final date = DateTime(2026, 8, 26);
+      await frame(
+        tester,
+        date,
+        OrdoScreen(initialDate: date),
+        overrides: [dioceseSelectionProvider.overrideWith(_Dioceses.new)],
+      );
+      expect(
+        find.textContaining('Выбраныя дыяцэзіі адрозніваюцца'),
+        findsOneWidget,
+      );
+      await capture(tester, 'dioceses-header');
+      await tester.ensureVisible(
+        find.textContaining('Выбраныя дыяцэзіі адрозніваюцца'),
+      );
+      await tester.pumpAndSettle();
+      await capture(tester, 'dioceses-celebrations');
+      await tester.pumpWidget(const SizedBox());
+      await frame(
+        tester,
+        DateTime(2026, 10, 9),
+        OrdoScreen(initialDate: DateTime(2026, 10, 9)),
+      );
+      final groups = find.byKey(const Key('ordo-reading-references'));
+      final citations = <String>[];
+      for (final text in tester.widgetList<Text>(
+        find.descendant(of: groups, matching: find.byType(Text)),
+      )) {
+        if (text.textSpan is TextSpan) {
+          final span = text.textSpan! as TextSpan;
+          citations.add((span.children!.last as TextSpan).text!);
+        }
+      }
+      expect(citations, isNotEmpty);
+      expect(citations.toSet().length, citations.length);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   for (final day in [7, 9]) {
     for (final width in [360.0, 430.0]) {
       for (final brightness in Brightness.values) {
@@ -147,11 +551,11 @@ void main() {
             if (day == 7) {
               expect(
                 find.byKey(const Key('hours-single-celebration')),
-                findsOneWidget,
+                findsNothing,
               );
               expect(
-                find.byKey(const Key('hours-celebration-our-lady-rosary')),
-                findsNothing,
+                find.byKey(ValueKey('hours-celebration-${options.first.key}')),
+                findsOneWidget,
               );
               expect(
                 find.descendant(of: sheet, matching: find.text('З дня')),
@@ -313,7 +717,7 @@ void main() {
     expect(find.text('• З дня'), findsOneWidget);
     expect(find.text('• Пра Найсвяцейшую Панну Марыю'), findsOneWidget);
     expect(find.text('Псалтыр III · Год II'), findsOneWidget);
-    expect(find.textContaining('Успамін · Белы'), findsOneWidget);
+    expect(find.textContaining('Белы', findRichText: true), findsWidgets);
     expect(find.byType(TextButton), findsNWidgets(2));
     await capture(tester, 'day-7-light');
     expect(tester.takeException(), isNull);
@@ -376,8 +780,8 @@ void main() {
           brightness: brightness,
         );
         expect(find.byKey(const Key('ordo-open-month')), findsOneWidget);
-        expect(find.text('Адкрыць чытанні'), findsOneWidget);
-        expect(find.text('Адкрыць Літургію гадзін'), findsOneWidget);
+        expect(find.byTooltip('Адкрыць чытанні'), findsOneWidget);
+        expect(find.byTooltip('Адкрыць Літургію гадзін'), findsOneWidget);
         expect(find.byType(RadioListTile<String>), findsNothing);
         expect(find.byType(TextButton), findsNWidgets(2));
         await capture(tester, 'day-${brightness.name}-$scale');
