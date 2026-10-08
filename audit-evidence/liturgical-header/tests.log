@@ -1,0 +1,65 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: (setUpAll)
+[ContentStore] liturgicalCalendarMeta: 1 docs in 198 ms
+[ContentStore] invitatoriums: 4 docs in 209 ms
+[ContentStore] liturgicalYearOverrides: 4 docs in 195 ms
+[ContentStore] prayerCategories: 5 docs in 172 ms
+[ContentStore] completoriums: 35 docs in 209 ms
+[ContentStore] compendiumMeta: 1 docs in 150 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 203 ms
+[ContentStore] liturgicalTemplates: 16 docs in 217 ms
+[ContentStore] prayers: 117 docs in 182 ms
+[ContentStore] liturgicalDioceseOverrides: 74 docs in 201 ms
+[ContentStore] songs: 447 docs in 167 ms
+[ContentStore] compendium: 27 docs in 159 ms
+[ContentStore] liturgicalOrdoNotes: 1204 docs in 169 ms
+[ContentStore] readings: 815 docs in 264 ms
+[ContentStore] liturgicalProperTexts: 290 docs in 248 ms
+[ContentStore] days: 735 docs in 416 ms
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real weekday and Marian memorial share canonical presentation
+00:00 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: manual Office survives date round trip and calendar bounds
+00:01 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: both headers retain title and blue accent after Office selection
+[data] CACHE HIT  readings 2026-10-07
+00:03 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: calendar date, Today and advanced picker use one entry
+00:05 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: shell calendar shortcut opens the same month sheet
+00:06 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: headers and variants allow 200 percent text
+[data] CACHE HIT  readings 2026-10-07
+00:06 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-06
+00:08 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: (tearDownAll)
+00:08 +7: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart
+00:10 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: (setUpAll)
+00:10 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter sorted first option becomes primary and empty is explicit
+00:10 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter alternatives count excludes primary and manual choice is resolved
+00:10 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter template choice updates effective day without changing option
+00:10 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter hour availability keeps production checkFields rule
+00:10 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter Compline availability uses its separate record source
+00:10 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter manual overrides are session-scoped per date
+00:10 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter Hours and Readings share date and selected celebration
+00:10 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: single option hides alternatives and hour opens correct Ora
+00:11 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours title has no calendar capsule
+00:11 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: local celebration shows its Belarusian diocese name
+00:12 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: alternatives sheet updates the selected celebration in place
+00:12 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Today moves Hours and Readings to the same date
+00:13 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours layout supports 200 percent text on a narrow surface
+00:13 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: (tearDownAll)
+00:13 +20: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart
+00:14 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (setUpAll)
+00:14 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter keeps first sorted group and calendar cycle fallback
+00:14 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter linked dayId wins and manual cycle can return to automatic
+00:14 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter weekday and non-cycle groups expose only real cycles
+00:14 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+00:16 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load
+00:17 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: period reading uses the Liturgy of the Hours title
+00:17 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: celebration titles do not get a lectionary year suffix
+00:17 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: liturgical route formats its title with a Roman week number
+00:17 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: synthetic fallback keeps alleluia text and lone alt chorus
+00:17 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: a reading sentence opens an accessible color palette
+00:18 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+00:19 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: Today moves Readings and Hours to the same date
+00:20 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (tearDownAll)
+00:20 +32: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/horizontal_swipe_navigation_test.dart
+00:21 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/horizontal_swipe_navigation_test.dart: left and right swipes navigate next and previous
+00:22 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/horizontal_swipe_navigation_test.dart: a short movement does not navigate
+00:23 +34: All tests passed!

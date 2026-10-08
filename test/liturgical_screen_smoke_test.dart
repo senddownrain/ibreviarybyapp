@@ -661,6 +661,8 @@ void main() {
         title: 'Свята',
         reading1: const ParsedSection(
           bible: 'Флп 4, 10–23',
+          comment: 'Даведаліся пра дадзеную мне ласку',
+          title: 'Чытанне Паслання святога апостала Паўла.',
           text: 'Браты, я вельмі ўзрадаваўся ў Пану.',
         ),
         psalm: const ParsedSection(
@@ -668,8 +670,13 @@ void main() {
           chorus: 'Пан пачуў мяне.',
           verses: ['2. Я цвёрда спадзяваўся * і Ён пачуў мяне.'],
         ),
+        alleluia: const ParsedSection(
+          bible: 'Рым 8, 15',
+          verse: 'Пане, навучы нас маліцца.',
+        ),
         gospel: const ParsedSection(
           bible: 'Лк 1, 68–79',
+          title: '+ Чытанне святога Евангелля паводле Лукі.',
           text: 'Благаслаўлёны Пан, Бог Ізраэля.',
         ),
       );
@@ -710,10 +717,84 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
+      final responseColor = ReaderTheme.of(
+        tester.element(find.byKey(const Key('reader-content-surface'))),
+      ).rubricSoft;
+      final responses = find.byWidgetPredicate(
+        (widget) =>
+            widget is Container &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration! as BoxDecoration).color == responseColor,
+      );
+      expect(responses, findsNWidgets(4));
+      for (final response in tester.widgetList<Container>(responses)) {
+        final decoration = response.decoration! as BoxDecoration;
+        expect(decoration.boxShadow, isNull);
+        expect(decoration.border, isNull);
+        expect(decoration.borderRadius, BorderRadius.circular(6));
+      }
       await _captureIfRequested(
         tester,
         'readings-${brightness.name}-$size-${viewport.width}x${viewport.height}',
       );
+      await _captureSectionIfRequested(
+        tester,
+        'readings-refrain-${brightness.name}-$size-${viewport.width}',
+        find.byKey(const Key('psalm-refrain-opening')),
+      );
+      await _captureSectionIfRequested(
+        tester,
+        'readings-acclamation-${brightness.name}-$size-${viewport.width}',
+        find.text('Пане, навучы нас маліцца.', findRichText: true),
+      );
+
+      // Exercise the actual Aa slider and settings rebuild at every supported
+      // step, including the minimum where absolute metadata floors regress.
+      await tester.tap(find.byKey(const Key('text-scale-open')));
+      await tester.pumpAndSettle();
+      for (var step = 7; step <= 18; step++) {
+        final requestedSize = kDefaultReaderFontSize * step / 10;
+        tester
+            .widget<Slider>(find.byKey(const Key('text-scale-slider')))
+            .onChanged!(requestedSize);
+        await tester.pumpAndSettle();
+        final reader = ReaderTheme.of(
+          tester.element(find.byKey(const Key('reader-content-surface'))),
+        );
+        for (final reference in ['Флп 4, 10–23', 'Рым 8, 15', 'Лк 1, 68–79']) {
+          final style = tester.widget<Text>(find.text(reference)).style!;
+          expect(
+            style.fontSize,
+            closeTo(reader.metadata(requestedSize).fontSize!, .001),
+          );
+          expect(style.fontSize, lessThan(requestedSize));
+        }
+        final comment = tester
+            .widget<Text>(find.text('Даведаліся пра дадзеную мне ласку'))
+            .style!;
+        expect(
+          comment.fontSize,
+          closeTo(reader.psalmSubtitle(requestedSize).fontSize!, .001),
+        );
+        expect(comment.fontStyle, FontStyle.italic);
+        for (final formula in [
+          'Чытанне Паслання святога апостала Паўла.',
+          '+ Чытанне святога Евангелля паводле Лукі.',
+        ]) {
+          expect(
+            tester.widget<Text>(find.text(formula)).style!.fontSize,
+            closeTo(requestedSize, .001),
+          );
+        }
+        final body = tester.widget<Text>(
+          find.text('Браты, я вельмі ўзрадаваўся ў Пану.', findRichText: true),
+        );
+        expect(
+          (body.textSpan! as TextSpan).children!.first.style!.fontSize,
+          closeTo(requestedSize, .001),
+        );
+        expect(tester.takeException(), isNull);
+      }
     });
   }
 }

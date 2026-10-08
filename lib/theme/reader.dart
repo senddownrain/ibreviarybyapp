@@ -138,7 +138,7 @@ class ReaderTheme {
   }
 
   TextStyle serviceHeading(double bodySize, {String? family}) => body(
-    (bodySize * .88).clamp(14, double.infinity),
+    bodySize * .88,
     family: family,
   ).copyWith(color: rubric, height: metadataHeight);
 
@@ -149,10 +149,7 @@ class ReaderTheme {
       ).copyWith(fontWeight: FontWeight.w500);
 
   TextStyle metadata(double bodySize, {bool italic = false, String? family}) =>
-      body(
-        (bodySize * .88).clamp(14, double.infinity),
-        family: family,
-      ).copyWith(
+      body(bodySize * .88, family: family).copyWith(
         height: metadataHeight,
         color: muted,
         fontStyle: italic ? FontStyle.italic : FontStyle.normal,
@@ -160,6 +157,13 @@ class ReaderTheme {
 
   TextStyle sourceStyle(double bodySize, {String? family}) =>
       metadata(bodySize, family: family);
+
+  /// Psalm explanations share the Hours scale and follow the full Aa range.
+  TextStyle psalmSubtitle(double bodySize, {String? family}) => metadata(
+    bodySize,
+    italic: true,
+    family: family,
+  ).copyWith(fontSize: bodySize * .76);
 
   TextStyle rubricBlock(double bodySize, {String? family}) =>
       rubricStyle((bodySize * .90).clamp(14, double.infinity), family: family);

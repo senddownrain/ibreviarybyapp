@@ -1,6 +1,7 @@
 import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
 
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
@@ -18,6 +19,9 @@ class LiturgicalNavigationController {
 
   void openDate(DateTime value, {String? dayId, String? diocese}) {
     final date = DateUtils.dateOnly(value);
+    if (date.isBefore(kCalendarFirstDate) || date.isAfter(kCalendarLastDate)) {
+      return;
+    }
     final current = DateUtils.dateOnly(ref.read(selectedDateProvider));
     if (!DateUtils.isSameDay(date, current)) {
       ref.read(homeNavDirectionProvider.notifier).state = date.isAfter(current)
@@ -32,12 +36,13 @@ class LiturgicalNavigationController {
     }
     ref.read(selectedDateProvider.notifier).state = date;
 
+    final effectiveDayId = ref.read(hoursLiturgicalSelectionProvider).dayId;
     final readings = ref.read(readingsBranchStateProvider);
     ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
       date: date,
-      dayId: dayId,
+      dayId: effectiveDayId,
       clearLiturgicalKey: true,
-      clearDayId: dayId == null,
+      clearDayId: effectiveDayId == null,
     );
   }
 
@@ -46,16 +51,7 @@ class LiturgicalNavigationController {
   }
 
   void selectDay(DateTime value, String dayId, {String? diocese}) {
-    final date = DateUtils.dateOnly(value);
-    ref
-        .read(hoursLiturgicalOverridesProvider.notifier)
-        .select(date, dayId, diocese: diocese);
-    final readings = ref.read(readingsBranchStateProvider);
-    ref.read(readingsBranchStateProvider.notifier).state = readings.copyWith(
-      date: date,
-      dayId: dayId,
-      clearLiturgicalKey: true,
-    );
+    openDate(value, dayId: dayId, diocese: diocese);
   }
 }
 

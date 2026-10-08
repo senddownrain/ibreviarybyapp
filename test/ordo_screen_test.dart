@@ -195,7 +195,7 @@ void main() {
         .where((m) => m.colors.length > 1);
     expect(markers.first.colors, ['viridis', 'albus']);
     expect(
-      find.text('ПА ВЫБАРЫ · Неабавязковы ўспамін', skipOffstage: false),
+      find.text('Неабавязковы ўспамін · Белы', skipOffstage: false),
       findsOneWidget,
     );
   });

@@ -18,6 +18,8 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart' as production;
 import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
+import 'package:mybrev_flutter/screens/home_screen.dart';
+import 'package:mybrev_flutter/widgets/hours_options_sheet.dart';
 import 'package:mybrev_flutter/screens/ordo_screen.dart';
 import 'package:mybrev_flutter/screens/readings_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -154,13 +156,15 @@ void main() {
     double scale = 1,
     double width = 360,
     bool onlyRosary = false,
+    DateTime? selectedDate,
+    Brightness brightness = Brightness.light,
   }) async {
     tester.view.physicalSize = Size(width, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final container = ProviderContainer(
       overrides: [
-        selectedDateProvider.overrideWith((ref) => date),
+        selectedDateProvider.overrideWith((ref) => selectedDate ?? date),
         if (onlyRosary) dayOptionsProvider.overrideWithValue([rosary()]),
         liturgicalContentReadyProvider.overrideWith((ref) async {}),
         contentUpdatesProvider.overrideWith(_Idle.new),
@@ -179,7 +183,10 @@ void main() {
         container: container,
         child: MaterialApp.router(
           routerConfig: router,
-          theme: ThemeData(platform: TargetPlatform.android),
+          theme: ThemeData(
+            platform: TargetPlatform.android,
+            brightness: brightness,
+          ),
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(
               textScaler: TextScaler.linear(scale),
@@ -213,6 +220,25 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // ORDO is a separate route. Header calendar actions now open the shared
+  // month sheet; these tests enter ORDO explicitly to exercise its own flow.
+  Future<void> openOrdo(WidgetTester tester) async {
+    final context = tester.element(find.byType(HomeScreen));
+    final container = ProviderScope.containerOf(context);
+    final selected = container.read(hoursLiturgicalSelectionProvider);
+    GoRouter.of(context).push(
+      Uri(
+        path: '/hours/ordo',
+        queryParameters: {
+          'date': liturgicalDateKey(container.read(selectedDateProvider)),
+          if (selected.dayId != null) 'dayId': selected.dayId!,
+          if (selected.diocese != null) 'diocese': selected.diocese!,
+        },
+      ).toString(),
+    );
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('Hours exposes both Office choices even with one celebration', (
     tester,
   ) async {
@@ -221,6 +247,20 @@ void main() {
       tester,
       find.byKey(const Key('hours-alternatives-control')),
     );
+    final sheet = find.byType(HoursOptionsSheet);
+    expect(
+      find.descendant(of: sheet, matching: find.text(rosary().title)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.text('СВЯТКАВАННЕ')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('hours-celebration-our-lady-rosary')),
+      findsNothing,
+    );
+    expect(find.byKey(const Key('hours-single-celebration')), findsOneWidget);
     final option = rosary();
     for (final template in option.templates) {
       await tapVisible(
@@ -232,22 +272,22 @@ void main() {
         template.id,
       );
     }
-    await tester.tap(find.widgetWithText(FilledButton, 'Літургія'));
+    await tester.tap(find.byTooltip('Закрыць').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('hours-calendar-action')));
-    await tester.pumpAndSettle();
+    await openOrdo(tester);
+    expect(find.byType(OrdoScreen), findsOneWidget);
+    expect(find.byType(HoraPickerScreen), findsNothing);
     expect(
-      tester.widget<HoraPickerScreen>(find.byType(HoraPickerScreen)).dayId,
+      tester.widget<OrdoScreen>(find.byType(OrdoScreen)).dayId,
       option.templates.last.id,
     );
     expect(find.byKey(const Key('app-dock-full')), findsNothing);
+    expect(find.text('Ютрань'), findsNothing);
+    await tapVisible(tester, find.byKey(const Key('ordo-open-hours')));
+    expect(find.byType(HomeScreen), findsOneWidget);
     expect(
-      production
-          .appShellState
-          .activeController
-          .activeDescriptor
-          .showsNavigationDock,
-      isFalse,
+      container.read(hoursLiturgicalSelectionProvider).dayId,
+      option.templates.last.id,
     );
     await tapVisible(tester, find.text('Ютрань'));
     expect(
@@ -258,12 +298,14 @@ void main() {
     await tester.pumpAndSettle();
     await tapVisible(
       tester,
-      find.byKey(Key('day-template-${option.templates.first.id}')),
+      find.byKey(const Key('hours-alternatives-control')),
     );
-    expect(
-      tester.widget<HoraPickerScreen>(find.byType(HoraPickerScreen)).dayId,
-      option.templates.first.id,
+    await tapVisible(
+      tester,
+      find.byKey(Key('hours-template-${option.templates.first.id}')),
     );
+    await tester.tap(find.byTooltip('Закрыць').last);
+    await tester.pumpAndSettle();
     await tapVisible(tester, find.text('Ютрань'));
     expect(
       tester.widget<OraScreen>(find.byType(OraScreen)).dayId,
@@ -271,18 +313,61 @@ void main() {
     );
   });
 
+  testWidgets('October 9 selector and ORDO keep the chosen memorial Office', (
+    tester,
+  ) async {
+    final (_, container) = await start(
+      tester,
+      selectedDate: DateTime(2026, 10, 9),
+    );
+    await tapVisible(
+      tester,
+      find.byKey(const Key('hours-alternatives-control')),
+    );
+    final sheet = find.byType(HoursOptionsSheet);
+    expect(
+      find.descendant(
+        of: sheet,
+        matching: find.byType(LiturgicalMonthCalendar),
+      ),
+      findsNothing,
+    );
+    final option = container
+        .read(hoursLiturgicalSelectionProvider)
+        .sortedOptions
+        .singleWhere((o) => o.title.contains('Леанардзі'));
+    await tapVisible(
+      tester,
+      find.byKey(ValueKey('hours-celebration-${option.key}')),
+    );
+    final template = option.templates.last;
+    await tapVisible(
+      tester,
+      find.byKey(ValueKey('hours-template-${template.id}')),
+    );
+    await tester.tap(find.byTooltip('Закрыць').last);
+    await tester.pumpAndSettle();
+    expect(find.byType(HoursOptionsSheet), findsNothing);
+    expect(container.read(hoursLiturgicalSelectionProvider).dayId, template.id);
+    await openOrdo(tester);
+    expect(find.text('• ${template.label}'), findsOneWidget);
+    expect(find.byKey(const Key('ordo-open-readings')), findsOneWidget);
+    expect(find.byType(RadioListTile<String>), findsNothing);
+    await tapVisible(tester, find.byKey(const Key('ordo-open-hours')));
+    expect(container.read(hoursLiturgicalSelectionProvider).dayId, template.id);
+    expect(container.read(selectedDateProvider), DateTime(2026, 10, 9));
+  });
+
   testWidgets('Day → ORDO → Month → Day → back preserves month cursor', (
     tester,
   ) async {
     final (router, _) = await start(tester);
-    await tester.tap(find.byKey(const Key('hours-calendar-action')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('day-open-ordo')));
-    await tester.pumpAndSettle();
+    await openOrdo(tester);
     expect(find.byType(LiturgicalMonthCalendar), findsNothing);
     expect(find.byKey(const Key('app-dock-full')), findsNothing);
     await tapVisible(tester, find.byKey(const Key('ordo-open-month')));
-    expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);
+    expect(find.byType(LiturgicalMonthCalendar), findsNothing);
+    expect(find.byKey(const Key('ordo-month-list')), findsOneWidget);
     expect(
       production
           .appShellState
@@ -319,10 +404,7 @@ void main() {
       location: '/hours/ordo?date=2026-10-07&diocese=pinsk',
     );
     final primaryDiocese = container.read(dioceseSelectionProvider).primary;
-    await tapVisible(
-      tester,
-      find.byKey(const Key('ordo-readings-our-lady-rosary')),
-    );
+    await tapVisible(tester, find.byKey(const Key('ordo-open-readings')));
     final query = GoRouterState.of(
       tester.element(find.byType(ReadingsScreen)),
     ).uri.queryParameters;
@@ -333,16 +415,17 @@ void main() {
     expect(container.read(dioceseSelectionProvider).primary, primaryDiocese);
     router.pop();
     await tester.pumpAndSettle();
-    await tapVisible(
-      tester,
-      find.byKey(const Key('ordo-hours-our-lady-rosary')),
+    await tapVisible(tester, find.byKey(const Key('ordo-open-hours')));
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(container.read(selectedDateProvider), date);
+    expect(
+      container.read(hoursLiturgicalSelectionProvider).dayId,
+      rosary().dayId,
     );
-    final screen = tester.widget<HoraPickerScreen>(
-      find.byType(HoraPickerScreen),
+    expect(
+      container.read(hoursLiturgicalOverridesProvider)['2026-10-07']?.diocese,
+      'pinsk',
     );
-    expect(screen.date, date);
-    expect(screen.dayId, rosary().dayId);
-    expect(screen.diocese, 'pinsk');
     expect(container.read(dioceseSelectionProvider).primary, primaryDiocese);
   });
 
@@ -355,10 +438,7 @@ void main() {
         location:
             '/hours/ordo?date=2026-10-07&diocese=pinsk&dayId=${common.id}',
       );
-      await tapVisible(
-        tester,
-        find.byKey(const Key('ordo-readings-our-lady-rosary')),
-      );
+      await tapVisible(tester, find.byKey(const Key('ordo-open-readings')));
       final query = GoRouterState.of(
         tester.element(find.byType(ReadingsScreen)),
       ).uri.queryParameters;
@@ -377,8 +457,12 @@ void main() {
   testWidgets('An alternative celebration keeps its reading route context', (
     tester,
   ) async {
-    await start(tester, location: '/hours/ordo?date=2026-10-06&diocese=pinsk');
-    await tapVisible(tester, find.byKey(const Key('ordo-readings-sv-bruno')));
+    await start(
+      tester,
+      location:
+          '/hours/ordo?date=2026-10-06&diocese=pinsk&dayId=06-10-sv-bruno',
+    );
+    await tapVisible(tester, find.byKey(const Key('ordo-open-readings')));
     final query = GoRouterState.of(
       tester.element(find.byType(ReadingsScreen)),
     ).uri.queryParameters;
@@ -394,8 +478,7 @@ void main() {
     final (_, container) = await start(tester);
     await tester.tap(find.byKey(const Key('hours-date-action')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Выбраць дату'));
-    await tester.pumpAndSettle();
+    expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);
     await tester.tap(find.byKey(const Key('ordo-day-2026-10-08')));
     await tester.pumpAndSettle();
     expect(container.read(selectedDateProvider), DateTime(2026, 10, 8));

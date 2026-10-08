@@ -1764,10 +1764,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
     final style = switch (line.role) {
       PsalmMetadataRole.service => reader.serviceHeading(size),
       PsalmMetadataRole.muted => reader.metadata(size),
-      PsalmMetadataRole.subtitle =>
-        reader
-            .metadata(size, italic: true)
-            .copyWith(fontSize: (size * .76).clamp(12, double.infinity)),
+      PsalmMetadataRole.subtitle => reader.psalmSubtitle(size),
     };
     return Html(
       data: '<p>${line.html}</p>',

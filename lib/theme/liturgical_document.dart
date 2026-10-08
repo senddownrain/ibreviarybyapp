@@ -32,8 +32,8 @@ Map<String, Style> liturgicalDocumentStyles({
   final size = body.fontSize ?? 16;
   final heading = reader.blockHeading(size);
   final reference = reader.referenceStyle(size);
-  final metadataSize = (size * .88).clamp(14, double.infinity).toDouble();
-  final psalmSubtitleSize = (size * .76).clamp(12, double.infinity).toDouble();
+  final metadataSize = reader.metadata(size).fontSize!;
+  final psalmSubtitleSize = reader.psalmSubtitle(size).fontSize!;
   return {
     'body': Style(
       fontSize: FontSize(size),

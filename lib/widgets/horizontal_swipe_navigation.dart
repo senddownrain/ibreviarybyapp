@@ -12,11 +12,13 @@ class HorizontalSwipeNavigation extends StatefulWidget {
     required this.child,
     this.onPrevious,
     this.onNext,
+    this.followDrag = false,
   });
 
   final Widget child;
   final VoidCallback? onPrevious;
   final VoidCallback? onNext;
+  final bool followDrag;
 
   @override
   State<HorizontalSwipeNavigation> createState() =>
@@ -38,8 +40,12 @@ class LiturgicalDayTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentChild = child;
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      reverseDuration: const Duration(milliseconds: 240),
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 300),
+      reverseDuration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 240),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       layoutBuilder: (currentChild, previousChildren) => Stack(
@@ -72,14 +78,31 @@ class _HorizontalSwipeNavigationState extends State<HorizontalSwipeNavigation> {
   static const _minimumVelocity = 500.0;
 
   double _distance = 0;
+  double _offset = 0;
+  bool _dragging = false;
 
-  void _onStart(DragStartDetails details) => _distance = 0;
+  void _onStart(DragStartDetails details) {
+    _distance = 0;
+    _dragging = true;
+  }
 
   void _onUpdate(DragUpdateDetails details) {
     _distance += details.primaryDelta ?? 0;
+    if (widget.followDrag && !MediaQuery.disableAnimationsOf(context)) {
+      final allowed = _distance < 0
+          ? widget.onNext != null
+          : widget.onPrevious != null;
+      setState(() => _offset = allowed ? (_distance * .25).clamp(-36, 36) : 0);
+    }
   }
 
+  void _resetDrag() => setState(() {
+    _dragging = false;
+    _offset = 0;
+  });
+
   void _onEnd(DragEndDetails details) {
+    _resetDrag();
     final velocity = details.primaryVelocity ?? 0;
     final isDeliberate =
         _distance.abs() >= _minimumDistance ||
@@ -102,6 +125,16 @@ class _HorizontalSwipeNavigationState extends State<HorizontalSwipeNavigation> {
     onHorizontalDragStart: _onStart,
     onHorizontalDragUpdate: _onUpdate,
     onHorizontalDragEnd: _onEnd,
-    child: widget.child,
+    onHorizontalDragCancel: _resetDrag,
+    child: widget.followDrag
+        ? AnimatedContainer(
+            duration: _dragging || MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            transform: Matrix4.translationValues(_offset, 0, 0),
+            child: widget.child,
+          )
+        : widget.child,
   );
 }

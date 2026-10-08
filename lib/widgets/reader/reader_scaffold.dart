@@ -85,11 +85,13 @@ class ReaderScaffold extends StatelessWidget {
     this.showScrollToTop = false,
     this.onSwipePrevious,
     this.onSwipeNext,
+    this.followSwipeDrag = false,
     this.overlay,
   });
 
   final Widget content;
   final Widget? contextHeader;
+  final bool followSwipeDrag;
   final List<Widget> actions;
   final List<ReaderSecondaryAction> secondaryActions;
 
@@ -178,6 +180,7 @@ class ReaderScaffold extends StatelessWidget {
 
     if (onSwipePrevious != null || onSwipeNext != null) {
       scrollView = HorizontalSwipeNavigation(
+        followDrag: followSwipeDrag,
         onPrevious: onSwipePrevious,
         onNext: onSwipeNext,
         child: scrollView,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -12,7 +13,6 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
-import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/content_update_scheduler.dart';
 
@@ -154,22 +154,10 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                         top: topPadding + 8,
                         right: 12,
                         child: _FloatingDayButton(
-                          onTap: () {
-                            final date = ref.read(selectedDateProvider);
-                            final selection = ref.read(
-                              hoursLiturgicalSelectionProvider,
-                            );
-                            if (selection.dayId case final id?) {
-                              context.push(
-                                horaRouteForContext(
-                                  date: date,
-                                  dayId: id,
-                                  diocese: selection.diocese,
-                                  optionId: selection.selected?.optionId,
-                                ),
-                              );
-                            }
-                          },
+                          onTap: () => showLiturgicalCalendarSheet(
+                            context: context,
+                            pickerRoute: '/hours/picker',
+                          ),
                         ),
                       ),
                   ],
@@ -238,7 +226,7 @@ class _FloatingDayButton extends StatelessWidget {
       dimension: 48,
       child: IconButton(
         key: const Key('hours-calendar-action'),
-        tooltip: 'Літургічны дзень',
+        tooltip: 'Выбраць дату',
         onPressed: onTap,
         icon: const PhosphorIcon(PhosphorIconsRegular.calendarDots, size: 24),
       ),

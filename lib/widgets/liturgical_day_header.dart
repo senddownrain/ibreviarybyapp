@@ -1,0 +1,147 @@
+import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+
+/// Shared hierarchy and typography for both daily sections.
+class LiturgicalDayHeader extends StatelessWidget {
+  const LiturgicalDayHeader({
+    super.key,
+    required this.sectionTitle,
+    required this.presentation,
+    required this.onDateTap,
+    required this.onPrevious,
+    required this.onNext,
+    required this.onVariants,
+    required this.keyPrefix,
+  });
+
+  final String sectionTitle;
+  final String keyPrefix;
+  final LiturgicalDayPresentation presentation;
+  final VoidCallback onDateTap;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+  final VoidCallback onVariants;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = presentation;
+    final cs = Theme.of(context).colorScheme;
+    final ink = Color.lerp(p.accent, cs.onSurface, .28)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(sectionTitle, style: ReaderTheme.of(context).displayTitle(36)),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            IconButton(
+              key: Key('$keyPrefix-previous-day'),
+              tooltip: 'Папярэдні дзень',
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              onPressed: p.date.isAfter(kCalendarFirstDate) ? onPrevious : null,
+              icon: const Icon(Icons.chevron_left, size: 22),
+            ),
+            Expanded(
+              child: TextButton(
+                key: Key('$keyPrefix-date-action'),
+                style: TextButton.styleFrom(
+                  foregroundColor: ink,
+                  minimumSize: const Size(48, 48),
+                ),
+                onPressed: onDateTap,
+                child: Text(
+                  p.dateLabel,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: ink),
+                ),
+              ),
+            ),
+            IconButton(
+              key: Key('$keyPrefix-next-day'),
+              tooltip: 'Наступны дзень',
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              onPressed: p.date.isBefore(kCalendarLastDate) ? onNext : null,
+              icon: const Icon(Icons.chevron_right, size: 22),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AnimatedContainer(
+                key: Key('$keyPrefix-celebration-accent'),
+                duration: const Duration(milliseconds: 300),
+                width: 4,
+                margin: const EdgeInsets.symmetric(vertical: 3),
+                decoration: BoxDecoration(
+                  color: p.accent,
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p.title,
+                      key: Key('$keyPrefix-celebration-title'),
+                      style: ReaderTheme.of(context)
+                          .displayTitle(29)
+                          .copyWith(color: cs.onSurface, height: 1.18),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      p.metadata,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                    if (p.badges.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          for (final badge in p.badges)
+                            Chip(label: Text(badge)),
+                        ],
+                      ),
+                    ],
+                    if (p.place.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        p.place,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (p.variantCount > 1) ...[
+          const SizedBox(height: 10),
+          TextButton(
+            key: Key('$keyPrefix-alternatives-control'),
+            style: TextButton.styleFrom(
+              foregroundColor: ink,
+              minimumSize: const Size(48, 48),
+            ),
+            onPressed: onVariants,
+            child: Text('Іншыя літургічныя варыянты · ${p.variantCount}'),
+          ),
+        ],
+      ],
+    );
+  }
+}

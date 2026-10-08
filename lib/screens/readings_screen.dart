@@ -18,8 +18,9 @@ import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
-import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
-import 'package:mybrev_flutter/widgets/ambient_date_picker.dart';
+import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
+import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -286,7 +287,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   void _selectCelebrationGroup(String key) {
     if (key == _activeGroupKey) return;
     _clearSentenceSelection();
-    String? selectedDayId;
     setState(() {
       _activeGroupKey = key;
       final group = _groups.where((group) => group.key == key).firstOrNull;
@@ -295,13 +295,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           !_cyclesOfGroup(group).contains(_manualCycle)) {
         _manualCycle = null;
       }
-      selectedDayId = group == null ? null : readingCelebrationDayId(group);
     });
-    if (selectedDayId != null) {
-      ref
-          .read(liturgicalNavigationControllerProvider)
-          .selectDay(_currentDate, selectedDayId!);
-    }
+    // A lectionary set is not a different celebration. Only the shared
+    // calendar changes the selected liturgical day and its Office.
     _resetDocumentScroll();
   }
 
@@ -465,59 +461,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   DateTime get _currentDate =>
       DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
 
-  void _openDate(DateTime date) {
-    final normalized = DateUtils.dateOnly(date);
-    AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
-    ref.read(liturgicalNavigationControllerProvider).openDate(normalized);
-    context.go(readingsRouteForContext(date: normalized));
-  }
-
   void _openRelativeDate(int direction) {
-    final target = DateUtils.addDaysToDate(_currentDate, direction);
-    if (target.isBefore(kCalendarFirstDate) ||
-        target.isAfter(kCalendarLastDate)) {
-      return;
-    }
-    _openDate(target);
+    AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
+    ref.read(liturgicalNavigationControllerProvider).moveBy(direction);
   }
 
-  Future<void> _showDateActions() async {
-    final date = _currentDate;
-    final action = await showModalBottomSheet<_ReadingsDateAction>(
-      context: context,
-      useRootNavigator: true,
-      useSafeArea: true,
-      showDragHandle: true,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-      builder: (context) => const _ReadingsDateSheet(),
-    );
-    if (!mounted || action == null) return;
-    switch (action) {
-      case _ReadingsDateAction.today:
-        _openDate(DateTime.now());
-        return;
-      case _ReadingsDateAction.previous:
-        final target = DateUtils.addDaysToDate(date, -1);
-        if (!target.isBefore(kCalendarFirstDate)) _openDate(target);
-        return;
-      case _ReadingsDateAction.next:
-        final target = DateUtils.addDaysToDate(date, 1);
-        if (!target.isAfter(kCalendarLastDate)) _openDate(target);
-        return;
-      case _ReadingsDateAction.calendar:
-        final picked = await showAmbientDatePicker(
-          context: context,
-          initialDate: date,
-          seasonColor: _readingColor(),
-        );
-        if (mounted && picked != null) _openDate(picked);
-        return;
-      case _ReadingsDateAction.advanced:
-        context.push('/readings/picker?mode=readings');
-        return;
-    }
-  }
+  Future<void> _showDateActions({bool focusVariants = false}) =>
+      showLiturgicalCalendarSheet(
+        context: context,
+        pickerRoute: '/readings/picker?mode=readings',
+        focusVariants: focusVariants,
+      );
 
   /// Cycles of a group: of its Mass reading sets, else of its documents.
   List<String> _cyclesOfGroup(ReadingCelebrationGroup group) {
@@ -568,7 +522,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final seasonColor = _readingColor();
+    final sharedPresentation = ref.watch(liturgicalDayPresentationProvider);
+    final usesCalendar = widget.liturgicalKey == null;
+    final seasonColor = usesCalendar
+        ? sharedPresentation.accent
+        : _readingColor();
     Widget document;
     String contextTitle = _title;
     String? cycleLabel;
@@ -626,7 +584,6 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       manualGroup: manualGroup,
       manualCycle: _manualCycle != null,
     );
-    final today = DateUtils.isSameDay(_currentDate, DateTime.now());
     final hasOraReturn =
         AppNavigationScope.maybeOf(context)?.shellState.canReturnToOra() ??
         false;
@@ -656,6 +613,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
     final reader = _trackScroll(
       ReaderScaffold(
+        followSwipeDrag: true,
         onSwipePrevious: _currentDate.isAfter(kCalendarFirstDate)
             ? () => _openRelativeDate(-1)
             : null,
@@ -672,16 +630,56 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         onBack: hasOraReturn
             ? AppNavigationScope.maybeOf(context)?.returnToOra
             : null,
-        contextHeader: _ReadingsContextHeader(
-          title: contextTitle,
-          dateLabel: _formatReadingsDate(widget.dateStr, widget.liturgicalKey),
-          seasonColor: seasonColor,
-          cycleMetadata: cycleMetadata,
-          showToday: widget.dateStr != null && !today,
-          showOptions: !_loading && _error == null && _hasOptions,
-          onDateTap: _showDateActions,
-          onToday: () => _openDate(DateTime.now()),
-          onOptions: _showOptions,
+        contextHeader: Padding(
+          key: const Key('readings-context-header'),
+          padding: const EdgeInsets.fromLTRB(22, 8, 22, 22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (usesCalendar)
+                LiturgicalDayHeader(
+                  sectionTitle: 'Чытанні',
+                  keyPrefix: 'readings',
+                  presentation: sharedPresentation,
+                  onDateTap: _showDateActions,
+                  onVariants: () => _showDateActions(focusVariants: true),
+                  onPrevious: () => _openRelativeDate(-1),
+                  onNext: () => _openRelativeDate(1),
+                )
+              else ...[
+                Text(
+                  'Чытанні',
+                  style: ReaderTheme.of(context).displayTitle(36),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  contextTitle,
+                  style: ReaderTheme.of(context).displayTitle(29),
+                ),
+                TextButton(
+                  onPressed: _showDateActions,
+                  child: const Text('Выбраць дату'),
+                ),
+              ],
+              if (cycleMetadata != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  cycleMetadata,
+                  key: const Key('readings-cycle-metadata'),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              if (!_loading && _error == null && _hasOptions)
+                TextButton.icon(
+                  key: const Key('readings-options-action'),
+                  onPressed: _showOptions,
+                  icon: const Icon(Icons.tune_rounded, size: 18),
+                  label: const Text('Набор чытанняў'),
+                ),
+            ],
+          ),
         ),
         content: document,
       ),
@@ -799,219 +797,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   );
 }
 
-enum _ReadingsDateAction { today, previous, next, calendar, advanced }
-
-String _formatReadingsDate(String? dateStr, String? liturgicalKey) {
-  if (liturgicalKey != null) return 'Літургічны кантэкст';
-  final date = DateTime.tryParse(dateStr ?? '');
-  if (date == null) return 'Дата не вызначана';
-  const months = [
-    '',
-    'студзеня',
-    'лютага',
-    'сакавіка',
-    'красавіка',
-    'мая',
-    'чэрвеня',
-    'ліпеня',
-    'жніўня',
-    'верасня',
-    'кастрычніка',
-    'лістапада',
-    'снежня',
-  ];
-  return '${date.day} ${months[date.month]} ${date.year}';
-}
-
 String _readingsCycleLabel(String cycle) => switch (cycle) {
   '1' => 'I',
   '2' => 'II',
   _ => cycle,
 };
-
-class _ReadingsContextHeader extends StatelessWidget {
-  const _ReadingsContextHeader({
-    required this.title,
-    required this.dateLabel,
-    required this.seasonColor,
-    required this.showToday,
-    required this.showOptions,
-    required this.onDateTap,
-    required this.onToday,
-    required this.onOptions,
-    this.cycleMetadata,
-  });
-
-  final String title;
-  final String dateLabel;
-  final Color seasonColor;
-  final String? cycleMetadata;
-  final bool showToday;
-  final bool showOptions;
-  final VoidCallback onDateTap;
-  final VoidCallback onToday;
-  final VoidCallback onOptions;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return SizedBox(
-      width: double.infinity,
-      child: Padding(
-        key: const Key('readings-context-header'),
-        padding: const EdgeInsets.fromLTRB(22, 8, 22, 22),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Чытанні', style: ReaderTheme.of(context).displayTitle(36)),
-            const SizedBox(height: 10),
-            Semantics(
-              button: true,
-              label: 'Змяніць дату: $dateLabel',
-              child: InkWell(
-                key: const Key('readings-date-action'),
-                borderRadius: BorderRadius.circular(12),
-                onTap: onDateTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 7),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.calendar_today_rounded,
-                        size: 18,
-                        color: seasonColor,
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          dateLabel,
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                color: seasonColor,
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: seasonColor,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 7),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
-            ),
-            if (cycleMetadata != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                cycleMetadata!,
-                key: const Key('readings-cycle-metadata'),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: cs.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-            if (showToday || showOptions) ...[
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (showToday)
-                    TextButton.icon(
-                      key: const Key('readings-today-action'),
-                      onPressed: onToday,
-                      icon: const Icon(Icons.today_rounded, size: 18),
-                      label: const Text('Сёння'),
-                    ),
-                  if (showOptions)
-                    TextButton.icon(
-                      key: const Key('readings-options-action'),
-                      onPressed: onOptions,
-                      icon: const Icon(Icons.tune_rounded, size: 18),
-                      label: const Text('Варыянты'),
-                    ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ReadingsDateSheet extends StatelessWidget {
-  const _ReadingsDateSheet();
-
-  @override
-  Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: 620, maxHeight: 620),
-    child: ListView(
-      shrinkWrap: true,
-      padding: EdgeInsets.fromLTRB(
-        12,
-        0,
-        12,
-        20 + MediaQuery.viewPaddingOf(context).bottom,
-      ),
-      children: const [
-        _ReadingsDateTile(
-          Icons.today_rounded,
-          'Сёння',
-          _ReadingsDateAction.today,
-        ),
-        _ReadingsDateTile(
-          Icons.arrow_back_rounded,
-          'Папярэдні дзень',
-          _ReadingsDateAction.previous,
-        ),
-        _ReadingsDateTile(
-          Icons.arrow_forward_rounded,
-          'Наступны дзень',
-          _ReadingsDateAction.next,
-        ),
-        Divider(),
-        _ReadingsDateTile(
-          Icons.calendar_month_rounded,
-          'Выбраць дату',
-          _ReadingsDateAction.calendar,
-        ),
-        _ReadingsDateTile(
-          Icons.search_rounded,
-          'Знайсці літургічны дзень / свята',
-          _ReadingsDateAction.advanced,
-        ),
-      ],
-    ),
-  );
-}
-
-class _ReadingsDateTile extends StatelessWidget {
-  const _ReadingsDateTile(this.icon, this.label, this.action);
-  final IconData icon;
-  final String label;
-  final _ReadingsDateAction action;
-
-  @override
-  Widget build(BuildContext context) => ListTile(
-    minTileHeight: 52,
-    leading: Icon(icon),
-    title: Text(label),
-    onTap: () => Navigator.pop(context, action),
-  );
-}
 
 class _ReadingsOptionsSheet extends StatelessWidget {
   const _ReadingsOptionsSheet({
@@ -1804,7 +1594,9 @@ class _BibleRef extends StatelessWidget {
     final theme = reader ?? ReaderTheme.of(context);
     return Text(
       text,
-      style: theme.referenceStyle(base, family: textStyle?.fontFamily),
+      style: theme
+          .referenceStyle(base, family: textStyle?.fontFamily)
+          .copyWith(fontSize: theme.metadata(base).fontSize),
     );
   }
 }
@@ -2076,7 +1868,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
             child: Text(
               s.comment!,
               style: widget.textStyle.copyWith(
-                fontSize: base * 0.875,
+                fontSize: widget.reader.psalmSubtitle(base).fontSize,
                 color: widget.reader.muted,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w500,
@@ -2274,6 +2066,24 @@ class _PsalmSection extends StatelessWidget {
   }
 }
 
+/// Quiet shared surface for spoken responses; verses retain the page surface.
+class _ReadingResponseSurface extends StatelessWidget {
+  const _ReadingResponseSurface({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    decoration: BoxDecoration(
+      color: ReaderTheme.of(context).rubricSoft,
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: child,
+  );
+}
+
 class _ChorusBox extends StatelessWidget {
   final String label;
   final String chorus;
@@ -2309,29 +2119,31 @@ class _ChorusBox extends StatelessWidget {
       ),
       width: double.infinity,
       margin: EdgeInsets.fromLTRB(0, compact ? 5 : 2, 0, compact ? 9 : 13),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: textStyle.copyWith(
-              fontSize: (base * .88).clamp(14, double.infinity),
-              height: 1.2,
-              color: accent,
-              fontWeight: FontWeight.w800,
+      child: _ReadingResponseSurface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: textStyle.copyWith(
+                fontSize: reader.metadata(base).fontSize,
+                height: 1.2,
+                color: accent,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          SizedBox(height: compact ? 3 : 5),
-          SelectableText(
-            chorus,
-            style: textStyle.copyWith(
-              fontSize: base,
-              height: compact ? 1.48 : 1.5,
-              color: reader.ink,
-              fontWeight: compact ? FontWeight.w600 : FontWeight.w700,
+            SizedBox(height: compact ? 3 : 5),
+            SelectableText(
+              chorus,
+              style: textStyle.copyWith(
+                fontSize: base,
+                height: compact ? 1.48 : 1.5,
+                color: reader.ink,
+                fontWeight: compact ? FontWeight.w600 : FontWeight.w700,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2359,15 +2171,17 @@ class _AlleluiaSection extends StatelessWidget {
   Widget _acclamationLine(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: SelectableText.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: 'Акламацыя: ',
-              style: textStyle.copyWith(fontWeight: FontWeight.bold),
-            ),
-            TextSpan(text: _acclamation, style: textStyle),
-          ],
+      child: _ReadingResponseSurface(
+        child: SelectableText.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'Акламацыя: ',
+                style: textStyle.copyWith(fontWeight: FontWeight.w600),
+              ),
+              TextSpan(text: _acclamation, style: textStyle),
+            ],
+          ),
         ),
       ),
     );

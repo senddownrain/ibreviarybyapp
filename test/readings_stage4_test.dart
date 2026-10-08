@@ -11,6 +11,8 @@ import 'package:hive/hive.dart';
 
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -49,6 +51,7 @@ void main() {
   late Directory hiveDirectory;
 
   setUpAll(() async {
+    await initializeDateFormatting('be');
     hiveDirectory = await Directory.systemTemp.createTemp(
       'readings-stage4-test-',
     );
@@ -126,6 +129,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(
@@ -177,6 +181,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(
@@ -226,6 +231,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader([reading])),
@@ -235,7 +241,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('XXIII звычайны тыдзень, серада'), findsOneWidget);
+    expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
     expect(find.text('Сырая назва набору'), findsNothing);
   });
 
@@ -253,6 +259,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader([memorial])),
@@ -262,7 +269,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Святы Ян'), findsOneWidget);
+    expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
     expect(find.text('Святы Ян, Год A'), findsNothing);
     expect(find.text('Святы Ян, Год II'), findsNothing);
   });
@@ -273,6 +280,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader(const [])),
@@ -305,6 +313,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader([reading])),
@@ -398,6 +407,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          _presentationOverride,
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader(readings)),
@@ -407,7 +417,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Нядзельныя чытанні'), findsOneWidget);
+    expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
     expect(find.text('Цыкл B'), findsOneWidget);
     expect(find.textContaining('Тэкст B'), findsWidgets);
     await tester.tap(find.byKey(const Key('readings-options-action')));
@@ -421,7 +431,7 @@ void main() {
     expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
     expect(find.text('Цыкл A · зменены'), findsOneWidget);
     expect(find.text('Цыкл B'), findsNothing);
-    expect(find.text('Нядзельныя чытанні'), findsOneWidget);
+    expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
     expect(find.textContaining('Тэкст A'), findsWidgets);
 
     await tester.tap(find.byKey(const Key('readings-options-action')));
@@ -454,6 +464,7 @@ void main() {
   ) async {
     final container = ProviderContainer(
       overrides: [
+        liturgicalContentReadyProvider.overrideWith((ref) async {}),
         settingsProvider.overrideWith(_TestSettingsNotifier.new),
         liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
         selectedDateProvider.overrideWith((ref) => DateTime(2026, 9, 17)),
@@ -486,7 +497,13 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('readings-today-action')));
+    expect(find.byKey(const Key('readings-today-action')), findsNothing);
+    await tester.tap(find.byKey(const Key('readings-date-action')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(
+      find.byKey(const Key('liturgical-calendar-today')),
+    );
+    await tester.tap(find.byKey(const Key('liturgical-calendar-today')));
     await tester.pumpAndSettle();
 
     expect(
@@ -507,3 +524,13 @@ class _TestSettingsNotifier extends SettingsNotifier {
   @override
   SettingsState build() => const SettingsState();
 }
+
+final _presentationOverride = liturgicalDayPresentationProvider
+    .overrideWithValue(
+      LiturgicalDayPresentation(
+        date: DateTime(2026, 9, 9),
+        title: 'XXIII звычайны тыдзень',
+        rank: 'Будні дзень',
+        accent: Colors.green,
+      ),
+    );

@@ -223,7 +223,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Іншыя літургічныя варыянты'), findsOneWidget);
+    expect(find.textContaining('Іншыя літургічныя варыянты'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('hours-alternatives-control')));
     await tester.pumpAndSettle();
@@ -235,7 +235,7 @@ void main() {
       'alternative',
     );
     expect(find.text('Celebration alternative'), findsWidgets);
-    expect(find.text('Літургія'), findsWidgets);
+    expect(find.text('Гатова'), findsWidgets);
   });
 
   testWidgets('Today moves Hours and Readings to the same date', (
@@ -260,9 +260,14 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('hours-today-action')), findsOneWidget);
+    expect(find.byKey(const Key('hours-today-action')), findsNothing);
+    await tester.tap(find.byKey(const Key('hours-date-action')));
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('hours-today-action')));
+    await tester.ensureVisible(
+      find.byKey(const Key('liturgical-calendar-today')),
+    );
+    await tester.tap(find.byKey(const Key('liturgical-calendar-today')));
     await tester.pump();
     expect(
       DateUtils.isSameDay(container.read(selectedDateProvider), DateTime.now()),
@@ -325,6 +330,7 @@ List<Override> _overrides(DateTime date, List<DayOption> options) => [
   selectedDateProvider.overrideWith((ref) => date),
   dayOptionsProvider.overrideWithValue(options),
   selectedDateReadyProvider.overrideWith((ref) async {}),
+  liturgicalContentReadyProvider.overrideWith((ref) async {}),
   isOfflineProvider.overrideWithValue(false),
   contentUpdatesProvider.overrideWith(_TestBootstrapNotifier.new),
 ];

@@ -10,7 +10,6 @@ import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 
@@ -40,6 +39,14 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
   );
   void _move(int delta) =>
       setState(() => _month = DateTime(_month.year, _month.month + delta));
+  @override
+  void didUpdateWidget(covariant LiturgicalMonthCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!DateUtils.isSameDay(oldWidget.initialDate, widget.initialDate)) {
+      _month = DateTime(widget.initialDate.year, widget.initialDate.month);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ready = ref.watch(liturgicalContentReadyProvider);
@@ -111,7 +118,10 @@ class _MonthHeader extends StatelessWidget {
             '${label[0].toUpperCase()}${label.substring(1)}',
             key: const Key('ordo-month-label'),
             textAlign: TextAlign.center,
-            style: ReaderTheme.of(context).displayTitle(24),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         IconButton(
