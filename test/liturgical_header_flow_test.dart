@@ -25,6 +25,7 @@ import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
+import 'package:mybrev_flutter/screens/ordo_screen.dart';
 
 class _Idle extends ContentUpdatesNotifier {
   @override
@@ -256,11 +257,15 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('shell calendar shortcut opens the same month sheet', (
+  testWidgets('shell calendar shortcut opens the liturgical day', (
     tester,
   ) async {
     await start(tester);
     await tester.tap(find.byKey(const Key('hours-calendar-action')));
+    await tester.pumpAndSettle();
+    expect(find.byType(OrdoScreen), findsOneWidget);
+    expect(find.byType(LiturgicalCalendarSheet), findsNothing);
+    await tester.tap(find.byKey(const Key('ordo-date-action')));
     await tester.pumpAndSettle();
     expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
     expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);

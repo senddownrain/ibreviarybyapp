@@ -39,6 +39,15 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
   );
   void _move(int delta) =>
       setState(() => _month = DateTime(_month.year, _month.month + delta));
+
+  Future<void> _jumpToMonth() async {
+    final month = await showDialog<DateTime>(
+      context: context,
+      builder: (_) => _MonthJumpDialog(month: _month),
+    );
+    if (mounted && month != null) setState(() => _month = month);
+  }
+
   @override
   void didUpdateWidget(covariant LiturgicalMonthCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -56,6 +65,7 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
       children: [
         _MonthHeader(
           month: _month,
+          onJump: _jumpToMonth,
           onPrevious:
               _month.isAfter(
                 DateTime(kCalendarFirstDate.year, kCalendarFirstDate.month),
@@ -96,11 +106,13 @@ class _MonthHeader extends StatelessWidget {
     required this.month,
     required this.onPrevious,
     required this.onNext,
+    required this.onJump,
   });
 
   final DateTime month;
   final VoidCallback? onPrevious;
   final VoidCallback? onNext;
+  final VoidCallback onJump;
 
   @override
   Widget build(BuildContext context) {
@@ -114,13 +126,17 @@ class _MonthHeader extends StatelessWidget {
           icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
         ),
         Expanded(
-          child: Text(
-            '${label[0].toUpperCase()}${label.substring(1)}',
-            key: const Key('ordo-month-label'),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
+          child: TextButton(
+            key: const Key('ordo-jump-month'),
+            onPressed: onJump,
+            child: Text(
+              '${label[0].toUpperCase()}${label.substring(1)}',
+              key: const Key('ordo-month-label'),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -133,6 +149,92 @@ class _MonthHeader extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Browsing a month never commits a daily selection.
+class _MonthJumpDialog extends StatefulWidget {
+  const _MonthJumpDialog({required this.month});
+  final DateTime month;
+
+  @override
+  State<_MonthJumpDialog> createState() => _MonthJumpDialogState();
+}
+
+class _MonthJumpDialogState extends State<_MonthJumpDialog> {
+  late int _year = widget.month.year;
+  late int _month = widget.month.month;
+
+  List<int> get _months => [
+    for (var month = 1; month <= 12; month++)
+      if (!DateTime(_year, month + 1, 0).isBefore(kCalendarFirstDate) &&
+          !DateTime(_year, month).isAfter(kCalendarLastDate))
+        month,
+  ];
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Перайсці да месяца'),
+    scrollable: true,
+    content: SizedBox(
+      width: 320,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButtonFormField<int>(
+            key: ValueKey('ordo-jump-year-$_year'),
+            initialValue: _year,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Год'),
+            items: [
+              for (
+                var year = kCalendarFirstDate.year;
+                year <= kCalendarLastDate.year;
+                year++
+              )
+                DropdownMenuItem(value: year, child: Text('$year')),
+            ],
+            onChanged: (year) {
+              if (year == null) return;
+              setState(() {
+                _year = year;
+                _month = _month.clamp(_months.first, _months.last);
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<int>(
+            key: ValueKey('ordo-jump-month-$_year-$_month'),
+            initialValue: _month,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Месяц'),
+            items: [
+              for (final month in _months)
+                DropdownMenuItem(
+                  value: month,
+                  child: Text(
+                    DateFormat('LLLL', 'be').format(DateTime(_year, month)),
+                  ),
+                ),
+            ],
+            onChanged: (month) {
+              if (month != null) setState(() => _month = month);
+            },
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Скасаваць'),
+      ),
+      FilledButton(
+        key: const Key('ordo-jump-apply'),
+        onPressed: () => Navigator.pop(context, DateTime(_year, _month)),
+        child: const Text('Паказаць'),
+      ),
+    ],
+  );
 }
 
 class _MonthGrid extends ConsumerWidget {
@@ -269,6 +371,7 @@ class _DayCell extends StatelessWidget {
     return Semantics(
       button: true,
       selected: isSelected,
+      onTap: onTap,
       label:
           '${dayMonthLabel(iso)}${isToday ? ', сёння' : ''}. Колер: $colorLabel',
       excludeSemantics: true,

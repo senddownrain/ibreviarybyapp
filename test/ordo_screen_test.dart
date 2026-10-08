@@ -88,7 +88,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('Белы', findRichText: true), findsWidgets);
-    expect(find.text('Святкаванне дня'), findsOneWidget);
+    expect(find.text('Св. Анёлаў Ахоўнікаў'), findsOneWidget);
     expect(
       find.descendant(
         of: find.byKey(const Key('ordo-row-holy-guardian-angels-primary')),
@@ -122,7 +122,7 @@ void main() {
     expect(
       tester.getTopLeft(books).dy,
       lessThan(
-        tester.getTopLeft(find.text('Святкаванне дня', skipOffstage: false)).dy,
+        tester.getTopLeft(find.text('Імша і чытанні', skipOffstage: false)).dy,
       ),
     );
     expect(
@@ -180,20 +180,19 @@ void main() {
       findsNothing,
     );
     expect(
-      find.text('ПА ВЫБАРЫ · Успамін', skipOffstage: false),
+      find.text('Можна выбраць замест', skipOffstage: false),
       findsOneWidget,
     );
   });
 
-  testWidgets('a date with several legal colours shows a segmented marker', (
-    tester,
-  ) async {
+  testWidgets('each celebration displays its own legal colour', (tester) async {
     // 06.10.2026: the weekday (green) and St Bruno (white).
     await pump(tester, app(DateTime(2026, 10, 6)));
     final markers = tester
         .widgetList<VestmentMarker>(find.byType(VestmentMarker))
-        .where((m) => m.colors.length > 1);
-    expect(markers.first.colors, ['viridis', 'albus']);
+        .map((m) => m.colors);
+    expect(markers, contains(equals(['viridis'])));
+    expect(markers, contains(equals(['albus'])));
     expect(
       find.text('Неабавязковы ўспамін · Белы', skipOffstage: false),
       findsOneWidget,

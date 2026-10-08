@@ -6,11 +6,14 @@ import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dar
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/widgets/hours_options_sheet.dart';
 import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 
 Future<void> showLiturgicalCalendarSheet({
   required BuildContext context,
   required String pickerRoute,
   bool focusVariants = false,
+  String? diocese,
 }) async {
   final router = GoRouter.of(context);
   final advanced = await showModalBottomSheet<bool>(
@@ -19,16 +22,22 @@ Future<void> showLiturgicalCalendarSheet({
     useSafeArea: true,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => LiturgicalCalendarSheet(focusVariants: focusVariants),
+    builder: (_) =>
+        LiturgicalCalendarSheet(focusVariants: focusVariants, diocese: diocese),
   );
-  if (advanced == true) router.push(pickerRoute);
+  if (advanced == true) await router.push(pickerRoute);
 }
 
 /// Date and Office choices apply to the same session selection immediately.
 /// Keep the sheet open so the alternatives of the chosen date are visible.
 class LiturgicalCalendarSheet extends ConsumerStatefulWidget {
-  const LiturgicalCalendarSheet({super.key, this.focusVariants = false});
+  const LiturgicalCalendarSheet({
+    super.key,
+    this.focusVariants = false,
+    this.diocese,
+  });
   final bool focusVariants;
+  final String? diocese;
   @override
   ConsumerState<LiturgicalCalendarSheet> createState() => _CalendarSheetState();
 }
@@ -41,6 +50,23 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
     final presentation = ref.watch(liturgicalDayPresentationProvider);
     final ready = ref.watch(selectedDateReadyProvider);
     final navigation = ref.read(liturgicalNavigationControllerProvider);
+    void selectDate(DateTime date) {
+      final saved = ref.read(
+        hoursLiturgicalOverridesProvider,
+      )[liturgicalDateKey(date)];
+      final diocese = saved?.diocese ?? widget.diocese;
+      final id =
+          saved?.dayId ??
+          (diocese == null
+              ? null
+              : resolveHoursLiturgicalSelection(
+                  LiturgicalContentService()
+                      .contentForDate(date, diocese: diocese)
+                      .options,
+                ).dayId);
+      navigation.openDate(date, dayId: id, diocese: diocese);
+    }
+
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: 640,
@@ -78,7 +104,8 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
                     LiturgicalMonthCalendar(
                       initialDate: presentation.date,
                       seasonColor: presentation.accent,
-                      onSelected: navigation.openDate,
+                      diocese: widget.diocese,
+                      onSelected: selectDate,
                     )
                   else
                     TextButton.icon(
@@ -91,13 +118,13 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
                     child: TextButton(
                       key: const Key('liturgical-calendar-today'),
                       onPressed: () {
-                        navigation.openDate(DateTime.now());
+                        selectDate(DateTime.now());
                         setState(() => _calendarExpanded = true);
                       },
                       child: const Text('Сёння'),
                     ),
                   ),
-                  if (presentation.variantCount > 1)
+                  if (ready.hasValue)
                     HoursOptionsSheet(
                       date: presentation.date,
                       color: presentation.accent,
@@ -106,19 +133,14 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
                   else if (ready.hasError)
                     const Text('Не ўдалося адкрыць тэксты')
                   else
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Text(
-                        presentation.title,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
+                    const Center(child: CircularProgressIndicator.adaptive()),
                   const Divider(),
                   ListTile(
                     key: const Key('liturgical-calendar-picker'),
-                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.search),
                     title: const Text('Знайсці літургічны дзень'),
-                    trailing: const Icon(Icons.arrow_forward, size: 20),
+                    subtitle: const Text('Пошук паводле перыяду або свята'),
+                    trailing: const Icon(Icons.chevron_right, size: 20),
                     onTap: () => Navigator.pop(context, true),
                   ),
                 ],

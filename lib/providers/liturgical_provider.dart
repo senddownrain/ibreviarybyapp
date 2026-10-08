@@ -35,7 +35,13 @@ final dayContentsProvider = Provider<List<LiturgicalDayContent>>((ref) {
   ref.watch(selectedDateReadyProvider);
   ref.watch(cacheEpochProvider); // rebuild after a content update
   final date = ref.watch(selectedDateProvider);
-  final dioceses = ref.watch(dioceseSelectionProvider).ordered;
+  final contextDiocese = ref
+      .watch(hoursLiturgicalOverridesProvider)[_dateKey(date)]
+      ?.diocese;
+  final dioceses = <String>{
+    ?contextDiocese,
+    ...ref.watch(dioceseSelectionProvider).ordered,
+  };
   final service = LiturgicalContentService();
   return [
     for (final diocese in dioceses)
@@ -48,9 +54,13 @@ final dayContentsProvider = Provider<List<LiturgicalDayContent>>((ref) {
 final dayOptionsProvider = Provider<List<DayOption>>((ref) {
   final contents = ref.watch(dayContentsProvider);
   final selection = ref.watch(dioceseSelectionProvider);
+  final date = ref.watch(selectedDateProvider);
+  final contextDiocese = ref
+      .watch(hoursLiturgicalOverridesProvider)[_dateKey(date)]
+      ?.diocese;
   return unionDayOptions([
     for (final content in contents) (content.ordo.diocese, content.options),
-  ], primary: selection.primary);
+  ], primary: contextDiocese ?? selection.primary);
 });
 
 /// A manual choice on the Hours root: the document (assembly) and the

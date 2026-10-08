@@ -1,0 +1,88 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_screen_smoke_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: Ora day color reaches context without recoloring Reader or Aa
+[data] CACHE HIT  hour laudes ordinary-smoke
+[data] CACHE HIT  hour laudes smoke
+00:02 +1: ordinary-smoke laudes light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour laudes ordinary-smoke
+00:03 +2: sunday-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes sunday-smoke
+00:04 +3: smoke laudes light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour laudes smoke
+00:04 +4: smoke laudes dark 24.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour laudes smoke
+00:05 +5: smoke vespers light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour vespers smoke
+00:05 +6: smoke lectionis light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour lectionis smoke
+00:06 +7: smoke morning light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour morning smoke
+00:07 +8: smoke terz light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour terz smoke
+00:07 +9: smoke sext light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour sext smoke
+00:07 +10: smoke non light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour non smoke
+00:08 +11: smoke completorium light 16.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour completorium smoke
+00:08 +12: smoke completorium dark 24.0 900.0x1600.0 builds document
+[data] CACHE HIT  hour completorium smoke
+00:08 +13: smoke laudes light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour laudes smoke
+00:09 +14: smoke lectionis light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour lectionis smoke
+00:09 +15: smoke terz light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour terz smoke
+00:09 +16: smoke completorium light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour completorium smoke
+00:09 +17: smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes smoke
+00:10 +18: smoke lectionis light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour lectionis smoke
+00:10 +19: smoke sext light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour sext smoke
+00:11 +20: smoke completorium dark 24.0 390.0x844.0 builds document
+[data] CACHE HIT  hour completorium smoke
+00:11 +21: smoke morning light 16.0 360.0x800.0 builds document
+[data] CACHE HIT  hour morning smoke
+00:12 +22: smoke morning dark 24.0 390.0x844.0 builds document
+[data] CACHE HIT  hour morning smoke
+00:12 +23: smoke non light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour non smoke
+00:13 +24: structured-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes structured-smoke
+00:13 +25: single-ant-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes single-ant-smoke
+00:13 +26: plain-ant-smoke laudes light 16.0 390.0x844.0 builds document
+[data] CACHE HIT  hour laudes plain-ant-smoke
+00:14 +27: Laudes, Sext and structured psalms have equal geometry
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour terz smoke
+[data] CACHE HIT  hour laudes structured-smoke
+00:14 +28: hymn, prayer and intercession roles keep one geometry
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour lectionis smoke
+[data] CACHE HIT  hour terz smoke
+[data] CACHE HIT  hour sext smoke
+[data] CACHE HIT  hour non smoke
+[data] CACHE HIT  hour vespers smoke
+[data] CACHE HIT  hour completorium smoke
+[data] CACHE HIT  hour morning smoke
+00:17 +29: Gospel canticle metadata stays centered at 360.0 px
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour vespers smoke
+[data] CACHE HIT  hour completorium smoke
+[data] CACHE HIT  hour morning smoke
+00:18 +30: Gospel canticle metadata stays centered at 390.0 px
+[data] CACHE HIT  hour laudes smoke
+[data] CACHE HIT  hour vespers smoke
+[data] CACHE HIT  hour completorium smoke
+[data] CACHE HIT  hour morning smoke
+00:19 +31: single antiphon has one opening and one repeat
+[data] CACHE HIT  hour laudes single-ant-smoke
+00:20 +32: readings light 16.0 900.0x1600.0 builds document
+00:21 +33: readings dark 24.0 900.0x1600.0 builds document
+00:22 +34: readings light 16.0 360.0x800.0 builds document
+00:24 +35: readings dark 24.0 390.0x844.0 builds document
+00:24 +36: (tearDownAll)
+00:25 +36: All tests passed!

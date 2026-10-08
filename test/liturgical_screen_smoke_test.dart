@@ -30,6 +30,13 @@ double _fontSize = 16;
 class _SmokeSettings extends SettingsNotifier {
   @override
   SettingsState build() => SettingsState(fontSize: _fontSize);
+
+  // This UI fixture does not open SettingsNotifier's private Hive box. Keep
+  // slider changes in memory; persistence has its own real-I/O tests.
+  @override
+  void setFontSize(double size) {
+    state = state.copyWith(fontSize: normalizeReaderFontSize(size));
+  }
 }
 
 void main() {
@@ -786,17 +793,32 @@ void main() {
             closeTo(requestedSize, .001),
           );
         }
-        final body = tester.widget<Text>(
-          find.text('Браты, я вельмі ўзрадаваўся ў Пану.', findRichText: true),
+        final bodyFinder = find.text(
+          'Браты, я вельмі ўзрадаваўся ў Пану.',
+          findRichText: true,
         );
-        expect(
-          (body.textSpan! as TextSpan).children!.first.style!.fontSize,
-          closeTo(requestedSize, .001),
+        final body = tester.widget<RichText>(bodyFinder);
+        final sizes = _renderedFontSizes(
+          body.text,
+          DefaultTextStyle.of(tester.element(bodyFinder)).style,
         );
+        expect(sizes, isNotEmpty);
+        expect(sizes, everyElement(closeTo(requestedSize, .001)));
         expect(tester.takeException(), isNull);
       }
     });
   }
+}
+
+// HTML and sentence highlighting both inherit styles through nested spans.
+List<double?> _renderedFontSizes(InlineSpan span, TextStyle inherited) {
+  if (span is! TextSpan) return const [];
+  final style = inherited.merge(span.style);
+  return [
+    if ((span.text ?? '').trim().isNotEmpty) style.fontSize,
+    for (final child in span.children ?? <InlineSpan>[])
+      ..._renderedFontSizes(child, style),
+  ];
 }
 
 Future<void> _captureIfRequested(WidgetTester tester, String name) async {
