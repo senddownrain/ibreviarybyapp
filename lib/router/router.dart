@@ -799,6 +799,8 @@ Widget _readingsHost(GoRouterState state) {
     return ReadingsBranchHost(
       liturgicalKey: '$period/$week/$day',
       dayId: query['dayId'],
+      massSetId: query['set'],
+      cycle: query['year'],
     );
   }
   final rawDate = query['date'];
@@ -813,6 +815,8 @@ Widget _readingsHost(GoRouterState state) {
     date: date,
     dayId: query['dayId'],
     diocese: query['diocese'],
+    massSetId: query['set'],
+    cycle: query['year'],
   );
 }
 

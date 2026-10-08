@@ -68,10 +68,18 @@ class ReadingsBranchHost extends ConsumerStatefulWidget {
     this.diocese,
     this.liturgicalKey,
     this.invalidContext,
+    this.massSetId,
+    this.cycle,
   });
 
   final DateTime? date;
   final String? dayId;
+
+  /// Mass reading set of the route (`?set=`), e.g. `vigil` of 15.08.
+  final String? massSetId;
+
+  /// Lectionary cycle of the route (`?year=A|B|C`).
+  final String? cycle;
 
   /// Diocese context of the route (`?diocese=`), never written to Settings.
   final String? diocese;
@@ -151,6 +159,8 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
             key: ValueKey('readings-liturgical-${state.liturgicalKey}'),
             liturgicalKey: state.liturgicalKey,
             dayId: state.dayId,
+            requestedSetId: widget.massSetId,
+            requestedCycle: widget.cycle,
           )
         : ReadingsScreen(
             key: ValueKey(
@@ -158,6 +168,8 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
             ),
             dateStr: _dateKey(sharedDate),
             dayId: sharedDayId,
+            requestedSetId: widget.massSetId,
+            requestedCycle: widget.cycle,
           );
 
     final navigation = AppNavigationScope.of(context);

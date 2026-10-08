@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/models/mass_reading_sets.dart';
+
 /// Parse psalm verses — supports both `List<String>` and
 /// `List<{number, text}>` formats.
 List<String> _parseVerses(dynamic raw) {
@@ -70,6 +72,13 @@ class ParsedReading {
   final ParsedSection? psalm;
   final ParsedSection? alleluia;
   final ParsedSection? gospel;
+  final ParsedSection? sequence;
+
+  /// Structured Mass reading sets (vigil/day, A/B/C, Passion by roles).
+  final MassReadings? massReadings;
+
+  /// A legacy document covered by a canonical document with sets.
+  final MassReadingsRef? massReadingsRef;
 
   // Metadata
   final String? title;
@@ -96,6 +105,9 @@ class ParsedReading {
     this.psalm,
     this.alleluia,
     this.gospel,
+    this.sequence,
+    this.massReadings,
+    this.massReadingsRef,
     this.title,
     this.periodType,
     this.periodWeekNumber,
@@ -118,6 +130,9 @@ class ParsedReading {
   /// Whether this has a second reading (Sunday/solemnity).
   bool get hasTwoReadings => reading2 != null;
 
+  /// The document carries structured Mass reading sets.
+  bool get hasMassReadingSets => massReadings != null;
+
   factory ParsedReading.fromMap(String docId, Map<String, dynamic> map) {
     ParsedSection? section(String key) {
       final v = map[key];
@@ -134,6 +149,9 @@ class ParsedReading {
       psalm: section('psalm'),
       alleluia: section('alleluia'),
       gospel: section('gospel'),
+      sequence: section('sequence'),
+      massReadings: MassReadings.fromMap(map['massReadings']),
+      massReadingsRef: MassReadingsRef.fromMap(map['_massReadingsRef']),
       title: _asString(map['title']),
       periodType: map['_periodType'] as String?,
       periodWeekNumber: _toInt(map['_periodWeekNumber']),
@@ -183,6 +201,7 @@ class ParsedReading {
       if (psalm != null) 'psalm': _sectionToMap(psalm!),
       if (alleluia != null) 'alleluia': _sectionToMap(alleluia!),
       if (gospel != null) 'gospel': _sectionToMap(gospel!),
+      if (sequence != null) 'sequence': _sectionToMap(sequence!),
       if (title != null) 'title': title,
       if (periodType != null) '_periodType': periodType,
       if (periodWeekNumber != null) '_periodWeekNumber': periodWeekNumber,
