@@ -1,11 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+
+/// One transient selection for every psalm and canticle in an open Office.
+class PsalmodyScope extends InheritedNotifier<ValueNotifier<int?>> {
+  const PsalmodyScope({
+    super.key,
+    required ValueNotifier<int?> controller,
+    required this.verseLayout,
+    required this.markerBreakMode,
+    required super.child,
+  }) : super(notifier: controller);
+
+  final PsalmVerseLayout verseLayout;
+  final PsalmMarkerBreakMode markerBreakMode;
+
+  static PsalmodyScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<PsalmodyScope>();
+
+  @override
+  bool updateShouldNotify(PsalmodyScope oldWidget) =>
+      verseLayout != oldWidget.verseLayout ||
+      markerBreakMode != oldWidget.markerBreakMode ||
+      super.updateShouldNotify(oldWidget);
+}
 
 /// Renders psalm strophes as two alternating choirs.
 ///
-/// Tapping a strophe keeps its choir at full contrast and dims the other one.
-/// Tapping the selected choir again returns the psalm to its neutral state.
+/// Tapping a strophe dims its choir throughout the current Office.
+/// Tapping the selected choir again returns to the neutral state.
 class PsalmChoirHtml extends StatefulWidget {
   final String html;
   final Map<String, Style> style;
@@ -35,12 +59,21 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
 
   @override
   Widget build(BuildContext context) {
+    final scope = PsalmodyScope.maybeOf(context);
+    final selected = scope == null ? _selectedChoir : scope.notifier!.value;
+    final aligned = scope?.verseLayout == PsalmVerseLayout.alignedLeft;
+    final breakAfter =
+        scope?.markerBreakMode == PsalmMarkerBreakMode.breakAfterMarker;
     // The alternating inset already identifies the choirs, so the selection
     // state only needs a restrained contrast change.
     final dimmedText = widget.textColor.withValues(alpha: 0.60);
     return Html(
-      key: ValueKey(_selectedChoir),
-      data: preparePsalmChoirHtml(widget.html, selectedChoir: _selectedChoir),
+      key: ValueKey((selected, aligned, breakAfter)),
+      data: preparePsalmChoirHtml(
+        widget.html,
+        selectedChoir: selected,
+        breakAfterMarker: breakAfter,
+      ),
       onLinkTap: (url, attributes, element) {
         final choir = switch (url) {
           'psalm-choir:1' => 1,
@@ -48,12 +81,38 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
           _ => null,
         };
         if (choir == null) return;
+        if (scope != null) {
+          scope.notifier!.value = selected == choir ? null : choir;
+          return;
+        }
         setState(() {
           _selectedChoir = _selectedChoir == choir ? null : choir;
         });
       },
       style: {
         ...widget.style,
+        if (aligned) ...{
+          '.psalm-strophe-even': Style(
+            margin: Margins.only(
+              left: 0,
+              bottom:
+                  widget.style['.psalm-strophe']?.margin?.bottom?.value ?? 8,
+            ),
+          ),
+          '.psalm-strophe-even.semantic-last': Style(margin: Margins.zero),
+        },
+        '.psalm-line': Style(display: Display.block, margin: Margins.zero),
+        '.psalm-continuation': Style(
+          padding: HtmlPaddings.only(
+            left:
+                MediaQuery.textScalerOf(context).scale(
+                  widget.style['p']?.fontSize?.value ??
+                      widget.style['body']?.fontSize?.value ??
+                      16,
+                ) *
+                .8,
+          ),
+        ),
         '.psalm-choir-strophe': Style(
           color: widget.textColor,
           textDecoration: TextDecoration.none,

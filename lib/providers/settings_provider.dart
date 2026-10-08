@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -113,6 +114,8 @@ class SettingsState {
   final String bibleVersionId;
   final String startSection;
   final String lastSection;
+  final PsalmVerseLayout psalmVerseLayout;
+  final PsalmMarkerBreakMode psalmMarkerBreakMode;
 
   /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
@@ -128,6 +131,8 @@ class SettingsState {
     this.bibleVersionId = 'bel',
     this.startSection = 'hours',
     this.lastSection = 'hours',
+    this.psalmVerseLayout = PsalmVerseLayout.alternatingIndent,
+    this.psalmMarkerBreakMode = PsalmMarkerBreakMode.inline,
     this.prayerCategoryMap = const {},
   });
 
@@ -149,6 +154,8 @@ class SettingsState {
     String? bibleVersionId,
     String? startSection,
     String? lastSection,
+    PsalmVerseLayout? psalmVerseLayout,
+    PsalmMarkerBreakMode? psalmMarkerBreakMode,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
     themeMode: themeMode ?? this.themeMode,
@@ -162,6 +169,8 @@ class SettingsState {
     bibleVersionId: bibleVersionId ?? this.bibleVersionId,
     startSection: startSection ?? this.startSection,
     lastSection: lastSection ?? this.lastSection,
+    psalmVerseLayout: psalmVerseLayout ?? this.psalmVerseLayout,
+    psalmMarkerBreakMode: psalmMarkerBreakMode ?? this.psalmMarkerBreakMode,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
   );
 }
@@ -193,6 +202,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     };
     return SettingsState(
       themeMode: _parseTheme(mode),
+      psalmVerseLayout: _box.get('psalmVerseLayout') == 'alignedLeft'
+          ? PsalmVerseLayout.alignedLeft
+          : PsalmVerseLayout.alternatingIndent,
+      psalmMarkerBreakMode:
+          _box.get('psalmMarkerBreakMode') == 'breakAfterMarker'
+          ? PsalmMarkerBreakMode.breakAfterMarker
+          : PsalmMarkerBreakMode.inline,
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -224,6 +240,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('themeMode', _themeName(state.themeMode));
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
+    await _box.put('psalmVerseLayout', state.psalmVerseLayout.name);
+    await _box.put('psalmMarkerBreakMode', state.psalmMarkerBreakMode.name);
     await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
@@ -279,6 +297,16 @@ class SettingsNotifier extends Notifier<SettingsState> {
   void setKeepScreenOn(bool value) {
     state = state.copyWith(keepScreenOn: value);
     _save();
+  }
+
+  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) {
+    state = state.copyWith(psalmVerseLayout: value);
+    return _save();
+  }
+
+  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) {
+    state = state.copyWith(psalmMarkerBreakMode: value);
+    return _save();
   }
 
   Future<void> toggleFavorite(String id) {

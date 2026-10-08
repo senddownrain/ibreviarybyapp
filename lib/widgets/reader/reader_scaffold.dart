@@ -4,6 +4,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
+import 'package:mybrev_flutter/widgets/reader/hour_switcher_pill.dart';
 
 /// Navigation/chrome density requested by the application shell.
 ///
@@ -87,6 +88,9 @@ class ReaderScaffold extends StatelessWidget {
     this.onSwipeNext,
     this.followSwipeDrag = false,
     this.overlay,
+    this.hourTitle,
+    this.hourTitleAnchor,
+    this.onChangeHour,
   });
 
   final Widget content;
@@ -118,6 +122,9 @@ class ReaderScaffold extends StatelessWidget {
   /// Reader-specific floating control layered above the text (for example the
   /// Holy Mass section navigator). Hidden together with the chrome.
   final Widget? overlay;
+  final String? hourTitle;
+  final GlobalKey? hourTitleAnchor;
+  final VoidCallback? onChangeHour;
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +213,18 @@ class ReaderScaffold extends StatelessWidget {
             scrollView,
           ReaderEdgeProtection(mode: resolvedMode),
           if (resolvedMode != ReaderChromeMode.hidden) ?overlay,
+          if (resolvedMode != ReaderChromeMode.hidden &&
+              hourTitle != null &&
+              hourTitleAnchor != null &&
+              onChangeHour != null &&
+              scrollController != null)
+            HourSwitcherPill(
+              controller: scrollController!,
+              titleAnchor: hourTitleAnchor!,
+              title: hourTitle!,
+              onTap: onChangeHour!,
+              topInset: MediaQuery.paddingOf(context).top + 56,
+            ),
           if (showScrollToTop && scrollController != null)
             _ReaderScrollToTopControl(
               controller: scrollController!,
@@ -313,6 +332,9 @@ class _ReaderScrollToTopControlState extends State<_ReaderScrollToTopControl> {
   void initState() {
     super.initState();
     widget.controller.addListener(_handleScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _handleScroll();
+    });
   }
 
   @override
@@ -349,7 +371,7 @@ class _ReaderScrollToTopControlState extends State<_ReaderScrollToTopControl> {
         role: ChromeSurfaceRole.control,
         borderRadius: BorderRadius.circular(24),
         child: SizedBox.square(
-          dimension: 48,
+          dimension: 44,
           child: IconButton(
             key: const Key('reader-scroll-to-top'),
             tooltip: 'Вярнуцца ўверх',
@@ -606,6 +628,7 @@ class ReaderContextHeader extends StatelessWidget {
     this.eyebrowStyle,
     this.subtitleStyle,
     this.actions = const [],
+    this.titleAnchorKey,
   });
 
   final String title;
@@ -619,6 +642,7 @@ class ReaderContextHeader extends StatelessWidget {
   final TextStyle? eyebrowStyle;
   final TextStyle? subtitleStyle;
   final List<Widget> actions;
+  final GlobalKey? titleAnchorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -671,6 +695,7 @@ class ReaderContextHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   onTap: onTitleTap,
                   child: Padding(
+                    key: titleAnchorKey,
                     padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

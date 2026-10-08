@@ -139,3 +139,23 @@ bool isHourAvailable(
   }
   return hour.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
 }
+
+/// The picker and the document footer share both ordering and availability.
+HoraItem? nextAvailableHour(
+  LiturgicalDay day,
+  String currentType, {
+  bool? completoriumAvailable,
+}) {
+  final index = kHoraItems.indexWhere((hour) => hour.type == currentType);
+  if (index < 0) return null;
+  return kHoraItems
+      .skip(index + 1)
+      .where(
+        (hour) => isHourAvailable(
+          day,
+          hour,
+          completoriumAvailable: completoriumAvailable,
+        ),
+      )
+      .firstOrNull;
+}

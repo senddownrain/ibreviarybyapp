@@ -53,31 +53,31 @@ void main() {
       expect(result, contains('<span class="psalm-marker">†</span>'));
     });
 
-    test('prepares alternating choirs and dims only the opposite choir', () {
+    test('prepares alternating choirs and dims only the selected choir', () {
       final formatted = formatPsalmHtml(
         '<p>Першы радок *<br>другі радок</p>'
         '<p>Трэці радок *<br>чацвёрты радок</p>',
       );
 
       final neutral = preparePsalmChoirHtml(formatted);
-      expect(neutral, contains('href="psalm-choir:1"'));
       expect(neutral, contains('href="psalm-choir:2"'));
+      expect(neutral, contains('href="psalm-choir:1"'));
       expect(neutral, isNot(contains('psalm-choir-muted')));
 
       final firstSelected = preparePsalmChoirHtml(formatted, selectedChoir: 1);
-      final secondChoirLinks = RegExp(
-        'href="psalm-choir:2"',
+      final firstChoirLinks = RegExp(
+        'href="psalm-choir:1"',
       ).allMatches(firstSelected).length;
-      expect(secondChoirLinks, greaterThan(0));
+      expect(firstChoirLinks, greaterThan(0));
       expect(
         RegExp('psalm-choir-muted').allMatches(firstSelected),
-        hasLength(secondChoirLinks),
+        hasLength(firstChoirLinks),
       );
       expect(
         firstSelected,
         isNot(
           contains(
-            'href="psalm-choir:1" class="psalm-choir-strophe '
+            'href="psalm-choir:2" class="psalm-choir-strophe '
             'psalm-choir-muted"',
           ),
         ),
@@ -85,7 +85,7 @@ void main() {
       expect(
         firstSelected,
         contains(
-          'href="psalm-choir:2" class="psalm-choir-strophe '
+          'href="psalm-choir:1" class="psalm-choir-strophe '
           'psalm-choir-muted"',
         ),
       );

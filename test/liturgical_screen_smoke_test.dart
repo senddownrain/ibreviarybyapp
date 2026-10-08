@@ -7,6 +7,9 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:html/parser.dart' show parseFragment;
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -36,6 +39,16 @@ class _SmokeSettings extends SettingsNotifier {
   @override
   void setFontSize(double size) {
     state = state.copyWith(fontSize: normalizeReaderFontSize(size));
+  }
+
+  @override
+  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) async {
+    state = state.copyWith(psalmVerseLayout: value);
+  }
+
+  @override
+  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) async {
+    state = state.copyWith(psalmMarkerBreakMode: value);
   }
 }
 
@@ -189,6 +202,166 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  testWidgets(
+    'Office navigation preserves date and option and resets choir selection',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 720);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      _fontSize = 24;
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+      );
+      addTearDown(container.dispose);
+      final router = GoRouter(
+        initialLocation:
+            '/hours/ora/2028-08-01/smoke/laudes?option=chosen-variant',
+        routes: [
+          GoRoute(
+            path: '/hours/ora/:date/:dayId/:type',
+            builder: (context, state) => OraScreen(
+              key: ValueKey(state.uri),
+              date: DateTime.parse(state.pathParameters['date']!),
+              dayId: state.pathParameters['dayId']!,
+              oraType: state.pathParameters['type']!,
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final psalms = find.byType(PsalmChoirHtml);
+      expect(psalms, findsNWidgets(4)); // Three psalms and Benedictus.
+      Html firstPsalm() => tester.widget<Html>(
+        find.descendant(of: psalms.first, matching: find.byType(Html)),
+      );
+      firstPsalm().onLinkTap!('psalm-choir:1', {}, null);
+      await tester.pump();
+      for (final psalm in psalms.evaluate()) {
+        final html = tester.widget<Html>(
+          find.descendant(
+            of: find.byWidget(psalm.widget),
+            matching: find.byType(Html),
+          ),
+        );
+        expect(html.data, contains('psalm-choir-muted'));
+      }
+      final settings = container.read(settingsProvider.notifier);
+      await settings.setPsalmVerseLayout(PsalmVerseLayout.alignedLeft);
+      await settings.setPsalmMarkerBreakMode(
+        PsalmMarkerBreakMode.breakAfterMarker,
+      );
+      await tester.pumpAndSettle();
+      expect(firstPsalm().data, contains('psalm-continuation'));
+      expect(firstPsalm().data, contains('psalm-choir-muted'));
+      final reader = tester.widget<ReaderScaffold>(find.byType(ReaderScaffold));
+      final scroll = reader.scrollController!;
+      scroll.jumpTo(scroll.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      final next = find.byKey(const Key('ora-next-hour'));
+      final up = find.byKey(const Key('reader-scroll-to-top'));
+      expect(tester.getRect(next).overlaps(tester.getRect(up)), isFalse);
+      await tester.tap(next);
+      await tester.pumpAndSettle();
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/hours/ora/2028-08-01/smoke/terz',
+      );
+      expect(
+        router.routeInformationProvider.value.uri.queryParameters['option'],
+        'chosen-variant',
+      );
+      expect(
+        tester
+            .widget<ReaderScaffold>(find.byType(ReaderScaffold))
+            .scrollController!
+            .offset,
+        0,
+      );
+      for (final psalm in find.byType(PsalmChoirHtml).evaluate()) {
+        final html = tester.widget<Html>(
+          find.descendant(
+            of: find.byWidget(psalm.widget),
+            matching: find.byType(Html),
+          ),
+        );
+        expect(html.data, isNot(contains('psalm-choir-muted')));
+      }
+      final currentReader = tester.widget<ReaderScaffold>(
+        find.byType(ReaderScaffold),
+      );
+      currentReader.scrollController!.jumpTo(
+        currentReader.scrollController!.position.maxScrollExtent,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('hour-switcher-pill')));
+      await tester.pumpAndSettle();
+      expect(find.text('Літургія гадзінаў'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Камплета'),
+        180,
+        scrollable: find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.ensureVisible(find.text('Камплета'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Камплета'));
+      await tester.pumpAndSettle();
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/hours/ora/2028-08-01/smoke/completorium',
+      );
+      expect(
+        router.routeInformationProvider.value.uri.queryParameters['option'],
+        'chosen-variant',
+      );
+      expect(find.byKey(const Key('ora-next-hour')), findsNothing);
+      final canticle = tester.widget<Html>(
+        find.descendant(
+          of: find.byType(PsalmChoirHtml).last,
+          matching: find.byType(Html),
+        ),
+      );
+      expect(
+        parseFragment(canticle.data!).querySelectorAll('.psalm-continuation'),
+        isNotEmpty,
+      );
+      canticle.onLinkTap!('psalm-choir:1', {}, null);
+      await tester.pump();
+      router.go(
+        '/hours/ora/2028-08-02/ordinary-smoke/laudes?option=other-variant',
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<ReaderScaffold>(find.byType(ReaderScaffold))
+            .scrollController!
+            .offset,
+        0,
+      );
+      for (final psalm in find.byType(PsalmChoirHtml).evaluate()) {
+        final html = tester.widget<Html>(
+          find.descendant(
+            of: find.byWidget(psalm.widget),
+            matching: find.byType(Html),
+          ),
+        );
+        expect(html.data, isNot(contains('psalm-choir-muted')));
+      }
+
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('Ora day color reaches context without recoloring Reader or Aa', (
     tester,
   ) async {
@@ -278,6 +451,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
+      expect(find.byKey(const Key('ora-source-footer')), findsOneWidget);
       expect(tester.takeException(), isNull);
       final headings = tester
           .widgetList<LiturgicalSectionHeading>(
@@ -722,6 +896,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      expect(find.byKey(const Key('readings-source-footer')), findsOneWidget);
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
       final responseColor = ReaderTheme.of(
