@@ -93,6 +93,83 @@ void main() {
     expect(find.byKey(const Key('ordo-open-hours')), findsOneWidget);
   });
 
+  testWidgets('books volumes above the notes; All Souls on Sunday names the '
+      'Office of the Sunday', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pump(tester, app(DateTime(2025, 11, 2)));
+    expect(tester.takeException(), isNull);
+    final books = find.text('Лекцыянарый т. III · Літургія гадзін т. III');
+    await tester.scrollUntilVisible(
+      books,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(books, findsOneWidget);
+    // Facts line, above the celebrations and the notes.
+    expect(
+      tester.getTopLeft(books).dy,
+      lessThan(tester.getTopLeft(find.text('СВЯТКАВАННІ ДНЯ')).dy),
+    );
+    expect(
+      tester.getTopLeft(books).dy,
+      lessThan(
+        tester.getTopLeft(find.text('НАТАТКІ ORDO', skipOffstage: false)).dy,
+      ),
+    );
+    // The books note is not repeated among the notes.
+    expect(find.text('Лекцыянарый т. III', skipOffstage: false), findsNothing);
+    // Mass of All Souls is the primary celebration; the Hours are of the
+    // Sunday.
+    expect(
+      find.byKey(
+        const Key('ordo-row-all-faithful-departed-primary'),
+        skipOffstage: false,
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('ordo-office-split'), skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Літургія гадзін — з дня:', skipOffstage: false),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('13.06.2026: two memorial choices, no demotion badge', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pump(tester, app(DateTime(2026, 6, 13)));
+    expect(
+      find.byKey(
+        const Key('ordo-row-immaculate-heart-primary'),
+        skipOffstage: false,
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(
+        const Key('ordo-row-sv-anthony-padua-alternative'),
+        skipOffstage: false,
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Абодва ўспаміны неабавязковыя', skipOffstage: false),
+      findsNothing,
+    );
+    expect(
+      find.text('ПА ВЫБАРЫ · Успамін', skipOffstage: false),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('a date with several legal colours shows a segmented marker', (
     tester,
   ) async {

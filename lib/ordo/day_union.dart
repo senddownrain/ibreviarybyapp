@@ -4,6 +4,7 @@
 library;
 
 import 'package:mybrev_flutter/ordo/engine.dart';
+import 'package:mybrev_flutter/ordo/notes.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 
@@ -47,6 +48,27 @@ class OrdoDayUnion {
 
   OrdoDay dayOf(String diocese) =>
       days.firstWhere((day) => day.diocese == diocese, orElse: () => first);
+
+  /// Lectionary / Hours volumes line of every diocese (mybrev
+  /// `booksLabel`): one line when the dioceses agree, else one per
+  /// distinct label with the diocesan badges. Empty without notes.
+  List<(String, List<String>)> booksLines(OrdoBooks? Function(OrdoDay) of) {
+    final lines = <String, List<String>>{};
+    for (final day in days) {
+      final label = of(day)?.label ?? '';
+      if (label.isEmpty) continue;
+      (lines[label] ??= []).add(day.diocese);
+    }
+    return [
+      for (final MapEntry(key: label, value: dioceses) in lines.entries)
+        (
+          label,
+          dioceses.length == days.length
+              ? const <String>[]
+              : [for (final id in dioceses) kDioceseBadges[id] ?? id],
+        ),
+    ];
+  }
 }
 
 OrdoDayUnion buildOrdoDayUnion(List<OrdoDay> days) {
@@ -135,12 +157,13 @@ String dayMonthLabel(String iso) {
   return '$day ${_months[month - 1]}';
 }
 
-/// Short badges of an option: transfer, demotion, Belarus layer.
+/// Short badges of an option: transfer, provisional decision, Belarus
+/// layer.
 List<String> ordoOptionNotes(OrdoOption option) => [
   if (option.transferredFrom != null)
     'Перанесена з ${dayMonthLabel(option.transferredFrom!)}',
   if (option.movedFrom != null)
     'Перанесена з ${dayMonthLabel(option.movedFrom!)}',
-  if (option.demotedFrom != null) 'Абодва ўспаміны неабавязковыя',
+  if (option.provisional) 'Часовае рашэнне: абодва варыянты',
   if (option.layer == 'belarus') 'Уласны каляндар Беларусі',
 ];

@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
+import 'package:mybrev_flutter/ordo/engine.dart';
 import 'package:mybrev_flutter/ordo/reading_references.dart';
 import 'package:mybrev_flutter/ordo/runtime.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
@@ -401,6 +402,11 @@ class _DayDetail extends ConsumerWidget {
         }
       }
     }
+    // Lectionary / Liturgy of the Hours volumes (§13.1): one line in the
+    // facts, above the notes.
+    final books = notesReady
+        ? union.booksLines(engine.booksOf)
+        : const <(String, List<String>)>[];
     final index = ReadingReferenceIndex.current();
     final references = {
       for (final ordo in union.days)
@@ -445,6 +451,17 @@ class _DayDetail extends ConsumerWidget {
               color: cs.onSurfaceVariant,
             ),
           ),
+          for (final (label, badges) in books)
+            Padding(
+              key: Key('ordo-books-${badges.join('-')}'),
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                [label, ...badges].join(' · '),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+            ),
           const SizedBox(height: 12),
           VestmentColorLine(colors: union.colors, marianAccent: marianAccent),
           if (union.days.length > 1 && union.differs) ...[
@@ -470,6 +487,11 @@ class _DayDetail extends ConsumerWidget {
               row: row,
               date: date,
               references: references[row.dioceses.first]?[row.option.id],
+              // The Office source may differ from the Mass (All Souls on
+              // a Sunday: the Hours are of the Sunday, §11.1).
+              officeSource: row.role == 'primary'
+                  ? union.dayOf(row.dioceses.first).sources
+                  : null,
             ),
           const SizedBox(height: 14),
           FilledButton.icon(
@@ -567,11 +589,15 @@ class _CelebrationRow extends ConsumerWidget {
     required this.row,
     required this.date,
     required this.references,
+    this.officeSource,
   });
 
   final OrdoUnionRow row;
   final DateTime date;
   final OptionReadingReferences? references;
+
+  /// Office / Mass sources of the primary row's day.
+  final OrdoSources? officeSource;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -636,6 +662,16 @@ class _CelebrationRow extends ConsumerWidget {
                     children: [for (final chip in chips) _Badge(chip)],
                   ),
                 ],
+                if (officeSource?.split == true) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Літургія гадзін — з дня: ${officeSource!.office.title}',
+                    key: const Key('ordo-office-split'),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ],
                 if (references != null) ...[
                   const SizedBox(height: 6),
                   _References(references: references!),
@@ -649,8 +685,13 @@ class _CelebrationRow extends ConsumerWidget {
                         style: TextButton.styleFrom(
                           minimumSize: const Size(48, 44),
                         ),
-                        onPressed: () =>
-                            _openHours(context, ref, date, option.id, diocese),
+                        onPressed: () => _openHours(
+                          context,
+                          ref,
+                          date,
+                          officeSource?.office.optionId ?? option.id,
+                          diocese,
+                        ),
                         icon: const PhosphorIcon(
                           PhosphorIconsRegular.clock,
                           size: 18,

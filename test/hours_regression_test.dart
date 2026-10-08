@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
@@ -99,13 +100,76 @@ void main() {
   });
 
   test('All Souls: the Office for the Dead, not the weekday', () {
-    for (final year in [2026, 2027, 2031]) {
+    // 2025 and 2031: 2 November is a Sunday (separate test below).
+    for (final year in [2026, 2027, 2030]) {
       final content = service.contentForDate(DateTime(year, 11, 2));
       expect(content.ordo.primary.id, 'all-faithful-departed', reason: '$year');
       expect(content.ordo.primary.officeKind, 'all-souls');
       expect(
         content.options.any((option) => option.ordo?.officeKind == 'weekday'),
         isFalse,
+      );
+    }
+  });
+
+  test('All Souls on a Sunday: the Hours are of the Sunday, the Mass of All '
+      'Souls (§11.1)', () {
+    for (final date in [DateTime(2025, 11, 2), DateTime(2031, 11, 2)]) {
+      for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+        final content = service.contentForDate(date, diocese: diocese);
+        final ordo = content.ordo;
+        expect(ordo.primary.id, 'all-faithful-departed', reason: '$date');
+        expect(ordo.sources.split, isTrue);
+        expect(ordo.sources.mass.optionId, 'all-faithful-departed');
+        // One Office card: the Sunday. No All Souls Office, no votive
+        // Office for the Dead.
+        expect(content.options, hasLength(1), reason: '$date $diocese');
+        final sunday = content.options.single;
+        expect(sunday.ordo!.optionId, ordo.sources.office.optionId);
+        expect(sunday.ordo!.officeKind, 'sunday');
+        expect(sunday.source, LiturgicalOptionSource.period);
+        expect(
+          content.options.any(
+            (o) => o.source == LiturgicalOptionSource.officeForDead,
+          ),
+          isFalse,
+        );
+        expect(sunday.day!.data['officeOfReadingsTeDeum'], isNot(false));
+        expect(content.unavailable, isEmpty);
+      }
+    }
+    // The Monday after is an ordinary weekday again (no split).
+    expect(service.contentForDate(DateTime(2025, 11, 3)).ordo.isSplit, false);
+  });
+
+  test('Immaculate Heart + St Anthony (13.06.2026): exactly two memorial '
+      'Offices, no weekday card (§11.2)', () {
+    for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+      final content = service.contentForDate(
+        DateTime(2026, 6, 13),
+        diocese: diocese,
+      );
+      expect(
+        [for (final option in content.options) option.ordo?.optionId],
+        ['immaculate-heart', 'sv-anthony-padua'],
+        reason: diocese,
+      );
+      expect(content.options.first.ordo!.role, 'primary');
+      expect(content.options.last.ordo!.role, 'alternative');
+      expect(
+        content.options.any((o) => o.ordo?.kind == 'temporal'),
+        isFalse,
+        reason: 'the weekday is not a third option',
+      );
+      // The Immaculate Heart card has no «З дня» assembly; St Anthony keeps
+      // the rubrical memorial choice of the day's psalmody, as on the web.
+      expect(
+        content.options.first.templates.map((t) => t.choice),
+        isNot(contains(kCurrentDayChoice)),
+      );
+      expect(
+        content.options.first.templates.map((t) => t.label),
+        isNot(contains(kCurrentDayLabel)),
       );
     }
   });
