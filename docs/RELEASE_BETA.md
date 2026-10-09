@@ -51,10 +51,19 @@ GitHub → Actions → **MyBrev Beta Release** → Run workflow:
 `release_notes`. Manual only; one run at a time; the summary shows the commit,
 versions, build numbers and destinations; iOS and Android report separately.
 
-Runs on the self-hosted runner with labels `self-hosted, macOS,
-mybrev-release` (this Mac). Check it first with **Release runner smoke test**.
+Where it runs:
 
-### Secrets — environment `beta` (names only)
+- **Android** — a GitHub-hosted Linux runner (`ubuntu-latest`): no Mac needed.
+  Flutter, Java 17 and Ruby are installed by the workflow itself.
+- **iOS** — the self-hosted runner with labels `self-hosted, macOS,
+  mybrev-release` (this Mac must be on; Apple signing needs macOS). Check it
+  first with **Release runner smoke test**.
+- **Summary** — a Linux runner, so a run still reports when the Mac is off
+  (the iOS job then simply waits for the runner).
+
+Running only Android (`platform: android`) never touches the Mac.
+
+### Secrets — repository secrets (names only; Settings → Secrets and variables → Actions; the private repo is on GitHub Free, so no Environments)
 
 | Secret | Content |
 |---|---|
@@ -64,7 +73,7 @@ mybrev-release` (this Mac). Check it first with **Release runner smoke test**.
 | `ANDROID_KEYSTORE_BASE64` | `base64 -i ~/.mybrev-release/upload-keystore.jks` |
 | `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | from `~/.mybrev-release/key.properties` |
 
-Variables of the environment: `ANDROID_BETA_TRACK` (closed testing track id
+Repository variables: `ANDROID_BETA_TRACK` (closed testing track id
 from `fastlane android tracks`), `IOS_TESTFLIGHT_GROUPS` (optional,
 comma-separated), `PLAY_RELEASE_STATUS` (`draft` until Google has reviewed the
 app once, then empty = `completed`).
