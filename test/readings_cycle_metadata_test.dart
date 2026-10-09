@@ -5,11 +5,11 @@ void main() {
   test('cycle appears once for automatic and manual selections', () {
     expect(
       readingsCycleMetadata(cycle: 'B', manualGroup: false, manualCycle: false),
-      'Цыкл B',
+      'Год B',
     );
     expect(
       readingsCycleMetadata(cycle: 'B', manualGroup: false, manualCycle: true),
-      'Цыкл B · зменены',
+      'Год B · зменены',
     );
     expect(
       readingsCycleMetadata(cycle: null, manualGroup: true, manualCycle: false),
@@ -17,7 +17,7 @@ void main() {
     );
     expect(
       readingsCycleMetadata(cycle: 'B', manualGroup: true, manualCycle: true),
-      'Набор і цыкл B · зменены',
+      'Набор і год B · зменены',
     );
     expect(
       readingsCycleMetadata(

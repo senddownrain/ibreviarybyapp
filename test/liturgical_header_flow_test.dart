@@ -26,6 +26,10 @@ import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
 import 'package:mybrev_flutter/screens/ordo_screen.dart';
+import 'package:mybrev_flutter/widgets/hours_options_sheet.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
+import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 
 class _Idle extends ContentUpdatesNotifier {
   @override
@@ -134,7 +138,7 @@ void main() {
     await tester.runAsync(() async {
       final image = await boundary.toImage(pixelRatio: 2);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-      final output = Directory('audit-evidence/liturgical-header');
+      final output = Directory('build/refinement-header');
       await output.create(recursive: true);
       await File(
         '${output.path}/$name.png',
@@ -149,11 +153,11 @@ void main() {
     addTearDown(container.dispose);
     var p = container.read(liturgicalDayPresentationProvider);
     expect(p.title, 'XXVII звычайны тыдзень');
-    expect(p.metadata, 'Аўторак · будні дзень');
+    expect(p.metadata, 'Аўторак · III тыдзень Псалтыра');
     container.read(liturgicalNavigationControllerProvider).moveBy(1);
     p = container.read(liturgicalDayPresentationProvider);
     expect(p.title, contains('Ружанцовай'));
-    expect(p.metadata, 'Серада · успамін');
+    expect(p.metadata, 'Серада · III тыдзень Псалтыра');
     expect(p.accent, LiturgicalAccents.marian);
     expect(p.variantCount, greaterThan(1));
     container
@@ -161,7 +165,7 @@ void main() {
         .openDate(DateTime(2026, 10, 11));
     expect(
       container.read(liturgicalDayPresentationProvider).metadata,
-      'Нядзеля',
+      'Нядзеля · IV тыдзень Псалтыра',
     );
   });
 
@@ -213,49 +217,59 @@ void main() {
         container.read(hoursLiturgicalSelectionProvider).dayId,
         alternative,
       );
-      expect(find.text('Сёння'), findsNothing);
+      expect(find.text('Сёння'), findsOneWidget);
       await snapshot(tester, 'readings-marian');
       await tester.tap(find.byKey(const Key('readings-date-action')));
       await tester.pumpAndSettle();
-      expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
+      expect(
+        find.byKey(const Key('compact-liturgical-calendar')),
+        findsOneWidget,
+      );
       await snapshot(tester, 'calendar');
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('calendar date, Today and advanced picker use one entry', (
-    tester,
-  ) async {
-    final (_, container) = await start(tester);
-    await tester.tap(find.byKey(const Key('hours-previous-day')));
-    await tester.pumpAndSettle();
-    expect(container.read(selectedDateProvider), DateTime(2026, 10, 6));
-    await snapshot(tester, 'hours-weekday');
-    await tester.tap(find.byKey(const Key('hours-date-action')));
-    await tester.pumpAndSettle();
-    expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);
-    await tester.tap(find.byKey(const Key('ordo-day-2026-10-07')));
-    await tester.pumpAndSettle();
-    expect(container.read(selectedDateProvider), DateTime(2026, 10, 7));
-    expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
-    expect(find.textContaining('Ружанцовай'), findsWidgets);
-    await tester.ensureVisible(
-      find.byKey(const Key('liturgical-calendar-today')),
-    );
-    await tester.tap(find.byKey(const Key('liturgical-calendar-today')));
-    await tester.pumpAndSettle();
-    expect(
-      DateUtils.isSameDay(container.read(selectedDateProvider), DateTime.now()),
-      isTrue,
-    );
-    await tester.ensureVisible(
-      find.byKey(const Key('liturgical-calendar-picker')),
-    );
-    await tester.tap(find.byKey(const Key('liturgical-calendar-picker')));
-    await tester.pumpAndSettle();
-    expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'compact calendar closes into ORDO; Today and deep search remain available',
+    (tester) async {
+      final (router, container) = await start(tester);
+      await tester.tap(find.byKey(const Key('hours-previous-day')));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedDateProvider), DateTime(2026, 10, 6));
+      await tester.tap(find.byKey(const Key('hours-date-action')));
+      await tester.pumpAndSettle();
+      expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);
+      await tester.tap(find.byKey(const Key('ordo-day-2026-10-07')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('compact-liturgical-calendar')),
+        findsNothing,
+      );
+      expect(find.byType(OrdoScreen), findsOneWidget);
+      expect(container.read(selectedDateProvider), DateTime(2026, 10, 7));
+      router.pop();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('hours-today')));
+      await tester.pumpAndSettle();
+      expect(
+        DateUtils.isSameDay(
+          container.read(selectedDateProvider),
+          DateTime.now(),
+        ),
+        isTrue,
+      );
+      await tester.tap(find.byKey(const Key('hours-date-action')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const Key('liturgical-calendar-picker')),
+      );
+      await tester.tap(find.byKey(const Key('liturgical-calendar-picker')));
+      await tester.pumpAndSettle();
+      expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('shell calendar shortcut opens the liturgical day', (
     tester,
@@ -267,7 +281,10 @@ void main() {
     expect(find.byType(LiturgicalCalendarSheet), findsNothing);
     await tester.tap(find.byKey(const Key('ordo-date-action')));
     await tester.pumpAndSettle();
-    expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
+    expect(
+      find.byKey(const Key('compact-liturgical-calendar')),
+      findsOneWidget,
+    );
     expect(find.byType(LiturgicalMonthCalendar), findsOneWidget);
     expect(find.byKey(const Key('liturgical-calendar-today')), findsOneWidget);
   });
@@ -303,6 +320,13 @@ void main() {
     await tester.tap(find.byKey(const Key('ordo-day-2026-10-06')));
     await tester.pumpAndSettle();
     expect(container.read(selectedDateProvider), DateTime(2026, 10, 6));
+    expect(find.byType(OrdoScreen), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    router.go('/readings');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('readings-date-action')));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(
       find.byKey(const Key('liturgical-calendar-picker')),
     );
@@ -316,5 +340,74 @@ void main() {
           .mode,
       'readings',
     );
+  });
+  testWidgets(
+    '14 October Office header keeps weekday, celebration and applicable psalter',
+    (tester) async {
+      final (router, container) = await start(tester);
+      final date = DateTime(2026, 10, 14);
+      final navigation = container.read(liturgicalNavigationControllerProvider);
+      navigation.openDate(date);
+      await tester.pumpAndSettle();
+      final option = container
+          .read(hoursLiturgicalSelectionProvider)
+          .sortedOptions
+          .firstWhere((o) => o.title.contains('Калікста'));
+      navigation.selectDay(date, option.dayId!, diocese: option.contextDiocese);
+      await tester.pumpAndSettle();
+      router.push(
+        oraRouteForContext(
+          date: date,
+          dayId: option.dayId!,
+          oraType: 'invitatorium',
+          diocese: option.contextDiocese,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final header = tester.widget<ReaderContextHeader>(
+        find.byType(ReaderContextHeader),
+      );
+      expect(header.eyebrow, 'Серада, 14 кастрычніка 2026');
+      expect(header.subtitle, contains('Калікста'));
+      expect(header.title, 'Заклік');
+      expect(header.metadata, 'Звычайны перыяд · IV тыдзень Псалтыра');
+      await snapshot(tester, 'hour-14-october');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'Readings variants keep calendar celebrations separate from sets and Office templates',
+    (tester) async {
+      final (router, container) = await start(tester);
+      container
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(DateTime(2026, 10, 9));
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('readings-alternatives-control')));
+      await tester.pumpAndSettle();
+      final sheet = find.byKey(const Key('readings-options-sheet'));
+      expect(sheet, findsOneWidget);
+      expect(find.byType(HoursOptionsSheet), findsNothing);
+      expect(find.text('Варыянт літургіі гадзінаў'), findsNothing);
+      expect(
+        find.descendant(of: sheet, matching: find.textContaining('Ев.')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: sheet, matching: find.textContaining('Пс ')),
+        findsNothing,
+      );
+      await snapshot(tester, 'readings-variants-9-october');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  test('festal own texts do not advertise the seasonal psalter', () {
+    final container = containerFor(DateTime(2026, 12, 25));
+    addTearDown(container.dispose);
+    final day = container.read(hoursLiturgicalSelectionProvider).day!;
+    expect(liturgicalDayPsalterLabel(day, DateTime(2026, 12, 25)), isEmpty);
   });
 }

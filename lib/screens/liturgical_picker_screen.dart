@@ -156,7 +156,7 @@ class _LiturgicalPickerScreenState
                                     child: Text(
                                       widget.isReadingsMode
                                           ? 'Рэжым чытанняў'
-                                          : 'Рэжым літургічных гадзін',
+                                          : 'Рэжым літургіі гадзінаў',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w700,
                                       ),

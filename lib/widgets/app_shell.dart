@@ -11,7 +11,6 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
-import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/content_update_scheduler.dart';
 
@@ -143,7 +142,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                         top: topPadding + 8,
                         left: 12,
                         child: _FloatingMenuButton(
-                          onTap: () => showSecondaryMenu(context),
+                          onTap: () => context.push('/settings'),
                         ),
                       ),
                     if (shellOwnsTop &&
@@ -201,7 +200,7 @@ class _FloatingMenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Tooltip(
-      message: 'Меню',
+      message: 'Налады',
       child: AdaptiveChromeSurface(
         role: ChromeSurfaceRole.control,
         borderRadius: BorderRadius.circular(24),
@@ -214,7 +213,7 @@ class _FloatingMenuButton extends StatelessWidget {
               dimension: 48,
               child: Center(
                 child: PhosphorIcon(
-                  PhosphorIconsRegular.list,
+                  PhosphorIconsRegular.gear,
                   size: 24,
                   color: cs.onSurface,
                 ),

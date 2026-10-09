@@ -150,7 +150,11 @@ String liturgicalDayRankLabel(LiturgicalDay day) {
   if (day.field('_kind') == 'office-for-dead' || day.id == 'office-for-dead') {
     return '';
   }
-  final rank = day.rank ?? day.field('_feastType') ?? '';
+  final rank =
+      day.field('_celebrationRank') ??
+      day.rank ??
+      day.field('_feastType') ??
+      '';
   return feastTypeLabelMap[rank] ?? rank;
 }
 
@@ -186,6 +190,17 @@ List<String> mergedLiturgicalDayPlaces(Iterable<LiturgicalDay> days) {
 }
 
 String liturgicalDayPsalterLabel(LiturgicalDay day, DateTime date) {
+  // Proper festal psalmody is not the seasonal four-week psalter.
+  final rank =
+      day.field('_celebrationRank') ??
+      day.rank ??
+      day.field('_feastType') ??
+      '';
+  if (const {'solemnitas', 'festum', 'solemnity', 'feast'}.contains(rank) ||
+      day.field('_kind') == 'office-for-dead' ||
+      day.id == 'office-for-dead') {
+    return '';
+  }
   final periodType = day.periodType ?? day.field('_periodType') ?? '';
   final periodWeek =
       day.periodWeekNumber ??

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/models/mass_reading_sets.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -59,6 +60,8 @@ Widget _screen(
 }
 
 List<Override> _overrides(ReadingsLoadResult result) => [
+  liturgicalContentReadyProvider.overrideWith((ref) async {}),
+  dayOptionsProvider.overrideWithValue(const []),
   settingsProvider.overrideWith(_TestSettingsNotifier.new),
   liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
   readingsLocalLoaderProvider.overrideWithValue(
@@ -78,10 +81,29 @@ ChoiceChip _chip(WidgetTester tester, String setId) =>
 Future<void> _scrollTo(WidgetTester tester, Finder finder) => tester
     .scrollUntilVisible(finder, 400, scrollable: find.byType(Scrollable).first);
 
+Future<void> _openOptions(WidgetTester tester) async {
+  final action = find.byKey(const Key('readings-alternatives-control'));
+  await tester.scrollUntilVisible(
+    action,
+    -400,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.tap(action);
+  await tester.pumpAndSettle();
+  final selector = find.byKey(const Key('readings-mass-set-selector'));
+  await tester.scrollUntilVisible(
+    selector,
+    250,
+    scrollable: find.byType(Scrollable).last,
+  );
+  await tester.pumpAndSettle();
+}
+
 void main() {
   late Directory hiveDirectory;
 
   setUpAll(() async {
+    await initializeDateFormatting('be');
     hiveDirectory = await Directory.systemTemp.createTemp('mass-sets-widget-');
     Hive.init(hiveDirectory.path);
     await Hive.openBox('settings');
@@ -177,17 +199,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(
-        find.byKey(const Key('readings-mass-set-selector')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('readings-mass-set-selector')), findsNothing);
+      await _openOptions(tester);
       expect(_chip(tester, 'day').selected, isTrue);
+      Navigator.of(
+        tester.element(find.byKey(const Key('readings-mass-set-selector'))),
+      ).pop();
+      await tester.pumpAndSettle();
       final day = gospelOf('15-08-assumption-blessed-virgin-mary', 'day');
       final vigil = gospelOf('15-08-assumption-blessed-virgin-mary', 'vigil');
       await _scrollTo(tester, _text(day));
       expect(_text(day), findsOneWidget);
       expect(_text(vigil), findsNothing);
 
+      await _openOptions(tester);
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('readings-mass-set-vigil')),
         -400,
@@ -195,7 +220,7 @@ void main() {
       );
       await tester.tap(find.byKey(const ValueKey('readings-mass-set-vigil')));
       await tester.pumpAndSettle();
-      expect(_chip(tester, 'vigil').selected, isTrue);
+      expect(find.byKey(const Key('readings-mass-set-selector')), findsNothing);
       await _scrollTo(tester, _text(vigil));
       expect(_text(vigil), findsOneWidget);
       expect(_text(day), findsNothing);
@@ -204,13 +229,18 @@ void main() {
       });
 
       // Another screen of the same date (navigation away and back).
+      await tester.pumpWidget(const SizedBox());
       await tester.pumpWidget(
         _screen(_result(assumption), container: container, key: UniqueKey()),
       );
       await tester.pumpAndSettle();
+      await _openOptions(tester);
       expect(_chip(tester, 'vigil').selected, isTrue);
+      await tester.tap(find.byTooltip('Закрыць').last);
+      await tester.pumpAndSettle();
 
       // Another date does not inherit the choice.
+      await tester.pumpWidget(const SizedBox());
       await tester.pumpWidget(
         _screen(
           _result(assumption),
@@ -220,6 +250,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await _openOptions(tester);
       expect(_chip(tester, 'day').selected, isTrue);
       expect(tester.takeException(), isNull);
     });
@@ -236,6 +267,7 @@ void main() {
         _screen(_result(['25-12-naradzhenne-pana']), dateStr: '2026-12-25'),
       );
       await tester.pumpAndSettle();
+      await _openOptions(tester);
       await _scrollTo(
         tester,
         find.byKey(const ValueKey('readings-mass-set-day')),
@@ -255,6 +287,7 @@ void main() {
         _screen(_result(assumption), requestedSetId: 'vigil'),
       );
       await tester.pumpAndSettle();
+      await _openOptions(tester);
       expect(_chip(tester, 'vigil').selected, isTrue);
     });
 
@@ -267,6 +300,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await _openOptions(tester);
       expect(_chip(tester, 'vigil').selected, isTrue);
       expect(find.text('Ранішняя Св. Імша'), findsOneWidget);
       expect(find.byKey(const Key('readings-options-action')), findsNothing);
@@ -285,10 +319,15 @@ void main() {
       await tester.pumpWidget(_screen(palm, dateStr: '2027-03-21'));
       await tester.pumpAndSettle();
 
+      await _openOptions(tester);
       expect(_chip(tester, 'mass').selected, isTrue);
-      expect(find.text('Працэсія з пальмамі'), findsOneWidget);
-      expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
-      expect(_text('Цыкл B'), findsWidgets);
+      Navigator.of(
+        tester.element(find.byKey(const Key('readings-mass-set-selector'))),
+      ).pop();
+      await tester.pumpAndSettle();
+      expect(find.text('Працэсія з пальмамі'), findsNothing);
+      expect(find.textContaining('Год B'), findsWidgets);
+      expect(_text('Год B'), findsWidgets);
 
       final passion = find.byKey(const Key('passion-by-roles'));
       await _scrollTo(tester, passion);
@@ -335,7 +374,12 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await _openOptions(tester);
       expect(_chip(tester, 'procession').selected, isTrue);
+      Navigator.of(
+        tester.element(find.byKey(const Key('readings-mass-set-selector'))),
+      ).pop();
+      await tester.pumpAndSettle();
       await _scrollTo(tester, _text('Лк 19, 28–40'));
       expect(_text('Лк 19, 28–40'), findsOneWidget);
       expect(_text('Мц 21, 1–11'), findsNothing);

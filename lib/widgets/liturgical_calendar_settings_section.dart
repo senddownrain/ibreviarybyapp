@@ -21,7 +21,7 @@ class LiturgicalCalendarSettingsSection extends ConsumerWidget {
         Text('Літургічны каляндар', style: theme.textTheme.titleMedium),
         const SizedBox(height: 4),
         Text(
-          'Паказваць святкаванні выбраных дыяцэзій у Літургіі гадзін і '
+          'Паказваць святкаванні выбраных дыяцэзій у літургіі гадзінаў і '
           'календары.',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,

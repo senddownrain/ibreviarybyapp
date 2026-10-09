@@ -130,6 +130,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(
@@ -149,7 +151,10 @@ void main() {
     expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
     expect(find.text('Чытанне'), findsOneWidget);
     expect(find.textContaining('Тэкст чытання'), findsWidgets);
-    expect(find.byKey(const Key('readings-options-action')), findsNothing);
+    expect(
+      find.byKey(const Key('readings-alternatives-control')),
+      findsOneWidget,
+    );
     // Readings stay simple: no Ordo / calendar entry on the Readings root.
     expect(find.byKey(const Key('hours-calendar-action')), findsNothing);
     expect(find.text('Каляндар'), findsNothing);
@@ -182,6 +187,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(
@@ -211,7 +218,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('readings-options-action')), findsOneWidget);
+    expect(
+      find.byKey(const Key('readings-alternatives-control')),
+      findsOneWidget,
+    );
     expect(tester.getTopLeft(header).dx, loadingLeft);
   });
 
@@ -232,6 +242,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader([reading])),
@@ -260,6 +272,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader([memorial])),
@@ -281,6 +295,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader(const [])),
@@ -314,6 +330,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader([reading])),
@@ -408,6 +426,8 @@ void main() {
       ProviderScope(
         overrides: [
           _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
           settingsProvider.overrideWith(_TestSettingsNotifier.new),
           liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
           readingsLoaderProvider.overrideWithValue(_loader(readings)),
@@ -418,32 +438,37 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
-    expect(find.text('Цыкл B'), findsOneWidget);
+    expect(find.textContaining('Год B'), findsOneWidget);
     expect(find.textContaining('Тэкст B'), findsWidgets);
-    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.tap(find.byKey(const Key('readings-alternatives-control')));
     await tester.pumpAndSettle();
-    expect(find.text('СВЯТКАВАННЕ / НАБОР ЧЫТАННЯЎ'), findsOneWidget);
+    expect(find.text('НАБОР ЧЫТАННЯЎ'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('readings-cycle-A')),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('ВЫБАР ЧЫТАННЯЎ'), findsOneWidget);
     expect(find.text('Па календары'), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey('readings-cycle-A')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
-    expect(find.text('Цыкл A · зменены'), findsOneWidget);
-    expect(find.text('Цыкл B'), findsNothing);
+    expect(find.text('Год A · зменены'), findsOneWidget);
+    expect(find.text('Год B'), findsNothing);
     expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
     expect(find.textContaining('Тэкст A'), findsWidgets);
 
-    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.tap(find.byKey(const Key('readings-alternatives-control')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('readings-cycle-B')));
     await tester.pumpAndSettle();
-    expect(find.text('Цыкл B'), findsOneWidget);
-    expect(find.text('Цыкл A'), findsNothing);
-    expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
+    expect(find.textContaining('Год B'), findsOneWidget);
+    expect(find.text('Год A'), findsNothing);
+    expect(find.byKey(const Key('readings-cycle-metadata')), findsNothing);
     expect(find.textContaining('Тэкст B'), findsWidgets);
 
-    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.tap(find.byKey(const Key('readings-alternatives-control')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Іншае святкаванне'));
     await tester.pumpAndSettle();
@@ -451,12 +476,83 @@ void main() {
     expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
     expect(find.byKey(const Key('readings-cycle-badge')), findsNothing);
 
-    await tester.tap(find.byKey(const Key('readings-options-action')));
+    await tester.tap(find.byKey(const Key('readings-alternatives-control')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Нядзельныя чытанні, Год B').last);
     await tester.pumpAndSettle();
     expect(find.textContaining('Тэкст B'), findsWidgets);
-    expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
+    expect(find.byKey(const Key('readings-cycle-metadata')), findsNothing);
+  });
+
+  testWidgets('manual cycle and reading group survive leaving the date', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        _presentationOverride,
+        liturgicalContentReadyProvider.overrideWith((ref) async {}),
+        dayOptionsProvider.overrideWithValue(const []),
+        settingsProvider.overrideWith(_TestSettingsNotifier.new),
+        liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+        readingsLoaderProvider.overrideWithValue(
+          _loader([
+            _reading(
+              'a',
+              title: 'Нядзельныя чытанні',
+              year: 'A',
+              dayId: 'sunday',
+              text: 'Выбраны тэкст A',
+            ),
+            _reading(
+              'b',
+              title: 'Нядзельныя чытанні',
+              year: 'B',
+              dayId: 'sunday',
+              text: 'Аўтаматычны тэкст B',
+            ),
+            _reading('other', title: 'Іншы набор', text: 'Выбраны іншы набор'),
+          ]),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    Future<void> openDate(String date) async {
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: ReadingsScreen(key: ValueKey(date), dateStr: date),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await openDate('2026-09-09');
+    await tester.tap(find.byKey(const Key('readings-alternatives-control')));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('readings-cycle-A')),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.tap(find.byKey(const ValueKey('readings-cycle-A')));
+    await tester.pumpAndSettle();
+    await openDate('2026-09-10');
+    expect(find.textContaining('Аўтаматычны тэкст B'), findsWidgets);
+    await openDate('2026-09-09');
+    expect(find.textContaining('Выбраны тэкст A'), findsWidgets);
+    expect(find.text('Год A · зменены'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('readings-alternatives-control')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Іншы набор'));
+    await tester.pumpAndSettle();
+    await openDate('2026-09-10');
+    expect(find.textContaining('Аўтаматычны тэкст B'), findsWidgets);
+    await openDate('2026-09-09');
+    expect(find.textContaining('Выбраны іншы набор'), findsWidgets);
+    expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
   });
 
   testWidgets('Today moves Readings and Hours to the same date', (
@@ -497,13 +593,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('readings-today-action')), findsNothing);
-    await tester.tap(find.byKey(const Key('readings-date-action')));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(
-      find.byKey(const Key('liturgical-calendar-today')),
-    );
-    await tester.tap(find.byKey(const Key('liturgical-calendar-today')));
+    await tester.tap(find.byKey(const Key('readings-today')));
     await tester.pumpAndSettle();
 
     expect(

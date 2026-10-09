@@ -9,6 +9,83 @@ import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 
+/// Date-only entry. Browsing months does not change the underlying reader.
+Future<void> showCompactLiturgicalCalendar({
+  required BuildContext context,
+  required DateTime date,
+  required String pickerRoute,
+  String? diocese,
+  ValueChanged<DateTime>? onSelected,
+}) async {
+  final router = GoRouter.of(context);
+  final result = await showModalBottomSheet<Object>(
+    context: context,
+    useRootNavigator: true,
+    useSafeArea: true,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (sheetContext) => ConstrainedBox(
+      key: const Key('compact-liturgical-calendar'),
+      constraints: BoxConstraints(
+        maxWidth: 640,
+        maxHeight: MediaQuery.sizeOf(sheetContext).height * .85,
+      ),
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LiturgicalMonthCalendar(
+                initialDate: date,
+                diocese: diocese,
+                onSelected: (value) => Navigator.pop(sheetContext, value),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  key: const Key('liturgical-calendar-today'),
+                  onPressed: () => Navigator.pop(
+                    sheetContext,
+                    DateUtils.dateOnly(DateTime.now()),
+                  ),
+                  child: const Text('Сёння'),
+                ),
+              ),
+              ListTile(
+                key: const Key('liturgical-calendar-picker'),
+                leading: const Icon(Icons.search),
+                title: const Text('Знайсці літургічны дзень'),
+                subtitle: const Text('Пошук паводле перыяду або свята'),
+                onTap: () => Navigator.pop(sheetContext, true),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+  if (!context.mounted) return;
+  if (result is DateTime) {
+    if (onSelected != null) {
+      onSelected(result);
+    } else {
+      await router.push(
+        Uri(
+          path: '/hours/ordo',
+          queryParameters: {
+            'date': liturgicalDateKey(result),
+            'diocese': ?diocese,
+          },
+        ).toString(),
+      );
+    }
+  } else if (result == true) {
+    await router.push(pickerRoute);
+  }
+}
+
 Future<void> showLiturgicalCalendarSheet({
   required BuildContext context,
   required String pickerRoute,

@@ -371,10 +371,9 @@ void main() {
         final palette = tester.getRect(
           find.byKey(const Key('readings-highlight-palette')),
         );
+        // Attribution is the final content, after the reading document.
         final document = tester.getRect(
-          find.byKey(
-            const ValueKey('reading-document-layout-lab-reading-auto'),
-          ),
+          find.byKey(const Key('readings-source-footer')),
         );
         final safeTop = viewport.height - mode.systemInset;
         final safeGap = safeTop - palette.bottom;
@@ -473,9 +472,7 @@ void main() {
         await _jumpToEnd(tester);
         await tester.pump();
         final readingDocument = tester.getRect(
-          find.byKey(
-            const ValueKey('reading-document-layout-lab-reading-auto'),
-          ),
+          find.byKey(const Key('readings-source-footer')),
         );
         expect(readingsPalette.top - readingDocument.bottom, closeTo(24, 0.01));
         await tester.pumpWidget(const SizedBox.shrink());
@@ -688,8 +685,8 @@ void main() {
     await tester.pumpWidget(_readingsApp());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
-    expect(find.text('Цыкл B'), findsOneWidget);
+    expect(find.byKey(const Key('readings-cycle-metadata')), findsNothing);
+    expect(find.textContaining(' · Год B'), findsOneWidget);
   });
 
   testWidgets('cycle metadata dark', (tester) async {
@@ -697,8 +694,8 @@ void main() {
     await tester.pumpWidget(_readingsApp(brightness: Brightness.dark));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
-    expect(find.text('Цыкл B'), findsOneWidget);
+    expect(find.byKey(const Key('readings-cycle-metadata')), findsNothing);
+    expect(find.textContaining(' · Год B'), findsOneWidget);
   });
 }
 

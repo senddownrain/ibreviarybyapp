@@ -34,6 +34,7 @@ final readingsBranchStateProvider = StateProvider<ReadingsBranchState>(
 
 /// Mass reading set chosen on the Readings screen, per document of a
 /// Readings context (`'<date or liturgical key>|<document id>'` → set id).
+/// Group/cycle choices use `<context>|<day id>|@group` / `@cycle`.
 /// Kept for the session: returning to a date shows the same set. Not the
 /// Office option / Common choice of the Hours.
 final readingsMassSetSelectionProvider = StateProvider<Map<String, String>>(

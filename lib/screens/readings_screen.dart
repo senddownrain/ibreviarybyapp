@@ -14,7 +14,11 @@ import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
+import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/providers/liturgical_provider.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -154,8 +158,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     _groups = selection.groups;
     _activeGroupKey = selection.activeGroupKey;
     _automaticGroupKey = selection.activeGroupKey;
+    final savedChoices = ref.read(readingsMassSetSelectionProvider);
+    final savedGroup = savedChoices['$_choiceContext|@group'];
+    if (_groups.any((group) => group.key == savedGroup)) {
+      _activeGroupKey = savedGroup;
+    }
+    _manualCycle ??= savedChoices['$_choiceContext|@cycle'];
     _sundayCycle = result.sundayCycle;
     _weekdayCycle = result.weekdayCycle;
+    if (_manualCycle != null && !_selection.cycles.contains(_manualCycle)) {
+      _manualCycle = null;
+    }
     _loading = false;
     _error = null;
   }
@@ -296,6 +309,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         _manualCycle = null;
       }
     });
+    _rememberChoices();
     // A lectionary set is not a different celebration. Only the shared
     // calendar changes the selected liturgical day and its Office.
     _resetDocumentScroll();
@@ -315,6 +329,22 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   /// Readings context of the set choices (the date or the liturgical key).
   String get _setContext => widget.dateStr ?? widget.liturgicalKey ?? '';
+
+  String get _choiceContext => '$_setContext|${widget.dayId ?? ''}';
+
+  void _rememberChoices() {
+    final notifier = ref.read(readingsMassSetSelectionProvider.notifier);
+    final choices = {...notifier.state};
+    if (_activeGroupKey != null) {
+      choices['$_choiceContext|@group'] = _activeGroupKey!;
+    }
+    if (_manualCycle == null) {
+      choices.remove('$_choiceContext|@cycle');
+    } else {
+      choices['$_choiceContext|@cycle'] = _manualCycle!;
+    }
+    notifier.state = choices;
+  }
 
   /// Sets chosen on this screen for the documents of its context.
   Map<String, String> _setChoices() {
@@ -357,6 +387,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     if (_manualCycle == cycle) return;
     _clearSentenceSelection();
     setState(() => _manualCycle = cycle);
+    _rememberChoices();
     _resetDocumentScroll();
   }
 
@@ -369,10 +400,18 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         icon: const Icon(Icons.arrow_back_rounded),
       );
     }
+    if (!(AppRouteEntryScope.maybeOf(context)?.entry.descriptor.isBranchRoot ??
+        true)) {
+      return IconButton(
+        tooltip: 'Назад',
+        icon: const Icon(Icons.arrow_back_rounded),
+        onPressed: () => context.pop(),
+      );
+    }
     return IconButton(
-      tooltip: 'Меню',
-      icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
-      onPressed: () => showSecondaryMenu(context),
+      tooltip: 'Налады',
+      icon: const PhosphorIcon(PhosphorIconsRegular.gear, size: 22),
+      onPressed: () => context.push('/settings'),
     );
   }
 
@@ -466,12 +505,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     ref.read(liturgicalNavigationControllerProvider).moveBy(direction);
   }
 
-  Future<void> _showDateActions({bool focusVariants = false}) =>
-      showLiturgicalCalendarSheet(
-        context: context,
-        pickerRoute: '/readings/picker?mode=readings',
-        focusVariants: focusVariants,
-      );
+  Future<void> _showDateActions() => showCompactLiturgicalCalendar(
+    context: context,
+    date: _currentDate,
+    diocese: ref.read(hoursLiturgicalSelectionProvider).diocese,
+    pickerRoute: '/readings/picker?mode=readings',
+  );
 
   /// Cycles of a group: of its Mass reading sets, else of its documents.
   List<String> _cyclesOfGroup(ReadingCelebrationGroup group) {
@@ -488,7 +527,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   bool get _hasOptions {
     final selection = _selection;
-    return selection.groups.length > 1 || selection.cycles.length > 1;
+    return selection.groups.length > 1 ||
+        selection.cycles.length > 1 ||
+        (selection.massSet?.sets.length ?? 0) > 1;
   }
 
   Future<void> _showOptions() async {
@@ -502,6 +543,46 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       builder: (sheetContext) => _ReadingsOptionsSheet(
+        date: widget.liturgicalKey == null ? _currentDate : null,
+        celebrations: widget.liturgicalKey == null
+            ? ref
+                  .read(hoursLiturgicalSelectionProvider)
+                  .sortedOptions
+                  .where(
+                    (o) =>
+                        o.ordo != null &&
+                        !o.disabled &&
+                        o.source != LiturgicalOptionSource.officeForDead,
+                  )
+                  .toList()
+            : const [],
+        selectedCelebration: ref
+            .read(hoursLiturgicalSelectionProvider)
+            .selected
+            ?.key,
+        onCelebrationSelected: (option) {
+          Navigator.pop(sheetContext);
+          if (option.dayId != null) {
+            ref
+                .read(liturgicalNavigationControllerProvider)
+                .selectDay(
+                  _currentDate,
+                  option.dayId!,
+                  diocese: option.contextDiocese,
+                );
+          }
+        },
+        onDateSelected: (date) {
+          Navigator.pop(sheetContext);
+          ref.read(liturgicalNavigationControllerProvider).openDate(date);
+        },
+        massSet: selection.massSet,
+        onSetSelected: (id) {
+          Navigator.pop(sheetContext);
+          if (selection.massSet != null) {
+            _selectMassSet(selection.massSet!, id);
+          }
+        },
         accentColor: _readingColor(),
         groups: selection.groups,
         activeGroupKey: selection.activeGroupKey,
@@ -649,7 +730,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                   keyPrefix: 'readings',
                   presentation: sharedPresentation,
                   onDateTap: _showDateActions,
-                  onVariants: () => _showDateActions(focusVariants: true),
+                  metadata: [
+                    sharedPresentation.weekday,
+                    if (cycleLabel != null) 'Год $cycleLabel',
+                  ].join(' · '),
+                  onToday: () => ref
+                      .read(liturgicalNavigationControllerProvider)
+                      .openDate(DateTime.now()),
+                  onVariants: _showOptions,
                   onPrevious: () => _openRelativeDate(-1),
                   onNext: () => _openRelativeDate(1),
                 )
@@ -668,7 +756,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                   child: const Text('Выбраць дату'),
                 ),
               ],
-              if (cycleMetadata != null) ...[
+              if (cycleMetadata != null &&
+                  (!usesCalendar || manualGroup || _manualCycle != null)) ...[
                 const SizedBox(height: 10),
                 Text(
                   cycleMetadata,
@@ -678,12 +767,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                   ),
                 ),
               ],
-              if (!_loading && _error == null && _hasOptions)
+              if (!usesCalendar && !_loading && _error == null && _hasOptions)
                 TextButton.icon(
                   key: const Key('readings-options-action'),
                   onPressed: _showOptions,
                   icon: const Icon(Icons.tune_rounded, size: 18),
-                  label: const Text('Набор чытанняў'),
+                  label: const Text('Іншыя варыянты'),
                 ),
             ],
           ),
@@ -729,19 +818,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       selectedSentenceId: _selectedSentenceId,
       onSentenceTap: _toggleSentence,
     );
-    if (massSet == null || massSet.sets.length < 2) return body;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        MassSetSelector(
-          sets: massSet.sets,
-          selectedId: massSet.set.id,
-          accentColor: seasonColor,
-          onSelected: (id) => _selectMassSet(massSet, id),
-        ),
-        body,
-      ],
-    );
+    return body;
   }
 
   Widget _highlightPalette() => AdaptiveChromeSurface(
@@ -813,6 +890,13 @@ String _readingsCycleLabel(String cycle) => switch (cycle) {
 class _ReadingsOptionsSheet extends StatelessWidget {
   const _ReadingsOptionsSheet({
     required this.accentColor,
+    this.date,
+    this.celebrations = const [],
+    this.selectedCelebration,
+    required this.onCelebrationSelected,
+    required this.onDateSelected,
+    this.massSet,
+    required this.onSetSelected,
     required this.groups,
     required this.activeGroupKey,
     required this.cycles,
@@ -822,6 +906,13 @@ class _ReadingsOptionsSheet extends StatelessWidget {
     required this.onCycleSelected,
   });
 
+  final DateTime? date;
+  final List<DayOption> celebrations;
+  final String? selectedCelebration;
+  final ValueChanged<DayOption> onCelebrationSelected;
+  final ValueChanged<DateTime> onDateSelected;
+  final MassSetSelection? massSet;
+  final ValueChanged<String> onSetSelected;
   final Color accentColor;
   final List<ReadingCelebrationGroup> groups;
   final String? activeGroupKey;
@@ -833,31 +924,75 @@ class _ReadingsOptionsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: 620, maxHeight: 680),
+    key: const Key('readings-options-sheet'),
+    constraints: BoxConstraints(
+      maxWidth: 620,
+      maxHeight: MediaQuery.sizeOf(context).height * .85,
+    ),
     child: ListView(
       shrinkWrap: true,
       padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + systemBottomInset(context)),
       children: [
-        Text(
-          'Варыянты чытанняў',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            'Іншыя варыянты',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          trailing: IconButton(
+            tooltip: 'Закрыць',
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close),
+          ),
         ),
+        if (date != null)
+          ExpansionTile(
+            title: const Text('Каляндар'),
+            tilePadding: EdgeInsets.zero,
+            children: [
+              LiturgicalMonthCalendar(
+                initialDate: date!,
+                onSelected: onDateSelected,
+              ),
+            ],
+          ),
+        if (celebrations.length > 1) ...[
+          const _OptionsHeading('Святкаванне'),
+          for (final option in celebrations)
+            ListTile(
+              key: ValueKey('readings-celebration-${option.key}'),
+              selected: option.key == selectedCelebration,
+              leading: VestmentMarker(colors: [option.ordo!.color], size: 14),
+              title: Text(option.title),
+              subtitle: Text(liturgicalOptionRank(option)),
+              trailing: option.key == selectedCelebration
+                  ? const Icon(Icons.check)
+                  : null,
+              onTap: () => onCelebrationSelected(option),
+            ),
+        ],
         if (groups.length > 1) ...[
           const SizedBox(height: 18),
-          const _OptionsHeading('Святкаванне / набор чытанняў'),
+          const _OptionsHeading('Набор чытанняў'),
           for (final group in groups)
             ListTile(
               key: ValueKey('readings-group-${group.key}'),
               selected: group.key == activeGroupKey,
               title: Text(group.label),
-              subtitle: Text(_groupCycles(group.documents)),
               trailing: group.key == activeGroupKey
                   ? const Icon(Icons.check_rounded)
                   : null,
               onTap: () => onGroupSelected(group.key),
             ),
+        ],
+        if (massSet != null && massSet!.sets.length > 1) ...[
+          const SizedBox(height: 18),
+          MassSetSelector(
+            sets: massSet!.sets,
+            selectedId: massSet!.set.id,
+            accentColor: accentColor,
+            onSelected: onSetSelected,
+          ),
         ],
         if (cycles.length > 1) ...[
           const SizedBox(height: 18),
@@ -868,7 +1003,7 @@ class _ReadingsOptionsSheet extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: SelectionOptionCard(
                 key: ValueKey('readings-cycle-$cycle'),
-                title: 'Цыкл ${_readingsCycleLabel(cycle)}',
+                title: 'Год ${_readingsCycleLabel(cycle)}',
                 leading: const Icon(Icons.auto_stories_outlined),
                 accentColor: accentColor,
                 selected: cycle == (manualCycle ?? automaticCycle),
@@ -877,15 +1012,21 @@ class _ReadingsOptionsSheet extends StatelessWidget {
               ),
             ),
         ],
+        if (groups.length < 2 &&
+            (massSet?.sets.length ?? 0) < 2 &&
+            cycles.length < 2 &&
+            celebrations.length < 2)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text('Для гэтай даты іншых набораў чытанняў няма'),
+          ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Гатова'),
+        ),
       ],
     ),
   );
-
-  static String _groupCycles(List<ParsedReading> documents) {
-    final cycles = availableCyclesForGroup(documents);
-    if (cycles.isEmpty) return 'Уласны набор чытанняў';
-    return 'Цыклы ${cycles.map(_readingsCycleLabel).join(', ')}';
-  }
 }
 
 class _OptionsHeading extends StatelessWidget {

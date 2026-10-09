@@ -24,6 +24,7 @@ class LiturgicalDayPresentation {
     this.variantCount = 0,
     this.place = '',
     this.badges = const [],
+    this.contextMetadata = '',
   });
 
   factory LiturgicalDayPresentation.fromSelection(
@@ -54,6 +55,9 @@ class LiturgicalDayPresentation {
           ),
       place: option?.day == null ? '' : liturgicalDayPlaceLabel(option!.day!),
       badges: option?.badges ?? const [],
+      contextMetadata: selection.day == null
+          ? ''
+          : liturgicalDayPsalterLabel(selection.day!, date),
     );
   }
 
@@ -64,13 +68,12 @@ class LiturgicalDayPresentation {
   final int variantCount;
   final String place;
   final List<String> badges;
+  final String contextMetadata;
   String get dateLabel => '${date.day} ${_months[date.month - 1]} ${date.year}';
   String get weekday => weekdayLabelMap[date.weekday % 7 + 1]!;
 
-  String get metadata => [
-    weekday,
-    if (rank.toLowerCase() != weekday.toLowerCase()) rank.toLowerCase(),
-  ].where((s) => s.isNotEmpty).join(' · ');
+  String get metadata =>
+      [weekday, contextMetadata].where((s) => s.isNotEmpty).join(' · ');
 }
 
 const _months = [

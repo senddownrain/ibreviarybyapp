@@ -67,15 +67,17 @@ class HomeScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             LiturgicalDayHeader(
-                              sectionTitle: 'Літургія гадзін',
+                              sectionTitle: 'Літургія гадзінаў',
                               keyPrefix: 'hours',
                               presentation: presentation,
-                              onDateTap: () => showLiturgicalCalendarSheet(
+                              onToday: () =>
+                                  dayNavigation.openDate(DateTime.now()),
+                              onDateTap: () => showCompactLiturgicalCalendar(
                                 context: context,
+                                date: date,
+                                diocese: selection.diocese,
                                 pickerRoute: '/hours/picker',
                               ),
-                              // Both entry points belong to the shared calendar
-                              // flow; the standalone ORDO selector is separate.
                               onVariants: () => showLiturgicalCalendarSheet(
                                 context: context,
                                 pickerRoute: '/hours/picker',
@@ -145,14 +147,14 @@ class _HoursList extends StatelessWidget {
       return const _HoursMessage(
         icon: PhosphorIconsRegular.clockCountdown,
         title: 'Няма даступных гадзін',
-        body: 'Для выбранага варыянту няма змесціва Літургіі гадзін.',
+        body: 'Для выбранага варыянту няма змесціва літургіі гадзінаў.',
       );
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'ЛІТУРГІЯ ГАДЗІН',
+          'Літургія гадзінаў',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w800,

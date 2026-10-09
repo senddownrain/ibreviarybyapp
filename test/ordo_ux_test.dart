@@ -429,7 +429,7 @@ void main() {
           date,
           OrdoScreen(initialDate: date, dayId: option.templates.last.id),
         );
-        expect(find.text(option.title), findsOneWidget);
+        expect(find.text(option.title), findsWidgets);
         if (date.month == 6 && date.day == 13) {
           final refs = readingReferencesForDay(
             LiturgicalContentService().contentForDate(date).ordo,
@@ -442,7 +442,7 @@ void main() {
             findsOneWidget,
           );
         }
-        expect(find.text('Абрана'), findsNWidgets(2));
+        expect(find.text('Абрана'), findsOneWidget);
         final directions = find.ancestor(
           of: find.text('Асаблівыя ўказанні'),
           matching: find.byType(ExpansionTile),
@@ -460,7 +460,16 @@ void main() {
         await tester.ensureVisible(find.byKey(const Key('ordo-open-hours')));
         await tester.pumpAndSettle();
         await capture(tester, 'selected-${date.month}-${date.day}-office');
-        await tester.ensureVisible(find.text('Асаблівыя ўказанні'));
+        await tester.scrollUntilVisible(
+          find.text('Асаблівыя ўказанні'),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await Scrollable.ensureVisible(
+          tester.element(find.text('Асаблівыя ўказанні')),
+          alignment: .5,
+        );
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Асаблівыя ўказанні'));
         await tester.pumpAndSettle();
         expect(find.textContaining('Камплета:'), findsOneWidget);
@@ -586,7 +595,7 @@ void main() {
                       ?.optionId,
                   option.optionId,
                 );
-                expect(find.text(option.title), findsOneWidget);
+                expect(find.text(option.title), findsWidgets);
                 if (option.templates.length > 1) {
                   final variants = find.byKey(
                     ValueKey('hours-variants-${option.key}'),
@@ -637,12 +646,16 @@ void main() {
             }
             expect(
               tester
-                  .getSize(find.widgetWithText(FilledButton, 'Літургія'))
+                  .getSize(
+                    find.widgetWithText(FilledButton, 'Літургія гадзінаў'),
+                  )
                   .height,
               greaterThanOrEqualTo(48),
             );
             expect(
-              find.widgetWithText(FilledButton, 'Літургія').hitTestable(),
+              find
+                  .widgetWithText(FilledButton, 'Літургія гадзінаў')
+                  .hitTestable(),
               findsOneWidget,
             );
             expect(tester.takeException(), isNull);
@@ -652,7 +665,9 @@ void main() {
             final applied = container
                 .read(hoursLiturgicalSelectionProvider)
                 .dayId;
-            await tester.tap(find.widgetWithText(FilledButton, 'Літургія'));
+            await tester.tap(
+              find.widgetWithText(FilledButton, 'Літургія гадзінаў'),
+            );
             await tester.pumpAndSettle();
             expect(find.byType(HoursOptionsSheet), findsNothing);
             expect(
@@ -714,11 +729,15 @@ void main() {
       find.byKey(const Key('ordo-row-our-lady-rosary-primary')),
       findsOneWidget,
     );
-    expect(find.text('• З дня'), findsOneWidget);
+    expect(find.textContaining('• З дня'), findsOneWidget);
     expect(find.text('• Пра Найсвяцейшую Панну Марыю'), findsOneWidget);
-    expect(find.text('Псалтыр III · Год II'), findsOneWidget);
-    expect(find.textContaining('Белы', findRichText: true), findsWidgets);
-    expect(find.byType(TextButton), findsNWidgets(2));
+    expect(
+      find.textContaining('Год II · III тыдзень Псалтыра'),
+      findsOneWidget,
+    );
+    expect(find.bySemanticsLabel('Белы'), findsWidgets);
+    expect(find.text('Літургія гадзінаў'), findsWidgets);
+    expect(find.text('Чытанні'), findsWidgets);
     await capture(tester, 'day-7-light');
     expect(tester.takeException(), isNull);
   });
@@ -780,10 +799,11 @@ void main() {
           brightness: brightness,
         );
         expect(find.byKey(const Key('ordo-open-month')), findsOneWidget);
-        expect(find.byTooltip('Адкрыць чытанні'), findsOneWidget);
-        expect(find.byTooltip('Адкрыць Літургію гадзін'), findsOneWidget);
+        expect(find.byKey(const Key('ordo-open-readings')), findsOneWidget);
+        expect(find.byKey(const Key('ordo-open-hours')), findsOneWidget);
         expect(find.byType(RadioListTile<String>), findsNothing);
-        expect(find.byType(TextButton), findsNWidgets(2));
+        expect(find.text('Літургія гадзінаў'), findsWidgets);
+        expect(find.text('Чытанні'), findsWidgets);
         await capture(tester, 'day-${brightness.name}-$scale');
         await tester.pumpWidget(const SizedBox());
         await frame(

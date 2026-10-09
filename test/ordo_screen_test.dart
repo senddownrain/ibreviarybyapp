@@ -78,16 +78,11 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('ordo-month-label')), findsNothing);
     expect(find.byType(CalendarDatePicker), findsNothing);
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('ordo-vestment-color')),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    expect(find.bySemanticsLabel('Белы'), findsOneWidget);
     expect(
       find.textContaining('Колер літургічнага адзення', findRichText: true),
-      findsOneWidget,
+      findsNothing,
     );
-    expect(find.textContaining('Белы', findRichText: true), findsWidgets);
     expect(find.text('Св. Анёлаў Ахоўнікаў'), findsOneWidget);
     expect(
       find.descendant(
@@ -111,7 +106,7 @@ void main() {
     addTearDown(tester.view.reset);
     await pump(tester, app(DateTime(2025, 11, 2)));
     expect(tester.takeException(), isNull);
-    final books = find.text('Лекцыянарый т. III · Літургія гадзін т. III');
+    final books = find.text('Лекцыянарый т. III · Літургія гадзінаў т. III');
     await tester.scrollUntilVisible(
       books,
       300,
@@ -119,12 +114,6 @@ void main() {
     );
     expect(books, findsOneWidget);
     // Facts line, above the celebrations and the notes.
-    expect(
-      tester.getTopLeft(books).dy,
-      lessThan(
-        tester.getTopLeft(find.text('Імша і чытанні', skipOffstage: false)).dy,
-      ),
-    );
     expect(
       tester.getTopLeft(books).dy,
       lessThan(
@@ -149,7 +138,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('Літургія гадзін — з дня:', skipOffstage: false),
+      find.textContaining('Літургія гадзінаў — з дня:', skipOffstage: false),
       findsOneWidget,
     );
   });
@@ -191,10 +180,10 @@ void main() {
     final markers = tester
         .widgetList<VestmentMarker>(find.byType(VestmentMarker))
         .map((m) => m.colors);
-    expect(markers, contains(equals(['viridis'])));
+    expect(find.bySemanticsLabel('Зялёны'), findsWidgets);
     expect(markers, contains(equals(['albus'])));
     expect(
-      find.text('Неабавязковы ўспамін · Белы', skipOffstage: false),
+      find.text('Неабавязковы ўспамін', skipOffstage: false),
       findsOneWidget,
     );
   });

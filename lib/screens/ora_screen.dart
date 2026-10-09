@@ -534,33 +534,30 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         .replaceAll(RegExp(r'\\?<br\s*/?>', caseSensitive: false), '\n')
         .replaceAll(RegExp(r'<[^>]+>'), '')
         .trim();
+    final weekday = DateFormat('EEEE', 'be').format(widget.date);
+    final celebration = dayTitle.replaceFirst(
+      RegExp(',\\s*${RegExp.escape(weekday)}\$', caseSensitive: false),
+      '',
+    );
     final periodLabel = liturgicalDayPeriodLabel(day);
     final psalterLabel = liturgicalDayPsalterLabel(day, widget.date);
-    final rankLabel = liturgicalDayRankLabel(day);
     final placeLabel = liturgicalDayPlaceLabel(day);
     final feastComment = (day.feastComment ?? '').trim();
     final contextSummary = [
-      if (periodLabel.isNotEmpty) periodLabel,
+      if ((day.feastName ?? '').isNotEmpty && periodLabel.isNotEmpty)
+        periodLabel,
       if (psalterLabel.isNotEmpty) psalterLabel,
-      if (rankLabel.isNotEmpty) rankLabel,
     ].join(' · ');
     final header = ReaderContextHeader(
       titleAnchorKey: _hourTitleAnchor,
       accentColor: accent,
-      eyebrow: '${DateFormat('d MMMM y', 'be').format(widget.date)} г.',
-      subtitle: dayTitle,
-      eyebrowStyle: theme.textTheme.titleSmall?.copyWith(
-        color: accent,
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        height: 1.3,
-      ),
-      subtitleStyle: theme.textTheme.titleMedium?.copyWith(
+      eyebrow:
+          '${weekday[0].toUpperCase()}${weekday.substring(1)}, ${DateFormat('d MMMM y', 'be').format(widget.date)}',
+      subtitle: celebration,
+      eyebrowStyle: theme.textTheme.bodyMedium?.copyWith(
         color: theme.colorScheme.onSurfaceVariant,
-        fontSize: 18,
-        fontWeight: FontWeight.w500,
-        height: 1.4,
       ),
+      subtitleStyle: ReaderTheme.of(context).displayTitle(24),
       title: _oraTitle(widget.oraType),
       metadata: contextSummary,
       details: placeLabel.isEmpty

@@ -60,7 +60,7 @@ class HoursOptionsSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _Label('ВАРЫЯНТ ЛІТУРГІІ ГАДЗІН'),
+          const _Label('Варыянт літургіі гадзінаў'),
           RadioGroup<String>(
             groupValue: selection.template?.id ?? selection.dayId,
             onChanged: (id) {
@@ -108,19 +108,33 @@ class HoursOptionsSheet extends ConsumerWidget {
           value: option.key,
           contentPadding: EdgeInsets.zero,
           controlAffinity: ListTileControlAffinity.leading,
-          secondary: SizedBox(
-            width: 32,
-            child: Center(child: VestmentMarker(colors: colors, size: 16)),
-          ),
-          title: Text(
-            option.title,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: VestmentMarker(colors: colors, size: 14),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  option.title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
           subtitle: _metadata(option).isEmpty
               ? null
-              : Text(_metadata(option), style: theme.textTheme.bodyMedium),
+              : Padding(
+                  padding: const EdgeInsets.only(left: 22),
+                  child: Text(
+                    _metadata(option),
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
         ),
       );
     }
@@ -175,7 +189,7 @@ class HoursOptionsSheet extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'Іншыя літургічныя варыянты',
+                        'Іншыя варыянты',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -206,7 +220,7 @@ class HoursOptionsSheet extends ConsumerWidget {
                       minimumSize: const Size.fromHeight(48),
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Літургія'),
+                    child: const Text('Літургія гадзінаў'),
                   ),
                 ),
               ),
@@ -223,11 +237,6 @@ String _metadata(DayOption option) => <String>{
     kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind)
   else if (option.subtitle != null)
     option.subtitle!,
-  if (option.ordo case final ordo?)
-    [
-      ordo.color,
-      ...ordo.colorAlternatives,
-    ].map(vestmentLabel).where((label) => label.isNotEmpty).join(' або '),
   if (option.placeLabel != null) option.placeLabel!,
   ...option.badges,
 }.where((s) => s.isNotEmpty).join(' · ');

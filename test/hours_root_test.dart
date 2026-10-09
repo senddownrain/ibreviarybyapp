@@ -14,6 +14,7 @@ import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
 
 void main() {
   setUpAll(() => initializeDateFormatting('be'));
@@ -165,7 +166,7 @@ void main() {
     await tester.pumpWidget(_testApp(router, date, [option]));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('hours-alternatives-control')), findsNothing);
+    expect(find.byKey(const Key('hours-alternatives-control')), findsOneWidget);
     expect(find.byKey(const Key('hours-hour-laudes')), findsOneWidget);
     expect(find.byKey(const Key('hours-hour-vespers')), findsNothing);
 
@@ -182,7 +183,13 @@ void main() {
     await tester.pumpWidget(_testApp(router, date, [option]));
     await tester.pumpAndSettle();
     expect(find.text('Каляндар'), findsNothing);
-    expect(find.text('Літургія гадзін'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(LiturgicalDayHeader),
+        matching: find.text('Літургія гадзінаў'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('local celebration shows its Belarusian diocese name', (
@@ -223,7 +230,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.textContaining('Іншыя літургічныя варыянты'), findsOneWidget);
+    expect(find.textContaining('Іншыя варыянты'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('hours-alternatives-control')));
     await tester.pumpAndSettle();
@@ -261,14 +268,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('hours-today-action')), findsNothing);
-    await tester.tap(find.byKey(const Key('hours-date-action')));
+    await tester.tap(find.byKey(const Key('hours-today')));
     await tester.pumpAndSettle();
-
-    await tester.ensureVisible(
-      find.byKey(const Key('liturgical-calendar-today')),
-    );
-    await tester.tap(find.byKey(const Key('liturgical-calendar-today')));
-    await tester.pump();
     expect(
       DateUtils.isSameDay(container.read(selectedDateProvider), DateTime.now()),
       isTrue,

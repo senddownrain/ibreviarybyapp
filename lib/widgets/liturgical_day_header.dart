@@ -14,6 +14,9 @@ class LiturgicalDayHeader extends StatelessWidget {
     required this.onNext,
     required this.onVariants,
     required this.keyPrefix,
+    this.onToday,
+    this.metadata,
+    this.showVariants = true,
   });
 
   final String sectionTitle;
@@ -23,6 +26,9 @@ class LiturgicalDayHeader extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final VoidCallback onVariants;
+  final VoidCallback? onToday;
+  final String? metadata;
+  final bool showVariants;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +38,7 @@ class LiturgicalDayHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(sectionTitle, style: ReaderTheme.of(context).displayTitle(36)),
+        Text(sectionTitle, style: ReaderTheme.of(context).documentTitle()),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -98,7 +104,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      p.metadata,
+                      metadata ?? p.metadata,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: cs.onSurfaceVariant,
                       ),
@@ -129,7 +135,17 @@ class LiturgicalDayHeader extends StatelessWidget {
             ],
           ),
         ),
-        if (p.variantCount > 1) ...[
+        if (onToday != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              key: Key('$keyPrefix-today'),
+              onPressed: onToday,
+              icon: const Icon(Icons.history, size: 18),
+              label: const Text('Сёння'),
+            ),
+          ),
+        if (showVariants) ...[
           const SizedBox(height: 10),
           TextButton(
             key: Key('$keyPrefix-alternatives-control'),
@@ -138,7 +154,12 @@ class LiturgicalDayHeader extends StatelessWidget {
               minimumSize: const Size(48, 48),
             ),
             onPressed: onVariants,
-            child: Text('Іншыя літургічныя варыянты · ${p.variantCount}'),
+            child: const Row(
+              children: [
+                Expanded(child: Text('Іншыя варыянты')),
+                Icon(Icons.chevron_right, size: 20),
+              ],
+            ),
           ),
         ],
       ],

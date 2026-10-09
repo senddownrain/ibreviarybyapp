@@ -5,8 +5,8 @@ String? readingsCycleMetadata({
   required bool manualCycle,
 }) {
   assert(!manualCycle || cycle != null);
-  if (manualGroup && manualCycle) return 'Набор і цыкл $cycle · зменены';
+  if (manualGroup && manualCycle) return 'Набор і год $cycle · зменены';
   if (manualGroup) return 'Набор чытанняў · зменены';
-  if (manualCycle) return 'Цыкл $cycle · зменены';
-  return cycle == null ? null : 'Цыкл $cycle';
+  if (manualCycle) return 'Год $cycle · зменены';
+  return cycle == null ? null : 'Год $cycle';
 }

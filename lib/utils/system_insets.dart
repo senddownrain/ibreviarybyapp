@@ -10,6 +10,8 @@ double systemBottomObstruction({
 /// The window's bottom system/gesture obstruction, in logical pixels.
 /// Descendant MediaQuery padding can include the application's floating dock.
 double systemBottomInset(BuildContext context) {
+  // The window values alone do not subscribe this widget to metric changes.
+  final media = MediaQuery.of(context);
   final view = View.of(context);
   final visual = view.viewPadding.bottom / view.devicePixelRatio;
   final gesture = view.systemGestureInsets.bottom / view.devicePixelRatio;
@@ -18,7 +20,6 @@ double systemBottomInset(BuildContext context) {
   }
 
   // Preserve iOS placement when a route supplies additional local padding.
-  final media = MediaQuery.of(context);
   return math.max(
     math.max(media.padding.bottom, media.viewPadding.bottom),
     math.max(math.max(media.systemGestureInsets.bottom, visual), gesture),

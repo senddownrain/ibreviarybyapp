@@ -225,7 +225,7 @@ class OrdoBooks {
   /// «Лекцыянарый т. III · Літургія гадзін т. III» (mybrev `booksLabel`).
   String get label => [
     if (lectionaryVolume != null) 'Лекцыянарый т. $lectionaryVolume',
-    if (hoursVolume != null) 'Літургія гадзін т. $hoursVolume',
+    if (hoursVolume != null) 'Літургія гадзінаў т. $hoursVolume',
   ].join(' · ');
 
   Json toJson() => {

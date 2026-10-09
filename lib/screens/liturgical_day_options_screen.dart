@@ -150,7 +150,7 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
                       PhosphorIconsRegular.clockCountdown,
                       size: 20,
                     ),
-                    label: const Text('Літургія гадзін'),
+                    label: const Text('Літургія гадзінаў'),
                     onPressed: dayId != null && targetDateKey != null
                         ? () => context.push(
                             Uri(

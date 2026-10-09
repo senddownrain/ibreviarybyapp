@@ -412,7 +412,7 @@ void main() {
       final books = engine.booksOf(day)!;
       expect(books.lectionaryVolume, 'III');
       expect(books.hoursVolume, 'III');
-      expect(books.label, 'Лекцыянарый т. III · Літургія гадзін т. III');
+      expect(books.label, 'Лекцыянарый т. III · Літургія гадзінаў т. III');
       expect(books.noteIds, isNotEmpty);
       final notes = engine.notesOf(day);
       expect(notes.any(isBooksNote), isFalse);

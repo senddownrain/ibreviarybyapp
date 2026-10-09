@@ -374,7 +374,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
                           if (_templates.length > 1) ...[
                             const SizedBox(height: 14),
                             Text(
-                              'Варыянт Літургіі гадзін',
+                              'Варыянт літургіі гадзінаў',
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     color: cs.onSurfaceVariant,

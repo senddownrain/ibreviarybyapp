@@ -219,7 +219,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       value: 'last',
                       child: Text('Апошні адкрыты'),
                     ),
-                    DropdownMenuItem(value: 'hours', child: Text('Літургія')),
+                    DropdownMenuItem(
+                      value: 'hours',
+                      child: Text('Літургія гадзінаў'),
+                    ),
                     DropdownMenuItem(value: 'readings', child: Text('Чытанні')),
                     DropdownMenuItem(
                       value: 'prayerbook',
@@ -274,7 +277,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   alignment: Alignment.centerLeft,
                   child: TextButton(
                     onPressed: () => context.push('/about'),
-                    child: const Text('Інфармацыя пра дадатак'),
+                    child: const Text('Інфармацыя'),
                   ),
                 ),
               ],

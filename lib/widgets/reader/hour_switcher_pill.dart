@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 
 /// Uses the same scroll controller and picker callback as the Office header.
 class HourSwitcherPill extends StatefulWidget {
@@ -81,7 +81,7 @@ class _HourSwitcherPillState extends State<HourSwitcherPill> {
         alignment: Alignment.topCenter,
         child: Padding(
           // The space between Back and Aa already belongs to reader chrome.
-          // Keep the pill there so no additional band covers document lines.
+          // Keep the trigger there so no additional band covers document lines.
           padding: EdgeInsets.fromLTRB(72, widget.topInset - 44, 72, 0),
           child: AnimatedSlide(
             offset: _visible ? Offset.zero : const Offset(0, -.15),
@@ -89,51 +89,43 @@ class _HourSwitcherPillState extends State<HourSwitcherPill> {
             child: AnimatedOpacity(
               opacity: _visible ? 1 : 0,
               duration: const Duration(milliseconds: 180),
-              child: Material(
-                color: ReaderTheme.of(context).surface,
-                shape: StadiumBorder(
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                ),
-                elevation: 1,
-                child: InkWell(
-                  key: const Key('hour-switcher-pill'),
-                  customBorder: const StadiumBorder(),
-                  onTap: widget.onTap,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 340,
-                      minHeight: 40,
-                      maxHeight: 40,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 6,
+              child: AdaptiveChromeSurface(
+                role: ChromeSurfaceRole.group,
+                borderRadius: BorderRadius.zero,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    key: const Key('hour-switcher-pill'),
+                    borderRadius: BorderRadius.zero,
+                    onTap: widget.onTap,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 340,
+                        minHeight: 48,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              widget.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textScaler: MediaQuery.textScalerOf(
-                                context,
-                              ).clamp(maxScaleFactor: 1.4),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.labelLarge?.copyWith(height: 1.1),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.title,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.labelLarge?.copyWith(height: 1.1),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 18,
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 18,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
