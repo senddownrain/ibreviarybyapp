@@ -51,8 +51,17 @@ GitHub → Actions → **MyBrev Beta Release** → Run workflow:
 `release_notes`. Manual only; one run at a time; the summary shows the commit,
 versions, build numbers and destinations; iOS and Android report separately.
 
-Runs on the self-hosted runner with labels `self-hosted, macOS,
-mybrev-release` (this Mac). Check it first with **Release runner smoke test**.
+Where it runs:
+
+- **Android** — a GitHub-hosted Linux runner (`ubuntu-latest`): no Mac needed.
+  Flutter, Java 17 and Ruby are installed by the workflow itself.
+- **iOS** — the self-hosted runner with labels `self-hosted, macOS,
+  mybrev-release` (this Mac must be on; Apple signing needs macOS). Check it
+  first with **Release runner smoke test**.
+- **Summary** — a Linux runner, so a run still reports when the Mac is off
+  (the iOS job then simply waits for the runner).
+
+Running only Android (`platform: android`) never touches the Mac.
 
 ### Secrets — environment `beta` (names only)
 

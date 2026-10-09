@@ -1,5 +1,7 @@
 # MyBrev Beta Release — manual only. Runs the same fastlane lanes as the
-# developer Mac (docs/RELEASE_BETA.md) on the self-hosted Mac runner.
+# developer Mac (docs/RELEASE_BETA.md).
+#   iOS      → the self-hosted Mac runner (Apple signing needs macOS).
+#   Android  → a GitHub-hosted Linux runner: no Mac needed for Google Play.
 # Never production: TestFlight and Google Play testing tracks only.
 name: MyBrev Beta Release
 
@@ -35,7 +37,9 @@ env:
   RELEASE_NOTES: ${{ inputs.release_notes }}
 
 jobs:
-  preflight:
+  # ---- iOS: the Mac runner ---------------------------------------------------
+  preflight-ios:
+    if: inputs.platform != 'android'
     runs-on: [self-hosted, macOS, mybrev-release]
     environment: beta
     timeout-minutes: 15
@@ -44,18 +48,9 @@ jobs:
       - name: Runner, tools and secrets (names only)
         shell: bash -l {0}
         env:
-          NEED_IOS: ${{ inputs.platform != 'android' }}
-          NEED_ANDROID: ${{ inputs.platform != 'ios' }}
           HAS_ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID != '' }}
           HAS_ASC_ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID != '' }}
           HAS_ASC_P8: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 != '' }}
-          HAS_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 != '' }}
-          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
-          HAS_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD != '' }}
-          HAS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS != '' }}
-          HAS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD != '' }}
-          HAS_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK != '' }}
-          ANDROID_TRACK: ${{ inputs.android_track }}
         run: |
           set -euo pipefail
           echo "ref: $GITHUB_REF  commit: $GITHUB_SHA  runner: $(hostname)"
@@ -64,23 +59,11 @@ jobs:
           [ "$avail_gb" -ge 8 ] || { echo "::error::only ${avail_gb} GB free on the runner"; exit 1; }
           flutter --version | head -1
           java -version 2>&1 | head -1
+          xcodebuild -version | head -1
           missing=()
-          if [ "$NEED_IOS" = true ]; then
-            xcodebuild -version | head -1
-            [ "$HAS_ASC_KEY_ID" = true ] || missing+=(APP_STORE_CONNECT_KEY_ID)
-            [ "$HAS_ASC_ISSUER" = true ] || missing+=(APP_STORE_CONNECT_ISSUER_ID)
-            [ "$HAS_ASC_P8" = true ] || missing+=(APP_STORE_CONNECT_PRIVATE_KEY_BASE64)
-          fi
-          if [ "$NEED_ANDROID" = true ]; then
-            [ "$HAS_PLAY_JSON" = true ] || missing+=(GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64)
-            [ "$HAS_KEYSTORE" = true ] || missing+=(ANDROID_KEYSTORE_BASE64)
-            [ "$HAS_KEYSTORE_PASSWORD" = true ] || missing+=(ANDROID_KEYSTORE_PASSWORD)
-            [ "$HAS_KEY_ALIAS" = true ] || missing+=(ANDROID_KEY_ALIAS)
-            [ "$HAS_KEY_PASSWORD" = true ] || missing+=(ANDROID_KEY_PASSWORD)
-            if [ "$ANDROID_TRACK" = beta ] && [ "$HAS_BETA_TRACK" != true ]; then
-              missing+=("variable ANDROID_BETA_TRACK")
-            fi
-          fi
+          [ "$HAS_ASC_KEY_ID" = true ] || missing+=(APP_STORE_CONNECT_KEY_ID)
+          [ "$HAS_ASC_ISSUER" = true ] || missing+=(APP_STORE_CONNECT_ISSUER_ID)
+          [ "$HAS_ASC_P8" = true ] || missing+=(APP_STORE_CONNECT_PRIVATE_KEY_BASE64)
           if [ ${#missing[@]} -gt 0 ]; then
             echo "::error::missing in environment 'beta': ${missing[*]}"
             exit 1
@@ -91,7 +74,7 @@ jobs:
           bundle exec fastlane --version | tail -1
 
   ios:
-    needs: preflight
+    needs: preflight-ios
     if: inputs.platform != 'android'
     runs-on: [self-hosted, macOS, mybrev-release]
     environment: beta
@@ -118,21 +101,69 @@ jobs:
           bundle exec fastlane ios beta
           cat fastlane/release-result-ios.env >> "$GITHUB_OUTPUT"
 
-  android:
-    needs: preflight
+  # ---- Android: GitHub-hosted Linux, the Mac is not needed --------------------
+  preflight-android:
     if: inputs.platform != 'ios'
-    runs-on: [self-hosted, macOS, mybrev-release]
+    runs-on: ubuntu-latest
+    environment: beta
+    timeout-minutes: 10
+    steps:
+      - name: Secrets (names only)
+        env:
+          HAS_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 != '' }}
+          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+          HAS_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD != '' }}
+          HAS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS != '' }}
+          HAS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD != '' }}
+          HAS_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK != '' }}
+          ANDROID_TRACK: ${{ inputs.android_track }}
+        run: |
+          set -euo pipefail
+          echo "ref: $GITHUB_REF  commit: $GITHUB_SHA"
+          missing=()
+          [ "$HAS_PLAY_JSON" = true ] || missing+=(GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64)
+          [ "$HAS_KEYSTORE" = true ] || missing+=(ANDROID_KEYSTORE_BASE64)
+          [ "$HAS_KEYSTORE_PASSWORD" = true ] || missing+=(ANDROID_KEYSTORE_PASSWORD)
+          [ "$HAS_KEY_ALIAS" = true ] || missing+=(ANDROID_KEY_ALIAS)
+          [ "$HAS_KEY_PASSWORD" = true ] || missing+=(ANDROID_KEY_PASSWORD)
+          if [ "$ANDROID_TRACK" = beta ] && [ "$HAS_BETA_TRACK" != true ]; then
+            missing+=("variable ANDROID_BETA_TRACK")
+          fi
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::missing in environment 'beta': ${missing[*]}"
+            exit 1
+          fi
+
+  android:
+    needs: preflight-android
+    if: inputs.platform != 'ios'
+    runs-on: ubuntu-latest
     environment: beta
     timeout-minutes: 60
+    env:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     outputs:
       version_code: ${{ steps.release.outputs.ANDROID_VERSION_CODE }}
       version: ${{ steps.release.outputs.ANDROID_VERSION }}
       track: ${{ steps.release.outputs.ANDROID_TRACK }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.38.9"
+          cache: true
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
       - name: fastlane android ${{ inputs.android_track }}
         id: release
-        shell: bash -l {0}
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -143,26 +174,25 @@ jobs:
           PLAY_RELEASE_STATUS: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
         run: |
           set -euo pipefail
-          export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-          bundle config set --local path "$HOME/.cache/mybrev-release-bundle"
-          bundle install --quiet
+          flutter --version | head -1
           bundle exec fastlane android ${{ inputs.android_track }}
           cat fastlane/release-result-android.env >> "$GITHUB_OUTPUT"
 
+  # ---- Summary: needs no Mac, so it still reports when the Mac is off ---------
   summary:
-    needs: [preflight, ios, android]
+    needs: [preflight-ios, ios, preflight-android, android]
     if: always()
-    runs-on: [self-hosted, macOS, mybrev-release]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Release summary
         shell: bash
         env:
-          IOS_RESULT: ${{ needs.ios.result }}
+          IOS_RESULT: ${{ needs.ios.result == 'skipped' && needs.preflight-ios.result != 'skipped' && needs.preflight-ios.result || needs.ios.result }}
           IOS_VERSION: ${{ needs.ios.outputs.version }}
           IOS_BUILD: ${{ needs.ios.outputs.build }}
           IOS_GROUPS: ${{ needs.ios.outputs.groups }}
-          ANDROID_RESULT: ${{ needs.android.result }}
+          ANDROID_RESULT: ${{ needs.android.result == 'skipped' && needs.preflight-android.result != 'skipped' && needs.preflight-android.result || needs.android.result }}
           ANDROID_VERSION: ${{ needs.android.outputs.version }}
           ANDROID_VERSION_CODE: ${{ needs.android.outputs.version_code }}
           ANDROID_TRACK: ${{ needs.android.outputs.track }}
