@@ -39,8 +39,15 @@ end
 
 # Flutter (and CocoaPods it calls) run in the user's own environment, not in
 # fastlane's Bundler one: CocoaPods is installed apart from this Gemfile.
+#
+# `with_unbundled_env` restores the environment fastlane started with, so
+# variables a lane set meanwhile (the materialized upload keystore:
+# ANDROID_KEYSTORE_PATH) must be carried into it, or Gradle falls back to the
+# debug key.
 def flutter(*args, **options)
+  carried = ENV.to_h.select { |name, _| name.start_with?("ANDROID_") }
   Bundler.with_unbundled_env do
+    carried.each { |name, value| ENV[name] = value }
     Dir.chdir(ROOT) { sh(FLUTTER, *args, **options) }
   end
 end
