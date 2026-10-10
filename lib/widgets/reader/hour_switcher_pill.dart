@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:mybrev_flutter/theme/platform_design.dart';
 
 /// Uses the same scroll controller and picker callback as the Office header.
 class HourSwitcherPill extends StatefulWidget {
+  /// Reserve enough shared top chrome for the unabridged, system-scaled label.
+  static double chromeHeight(BuildContext context, String title) {
+    final triggerWidth = (MediaQuery.sizeOf(context).width - 144).clamp(
+      1.0,
+      340.0,
+    );
+    final width = (triggerWidth - 28 - 22).clamp(1.0, double.infinity);
+    final painter = TextPainter(
+      text: TextSpan(
+        text: title,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(height: 1.1),
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout(maxWidth: width);
+    final height = (painter.height + 12).clamp(48.0, double.infinity);
+    painter.dispose();
+    return height;
+  }
+
   const HourSwitcherPill({
     super.key,
     required this.controller,
@@ -59,11 +78,10 @@ class _HourSwitcherPillState extends State<HourSwitcherPill> {
       return;
     }
     final bottom = anchor.localToGlobal(Offset(0, anchor.size.height)).dy;
-    final top = overlay.localToGlobal(Offset.zero).dy;
     final visible =
         widget.controller.hasClients &&
         widget.controller.offset > 0 &&
-        bottom <= top + widget.topInset;
+        bottom <= widget.topInset;
     if (_visible != visible && mounted) setState(() => _visible = visible);
   }
 
@@ -74,58 +92,56 @@ class _HourSwitcherPillState extends State<HourSwitcherPill> {
   }
 
   @override
-  Widget build(BuildContext context) => Positioned.fill(
+  Widget build(BuildContext context) => Positioned(
+    top: MediaQuery.paddingOf(context).top + 8,
+    left: 72,
+    right: 72,
     child: IgnorePointer(
       ignoring: !_visible,
       child: Align(
         alignment: Alignment.topCenter,
         child: Padding(
-          // The space between Back and Aa already belongs to reader chrome.
-          // Keep the trigger there so no additional band covers document lines.
-          padding: EdgeInsets.fromLTRB(72, widget.topInset - 44, 72, 0),
+          padding: EdgeInsets.zero,
           child: AnimatedSlide(
             offset: _visible ? Offset.zero : const Offset(0, -.15),
             duration: const Duration(milliseconds: 180),
             child: AnimatedOpacity(
               opacity: _visible ? 1 : 0,
               duration: const Duration(milliseconds: 180),
-              child: AdaptiveChromeSurface(
-                role: ChromeSurfaceRole.group,
-                borderRadius: BorderRadius.zero,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    key: const Key('hour-switcher-pill'),
-                    borderRadius: BorderRadius.zero,
-                    onTap: widget.onTap,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 340,
-                        minHeight: 48,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  key: const Key('hour-switcher-pill'),
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: widget.onTap,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 340,
+                      minHeight: 48,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                widget.title,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.labelLarge?.copyWith(height: 1.1),
-                              ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              widget.title,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelLarge?.copyWith(height: 1.1),
                             ),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              size: 18,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 18,
+                          ),
+                        ],
                       ),
                     ),
                   ),

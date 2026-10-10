@@ -108,33 +108,16 @@ class HoursOptionsSheet extends ConsumerWidget {
           value: option.key,
           contentPadding: EdgeInsets.zero,
           controlAffinity: ListTileControlAffinity.leading,
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: VestmentMarker(colors: colors, size: 14),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  option.title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+          title: Text(
+            option.title,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          secondary: VestmentMarker(colors: colors, size: 14),
           subtitle: _metadata(option).isEmpty
               ? null
-              : Padding(
-                  padding: const EdgeInsets.only(left: 22),
-                  child: Text(
-                    _metadata(option),
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ),
+              : Text(_metadata(option), style: theme.textTheme.bodyMedium),
         ),
       );
     }

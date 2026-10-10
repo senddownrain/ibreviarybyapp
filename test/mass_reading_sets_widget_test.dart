@@ -220,13 +220,21 @@ void main() {
       );
       await tester.tap(find.byKey(const ValueKey('readings-mass-set-vigil')));
       await tester.pumpAndSettle();
+      expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
+      expect(_chip(tester, 'vigil').selected, isTrue);
+      await tester.tap(find.byTooltip('Закрыць').last);
+      await tester.pumpAndSettle();
       expect(find.byKey(const Key('readings-mass-set-selector')), findsNothing);
       await _scrollTo(tester, _text(vigil));
       expect(_text(vigil), findsOneWidget);
       expect(_text(day), findsNothing);
-      expect(container.read(readingsMassSetSelectionProvider), {
-        '2026-08-15|15-08-assumption-blessed-virgin-mary': 'vigil',
-      });
+      expect(
+        container.read(readingsMassSetSelectionProvider),
+        containsPair(
+          '2026-08-15|15-08-assumption-blessed-virgin-mary',
+          'vigil',
+        ),
+      );
 
       // Another screen of the same date (navigation away and back).
       await tester.pumpWidget(const SizedBox());

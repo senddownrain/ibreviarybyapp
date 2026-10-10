@@ -1,11 +1,121 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
 
 void main() {
+  for (final layout in PsalmVerseLayout.values) {
+    for (final breaks in PsalmMarkerBreakMode.values) {
+      testWidgets('strophe alignment: ${layout.name}, ${breaks.name}', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(240, 1600);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final controller = ValueNotifier<int?>(null);
+        addTearDown(controller.dispose);
+        final html = formatPsalmHtml(
+          [
+            for (var i = 1; i <= 6; i++)
+              '<p${i == 6 ? ' class="semantic-last"' : ''}>Страфа $i † '
+                  'працяг $i з доўгім тэкстам для некалькіх '
+                  'аўтаматычных пераносаў на вузкім экране * '
+                  'яшчэ $i † канец $i *</p>',
+          ].join(),
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: PsalmodyScope(
+              controller: controller,
+              verseLayout: layout,
+              markerBreakMode: breaks,
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  child: PsalmChoirHtml(
+                    html: html,
+                    style: {
+                      'body': Style(fontSize: FontSize(16)),
+                      '.psalm-strophe': Style(margin: Margins.only(bottom: 8)),
+                      '.psalm-strophe-even': Style(
+                        margin: Margins.only(left: 16, bottom: 8),
+                      ),
+                      '.psalm-strophe-even.semantic-last': Style(
+                        margin: Margins.only(left: 16),
+                      ),
+                    },
+                    textColor: Colors.black,
+                    rubricColor: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        Finder line(String prefix) => find.byWidgetPredicate(
+          (widget) =>
+              widget is RichText &&
+              widget.text.toPlainText().trimLeft().startsWith(prefix),
+        );
+        final origin = tester.getTopLeft(line('Страфа 1')).dx;
+        for (var i = 1; i <= 6; i++) {
+          final first = line('Страфа $i');
+          final left = tester.getTopLeft(first).dx;
+          expect(
+            left - origin,
+            closeTo(
+              layout == PsalmVerseLayout.alternatingIndent && i.isEven ? 16 : 0,
+              .01,
+            ),
+          );
+          if (breaks == PsalmMarkerBreakMode.breakAfterMarker) {
+            for (final prefix in ['працяг $i', 'яшчэ $i', 'канец $i']) {
+              final continuation = line(prefix);
+              final paragraph = tester.renderObject<RenderParagraph>(
+                continuation,
+              );
+              final continuationLeft = tester.getTopLeft(continuation).dx;
+              expect(
+                continuationLeft - left,
+                closeTo(
+                  layout == PsalmVerseLayout.alternatingIndent ? 0 : 16 * .8,
+                  .01,
+                ),
+              );
+              final boxes = paragraph.getBoxesForSelection(
+                TextSelection(
+                  baseOffset: 0,
+                  extentOffset: paragraph.text.toPlainText().length,
+                ),
+              );
+              final physicalLines = <double, double>{};
+              for (final box in boxes) {
+                physicalLines.update(
+                  box.top,
+                  (left) => box.left < left ? box.left : left,
+                  ifAbsent: () => box.left,
+                );
+              }
+              if (prefix.startsWith('працяг')) {
+                expect(physicalLines.length, greaterThan(1));
+              }
+              for (final x in physicalLines.values) {
+                // Paragraph shaping can round glyph bounds to subpixels.
+                expect(x, closeTo(0, .5));
+              }
+            }
+          }
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
   testWidgets('tap selects a choir and a second tap clears it', (tester) async {
     final html = formatPsalmHtml(
       '<p>Першы радок *<br>другі радок</p>'

@@ -72,10 +72,8 @@ class HomeScreen extends ConsumerWidget {
                               presentation: presentation,
                               onToday: () =>
                                   dayNavigation.openDate(DateTime.now()),
-                              onDateTap: () => showCompactLiturgicalCalendar(
+                              onDateTap: () => showLiturgicalCalendarSheet(
                                 context: context,
-                                date: date,
-                                diocese: selection.diocese,
                                 pickerRoute: '/hours/picker',
                               ),
                               onVariants: () => showLiturgicalCalendarSheet(

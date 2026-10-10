@@ -273,6 +273,9 @@ class _MonthGrid extends ConsumerWidget {
     final theme = Theme.of(context);
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
+        // Keep the grid's scroll offset separate from an enclosing
+        // ExpansionTile's boolean PageStorage value.
+        key: const PageStorageKey('liturgical-month-grid-scroll'),
         scrollDirection: Axis.horizontal,
         child: SizedBox(
           width: constraints.maxWidth.clamp(322.0, 696.0),

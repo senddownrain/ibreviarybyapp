@@ -130,9 +130,12 @@ class ReaderScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final scopedController = ReaderChromeModeScope.maybeControllerOf(context);
     final resolvedMode = scopedController?.value ?? chromeMode;
+    final hourChromeHeight = hourTitle == null
+        ? 48.0
+        : HourSwitcherPill.chromeHeight(context, hourTitle!);
     final topInset = resolvedMode == ReaderChromeMode.hidden
         ? MediaQuery.paddingOf(context).top + 16
-        : MediaQuery.paddingOf(context).top + 76;
+        : MediaQuery.paddingOf(context).top + hourChromeHeight + 28;
 
     void setMode(ReaderChromeMode mode) {
       if (scopedController != null) {
@@ -211,7 +214,10 @@ class ReaderScaffold extends StatelessWidget {
             )
           else
             scrollView,
-          ReaderEdgeProtection(mode: resolvedMode),
+          ReaderEdgeProtection(
+            mode: resolvedMode,
+            topChromeHeight: hourTitle == null ? null : hourChromeHeight,
+          ),
           if (resolvedMode != ReaderChromeMode.hidden) ?overlay,
           if (resolvedMode != ReaderChromeMode.hidden &&
               hourTitle != null &&
@@ -223,7 +229,8 @@ class ReaderScaffold extends StatelessWidget {
               titleAnchor: hourTitleAnchor!,
               title: hourTitle!,
               onTap: onChangeHour!,
-              topInset: MediaQuery.paddingOf(context).top + 56,
+              topInset:
+                  MediaQuery.paddingOf(context).top + hourChromeHeight + 8,
             ),
           if (showScrollToTop && scrollController != null)
             _ReaderScrollToTopControl(
@@ -252,9 +259,14 @@ class ReaderScaffold extends StatelessWidget {
 /// Soft visual backing at the reader edges. It sits above scrolling text but
 /// never changes scroll geometry or participates in hit testing.
 class ReaderEdgeProtection extends StatelessWidget {
-  const ReaderEdgeProtection({super.key, required this.mode});
+  const ReaderEdgeProtection({
+    super.key,
+    required this.mode,
+    this.topChromeHeight,
+  });
 
   final ReaderChromeMode mode;
+  final double? topChromeHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +274,14 @@ class ReaderEdgeProtection extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final safeTop = MediaQuery.viewPaddingOf(context).top;
     final safeBottom = MediaQuery.viewPaddingOf(context).bottom;
-    final topFadeHeight = safeTop + (mode == ReaderChromeMode.hidden ? 10 : 58);
+    final protectedHeight = topChromeHeight == null
+        ? safeTop
+        : safeTop + topChromeHeight! + 8;
+    final topFadeHeight = mode == ReaderChromeMode.hidden
+        ? safeTop + 10
+        : topChromeHeight == null
+        ? safeTop + 58
+        : protectedHeight + 18;
     return IgnorePointer(
       key: const Key('reader-edge-protection'),
       child: Stack(
@@ -279,7 +298,14 @@ class ReaderEdgeProtection extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [surface, surface, surface.withValues(alpha: 0)],
-                  stops: [0, safeTop / topFadeHeight, 1],
+                  stops: [
+                    0,
+                    (mode == ReaderChromeMode.hidden
+                            ? safeTop
+                            : protectedHeight) /
+                        topFadeHeight,
+                    1,
+                  ],
                 ),
               ),
             ),

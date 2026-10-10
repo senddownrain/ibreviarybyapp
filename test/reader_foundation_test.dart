@@ -2,8 +2,115 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/theme/platform_design.dart';
 
 void main() {
+  testWidgets(
+    'scrolled hour title shares readable chrome and leaves scrolling reachable',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      for (final width in [320.0, 800.0]) {
+        tester.view.physicalSize = Size(width, 800);
+        for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+          for (final brightness in Brightness.values) {
+            for (final scale in [1.0, 2.0]) {
+              final scroll = ScrollController();
+              final anchor = GlobalKey();
+              var opened = 0;
+              const title = 'Малітва перад поўднем';
+              await tester.pumpWidget(
+                MaterialApp(
+                  key: UniqueKey(),
+                  theme: ThemeData(platform: platform, brightness: brightness),
+                  home: MediaQuery(
+                    data: MediaQueryData(
+                      size: Size(width, 800),
+                      padding: const EdgeInsets.only(top: 24),
+                      viewPadding: const EdgeInsets.only(top: 24),
+                      textScaler: TextScaler.linear(scale),
+                    ),
+                    child: ReaderScaffold(
+                      scrollController: scroll,
+                      hourTitle: title,
+                      hourTitleAnchor: anchor,
+                      onChangeHour: () => opened++,
+                      actions: [
+                        SizedBox.square(
+                          dimension: 48,
+                          child: IconButton(
+                            key: const Key('test-aa'),
+                            onPressed: () {},
+                            icon: const Icon(Icons.text_fields),
+                          ),
+                        ),
+                      ],
+                      contextHeader: Text(title, key: anchor),
+                      content: Column(
+                        children: List.generate(
+                          60,
+                          (i) => Text(
+                            'Малітва, радок $i',
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+              await tester.pumpAndSettle();
+              scroll.jumpTo(500);
+              await tester.pumpAndSettle();
+              final trigger = find.byKey(const Key('hour-switcher-pill'));
+              final rect = tester.getRect(trigger);
+              expect(rect.height, greaterThanOrEqualTo(48));
+              expect(
+                rect.left,
+                greaterThanOrEqualTo(
+                  tester
+                      .getRect(find.byKey(const Key('reader-chrome-back')))
+                      .right,
+                ),
+              );
+              expect(
+                rect.right,
+                lessThanOrEqualTo(
+                  tester.getRect(find.byKey(const Key('test-aa'))).left,
+                ),
+              );
+              expect(
+                find.ancestor(
+                  of: trigger,
+                  matching: find.byType(AdaptiveChromeSurface),
+                ),
+                findsNothing,
+              );
+              final fade = tester.getRect(
+                find.byKey(const Key('reader-top-fade')),
+              );
+              expect(fade.bottom, greaterThan(rect.bottom));
+              await tester.tap(trigger);
+              await tester.pumpAndSettle();
+              expect(opened, 1);
+              final before = scroll.offset;
+              await tester.dragFrom(
+                Offset(width / 2, 450),
+                const Offset(0, -120),
+              );
+              await tester.pumpAndSettle();
+              expect(scroll.offset, greaterThan(before));
+              expect(tester.takeException(), isNull);
+              await tester.pumpWidget(const SizedBox());
+              await tester.pump();
+              scroll.dispose();
+            }
+          }
+        }
+      }
+    },
+  );
+
   testWidgets('shell controller drives full compact and hidden chrome', (
     tester,
   ) async {

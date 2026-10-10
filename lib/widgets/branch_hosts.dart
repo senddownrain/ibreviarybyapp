@@ -163,9 +163,9 @@ class _ReadingsBranchHostState extends ConsumerState<ReadingsBranchHost> {
             requestedCycle: widget.cycle,
           )
         : ReadingsScreen(
-            key: ValueKey(
-              'readings-${sharedDate.toIso8601String()}-${sharedDayId ?? ''}',
-            ),
+            // An open chooser belongs to this reader across date/celebration
+            // changes. didUpdateWidget reloads its existing selection state.
+            key: const ValueKey('readings-calendar'),
             dateStr: _dateKey(sharedDate),
             dayId: sharedDayId,
             requestedSetId: widget.massSetId,

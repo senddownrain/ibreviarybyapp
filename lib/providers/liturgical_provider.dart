@@ -91,6 +91,26 @@ class HoursLiturgicalOverrideNotifier
     final next = Map<String, HoursChoice>.from(state)..remove(_dateKey(date));
     state = next;
   }
+
+  /// An explicit Settings change supersedes an old route's source context.
+  /// Keep the celebration choice: the existing resolver can retain it when
+  /// legal in the newly selected dioceses, or fall back to the primary day.
+  void retainSelectedContexts(DioceseSelection selection) {
+    if (!state.values.any(
+      (choice) =>
+          choice.diocese != null && !selection.contains(choice.diocese!),
+    )) {
+      return;
+    }
+    state = {
+      for (final entry in state.entries)
+        entry.key:
+            entry.value.diocese != null &&
+                !selection.contains(entry.value.diocese!)
+            ? HoursChoice(entry.value.dayId)
+            : entry.value,
+    };
+  }
 }
 
 /// Session-scoped manual choices, keyed by date so they never leak to another
@@ -99,7 +119,13 @@ final hoursLiturgicalOverridesProvider =
     StateNotifierProvider<
       HoursLiturgicalOverrideNotifier,
       Map<String, HoursChoice>
-    >((ref) => HoursLiturgicalOverrideNotifier());
+    >((ref) {
+      final notifier = HoursLiturgicalOverrideNotifier();
+      ref.listen(dioceseSelectionProvider, (previous, next) {
+        notifier.retainSelectedContexts(next);
+      });
+      return notifier;
+    });
 
 final hoursLiturgicalSelectionProvider = Provider<HoursLiturgicalSelection>((
   ref,

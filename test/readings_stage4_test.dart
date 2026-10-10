@@ -455,6 +455,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
     expect(find.text('Год A · зменены'), findsOneWidget);
+    expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
+    await tester.tap(find.byTooltip('Закрыць').last);
+    await tester.pumpAndSettle();
     expect(find.text('Год B'), findsNothing);
     expect(find.text('XXIII звычайны тыдзень'), findsOneWidget);
     expect(find.textContaining('Тэкст A'), findsWidgets);
@@ -462,6 +465,8 @@ void main() {
     await tester.tap(find.byKey(const Key('readings-alternatives-control')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('readings-cycle-B')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Закрыць').last);
     await tester.pumpAndSettle();
     expect(find.textContaining('Год B'), findsOneWidget);
     expect(find.text('Год A'), findsNothing);
@@ -472,6 +477,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Іншае святкаванне'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Закрыць').last);
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-cycle-metadata')), findsOneWidget);
     expect(find.text('Набор чытанняў · зменены'), findsOneWidget);
     expect(find.byKey(const Key('readings-cycle-badge')), findsNothing);
@@ -479,6 +486,8 @@ void main() {
     await tester.tap(find.byKey(const Key('readings-alternatives-control')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Нядзельныя чытанні, Год B').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Закрыць').last);
     await tester.pumpAndSettle();
     expect(find.textContaining('Тэкст B'), findsWidgets);
     expect(find.byKey(const Key('readings-cycle-metadata')), findsNothing);
@@ -517,6 +526,13 @@ void main() {
     );
     addTearDown(container.dispose);
     Future<void> openDate(String date) async {
+      if (find
+          .byKey(const Key('readings-options-sheet'))
+          .evaluate()
+          .isNotEmpty) {
+        await tester.tap(find.byTooltip('Закрыць').last);
+        await tester.pumpAndSettle();
+      }
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,

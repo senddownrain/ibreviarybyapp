@@ -103,15 +103,19 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
         },
         '.psalm-line': Style(display: Display.block, margin: Margins.zero),
         '.psalm-continuation': Style(
-          padding: HtmlPaddings.only(
-            left:
-                MediaQuery.textScalerOf(context).scale(
-                  widget.style['p']?.fontSize?.value ??
-                      widget.style['body']?.fontSize?.value ??
-                      16,
-                ) *
-                .8,
-          ),
+          // With alternating strophes, every line uses its paragraph's inset,
+          // including lines that wrap to fit the screen.
+          padding: !aligned && breakAfter
+              ? HtmlPaddings.zero
+              : HtmlPaddings.only(
+                  left:
+                      MediaQuery.textScalerOf(context).scale(
+                        widget.style['p']?.fontSize?.value ??
+                            widget.style['body']?.fontSize?.value ??
+                            16,
+                      ) *
+                      .8,
+                ),
         ),
         '.psalm-choir-strophe': Style(
           color: widget.textColor,

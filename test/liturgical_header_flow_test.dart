@@ -18,6 +18,9 @@ import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dar
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
+import 'package:mybrev_flutter/models/parsed_reading.dart';
+import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/router/router.dart' as production;
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
@@ -85,23 +88,28 @@ void main() {
     await directory.delete(recursive: true);
   });
 
-  ProviderContainer containerFor(DateTime date) => ProviderContainer(
+  ProviderContainer containerFor(
+    DateTime date, [
+    List<Override> overrides = const [],
+  ]) => ProviderContainer(
     overrides: [
       selectedDateProvider.overrideWith((ref) => date),
       liturgicalContentReadyProvider.overrideWith((ref) async {}),
       contentUpdatesProvider.overrideWith(_Idle.new),
       settingsProvider.overrideWith(_Settings.new),
+      ...overrides,
     ],
   );
 
   Future<(GoRouter, ProviderContainer)> start(
     WidgetTester tester, {
     double scale = 1,
+    List<Override> overrides = const [],
   }) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    final container = containerFor(DateTime(2026, 10, 7));
+    final container = containerFor(DateTime(2026, 10, 7), overrides);
     final router = GoRouter(
       initialLocation: '/hours',
       navigatorKey: production.rootNavigatorKey,
@@ -221,17 +229,14 @@ void main() {
       await snapshot(tester, 'readings-marian');
       await tester.tap(find.byKey(const Key('readings-date-action')));
       await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('compact-liturgical-calendar')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
       await snapshot(tester, 'calendar');
       expect(tester.takeException(), isNull);
     },
   );
 
   testWidgets(
-    'compact calendar closes into ORDO; Today and deep search remain available',
+    'Hours date expands the same chooser; Today and deep search remain available',
     (tester) async {
       final (router, container) = await start(tester);
       await tester.tap(find.byKey(const Key('hours-previous-day')));
@@ -246,7 +251,8 @@ void main() {
         find.byKey(const Key('compact-liturgical-calendar')),
         findsNothing,
       );
-      expect(find.byType(OrdoScreen), findsOneWidget);
+      expect(find.byType(OrdoScreen), findsNothing);
+      expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
       expect(container.read(selectedDateProvider), DateTime(2026, 10, 7));
       router.pop();
       await tester.pumpAndSettle();
@@ -267,6 +273,150 @@ void main() {
       await tester.tap(find.byKey(const Key('liturgical-calendar-picker')));
       await tester.pumpAndSettle();
       expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'Readings chooser stays reactive across celebrations, years and dates',
+    (tester) async {
+      String? singleDayId;
+      final (router, container) = await start(
+        tester,
+        overrides: [
+          readingsLocalLoaderProvider.overrideWithValue(
+            ({required dateStr, required liturgicalKey, required dayId}) =>
+                null,
+          ),
+          readingsLoaderProvider.overrideWithValue(
+            ({
+              required dateStr,
+              required liturgicalKey,
+              required dayId,
+            }) async => ReadingsLoadResult(
+              sundayCycle: 'A',
+              weekdayCycle: '2',
+              readings: [
+                if (dayId != null && dayId == singleDayId)
+                  const ParsedReading(
+                    id: 'single',
+                    title: 'Уласныя чытанні',
+                    reading1: ParsedSection(text: 'Адзіны ўласны тэкст.'),
+                  )
+                else ...[
+                  const ParsedReading(
+                    id: 'year1',
+                    dayId: 'weekday',
+                    title: 'Чытанні дня',
+                    year: '1',
+                    reading1: ParsedSection(text: 'Тэкст першага года.'),
+                  ),
+                  const ParsedReading(
+                    id: 'year2',
+                    dayId: 'weekday',
+                    title: 'Чытанні дня',
+                    year: '2',
+                    reading1: ParsedSection(text: 'Тэкст другога года.'),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      );
+      container
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(DateTime(2026, 10, 9));
+      await tester.pumpAndSettle();
+      final options = container
+          .read(hoursLiturgicalSelectionProvider)
+          .sortedOptions;
+      final memorial = options.firstWhere((o) => o.title.contains('Дыянісія'));
+      singleDayId = memorial.dayId;
+      final weekday = options.firstWhere((o) => o.ordo?.kind == 'temporal');
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('readings-alternatives-control')));
+      await tester.pumpAndSettle();
+      Future<void> choose(String key) async {
+        final finder = find.byKey(ValueKey(key));
+        await tester.scrollUntilVisible(
+          finder,
+          200,
+          scrollable: find
+              .descendant(
+                of: find.byKey(const Key('readings-options-scroll')),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        await tester.tap(finder);
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
+      }
+
+      await choose('readings-celebration-${memorial.key}');
+      expect(
+        container.read(hoursLiturgicalSelectionProvider).selected?.key,
+        memorial.key,
+      );
+      expect(find.byKey(const ValueKey('readings-cycle-1')), findsNothing);
+      expect(
+        find.byKey(ValueKey('readings-celebration-${weekday.key}')),
+        findsOneWidget,
+      );
+      await choose('readings-celebration-${weekday.key}');
+      await choose('readings-cycle-1');
+      expect(
+        tester
+            .widget<SelectionOptionCard>(
+              find.byKey(const ValueKey('readings-cycle-1')),
+            )
+            .selected,
+        isTrue,
+      );
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('readings-options-done')),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('readings-options-scroll')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(find.byKey(const Key('readings-options-done')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('readings-options-sheet')), findsNothing);
+      expect(find.textContaining('Тэкст першага года.'), findsWidgets);
+      await tester.tap(find.byKey(const Key('readings-alternatives-control')));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<SelectionOptionCard>(
+              find.byKey(const ValueKey('readings-cycle-1')),
+            )
+            .selected,
+        isTrue,
+      );
+      await tester.scrollUntilVisible(
+        find.text('Паказаць каляндар'),
+        -300,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('readings-options-scroll')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(find.text('Паказаць каляндар'));
+      await tester.pumpAndSettle();
+      await choose('ordo-day-2026-10-10');
+      expect(container.read(selectedDateProvider), DateTime(2026, 10, 10));
+      expect(
+        find.byKey(ValueKey('readings-celebration-${memorial.key}')),
+        findsNothing,
+      );
       expect(tester.takeException(), isNull);
     },
   );
@@ -320,18 +470,20 @@ void main() {
     await tester.tap(find.byKey(const Key('ordo-day-2026-10-06')));
     await tester.pumpAndSettle();
     expect(container.read(selectedDateProvider), DateTime(2026, 10, 6));
-    expect(find.byType(OrdoScreen), findsOneWidget);
-    router.pop();
-    await tester.pumpAndSettle();
-    router.go('/readings');
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('readings-date-action')));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(
-      find.byKey(const Key('liturgical-calendar-picker')),
+    expect(find.byType(OrdoScreen), findsNothing);
+    expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('readings-calendar-picker')),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byKey(const Key('readings-options-scroll')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('liturgical-calendar-picker')));
+    await tester.tap(find.byKey(const Key('readings-calendar-picker')));
     await tester.pumpAndSettle();
     expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
     expect(

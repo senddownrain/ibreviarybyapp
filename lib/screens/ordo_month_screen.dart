@@ -49,10 +49,7 @@ class _OrdoMonthScreenState extends ConsumerState<OrdoMonthScreen> {
   Widget build(BuildContext context) {
     final ready = ref.watch(liturgicalContentReadyProvider);
     ref.watch(cacheEpochProvider);
-    final dioceses = <String>{
-      ?widget.diocese,
-      ...ref.watch(dioceseSelectionProvider).ordered,
-    };
+    final dioceses = ref.watch(dioceseSelectionProvider).ordered;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final today = DateUtils.dateOnly(DateTime.now());
@@ -328,14 +325,6 @@ class _MonthEntry extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: VestmentMarker(
-              colors: [option.color, ...option.colorAlternatives],
-              size: 12,
-            ),
-          ),
-          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,6 +348,14 @@ class _MonthEntry extends StatelessWidget {
                     ),
                   ),
               ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: VestmentMarker(
+              colors: [option.color, ...option.colorAlternatives],
+              size: 12,
             ),
           ),
         ],

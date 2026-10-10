@@ -80,6 +80,43 @@ void main() {
 
   group('Hours union', () {
     final service = LiturgicalContentService();
+    test(
+      'Settings replaces an old route context, while new links still work',
+      () {
+        final date = DateTime(2026, 10, 9);
+        final container = ProviderContainer(
+          overrides: [selectedDateProvider.overrideWith((ref) => date)],
+        );
+        addTearDown(container.dispose);
+        final dayId = container.read(dayOptionsProvider).first.dayId!;
+        final choices = container.read(
+          hoursLiturgicalOverridesProvider.notifier,
+        );
+        choices.select(date, dayId, diocese: 'minsk-mohilev');
+        final settings = container.read(dioceseSelectionProvider.notifier);
+        settings.toggle('vitebsk');
+        settings.toggle('minsk-mohilev');
+        expect(
+          container.read(dayContentsProvider).map((day) => day.ordo.diocese),
+          ['vitebsk'],
+        );
+        expect(
+          container.read(hoursLiturgicalOverridesProvider)['2026-10-09'],
+          HoursChoice(dayId),
+        );
+        expect(
+          container.read(hoursLiturgicalSelectionProvider).selected?.dayId,
+          dayId,
+        );
+
+        choices.select(date, dayId, diocese: 'minsk-mohilev');
+        expect(
+          container.read(hoursLiturgicalSelectionProvider).diocese,
+          'minsk-mohilev',
+        );
+        expect(container.read(dioceseSelectionProvider).selected, ['vitebsk']);
+      },
+    );
     List<DayOption> union(DateTime date, List<String> dioceses) =>
         unionDayOptions([
           for (final diocese in dioceses)

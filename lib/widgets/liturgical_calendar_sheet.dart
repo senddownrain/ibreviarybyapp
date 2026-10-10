@@ -13,7 +13,7 @@ import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 Future<void> showCompactLiturgicalCalendar({
   required BuildContext context,
   required DateTime date,
-  required String pickerRoute,
+  String? pickerRoute,
   String? diocese,
   ValueChanged<DateTime>? onSelected,
 }) async {
@@ -53,13 +53,14 @@ Future<void> showCompactLiturgicalCalendar({
                   child: const Text('Сёння'),
                 ),
               ),
-              ListTile(
-                key: const Key('liturgical-calendar-picker'),
-                leading: const Icon(Icons.search),
-                title: const Text('Знайсці літургічны дзень'),
-                subtitle: const Text('Пошук паводле перыяду або свята'),
-                onTap: () => Navigator.pop(sheetContext, true),
-              ),
+              if (pickerRoute != null)
+                ListTile(
+                  key: const Key('liturgical-calendar-picker'),
+                  leading: const Icon(Icons.search),
+                  title: const Text('Знайсці літургічны дзень'),
+                  subtitle: const Text('Пошук паводле перыяду або свята'),
+                  onTap: () => Navigator.pop(sheetContext, true),
+                ),
             ],
           ),
         ),
@@ -81,7 +82,7 @@ Future<void> showCompactLiturgicalCalendar({
         ).toString(),
       );
     }
-  } else if (result == true) {
+  } else if (result == true && pickerRoute != null) {
     await router.push(pickerRoute);
   }
 }
@@ -183,13 +184,18 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
                       seasonColor: presentation.accent,
                       diocese: widget.diocese,
                       onSelected: selectDate,
-                    )
-                  else
-                    TextButton.icon(
-                      onPressed: () => setState(() => _calendarExpanded = true),
-                      icon: const Icon(Icons.calendar_month_outlined),
-                      label: const Text('Паказаць каляндар'),
                     ),
+                  TextButton.icon(
+                    key: const Key('liturgical-calendar-toggle'),
+                    onPressed: () =>
+                        setState(() => _calendarExpanded = !_calendarExpanded),
+                    icon: const Icon(Icons.calendar_month_outlined),
+                    label: Text(
+                      _calendarExpanded
+                          ? 'Схаваць каляндар'
+                          : 'Паказаць каляндар',
+                    ),
+                  ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(

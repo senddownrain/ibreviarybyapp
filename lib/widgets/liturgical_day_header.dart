@@ -103,9 +103,29 @@ class LiturgicalDayHeader extends StatelessWidget {
                           .copyWith(color: cs.onSurface, height: 1.18),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      metadata ?? p.metadata,
+                    Text.rich(
+                      key: Key('$keyPrefix-day-metadata'),
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: p.weekday,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: cs.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: (metadata ?? p.metadata).replaceFirst(
+                              p.weekday,
+                              '',
+                            ),
+                          ),
+                        ],
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 14.5,
                         color: cs.onSurfaceVariant,
                       ),
                     ),

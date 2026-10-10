@@ -526,11 +526,29 @@ void main() {
     expect(container.read(selectedDateProvider), DateTime(2026, 10, 8));
     expect(
       find.byKey(ValueKey('hours-root-${DateTime(2026, 10, 8)}')),
-      findsNothing,
+      findsOneWidget,
     );
-    expect(find.byType(OrdoScreen), findsOneWidget);
+    expect(find.byType(OrdoScreen), findsNothing);
+    expect(find.byType(LiturgicalCalendarSheet), findsOneWidget);
     expect(find.byKey(const Key('compact-liturgical-calendar')), findsNothing);
     expect(find.byType(Dialog), findsNothing);
+  });
+
+  testWidgets('ORDO reused route adopts its new date and source', (
+    tester,
+  ) async {
+    final (router, container) = await start(
+      tester,
+      location: '/hours/ordo?date=2026-10-09',
+    );
+    await tapVisible(tester, find.byKey(const Key('ordo-next-day')));
+    expect(container.read(selectedDateProvider), DateTime(2026, 10, 10));
+    router.go('/hours/ordo?date=2026-08-26&diocese=grodno');
+    await tester.pumpAndSettle();
+    expect(find.byType(OrdoScreen), findsOneWidget);
+    expect(find.text('26 жніўня 2026'), findsOneWidget);
+    expect(container.read(selectedDateProvider), DateTime(2026, 8, 26));
+    expect(container.read(hoursLiturgicalSelectionProvider).diocese, 'grodno');
   });
 
   testWidgets('Hours calendar icon opens the day; arrows keep one route', (
@@ -555,7 +573,7 @@ void main() {
   });
 
   testWidgets(
-    'ORDO compact calendar closes on selection and preserves the temporary diocese',
+    'ORDO compact calendar closes on selection and preserves shared dioceses',
     (tester) async {
       final (_, container) = await start(
         tester,
@@ -583,28 +601,45 @@ void main() {
         container.read(hoursLiturgicalSelectionProvider).dayId,
         rosary().templates.last.id,
       );
-      expect(container.read(hoursLiturgicalSelectionProvider).diocese, 'pinsk');
+      expect(
+        container.read(hoursLiturgicalSelectionProvider).diocese,
+        settings.primary,
+      );
     },
   );
 
   testWidgets(
-    'ORDO dioceses are temporary, merge engine rows and keep one detailed context',
+    'ORDO dioceses persist through the shared settings and Month context',
     (tester) async {
       final (_, container) = await start(
         tester,
-        location: '/hours/ordo?date=2026-08-26',
+        location: '/hours/ordo?date=2026-08-26&diocese=minsk-mohilev',
       );
       final settings = container.read(dioceseSelectionProvider);
       await tapVisible(tester, find.byKey(const Key('ordo-dioceses')));
-      await tapVisible(tester, find.byKey(const Key('ordo-diocese-grodno')));
-      await tapVisible(tester, find.byKey(const Key('ordo-diocese-vitebsk')));
-      await tapVisible(tester, find.byKey(const Key('ordo-context-vitebsk')));
+      Future<void> toggleDiocese(String id) async {
+        // Dispatch these callbacks in the real IO zone: the production
+        // notifier persists to Hive as soon as the checkbox changes.
+        await tester.runAsync(
+          () => tester.tap(find.byKey(Key('ordo-diocese-$id'))),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      await toggleDiocese('grodno');
+      await toggleDiocese('vitebsk');
+      expect(find.text('Падрабязны кантэкст'), findsNothing);
       for (final id in settings.selected.where(
         (id) => id != 'grodno' && id != 'vitebsk',
       )) {
-        await tapVisible(tester, find.byKey(Key('ordo-diocese-$id')));
+        await toggleDiocese(id);
       }
-      expect(container.read(dioceseSelectionProvider), same(settings));
+      final shared = container.read(dioceseSelectionProvider);
+      expect(shared.selected, ['grodno', 'vitebsk']);
+      expect(
+        DioceseSelectionNotifier.read(Hive.box('settings')).selected,
+        shared.selected,
+      );
       await tapVisible(tester, find.text('Гатова'));
       expect(
         find.textContaining('Выбраныя дыяцэзіі адрозніваюцца'),
@@ -614,8 +649,11 @@ void main() {
       final query = GoRouterState.of(
         tester.element(find.byType(ReadingsScreen)),
       ).uri.queryParameters;
-      expect(query['diocese'], 'vitebsk');
-      expect(container.read(dioceseSelectionProvider), same(settings));
+      expect(query['diocese'], shared.primary);
+      expect(container.read(dioceseSelectionProvider), same(shared));
+      // Hive writes use real file IO; let the widget test drain them before
+      // closing the box in tearDownAll.
+      await tester.runAsync(() => Hive.box('settings').flush());
     },
   );
 
@@ -649,24 +687,24 @@ void main() {
     );
   }
 
-  testWidgets('calendar search reaches the existing period and feast picker', (
-    tester,
-  ) async {
-    final (router, _) = await start(tester);
-    await tapVisible(tester, find.byKey(const Key('hours-calendar-action')));
-    await tapVisible(tester, find.byKey(const Key('ordo-date-action')));
-    await tapVisible(
-      tester,
-      find.byKey(const Key('liturgical-calendar-picker')),
-    );
-    expect(find.byType(LiturgicalCalendarSheet), findsNothing);
-    expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
-    expect(find.text('Перыяды'), findsOneWidget);
-    expect(find.text('Святы'), findsOneWidget);
-    router.pop();
-    await tester.pumpAndSettle();
-    expect(find.byType(OrdoScreen), findsOneWidget);
-  });
+  testWidgets(
+    'Hours calendar search reaches the existing period and feast picker',
+    (tester) async {
+      final (router, _) = await start(tester);
+      await tapVisible(tester, find.byKey(const Key('hours-date-action')));
+      await tapVisible(
+        tester,
+        find.byKey(const Key('liturgical-calendar-picker')),
+      );
+      expect(find.byType(LiturgicalCalendarSheet), findsNothing);
+      expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
+      expect(find.text('Перыяды'), findsOneWidget);
+      expect(find.text('Святы'), findsOneWidget);
+      router.pop();
+      await tester.pumpAndSettle();
+      expect(find.byType(HomeScreen), findsOneWidget);
+    },
+  );
 
   for (final year in [2025, 2031]) {
     testWidgets(
