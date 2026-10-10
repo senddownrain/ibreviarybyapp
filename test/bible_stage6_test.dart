@@ -438,7 +438,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Aa changes the shared size and exposes reader fonts', (
+    testWidgets('Aa changes shared text size without exposing font settings', (
       tester,
     ) async {
       await _pumpBible(tester);
@@ -449,7 +449,7 @@ void main() {
       await tester.tap(find.byKey(const Key('text-scale-increase')));
       await tester.pump();
       expect(find.text('110%'), findsOneWidget);
-      expect(find.text('Шрыфт чытання'), findsOneWidget);
+      expect(find.byKey(const Key('settings-reader-font')), findsNothing);
     });
 
     testWidgets('search result opens the verse and Back restores query state', (
