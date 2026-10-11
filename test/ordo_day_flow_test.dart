@@ -357,6 +357,7 @@ void main() {
     expect(find.byType(HoursOptionsSheet), findsNothing);
     expect(container.read(hoursLiturgicalSelectionProvider).dayId, template.id);
     await openOrdo(tester);
+    await tapVisible(tester, find.text('Літургія гадзінаў').first);
     expect(find.textContaining('• ${template.label}'), findsOneWidget);
     expect(find.byKey(const Key('ordo-open-readings')), findsOneWidget);
     expect(find.byType(RadioListTile<String>), findsNothing);
@@ -719,6 +720,7 @@ void main() {
           find.byKey(const Key('ordo-row-all-faithful-departed-primary')),
           findsOneWidget,
         );
+        await tapVisible(tester, find.text('Літургія гадзінаў').first);
         expect(find.byKey(const Key('ordo-office-split')), findsOneWidget);
         expect(
           find.byKey(const ValueKey('ordo-mass-set-first')),

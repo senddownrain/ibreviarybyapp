@@ -84,7 +84,7 @@ class HomeScreen extends ConsumerWidget {
                               onPrevious: () => dayNavigation.moveBy(-1),
                               onNext: () => dayNavigation.moveBy(1),
                             ),
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 16),
                             if (selection.selected != null) ...[
                               _HoursList(
                                 date: date,
@@ -151,15 +151,6 @@ class _HoursList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Літургія гадзінаў',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.0,
-          ),
-        ),
-        const SizedBox(height: 8),
         for (var index = 0; index < available.length; index++) ...[
           _HourRow(
             hour: available[index],

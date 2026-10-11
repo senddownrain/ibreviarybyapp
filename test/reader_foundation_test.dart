@@ -60,6 +60,28 @@ void main() {
                 ),
               );
               await tester.pumpAndSettle();
+              AnimatedOpacity protection() => tester.widget<AnimatedOpacity>(
+                find.byKey(const Key('reader-top-protection-opacity')),
+              );
+              AnimatedOpacity titleOpacity() => tester.widget<AnimatedOpacity>(
+                find.byKey(const Key('hour-switcher-opacity')),
+              );
+              expect(protection().opacity, 0);
+              expect(titleOpacity().opacity, 0);
+              final titleBottom = tester.getBottomLeft(find.byKey(anchor)).dy;
+              scroll.jumpTo(titleBottom - 24 - 1);
+              await tester.pumpAndSettle();
+              expect(titleOpacity().opacity, 0);
+              expect(protection().opacity, 0);
+              scroll.jumpTo(titleBottom - 24 + 8);
+              await tester.pumpAndSettle();
+              expect(titleOpacity().opacity, 1);
+              expect(protection().opacity, 1);
+              scroll.jumpTo(0);
+              await tester.pumpAndSettle();
+              expect(titleOpacity().opacity, 0);
+              expect(protection().opacity, 0);
+              expect(scroll.offset, 0);
               scroll.jumpTo(500);
               await tester.pumpAndSettle();
               final trigger = find.byKey(const Key('hour-switcher-pill'));

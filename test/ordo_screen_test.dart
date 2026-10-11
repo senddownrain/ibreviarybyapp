@@ -99,29 +99,39 @@ void main() {
     expect(find.byKey(const Key('ordo-open-hours')), findsOneWidget);
   });
 
-  testWidgets('books volumes above the notes; All Souls on Sunday names the '
+  testWidgets('books are collapsed; All Souls on Sunday names the '
       'Office of the Sunday', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     await pump(tester, app(DateTime(2025, 11, 2)));
-    expect(tester.takeException(), isNull);
     final books = find.text('Лекцыянарый т. III · Літургія гадзінаў т. III');
+    expect(books.hitTestable(), findsNothing);
     await tester.scrollUntilVisible(
-      books,
+      find.text('Літургічныя кнігі'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(books, findsOneWidget);
-    // Facts line, above the celebrations and the notes.
-    expect(
-      tester.getTopLeft(books).dy,
-      lessThan(
-        tester
-            .getTopLeft(find.text('Асаблівыя ўказанні', skipOffstage: false))
-            .dy,
-      ),
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Літургічныя кнігі')),
+      alignment: .5,
     );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Літургічныя кнігі'));
+    await tester.pumpAndSettle();
+    expect(books, findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Літургія гадзінаў').first,
+      -300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Літургія гадзінаў').first),
+      alignment: .5,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Літургія гадзінаў').first);
+    await tester.pumpAndSettle();
     // The books note is not repeated among the notes.
     expect(find.text('Лекцыянарый т. III', skipOffstage: false), findsNothing);
     // Mass of All Souls is the primary celebration; the Hours are of the
@@ -141,6 +151,27 @@ void main() {
       find.textContaining('Літургія гадзінаў — з дня:', skipOffstage: false),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Sunday suppressed celebrations stay inside collapsed notes', (
+    tester,
+  ) async {
+    await pump(tester, app(DateTime(2026, 10, 11)));
+    expect(find.text('Іншыя святкаванні дня'), findsNothing);
+    expect(find.textContaining('Не адзначаюцца').hitTestable(), findsNothing);
+    await tester.scrollUntilVisible(
+      find.text('Літургічныя заўвагі'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Літургічныя заўвагі')),
+      alignment: .5,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Літургічныя заўвагі'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Не адзначаюцца'), findsOneWidget);
   });
 
   testWidgets('13.06.2026: two memorial choices, no demotion badge', (

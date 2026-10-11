@@ -137,7 +137,17 @@ class ParsedReading {
     ParsedSection? section(String key) {
       final v = map[key];
       if (v == null) return null;
-      return ParsedSection.fromMap(Map<String, dynamic>.from(v as Map));
+      final data = Map<String, dynamic>.from(v as Map);
+      // The bundled ordinary-w28-d1 year A source prints «Мк 22» above
+      // a Gospel explicitly titled «паводле Мацвея». Correct only this
+      // confirmed book mismatch, preserving the complete/short verse ranges
+      // and source JSON. Both the reader and ORDO consume this projection.
+      if (key == 'gospel' &&
+          (data['title'] as String? ?? '').contains('паводле Мацвея') &&
+          RegExp(r'^Мк\s+22\s*,').hasMatch(data['bible'] as String? ?? '')) {
+        data['bible'] = (data['bible'] as String).replaceFirst('Мк', 'Мц');
+      }
+      return ParsedSection.fromMap(data);
     }
 
     return ParsedReading(

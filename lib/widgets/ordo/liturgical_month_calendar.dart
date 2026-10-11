@@ -387,15 +387,17 @@ class _DayCell extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 6),
           margin: const EdgeInsets.all(1),
           decoration: BoxDecoration(
-            color: isSelected ? accent.withValues(alpha: 0.18) : null,
-            borderRadius: BorderRadius.circular(14),
-            border: isToday
-                ? Border.all(
-                    color: Color.lerp(accent, cs.onSurface, 0.2)!,
-                    width: 1.6,
+            color: isSelected
+                ? Color.alphaBlend(
+                    cs.onSurface.withValues(alpha: .08),
+                    cs.secondaryContainer,
                   )
-                : isSelected
-                ? Border.all(color: accent.withValues(alpha: 0.55))
+                : null,
+            borderRadius: BorderRadius.circular(14),
+            border: isSelected
+                ? Border.all(color: cs.outline.withValues(alpha: .8))
+                : isToday
+                ? Border.all(color: cs.outline.withValues(alpha: .4))
                 : null,
           ),
           child: Column(
@@ -404,10 +406,14 @@ class _DayCell extends StatelessWidget {
               Text(
                 '$day',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: isSelected || isToday || sunday
+                  fontWeight: isSelected || sunday
                       ? FontWeight.w800
                       : FontWeight.w500,
-                  color: sunday ? cs.error : cs.onSurface,
+                  color: isSelected
+                      ? cs.onSecondaryContainer
+                      : sunday
+                      ? cs.error
+                      : cs.onSurface,
                 ),
                 maxLines: 1,
               ),

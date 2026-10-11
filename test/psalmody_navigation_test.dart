@@ -13,7 +13,6 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
-import 'package:mybrev_flutter/widgets/reader/hour_switcher_pill.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -351,10 +350,7 @@ void main() {
         expect(
           tester
               .widget<AnimatedOpacity>(
-                find.descendant(
-                  of: find.byType(HourSwitcherPill),
-                  matching: find.byType(AnimatedOpacity),
-                ),
+                find.byKey(const Key('hour-switcher-opacity')),
               )
               .opacity,
           0,
@@ -364,10 +360,7 @@ void main() {
         expect(
           tester
               .widget<AnimatedOpacity>(
-                find.descendant(
-                  of: find.byType(HourSwitcherPill),
-                  matching: find.byType(AnimatedOpacity),
-                ),
+                find.byKey(const Key('hour-switcher-opacity')),
               )
               .opacity,
           1,

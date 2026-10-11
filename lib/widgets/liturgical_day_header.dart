@@ -34,12 +34,12 @@ class LiturgicalDayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = presentation;
     final cs = Theme.of(context).colorScheme;
-    final ink = Color.lerp(p.accent, cs.onSurface, .28)!;
+    final ink = cs.onSurface;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(sectionTitle, style: ReaderTheme.of(context).documentTitle()),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Row(
           children: [
             IconButton(
@@ -60,9 +60,11 @@ class LiturgicalDayHeader extends StatelessWidget {
                 child: Text(
                   p.dateLabel,
                   textAlign: TextAlign.center,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: ink),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: ink,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -75,7 +77,7 @@ class LiturgicalDayHeader extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -166,11 +168,15 @@ class LiturgicalDayHeader extends StatelessWidget {
             ),
           ),
         if (showVariants) ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
           TextButton(
             key: Key('$keyPrefix-alternatives-control'),
             style: TextButton.styleFrom(
               foregroundColor: ink,
+              textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
               minimumSize: const Size(48, 48),
             ),
             onPressed: onVariants,

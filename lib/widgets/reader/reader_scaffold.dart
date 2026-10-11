@@ -133,6 +133,11 @@ class ReaderScaffold extends StatelessWidget {
     final hourChromeHeight = hourTitle == null
         ? 48.0
         : HourSwitcherPill.chromeHeight(context, hourTitle!);
+    final hasHourSwitcher =
+        hourTitle != null &&
+        hourTitleAnchor != null &&
+        onChangeHour != null &&
+        scrollController != null;
     final topInset = resolvedMode == ReaderChromeMode.hidden
         ? MediaQuery.paddingOf(context).top + 16
         : MediaQuery.paddingOf(context).top + hourChromeHeight + 28;
@@ -170,7 +175,24 @@ class ReaderScaffold extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: maxContentWidth),
-                child: header,
+                child: hasHourSwitcher
+                    ? DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              ReaderTheme.of(
+                                context,
+                              ).surface.withValues(alpha: 0),
+                              ReaderTheme.of(context).surface,
+                            ],
+                            stops: const [.45, 1],
+                          ),
+                        ),
+                        child: header,
+                      )
+                    : header,
               ),
             ),
           ),
@@ -178,6 +200,7 @@ class ReaderScaffold extends StatelessWidget {
           child: ReaderContentSurface(
             maxContentWidth: maxContentWidth,
             semanticLabel: semanticLabel,
+            topSpacing: hasHourSwitcher ? 16 : 25,
             child: content,
           ),
         ),
@@ -187,6 +210,15 @@ class ReaderScaffold extends StatelessWidget {
         ),
       ],
     );
+
+    if (hasHourSwitcher) {
+      // Keep scrolling ink out of the system status area without painting a
+      // surface over the book header or changing its scroll geometry.
+      scrollView = ClipRect(
+        clipper: _ReaderSafeTopClipper(MediaQuery.viewPaddingOf(context).top),
+        child: scrollView,
+      );
+    }
 
     if (onSwipePrevious != null || onSwipeNext != null) {
       scrollView = HorizontalSwipeNavigation(
@@ -214,10 +246,11 @@ class ReaderScaffold extends StatelessWidget {
             )
           else
             scrollView,
-          ReaderEdgeProtection(
-            mode: resolvedMode,
-            topChromeHeight: hourTitle == null ? null : hourChromeHeight,
-          ),
+          if (!hasHourSwitcher || resolvedMode == ReaderChromeMode.hidden)
+            ReaderEdgeProtection(
+              mode: resolvedMode,
+              topChromeHeight: hourTitle == null ? null : hourChromeHeight,
+            ),
           if (resolvedMode != ReaderChromeMode.hidden) ?overlay,
           if (resolvedMode != ReaderChromeMode.hidden &&
               hourTitle != null &&
@@ -229,8 +262,14 @@ class ReaderScaffold extends StatelessWidget {
               titleAnchor: hourTitleAnchor!,
               title: hourTitle!,
               onTap: onChangeHour!,
-              topInset:
-                  MediaQuery.paddingOf(context).top + hourChromeHeight + 8,
+              // Wait until the book title has passed the status area, not merely
+              // entered the floating controls' row.
+              topInset: MediaQuery.paddingOf(context).top,
+              edgeProtectionBuilder: (visible) => ReaderEdgeProtection(
+                mode: resolvedMode,
+                topChromeHeight: hourChromeHeight,
+                showTopProtection: visible,
+              ),
             ),
           if (showScrollToTop && scrollController != null)
             _ReaderScrollToTopControl(
@@ -256,6 +295,17 @@ class ReaderScaffold extends StatelessWidget {
   }
 }
 
+class _ReaderSafeTopClipper extends CustomClipper<Rect> {
+  const _ReaderSafeTopClipper(this.top);
+  final double top;
+
+  @override
+  Rect getClip(Size size) => Rect.fromLTRB(0, top, size.width, size.height);
+
+  @override
+  bool shouldReclip(_ReaderSafeTopClipper oldClipper) => oldClipper.top != top;
+}
+
 /// Soft visual backing at the reader edges. It sits above scrolling text but
 /// never changes scroll geometry or participates in hit testing.
 class ReaderEdgeProtection extends StatelessWidget {
@@ -263,10 +313,12 @@ class ReaderEdgeProtection extends StatelessWidget {
     super.key,
     required this.mode,
     this.topChromeHeight,
+    this.showTopProtection = true,
   });
 
   final ReaderChromeMode mode;
   final double? topChromeHeight;
+  final bool showTopProtection;
 
   @override
   Widget build(BuildContext context) {
@@ -291,21 +343,28 @@ class ReaderEdgeProtection extends StatelessWidget {
             left: 0,
             right: 0,
             height: topFadeHeight,
-            child: DecoratedBox(
-              key: const Key('reader-top-fade'),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [surface, surface, surface.withValues(alpha: 0)],
-                  stops: [
-                    0,
-                    (mode == ReaderChromeMode.hidden
-                            ? safeTop
-                            : protectedHeight) /
-                        topFadeHeight,
-                    1,
-                  ],
+            child: AnimatedOpacity(
+              key: const Key('reader-top-protection-opacity'),
+              opacity: showTopProtection ? 1 : 0,
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : const Duration(milliseconds: 200),
+              child: DecoratedBox(
+                key: const Key('reader-top-fade'),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [surface, surface, surface.withValues(alpha: 0)],
+                    stops: [
+                      0,
+                      (mode == ReaderChromeMode.hidden
+                              ? safeTop
+                              : protectedHeight) /
+                          topFadeHeight,
+                      1,
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -488,11 +547,13 @@ class ReaderContentSurface extends StatelessWidget {
     required this.child,
     this.maxContentWidth = 700,
     this.semanticLabel,
+    this.topSpacing = 25,
   });
 
   final Widget child;
   final double maxContentWidth;
   final String? semanticLabel;
+  final double topSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -509,7 +570,12 @@ class ReaderContentSurface extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(22, 25, 22, bottomSpacing + bottom),
+            padding: EdgeInsets.fromLTRB(
+              22,
+              topSpacing,
+              22,
+              bottomSpacing + bottom,
+            ),
             child: child,
           ),
         ),

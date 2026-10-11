@@ -361,8 +361,7 @@ class _DayDetail extends ConsumerWidget {
         }
       }
     }
-    // Lectionary / Liturgy of the Hours volumes (§13.1): one line in the
-    // facts, above the notes.
+    // Keep book volumes available in the collapsed additional information.
     final books = notesReady
         ? union.booksLines(engine.booksOf)
         : const <(String, List<String>)>[];
@@ -642,6 +641,12 @@ class _DayDetail extends ConsumerWidget {
                     optionId: row.option.id,
                     selectedDayId: main ? officeSelection.dayId : null,
                   ),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                    textStyle: theme.textTheme.titleSmall?.copyWith(
+                      fontSize: 15,
+                    ),
+                  ),
                   label: const Text('Літургія'),
                   icon: const Icon(Icons.chevron_right, size: 18),
                 ),
@@ -657,6 +662,12 @@ class _DayDetail extends ConsumerWidget {
                     row,
                     selectedDayId: main ? dayId : null,
                     contextDiocese: diocese,
+                  ),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                    textStyle: theme.textTheme.titleSmall?.copyWith(
+                      fontSize: 15,
+                    ),
                   ),
                   label: const Text('Чытанні'),
                   icon: const Icon(Icons.chevron_right, size: 18),
@@ -746,7 +757,9 @@ class _DayDetail extends ConsumerWidget {
             ],
           ),
         ),
-        if (union.rows.length > 1 || suppressed.isNotEmpty)
+        if (union.rows.any(
+          (row) => row != chosen && row.role != 'commemoration',
+        ))
           _Section(
             title: 'Іншыя святкаванні дня',
             children: [
@@ -764,47 +777,12 @@ class _DayDetail extends ConsumerWidget {
                 ))
                   celebration(row),
               ],
-              for (final row in union.rows.where(
-                (r) => r.role == 'commemoration',
-              ))
-                celebration(row),
-              if (suppressed.isNotEmpty)
-                ExpansionTile(
-                  title: Text('Не адзначаюцца · ${suppressed.length}'),
-                  tilePadding: EdgeInsets.zero,
-                  children: [
-                    for (final (title, dioceses) in suppressed.values)
-                      ListTile(
-                        title: Text(title),
-                        subtitle: dioceses.length == union.days.length
-                            ? null
-                            : Text(
-                                dioceses
-                                    .map((id) => kDioceseBadges[id] ?? id)
-                                    .join(' · '),
-                              ),
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        if (books.isNotEmpty)
-          _Section(
-            title: 'Літургічныя кнігі',
-            children: [
-              for (final (label, badges) in books)
-                Padding(
-                  key: Key('ordo-books-${badges.join('-')}'),
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    [label, ...badges].join(' · '),
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ),
             ],
           ),
         _Section(
           title: 'Літургія гадзінаў',
+          collapsed: true,
+          storageKey: 'ordo-office-${day.date}',
           children: [
             if (officeSelection.day == null)
               const Text('Тэксты літургіі гадзінаў пакуль недаступныя')
@@ -847,64 +825,115 @@ class _DayDetail extends ConsumerWidget {
             ),
           ],
         ),
-        _Section(
-          title: 'Асаблівыя ўказанні',
-          collapsed: true,
-          storageKey: 'ordo-directions-${day.date}',
-          children: [
-            for (final entry in directions.entries)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  [
-                    entry.key,
-                    if (entry.value.length < union.days.length)
-                      entry.value
-                          .map((id) => kDioceseBadges[id] ?? id)
-                          .join(' · '),
-                  ].join(' · '),
+        if (directions.isNotEmpty || directionNotes.isNotEmpty)
+          _Section(
+            title: 'Асаблівыя ўказанні',
+            collapsed: true,
+            storageKey: 'ordo-directions-${day.date}',
+            children: [
+              for (final entry in directions.entries)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    [
+                      entry.key,
+                      if (entry.value.length < union.days.length)
+                        entry.value
+                            .map((id) => kDioceseBadges[id] ?? id)
+                            .join(' · '),
+                    ].join(' · '),
+                  ),
                 ),
-              ),
-            ...directionNotes,
-          ],
-        ),
-        _Section(
-          title: 'Літургічныя заўвагі',
-          collapsed: true,
-          storageKey: 'ordo-notes-${day.date}',
-          children: [
-            if (massNotes.isNotEmpty) ...[
-              Text('Імша', style: theme.textTheme.titleMedium),
-              ...massNotes,
+              ...directionNotes,
             ],
-            if (officeNotes.isNotEmpty) ...[
-              Text('Літургія гадзінаў', style: theme.textTheme.titleMedium),
-              ...officeNotes,
+          ),
+        if (notesError ||
+            !notesReady ||
+            groups.isNotEmpty ||
+            massNotes.isNotEmpty ||
+            officeNotes.isNotEmpty ||
+            suppressed.isNotEmpty ||
+            union.rows.any((row) => row.role == 'commemoration'))
+          _Section(
+            title: 'Літургічныя заўвагі',
+            collapsed: true,
+            storageKey: 'ordo-notes-${day.date}',
+            children: [
+              if (union.rows.any((row) => row.role == 'commemoration')) ...[
+                Text('Камемарацыі', style: theme.textTheme.titleMedium),
+                for (final row in union.rows.where(
+                  (row) => row.role == 'commemoration',
+                ))
+                  celebration(row),
+              ],
+              if (suppressed.isNotEmpty)
+                ExpansionTile(
+                  title: Text('Не адзначаюцца · ${suppressed.length}'),
+                  tilePadding: EdgeInsets.zero,
+                  children: [
+                    for (final (title, dioceses) in suppressed.values)
+                      ListTile(
+                        title: Text(title),
+                        subtitle: dioceses.length == union.days.length
+                            ? null
+                            : Text(
+                                dioceses
+                                    .map((id) => kDioceseBadges[id] ?? id)
+                                    .join(' · '),
+                              ),
+                      ),
+                  ],
+                ),
+
+              if (massNotes.isNotEmpty) ...[
+                Text('Імша', style: theme.textTheme.titleMedium),
+                ...massNotes,
+              ],
+              if (officeNotes.isNotEmpty) ...[
+                Text('Літургія гадзінаў', style: theme.textTheme.titleMedium),
+                ...officeNotes,
+              ],
+              if (notesError)
+                const Text(
+                  'Не ўдалося прачытаць літургічныя заўвагі. Паспрабуйце адкрыць дзень яшчэ раз.',
+                )
+              else if (!notesReady)
+                const Text('Заўвагі адкрываюцца…')
+              else
+                for (final entry in groups.entries)
+                  if (entry.key == 'Агульныя ўказанні перыяду')
+                    ExpansionTile(
+                      key: PageStorageKey(
+                        'ordo-notes-${day.date}-${entry.key}',
+                      ),
+                      title: Text(entry.key),
+                      subtitle: Text('${entry.value.length}'),
+                      tilePadding: EdgeInsets.zero,
+                      children: entry.value,
+                    )
+                  else ...[
+                    Text(entry.key, style: theme.textTheme.titleMedium),
+                    ...entry.value,
+                  ],
             ],
-            if (notesError)
-              const Text(
-                'Не ўдалося прачытаць літургічныя заўвагі. Паспрабуйце адкрыць дзень яшчэ раз.',
-              )
-            else if (!notesReady)
-              const Text('Заўвагі адкрываюцца…')
-            else if (groups.isEmpty && massNotes.isEmpty && officeNotes.isEmpty)
-              const Text('Для гэтага дня заўваг няма.')
-            else
-              for (final entry in groups.entries)
-                if (entry.key == 'Агульныя ўказанні перыяду')
-                  ExpansionTile(
-                    key: PageStorageKey('ordo-notes-${day.date}-${entry.key}'),
-                    title: Text(entry.key),
-                    subtitle: Text('${entry.value.length}'),
-                    tilePadding: EdgeInsets.zero,
-                    children: entry.value,
-                  )
-                else ...[
-                  Text(entry.key, style: theme.textTheme.titleMedium),
-                  ...entry.value,
-                ],
-          ],
-        ),
+          ),
+        if (books.isNotEmpty)
+          _Section(
+            title: 'Літургічныя кнігі',
+            collapsed: true,
+            storageKey: 'ordo-books-${day.date}',
+            children: [
+              for (final (label, badges) in books)
+                Padding(
+                  key: Key('ordo-books-${badges.join('-')}'),
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    [label, ...badges].join(' · '),
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+            ],
+          ),
         const Divider(height: 32),
         ListTile(
           key: const Key('ordo-bottom-month'),
@@ -931,17 +960,20 @@ class _Section extends StatelessWidget {
   final String? storageKey;
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(8, 12, 8, 4),
+    padding: collapsed
+        ? const EdgeInsets.fromLTRB(8, 4, 8, 0)
+        : const EdgeInsets.fromLTRB(8, 12, 8, 4),
     child: DefaultTextStyle.merge(
       style: const TextStyle(fontSize: 16, height: 1.4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Divider(height: 24),
+          Divider(height: collapsed ? 12 : 24),
           if (collapsed)
             ExpansionTile(
               key: PageStorageKey(storageKey ?? title),
               tilePadding: EdgeInsets.zero,
+              minTileHeight: 48,
               childrenPadding: const EdgeInsets.only(bottom: 12),
               expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
               title: Text(
@@ -1204,7 +1236,8 @@ class _CelebrationRow extends StatelessWidget {
                               : FontWeight.w500,
                         ),
               ),
-              if (!heading || option.rank != 'feria') ...[
+              if (!heading ||
+                  (option.rank != 'feria' && option.rank != 'dominica')) ...[
                 const SizedBox(height: 3),
                 Text(
                   [
