@@ -6,6 +6,9 @@ class Prayer {
   final String? textFormat;
   final List<String> tags;
   final bool isLocal;
+  final bool priestOnly;
+  final String? categoryId;
+  final List<String> categoryIds;
 
   const Prayer({
     required this.id,
@@ -15,6 +18,9 @@ class Prayer {
     this.textFormat,
     this.tags = const [],
     this.isLocal = false,
+    this.priestOnly = false,
+    this.categoryId,
+    this.categoryIds = const [],
   });
 
   String get displayTitle {
@@ -44,6 +50,10 @@ class Prayer {
       textFormat: _asString(data['textFormat']),
       tags: _resolveTags(data['tags']),
       isLocal: data['isLocal'] == true,
+      priestOnly:
+          data['priestOnly'] == true || data['effectivePriestOnly'] == true,
+      categoryId: _asString(data['categoryId']),
+      categoryIds: _resolveTags(data['categoryIds']),
     );
   }
 
@@ -55,6 +65,9 @@ class Prayer {
     if (textFormat != null) 'textFormat': textFormat,
     'tags': tags,
     'isLocal': isLocal,
+    if (priestOnly) 'priestOnly': true,
+    if (categoryId != null) 'categoryId': categoryId,
+    if (categoryIds.isNotEmpty) 'categoryIds': categoryIds,
   };
 
   Prayer copyWith({
@@ -73,6 +86,9 @@ class Prayer {
     textFormat: textFormat ?? this.textFormat,
     tags: tags ?? this.tags,
     isLocal: isLocal ?? this.isLocal,
+    priestOnly: priestOnly,
+    categoryId: categoryId,
+    categoryIds: categoryIds,
   );
 
   static String _resolveTitle(Map<String, dynamic> data) {

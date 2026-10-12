@@ -142,7 +142,10 @@ class PrayersScreen extends ConsumerWidget {
                   )
                 else
                   for (final category in categories)
-                    _CategoryRow(category: category),
+                    if (category.parentId == null ||
+                        category.parentId!.isEmpty ||
+                        !categories.any((c) => c.id == category.parentId))
+                      _CategoryRow(category: category),
                 const SizedBox(height: 28),
                 const _SectionTitle(title: 'Усе малітвы'),
                 _DestinationRow(
@@ -319,6 +322,10 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
     }
     final settings = ref.watch(settingsProvider);
+    final children = ref
+        .watch(prayerMenuCategoriesProvider)
+        .where((item) => item.parentId == category.id)
+        .toList();
     final prayers = prayersForCategory(
       ref.watch(prayerCatalogProvider),
       category,
@@ -336,6 +343,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
         icon: const Icon(Icons.more_horiz_rounded),
       ),
       prayers: prayers,
+      categories: children,
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
     );
   }
@@ -575,6 +583,7 @@ class _PrayerListPage extends StatelessWidget {
     required this.scrollKey,
     this.topAction,
     this.searchDock,
+    this.categories = const [],
   });
 
   final String title;
@@ -585,6 +594,7 @@ class _PrayerListPage extends StatelessWidget {
   final PageStorageKey<String> scrollKey;
   final Widget? topAction;
   final Widget? searchDock;
+  final List<PrayerMenuCategory> categories;
 
   @override
   Widget build(BuildContext context) {
@@ -615,7 +625,10 @@ class _PrayerListPage extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
                 const SizedBox(height: 18),
-                if (prayers.isEmpty)
+                for (final category in categories)
+                  _CategoryRow(category: category),
+                if (categories.isNotEmpty) const SizedBox(height: 18),
+                if (prayers.isEmpty && categories.isEmpty)
                   Padding(
                     key: const Key('prayer-list-empty'),
                     padding: const EdgeInsets.symmetric(vertical: 42),

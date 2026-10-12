@@ -3,6 +3,7 @@ import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 import 'package:mybrev_flutter/utils/retry.dart';
+import 'package:mybrev_flutter/services/priest_access_policy.dart';
 
 /// Firestore collection of the version manifest (MyBrev
 /// `npm run content:manifest`).
@@ -321,6 +322,36 @@ class ContentUpdater {
       staged[update] = docs;
     }
     // Everything verified: one generation, active all at once.
+    if (plan.collections.any(
+      (c) => c.collection == 'prayers' || c.collection == 'prayerCategories',
+    )) {
+      await _store.ensureLoaded(['prayers', 'prayerCategories']);
+      Map<String, Map<String, dynamic>> effective(String name) {
+        final collection = _store.collection(name);
+        final docs = {
+          for (final id in collection.keys)
+            id: Map<String, dynamic>.from(collection.get(id) as Map),
+        };
+        for (final entry in staged.entries.where(
+          (e) => e.key.collection == name,
+        )) {
+          for (final id in entry.key.remove) {
+            docs.remove(id);
+          }
+          docs.addAll(entry.value);
+        }
+        return docs;
+      }
+
+      final categories = effective('prayerCategories');
+      final policy = PriestAccessPolicy(categories);
+      if (categories.keys.any(policy.categoryRestricted) ||
+          effective('prayers').values.any(policy.prayerRestricted)) {
+        throw const ContentUpdateRejected(
+          'Protected content cannot enter the public cache',
+        );
+      }
+    }
     await _store.commit({
       for (final MapEntry(key: update, value: docs) in staged.entries)
         update.collection: _store
@@ -334,5 +365,10 @@ class ContentUpdater {
               plan.contentVersion,
             ),
     }, plan.contentVersion);
+    if (plan.collections.any(
+      (update) => update.collection == 'prayers' && update.remove.isNotEmpty,
+    )) {
+      await _store.collection('prayers').compactOverlay();
+    }
   }
 }

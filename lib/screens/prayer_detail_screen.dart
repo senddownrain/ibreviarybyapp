@@ -9,6 +9,7 @@ import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/mass_ritual_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
@@ -229,7 +230,26 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
       );
     }
 
-    final p = prayer;
+    var p = prayer;
+    if (p.priestOnly) {
+      final checked = ref.watch(protectedPrayerProvider(p.id));
+      if (checked.isLoading) {
+        return const ReaderScaffold(
+          semanticLabel: 'Праверка доступу',
+          content: Center(child: CircularProgressIndicator()),
+        );
+      }
+      final document = checked.value;
+      if (document == null) {
+        return const ReaderScaffold(
+          semanticLabel: 'Малітва недаступная',
+          content: Center(
+            child: Text('Малітва недаступная. Праверце доступ і злучэнне.'),
+          ),
+        );
+      }
+      p = Prayer.fromMap({...document, 'effectivePriestOnly': true}, p.id);
+    }
     final isFav = settings.favoriteIds.contains(p.id);
     final variant = _isMass ? kMassRitual.variant(_massLanguage) : null;
     final textPrayer = variant == null

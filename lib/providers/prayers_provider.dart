@@ -7,6 +7,8 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
+import 'package:mybrev_flutter/services/priest_access_policy.dart';
 
 // ── Filter state ──────────────────────────────────────────────────────────────
 
@@ -76,19 +78,44 @@ class PrayersFilterNotifier extends Notifier<PrayersFilter> {
 
 /// The app's prayer texts are loaded (bundled; decoded on first use).
 final prayersContentProvider = FutureProvider<void>(
-  (ref) => ContentStore.instance.ensureLoaded(const ['prayers']),
+  (ref) =>
+      ContentStore.instance.ensureLoaded(const ['prayers', 'prayerCategories']),
 );
 
 final allPrayersProvider = Provider<List<Prayer>>((ref) {
   ref.watch(cacheEpochProvider);
   ref.watch(prayersContentProvider);
   final box = HiveService.prayersBox;
+  final access = ref.watch(priestAccessProvider);
+  final categories = HiveService.prayerCategoriesBox;
+  final categoryDocs =
+      access.content?.categories ??
+      access.publicContent?.categories ??
+      {
+        for (final key in categories.keys)
+          if (categories.get(key) case final Map data)
+            key: Map<String, dynamic>.from(data),
+      };
+  final policy = PriestAccessPolicy(categoryDocs);
+  final documents =
+      access.content?.prayers ??
+      access.publicContent?.prayers ??
+      {
+        for (final key in box.keys)
+          if (box.get(key) case final Map data)
+            key: Map<String, dynamic>.from(data),
+      };
   final prayers = <Prayer>[];
-  for (final key in box.keys) {
-    final raw = box.get(key);
-    if (raw == null) continue;
+  for (final entry in documents.entries) {
+    final restricted = policy.prayerRestricted(entry.value);
+    if (restricted && access.content == null) continue;
     try {
-      prayers.add(Prayer.fromMap(Map<String, dynamic>.from(raw), key));
+      prayers.add(
+        Prayer.fromMap({
+          ...entry.value,
+          'effectivePriestOnly': restricted,
+        }, entry.key),
+      );
     } catch (_) {}
   }
   prayers.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
@@ -122,6 +149,10 @@ bool prayerBelongsToCategory(
   SettingsState settings,
 ) {
   if (settings.prayerCategoryMap[prayer.id]?.contains(category.id) == true) {
+    return true;
+  }
+  if (prayer.categoryId == category.id ||
+      prayer.categoryIds.contains(category.id)) {
     return true;
   }
   final categoryTags = category.tags

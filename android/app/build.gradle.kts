@@ -1,5 +1,7 @@
 import java.io.FileInputStream
 import java.util.Properties
+import java.util.Base64
+import com.google.gms.googleservices.GoogleServicesTask
 
 plugins {
     id("com.android.application")
@@ -35,7 +37,25 @@ val uploadKey: Map<String, String>? = run {
     }
 }
 
+// Select a synthetic native configuration before FirebaseInitProvider runs.
+// Selecting task inputs also invalidates Gradle's cache on the next normal build.
+val useFirebaseEmulators = (project.findProperty("dart-defines") as? String)
+    .orEmpty().split(",").any {
+        runCatching { String(Base64.getDecoder().decode(it)) }
+            .getOrNull() == "PRIEST_USE_EMULATORS=true"
+    }
+afterEvaluate {
+    if (useFirebaseEmulators) {
+        tasks.named<GoogleServicesTask>("processDebugGoogleServices") {
+            googleServicesJsonFiles.set(listOf(file("src/firebaseEmulator/google-services.json")))
+        }
+    }
+}
+
 android {
+    if (useFirebaseEmulators) {
+        sourceSets.getByName("debug").manifest.srcFile("src/firebaseEmulator/AndroidManifest.xml")
+    }
     // Code namespace (R, BuildConfig, MainActivity); independent of the
     // store identity below and not visible to Google Play.
     namespace = "com.example.mybrev_flutter"

@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_migration.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
+import 'package:mybrev_flutter/services/priest_access_policy.dart';
 
 const kTemplatesBoxName = 'liturgicalTemplates';
 
@@ -80,6 +81,36 @@ class HiveService {
     _settings = await Hive.openBox(_settingsBoxName);
     final withBundle = loadBundle ?? path == null;
     await content.open(bundle: bundle, loadBundle: withBundle);
+    if (withBundle) {
+      // Remove protected texts that a former public sync may have left behind.
+      // User prayers, settings and favourite IDs are never touched.
+      await content.ensureLoaded(['prayers', 'prayerCategories']);
+      final policy = PriestAccessPolicy({
+        for (final id in prayerCategoriesBox.keys)
+          id: Map<String, dynamic>.from(prayerCategoriesBox.get(id) as Map),
+      });
+      final restricted = {
+        for (final id in prayersBox.keys)
+          if (policy.prayerRestricted(prayersBox.get(id) as Map)) id: null,
+      };
+      if (restricted.isNotEmpty) {
+        await prayersBox.applyUpdate(
+          restricted,
+          {},
+          DateTime.now().millisecondsSinceEpoch,
+        );
+      }
+      // Also discard old, already-deleted frames on the first upgrade to this
+      // access model; Hive's visible keys alone cannot find those frames.
+      const sanitizedKey = 'priestPublicCacheSanitizedV1';
+      if (restricted.isNotEmpty || _meta.get(sanitizedKey) != true) {
+        await prayersBox.compactOverlay();
+        if (Hive.isBoxOpen(ContentStore.stagingBoxName)) {
+          await Hive.box(ContentStore.stagingBoxName).compact();
+        }
+        await _meta.put(sanitizedKey, true);
+      }
+    }
     if (withBundle) content.preloadAll();
     if (!withBundle) {
       // Tests start on the current model.
@@ -94,6 +125,18 @@ class HiveService {
     await WidgetsBinding.instance.endOfFrame;
     await content.ensureLoaded(kLiturgicalCollections);
     await ContentMigration(_meta).run();
+  }
+
+  /// Former Firestore prayer reads also populated the SDK's disk cache.
+  /// Canonical offline content lives in ContentStore; this duplicate cache
+  /// can be cleared once without removing user data or the public corpus.
+  static Future<void> sanitizeLegacyFirestoreCache(
+    Future<void> Function() clearPersistence,
+  ) async {
+    const key = 'priestFirestoreCacheSanitizedV1';
+    if (_meta.get(key) == true) return;
+    await clearPersistence();
+    await _meta.put(key, true);
   }
 
   static bool? getMetaFlag(String key) => _meta.get(key) as bool?;

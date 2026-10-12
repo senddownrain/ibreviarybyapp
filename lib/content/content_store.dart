@@ -452,6 +452,10 @@ class ContentCollection {
     _reloadView();
   }
 
+  /// Hive is append-only: removing a formerly protected document must also
+  /// discard the old serialized frames from the live overlay file.
+  Future<void> compactOverlay() async => _overlay!.compact();
+
   /// An app release with another bundle, without rebuilding the app (tests):
   /// the new baseline, then the same reconciliation as at a real start.
   @visibleForTesting

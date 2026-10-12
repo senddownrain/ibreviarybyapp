@@ -17,6 +17,7 @@ import 'package:mybrev_flutter/theme/ib_colors.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:mybrev_flutter/widgets/priest_access_lifecycle.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,28 @@ void main() async {
       persistenceEnabled: true,
     );
   }
+  if (const bool.fromEnvironment('PRIEST_USE_EMULATORS')) {
+    const host = String.fromEnvironment('FIREBASE_EMULATOR_HOST');
+    if (!kDebugMode || !['localhost', '127.0.0.1', '10.0.2.2'].contains(host)) {
+      throw StateError(
+        'Firebase emulators require a debug build and a local host',
+      );
+    }
+    FirebaseFirestore.instance.useFirestoreEmulator(
+      host,
+      const int.fromEnvironment('FIRESTORE_EMULATOR_PORT', defaultValue: 8089),
+    );
+  }
   await HiveService.init();
+  if (!kIsWeb) {
+    try {
+      await HiveService.sanitizeLegacyFirestoreCache(
+        FirebaseFirestore.instance.clearPersistence,
+      );
+    } catch (_) {
+      debugPrint('[PriestAccess] Legacy Firestore cache cleanup will retry.');
+    }
+  }
   _registerFontLicenses();
 
   // Both designs are edge-to-edge. Platform chrome floats above the content;
@@ -292,6 +314,8 @@ class MyBrevApp extends ConsumerWidget {
       restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
+      builder: (context, child) =>
+          PriestAccessLifecycle(child: child ?? const SizedBox.shrink()),
       themeMode: themeMode,
       themeAnimationDuration: Duration.zero,
       theme: makeTheme(light),
