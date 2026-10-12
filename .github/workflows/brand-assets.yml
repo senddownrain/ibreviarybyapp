@@ -1,0 +1,37 @@
+name: Validate iOS brand assets
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/malitounik-brand-icons]
+    paths:
+      - ios/Runner/Assets.xcassets/**
+      - ios/Runner/Base.lproj/LaunchScreen.storyboard
+      - .github/workflows/brand-assets.yml
+
+permissions:
+  contents: read
+
+jobs:
+  ios-assets:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile AppIcon, launch images and named colours
+        run: |
+          mkdir -p "$RUNNER_TEMP/brand-assets"
+          xcrun actool --compile "$RUNNER_TEMP/brand-assets" \
+            --platform iphonesimulator --minimum-deployment-target 14.0 \
+            --target-device iphone --target-device ipad --app-icon AppIcon \
+            --output-partial-info-plist "$RUNNER_TEMP/brand-assets/icon-info.plist" \
+            ios/Runner/Assets.xcassets
+      - name: Compile the static launch storyboard
+        run: |
+          xcrun ibtool --compile "$RUNNER_TEMP/brand-assets/LaunchScreen.storyboardc" \
+            --minimum-deployment-target 14.0 \
+            ios/Runner/Base.lproj/LaunchScreen.storyboard
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compiled-ios-brand-assets
+          path: ${{ runner.temp }}/brand-assets
