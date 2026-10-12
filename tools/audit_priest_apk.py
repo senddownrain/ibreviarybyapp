@@ -36,6 +36,10 @@ with zipfile.ZipFile(sys.argv[1]) as apk:
     base = "assets/flutter_assets/assets/content/"
     categories = decode(apk.read(base + "prayerCategories.json.gz"))
     prayers = decode(apk.read(base + "prayers.json.gz"))
+    manifest = json.loads(apk.read(base + "manifest.json"))
+    cleanup = manifest.get("priestCacheCleanup", {})
+    assert not set(cleanup.get("protectedPrayerIds", [])).intersection(prayers), "Migrated private prayer in APK"
+    assert not set(cleanup.get("protectedCategoryIds", [])).intersection(categories), "Migrated private category in APK"
 
     def restricted_category(key, visited=frozenset()):
         category = categories.get(key)

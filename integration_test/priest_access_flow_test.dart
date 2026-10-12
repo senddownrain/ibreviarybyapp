@@ -53,6 +53,18 @@ Future<void> seed(
   expect(response.statusCode, 200);
 }
 
+Future<http.Response> deviceRead(String uid, String collection) async {
+  final auth = FirebaseAuth.instanceFor(
+    app: Firebase.app(FirebasePriestAccess.appName),
+  );
+  final token = await auth.currentUser!.getIdToken();
+  // Emulator only. Credentials stay in headers and are never logged.
+  return http.get(
+    Uri.parse('$base/$collection/$uid'),
+    headers: {'Authorization': 'Bearer $token'},
+  );
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   testWidgets(
@@ -196,10 +208,36 @@ void main() {
       await controller.activate(nextCode, 'Pixel 7 Spark');
       expect(controller.state.registered, false);
       expect(controller.state.error, contains('Няправільны'));
+      final rejectedUid = await gateway.restoreSession();
+      for (final collection in [
+        'priestDeviceGrants',
+        'priestActivationClaims',
+      ]) {
+        final response = await http.get(
+          Uri.parse('$base/$collection/$rejectedUid'),
+          headers: {'Authorization': 'Bearer owner'},
+        );
+        expect(
+          response.statusCode,
+          404,
+          reason: 'Rejected batch must leave neither document',
+        );
+      }
       await controller.activate(code, 'Pixel 7 Spark');
       await waitFor(() => controller.state.content != null);
       final uid = await gateway.restoreSession();
       expect(uid, isNotNull);
+      final ownGrant = await deviceRead(uid!, 'priestDeviceGrants');
+      expect(ownGrant.statusCode, 200);
+      expect(
+        (jsonDecode(ownGrant.body)['fields'] as Map).keys,
+        isNot(contains('activationProof')),
+      );
+      expect(
+        (await deviceRead(uid, 'priestActivationClaims')).statusCode,
+        403,
+        reason: 'Even the activated owner must not read the bearer proof',
+      );
       expect(
         FirebaseAuth.instance.currentUser,
         null,
@@ -262,7 +300,7 @@ void main() {
       expect(controller.state.content, null);
       expect(await controller.readPrayer('spark-single'), null);
       await expectLater(
-        gateway.readProtectedPrayer(uid!, 'spark-single'),
+        gateway.readProtectedPrayer(uid, 'spark-single'),
         throwsA(isA<Exception>()),
       );
       await screen('revoked');

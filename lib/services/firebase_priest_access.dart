@@ -9,7 +9,7 @@ import 'package:mybrev_flutter/models/priest_access_content.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 
-/// Spark contract from mybrev 7122bb2. No HTTP access service or Functions.
+/// Shared Spark claim/grant batch contract from mybrev, no Functions/HTTP API.
 class FirebasePriestAccess implements PriestAccessGateway {
   static const appName = 'mybrev-priest';
   static const _server = GetOptions(source: Source.server);
@@ -50,6 +50,9 @@ class FirebasePriestAccess implements PriestAccessGateway {
     );
     // Must precede every grant/text read. Default public Firestore is untouched.
     _privateDb!.settings = const Settings(persistenceEnabled: false);
+    // FlutterFire Web maps false to setLogLevel('silent'). Failed SDK writes
+    // must not print their full activation payload/proof, even in debug builds.
+    await FirebaseFirestore.setLoggingEnabled(false);
     const host = String.fromEnvironment('FIREBASE_EMULATOR_HOST');
     if (host.isNotEmpty) {
       if (!kDebugMode ||
@@ -84,6 +87,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<T> _run<T>(
     Future<T> Function() task, {
     bool activation = false,
+    bool readingGrant = false,
   }) async {
     try {
       await _initialize();
@@ -105,7 +109,12 @@ class FirebasePriestAccess implements PriestAccessGateway {
         debugPrint('[PriestAccess] Firestore error: ${error.code}');
       }
       throw PriestAccessException(switch (error.code) {
-        'permission-denied' => activation ? 'INVALID_CODE' : 'ACCESS_REQUIRED',
+        'permission-denied' =>
+          activation
+              ? 'INVALID_CODE'
+              : readingGrant
+              ? 'GRANT_UNREADABLE'
+              : 'ACCESS_REQUIRED',
         'unauthenticated' => 'ACCESS_REQUIRED',
         'unavailable' || 'deadline-exceeded' => 'OFFLINE',
         _ => 'SERVICE_UNAVAILABLE',
@@ -138,8 +147,16 @@ class FirebasePriestAccess implements PriestAccessGateway {
   platform.DocumentReferencePlatform _grant(String uid) =>
       _privateDb!.collection('priestDeviceGrants').doc(uid);
   PriestDeviceGrant? _grantData(platform.DocumentSnapshotPlatform snapshot) {
+    if (snapshot.metadata.isFromCache || snapshot.metadata.hasPendingWrites) {
+      throw const PriestAccessException('OFFLINE');
+    }
     final data = snapshot.data();
     if (data == null) return null;
+    // New Rules reject owner reads of legacy proof-bearing grants until the
+    // field-only web migration. Never mistake an incomplete rollout for revoke.
+    if (data.containsKey('activationProof')) {
+      throw const PriestAccessException('GRANT_UNREADABLE');
+    }
     return PriestDeviceGrant(
       snapshot.id,
       data['uid'] == snapshot.id && data['status'] == 'active',
@@ -151,7 +168,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<PriestDeviceGrant?> grant(String uid) => _run(() async {
     _own(uid);
     return _grantData(await _grant(uid).get(_server));
-  });
+  }, readingGrant: true);
   @override
   Stream<PriestDeviceGrant?> watchGrant(String uid) {
     // Called only after a successful server grant check. Forward cancellation
@@ -182,7 +199,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
                 PriestAccessException(
                   error is FirebaseException &&
                           error.code == 'permission-denied'
-                      ? 'ACCESS_REQUIRED'
+                      ? 'GRANT_UNREADABLE'
                       : 'OFFLINE',
                 ),
                 trace,
@@ -193,22 +210,42 @@ class FirebasePriestAccess implements PriestAccessGateway {
   }
 
   @override
-  Future<void> createGrant(String uid, String proof, String deviceName) =>
-      _run(() async {
-        _own(uid);
-        await _grant(uid).set({
-          'uid': uid,
-          'status': 'active',
-          'deviceName': deviceName.isEmpty ? 'Flutter' : deviceName,
-          'client': 'Flutter',
-          'platform': kIsWeb ? 'Web' : defaultTargetPlatform.name,
-          'label': deviceName,
-          'activatedAt': FieldValue.serverTimestamp(),
-          'lastActiveAt': FieldValue.serverTimestamp(),
-          'revokedAt': null,
-          'activationProof': proof,
-        });
-      }, activation: true);
+  Future<void> createGrant(String uid, String proof, String deviceName) => _run(
+    () async {
+      _own(uid);
+      final batch = _privateDb!.batch();
+      batch.set('priestActivationClaims/$uid', {
+        'uid': uid,
+        'activationProof': proof,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      batch.set('priestDeviceGrants/$uid', {
+        'uid': uid,
+        'status': 'active',
+        'deviceName': deviceName.isEmpty ? 'Flutter' : deviceName,
+        'client': 'Flutter',
+        'platform': kIsWeb ? 'Web' : defaultTargetPlatform.name,
+        'label': deviceName,
+        'activatedAt': FieldValue.serverTimestamp(),
+        'lastActiveAt': FieldValue.serverTimestamp(),
+        'revokedAt': null,
+      });
+      // Both documents must be NEW; Rules validate their post-batch state.
+      // No claim get/list, no proof in the readable grant, no legacy fallback.
+      try {
+        await batch.commit();
+      } on FirebaseException catch (error) {
+        // Another browser tab may have registered the restored UID meanwhile.
+        // Only a fresh, acknowledged server grant can resolve that race.
+        if (error.code == 'permission-denied' &&
+            _grantData(await _grant(uid).get(_server))?.active == true) {
+          return;
+        }
+        rethrow;
+      }
+    },
+    activation: true,
+  );
   @override
   Future<void> disable(String uid) => _run(() async {
     _own(uid);
@@ -219,7 +256,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
         FieldPath(['revokedAt']): FieldValue.serverTimestamp(),
       });
     }
-  });
+  }, readingGrant: true);
   @override
   Future<void> signOut() => _run(() => _auth!.signOut());
   @override
@@ -243,14 +280,20 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Map<String, Map<String, dynamic>> _documents(
     platform.QuerySnapshotPlatform snapshot, {
     bool protected = false,
-  }) => {
-    for (final item in snapshot.docs)
-      item.id: firestoreToStorable({
-        ...Map<String, dynamic>.from(item.data()!),
-        'id': item.id,
-        if (protected) 'effectivePriestOnly': true,
-      }),
-  };
+  }) {
+    if (snapshot.metadata.isFromCache || snapshot.metadata.hasPendingWrites) {
+      throw const PriestAccessException('OFFLINE');
+    }
+    return {
+      for (final item in snapshot.docs)
+        item.id: firestoreToStorable({
+          ...Map<String, dynamic>.from(item.data()!),
+          'id': item.id,
+          if (protected) 'effectivePriestOnly': true,
+        }),
+    };
+  }
+
   @override
   Future<PrayerAccessContent> publicContent() async {
     try {
@@ -260,6 +303,12 @@ class FirebasePriestAccess implements PriestAccessGateway {
         db.collection('prayers').get(_server),
         db.collection('prayerCategories').get(_server),
       ]).timeout(_timeout);
+      if (snapshots.any(
+        (snapshot) =>
+            snapshot.metadata.isFromCache || snapshot.metadata.hasPendingWrites,
+      )) {
+        throw const PriestAccessException('OFFLINE');
+      }
       return PrayerAccessContent(
         {
           for (final item in snapshots[0].docs)
@@ -297,6 +346,10 @@ class FirebasePriestAccess implements PriestAccessGateway {
             .collection('priestProtectedPrayers')
             .doc(id)
             .get(_server);
+        if (snapshot.metadata.isFromCache ||
+            snapshot.metadata.hasPendingWrites) {
+          throw const PriestAccessException('OFFLINE');
+        }
         final data = snapshot.data();
         return data == null
             ? null

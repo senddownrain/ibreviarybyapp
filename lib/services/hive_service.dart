@@ -85,13 +85,26 @@ class HiveService {
       // Remove protected texts that a former public sync may have left behind.
       // User prayers, settings and favourite IDs are never touched.
       await content.ensureLoaded(['prayers', 'prayerCategories']);
+      final cleanup = PriestCacheCleanup.fromManifest(content.bundleManifest);
+      final sanitizedKey = 'priestPublicCacheSanitized${cleanup.digest}';
+      final migrationNeeded = _meta.get(sanitizedKey) != true;
       final policy = PriestAccessPolicy({
         for (final id in prayerCategoriesBox.keys)
-          id: Map<String, dynamic>.from(prayerCategoriesBox.get(id) as Map),
+          id: {
+            ...Map<String, dynamic>.from(prayerCategoriesBox.get(id) as Map),
+            if (migrationNeeded && cleanup.categories.contains(id))
+              'priestOnly': true,
+          },
       });
       final restricted = {
         for (final id in prayersBox.keys)
-          if (policy.prayerRestricted(prayersBox.get(id) as Map)) id: null,
+          if (policy.prayerRestricted(prayersBox.get(id) as Map) ||
+              (migrationNeeded && cleanup.prayers.contains(id)))
+            id: null,
+      };
+      final restrictedCategories = {
+        for (final id in prayerCategoriesBox.keys)
+          if (policy.categoryRestricted(id)) id: null,
       };
       if (restricted.isNotEmpty) {
         await prayersBox.applyUpdate(
@@ -100,11 +113,20 @@ class HiveService {
           DateTime.now().millisecondsSinceEpoch,
         );
       }
+      if (restrictedCategories.isNotEmpty) {
+        await prayerCategoriesBox.applyUpdate(
+          restrictedCategories,
+          {},
+          DateTime.now().millisecondsSinceEpoch,
+        );
+      }
       // Also discard old, already-deleted frames on the first upgrade to this
       // access model; Hive's visible keys alone cannot find those frames.
-      const sanitizedKey = 'priestPublicCacheSanitizedV1';
-      if (restricted.isNotEmpty || _meta.get(sanitizedKey) != true) {
+      if (restricted.isNotEmpty ||
+          restrictedCategories.isNotEmpty ||
+          migrationNeeded) {
         await prayersBox.compactOverlay();
+        await prayerCategoriesBox.compactOverlay();
         if (Hive.isBoxOpen(ContentStore.stagingBoxName)) {
           await Hive.box(ContentStore.stagingBoxName).compact();
         }
@@ -133,7 +155,8 @@ class HiveService {
   static Future<void> sanitizeLegacyFirestoreCache(
     Future<void> Function() clearPersistence,
   ) async {
-    const key = 'priestFirestoreCacheSanitizedV1';
+    final cleanup = PriestCacheCleanup.fromManifest(content.bundleManifest);
+    final key = 'priestFirestoreCacheSanitized${cleanup.digest}';
     if (_meta.get(key) == true) return;
     await clearPersistence();
     await _meta.put(key, true);

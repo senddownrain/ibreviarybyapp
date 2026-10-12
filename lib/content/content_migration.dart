@@ -100,7 +100,7 @@ class ContentMigration {
     await _store.ensureLoaded([name]);
     final collection = _store.collection(name);
     PriestAccessPolicy? accessPolicy;
-    if (name == 'prayers') {
+    if (name == 'prayers' || name == 'prayerCategories') {
       await _store.ensureLoaded(['prayerCategories']);
       final categories = _store.collection('prayerCategories');
       final docs = {
@@ -120,12 +120,21 @@ class ContentMigration {
       accessPolicy = PriestAccessPolicy(docs);
     }
     final bundleVersion = collection.baselineVersion;
+    final cleanup = PriestCacheCleanup.fromManifest(_store.bundleManifest);
     for (final key in box.keys) {
       final raw = box.get(key);
       if (raw is! Map) continue;
       final doc = Map<String, dynamic>.from(raw);
-      if (accessPolicy?.prayerRestricted(doc) == true) continue;
       final id = key.toString();
+      if ((name == 'prayers' && accessPolicy?.prayerRestricted(doc) == true) ||
+          (name == 'prayerCategories' &&
+              accessPolicy?.categoryRestricted(id) == true)) {
+        continue;
+      }
+      if ((name == 'prayers' && cleanup.prayers.contains(id)) ||
+          (name == 'prayerCategories' && cleanup.categories.contains(id))) {
+        continue;
+      }
       final updated = _time(doc['updatedAt'] ?? doc['importedAt']);
       if (updated == null) continue;
       final bundled = collection.baselineDocument(id);

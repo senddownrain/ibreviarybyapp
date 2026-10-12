@@ -1,10 +1,13 @@
 # Доступ для святароў: Firebase Spark
 
-Flutter согласован с фактической реализацией `mybrev`, commit `7122bb2`:
+Flutter согласован с фактической реализацией `mybrev`, ветка `codex/priest-spark`:
 `firestore.rules`, `src/utils/priestCode.mjs`, `src/utils/priestPolicy.mjs`,
 `shared/priest-code-vectors.json` и `docs/priest-access.md`.
 Cloud Functions, прежний priestApi и локальная проверка правильности кода не используются.
 Веб-проект в рамках этой Flutter-реализации не изменяется и не публикуется.
+Исходный контракт `7122bb2` дополнен атомарными claims/grants в веб-задаче
+12.10.2026. Точный проверенный SHA-256 Rules записан в
+`audit-evidence/priest-spark-refresh/contract-checksums.json`.
 
 ## Auth и первоначальная активация
 
@@ -24,11 +27,25 @@ Flutter вычисляет SHA-256 UTF-8 нормализованной стро
 
 `priestDeviceGrants/{uid}` создаётся с полями:
 `uid`, `status: active`, `deviceName`, `client: Flutter`, `platform`, `label`,
-`activatedAt`, `lastActiveAt`, `revokedAt: null`, `activationProof`.
-Времена задаются `serverTimestamp`. Rules сравнивают proof с закрытым
-`priestAccess/settings.activeCodeProof` и проверяют UID и допустимые поля.
+`activatedAt`, `lastActiveAt`, `revokedAt: null` — **без proof**.
+Первоначальная активация одним WriteBatch создаёт два новых документа:
+`priestActivationClaims/{uid}` содержит `uid`, `activationProof`, `createdAt`;
+grant содержит только перечисленные метаданные. Все три времени задаются
+`serverTimestamp`. Rules через `getAfter()` проверяют новую пару, UID, поля,
+времена и совпадение proof с закрытым `priestAccess/settings.activeCodeProof`.
+Claim отдельно, grant отдельно, повторный или ранее созданный claim запрещены.
+Клиент Flutter никогда не читает claims; они недоступны даже создателю и
+администратору через клиентские SDK. Статус читается из своего безопасного
+grant, с `Source.server` и без `isFromCache`/`hasPendingWrites`.
 Flutter не читает закрытые настройки. Необязательный контакт читается из
 `priestAccessPublic/help.helpText`.
+
+Старый grant с `activationProof` не признаётся подтверждённым; отказ его
+чтения рассматривается как незавершённая серверная миграция, не отзыв устройства.
+Auth-сессия сохраняется, проверка повторяется. После field-only миграции веба
+тот же UID продолжает пользоваться доступом без ввода кода. Старого writer или
+HTTP fallback в клиенте нет. Диагностика Firestore SDK выключена, включая Web,
+чтобы отказ записи не выводил payload/proof в консоль.
 
 У grant нет срока окончания. При запуске проверяется его статус, а не старый
 код. Смена кода не меняет существующее разрешение. Активность записывается не
@@ -67,6 +84,25 @@ compaction удаляют перемещённые из публичного к�
 синхронизация продолжает читать публичные документы Firestore и проверять хеши.
 Закрытые коллекции не входят в список коллекций Bundle/Manifest обновления.
 
+Публичный bundle 12.10.2026 пересобран из уже существующего локального снимка
+`mybrev/backups/priest-live-20261012` и согласованной политики переноса веба,
+через его общий `prayerStoragePlan`/codec: 85 молитв, 4 категории. Ранее в APK
+оставались 21 теперь закрытая молитва с устаревшими публичными флагами;
+проверка одних флагов была недостаточна. Они исключены вместе с закрытой
+категорией; другие bundle-файлы не изменены. В manifest добавлены только ID
+для одноразовой очистки прежнего plaintext-кеша, без текстов/названий/proof.
+Очистка имеет собственный digest, повторно очищает Hive и старый Firestore
+дисковый кеш даже после выполненной V1 миграции; legacy download cache не
+может повторно перенести эти ID. Сохраняются публичные данные, пользовательские
+молитвы и избранные ID. Это отрицательная миграция, не разрешение доступа и
+не постоянный blacklist: последующие публичные серверные обновления работают.
+
+Повторная локальная сборка только публичных prayer ресурсов, без live reads:
+`node tools/refresh_priest_public_bundle.mjs --web-dir ../mybrev
+--snapshot ../mybrev/backups/priest-live-20261012
+--policy ../mybrev/reports/priest-access/live/move-policy.json
+--out assets/content --write`. Без `--write` выводится только отчёт количеств.
+
 ## Отзыв и офлайн
 
 Закрытые материалы доступны только онлайн. Отдельный Firestore client имеет
@@ -100,7 +136,7 @@ UID сам по себе не позволяет отозвать старую �
 
 ## Проверки и выпуск
 
-Результаты текущего прогона сохранены локально в `audit-evidence/priest-spark`; эта
+Результаты текущего прогона сохранены локально в `audit-evidence/priest-spark-refresh`; эта
 папка содержит машинные логи и скриншоты и не входит в коммит.
 Локальные Auth/Firestore Emulator используются с project `demo-rules`,
 а не с production project. Правила для тестов копируются из согласованного
@@ -108,12 +144,15 @@ UID сам по себе не позволяет отозвать старую �
 
 Перед выпуском:
 
-1. В веб-проекте завершить физическое разделение данных и пересоздать безопасный
-   публичный Bundle/Manifest из полного backup; не публиковать неполную миграцию.
+1. Проверить публикацию новых batch Rules и field-only миграцию старых grants,
+   сохраняя UID, статус и даты, по документации веба. Старые proof-bearing grants
+   до очистки не выдавать за окончательно отозванные; не откатывать новый клиент
+   к записи proof в grant. Этот Flutter task ничего не публикует на сервере.
 2. В Firebase Console включить Anonymous Authentication. Не включать автоматическое
    удаление anonymous accounts, которое может уничтожить долгосрочную Auth-сессию.
-3. По отдельному подтверждению опубликовать согласованные Firestore Rules и
-   создать закрытые settings с новым случайным кодом по веб-алгоритму.
+3. Сверить безопасный публичный Bundle/Manifest и согласовать выпуск новой
+   версии Flutter; массовый перенос не заменять принудительным content patch.
+   Учесть уже опубликованные старые APK: их ресурсы ретроспективно не защитить.
 4. Проверить production проект, квоты Spark, текущую версию публичного bundle
    и grants через административный интерфейс. В рамках этого задания production
    коды, данные и правила не изменяются.
@@ -126,6 +165,7 @@ UID сам по себе не позволяет отозвать старую �
 --target=integration_test/priest_access_flow_test.dart -d <emulator>
 --dart-define=PRIEST_USE_EMULATORS=true --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
 --dart-define=FIRESTORE_EMULATOR_PORT=8088 --dart-define=FIREBASE_AUTH_EMULATOR_PORT=9098`.
+Для новых скриншотов перед helper задать `PRIEST_EVIDENCE_DIR=audit-evidence/priest-spark-refresh`.
 Первый прогон сохраняет тестовую отметку для двух следующих запусков: после
 остановки процесса и после перезагрузки Android. Не переустанавливать APK между
 этими фазами: повторная установка через `flutter drive --use-application-binary`

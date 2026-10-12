@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1791397285761,
-  "contentDate": "2026-10-07T18:21:25.761Z",
+  "contentVersion": 1791800896428,
+  "contentDate": "2026-10-12T10:28:16.428Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -104,21 +104,21 @@
     },
     "prayers": {
       "file": "prayers.json.gz",
-      "contentVersion": 1791397285761,
-      "contentDate": "2026-10-07T18:21:25.761Z",
-      "count": 117,
-      "digest": "3545a1b2520f2a5d",
-      "storedBytes": 2087949,
-      "bundleBytes": 251525
+      "contentVersion": 1791800896428,
+      "contentDate": "2026-10-12T10:28:16.428Z",
+      "count": 85,
+      "digest": "c03c8e160fa986c0",
+      "storedBytes": 1688705,
+      "bundleBytes": 217640
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
-      "contentVersion": 1791397285761,
-      "contentDate": "2026-10-07T18:21:25.761Z",
-      "count": 5,
-      "digest": "7a0834aa4c715956",
-      "storedBytes": 879,
-      "bundleBytes": 577
+      "contentVersion": 1791800896428,
+      "contentDate": "2026-10-12T10:28:16.428Z",
+      "count": 4,
+      "digest": "3d9821f9c0185ef4",
+      "storedBytes": 848,
+      "bundleBytes": 495
     },
     "songs": {
       "file": "songs.json.gz",
@@ -147,5 +147,34 @@
       "storedBytes": 6072,
       "bundleBytes": 1775
     }
+  },
+  "priestCacheCleanup": {
+    "digest": "8c812bdabc045acd55661afaf2ba58532cc8223b0f04659b6ef7116ed2a799b8",
+    "protectedPrayerIds": [
+      "0cRVj5FPNwF4nw0BxQC8",
+      "19wH3DQbZRUPfThpuZ1s",
+      "7wpK9LBY9DCnLRVnHCw6",
+      "ApZTeHQJwhYCZW14m9Rc",
+      "CE5LNSwEKAp5Az4uUgkx",
+      "GFEHCku34G75P03dguxS",
+      "Ip3HkiO83hIpCP9uWs72",
+      "MQNZJOhMHM0AzEb2s0g5",
+      "O7u3uGOyXxHqecBCIpZJ",
+      "P0PPlLItJkgr1NmqL9GW",
+      "QuQtc7TuVg76BCUfJg9g",
+      "Ru2lSospoxSf3Ucb7OPi",
+      "Y42tcKtlcBhqMsQ1WDdL",
+      "Z2bxieW6pf0qBOGa9Jq5",
+      "ajGyoTMlqldD4d4xgS9p",
+      "d3GPdAFoOlbJUDvnEjgU",
+      "hi4FSOGf61u2B2xqA8dx",
+      "kgkiyIjCgNdKyem7qafj",
+      "oqf7gXKa3opFPlDZr0EC",
+      "scV1QWTpTyQ5RculcQoF",
+      "xXVJUqSExxkfx6Rq0E8s"
+    ],
+    "protectedCategoryIds": [
+      "gMzVAGRUogiZa2MAxpr4"
+    ]
   }
 }

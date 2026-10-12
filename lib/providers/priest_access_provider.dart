@@ -221,7 +221,11 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
               unawaited(_revoked());
             } else {
               ++_generation;
-              _set(error: const PriestAccessException('OFFLINE').message);
+              _set(
+                error: error is PriestAccessException
+                    ? error.message
+                    : const PriestAccessException('OFFLINE').message,
+              );
               unawaited(_clearMemory().whenComplete(_scheduleRetry));
             }
           },
@@ -371,7 +375,14 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       _set(registered: true);
       await refresh();
     } on PriestAccessException catch (error) {
-      if (_current(generation)) _set(error: error.message);
+      if (_current(generation)) {
+        _set(error: error.message);
+        if (error.code == 'OFFLINE' ||
+            error.code == 'SERVICE_UNAVAILABLE' ||
+            error.code == 'GRANT_UNREADABLE') {
+          _scheduleRetry();
+        }
+      }
     } catch (_) {
       if (_current(generation)) {
         _set(error: const PriestAccessException('STORAGE').message);

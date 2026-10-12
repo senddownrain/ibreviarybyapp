@@ -55,6 +55,7 @@ class ContentStore {
   /// ready (tests seed them through the overlay API).
   Future<void> open({AssetBundle? bundle, bool loadBundle = true}) async {
     _bundle = bundle;
+    bundleManifest = null;
     _bundleEnabled = loadBundle;
     _loading.clear();
     for (final item in _collections.values) {

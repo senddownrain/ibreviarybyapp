@@ -74,7 +74,7 @@ const prayers = {
 class SparkGateway implements PriestAccessGateway {
   String expectedProof = priestCodeProof(validCode)!;
   String? uid;
-  bool active = false, exists = false, offline = false;
+  bool active = false, exists = false, offline = false, unreadable = false;
   int signups = 0, activations = 0, reads = 0, clears = 0;
   Completer<void>? pauseContent, pauseReader, pauseActivation;
   final events = StreamController<PriestDeviceGrant?>.broadcast();
@@ -100,6 +100,7 @@ class SparkGateway implements PriestAccessGateway {
   @override
   Future<PriestDeviceGrant?> grant(String id) async {
     check();
+    if (unreadable) throw const PriestAccessException('GRANT_UNREADABLE');
     return exists ? PriestDeviceGrant(id, active) : null;
   }
 
@@ -343,6 +344,32 @@ void main() {
     controller.dispose();
     await gateway.close();
   });
+  test(
+    'proof cleanup rollout does not revoke or replace the restored UID',
+    () async {
+      final gateway = SparkGateway(), storage = MemoryStorage();
+      var controller = PriestAccessController(gateway, storage);
+      await controller.initialize();
+      await controller.activate(validCode, '');
+      final uid = gateway.uid;
+      gateway.unreadable = true;
+      await controller.refresh();
+      expect(controller.state.content, null);
+      expect(controller.state.registered, true);
+      expect(storage.record['verifiedUid'], uid);
+      controller.dispose();
+      controller = PriestAccessController(gateway, storage);
+      await controller.initialize();
+      gateway.unreadable = false;
+      await controller.refresh();
+      expect(controller.state.content, isNotNull);
+      expect(gateway.uid, uid);
+      expect(gateway.signups, 1);
+      expect(gateway.activations, 1);
+      controller.dispose();
+      await gateway.close();
+    },
+  );
   test(
     'offline disable persists intent and blocks all protected reads until server acknowledges after restart',
     () async {
