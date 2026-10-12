@@ -1,5 +1,5 @@
 // Ordo reading references: the same readings (status and documents) as the
-// web `readingReferencesForDay` on the same corpus, 2025–2032 × 4 dioceses.
+// web `readingReferencesForDay` on the same corpus, 2025–2035 × 4 dioceses.
 import 'dart:convert';
 import 'dart:io';
 

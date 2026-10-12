@@ -231,7 +231,14 @@ List<ParsedReading> selectReadingDocuments(
         .toList();
   }
   if (where['_date'] != null) {
-    final sameDate = docs.where((doc) => doc.date == where['_date']).toList();
+    final variant = '${where['_variant'] ?? ''}'.toLowerCase();
+    final sameDate = docs
+        .where(
+          (doc) =>
+              doc.date == where['_date'] &&
+              (variant.isEmpty || (doc.variant ?? '').toLowerCase() == variant),
+        )
+        .toList();
     if (entry.purpose == 'weekday' || where['dateOnly'] == true) {
       return sameDate;
     }

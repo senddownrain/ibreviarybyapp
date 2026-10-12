@@ -245,7 +245,7 @@ class OrdoDay {
         role: option.role,
         kind: option.kind,
         officeKind: option.officeKind,
-        lookup: readingsLookupOf(option.data, temporal.data),
+        lookup: readingsLookupOf(option.data, temporal.data, season),
         option: option.data,
         readingsReference: option.readingsReference,
         readingsStatus: option.contentStatus?['readings'] as String?,

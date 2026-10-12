@@ -47,7 +47,11 @@ class OptionReadingsPlan {
       officeKind == 'memorial' || officeKind == 'optional-memorial';
 }
 
-List<ReadingLookup> readingsLookupOf(Json candidate, Json temporal) {
+List<ReadingLookup> readingsLookupOf(
+  Json candidate,
+  Json temporal,
+  Season season,
+) {
   final kind = candidate['officeKind'];
   final weekday = ReadingLookup(
     'weekday',
@@ -64,7 +68,19 @@ List<ReadingLookup> readingsLookupOf(Json candidate, Json temporal) {
     // GIRM 357: on memorials the weekday readings are normally kept.
     return [weekday, ?proper];
   }
-  if (candidate['kind'] == 'temporal') return [weekday];
+  if (candidate['kind'] == 'temporal') {
+    // 24 December on a Sunday: the Sunday of Advent (morning) and, in the
+    // evening, the Mass of the Christmas Vigil (its own legacy document, the
+    // projection of the `vigil` set of `advent-24-12`).
+    final vigil = season.date.endsWith('-12-24') && season.dayOfWeek == 1
+        ? ReadingLookup('weekday', {
+            '_date': '24.12',
+            'dateOnly': true,
+            '_variant': 'christmas-vigil',
+          })
+        : null;
+    return [weekday, ?vigil];
+  }
   if (candidate['temporal'] == true) return [?proper, weekday];
   return [?proper];
 }
