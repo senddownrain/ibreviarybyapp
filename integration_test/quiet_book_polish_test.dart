@@ -61,6 +61,10 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(HomeScreen)),
       );
+      final auditDate = DateTime(2026, 10, 11);
+      final calendarDate = DateUtils.isSameDay(auditDate, DateTime.now())
+          ? DateTime(2026, 10, 12)
+          : auditDate;
       for (final dark in [false, true]) {
         final theme = dark ? 'dark' : 'light';
         appThemeModeController.value = dark ? ThemeMode.dark : ThemeMode.light;
@@ -73,9 +77,17 @@ void main() {
         position(find.byType(HomeScreen)).jumpTo(0);
         await settle();
         await shot('$theme-hours-11');
+        container
+            .read(liturgicalNavigationControllerProvider)
+            .openDate(calendarDate);
+        await settle();
         await tap(find.byKey(const Key('hours-date-action')));
         await shot('$theme-calendar-today-selected');
         await tap(find.text('Гатова'));
+        container
+            .read(liturgicalNavigationControllerProvider)
+            .openDate(auditDate);
+        await settle();
         await tap(find.byKey(const Key('hours-hour-laudes')));
         await waitFor(find.byType(HourSwitcherPill));
         await shot('$theme-laudes-start');
@@ -171,11 +183,15 @@ void main() {
       router.go('/hours');
       container
           .read(liturgicalNavigationControllerProvider)
-          .openDate(DateTime(2026, 10, 11));
+          .openDate(calendarDate);
       await settle();
       await tap(find.byKey(const Key('hours-date-action')));
       await shot('large-calendar-today-selected');
       await tap(find.text('Гатова'));
+      container
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(auditDate);
+      await settle();
       await tap(find.byKey(const Key('hours-hour-laudes')));
       await shot('large-laudes-start');
       final largeScroll = position(find.byType(ReaderScaffold));
@@ -188,8 +204,20 @@ void main() {
       }
       await shot('large-laudes-end');
       await tap(find.byKey(const Key('ora-next-hour')));
-      position(find.byType(ReaderScaffold)).jumpTo(600);
+      final longReader = find.byType(ReaderScaffold);
+      final longTitle = find.byKey(const Key('reader-context-title-action'));
+      final longTitleBottom = tester.getBottomLeft(longTitle).dy;
+      final longSafeTop = MediaQuery.paddingOf(tester.element(longReader)).top;
+      position(longReader).jumpTo(longTitleBottom - longSafeTop + 120);
       await settle();
+      expect(
+        tester
+            .widget<AnimatedOpacity>(
+              find.byKey(const Key('hour-switcher-opacity')),
+            )
+            .opacity,
+        1,
+      );
       await shot('large-long-hour-title');
       debugPrint('QUIET_BOOK_FONT_SCALE::restore');
       await Future<void>.delayed(const Duration(seconds: 3));
