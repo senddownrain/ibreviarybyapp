@@ -18,17 +18,8 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'support/lectionary_fixture.dart';
 import 'support/lectionary_run.dart';
 
-/// Differences from the web the app keeps on purpose; each is named in
-/// docs/flutter-lectionary-audit.md and waits for a web-side decision.
-const kDocumentedDifferences = {
-  // The Catholic.by page 4865 (and so the web document) prints the Gospel of
-  // the XXVIII Sunday, year A, as «Мк 22, 1–10» under the title «паводле
-  // Мацвея»: the app corrects the book on read (ParsedReading.fromMap).
-  'local-citation-correction:ordinary-w28-d1--A': (
-    kind: 'sections',
-    doc: 'ordinary-w28-d1--A',
-  ),
-};
+/// Differences from the web the app keeps on purpose: none.
+const kDocumentedDifferences = <String, ({String kind, String doc})>{};
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -100,15 +91,6 @@ void main() {
             )
             .firstOrNull
             ?.key;
-        final memorialFirst =
-            kind == 'active-group' &&
-            '$web'.startsWith('[') &&
-            RegExp(r'^\[\d\d-\d\d-').hasMatch('$web') &&
-            !'$app'.contains(RegExp(r'\d\d-\d\d-'));
-        if (memorialFirst) {
-          accepted.add({...record, 'reason': 'memorial-weekday-first'});
-          return;
-        }
         if (reason != null) {
           accepted.add({...record, 'reason': reason});
           return;
