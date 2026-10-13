@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1791800896428,
-  "contentDate": "2026-10-12T10:28:16.428Z",
+  "contentVersion": 1791877294111,
+  "contentDate": "2026-10-13T07:41:34.111Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 736,
       "digest": "b5f4b077f42f6664",
       "storedBytes": 53966736,
@@ -14,17 +14,17 @@
     },
     "readings": {
       "file": "readings.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 822,
-      "digest": "6025a2f6fa0262af",
-      "storedBytes": 4777430,
-      "bundleBytes": 880277
+      "digest": "93314983ba9c1bd5",
+      "storedBytes": 4813227,
+      "bundleBytes": 901221
     },
     "liturgicalTemplates": {
       "file": "liturgicalTemplates.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 16,
       "digest": "665cc09448b91bf7",
       "storedBytes": 1137473,
@@ -32,8 +32,8 @@
     },
     "invitatoriums": {
       "file": "invitatoriums.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 4,
       "digest": "587d64f9ff8e7b0d",
       "storedBytes": 9678,
@@ -41,8 +41,8 @@
     },
     "completoriums": {
       "file": "completoriums.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 35,
       "digest": "42eb55a0b377d638",
       "storedBytes": 323076,
@@ -50,17 +50,17 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 1,
       "digest": "7676e4c645130243",
       "storedBytes": 139,
-      "bundleBytes": 201
+      "bundleBytes": 204
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 241,
       "digest": "8fb0b75436b7f528",
       "storedBytes": 132977,
@@ -68,17 +68,17 @@
     },
     "liturgicalDioceseOverrides": {
       "file": "liturgicalDioceseOverrides.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 75,
       "digest": "1df4e38742254f17",
       "storedBytes": 53313,
-      "bundleBytes": 7768
+      "bundleBytes": 7767
     },
     "liturgicalYearOverrides": {
       "file": "liturgicalYearOverrides.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 15,
       "digest": "62198d0893b2a40f",
       "storedBytes": 8111,
@@ -86,17 +86,17 @@
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 291,
       "digest": "884f219bbbfe5a7a",
       "storedBytes": 3192409,
-      "bundleBytes": 590354
+      "bundleBytes": 590355
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",
-      "contentVersion": 1791397274814,
-      "contentDate": "2026-10-07T18:21:14.814Z",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
       "count": 1337,
       "digest": "db0465255c4bc5a3",
       "storedBytes": 780774,
@@ -104,35 +104,35 @@
     },
     "prayers": {
       "file": "prayers.json.gz",
-      "contentVersion": 1791800896428,
-      "contentDate": "2026-10-12T10:28:16.428Z",
-      "count": 85,
-      "digest": "c03c8e160fa986c0",
-      "storedBytes": 1688705,
-      "bundleBytes": 217640
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 115,
+      "digest": "43711607f69fe4c5",
+      "storedBytes": 2369569,
+      "bundleBytes": 364359
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
-      "contentVersion": 1791800896428,
-      "contentDate": "2026-10-12T10:28:16.428Z",
-      "count": 4,
-      "digest": "3d9821f9c0185ef4",
-      "storedBytes": 848,
-      "bundleBytes": 495
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 5,
+      "digest": "2615b158b86e8582",
+      "storedBytes": 1058,
+      "bundleBytes": 580
     },
     "songs": {
       "file": "songs.json.gz",
-      "contentVersion": 1791397285761,
-      "contentDate": "2026-10-07T18:21:25.761Z",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
       "count": 447,
       "digest": "9752aef2fd846b49",
       "storedBytes": 369604,
-      "bundleBytes": 111477
+      "bundleBytes": 111478
     },
     "compendium": {
       "file": "compendium.json.gz",
-      "contentVersion": 1791397285761,
-      "contentDate": "2026-10-07T18:21:25.761Z",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
       "count": 27,
       "digest": "7659d6be6ac3ead8",
       "storedBytes": 536467,
@@ -140,12 +140,12 @@
     },
     "compendiumMeta": {
       "file": "compendiumMeta.json.gz",
-      "contentVersion": 1791397285761,
-      "contentDate": "2026-10-07T18:21:25.761Z",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
       "count": 1,
       "digest": "879c4b7ae16cb312",
       "storedBytes": 6072,
-      "bundleBytes": 1775
+      "bundleBytes": 1776
     }
   },
   "priestCacheCleanup": {

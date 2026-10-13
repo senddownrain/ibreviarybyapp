@@ -221,11 +221,14 @@ List<ParsedReading> selectReadingDocuments(
   if (where['_periodType'] != null) {
     final rawWeeks = where['_periodWeekNumber'];
     final weeks = rawWeeks is List ? rawWeeks : [rawWeeks];
+    final variant = '${where['_variant'] ?? ''}'.toLowerCase();
     return docs
         .where(
           (doc) =>
               (doc.date ?? '').isEmpty &&
               (doc.feast ?? '').isEmpty &&
+              (variant.isEmpty ||
+                  (doc.variant ?? '').toLowerCase() == variant) &&
               doc.periodType == where['_periodType'] &&
               weeks.any((week) => _sameWeek(doc.periodWeekNumber, week)) &&
               doc.dayOfWeek == (where['_dayOfWeek'] as num?)?.toInt(),

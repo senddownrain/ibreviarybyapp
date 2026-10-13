@@ -18,17 +18,8 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'support/lectionary_fixture.dart';
 import 'support/lectionary_run.dart';
 
-/// Differences from the web the app keeps on purpose; each is named in
-/// docs/flutter-lectionary-audit.md and waits for a web-side decision.
-const kDocumentedDifferences = {
-  // The Catholic.by page 4865 (and so the web document) prints the Gospel of
-  // the XXVIII Sunday, year A, as «Мк 22, 1–10» under the title «паводле
-  // Мацвея»: the app corrects the book on read (ParsedReading.fromMap).
-  'local-citation-correction:ordinary-w28-d1--A': (
-    kind: 'sections',
-    doc: 'ordinary-w28-d1--A',
-  ),
-};
+/// Differences from the web the app keeps on purpose: none.
+const kDocumentedDifferences = <String, ({String kind, String doc})>{};
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +30,8 @@ void main() {
     await HiveService.init(path: directory.path, loadBundle: true);
     await ContentStore.instance.ensureLoaded(kContentCollections);
     final check = await applyPublishedReadings();
-    expect(check.kind.name, 'patch');
+    // The bundle is the published export: nothing to patch.
+    expect(check.kind.name, 'current');
   });
   tearDownAll(() async {
     await Hive.close();
@@ -100,15 +92,6 @@ void main() {
             )
             .firstOrNull
             ?.key;
-        final memorialFirst =
-            kind == 'active-group' &&
-            '$web'.startsWith('[') &&
-            RegExp(r'^\[\d\d-\d\d-').hasMatch('$web') &&
-            !'$app'.contains(RegExp(r'\d\d-\d\d-'));
-        if (memorialFirst) {
-          accepted.add({...record, 'reason': 'memorial-weekday-first'});
-          return;
-        }
         if (reason != null) {
           accepted.add({...record, 'reason': reason});
           return;
@@ -404,7 +387,7 @@ void main() {
                     {'id': d['id'], 'fields': d['fields']},
               ],
               'note':
-                  'Effective content of an updated phone = bundle + manifest patch = the web dataset digest (lectionary_delivery_test). The bundle is NOT rebuilt: see docs/flutter-lectionary-audit.md.',
+                  'The bundle is the published export (bundle == manifest, readings v7): nothing is stale (lectionary_delivery_test).',
             },
             'compared': report,
             'statuses': statuses,

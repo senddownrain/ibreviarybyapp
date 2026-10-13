@@ -187,6 +187,10 @@ class ParsedReading {
   /// stored).
   final String? ordoOptionId;
 
+  /// Role of this document in each legal option that names it (`purpose`,
+  /// `isDefault`; mybrev `_ordoOptionRoles`). Never stored.
+  final Map<String, ({String purpose, bool isDefault})> ordoOptionRoles;
+
   const ParsedReading({
     required this.id,
     this.year,
@@ -214,10 +218,14 @@ class ParsedReading {
     this.calendarDayOfWeek,
     this.hasReadings = true,
     this.ordoOptionId,
+    this.ordoOptionRoles = const {},
   });
 
   /// This document, remembered as belonging to the legal option [optionId].
-  ParsedReading withOrdoOption(String optionId) => ParsedReading(
+  ParsedReading withOrdoOption(
+    String optionId, {
+    Map<String, ({String purpose, bool isDefault})>? roles,
+  }) => ParsedReading(
     id: id,
     year: year,
     reading: reading,
@@ -244,6 +252,7 @@ class ParsedReading {
     calendarDayOfWeek: calendarDayOfWeek,
     hasReadings: hasReadings,
     ordoOptionId: optionId,
+    ordoOptionRoles: roles ?? ordoOptionRoles,
   );
 
   /// First reading regardless of field name (reading or reading1).
@@ -260,15 +269,6 @@ class ParsedReading {
       final v = map[key];
       if (v == null) return null;
       final data = Map<String, dynamic>.from(v as Map);
-      // The bundled ordinary-w28-d1 year A source prints «Мк 22» above
-      // a Gospel explicitly titled «паводле Мацвея». Correct only this
-      // confirmed book mismatch, preserving the complete/short verse ranges
-      // and source JSON. Both the reader and ORDO consume this projection.
-      if (key == 'gospel' &&
-          (data['title'] as String? ?? '').contains('паводле Мацвея') &&
-          RegExp(r'^Мк\s+22\s*,').hasMatch(data['bible'] as String? ?? '')) {
-        data['bible'] = (data['bible'] as String).replaceFirst('Мк', 'Мц');
-      }
       return ParsedSection.fromMap(data);
     }
 

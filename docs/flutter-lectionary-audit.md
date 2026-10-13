@@ -6,7 +6,27 @@ mybrev `main` = `e2deccc` (`docs/lectionary-full-audit.md`), dataset
 manifest v3). Machine-readable result: `reports/flutter-lectionary-parity.json`.
 Flutter SDK for every number below: 3.41.4 (`~/.cache/flutter-3.41.4`).
 
-## Verdict (not a 100 % claim)
+## Update 2026-10-13 (final synchronization)
+
+Superseded numbers: this section replaces the verdict, the "differences kept on
+purpose" and the delivery chapters below (kept as history). Full report:
+`docs/web-flutter-lectionary-sync.md`.
+
+* Web `main` 2c56a93, Flutter branch `sync/flutter-web-final` (from `e2643a4`).
+  Production `readings` v7 / digest `93314983ba9c1bd5`, 822 documents; the
+  bundle (`assets/content`) is rebuilt from that export: **bundle == manifest**.
+* 20 717 legal Mass options (16 068 date x diocese pairs, 2025-2035): **0
+  mismatches**, 0 deliberate differences, 155 466 sections compared by hash.
+  Status: OK 20 648, REFERENCE_ONLY_EXPECTED 60, UPSTREAM_MISSING 9;
+  BUNDLE_STALE / OVERLAY_STALE / WRONG_LOOKUP / WRONG_DEFAULT / BAD_RENDER 0.
+* Memorials follow the web rule (weekday by default, proper readings only for
+  the 12-entry registry, Budslav only in Pinsk, own/Common as alternatives; the
+  option route opens the option default through `_ordoOptionRoles`).
+* Pentecost Saturday 2031 (vigil lookup, `_variant`), 24.06 and 06.08 sets,
+  the Hours `dayId` route adds only planned documents: ported.
+* The local "Мк 22 -> Мц 22" correction is removed; the bundle holds «Мц 22, 1-10».
+
+## Earlier verdict (superseded)
 
 * Lookup, selection and structured content of the Readings screen equal the
   web's for **20 717 legal Mass options** (16 068 date x diocese pairs, 2025-2035,
@@ -136,7 +156,7 @@ old parser text (resync plan); the «Мк 22» citation; the Hours -> Readings
 `?dayId=` route of Sundays; whether an explicitly chosen optional memorial opens
 its own readings.
 
-## Preparing updated builds
+## Preparing updated builds (see also docs/web-flutter-lectionary-sync.md)
 
 * Android: `export PATH="$HOME/.cache/flutter-3.41.4/bin:$PATH"`, then
   `flutter build appbundle --release` (or the beta workflow, now pinned to
