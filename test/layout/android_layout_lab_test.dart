@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
@@ -204,6 +205,7 @@ void main() {
   });
 
   setUpAll(() async {
+    await initializeDateFormatting('be');
     GoogleFonts.config.allowRuntimeFetching = false;
     final hiveDirectory = await Directory.systemTemp.createTemp(
       'android-layout-lab-',
