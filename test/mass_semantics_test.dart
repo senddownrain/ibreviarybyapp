@@ -15,7 +15,7 @@ import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 
 MassSemanticDocument _build(String language, String markdown) =>
     buildMassDocument(
-      prayerMarkdownToHtml(markdown),
+      prayerMarkdownToHtml(markdown, recognizeSpeakers: false),
       kMassRitual.variant(language)!,
     );
 
@@ -579,7 +579,9 @@ void main() {
     for (final texts in [before, after]) {
       for (final language in ['be', 'la', 'en']) {
         final formatted = buildMassDocument(
-          formatLiturgicalHtml(prayerMarkdownToHtml(texts[language]!)),
+          formatLiturgicalHtml(
+            prayerMarkdownToHtml(texts[language]!, recognizeSpeakers: false),
+          ),
           kMassRitual.variant(language)!,
         );
         expect(
@@ -821,7 +823,7 @@ void main() {
   test('markdown bold may span the lines of one paragraph', () {
     expect(
       prayerMarkdownToHtml('**узяў хлеб,\nламаў:**'),
-      contains('<strong>узяў хлеб,<br>ламаў:</strong>'),
+      contains('<strong>узяў хлеб,<br>\nламаў:</strong>'),
     );
     final doc = _build('be', _beAfter);
     expect(

@@ -34,12 +34,11 @@ class Prayer {
 
   bool get isMarkdown =>
       textFormat == 'mybrev-markdown' ||
-      (displayText.isNotEmpty &&
-          !displayText.contains('<') &&
-          (displayText.contains('**') ||
-              RegExp(r'\[(?:\\.|[^\]])+\]\([^\s)]+\)').hasMatch(displayText) ||
-              displayText.contains(':::rubric') ||
-              RegExp(r'^#{1,6}\s', multiLine: true).hasMatch(displayText)));
+      (textFormat != 'html' &&
+          !RegExp(
+            r'</?[a-z][^>]*>',
+            caseSensitive: false,
+          ).hasMatch(displayText));
 
   factory Prayer.fromMap(Map<String, dynamic> data, String id) {
     return Prayer(

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
-import 'package:mybrev_flutter/utils/prayer_markdown.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/prayer_link.dart';
+import 'package:mybrev_flutter/widgets/prayer_content.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 
 class PrayerFormScreen extends ConsumerStatefulWidget {
@@ -438,7 +440,7 @@ class _FormatButton extends StatelessWidget {
   );
 }
 
-class _PrayerMarkdownPreview extends StatelessWidget {
+class _PrayerMarkdownPreview extends ConsumerWidget {
   const _PrayerMarkdownPreview({
     super.key,
     required this.source,
@@ -449,7 +451,7 @@ class _PrayerMarkdownPreview extends StatelessWidget {
   final bool legacyHtml;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     if (source.trim().isEmpty) {
       return Container(
@@ -474,21 +476,20 @@ class _PrayerMarkdownPreview extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outlineVariant),
       ),
-      child: Html(
-        data: legacyHtml ? source : prayerMarkdownToHtml(source),
-        style: {
-          'body': Style(
-            margin: Margins.zero,
-            padding: HtmlPaddings.zero,
-            color: cs.onSurface,
-            lineHeight: LineHeight(1.55),
-          ),
-          'p': Style(margin: Margins.only(bottom: 8)),
-          'h2': Style(
-            margin: Margins.only(top: 12, bottom: 6),
-            fontSize: FontSize(20),
-            fontWeight: FontWeight.w700,
-          ),
+      child: PrayerContent(
+        prayer: Prayer(
+          id: 'preview',
+          title: '',
+          body: source,
+          textFormat: legacyHtml ? 'html' : 'mybrev-markdown',
+        ),
+        textStyle: ReaderTheme.of(context).body(
+          ref.watch(settingsProvider).fontSize,
+          family: ref.watch(settingsProvider).fontFamily,
+        ),
+        onLinkTap: (url, attributes, element) {
+          final location = prayerLinkLocation(url);
+          if (location != null) context.push(location);
         },
       ),
     );
