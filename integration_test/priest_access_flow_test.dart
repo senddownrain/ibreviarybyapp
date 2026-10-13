@@ -1,6 +1,8 @@
 // Actual Firebase SDK + mybrev Rules, exclusively local demo emulators.
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart'
+    as platform;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/firebase_priest_access.dart';
+import 'package:mybrev_flutter/services/priest_access_gateway.dart';
 import 'package:mybrev_flutter/services/priest_access_storage.dart';
 import 'package:mybrev_flutter/services/priest_code.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -63,6 +66,36 @@ Future<http.Response> deviceRead(String uid, String collection) async {
     Uri.parse('$base/$collection/$uid'),
     headers: {'Authorization': 'Bearer $token'},
   );
+}
+
+// Test-only adversarial CACHE read: no request to the unreadable server claim.
+// A full SDK can otherwise read its own successful write despite server Rules.
+Future<void> expectNoCachedClaim(String uid) async {
+  final db = platform.FirebaseFirestorePlatform.instanceFor(
+    app: Firebase.app(FirebasePriestAccess.appName),
+    databaseId: '(default)',
+  );
+  db.settings = Settings(
+    persistenceEnabled: false,
+    host: '$host:$port',
+    sslEnabled: false,
+  );
+  try {
+    final cached = await db
+        .collection('priestActivationClaims')
+        .doc(uid)
+        .get(const GetOptions(source: Source.cache));
+    expect(
+      cached.data() == null,
+      true,
+      reason: 'Claim must leave no SDK cache',
+    );
+  } on FirebaseException catch (error) {
+    expect(
+      error.code,
+      'unavailable',
+    ); // No cached document in the fresh client.
+  }
 }
 
 void main() {
@@ -209,6 +242,7 @@ void main() {
       expect(controller.state.registered, false);
       expect(controller.state.error, contains('Няправільны'));
       final rejectedUid = await gateway.restoreSession();
+      await expectNoCachedClaim(rejectedUid!);
       for (final collection in [
         'priestDeviceGrants',
         'priestActivationClaims',
@@ -223,11 +257,48 @@ void main() {
           reason: 'Rejected batch must leave neither document',
         );
       }
+      // Queue a real SDK batch while its network is disabled. Its timeout must
+      // finish destroying the memory client before returning, preserve Auth,
+      // and prevent the queued proof from being replayed after reconnection.
+      final pausedDb = platform.FirebaseFirestorePlatform.instanceFor(
+        app: Firebase.app(FirebasePriestAccess.appName),
+        databaseId: '(default)',
+      );
+      pausedDb.settings = Settings(
+        persistenceEnabled: false,
+        host: '$host:$port',
+        sslEnabled: false,
+      );
+      await pausedDb.disableNetwork();
+      await expectLater(
+        gateway.createGrant(
+          rejectedUid,
+          priestCodeProof(code)!,
+          'Timeout test',
+        ),
+        throwsA(
+          isA<PriestAccessException>().having((e) => e.code, 'code', 'OFFLINE'),
+        ),
+      );
+      expect(
+        Firebase.apps.any((a) => a.name == FirebasePriestAccess.appName),
+        false,
+        reason: 'Cleanup must complete before the timeout is reported',
+      );
+      expect(await gateway.restoreSession(), rejectedUid);
+      await expectNoCachedClaim(rejectedUid);
+      expect(await gateway.grant(rejectedUid), null);
       await controller.activate(code, 'Pixel 7 Spark');
       await waitFor(() => controller.state.content != null);
       final uid = await gateway.restoreSession();
       expect(uid, isNotNull);
-      final ownGrant = await deviceRead(uid!, 'priestDeviceGrants');
+      expect(
+        uid,
+        rejectedUid,
+        reason: 'Neither denial nor timeout replaces UID',
+      );
+      await expectNoCachedClaim(uid!);
+      final ownGrant = await deviceRead(uid, 'priestDeviceGrants');
       expect(ownGrant.statusCode, 200);
       expect(
         (jsonDecode(ownGrant.body)['fields'] as Map).keys,

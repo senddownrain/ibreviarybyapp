@@ -88,10 +88,11 @@ class FirebasePriestAccess implements PriestAccessGateway {
     Future<T> Function() task, {
     bool activation = false,
     bool readingGrant = false,
+    bool timeoutTask = true,
   }) async {
     try {
       await _initialize();
-      return await task().timeout(_timeout);
+      return timeoutTask ? await task().timeout(_timeout) : await task();
     } on PriestAccessException {
       rethrow;
     } on TimeoutException {
@@ -213,38 +214,47 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<void> createGrant(String uid, String proof, String deviceName) => _run(
     () async {
       _own(uid);
-      final batch = _privateDb!.batch();
-      batch.set('priestActivationClaims/$uid', {
-        'uid': uid,
-        'activationProof': proof,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      batch.set('priestDeviceGrants/$uid', {
-        'uid': uid,
-        'status': 'active',
-        'deviceName': deviceName.isEmpty ? 'Flutter' : deviceName,
-        'client': 'Flutter',
-        'platform': kIsWeb ? 'Web' : defaultTargetPlatform.name,
-        'label': deviceName,
-        'activatedAt': FieldValue.serverTimestamp(),
-        'lastActiveAt': FieldValue.serverTimestamp(),
-        'revokedAt': null,
-      });
-      // Both documents must be NEW; Rules validate their post-batch state.
-      // No claim get/list, no proof in the readable grant, no legacy fallback.
       try {
-        await batch.commit();
+        try {
+          final batch = _privateDb!.batch();
+          batch.set('priestActivationClaims/$uid', {
+            'uid': uid,
+            'activationProof': proof,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          batch.set('priestDeviceGrants/$uid', {
+            'uid': uid,
+            'status': 'active',
+            'deviceName': deviceName.isEmpty ? 'Flutter' : deviceName,
+            'client': 'Flutter',
+            'platform': kIsWeb ? 'Web' : defaultTargetPlatform.name,
+            'label': deviceName,
+            'activatedAt': FieldValue.serverTimestamp(),
+            'lastActiveAt': FieldValue.serverTimestamp(),
+            'revokedAt': null,
+          });
+          // Both documents must be NEW; Rules validate their post-batch state.
+          // No claim get/list, no proof in the readable grant, no legacy fallback.
+          await batch.commit().timeout(_timeout);
+        } finally {
+          // Unlike Firestore Lite, the full SDK caches its own claim write.
+          // Discard that client on success, denial AND timeout, keeping Auth.
+          await clearProtectedMemory();
+        }
       } on FirebaseException catch (error) {
         // Another browser tab may have registered the restored UID meanwhile.
         // Only a fresh, acknowledged server grant can resolve that race.
         if (error.code == 'permission-denied' &&
-            _grantData(await _grant(uid).get(_server))?.active == true) {
+            (await grant(uid))?.active == true) {
           return;
         }
         rethrow;
       }
     },
     activation: true,
+    // The commit has its own timeout. An outer timeout could return before
+    // finally finishes destroying the SDK cache / pending offline write queue.
+    timeoutTask: false,
   );
   @override
   Future<void> disable(String uid) => _run(() async {
