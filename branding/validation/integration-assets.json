@@ -1,8 +1,10 @@
 {
   "approvedSourceSHA256": "fa8ac6990b67f4a48e5907d00c86aa7306fb44921f079dd5bc92c7bba682a294",
   "pngExportCount": 38,
-  "appIconCount": 19,
+  "appIconSlots": 19,
+  "uniqueAppIconPNGCount": 15,
   "appIconsRGBWithoutAlpha": true,
+  "monochromeSVGParsed": true,
   "adaptiveAlphaBBox": [
     86,
     86,

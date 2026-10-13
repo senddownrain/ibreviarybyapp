@@ -4,8 +4,13 @@
 
 ## Основание и границы
 
-База интеграции: актуальный `origin/main`
+Начальная база интеграции: `origin/main`
 `e2643a4b43a3ed86e64b922224b730e156f65404`.
+Во время проверки `main` обновился до
+`4872f04f5d1d81235bcffa7c7533b5a8ba481dac` (обновления Lektionary/Ordo,
+контента и тестов). Его изменения включаются обычным merge из `origin/main`
+в интеграционную ветку, без переписывания опубликованной истории.
+Проверки итогового дерева будут повторены; они будут отличены от начальных.
 Источник выбранных файлов: `origin/codex/malitounik-brand-icons`,
 `b7e4f3ea531722e20cd9e1de3dcfd4b8bbd10ba3`.
 Ветка: `codex/integrate-malitounik-brand`; отдельный managed worktree.
@@ -36,26 +41,39 @@ Native `MyBrev Test`, app IDs, signing, версии, Firebase configs,
 SHA256 `fa8ac6990b67f4a48e5907d00c86aa7306fb44921f079dd5bc92c7bba682a294`.
 Байты исходника совпадают с исходной брендовой веткой. Перерисовки нет.
 
-`tools/audit_brand_assets.py`: проверены 38 PNG экспортов, 19 RGB AppIcon
-без alpha, XML/JSON/SVG подключений, adaptive foreground 432×432 с bbox
+`tools/audit_brand_assets.py`: проверены 38 PNG экспортов, 19 слотов AppIcon
+(15 PNG файлов), RGB без alpha, XML/JSON/SVG подключений, adaptive foreground 432×432 с bbox
 `(86,86,346,346)` внутри safe zone, прозрачные monochrome cutouts и maskable
 safe zone. Детерминированная регенерация resvg 2.6.2 + Pillow 11.3.0
 оставила все SHA256 экспортов и manifest неизменными, включая совпадение
 с исходной веткой. Размеры 32/48/60 px и themed silhouette визуально
 проверены в `export-preview.png`; рисунок не менялся.
 
-## Проверки именно интеграционной ветки
+## Начальные проверки интеграционной ветки (база e2643a4)
 
 - `flutter pub get`: успешно; lockfile и зависимости не изменены.
 - `flutter analyze --no-pub`: успешно, No issues found.
 - `flutter test --no-pub test/app_theme_test.dart test/color_foundations_test.dart
   test/reader_theme_test.dart test/platform_design_test.dart --reporter expanded`:
   **21 тест прошёл**.
-- `flutter build apk --debug --no-pub`: выполняется; результат будет добавлен.
-- Android API 34: свежий отдельный AVD подготовлен; проверка ожидает APK.
+- `flutter build apk --debug --no-pub`: успешно, Gradle assembleDebug 363.8 s.
+  APK SHA256 `71b9ce289c28cab5973a3bb3c922e1bb968c8c71a90b76b9afcd6d54cc24cc91`.
+  `aapt dump badging` подтвердил `by.mybrev.playtest2026`, `MyBrev Test`,
+  versionCode 6, versionName 1.0.0, adaptive icon v33. Проверены точные пиксели
+  foreground, monochrome, splash внутри готового APK (`integration-apk.json`).
+- Android API 34: свежий runtime **не подтверждён**. Новый отдельный AVD
+  не удалось инициализировать при доступном месте на диске. Прежний
+  одноразовый брендовый AVD на `emulator-5576` загрузился, но произошёл
+  системный `DeadSystemException` (Android system/phone/networkstack),
+  а установка APK вернула код 1. Приложение этой проверкой не валидировано.
+  Эмулятор остановлен. Исторические успешные кадры исходной ветки обозначены
+  отдельно; их не выдаём за результат актуального main.
 - Android до 12: launch XML и density assets проверены статически;
   runtime на старой ОС пока не выполнялся.
-- iOS actool/ibtool: ожидается свежая проверка CI интеграционной ветки.
+- iOS actool/ibtool: **успешно**, macOS-15, AppIcon/LaunchImage/LaunchBackground
+  и static launch storyboard. [Свежий CI 38384065857](https://github.com/senddownrain/ibreviarybyapp/actions/runs/38384065857),
+  commit `72b7a3abc33d7b7955cb1d3c01e8d194b2ddec0d`.
+  Полный результат: `integration-ios-ci.json`.
   Полная iOS-сборка/Simulator/iPhone не выполнялись на Windows.
 - Flutter Web runner: manifest и размеры/opacity/maskable проверены статически;
   Web build/install здесь не запускались.
@@ -68,7 +86,8 @@ safe zone. Детерминированная регенерация resvg 2.6.2
 
 ## GitHub и отдельные последующие задачи
 
-PR и статус слияния будут добавлены после свежих проверок.
+[PR #11](https://github.com/senddownrain/ibreviarybyapp/pull/11) создан как draft.
+Результаты проверок обновлённой базы и статус слияния будут добавлены.
 Безопасное слияние разрешено владельцем после чистого diff и успешного CI.
 Релизный workflow остаётся manual-only; магазинные выпуски и deployment
 не выполняются.

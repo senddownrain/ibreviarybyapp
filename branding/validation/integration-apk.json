@@ -1,0 +1,11 @@
+{
+  "apkSHA256": "71b9ce289c28cab5973a3bb3c922e1bb968c8c71a90b76b9afcd6d54cc24cc91",
+  "packageBadging": "package: name='by.mybrev.playtest2026' versionCode='6' versionName='1.0.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+  "applicationLabel": "application-label:'MyBrev Test'",
+  "applicationBadging": "application: label='MyBrev Test' icon='res/mipmap-anydpi-v33/ic_launcher.xml'",
+  "compiledArtworkPixelMatches": [
+    "res/drawable-nodpi-v4/ic_launcher_foreground.png",
+    "res/drawable-nodpi-v4/ic_launcher_monochrome.png",
+    "res/drawable-nodpi-v4/brand_splash_icon.png"
+  ]
+}

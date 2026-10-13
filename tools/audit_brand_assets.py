@@ -28,6 +28,7 @@ def main():
     inventory = json.loads(inventory_bytes)
     assert digest(ROOT / 'branding/source/approved-icon.png') == EXPECTED_SOURCE
     assert inventory['approved_source_sha256'] == EXPECTED_SOURCE
+    ET.parse(ROOT / 'branding/source/monochrome.svg')
     exports = inventory['files']
     for entry in exports:
         assert digest(ROOT / entry['path']) == entry['sha256'], entry['path']
@@ -98,7 +99,9 @@ def main():
     for entry in exports:
         assert digest(ROOT / entry['path']) == entry['sha256'], 'Regeneration changed '+entry['path']
     result = {'approvedSourceSHA256': EXPECTED_SOURCE, 'pngExportCount': len(exports),
-              'appIconCount': len(catalog['images']), 'appIconsRGBWithoutAlpha': True,
+              'appIconSlots': len(catalog['images']),
+              'uniqueAppIconPNGCount': len({x['filename'] for x in catalog['images']}),
+              'appIconsRGBWithoutAlpha': True, 'monochromeSVGParsed': True,
               'adaptiveAlphaBBox': list(bbox), 'monochromeCutouts': True,
               'maskableSafeZone': True, 'xmlFilesParsed': parsed,
               'splashMatchesCurrentIbColors': True, 'deterministicRegeneration': True}
