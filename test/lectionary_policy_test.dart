@@ -295,7 +295,7 @@ void main() {
               .toList();
           if (plan.isEmpty || !plan.single.isMemorial) continue;
           final expected = diocese == 'pinsk' ? 'proper' : 'weekday';
-          expect(plan.single.defaultPurpose, expected, reason: '$diocese');
+          expect(plan.single.defaultPurpose, expected, reason: diocese);
           expect(plan.single.lookup.first.purpose, expected);
           // Without `_dayIds` on the readings document nothing wrong opens.
           final s = screen(
