@@ -211,11 +211,24 @@ void main() {
           true,
         );
         await screen(restartPhase == 1 ? 'restart-process' : 'restart-reboot');
+        // Verify the actual reader after cold Auth restoration as well as the
+        // catalog, without entering an activation code again.
+        router.go('/prayer/spark-single');
+        final protectedText = find.textContaining(
+          'PRIVATE-SPARK-SENTINEL',
+          findRichText: true,
+        );
+        await waitFor(() => protectedText.evaluate().isNotEmpty);
+        await screen(
+          restartPhase == 1 ? 'reader-after-process' : 'reader-after-reboot',
+        );
         if (restartPhase == 1) {
           await storage.write({...await storage.read(), 'testRestartCheck': 2});
         } else {
           await controller.disable();
           expect(controller.state.content, null);
+          await waitFor(() => protectedText.evaluate().isEmpty);
+          await screen('reader-after-disable');
           await storage.write({});
           if (container
               .read(settingsProvider)

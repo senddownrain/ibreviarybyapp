@@ -138,6 +138,9 @@ void main() {
           find.byKey(ValueKey('readings-celebration-${alternative.key}')),
         );
         expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
+        // At 320 dp the radio choice scrolls the disclosure outside the lazy
+        // ListView. Rebuild its visible row before checking retained state.
+        await top(find.byKey(const Key('readings-options-scroll')));
         expect(
           tester
               .widget<LiturgicalCalendarDisclosure>(
@@ -150,6 +153,7 @@ void main() {
         await shot('$theme-readings-calendar-expanded');
         await tap(find.byKey(const Key('ordo-day-2026-10-10')));
         expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
+        await top(find.byKey(const Key('readings-options-scroll')));
         expect(
           tester
               .widget<LiturgicalCalendarDisclosure>(
