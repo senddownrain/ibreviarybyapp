@@ -30,7 +30,8 @@ void main() {
     await HiveService.init(path: directory.path, loadBundle: true);
     await ContentStore.instance.ensureLoaded(kContentCollections);
     final check = await applyPublishedReadings();
-    expect(check.kind.name, 'patch');
+    // The bundle is the published export: nothing to patch.
+    expect(check.kind.name, 'current');
   });
   tearDownAll(() async {
     await Hive.close();
