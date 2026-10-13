@@ -22,7 +22,12 @@ ANDROID_PACKAGE = "by.mybrev.playtest2026"
 # Every track a version code may already be used on.
 PLAY_STANDARD_TRACKS = %w[internal alpha beta production].freeze
 
-FLUTTER = ENV.fetch("FLUTTER", "flutter")
+# Tracks a release may go to: an explicit allow-list (production is never one).
+# `beta` is the closed-testing track id from ANDROID_BETA_TRACK.
+PLAY_RELEASE_TRACKS = %w[internal beta].freeze
+PLAY_RELEASE_STATUSES = %w[draft completed].freeze
+
+FLUTTER = ENV["FLUTTER"].to_s.strip.empty? ? "flutter" : ENV["FLUTTER"].strip
 
 # No generated fastlane/README.md: a release needs a clean tree.
 skip_docs
@@ -182,6 +187,9 @@ platform :ios do
             "--build-name=#{name}", "--build-number=#{build}")
     ipa = signed_archive(api_key)
     verify_ipa(ipa)
+    # Re-check right before the upload (another upload may have taken the number).
+    latest = latest_build(api_key)
+    UI.user_error!("Build number conflict: #{build} is not above TestFlight build #{latest}; run the release again") if build <= latest
     groups = ENV["IOS_TESTFLIGHT_GROUPS"].to_s.split(",").map(&:strip).reject(&:empty?)
     upload_to_testflight(
       api_key: api_key,
@@ -262,7 +270,12 @@ platform :android do
     UI.success("Bundle OK: #{ANDROID_PACKAGE}, versionCode #{version_code}, upload-signed")
   end
 
-  def release(track)
+  # `kind` is the allow-listed lane (internal / beta); `track` the Play track id.
+  def release(kind, track)
+    UI.user_error!("Track #{kind} is not allowed (only #{PLAY_RELEASE_TRACKS.join(', ')}; never production)") unless PLAY_RELEASE_TRACKS.include?(kind)
+    UI.user_error!("Not on production (track id #{track})") if track.to_s.strip.empty? || track.to_s =~ /prod/i
+    status = ENV.fetch("PLAY_RELEASE_STATUS", "completed")
+    UI.user_error!("PLAY_RELEASE_STATUS #{status} is not allowed (#{PLAY_RELEASE_STATUSES.join(' / ')})") unless PLAY_RELEASE_STATUSES.include?(status)
     require_clean_tree
     json_key = play_json_key
     validate_play_store_json_key(json_key: json_key)
@@ -280,6 +293,11 @@ platform :android do
             error_callback: ->(output) { accept_unverified_strip(output, aab) })
     verify_bundle(aab, version_code)
 
+    # Re-check right before the upload: another release may have taken the
+    # number while this one was building.
+    latest = used_version_codes(json_key, [track]).max.to_i
+    UI.user_error!("Version code conflict: #{version_code} is not above #{latest} now used in Google Play; run the release again") if version_code <= latest
+
     # Release notes as a changelog of this version code.
     metadata = Dir.mktmpdir("mybrev-play-")
     language = ENV.fetch("PLAY_LANGUAGE", "en-US")
@@ -294,7 +312,7 @@ platform :android do
       aab: aab,
       # A new app stays «draft» until Google reviews it the first time
       # (PLAY_RELEASE_STATUS=draft); afterwards releases go out at once.
-      release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
+      release_status: status,
       metadata_path: metadata,
       skip_upload_metadata: true,
       skip_upload_images: true,
@@ -330,7 +348,7 @@ platform :android do
 
   desc "Signed AAB → Google Play internal testing"
   lane :internal do
-    release("internal")
+    release("internal", "internal")
   end
 
   desc "Signed AAB → Google Play closed testing «MyBrev Beta» (ANDROID_BETA_TRACK)"
@@ -338,7 +356,7 @@ platform :android do
     # The closed track id comes from `fastlane android tracks`, never guessed.
     require_env("ANDROID_BETA_TRACK")
     track = ENV.fetch("ANDROID_BETA_TRACK")
-    UI.user_error!("Not on production") if track == "production"
-    release(track)
+    UI.user_error!("Not on production") if track =~ /prod/i
+    release("beta", track)
   end
 end

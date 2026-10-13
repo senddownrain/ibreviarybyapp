@@ -1,0 +1,21 @@
+# Fast release gate (tool/release/run_tests.sh): content, delivery, readings,
+# liturgical calendar/resolution, ordo core, routing. One test file per line.
+# The slow parity suites (hours_parity, lectionary_parity, ordo_parity, ...)
+# run with run_full_tests=true or in the normal development checks.
+test/content_offline_test.dart
+test/lectionary_delivery_test.dart
+test/lectionary_model_test.dart
+test/lectionary_policy_test.dart
+test/liturgical_calendar_test.dart
+test/liturgical_resolution_test.dart
+test/civil_date_test.dart
+test/day_test.dart
+test/mass_reading_sets_test.dart
+test/readings_cycle_metadata_test.dart
+test/office_assembly_test.dart
+test/route_identity_test.dart
+test/router_architecture_test.dart
+test/app_shell_state_test.dart
+test/ordo_content_update_test.dart
+test/ordo_day_flow_test.dart
+test/reading_references_parity_test.dart
