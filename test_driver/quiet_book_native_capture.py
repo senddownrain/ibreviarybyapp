@@ -1,5 +1,6 @@
 """Run beside quiet_book_polish_test.dart; captures native Android frames."""
 import re
+import sys
 import subprocess
 import time
 from pathlib import Path
@@ -14,7 +15,7 @@ def adb(*args, **kwargs):
 
 original = adb("shell", "settings", "get", "system", "font_scale",
                capture_output=True, text=True).stdout.strip()
-folder = Path("audit-evidence/quiet-book-polish")
+folder = Path(sys.argv[1] if len(sys.argv) > 1 else "audit-evidence/quiet-book-polish")
 folder.mkdir(parents=True, exist_ok=True)
 adb("logcat", "-c")
 process = subprocess.Popen(

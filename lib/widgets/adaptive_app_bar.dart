@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mybrev_flutter/theme/platform_design.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 
 /// Space reserved by content scrolling behind the floating top controls.
 const double kFloatingAppBarContentInset = 76;
@@ -18,6 +18,9 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.seasonColor,
+    this.showOverflow = false,
+    this.showTextScale = false,
+    this.showPsalmody = false,
   });
 
   AdaptiveAppBar.text(
@@ -26,8 +29,14 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.seasonColor,
+    this.showOverflow = false,
+    this.showTextScale = false,
+    this.showPsalmody = false,
   }) : title = Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
 
+  final bool showOverflow;
+  final bool showTextScale;
+  final bool showPsalmody;
   final Widget title;
   final List<Widget>? actions;
   final Widget? leading;
@@ -40,6 +49,7 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageActions = actions ?? const <Widget>[];
     final cupertino = usesCupertinoGlass(context);
     final cs = Theme.of(context).colorScheme;
     final canPop = Navigator.canPop(context);
@@ -58,10 +68,6 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () => Navigator.maybePop(context),
               )
             : null);
-    final readerAction = actions?.whereType<TextScaleControl>().firstOrNull;
-    final pageActions = actions
-        ?.where((action) => action is! TextScaleControl)
-        .toList(growable: false);
 
     return ColoredBox(
       color: Colors.transparent,
@@ -101,7 +107,7 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 ),
-                if (pageActions != null && pageActions.isNotEmpty) ...[
+                if (pageActions.isNotEmpty) ...[
                   const SizedBox(width: 10),
                   AdaptiveChromeSurface(
                     role: ChromeSurfaceRole.group,
@@ -114,9 +120,12 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 ],
-                if (readerAction != null) ...[
+                if (showOverflow) ...[
                   const SizedBox(width: 8),
-                  readerAction,
+                  AppOverflowMenu(
+                    showTextScale: showTextScale,
+                    showPsalmody: showPsalmody,
+                  ),
                 ],
               ],
             ),

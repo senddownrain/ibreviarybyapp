@@ -519,9 +519,9 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
-    expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
+    expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
     expect(controller.value, ReaderChromeMode.compact);
-    expect(find.byKey(const Key('reader-chrome-overflow')), findsNothing);
+    expect(find.byKey(const Key('reader-chrome-overflow')), findsOneWidget);
     expect(find.text('Падзяліцца'), findsNothing);
     expect(find.text('Рэдагаваць'), findsNothing);
     expect(find.text('Поўнаэкраннае чытанне'), findsNothing);

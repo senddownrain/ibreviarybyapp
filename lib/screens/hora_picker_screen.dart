@@ -194,7 +194,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     if (_loading) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar.text('Літургічны дзень'),
+        appBar: AdaptiveAppBar.text('Літургічны дзень', showOverflow: true),
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
@@ -221,7 +221,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     if (day == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar.text('Літургічны дзень'),
+        appBar: AdaptiveAppBar.text('Літургічны дзень', showOverflow: true),
         body: Stack(
           children: [
             AmbientWash.hero(seasonColor: seasonColor),
@@ -249,6 +249,7 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar(
+        showOverflow: true,
         title: const Text('Літургічны дзень'),
         actions: [
           IconButton(

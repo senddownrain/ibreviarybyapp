@@ -181,7 +181,7 @@ void main() {
       );
       final scale = find.descendant(
         of: chrome,
-        matching: find.byKey(const Key('text-scale-open')),
+        matching: find.byKey(const Key('app-overflow-open')),
       );
       expect(language, findsOneWidget);
       expect(scale, findsOneWidget);
@@ -426,7 +426,7 @@ void main() {
       final bar = tester.getRect(find.byKey(const Key('mass-navigator-bar')));
       expect(bar.left, greaterThanOrEqualTo(0));
       expect(bar.right, lessThanOrEqualTo(320));
-      for (final key in ['mass-language-selector', 'text-scale-open']) {
+      for (final key in ['mass-language-selector', 'app-overflow-open']) {
         final action = tester.getRect(find.byKey(Key(key)));
         expect(action.left, greaterThanOrEqualTo(0));
         expect(action.right, lessThanOrEqualTo(320));
@@ -522,7 +522,7 @@ void main() {
     expect(
       find.descendant(
         of: chrome,
-        matching: find.byKey(const Key('text-scale-open')),
+        matching: find.byKey(const Key('app-overflow-open')),
       ),
       findsOneWidget,
     );

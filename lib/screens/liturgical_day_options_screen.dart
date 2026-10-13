@@ -86,6 +86,7 @@ class LiturgicalDayOptionsScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar(
+        showOverflow: true,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

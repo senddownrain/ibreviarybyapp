@@ -8,6 +8,7 @@ import 'package:mybrev_flutter/widgets/hours_options_sheet.dart';
 import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_disclosure.dart';
 
 /// Date-only entry. Browsing months does not change the underlying reader.
 Future<void> showCompactLiturgicalCalendar({
@@ -178,22 +179,16 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (_calendarExpanded)
-                    LiturgicalMonthCalendar(
+                  LiturgicalCalendarDisclosure(
+                    controlKey: const Key('liturgical-calendar-toggle'),
+                    expanded: _calendarExpanded,
+                    onChanged: (expanded) =>
+                        setState(() => _calendarExpanded = expanded),
+                    calendar: LiturgicalMonthCalendar(
                       initialDate: presentation.date,
                       seasonColor: presentation.accent,
                       diocese: widget.diocese,
                       onSelected: selectDate,
-                    ),
-                  TextButton.icon(
-                    key: const Key('liturgical-calendar-toggle'),
-                    onPressed: () =>
-                        setState(() => _calendarExpanded = !_calendarExpanded),
-                    icon: const Icon(Icons.calendar_month_outlined),
-                    label: Text(
-                      _calendarExpanded
-                          ? 'Схаваць каляндар'
-                          : 'Паказаць каляндар',
                     ),
                   ),
                   Align(

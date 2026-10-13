@@ -21,9 +21,9 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_disclosure.dart';
 import 'package:mybrev_flutter/ordo/reading_references.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
@@ -417,7 +417,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     _resetDocumentScroll();
   }
 
-  Widget _menuLeading() {
+  Widget? _menuLeading() {
     final navigation = AppNavigationScope.maybeOf(context);
     if (navigation?.shellState.canReturnToOra() ?? false) {
       return IconButton(
@@ -434,11 +434,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         onPressed: () => context.pop(),
       );
     }
-    return IconButton(
-      tooltip: 'Налады',
-      icon: const PhosphorIcon(PhosphorIconsRegular.gear, size: 22),
-      onPressed: () => context.push('/settings'),
-    );
+    return null;
   }
 
   String _cycleLabel(String cycle) => switch (cycle) {
@@ -768,7 +764,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         seasonColor: seasonColor,
         chromeMode: ReaderChromeMode.full,
         leading: _menuLeading(),
-        actions: const [TextScaleControl()],
+        showBack: false,
         onBack: hasOraReturn
             ? AppNavigationScope.maybeOf(context)?.returnToOra
             : null,
@@ -941,7 +937,7 @@ String _readingsCycleLabel(String cycle) => switch (cycle) {
   _ => cycle,
 };
 
-class _ReadingsOptionsSheet extends StatelessWidget {
+class _ReadingsOptionsSheet extends StatefulWidget {
   const _ReadingsOptionsSheet({
     required this.accentColor,
     this.date,
@@ -985,6 +981,13 @@ class _ReadingsOptionsSheet extends StatelessWidget {
   final String? readingNote;
 
   @override
+  State<_ReadingsOptionsSheet> createState() => _ReadingsOptionsSheetState();
+}
+
+class _ReadingsOptionsSheetState extends State<_ReadingsOptionsSheet> {
+  late bool _calendarExpanded = widget.calendarExpanded;
+
+  @override
   Widget build(BuildContext context) => ConstrainedBox(
     key: const Key('readings-options-sheet'),
     constraints: BoxConstraints(
@@ -1012,36 +1015,34 @@ class _ReadingsOptionsSheet extends StatelessWidget {
             shrinkWrap: true,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              if (date != null)
-                ExpansionTile(
-                  key: const PageStorageKey('readings-calendar-disclosure'),
-                  initiallyExpanded: calendarExpanded,
-                  title: const Text('Паказаць каляндар'),
-                  tilePadding: EdgeInsets.zero,
-                  children: [
-                    LiturgicalMonthCalendar(
-                      initialDate: date!,
-                      onSelected: onDateSelected,
-                    ),
-                  ],
+              if (widget.date != null)
+                LiturgicalCalendarDisclosure(
+                  controlKey: const Key('readings-calendar-disclosure'),
+                  expanded: _calendarExpanded,
+                  onChanged: (expanded) =>
+                      setState(() => _calendarExpanded = expanded),
+                  calendar: LiturgicalMonthCalendar(
+                    initialDate: widget.date!,
+                    onSelected: widget.onDateSelected,
+                  ),
                 ),
-              if (celebrations.isNotEmpty) ...[
+              if (widget.celebrations.isNotEmpty) ...[
                 const _OptionsHeading('Святкаванне'),
                 RadioGroup<String>(
-                  groupValue: selectedCelebration,
+                  groupValue: widget.selectedCelebration,
                   onChanged: (key) {
-                    final option = celebrations
+                    final option = widget.celebrations
                         .where((o) => o.key == key)
                         .firstOrNull;
-                    if (option != null) onCelebrationSelected(option);
+                    if (option != null) widget.onCelebrationSelected(option);
                   },
                   child: Column(
                     children: [
-                      for (final option in celebrations)
+                      for (final option in widget.celebrations)
                         RadioListTile<String>(
                           key: ValueKey('readings-celebration-${option.key}'),
                           value: option.key,
-                          selected: option.key == selectedCelebration,
+                          selected: option.key == widget.selectedCelebration,
                           contentPadding: EdgeInsets.zero,
                           secondary: VestmentMarker(
                             colors: [
@@ -1066,72 +1067,75 @@ class _ReadingsOptionsSheet extends StatelessWidget {
                   ),
                 ),
               ],
-              if (loading) const LinearProgressIndicator(),
-              if (!loading && readingNote != null)
+              if (widget.loading) const LinearProgressIndicator(),
+              if (!widget.loading && widget.readingNote != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 8,
                   ),
-                  child: Text(readingNote!),
+                  child: Text(widget.readingNote!),
                 ),
-              if (groups.length > 1) ...[
+              if (widget.groups.length > 1) ...[
                 const SizedBox(height: 18),
                 const _OptionsHeading('Набор чытанняў'),
-                for (final group in groups)
+                for (final group in widget.groups)
                   ListTile(
                     key: ValueKey('readings-group-${group.key}'),
-                    selected: group.key == activeGroupKey,
+                    selected: group.key == widget.activeGroupKey,
                     title: Text(group.label),
-                    trailing: group.key == activeGroupKey
+                    trailing: group.key == widget.activeGroupKey
                         ? const Icon(Icons.check_rounded)
                         : null,
-                    onTap: () => onGroupSelected(group.key),
+                    onTap: () => widget.onGroupSelected(group.key),
                   ),
               ],
-              if (massSet != null && massSet!.sets.length > 1) ...[
+              if (widget.massSet != null &&
+                  widget.massSet!.sets.length > 1) ...[
                 const SizedBox(height: 18),
                 MassSetSelector(
-                  sets: massSet!.sets,
-                  selectedId: massSet!.set.id,
-                  accentColor: accentColor,
-                  onSelected: onSetSelected,
+                  sets: widget.massSet!.sets,
+                  selectedId: widget.massSet!.set.id,
+                  accentColor: widget.accentColor,
+                  onSelected: widget.onSetSelected,
                 ),
               ],
-              if (cycles.length > 1) ...[
+              if (widget.cycles.length > 1) ...[
                 const SizedBox(height: 18),
                 const _OptionsHeading('Выбар чытанняў'),
                 const SizedBox(height: 6),
-                for (final cycle in cycles)
+                for (final cycle in widget.cycles)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                     child: SelectionOptionCard(
                       key: ValueKey('readings-cycle-$cycle'),
                       title: 'Год ${_readingsCycleLabel(cycle)}',
                       leading: const Icon(Icons.auto_stories_outlined),
-                      accentColor: accentColor,
-                      selected: cycle == (manualCycle ?? automaticCycle),
-                      onTap: () => onCycleSelected(
-                        cycle == automaticCycle ? null : cycle,
+                      accentColor: widget.accentColor,
+                      selected:
+                          cycle ==
+                          (widget.manualCycle ?? widget.automaticCycle),
+                      onTap: () => widget.onCycleSelected(
+                        cycle == widget.automaticCycle ? null : cycle,
                       ),
                     ),
                   ),
               ],
-              if (groups.length < 2 &&
-                  (massSet?.sets.length ?? 0) < 2 &&
-                  cycles.length < 2 &&
-                  celebrations.length < 2)
+              if (widget.groups.length < 2 &&
+                  (widget.massSet?.sets.length ?? 0) < 2 &&
+                  widget.cycles.length < 2 &&
+                  widget.celebrations.length < 2)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Text('Для гэтай даты іншых набораў чытанняў няма'),
                 ),
-              if (date != null)
+              if (widget.date != null)
                 ListTile(
                   key: const Key('readings-calendar-picker'),
                   leading: const Icon(Icons.search),
                   title: const Text('Знайсці літургічны дзень'),
                   subtitle: const Text('Пошук паводле перыяду або свята'),
-                  onTap: onFindDay,
+                  onTap: widget.onFindDay,
                 ),
             ],
           ),

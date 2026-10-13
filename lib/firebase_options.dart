@@ -7,6 +7,16 @@ import 'package:flutter/foundation.dart';
 /// These identifiers grant no admin access; Firestore rules control data access.
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
+    if (const bool.fromEnvironment('PRIEST_USE_EMULATORS')) {
+      if (!kDebugMode) throw StateError('Emulator configuration is debug-only');
+      return const FirebaseOptions(
+        apiKey: 'AIzaSyEmulatorOnlyFakeKey000000000000000',
+        appId: '1:123456789:android:0123456789abcdef',
+        messagingSenderId: '123456789',
+        projectId: 'demo-rules',
+        authDomain: 'demo-rules.firebaseapp.com',
+      );
+    }
     if (kIsWeb) return web;
     return switch (defaultTargetPlatform) {
       TargetPlatform.android => android,

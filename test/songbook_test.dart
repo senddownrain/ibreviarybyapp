@@ -502,11 +502,11 @@ void main() {
         find.textContaining('Тэставая крыніца', findRichText: true),
         findsOneWidget,
       );
-      expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
+      expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
       expect(
         find.byKey(const Key('reader-chrome-overflow')),
-        findsNothing,
-        reason: 'no separate songbook settings entry',
+        findsOneWidget,
+        reason: 'one unified reader menu',
       );
       expect(find.byKey(const Key('song-chord-control')), findsOneWidget);
       expect(

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/hour_switcher_pill.dart';
+
+export 'package:mybrev_flutter/widgets/app_overflow_menu.dart'
+    show ReaderSecondaryAction;
 
 /// Navigation/chrome density requested by the application shell.
 ///
@@ -48,18 +52,6 @@ class ReaderChromeModeScope
           ?.notifier;
 }
 
-class ReaderSecondaryAction {
-  const ReaderSecondaryAction({
-    required this.label,
-    required this.icon,
-    required this.onSelected,
-  });
-
-  final String label;
-  final IconData icon;
-  final VoidCallback onSelected;
-}
-
 /// Shared long-form reader layout.
 ///
 /// Context and platform chrome remain outside [ReaderContentSurface]. The
@@ -71,6 +63,9 @@ class ReaderScaffold extends StatelessWidget {
     this.contextHeader,
     this.actions = const [],
     this.secondaryActions = const [],
+    this.showBack = true,
+    this.showTextScale = true,
+    this.showPsalmody = false,
     this.seasonColor,
     this.chromeMode = ReaderChromeMode.compact,
     this.onChromeModeChanged,
@@ -98,6 +93,9 @@ class ReaderScaffold extends StatelessWidget {
   final bool followSwipeDrag;
   final List<Widget> actions;
   final List<ReaderSecondaryAction> secondaryActions;
+  final bool showBack;
+  final bool showTextScale;
+  final bool showPsalmody;
 
   /// Day-context accent for the ambient header, never for reader controls.
   final Color? seasonColor;
@@ -105,7 +103,7 @@ class ReaderScaffold extends StatelessWidget {
   final ValueChanged<ReaderChromeMode>? onChromeModeChanged;
   final VoidCallback? onBack;
 
-  /// Optional root-level leading control (for example the application menu).
+  /// Optional context-specific return control (for example returning to Ora).
   /// Detail readers continue to use the default platform back control.
   final Widget? leading;
   final Widget? drawer;
@@ -284,6 +282,9 @@ class ReaderScaffold extends StatelessWidget {
               mode: resolvedMode,
               actions: actions,
               secondaryActions: secondaryActions,
+              showBack: showBack,
+              showTextScale: showTextScale,
+              showPsalmody: showPsalmody,
               onBack: onBack,
               leading: leading,
               onModeChanged: setMode,
@@ -595,6 +596,9 @@ class ReaderChrome extends StatelessWidget {
     required this.onModeChanged,
     this.actions = const [],
     this.secondaryActions = const [],
+    this.showBack = true,
+    this.showTextScale = true,
+    this.showPsalmody = false,
     this.seasonColor,
     this.onBack,
     this.leading,
@@ -604,6 +608,9 @@ class ReaderChrome extends StatelessWidget {
   final ValueChanged<ReaderChromeMode> onModeChanged;
   final List<Widget> actions;
   final List<ReaderSecondaryAction> secondaryActions;
+  final bool showBack;
+  final bool showTextScale;
+  final bool showPsalmody;
 
   /// Kept for existing callers; reader controls use neutral chrome colors.
   final Color? seasonColor;
@@ -631,7 +638,7 @@ class ReaderChrome extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   child: SizedBox.square(dimension: 48, child: leading),
                 )
-              else
+              else if (showBack)
                 _ReaderChromeButton(
                   key: const Key('reader-chrome-back'),
                   tooltip: 'Назад',
@@ -643,31 +650,12 @@ class ReaderChrome extends StatelessWidget {
                 ),
               const Spacer(),
               ...actions.expand((action) => [action, const SizedBox(width: 8)]),
-              if (secondaryActions.isNotEmpty)
-                AdaptiveChromeSurface(
-                  role: ChromeSurfaceRole.control,
-                  borderRadius: BorderRadius.circular(24),
-                  child: SizedBox.square(
-                    dimension: 48,
-                    child: PopupMenuButton<ReaderSecondaryAction>(
-                      key: const Key('reader-chrome-overflow'),
-                      tooltip: 'Дзеянні чытання',
-                      icon: const Icon(Icons.more_horiz_rounded),
-                      onSelected: (action) => action.onSelected(),
-                      itemBuilder: (context) => [
-                        for (final action in secondaryActions)
-                          PopupMenuItem(
-                            value: action,
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Icon(action.icon),
-                              title: Text(action.label),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
+              AppOverflowMenu(
+                key: const Key('reader-chrome-overflow'),
+                showTextScale: showTextScale,
+                showPsalmody: showPsalmody,
+                actions: secondaryActions,
+              ),
             ],
           ),
         ),

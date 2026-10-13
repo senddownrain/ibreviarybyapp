@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
+import 'package:mybrev_flutter/services/priest_access_policy.dart';
 
 /// Content model of the device: 1 = former download cache (`days`,
 /// `readings`, … boxes filled from Firestore), 2 = bundle + update overlay.
@@ -98,12 +99,42 @@ class ContentMigration {
   Future<void> _carryOver(String name, Box box) async {
     await _store.ensureLoaded([name]);
     final collection = _store.collection(name);
+    PriestAccessPolicy? accessPolicy;
+    if (name == 'prayers' || name == 'prayerCategories') {
+      await _store.ensureLoaded(['prayerCategories']);
+      final categories = _store.collection('prayerCategories');
+      final docs = {
+        for (final id in categories.keys)
+          id: Map<String, dynamic>.from(categories.get(id) as Map),
+      };
+      if (await Hive.boxExists('prayerCategories')) {
+        final old = Hive.isBoxOpen('prayerCategories')
+            ? Hive.box('prayerCategories')
+            : await Hive.openBox('prayerCategories');
+        for (final id in old.keys) {
+          if (old.get(id) case final Map data) {
+            docs[id.toString()] = Map<String, dynamic>.from(data);
+          }
+        }
+      }
+      accessPolicy = PriestAccessPolicy(docs);
+    }
     final bundleVersion = collection.baselineVersion;
+    final cleanup = PriestCacheCleanup.fromManifest(_store.bundleManifest);
     for (final key in box.keys) {
       final raw = box.get(key);
       if (raw is! Map) continue;
       final doc = Map<String, dynamic>.from(raw);
       final id = key.toString();
+      if ((name == 'prayers' && accessPolicy?.prayerRestricted(doc) == true) ||
+          (name == 'prayerCategories' &&
+              accessPolicy?.categoryRestricted(id) == true)) {
+        continue;
+      }
+      if ((name == 'prayers' && cleanup.prayers.contains(id)) ||
+          (name == 'prayerCategories' && cleanup.categories.contains(id))) {
+        continue;
+      }
       final updated = _time(doc['updatedAt'] ?? doc['importedAt']);
       if (updated == null) continue;
       final bundled = collection.baselineDocument(id);

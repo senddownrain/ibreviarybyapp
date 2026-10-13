@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/content_update_scheduler.dart';
 
@@ -137,38 +138,38 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                             )
                           : widget.navigationShell,
                     ),
-                    if (shellOwnsTop)
-                      Positioned(
-                        top: topPadding + 8,
-                        left: 12,
-                        child: _FloatingMenuButton(
-                          onTap: () => context.push('/settings'),
-                        ),
-                      ),
-                    if (shellOwnsTop &&
-                        descriptor.isBranchRoot &&
-                        widget.activeBranch == AppBranch.hours)
+                    if (shellOwnsTop && mode != ReaderChromeMode.hidden)
                       Positioned(
                         top: topPadding + 8,
                         right: 12,
-                        child: _FloatingDayButton(
-                          onTap: () {
-                            final selection = ref.read(
-                              hoursLiturgicalSelectionProvider,
-                            );
-                            context.push(
-                              Uri(
-                                path: '/hours/ordo',
-                                queryParameters: {
-                                  'date': liturgicalDateKey(
-                                    ref.read(selectedDateProvider),
-                                  ),
-                                  'dayId': ?selection.dayId,
-                                  'diocese': ?selection.diocese,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (descriptor.isBranchRoot &&
+                                widget.activeBranch == AppBranch.hours) ...[
+                              _FloatingDayButton(
+                                onTap: () {
+                                  final selection = ref.read(
+                                    hoursLiturgicalSelectionProvider,
+                                  );
+                                  context.push(
+                                    Uri(
+                                      path: '/hours/ordo',
+                                      queryParameters: {
+                                        'date': liturgicalDateKey(
+                                          ref.read(selectedDateProvider),
+                                        ),
+                                        'dayId': ?selection.dayId,
+                                        'diocese': ?selection.diocese,
+                                      },
+                                    ).toString(),
+                                  );
                                 },
-                              ).toString(),
-                            );
-                          },
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            const AppOverflowMenu(),
+                          ],
                         ),
                       ),
                   ],
@@ -186,41 +187,6 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _FloatingMenuButton extends StatelessWidget {
-  const _FloatingMenuButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Tooltip(
-      message: 'Налады',
-      child: AdaptiveChromeSurface(
-        role: ChromeSurfaceRole.control,
-        borderRadius: BorderRadius.circular(24),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(24),
-            child: SizedBox.square(
-              dimension: 48,
-              child: Center(
-                child: PhosphorIcon(
-                  PhosphorIconsRegular.gear,
-                  size: 24,
-                  color: cs.onSurface,
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

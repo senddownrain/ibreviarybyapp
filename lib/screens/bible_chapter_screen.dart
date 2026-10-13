@@ -11,10 +11,8 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
-import 'package:mybrev_flutter/widgets/navigation_drawer.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 
@@ -239,6 +237,11 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       return ReaderScaffold(
         showAmbient: false,
         semanticLabel: 'Памылка адкрыцця Бібліі',
+        showBack:
+            !(AppRouteEntryScope.maybeOf(
+                  context,
+                )?.entry.descriptor.isBranchRoot ??
+                true),
         content: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -290,7 +293,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                 ),
                 semanticLabel: '${book.name}, раздзел ${widget.chapter}',
                 chromeMode: ReaderChromeMode.compact,
-                leading: isSearchResult ? null : _menuLeading(),
+                showBack: isSearchResult,
                 actions: [
                   _ChromeAction(
                     key: const Key('bible-search-open'),
@@ -298,7 +301,6 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                     icon: PhosphorIconsRegular.magnifyingGlass,
                     onPressed: () => _openSearch(book),
                   ),
-                  const TextScaleControl(),
                 ],
                 contextHeader: ReaderContextHeader(
                   eyebrow: book.isNewTestament
@@ -395,12 +397,6 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
       ),
     );
   }
-
-  Widget _menuLeading() => IconButton(
-    tooltip: 'Меню',
-    onPressed: () => showSecondaryMenu(context),
-    icon: const PhosphorIcon(PhosphorIconsRegular.list, size: 22),
-  );
 
   Widget _translationControl(BibleBookInfo book) => SizedBox(
     width: 136,

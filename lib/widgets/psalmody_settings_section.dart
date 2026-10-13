@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 
-/// Shared by global settings and the Office's local Aa panel.
+/// Detailed preferences in global settings. Ora uses two compact switches.
 class PsalmodySettingsSection extends ConsumerWidget {
   const PsalmodySettingsSection({super.key});
 

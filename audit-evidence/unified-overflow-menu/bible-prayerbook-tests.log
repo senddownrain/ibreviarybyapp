@@ -1,0 +1,56 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+00:12 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+00:14 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:15 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:16 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:16 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:19 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:27 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:31 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:41 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:46 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: favorite toggle is shared by catalog and root providers
+00:48 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions BEL and RUS switch keeps the reading location
+00:49 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions BEL and RUS switch keeps the reading location
+00:49 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions BEL and RUS switch keeps the reading location
+00:50 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+00:50 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:51 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:53 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:53 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:54 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:58 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+01:06 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+01:08 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+01:10 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer reader shows scroll-to-top only outside fullscreen
+01:10 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions inline chapter center opens the existing full-name picker
+01:11 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions inline chapter center opens the existing full-name picker
+01:12 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions inline chapter center opens the existing full-name picker
+01:13 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions inline chapter center opens the existing full-name picker
+01:13 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer editor formats text and shows preview
+01:15 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions manual downward scroll compacts the Bible dock and a new chapter resets it
+01:16 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions manual downward scroll compacts the Bible dock and a new chapter resets it
+01:16 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayerbook title clears top search at narrow and wide sizes
+01:20 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayerbook title clears top search at narrow and wide sizes
+01:20 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse selection adds, removes, and persists a highlight
+01:22 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions double tap enters fullscreen without selecting a verse
+01:22 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse palette exposes names, state, and 48dp targets
+01:24 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse announces its number, text, and selected state
+01:25 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse palette uses reported zero system inset
+01:27 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions system TextScaler increases rendered verse body
+01:28 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions Aa changes shared text size without exposing font settings
+01:31 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions search result opens the verse and Back restores query state
+01:38 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions scroll offset survives recreation and branch-style return
+01:38 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions Compact and Hidden chrome remain shell-controlled
+01:39 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions iOS and Android use their native chrome interpretations
+01:42 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions large text and narrow screens do not overflow
+01:43 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (tearDownAll)
+01:43 +52: All tests passed!

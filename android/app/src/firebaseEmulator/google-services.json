@@ -1,0 +1,11 @@
+{
+  "project_info": {"project_number": "123456789", "project_id": "demo-rules"},
+  "client": [{
+    "client_info": {
+      "mobilesdk_app_id": "1:123456789:android:0123456789abcdef",
+      "android_client_info": {"package_name": "by.mybrev.playtest2026"}
+    },
+    "api_key": [{"current_key": "AIzaSyEmulatorOnlyFakeKey000000000000000"}]
+  }],
+  "configuration_version": "1"
+}

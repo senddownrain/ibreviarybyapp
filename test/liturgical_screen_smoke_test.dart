@@ -23,7 +23,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/models/day.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
@@ -386,9 +386,9 @@ void main() {
       await tester.pumpAndSettle();
       final reader = tester.widget<ReaderScaffold>(find.byType(ReaderScaffold));
       expect(reader.seasonColor, contexts.last);
-      expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
+      expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
       schemes.add(
-        Theme.of(tester.element(find.byType(TextScaleControl))).colorScheme,
+        Theme.of(tester.element(find.byType(AppOverflowMenu))).colorScheme,
       );
       expect(tester.takeException(), isNull);
     }
@@ -932,7 +932,9 @@ void main() {
 
       // Exercise the actual Aa slider and settings rebuild at every supported
       // step, including the minimum where absolute metadata floors regress.
-      await tester.tap(find.byKey(const Key('text-scale-open')));
+      await tester.tap(find.byKey(const Key('app-overflow-open')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Шрыфт'));
       await tester.pumpAndSettle();
       for (var step = 7; step <= 18; step++) {
         final requestedSize = kDefaultReaderFontSize * step / 10;

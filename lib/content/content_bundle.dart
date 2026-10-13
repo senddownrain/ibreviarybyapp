@@ -9,6 +9,42 @@ import 'package:crypto/crypto.dart';
 const kContentSchemaVersion = 1;
 const kContentAssetDir = 'assets/content';
 
+/// A negative-only cleanup list from the reviewed web migration. It contains
+/// IDs, never private texts or authorization, and cannot activate access.
+class PriestCacheCleanup {
+  const PriestCacheCleanup._(this.digest, this.prayers, this.categories);
+  final String digest;
+  final Set<String> prayers;
+  final Set<String> categories;
+  factory PriestCacheCleanup.fromManifest(Map<String, dynamic>? manifest) {
+    final raw = manifest?['priestCacheCleanup'];
+    if (raw == null) return const PriestCacheCleanup._('V1', {}, {});
+    if (raw is! Map) throw const FormatException('Invalid cache cleanup');
+    final prayers = (raw['protectedPrayerIds'] as List).cast<String>().toList()
+      ..sort();
+    final categories =
+        (raw['protectedCategoryIds'] as List).cast<String>().toList()..sort();
+    final expected = sha256
+        .convert(
+          utf8.encode(
+            jsonEncode({
+              'protectedPrayerIds': prayers,
+              'protectedCategoryIds': categories,
+            }),
+          ),
+        )
+        .toString();
+    if (raw['digest'] != expected) {
+      throw const FormatException('Cache cleanup digest mismatch');
+    }
+    return PriestCacheCleanup._(
+      'V2-$expected',
+      prayers.toSet(),
+      categories.toSet(),
+    );
+  }
+}
+
 /// Marks a reference into the collection's string table.
 const kStringRef = '\u0001';
 

@@ -88,15 +88,21 @@ Future<void> _openOptions(WidgetTester tester) async {
     -400,
     scrollable: find.byType(Scrollable).first,
   );
-  await tester.ensureVisible(action);
+  // ensureVisible changes the scroll offset; wait for the new layout before
+  // tapping. At 320 px / 200% the old button rect is below the viewport.
   await tester.pumpAndSettle();
+  expect(action.hitTestable(), findsOneWidget);
   await tester.tap(action);
   await tester.pumpAndSettle();
+  expect(find.byKey(const Key('readings-options-sheet')), findsOneWidget);
   final selector = find.byKey(const Key('readings-mass-set-selector'));
   await tester.scrollUntilVisible(
     selector,
     250,
-    scrollable: find.byType(Scrollable).last,
+    scrollable: find.descendant(
+      of: find.byKey(const Key('readings-options-scroll')),
+      matching: find.byType(Scrollable),
+    ),
   );
   await tester.pumpAndSettle();
 }

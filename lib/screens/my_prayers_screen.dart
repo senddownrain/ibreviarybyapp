@@ -27,7 +27,7 @@ class MyPrayersScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AdaptiveAppBar.text('Мае малітвы'),
+      appBar: AdaptiveAppBar.text('Мае малітвы', showOverflow: true),
       // The app dock belongs to the parent Scaffold. With extendBody enabled,
       // its height is exposed here as MediaQuery.padding.bottom, but a nested
       // Scaffold does not apply that padding to its FAB automatically.

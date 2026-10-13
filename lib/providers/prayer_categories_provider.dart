@@ -3,6 +3,8 @@ import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
+import 'package:mybrev_flutter/services/priest_access_policy.dart';
 
 const kPrayerCategoriesCollection = 'prayerCategories';
 
@@ -11,12 +13,16 @@ class PrayerMenuCategory {
   final String name;
   final List<String> tags;
   final bool isGlobal;
+  final bool priestOnly;
+  final String? parentId;
 
   const PrayerMenuCategory({
     required this.id,
     required this.name,
     required this.tags,
     required this.isGlobal,
+    this.priestOnly = false,
+    this.parentId,
   });
 
   factory PrayerMenuCategory.global(String id, Map data) {
@@ -25,6 +31,9 @@ class PrayerMenuCategory {
       name: data['name']?.toString().trim() ?? '',
       tags: _cleanTags(data['tags']),
       isGlobal: true,
+      priestOnly:
+          data['priestOnly'] == true || data['effectivePriestOnly'] == true,
+      parentId: data['parentId']?.toString(),
     );
   }
 
@@ -51,13 +60,30 @@ List<String> _cleanTags(dynamic value) {
 final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
   (ref) async* {
     ref.watch(cacheEpochProvider);
+    final access = ref.watch(priestAccessProvider);
     await ContentStore.instance.ensureLoaded(const [
       kPrayerCategoriesCollection,
     ]);
     final box = HiveService.prayerCategoriesBox;
+    final source =
+        access.content?.categories ??
+        access.publicContent?.categories ??
+        {
+          for (final key in box.keys)
+            if (box.get(key) case final Map data)
+              key: Map<String, dynamic>.from(data),
+        };
+    final policy = PriestAccessPolicy(source);
     final documents = [
-      for (final key in box.keys)
-        if (box.get(key) case final Map data) (key, data),
+      for (final entry in source.entries)
+        if (access.content != null || !policy.categoryRestricted(entry.key))
+          (
+            entry.key,
+            {
+              ...entry.value,
+              'effectivePriestOnly': policy.categoryRestricted(entry.key),
+            },
+          ),
     ];
     double order(Map data) =>
         (data['order'] is num ? (data['order'] as num).toDouble() : null) ??

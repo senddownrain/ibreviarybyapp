@@ -17,6 +17,7 @@ import 'package:mybrev_flutter/screens/ordo_screen.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/ordo/runtime.dart';
 
 class _Dioceses extends DioceseSelectionNotifier {
   _Dioceses(this.value);
@@ -105,7 +106,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     await pump(tester, app(DateTime(2025, 11, 2)));
-    final books = find.text('Лекцыянарый т. III · Літургія гадзінаў т. III');
+    final books = find.byKey(const Key('ordo-book-Лекцыянарый-Том III'));
     expect(books.hitTestable(), findsNothing);
     await tester.scrollUntilVisible(
       find.text('Літургічныя кнігі'),
@@ -120,6 +121,14 @@ void main() {
     await tester.tap(find.text('Літургічныя кнігі'));
     await tester.pumpAndSettle();
     expect(books, findsOneWidget);
+    expect(
+      find.descendant(of: books, matching: find.text('Том III')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('ordo-book-Літургія гадзінаў-Том III')),
+      findsOneWidget,
+    );
     await tester.scrollUntilVisible(
       find.text('Літургія гадзінаў').first,
       -300,
@@ -148,7 +157,12 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('Літургія гадзінаў — з дня:', skipOffstage: false),
+      find.descendant(
+        of: find.byKey(const Key('ordo-office-split')),
+        matching: find.text(
+          OrdoRuntime.engine.resolve('2025-11-02').sources.office.title,
+        ),
+      ),
       findsOneWidget,
     );
   });

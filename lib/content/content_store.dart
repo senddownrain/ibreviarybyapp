@@ -55,6 +55,7 @@ class ContentStore {
   /// ready (tests seed them through the overlay API).
   Future<void> open({AssetBundle? bundle, bool loadBundle = true}) async {
     _bundle = bundle;
+    bundleManifest = null;
     _bundleEnabled = loadBundle;
     _loading.clear();
     for (final item in _collections.values) {
@@ -451,6 +452,10 @@ class ContentCollection {
     await _overlay!.clear();
     _reloadView();
   }
+
+  /// Hive is append-only: removing a formerly protected document must also
+  /// discard the old serialized frames from the live overlay file.
+  Future<void> compactOverlay() async => _overlay!.compact();
 
   /// An app release with another bundle, without rebuilding the app (tests):
   /// the new baseline, then the same reconciliation as at a real start.

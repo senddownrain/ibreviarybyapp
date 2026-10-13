@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -11,6 +12,7 @@ import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
+import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
@@ -32,6 +34,7 @@ class _MemorySettings extends SettingsNotifier {
 }
 
 void main() {
+  setUpAll(() => initializeDateFormatting('be'));
   test('Bible selection temporarily owns the bottom slot', () {
     const entry = AppRouteEntry(id: 'bible', descriptor: bibleRootRoute);
     final controller = BranchShellController(AppBranch.bible, bibleRootRoute)
@@ -100,7 +103,28 @@ void main() {
                             ref.watch(selectedDateProvider);
                             ref.watch(readingsBranchStateProvider);
                             ref.watch(settingsProvider);
-                            return Text(branch.name);
+                            final search = IconButton(
+                              key: Key('root-search-${branch.name}'),
+                              tooltip: 'Пошук',
+                              onPressed: () {},
+                              icon: const Icon(Icons.search),
+                            );
+                            return switch (branch) {
+                              AppBranch.hours => Text(branch.name),
+                              AppBranch.prayerbook => Stack(
+                                children: [
+                                  Text(branch.name),
+                                  FloatingTopActions(actions: [search]),
+                                ],
+                              ),
+                              _ => ReaderScaffold(
+                                showBack: false,
+                                actions: branch == AppBranch.bible
+                                    ? [search]
+                                    : const [],
+                                content: Text(branch.name),
+                              ),
+                            };
                           },
                         ),
                       ),
@@ -125,6 +149,42 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+
+      // Exercise the production chrome-owner descriptors for all four roots.
+      for (final branch in AppBranch.values) {
+        router.go('/${branch.name}');
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('app-overflow-open')),
+          findsOneWidget,
+          reason: branch.name,
+        );
+        expect(
+          find.byKey(const Key('reader-chrome-back')),
+          findsNothing,
+          reason: branch.name,
+        );
+        expect(find.byTooltip('Налады'), findsNothing, reason: branch.name);
+        expect(
+          find.byKey(const Key('hours-calendar-action')),
+          branch == AppBranch.hours ? findsOneWidget : findsNothing,
+        );
+        if (branch == AppBranch.prayerbook || branch == AppBranch.bible) {
+          expect(find.byKey(Key('root-search-${branch.name}')), findsOneWidget);
+        }
+        await tester.tap(find.byKey(const Key('app-overflow-open')));
+        await tester.pumpAndSettle();
+        expect(find.text('Налады'), findsOneWidget);
+        expect(find.text('Інфармацыя'), findsOneWidget);
+        expect(
+          find.text('Шрыфт'),
+          branch == AppBranch.readings || branch == AppBranch.bible
+              ? findsOneWidget
+              : findsNothing,
+        );
+        await tester.tapAt(const Offset(4, 400));
+        await tester.pumpAndSettle();
+      }
 
       expect(container.read(selectedDateProvider), date);
       expect(container.read(readingsBranchStateProvider).date, date);

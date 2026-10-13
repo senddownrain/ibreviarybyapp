@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -101,16 +102,12 @@ class _LiturgicalPickerScreenState
               child: Column(
                 key: const Key('liturgical-picker-heading'),
                 children: [
-                  SafeArea(
-                    bottom: false,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        key: const Key('liturgical-picker-back'),
-                        tooltip: 'Назад',
-                        onPressed: () => Navigator.maybePop(context),
-                        icon: const Icon(Icons.arrow_back_rounded),
-                      ),
+                  FloatingTopActions(
+                    leading: IconButton(
+                      key: const Key('liturgical-picker-back'),
+                      tooltip: 'Назад',
+                      onPressed: () => Navigator.maybePop(context),
+                      icon: const Icon(Icons.arrow_back_rounded),
                     ),
                   ),
                   Padding(
