@@ -147,3 +147,15 @@ its own readings.
   rebuild `assets/content` from the verified export with the web's
   `npm run content:app-bundle` (see mybrev `docs/app-content-distribution.md`),
   regenerate `lectionary_delivery.json.gz`, run `flutter test`.
+
+## Android emulator (targeted check)
+
+Debug arm64 build (`flutter build apk --debug --target-platform android-arm64`,
+Flutter 3.41.4, AVD `lv_test`, applicationId `by.mybrev.playtest2026`): the app
+installs and starts, the bundle decodes (`ContentMigration` 0 documents), the
+Readings tab opens 13.10.2026 (XXVIII week, Tuesday, year II) with the Galatians
+reading, the bottom navigation does not cover the text start, «Іншыя варыянты»
+is present. The update check failed offline-style (`firestore/unavailable`) and
+the app kept the bundle, as designed. Not run on device: release build, iOS
+(no iOS device or Simulator was used), the 320 px / large-text cases (covered by
+widget tests only).
