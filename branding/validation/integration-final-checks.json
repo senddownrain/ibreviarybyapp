@@ -1,0 +1,23 @@
+{
+  "baseMain": "4872f04f5d1d81235bcffa7c7533b5a8ba481dac",
+  "testedImplementationCommit": "326f6db6b4f714c114c0e212005ab46554803cd3",
+  "approvedSourceSHA256": "fa8ac6990b67f4a48e5907d00c86aa7306fb44921f079dd5bc92c7bba682a294",
+  "pubGetInitialBase": "success",
+  "pubspecAndLockUnchangedAgainstCurrentMain": true,
+  "flutterAnalyze": "No issues found (119.6 s)",
+  "flutterTestCount": 21,
+  "flutterTests": "passed",
+  "debugAPKBuild": "success (assembleDebug 102.0 s)",
+  "apkSHA256": "3801deaafcaef80b0098aa1586e0d793a5114387b4030b069002ae8307a75a1e",
+  "compiledBrandPixelMatches": true,
+  "currentMainFunctionalityPreserved": true,
+  "iosResourceCI": "https://github.com/senddownrain/ibreviarybyapp/actions/runs/38386989504",
+  "iosResourceCIConclusion": "success",
+  "iosFullAppOrDeviceValidation": false,
+  "freshAndroidRuntimeValidated": false,
+  "freshAndroidRuntimeLimitation": "Isolated AVD system failed; capture install returned 1. Historical successful source-branch captures retained separately.",
+  "preAndroid12RuntimeValidated": false,
+  "flutterWebBuildInstallValidated": false,
+  "separateWebRepositoryModified": false,
+  "storeReleaseOrDeploymentPerformed": false
+}
