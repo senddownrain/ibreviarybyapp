@@ -175,15 +175,26 @@ DefaultReadingsSelection resolveDefaultReadings({
   // id: the seasonal date document of a Sunday (`advent-21-12`) is linked
   // to the Hours day of the Sunday but is not its lectionary (the period
   // document `advent-w4-d1--A` is).
+  // The option opens ITS DEFAULT readings: the weekday readings of a
+  // memorial, its own readings only where the Lectionary prescribes them
+  // (web `resolveReadingsScreen`); else the first group tagged with it.
   final ofOption = optionId == null || optionId.isEmpty
       ? null
-      : groups
-            .where(
-              (group) => group.documents.any(
-                (reading) => reading.ordoOptionId == optionId,
-              ),
-            )
-            .firstOrNull;
+      : (groups
+                .where(
+                  (group) => group.documents.any(
+                    (reading) =>
+                        reading.ordoOptionRoles[optionId]?.isDefault == true,
+                  ),
+                )
+                .firstOrNull ??
+            groups
+                .where(
+                  (group) => group.documents.any(
+                    (reading) => reading.ordoOptionId == optionId,
+                  ),
+                )
+                .firstOrNull);
   selected ??= ofOption ?? linked ?? preferredReadingGroup(groups);
   final documents = selected?.documents ?? visible;
 

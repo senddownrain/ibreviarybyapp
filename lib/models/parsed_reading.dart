@@ -187,6 +187,10 @@ class ParsedReading {
   /// stored).
   final String? ordoOptionId;
 
+  /// Role of this document in each legal option that names it (`purpose`,
+  /// `isDefault`; mybrev `_ordoOptionRoles`). Never stored.
+  final Map<String, ({String purpose, bool isDefault})> ordoOptionRoles;
+
   const ParsedReading({
     required this.id,
     this.year,
@@ -214,10 +218,14 @@ class ParsedReading {
     this.calendarDayOfWeek,
     this.hasReadings = true,
     this.ordoOptionId,
+    this.ordoOptionRoles = const {},
   });
 
   /// This document, remembered as belonging to the legal option [optionId].
-  ParsedReading withOrdoOption(String optionId) => ParsedReading(
+  ParsedReading withOrdoOption(
+    String optionId, {
+    Map<String, ({String purpose, bool isDefault})>? roles,
+  }) => ParsedReading(
     id: id,
     year: year,
     reading: reading,
@@ -244,6 +252,7 @@ class ParsedReading {
     calendarDayOfWeek: calendarDayOfWeek,
     hasReadings: hasReadings,
     ordoOptionId: optionId,
+    ordoOptionRoles: roles ?? ordoOptionRoles,
   );
 
   /// First reading regardless of field name (reading or reading1).

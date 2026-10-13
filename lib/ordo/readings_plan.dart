@@ -4,7 +4,9 @@
 /// tried; the texts stay in `readings`.
 library;
 
+import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
+import 'package:mybrev_flutter/ordo/memorial_readings.dart';
 import 'package:mybrev_flutter/ordo/season.dart';
 
 /// One lookup of a readings plan.
@@ -27,6 +29,7 @@ class OptionReadingsPlan {
     required this.officeKind,
     required this.lookup,
     required this.option,
+    this.defaultPurpose = '',
     this.readingsReference,
     this.readingsStatus,
   });
@@ -40,6 +43,11 @@ class OptionReadingsPlan {
   /// Without the `common` lookup (the Readings screen does not use it).
   final List<ReadingLookup> lookup;
   final Json option;
+
+  /// `allowedChoices[0].default` of the web descriptor: the purpose whose
+  /// readings open by default (a memorial: `weekday`, or `proper` where the
+  /// Lectionary prescribes proper readings).
+  final String defaultPurpose;
   final String? readingsReference;
   final String? readingsStatus;
 
@@ -50,8 +58,9 @@ class OptionReadingsPlan {
 List<ReadingLookup> readingsLookupOf(
   Json candidate,
   Json temporal,
-  Season season,
-) {
+  Season season, {
+  String diocese = '',
+}) {
   final kind = candidate['officeKind'];
   final weekday = ReadingLookup(
     'weekday',
@@ -64,11 +73,14 @@ List<ReadingLookup> readingsLookupOf(
           Json.from((candidate['readingsRef'] as Map?) ?? const {}),
           title: candidate['title'] as String?,
         );
+  List<ReadingLookup> lookup;
   if (kind == 'memorial' || kind == 'optional-memorial') {
-    // GIRM 357: on memorials the weekday readings are normally kept.
-    return [weekday, ?proper];
-  }
-  if (candidate['kind'] == 'temporal') {
+    // GIRM 357 / OLM 83: the weekday readings are kept on memorials; PROPER
+    // readings the Lectionary prescribes replace them (`memorialReadingsRule`);
+    // own readings stay a legal alternative.
+    final rule = memorialReadingsRule('${candidate['id']}', '$kind', diocese)!;
+    lookup = rule.prescribed ? [?proper, weekday] : [weekday, ?proper];
+  } else if (candidate['kind'] == 'temporal') {
     // 24 December on a Sunday: the Sunday of Advent (morning) and, in the
     // evening, the Mass of the Christmas Vigil (its own legacy document, the
     // projection of the `vigil` set of `advent-24-12`).
@@ -79,10 +91,28 @@ List<ReadingLookup> readingsLookupOf(
             '_variant': 'christmas-vigil',
           })
         : null;
-    return [weekday, ?vigil];
+    lookup = [weekday, ?vigil];
+  } else if (candidate['temporal'] == true) {
+    lookup = [?proper, weekday];
+  } else {
+    lookup = [?proper];
   }
-  if (candidate['temporal'] == true) return [?proper, weekday];
-  return [?proper];
+  // The Saturday before Pentecost taken by a feast (the Visitation on
+  // 31 May 2031): the morning Mass is that celebration, the evening Mass is
+  // the Vigil Mass of Pentecost (the weekday document `_variant:
+  // pentecost-vigil`); a memorial keeps its weekday lookup.
+  if (candidate['kind'] != 'temporal' &&
+      candidate['role'] == 'primary' &&
+      season.date == addDays(season.anchors.pentecost, -1) &&
+      !lookup.any((entry) => entry.purpose == 'weekday')) {
+    lookup.add(
+      ReadingLookup('weekday', {
+        ...Json.from(temporal['readingsRef'] as Map),
+        '_variant': 'pentecost-vigil',
+      }),
+    );
+  }
+  return lookup;
 }
 
 /// Lectionary cycle a reading of [officeKind] follows.

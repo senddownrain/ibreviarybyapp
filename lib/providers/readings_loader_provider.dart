@@ -28,8 +28,8 @@ class ReadingsLoadResult {
   /// order); its own readings stay a choice.
   final bool linkDayId;
 
-  /// The legal Mass option the route stands for, whose readings open first;
-  /// null for a memorial (weekday-first) or without an Ordo selection.
+  /// The legal Mass option the route stands for, whose default readings
+  /// open first; null without a day id or an Ordo selection.
   final String? optionId;
 }
 
@@ -163,7 +163,9 @@ ReadingsLoadResult? loadReadingsForDate({
     linkDayId: _linksDayId(selection),
     // Without a chosen celebration (no day id) the default group applies
     // (the evening Mass of 24.12 / Holy Thursday / Pentecost Saturday).
-    optionId: selection == null || selection.memorial || (dayId ?? '').isEmpty
+    // A memorial opens its option's DEFAULT group (weekday readings, or its
+    // own where the Lectionary prescribes them): the document roles decide.
+    optionId: selection == null || (dayId ?? '').isEmpty
         ? null
         : selection.optionId,
   );

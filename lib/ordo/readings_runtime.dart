@@ -142,21 +142,52 @@ List<ParsedReading> orderReadingsByPlan(
   required int dayOfWeek,
   String dayId = '',
 }) {
-  final ordered = <ParsedReading>[
-    if (dayId.isNotEmpty) ...docs.where((doc) => _linkedTo(doc, dayId)),
-  ];
+  final planned = <ParsedReading>[];
   for (final option in plan) {
-    for (final list in optionReadingLists(option, docs, dayOfWeek)) {
-      ordered.addAll(list.map((doc) => doc.withOrdoOption(option.optionId)));
+    final lists = optionReadingLists(option, docs, dayOfWeek);
+    for (var i = 0; i < lists.length; i++) {
+      final purpose = option.lookup[i].purpose;
+      final role = (
+        purpose: purpose,
+        isDefault: purpose == option.defaultPurpose,
+      );
+      planned.addAll(
+        lists[i].map(
+          (doc) => doc.withOrdoOption(
+            option.optionId,
+            roles: {option.optionId: role},
+          ),
+        ),
+      );
     }
   }
+  // A document linked to the Hours day id comes first, but only when the
+  // plan itself offers it.
+  final plannedIds = {for (final doc in planned) doc.id};
+  final ordered = <ParsedReading>[
+    if (dayId.isNotEmpty)
+      ...docs.where(
+        (doc) => _linkedTo(doc, dayId) && plannedIds.contains(doc.id),
+      ),
+    ...planned,
+  ];
   final unique = <String, ParsedReading>{};
   for (final doc in ordered) {
     final known = unique[doc.id];
     if (known == null) {
       unique[doc.id] = doc;
-    } else if (known.ordoOptionId == null && doc.ordoOptionId != null) {
-      unique[doc.id] = known.withOrdoOption(doc.ordoOptionId!);
+    } else {
+      unique[doc.id] =
+          (known.ordoOptionId == null && doc.ordoOptionId != null
+                  ? known.withOrdoOption(
+                      doc.ordoOptionId!,
+                      roles: known.ordoOptionRoles,
+                    )
+                  : known)
+              .withOrdoOption(
+                (known.ordoOptionId ?? doc.ordoOptionId)!,
+                roles: {...known.ordoOptionRoles, ...doc.ordoOptionRoles},
+              );
     }
   }
   return unique.values.toList();

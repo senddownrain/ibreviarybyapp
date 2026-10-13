@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/ordo/candidates.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/display.dart';
+import 'package:mybrev_flutter/ordo/memorial_readings.dart';
 import 'package:mybrev_flutter/ordo/notes.dart';
 import 'package:mybrev_flutter/ordo/office.dart';
 import 'package:mybrev_flutter/ordo/readings_plan.dart';
@@ -238,19 +239,30 @@ class OrdoDay {
 
   /// Readings plan of every legal option (engine order).
   List<OptionReadingsPlan> get readingsPlan => [
-    for (final option in options)
-      OptionReadingsPlan(
-        optionId: option.id,
-        title: option.title,
-        role: option.role,
-        kind: option.kind,
-        officeKind: option.officeKind,
-        lookup: readingsLookupOf(option.data, temporal.data, season),
-        option: option.data,
-        readingsReference: option.readingsReference,
-        readingsStatus: option.contentStatus?['readings'] as String?,
-      ),
+    for (final option in options) _readingsPlanOf(option),
   ];
+
+  OptionReadingsPlan _readingsPlanOf(OrdoOption option) {
+    final lookup = readingsLookupOf(
+      option.data,
+      temporal.data,
+      season,
+      diocese: diocese,
+    );
+    final rule = memorialReadingsRule(option.id, option.officeKind, diocese);
+    return OptionReadingsPlan(
+      optionId: option.id,
+      title: option.title,
+      role: option.role,
+      kind: option.kind,
+      officeKind: option.officeKind,
+      lookup: lookup,
+      defaultPurpose: rule?.defaultPurpose ?? lookup.firstOrNull?.purpose ?? '',
+      option: option.data,
+      readingsReference: option.readingsReference,
+      readingsStatus: option.contentStatus?['readings'] as String?,
+    );
+  }
 
   /// Vestment colours of the legal options, primary first (no duplicates;
   /// suppressed celebrations never colour a date).
