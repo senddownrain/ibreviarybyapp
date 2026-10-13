@@ -10,7 +10,8 @@
 `4872f04f5d1d81235bcffa7c7533b5a8ba481dac` (обновления Lektionary/Ordo,
 контента и тестов). Его изменения включаются обычным merge из `origin/main`
 в интеграционную ветку, без переписывания опубликованной истории.
-Проверки итогового дерева будут повторены; они будут отличены от начальных.
+Merge commit интеграционной ветки: `326f6db6b4f714c114c0e212005ab46554803cd3`.
+Проверки итогового дерева повторены; результаты ниже отличены от начальных.
 Источник выбранных файлов: `origin/codex/malitounik-brand-icons`,
 `b7e4f3ea531722e20cd9e1de3dcfd4b8bbd10ba3`.
 Ветка: `codex/integrate-malitounik-brand`; отдельный managed worktree.
@@ -60,7 +61,8 @@ safe zone. Детерминированная регенерация resvg 2.6.2
   APK SHA256 `71b9ce289c28cab5973a3bb3c922e1bb968c8c71a90b76b9afcd6d54cc24cc91`.
   `aapt dump badging` подтвердил `by.mybrev.playtest2026`, `MyBrev Test`,
   versionCode 6, versionName 1.0.0, adaptive icon v33. Проверены точные пиксели
-  foreground, monochrome, splash внутри готового APK (`integration-apk.json`).
+  foreground, monochrome, splash внутри готового APK. JSON ниже фиксирует
+  последний APK после обновления main.
 - Android API 34: свежий runtime **не подтверждён**. Новый отдельный AVD
   не удалось инициализировать при доступном месте на диске. Прежний
   одноразовый брендовый AVD на `emulator-5576` загрузился, но произошёл
@@ -84,10 +86,36 @@ safe zone. Детерминированная регенерация resvg 2.6.2
 В интеграции сохранены только показательные кадры; остальные доступны в
 исходной ветке. Логи, APK, видео и временные данные не коммитятся.
 
+## Итоговые проверки на актуальной базе 4872f04
+
+- `flutter analyze --no-pub`: **No issues found**, 119.6 s.
+- Те же четыре профильных файла `flutter test --no-pub`: **21 тест прошёл**.
+- `flutter build apk --debug --no-pub`: **успешно**, assembleDebug 102.0 s.
+  SHA256 актуального APK:
+  `3801deaafcaef80b0098aa1586e0d793a5114387b4030b069002ae8307a75a1e`.
+  Foreground, monochrome и splash в APK совпали с экспортами по пикселям.
+  `MyBrev Test`, `by.mybrev.playtest2026`, 1.0.0+6 подтверждены через aapt.
+  Результат: `integration-apk.json`.
+- [macOS CI 38386989504](https://github.com/senddownrain/ibreviarybyapp/actions/runs/38386989504):
+  **actool и ibtool успешно** для дерева с обновлённым main.
+  Результат: `integration-current-main-ios-ci.json`.
+- Diff относительно актуального main не содержит изменений `lib/`,
+  `assets/`, `test/`, `docs/`, `reports/`, `scripts/`, pubspec/lock,
+  AndroidManifest/Gradle, Info.plist/project.pbxproj и release workflow.
+  Параллельная работа по чтениям/Ordo/контенту сохранена байт-в-байт.
+- SHA256 исходника и всех 38 экспортов сохранились. После проверяемого
+  commit 326f6db менялись только отчёт/README, инвентарь и JSON свидетельств;
+  CI финального PR проверяется перед слиянием.
+- Свежий Android runtime, runtime Android до 12, полная iOS app/device
+  и Flutter Web build/install **не подтверждены**; ограничения не скрыты.
+
+Машиночитаемая сводка: `integration-final-checks.json`.
+
 ## GitHub и отдельные последующие задачи
 
-[PR #11](https://github.com/senddownrain/ibreviarybyapp/pull/11) создан как draft.
-Результаты проверок обновлённой базы и статус слияния будут добавлены.
+[PR #11](https://github.com/senddownrain/ibreviarybyapp/pull/11) содержит только
+брендинг относительно актуального main. Слияние выполняется через этот PR;
+фактический статус и merge commit SHA доступны на его странице в GitHub.
 Безопасное слияние разрешено владельцем после чистого diff и успешного CI.
 Релизный workflow остаётся manual-only; магазинные выпуски и deployment
 не выполняются.
