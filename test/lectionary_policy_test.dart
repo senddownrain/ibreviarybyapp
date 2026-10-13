@@ -197,4 +197,115 @@ void main() {
       }
     }
   });
+
+  group('decisions of the web audit (2026-10-13)', () {
+    List<String> optionIds(String iso, String diocese) {
+      final day = OrdoRuntime.engine.resolve(
+        DateTime.parse(iso),
+        diocese: diocese,
+      );
+      return [for (final o in day.options) o.id];
+    }
+
+    test('24.06: vigil + day sets, DAY by default', () {
+      final s = screen('2026-06-24');
+      expect(ids(s), ['vigil', 'day']);
+      expect(s.activeSet, 'day');
+    });
+
+    test('06.08: one Mass set with the Gospels of the years A, B and C', () {
+      final s = screen('2026-08-06');
+      expect(s.cycles, 'ABC');
+      expect(s.setDoc, '06-08-transfiguration-lord');
+    });
+
+    test(
+      'Pentecost Saturday 2031-05-31 (Visitation): the feast Mass and the '
+      'Vigil Mass of Pentecost are both offered, the vigil is the default',
+      () {
+        for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+          final date = DateTime.parse('2031-05-31');
+          final root = flutterScreenFor(
+            date,
+            diocese,
+            null,
+            useRouteDayId: false,
+          )!;
+          final docs = root.groups.expand((g) => g.$2).toList();
+          expect(
+            docs.any((d) => d.contains('visitation')),
+            isTrue,
+            reason: diocese,
+          );
+          expect(
+            docs.any((d) => d.startsWith('easter-w7-d7')),
+            isTrue,
+            reason: diocese,
+          );
+          final active = root.groups[root.active].$2;
+          expect(
+            active.any((d) => d.contains('visitation')),
+            isFalse,
+            reason: '$diocese: the evening vigil is the default',
+          );
+          final feast = optionIds('2031-05-31', diocese).first;
+          final viaOption = screen(
+            '2031-05-31',
+            diocese: diocese,
+            option: feast,
+          );
+          expect(viaOption.groups, isNotEmpty);
+        }
+      },
+    );
+
+    test('22.10 John Paul II: the weekday readings open, his own readings '
+        'are a selectable alternative', () {
+      for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+        final s = screen(
+          '2026-10-22',
+          diocese: diocese,
+          option: 'sv-john-paul-ii',
+        );
+        final docs = s.groups.expand((g) => g.$2).toList();
+        final active = s.groups[s.active].$2;
+        expect(
+          active.any((d) => d.startsWith('ordinary-w29')),
+          isTrue,
+          reason: diocese,
+        );
+        expect(
+          docs.any((d) => d.contains('john-paul')),
+          isTrue,
+          reason: diocese,
+        );
+        expect(active.any((d) => d.contains('john-paul')), isFalse);
+      }
+    });
+
+    test('Budslav 02.07: the plan prescribes the proper readings only in '
+        'Pinsk (the document link is pending web authorization)', () {
+      for (final year in [2026, 2027]) {
+        final date = DateTime.parse('$year-07-02');
+        for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+          final plan = OrdoRuntime.engine
+              .resolve(date, diocese: diocese)
+              .readingsPlan
+              .where((o) => o.optionId == 'our-lady-budslav')
+              .toList();
+          if (plan.isEmpty || !plan.single.isMemorial) continue;
+          final expected = diocese == 'pinsk' ? 'proper' : 'weekday';
+          expect(plan.single.defaultPurpose, expected, reason: diocese);
+          expect(plan.single.lookup.first.purpose, expected);
+          // Without `_dayIds` on the readings document nothing wrong opens.
+          final s = screen(
+            '$year-07-02',
+            diocese: diocese,
+            option: 'our-lady-budslav',
+          );
+          expect(s.groups, isNotEmpty);
+        }
+      }
+    });
+  });
 }

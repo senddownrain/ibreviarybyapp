@@ -9,7 +9,9 @@ void main() {
     () {
       final raw = bundledCollection('readings');
       final source = raw['ordinary-w28-d1--A']!;
-      expect((source['gospel'] as Map)['bible'], 'Мк 22, 1–10');
+      // The published data carries the corrected book (web migration); the app
+      // applies no local correction.
+      expect((source['gospel'] as Map)['bible'], 'Мц 22, 1–10');
       final index = ReadingReferenceIndex([
         for (final entry in raw.entries)
           ParsedReading.fromMap(entry.key, entry.value),
@@ -34,31 +36,14 @@ void main() {
     },
   );
 
-  test(
-    'confirmed Matthew typo preserves both verse forms and genuine Mark',
-    () {
-      for (final range in ['1–10', '1–14', '1–14 або 1–10']) {
-        final data = {
-          'gospel': {
-            'bible': 'Мк 22, $range',
-            'title': '+ Чытанне святога Евангелля паводле Мацвея.',
-            'text': 'Тэкст',
-          },
-        };
-        expect(
-          ParsedReading.fromMap('variant', data).gospel!.bible,
-          'Мц 22, $range',
-        );
-        expect((data['gospel'] as Map)['bible'], 'Мк 22, $range');
-      }
-      final mark = {
-        'gospel': {
-          'bible': 'Мк 10, 17–27',
-          'title': '+ Чытанне святога Евангелля паводле Марка.',
-          'text': 'Тэкст',
-        },
-      };
-      expect(ParsedReading.fromMap('mark', mark).gospel!.bible, 'Мк 10, 17–27');
-    },
-  );
+  test('no local book correction: the text is shown as published', () {
+    final data = {
+      'gospel': {
+        'bible': 'Мк 22, 1–10',
+        'title': '+ Чытанне святога Евангелля паводле Мацвея.',
+        'text': 'Тэкст',
+      },
+    };
+    expect(ParsedReading.fromMap('variant', data).gospel!.bible, 'Мк 22, 1–10');
+  });
 }

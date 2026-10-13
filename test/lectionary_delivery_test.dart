@@ -1,15 +1,13 @@
-// Delivery chain of the `readings` collection: what the bundle ships, what
-// the published version manifest offers, what an installed phone ends up
-// with — on the REAL manifest of the production snapshot (web audit
-// 2026-10-12, `readings@1e8aadb3fc05e137`), not a toy remote.
+// Delivery chain of the `readings` collection on the REAL published manifest
+// (readings v7, digest 93314983ba9c1bd5; production snapshot of 2026-10-13
+// after the web migration of 324 documents).
+//
+// The shipped bundle is now built from that export: bundle == manifest. The
+// scenarios of the former situation stay, run against an app that still
+// ships the OLD (2026-10-07) bundle:
 //
 //   BUNDLE_STALE   the shipped bundle differs from the published manifest
 //   OVERLAY_STALE  an overlay document older than the bundle/manifest
-//
-// The bundle is deliberately NOT rebuilt from production here: the web audit
-// found 323 identities that still differ from Catholic.by (old parser
-// output) and a dry-run resync that is not applied. See
-// docs/flutter-lectionary-audit.md.
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -30,10 +28,9 @@ void main() {
   late Directory directory;
   final delivery = lectionaryDeliveryFixture();
   final manifest = (delivery['manifest'] as Map)['readings'] as Map;
-  final changed = [
-    ...(delivery['changed'] as List).cast<String>(),
-    ...(delivery['added'] as List).cast<String>(),
-  ]..sort();
+  final old = delivery['old'] as Map<String, dynamic>;
+  // What the OLD bundle lacks / has in another version.
+  final changed = (old['changed'] as List).cast<String>()..sort();
 
   Future<void> open() async {
     await HiveService.init(path: directory.path, loadBundle: true);
@@ -51,6 +48,46 @@ void main() {
   });
 
   ContentCollection readings() => ContentStore.instance.collection('readings');
+
+  /// An installed app that still ships the 2026-10-07 bundle: the current
+  /// baseline with the old text of the documents that changed since.
+  Map<String, Map<String, dynamic>>? oldBaseDocs;
+  Map<String, String>? oldBaseHashes;
+
+  Future<void> installOldBundle() async {
+    final oldDocs = (old['documents'] as Map).cast<String, dynamic>();
+    final oldHashes = (old['hashes'] as Map).cast<String, String>();
+    final docs = <String, Map<String, dynamic>>{
+      for (final key in readings().keys)
+        key: oldDocs[key] != null
+            ? Map<String, dynamic>.from(oldDocs[key] as Map)
+            : Map<String, dynamic>.from(readings().get(key) as Map),
+    };
+    final hashes = <String, String>{
+      for (final entry in readings().effectiveHashes().entries)
+        if (entry.value != null) entry.key: entry.value!,
+      ...oldHashes,
+    };
+    oldBaseDocs = docs;
+    oldBaseHashes = hashes;
+    await readings().debugReplaceBaseline(
+      docs,
+      hashes,
+      old['contentVersion'] as int,
+    );
+  }
+
+  /// The process of the OLD app restarts: the same storage, the old bundle
+  /// as its baseline (the recovery runs before the baseline is read).
+  Future<void> restartOldApp() async {
+    await Hive.close();
+    await HiveService.init(path: directory.path, loadBundle: false);
+    await readings().debugReplaceBaseline(
+      oldBaseDocs!,
+      oldBaseHashes!,
+      old['contentVersion'] as int,
+    );
+  }
 
   group('what ships', () {
     test('the bundle is internally consistent', () {
@@ -71,28 +108,31 @@ void main() {
       );
     });
 
-    test('BUNDLE_STALE: the bundle is exactly the documented distance behind '
-        'the published manifest', () {
-      // Locally computed from the real manifest (never trusted from the
-      // fixture alone).
+    test('the bundle equals the published manifest: no stale document, '
+        'every web-rewritten document is in it', () {
       final hashes = (manifest['hashes'] as Map).cast<String, String>();
       final local = readings().effectiveHashes();
-      final stale = [
-        for (final entry in hashes.entries)
-          if (local[entry.key] != entry.value) entry.key,
-      ]..sort();
-      final removed = [
-        for (final id in local.keys)
-          if (!hashes.containsKey(id)) id,
-      ];
-      expect(removed, isEmpty);
-      expect(stale, changed);
-      final bundleDigest = readings().digest();
-      if (stale.isEmpty) {
-        expect(bundleDigest, manifest['digest']);
-      } else {
-        expect(bundleDigest, isNot(manifest['digest']));
+      expect(local, hashes);
+      expect(readings().digest(), manifest['digest']);
+      expect(manifest['digest'], '93314983ba9c1bd5');
+      expect(delivery['added'], isEmpty);
+      expect(delivery['changed'], isEmpty);
+      final rewritten = (delivery['rewritten'] as List)
+          .cast<Map<String, dynamic>>();
+      expect(rewritten, hasLength(324));
+      for (final item in rewritten) {
+        expect(local[item['id']], item['afterHash'], reason: '${item['id']}');
       }
+      expect(
+        readings().overlayLength,
+        0,
+        reason: 'the bundle itself, no overlay',
+      );
+    });
+
+    test('the corrected Gospel citation is the bundle data (Мц 22)', () {
+      final doc = readings().get('ordinary-w28-d1--A') as Map;
+      expect((doc['gospel'] as Map)['bible'], 'Мц 22, 1–10');
     });
 
     test('the Ordo collections are bundle-only: the manifest names none of '
@@ -108,7 +148,32 @@ void main() {
     });
   });
 
-  group('what an installed phone receives', () {
+  group('an app with the current bundle', () {
+    test('the version check says current and downloads nothing', () async {
+      final remote = ProductionReadingsRemote();
+      await ContentStore.instance.ensureLoaded(const ['readings']);
+      final check = await ContentUpdater(remote: remote).check();
+      expect(check.kind, ContentCheckKind.current);
+      expect(remote.fetched, isEmpty);
+    });
+  });
+
+  group('what an installed phone with the OLD bundle receives', () {
+    setUp(installOldBundle);
+
+    test('the old bundle is behind by exactly the documented distance '
+        '(BUNDLE_STALE)', () {
+      final hashes = (manifest['hashes'] as Map).cast<String, String>();
+      final local = readings().effectiveHashes();
+      final stale = [
+        for (final entry in hashes.entries)
+          if (local[entry.key] != entry.value) entry.key,
+      ]..sort();
+      expect(stale, changed);
+      expect(stale, hasLength(363));
+      expect(readings().digest(), isNot(manifest['digest']));
+    });
+
     test(
       'the check offers a small patch of exactly the stale documents',
       () async {
@@ -120,6 +185,9 @@ void main() {
         expect(update.download, changed);
         expect(update.remove, isEmpty);
         expect(check.plan!.isRebuildSized, isFalse);
+        // 363 of 822 documents = 44.2 %: below the client's rebuild guard
+        // (more than 50 % of the collection).
+        expect(update.download.length / 822, lessThan(0.5));
         expect(remote.fetched, isEmpty, reason: 'a check downloads no text');
       },
     );
@@ -197,8 +265,7 @@ void main() {
           stopAfter: phase,
         );
         // The process dies here: a new run opens the same storage.
-        await Hive.close();
-        await open();
+        await restartOldApp();
         final digest = readings().digest();
         final complete = digest == manifest['digest'];
         if (phase == ContentCommitPhase.staged) {
@@ -213,6 +280,7 @@ void main() {
   });
 
   group('overlay against a newer bundle', () {
+    setUp(installOldBundle);
     test('OVERLAY_STALE: an app update whose bundle already has the '
         'published documents drops the overlay (the bundle wins)', () async {
       await applyPublishedReadings();

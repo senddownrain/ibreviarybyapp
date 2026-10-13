@@ -27,6 +27,9 @@ const WEB = path.resolve(arg('--web'));
 const SNAPSHOT = path.resolve(arg('--snapshot'));
 const BUNDLE = path.resolve(arg('--bundle', 'assets/content'));
 const OUT = arg('--out');
+// An app released earlier (e.g. the 2026-10-07 bundle) that receives the manifest patch.
+const APPLIED = arg('--applied') ? path.resolve(arg('--applied')) : null;
+const OLD_BUNDLE = arg('--old-bundle') ? path.resolve(arg('--old-bundle')) : null;
 if (!arg('--web') || !arg('--snapshot') || !OUT) throw new Error('Usage: --web <mybrev> --snapshot <dir> --out <file> [--bundle assets/content]');
 
 const web = (rel) => import(pathToFileURL(path.join(WEB, rel)).href);
@@ -71,6 +74,24 @@ const drift = [...added, ...changed].map((id) => ({
   productionHash: productionHashes[id],
 }));
 
+let old = null;
+if (OLD_BUNDLE) {
+  const oldJson = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(OLD_BUNDLE, 'readings.json.gz'))).toString('utf8'));
+  const oldDocs = content.decodeCollection(oldJson);
+  const oldManifest = JSON.parse(fs.readFileSync(path.join(OLD_BUNDLE, 'manifest.json'), 'utf8'));
+  const oldChanged = Object.keys(production).filter((id) => id in oldDocs && productionHashes[id] !== oldJson.hashes[id]).sort();
+  old = {
+    contentVersion: oldManifest.contentVersion,
+    collection: oldManifest.collections.readings,
+    added: Object.keys(production).filter((id) => !(id in oldDocs)).sort(),
+    removed: Object.keys(oldDocs).filter((id) => !(id in production)).sort(),
+    changed: oldChanged,
+    hashes: Object.fromEntries(oldChanged.map((id) => [id, oldJson.hashes[id]])),
+    documents: Object.fromEntries(oldChanged.map((id) => [id, oldDocs[id]])),
+    productionBytes: oldChanged.reduce((sum, id) => sum + Buffer.byteLength(JSON.stringify(production[id])), 0),
+    collectionBytes: Object.values(production).reduce((sum, doc) => sum + Buffer.byteLength(JSON.stringify(doc)), 0),
+  };
+}
 const readingsManifest = manifest.readings;
 const fixture = {
   schema: 1,
@@ -91,7 +112,10 @@ const fixture = {
   removed,
   changed,
   drift,
-  documents: Object.fromEntries([...added, ...changed].map((id) => [id, production[id]])),
+  documents: Object.fromEntries([...added, ...changed, ...(old ? old.changed : [])].map((id) => [id, production[id]])),
+  ...(old ? { old } : {}),
+  // The documents the web migration rewrote (reports/lectionary/resync-plan.applied.json).
+  ...(APPLIED ? { rewritten: JSON.parse(fs.readFileSync(APPLIED, 'utf8')).changes.map((c) => ({ id: c.id, afterHash: c.afterHash, wave: c.wave })) } : {}),
 };
 const gz = zlib.gzipSync(Buffer.from(JSON.stringify(fixture)), { level: 9 });
 gz.writeUInt32LE(0, 4);
@@ -103,5 +127,6 @@ console.log(JSON.stringify({
   manifestDigest: fixture.manifest.readings.digest,
   bundleDigest: fixture.bundle.collection.digest,
   added: added.length, removed: removed.length, changed: changed.length,
+  ...(old ? { oldChanged: old.changed.length, oldAdded: old.added.length, oldRemoved: old.removed.length } : {}),
   bytes: gz.length,
 }, null, 2));
