@@ -39,11 +39,23 @@ class MassSetSelection {
   List<MassReadingSection> get sections => set.sectionsForCycle(cycle);
 }
 
-/// The existing production Readings selection policy, centralized for the
-/// Stage 4 reader UI. This intentionally preserves the current ordering and
-/// first-item fallbacks; it is not a new liturgical precedence resolver.
-/// TODO(readings-resolver): audit these fallbacks against the normative
-/// lectionary rules in a dedicated migration.
+/// The Readings selection policy of the screen (port of mybrev
+/// `resolveReadingsScreen`).
+///
+/// Group: the user's choice, else the celebration chosen in the calendar
+/// (`optionId`, the group of the readings that option's lookups named), else
+/// the group linked to the Hours day id, else the default group (an
+/// evening/vigil Mass before the morning one, otherwise the first).
+/// Documents with sets decide inside their sets (`defaultSetId`); the cycle
+/// is the one of the date when the document has it, else the first.
+///
+/// Audit 2026-10-13 (docs/flutter-lectionary-audit.md): the remaining
+/// «first item» fallbacks (`groups.first`, `cycles.first`,
+/// `documents.first`) are the web's own and agree with it on all 20 717
+/// legal Mass options 2025–2035 × 4 dioceses; the failing cases found
+/// (Sundays opening the seasonal date document through the Hours day id,
+/// documents of other dioceses, a wrong Sunday cycle on 27.11.2033) were
+/// lookup / cycle defects fixed upstream of this function, not fallbacks.
 class DefaultReadingsSelection {
   const DefaultReadingsSelection({
     required this.groups,

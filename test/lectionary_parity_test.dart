@@ -62,6 +62,13 @@ void main() {
       final accepted = <Map<String, Object?>>[];
       final byKind = <String, int>{};
       var webModeDivergence = 0;
+      final statuses = <String, int>{};
+      final cases = <List<Object?>>[];
+      final delivery = lectionaryDeliveryFixture();
+      final staleIds = {
+        ...(delivery['changed'] as List).cast<String>(),
+        ...(delivery['added'] as List).cast<String>(),
+      };
       var dates = 0;
       var options = 0;
       var sections = 0;
@@ -272,6 +279,8 @@ void main() {
                     jsonEncode(webScreen)) {
               webModeDivergence++;
             }
+            final before = mismatches.length;
+            final documented = accepted.length;
             compare(
               diocese,
               iso,
@@ -279,6 +288,58 @@ void main() {
               webScreen,
               flutterScreenFor(date, diocese, id, dayId: appDayId),
             );
+            // Status of the case (docs/flutter-lectionary-audit.md).
+            final kinds = [
+              for (final m in mismatches.skip(before)) m['kind'] as String,
+            ];
+            final groupDocs = [
+              for (final g in webScreen['g'] as List)
+                ...((g as List)[1] as List).cast<String>(),
+            ];
+            final viewKey = webScreen['v'] as String?;
+            final view = viewKey == null
+                ? null
+                : views[viewKey] as Map<String, dynamic>;
+            final notice = option['nt'] as String? ?? '';
+            String status;
+            if (kinds.any(
+              (k) => k.startsWith('groups') || k == 'no-screen' || k == 'sets',
+            )) {
+              status = 'WRONG_LOOKUP';
+            } else if (kinds.any(
+              (k) =>
+                  k == 'active-group' ||
+                  k == 'active-set' ||
+                  k == 'cycles' ||
+                  k == 'active-cycle' ||
+                  k == 'view-document' ||
+                  k == 'set-document' ||
+                  k == 'route-day-id',
+            )) {
+              status = 'WRONG_DEFAULT';
+            } else if (kinds.isNotEmpty) {
+              status = 'BAD_RENDER';
+            } else if (view?['referenceOnly'] == true ||
+                notice.startsWith('reference-only')) {
+              status = 'REFERENCE_ONLY_EXPECTED';
+            } else if (groupDocs.isEmpty) {
+              status = 'UPSTREAM_MISSING';
+            } else if (groupDocs.any(staleIds.contains)) {
+              status = 'BUNDLE_STALE';
+            } else {
+              status = 'OK';
+            }
+            statuses[status] = (statuses[status] ?? 0) + 1;
+            cases.add([
+              diocese,
+              iso,
+              id,
+              status,
+              view?['doc'],
+              view?['set'],
+              view?['cycle'],
+              if (accepted.length > documented) 'documented-difference',
+            ]);
           }
         }
       }
@@ -293,16 +354,76 @@ void main() {
         'documentedDifferences': accepted.length,
         'webDayIdRouteDiffersFromOptionRoute': webModeDivergence,
       };
-      File('${directory.path}/lectionary-parity.json').writeAsStringSync(
-        const JsonEncoder.withIndent(
-          '  ',
-        ).convert({...report, 'examples': mismatches, 'accepted': accepted}),
-      );
-      if (Platform.environment['LECTIONARY_REPORT'] != null) {
-        File(Platform.environment['LECTIONARY_REPORT']!).writeAsStringSync(
-          const JsonEncoder.withIndent(
-            '  ',
-          ).convert({...report, 'examples': mismatches, 'accepted': accepted}),
+      final reasons = <String, int>{};
+      for (final item in accepted) {
+        reasons['${item['reason']}'] = (reasons['${item['reason']}'] ?? 0) + 1;
+      }
+      final web = fixture['web'] as Map;
+      final out = Platform.environment['LECTIONARY_REPORT'];
+      if (out != null) {
+        final drift = (delivery['drift'] as List).cast<Map<String, dynamic>>();
+        File(out).writeAsStringSync(
+          jsonEncode({
+            'schema': 1,
+            'generatedAt': DateTime.now().toUtc().toIso8601String(),
+            'heads': {
+              'web': web['head'],
+              'flutter': Platform.environment['FLUTTER_HEAD'],
+              'flutterSdk': '3.41.4',
+            },
+            'webDataset': {
+              'revision': web['dataset'],
+              'documents': web['documents'],
+              'snapshot': web['snapshot'],
+              'exportedAt': web['exportedAt'],
+              'manifest': {
+                'version':
+                    ((delivery['manifest'] as Map)['readings']
+                        as Map)['version'],
+                'digest':
+                    ((delivery['manifest'] as Map)['readings']
+                        as Map)['digest'],
+                'contentVersion':
+                    ((delivery['manifest'] as Map)['current']
+                        as Map)['contentVersion'],
+              },
+            },
+            'bundle': {
+              'contentVersion': (delivery['bundle'] as Map)['contentVersion'],
+              'count':
+                  ((delivery['bundle'] as Map)['collection'] as Map)['count'],
+              'digest':
+                  ((delivery['bundle'] as Map)['collection'] as Map)['digest'],
+              'staleDocuments': drift.length,
+              'staleLayoutOnly': drift
+                  .where((d) => d['layoutOnly'] == true)
+                  .length,
+              'staleContent': [
+                for (final d in drift)
+                  if (d['layoutOnly'] != true)
+                    {'id': d['id'], 'fields': d['fields']},
+              ],
+              'note':
+                  'Effective content of an updated phone = bundle + manifest patch = the web dataset digest (lectionary_delivery_test). The bundle is NOT rebuilt: see docs/flutter-lectionary-audit.md.',
+            },
+            'compared': report,
+            'statuses': statuses,
+            'documentedDifferences': reasons,
+            'mismatches': mismatches,
+            'cases': {
+              'columns': [
+                'diocese',
+                'date',
+                'option',
+                'status',
+                'document',
+                'set',
+                'cycle',
+                'note',
+              ],
+              'rows': cases,
+            },
+          }),
         );
       }
       // ignore: avoid_print
