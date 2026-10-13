@@ -35,16 +35,6 @@ void main() {
                       hourTitle: title,
                       hourTitleAnchor: anchor,
                       onChangeHour: () => opened++,
-                      actions: [
-                        SizedBox.square(
-                          dimension: 48,
-                          child: IconButton(
-                            key: const Key('test-aa'),
-                            onPressed: () {},
-                            icon: const Icon(Icons.text_fields),
-                          ),
-                        ),
-                      ],
                       contextHeader: Text(title, key: anchor),
                       content: Column(
                         children: List.generate(
@@ -98,7 +88,9 @@ void main() {
               expect(
                 rect.right,
                 lessThanOrEqualTo(
-                  tester.getRect(find.byKey(const Key('test-aa'))).left,
+                  tester
+                      .getRect(find.byKey(const Key('app-overflow-open')))
+                      .left,
                 ),
               );
               expect(
@@ -395,7 +387,7 @@ void main() {
                   : 'adaptive-chrome-ambient',
             ),
           ),
-          findsOneWidget,
+          findsNWidgets(2),
         );
       }
     }

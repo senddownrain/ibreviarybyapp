@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
@@ -27,6 +28,7 @@ import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
+import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
 import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/mass_reading_sets.dart';
@@ -228,6 +230,7 @@ class _OrdoScreenState extends ConsumerState<OrdoScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AdaptiveAppBar(
+        showOverflow: true,
         title: const Text(''),
         actions: [
           IconButton(
@@ -343,9 +346,9 @@ class _DayDetail extends ConsumerWidget {
         : '';
     final notesReady = OrdoRuntime.notesReady;
     final engine = OrdoRuntime.engine;
-    final notes = <String, (Json, List<String>)>{};
+    final notes = <String, (Json, List<String>, Set<String>)>{};
     if (notesReady) {
-      for (final ordo in [day]) {
+      for (final ordo in union.days) {
         for (final note in engine.notesOf(ordo)) {
           final variants = note['variants'];
           final variant = variants is List
@@ -355,16 +358,22 @@ class _DayDetail extends ConsumerWidget {
                     .firstOrNull
               : null;
           final display = {...note, 'text': variant?['text'] ?? note['text']};
-          final id = '${display['text']}'.trim();
-          final entry = notes[id] ??= (display, <String>[]);
+          final text = '${display['text'] ?? display['title'] ?? ''}'.trim();
+          if (text.isEmpty) continue;
+          final selector = display['selector'];
+          final period =
+              selector is Map &&
+              const ['period', 'period-phase'].contains(selector['type']);
+          final id = '${display['category']}|$period|$text';
+          final entry = notes[id] ??= (display, <String>[], <String>{});
           if (!entry.$2.contains(ordo.diocese)) entry.$2.add(ordo.diocese);
+          final source = _noteSource(display, ordo.diocese);
+          if (source.isNotEmpty) entry.$3.add(source);
         }
       }
     }
     // Keep book volumes available in the collapsed additional information.
-    final books = notesReady
-        ? union.booksLines(engine.booksOf)
-        : const <(String, List<String>)>[];
+    final books = notesReady ? _ordoBookFacts(union) : const <_OrdoFact>[];
     final index = ReadingReferenceIndex.current();
     final references = {
       for (final ordo in union.days)
@@ -411,7 +420,7 @@ class _DayDetail extends ConsumerWidget {
       'announcement': 'Аб’явы',
       'other': 'Іншыя заўвагі',
     };
-    for (final (note, dioceses) in notes.values) {
+    for (final (note, dioceses, sources) in notes.values) {
       final selector = note['selector'];
       final periodNote =
           selector is Map &&
@@ -425,6 +434,7 @@ class _DayDetail extends ConsumerWidget {
           .add(
             _NoteRow(
               note: note,
+              sources: sources.toList(),
               badges: dioceses.length == union.days.length
                   ? const []
                   : [for (final id in dioceses) kDioceseBadges[id] ?? id],
@@ -519,34 +529,7 @@ class _DayDetail extends ConsumerWidget {
         }
       }
     }
-    // Group identical directions across dioceses without losing their scope.
-    final directions = <String, Set<String>>{};
-    for (final ordo in [day]) {
-      final lines = <String>{
-        switch (ordo.evening.vespersType) {
-          'first' => 'Першыя нешпары: ${ordo.evening.title}',
-          'second' => 'Другія нешпары: ${ordo.evening.title}',
-          _ => 'Нешпары гэтага дня: ${ordo.evening.title}',
-        },
-        if (ordo.firstVespersCelebratedOnEve)
-          'Першыя нешпары святкавання — напярэдадні.',
-        'Камплета: ${_complineLabel(ordo.evening.compline)}',
-        if (ordo.evening.omittedFirstVespers != null)
-          'Першыя нешпары наступнага святкавання саступаюць нешпарам гэтага дня.',
-        for (final row in legal.where((r) => r.dioceses.contains(ordo.diocese)))
-          if (ordo.office(row.option.id) ??
-                  (row.role == 'primary'
-                      ? ordo.office(ordo.sources.office.optionId)
-                      : null)
-              case final office?) ...[
-            '${legal.length > 1 ? '${row.option.title}: ' : ''}Te Deum ${office.teDeum ? 'спяваецца' : 'не спяваецца'}',
-            ...office.notes,
-          ],
-      };
-      for (final line in lines) {
-        (directions[line] ??= <String>{}).add(ordo.diocese);
-      }
-    }
+    final directions = _ordoDirections(union);
     final suppressed = <String, (String, List<String>)>{};
     for (final ordo in union.days) {
       for (final option in ordo.suppressed) {
@@ -693,33 +676,13 @@ class _DayDetail extends ConsumerWidget {
                 'Літургічны дзень',
                 style: ReaderTheme.of(context).documentTitle(),
               ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  IconButton(
-                    key: const Key('ordo-previous-day'),
-                    tooltip: 'Папярэдні дзень',
-                    onPressed: onPrevious,
-                    icon: const Icon(Icons.chevron_left),
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      key: const Key('ordo-date-action'),
-                      onPressed: onDateTap,
-                      child: Text(
-                        DateFormat('d MMMM y', 'be').format(date),
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.titleLarge,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    key: const Key('ordo-next-day'),
-                    tooltip: 'Наступны дзень',
-                    onPressed: onNext,
-                    icon: const Icon(Icons.chevron_right),
-                  ),
-                ],
+              const SizedBox(height: 12),
+              LiturgicalDateNavigationRow(
+                date: date,
+                keyPrefix: 'ordo',
+                onDateTap: onDateTap,
+                onPrevious: onPrevious,
+                onNext: onNext,
               ),
               Row(
                 children: [
@@ -786,43 +749,61 @@ class _DayDetail extends ConsumerWidget {
           children: [
             if (officeSelection.day == null)
               const Text('Тэксты літургіі гадзінаў пакуль недаступныя')
-            else if (union.dayOf(chosenDiocese).sources.split)
-              Text(
-                'Літургія гадзінаў — з дня: ${union.dayOf(chosenDiocese).sources.office.title}',
-                key: const Key('ordo-office-split'),
-              )
-            else if (officeSelection.selected?.title != chosen.option.title)
-              Text(
-                officeSelection.selected?.title ?? 'Тэксты пакуль недаступныя',
-                style: theme.textTheme.titleMedium,
-              )
             else
-              const Text('З абранага святкавання'),
-            for (final template
-                in officeSelection.selected?.templates ?? <DayTemplate>[])
-              Padding(
-                key: Key('ordo-template-${template.id}'),
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  [
-                    '• ${template.label == 'Перыяд' ? 'З дня' : template.label}',
-                    if (template.id == officeSelection.template?.id)
-                      'Абраны тэкст',
-                  ].join(' · '),
+              _FactRow(
+                key: union.dayOf(chosenDiocese).sources.split
+                    ? const Key('ordo-office-split')
+                    : const Key('ordo-office-source'),
+                fact: _OrdoFact(
+                  label: 'Афіцый',
+                  value: union.dayOf(chosenDiocese).sources.split
+                      ? union.dayOf(chosenDiocese).sources.office.title
+                      : officeSelection.selected?.ordo?.kind == 'temporal'
+                      ? 'З дня'
+                      : officeSelection.selected!.title,
+                  badges: union.differs
+                      ? [kDioceseBadges[chosenDiocese] ?? chosenDiocese]
+                      : const [],
                 ),
               ),
-            _Action(
-              key: const Key('ordo-office-options'),
-              label: 'Варыянты літургіі гадзінаў',
-              onTap: () => _openHours(
-                context,
-                ref,
-                date,
-                chosenDiocese,
-                selectedDayId: officeSelection.dayId,
-                optionId: chosen.option.id,
+            if (psalter.isNotEmpty)
+              _FactRow(
+                fact: _OrdoFact(label: 'Псалтыр', value: '$psalter тыдзень'),
               ),
-            ),
+            if ((officeSelection.selected?.templates.length ?? 0) > 1)
+              _NoteGroup(
+                label: 'Даступныя варыянты',
+                children: [
+                  for (final template in officeSelection.selected!.templates)
+                    Padding(
+                      key: Key('ordo-template-${template.id}'),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Semantics(
+                        selected: template.id == officeSelection.template?.id,
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              template.label == 'Перыяд'
+                                  ? 'З дня'
+                                  : template.label,
+                            ),
+                            if (template.id == officeSelection.template?.id)
+                              Text(
+                                'Абрана',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
           ],
         ),
         if (directions.isNotEmpty || directionNotes.isNotEmpty)
@@ -831,19 +812,7 @@ class _DayDetail extends ConsumerWidget {
             collapsed: true,
             storageKey: 'ordo-directions-${day.date}',
             children: [
-              for (final entry in directions.entries)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    [
-                      entry.key,
-                      if (entry.value.length < union.days.length)
-                        entry.value
-                            .map((id) => kDioceseBadges[id] ?? id)
-                            .join(' · '),
-                    ].join(' · '),
-                  ),
-                ),
+              for (final fact in directions) _FactRow(fact: fact),
               ...directionNotes,
             ],
           ),
@@ -860,16 +829,16 @@ class _DayDetail extends ConsumerWidget {
             storageKey: 'ordo-notes-${day.date}',
             children: [
               if (union.rows.any((row) => row.role == 'commemoration')) ...[
-                Text('Камемарацыі', style: theme.textTheme.titleMedium),
+                const _GroupHeading('Камемарацыі'),
                 for (final row in union.rows.where(
                   (row) => row.role == 'commemoration',
                 ))
                   celebration(row),
               ],
               if (suppressed.isNotEmpty)
-                ExpansionTile(
-                  title: Text('Не адзначаюцца · ${suppressed.length}'),
-                  tilePadding: EdgeInsets.zero,
+                _DetailDisclosure(
+                  storageKey: 'ordo-suppressed-${day.date}',
+                  label: 'Не адзначаюцца · ${suppressed.length}',
                   children: [
                     for (final (title, dioceses) in suppressed.values)
                       ListTile(
@@ -886,35 +855,32 @@ class _DayDetail extends ConsumerWidget {
                 ),
 
               if (massNotes.isNotEmpty) ...[
-                Text('Імша', style: theme.textTheme.titleMedium),
-                ...massNotes,
+                _NoteGroup(label: 'Імша', children: massNotes),
               ],
               if (officeNotes.isNotEmpty) ...[
-                Text('Літургія гадзінаў', style: theme.textTheme.titleMedium),
-                ...officeNotes,
+                _NoteGroup(label: 'Літургія гадзінаў', children: officeNotes),
               ],
               if (notesError)
                 const Text(
                   'Не ўдалося прачытаць літургічныя заўвагі. Паспрабуйце адкрыць дзень яшчэ раз.',
-                )
-              else if (!notesReady)
+                ),
+              if (!notesReady && !notesError)
                 const Text('Заўвагі адкрываюцца…')
-              else
-                for (final entry in groups.entries)
-                  if (entry.key == 'Агульныя ўказанні перыяду')
-                    ExpansionTile(
-                      key: PageStorageKey(
-                        'ordo-notes-${day.date}-${entry.key}',
-                      ),
-                      title: Text(entry.key),
-                      subtitle: Text('${entry.value.length}'),
-                      tilePadding: EdgeInsets.zero,
-                      children: entry.value,
-                    )
-                  else ...[
-                    Text(entry.key, style: theme.textTheme.titleMedium),
-                    ...entry.value,
-                  ],
+              else if (notesReady)
+                for (final name in [
+                  ...labels.values,
+                  'Агульныя ўказанні перыяду',
+                ])
+                  if (groups[name] case final children?)
+                    if (name == 'Агульныя ўказанні перыяду')
+                      _DetailDisclosure(
+                        storageKey: 'ordo-notes-${day.date}-$name',
+                        label: name,
+                        count: children.length,
+                        children: children,
+                      )
+                    else
+                      _NoteGroup(label: name, children: children),
             ],
           ),
         if (books.isNotEmpty)
@@ -923,14 +889,10 @@ class _DayDetail extends ConsumerWidget {
             collapsed: true,
             storageKey: 'ordo-books-${day.date}',
             children: [
-              for (final (label, badges) in books)
-                Padding(
-                  key: Key('ordo-books-${badges.join('-')}'),
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    [label, ...badges].join(' · '),
-                    style: theme.textTheme.bodyMedium,
-                  ),
+              for (final fact in books)
+                _FactRow(
+                  key: Key('ordo-book-${fact.label}-${fact.value}'),
+                  fact: fact,
                 ),
             ],
           ),
@@ -970,18 +932,11 @@ class _Section extends StatelessWidget {
         children: [
           Divider(height: collapsed ? 12 : 24),
           if (collapsed)
-            ExpansionTile(
-              key: PageStorageKey(storageKey ?? title),
-              tilePadding: EdgeInsets.zero,
-              minTileHeight: 48,
-              childrenPadding: const EdgeInsets.only(bottom: 12),
-              expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-              title: Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
+            _DetailDisclosure(
+              label: title,
+              storageKey: storageKey ?? title,
+              primary: true,
+              childrenPadding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
               children: children,
             )
           else ...[
@@ -1005,6 +960,263 @@ class _Section extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Only the parent section owns a hairline. Expanded tiles have no borders.
+class _DetailDisclosure extends StatelessWidget {
+  const _DetailDisclosure({
+    required this.label,
+    required this.storageKey,
+    required this.children,
+    this.count,
+    this.primary = false,
+    this.childrenPadding = const EdgeInsets.symmetric(vertical: 8),
+  });
+
+  final String label;
+  final String storageKey;
+  final List<Widget> children;
+  final int? count;
+  final bool primary;
+  final EdgeInsets childrenPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Theme(
+      data: theme.copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        key: PageStorageKey(storageKey),
+        shape: const Border(),
+        collapsedShape: const Border(),
+        maintainState: true,
+        tilePadding: EdgeInsets.zero,
+        minTileHeight: 48,
+        childrenPadding: childrenPadding,
+        expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+        expansionAnimationStyle: MediaQuery.disableAnimationsOf(context)
+            ? AnimationStyle.noAnimation
+            : const AnimationStyle(duration: Duration(milliseconds: 200)),
+        title: Text(
+          label,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontSize: primary ? 17 : 16,
+            fontWeight: primary ? FontWeight.w600 : FontWeight.w500,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        subtitle: count == null ? null : Text('$count'),
+        children: children,
+      ),
+    );
+  }
+}
+
+class _OrdoFact {
+  const _OrdoFact({
+    required this.label,
+    required this.value,
+    this.context,
+    this.badges = const [],
+  });
+  final String label;
+  final String value;
+  final String? context;
+  final List<String> badges;
+}
+
+/// Labels come from domain fields, never from splitting formatted sentences.
+List<_OrdoFact> _mergeFacts(
+  OrdoDayUnion union,
+  Iterable<(String, String, String?, String)> facts,
+) {
+  final grouped = <(String, String, String?), Set<String>>{};
+  for (final (label, value, context, diocese) in facts) {
+    if (value.isNotEmpty) {
+      (grouped[(label, value, context)] ??= {}).add(diocese);
+    }
+  }
+  return [
+    for (final entry in grouped.entries)
+      _OrdoFact(
+        label: entry.key.$1,
+        value: entry.key.$2,
+        context: entry.key.$3,
+        badges: entry.value.length == union.days.length
+            ? const []
+            : [for (final id in entry.value) kDioceseBadges[id] ?? id],
+      ),
+  ];
+}
+
+List<_OrdoFact> _ordoDirections(OrdoDayUnion union) => _mergeFacts(union, [
+  for (final day in union.days) ...[
+    (
+      'Нешпары',
+      switch (day.evening.vespersType) {
+        'first' => 'Першыя · ${day.evening.title}',
+        'second' => 'Другія · ${day.evening.title}',
+        _ => day.evening.title,
+      },
+      null,
+      day.diocese,
+    ),
+    if (day.firstVespersCelebratedOnEve)
+      ('I Нешпары', 'Напярэдадні святкавання', null, day.diocese),
+    ('Камплета', _complineLabel(day.evening.compline), null, day.diocese),
+    if (day.evening.omittedFirstVespers != null)
+      (
+        'Першынство',
+        'Першыя нешпары наступнага святкавання саступаюць нешпарам гэтага дня.',
+        null,
+        day.diocese,
+      ),
+    for (final option in day.officeOptions)
+      if (day.office(option.id) case final office?) ...[
+        (
+          'Te Deum',
+          office.teDeum ? 'Спяваецца' : 'Не спяваецца',
+          day.officeOptions.length > 1 ? option.title : null,
+          day.diocese,
+        ),
+        for (final note in office.notes)
+          (
+            'Літургія гадзінаў',
+            note,
+            day.officeOptions.length > 1 ? option.title : null,
+            day.diocese,
+          ),
+      ],
+  ],
+]);
+
+List<_OrdoFact> _ordoBookFacts(OrdoDayUnion union) => _mergeFacts(union, [
+  for (final day in union.days)
+    if (OrdoRuntime.engine.booksOf(day) case final books?) ...[
+      if (books.lectionaryVolume case final volume?)
+        ('Лекцыянарый', 'Том $volume', null, day.diocese),
+      if (books.hoursVolume case final volume?)
+        ('Літургія гадзінаў', 'Том $volume', null, day.diocese),
+    ],
+]);
+
+class _FactRow extends StatelessWidget {
+  const _FactRow({super.key, required this.fact});
+  final _OrdoFact fact;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final label = Text(
+      fact.label,
+      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+    );
+    final value = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          fact.value,
+          style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+        ),
+        if (fact.context != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            fact.context!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+        if (fact.badges.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            fact.badges.join(' · '),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ],
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns =
+              constraints.maxWidth >= 500 &&
+              MediaQuery.textScalerOf(context).scale(16) <= 21;
+          return columns
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 100, child: label),
+                    const SizedBox(width: 16),
+                    Expanded(child: value),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [label, const SizedBox(height: 4), value],
+                );
+        },
+      ),
+    );
+  }
+}
+
+class _GroupHeading extends StatelessWidget {
+  const _GroupHeading(this.label);
+  final String label;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 14, bottom: 4),
+    child: Text(
+      label,
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    ),
+  );
+}
+
+class _NoteGroup extends StatelessWidget {
+  const _NoteGroup({required this.label, required this.children});
+  final String label;
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [_GroupHeading(label), ...children],
+  );
+}
+
+String _noteSource(Json note, String diocese) {
+  if (note['source'] case final String source when source.trim().isNotEmpty) {
+    return source.trim();
+  }
+  final observed = note['observed'];
+  if (observed is! List) return '';
+  final observations = observed.whereType<Map>();
+  final source =
+      observations.where((item) => item['diocese'] == diocese).firstOrNull ??
+      observations.firstOrNull;
+  if (source == null) return '';
+  final dates = source['dates'];
+  final years = dates is List
+      ? dates
+            .whereType<String>()
+            .where((date) => date.length >= 4)
+            .map((date) => date.substring(0, 4))
+            .toSet()
+            .toList()
+      : <String>[];
+  years.sort();
+  final id = '${source['diocese'] ?? ''}';
+  return [
+    kDioceseBadges[id] ?? id,
+    years.join(', '),
+  ].where((part) => part.isNotEmpty).join(' · ');
 }
 
 class _Action extends StatelessWidget {
@@ -1457,48 +1669,49 @@ void _openSource(String url) {
 }
 
 class _NoteRow extends StatelessWidget {
-  const _NoteRow({required this.note, required this.badges});
+  const _NoteRow({
+    required this.note,
+    required this.badges,
+    this.sources = const [],
+  });
   final Json note;
   final List<String> badges;
+  final List<String> sources;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final text = '${note['text'] ?? note['title'] ?? ''}'.trim();
     if (text.isEmpty) return const SizedBox.shrink();
+    final metadata = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+      height: 1.45,
+    );
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 7),
-            child: Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurfaceVariant,
-                shape: BoxShape.circle,
-              ),
+          Text(
+            text,
+            style: GoogleFonts.literata(
+              textStyle: theme.textTheme.bodyLarge,
+              fontSize: 16,
+              height: 1.5,
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(text, style: theme.textTheme.bodyLarge),
-                if (badges.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 3),
-                    child: Wrap(
-                      spacing: 6,
-                      children: [for (final badge in badges) _Badge(badge)],
-                    ),
-                  ),
-              ],
-            ),
-          ),
+          if (badges.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text('Дыяцэзіі: ${badges.join(' · ')}', style: metadata),
+          ],
+          if (sources.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text('Крыніца: ${sources.join('; ')}', style: metadata),
+          ],
+          if (note['classification'] == 'NEEDS_REVIEW') ...[
+            const SizedBox(height: 4),
+            Text('Патрабуе праверкі', style: metadata),
+          ],
         ],
       ),
     );

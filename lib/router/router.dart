@@ -54,7 +54,7 @@ const prayerbookRootRoute = AppRouteDescriptor(
   id: 'prayerbook.root',
   branch: AppBranch.prayerbook,
   defaultChromeMode: ReaderChromeMode.full,
-  topChromeOwner: TopChromeOwner.shell,
+  topChromeOwner: TopChromeOwner.legacy,
   isBranchRoot: true,
 );
 const bibleRootRoute = AppRouteDescriptor(

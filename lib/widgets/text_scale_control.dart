@@ -3,16 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
-import 'package:mybrev_flutter/widgets/psalmody_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 /// Circular entry point for the shared reader-size panel.
 class TextScaleControl extends ConsumerWidget {
-  const TextScaleControl({super.key, this.showPsalmodySettings = false});
-
-  final bool showPsalmodySettings;
+  const TextScaleControl({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,13 +31,10 @@ class TextScaleControl extends ConsumerWidget {
           dimension: 48,
           child: IconButton(
             key: const Key('text-scale-open'),
-            tooltip: 'Выгляд тэксту',
+            tooltip: 'Шрыфт',
             onPressed: () {
               HapticFeedback.selectionClick();
-              _showTextScalePanel(
-                context,
-                showPsalmodySettings: showPsalmodySettings,
-              );
+              showTextScalePanel(context);
             },
             icon: const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
           ),
@@ -50,20 +44,15 @@ class TextScaleControl extends ConsumerWidget {
   }
 }
 
-Future<void> _showTextScalePanel(
-  BuildContext context, {
-  required bool showPsalmodySettings,
-}) {
+/// Opens the existing size-only panel after contextual menus are dismissed.
+Future<void> showTextScalePanel(BuildContext context) {
   if (usesCupertinoGlass(context)) {
     return showCupertinoModalPopup<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.28),
       builder: (_) => Material(
         color: Colors.transparent,
-        child: SafeArea(
-          top: false,
-          child: _TextScalePanel(showPsalmodySettings: showPsalmodySettings),
-        ),
+        child: SafeArea(top: false, child: const _TextScalePanel()),
       ),
     );
   }
@@ -78,15 +67,13 @@ Future<void> _showTextScalePanel(
     builder: (_) => SafeArea(
       top: false,
       minimum: EdgeInsets.only(bottom: 6),
-      child: _TextScalePanel(showPsalmodySettings: showPsalmodySettings),
+      child: const _TextScalePanel(),
     ),
   );
 }
 
 class _TextScalePanel extends ConsumerWidget {
-  const _TextScalePanel({required this.showPsalmodySettings});
-
-  final bool showPsalmodySettings;
+  const _TextScalePanel();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -138,7 +125,7 @@ class _TextScalePanel extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Выгляд тэксту',
+                            'Шрыфт',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w700),
                           ),
@@ -222,12 +209,6 @@ class _TextScalePanel extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    if (showPsalmodySettings) ...[
-                      const SizedBox(height: 12),
-                      Divider(color: cs.outlineVariant),
-                      const SizedBox(height: 10),
-                      const PsalmodySettingsSection(),
-                    ],
                   ],
                 ),
               ),

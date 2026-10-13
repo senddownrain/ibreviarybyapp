@@ -358,7 +358,14 @@ void main() {
     expect(container.read(hoursLiturgicalSelectionProvider).dayId, template.id);
     await openOrdo(tester);
     await tapVisible(tester, find.text('Літургія гадзінаў').first);
-    expect(find.textContaining('• ${template.label}'), findsOneWidget);
+    expect(find.text(template.label), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(Key('ordo-template-${template.id}')),
+        matching: find.text('Абрана'),
+      ),
+      findsOneWidget,
+    );
     expect(find.byKey(const Key('ordo-open-readings')), findsOneWidget);
     expect(find.byType(RadioListTile<String>), findsNothing);
     await tapVisible(

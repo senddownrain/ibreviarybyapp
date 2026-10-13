@@ -1,0 +1,52 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: Ora switches apply immediately and survive reopening the popup
+00:06 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: Ora switches apply immediately and survive reopening the popup
+00:12 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:19 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:21 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:22 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:22 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:23 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:23 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:25 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:26 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:26 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:27 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:28 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:29 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+[ContentUpdates] check failed: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+00:29 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:29 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:29 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:30 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:30 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:31 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:31 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:31 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:31 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:32 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:32 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:33 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+00:33 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:33 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:33 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:34 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:34 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader masks scrolling text throughout the status bar
+00:35 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 1.0 scale
+00:36 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: (tearDownAll)
+00:37 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader reserves space for floating bottom navigation
+00:37 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 1.5 scale
+00:39 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: reader reserves the safe area above floating chrome
+00:39 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 2.0 scale
+00:39 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 1.0 scale
+00:40 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 1.5 scale
+00:40 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 2.0 scale
+00:40 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: popup stays above an open keyboard on a small viewport
+00:40 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: root menu has no font and routes to settings and information
+00:41 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_overflow_menu_test.dart: root menu has no font and routes to settings and information
+00:41 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: context actions stay outside the document surface
+00:42 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: context actions stay outside the document surface
+00:42 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: context actions stay outside the document surface
+00:44 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: long reader content has no overflow at 180% on iOS and Android
+00:44 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_foundation_test.dart: document title and body fit the 200% system text matrix
+00:46 +47: All tests passed!

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
 import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 
 /// Floating top controls inspired by Samsung One UI.
 ///
 /// This is intentionally NOT an AppBar:
 /// controls float independently above page content.
 ///
-/// The global menu button can live in AppShell, while individual screens
-/// can place their own actions on the right.
+/// Catalog screens own their direct actions and the shared right-hand menu.
 class FloatingTopActions extends StatelessWidget {
   final List<Widget> actions;
+  final bool showOverflow;
 
   /// Show a separate floating back button on the left.
   ///
-  /// Keep this false for screens inside AppShell if AppShell already
-  /// displays the global menu button there.
+  /// Branch roots leave the left side empty.
   final bool showBack;
 
   final VoidCallback? onBack;
@@ -29,6 +29,7 @@ class FloatingTopActions extends StatelessWidget {
   const FloatingTopActions({
     super.key,
     this.actions = const [],
+    this.showOverflow = true,
     this.showBack = false,
     this.onBack,
     this.leading,
@@ -48,7 +49,11 @@ class FloatingTopActions extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (leading != null)
-              leading!
+              AdaptiveChromeSurface(
+                role: ChromeSurfaceRole.control,
+                borderRadius: BorderRadius.circular(24),
+                child: SizedBox.square(dimension: 48, child: leading),
+              )
             else if (showBack)
               _FloatingTopButton(
                 tooltip: 'Назад',
@@ -85,6 +90,10 @@ class FloatingTopActions extends StatelessWidget {
                   ),
                 ),
               ),
+            if (showOverflow) ...[
+              const SizedBox(width: 8),
+              const AppOverflowMenu(),
+            ],
           ],
         ),
       ),

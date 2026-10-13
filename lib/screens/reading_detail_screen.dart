@@ -6,6 +6,7 @@ import 'package:mybrev_flutter/models/reading.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
@@ -39,7 +40,11 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
     if (raw == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar.text('Чытанне'),
+        appBar: AdaptiveAppBar.text(
+          'Чытанне',
+          showOverflow: true,
+          showTextScale: true,
+        ),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -60,67 +65,46 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
     final title = reading.title != null ? _stripHtml(reading.title!) : '';
 
     return ReadingScaffold(
-      builder: (context, textStyle) => Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AdaptiveAppBar(
-          title: Text(
-            title.isNotEmpty ? title : 'Чытанне',
-            overflow: TextOverflow.ellipsis,
-          ),
-          actions: [
-            IconButton(
-              icon: PhosphorIcon(
-                _showRaw ? PhosphorIconsFill.code : PhosphorIconsRegular.code,
-                size: 22,
-              ),
-              tooltip: _showRaw ? 'Аддаць рэндэрынг' : 'Паказаць HTML',
-              onPressed: () => setState(() => _showRaw = !_showRaw),
-            ),
-            IconButton(
-              icon: const PhosphorIcon(
-                PhosphorIconsRegular.shareNetwork,
-                size: 22,
-              ),
-              tooltip: 'Падзяліцца',
-              onPressed: () {
-                final text =
-                    (title.isNotEmpty ? '$title\n\n' : '') +
-                    _stripHtml(reading.text);
-                Share.share(text);
-              },
-            ),
-          ],
+      builder: (context, textStyle) => ReaderScaffold(
+        semanticLabel: 'Тэкст чытання',
+        contextHeader: ReaderContextHeader(
+          title: title.isNotEmpty ? title : 'Чытанне',
         ),
-        body: Stack(
+        secondaryActions: [
+          ReaderSecondaryAction(
+            label: _showRaw ? 'Аддаць рэндэрынг' : 'Паказаць HTML',
+            icon: PhosphorIconsRegular.code,
+            onSelected: () => setState(() => _showRaw = !_showRaw),
+          ),
+          ReaderSecondaryAction(
+            label: 'Падзяліцца',
+            icon: PhosphorIconsRegular.shareNetwork,
+            onSelected: () {
+              final text =
+                  (title.isNotEmpty ? '$title\n\n' : '') +
+                  _stripHtml(reading.text);
+              Share.share(text);
+            },
+          ),
+        ],
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                MediaQuery.paddingOf(context).top + kFloatingAppBarContentInset,
-                16,
-                40,
+            if (reading.cycle != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Chip(label: Text('Цыкл ${reading.cycle}')),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (reading.cycle != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Chip(label: Text('Цыкл ${reading.cycle}')),
-                    ),
-                  if (_showRaw)
-                    SelectableText(
-                      reading.text,
-                      style: textStyle.copyWith(
-                        fontFamily: 'monospace',
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    )
-                  else
-                    _buildRendered(reading.text, textStyle),
-                ],
-              ),
-            ),
+            if (_showRaw)
+              SelectableText(
+                reading.text,
+                style: textStyle.copyWith(
+                  fontFamily: 'monospace',
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              )
+            else
+              _buildRendered(reading.text, textStyle),
           ],
         ),
       ),

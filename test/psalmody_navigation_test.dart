@@ -382,7 +382,7 @@ void main() {
   }
 
   testWidgets(
-    'Office Aa settings are scrollable on a small screen at 200 percent',
+    'Office font panel is size-only and scrollable on a small screen at 200 percent',
     (tester) async {
       tester.view.physicalSize = const Size(320, 640);
       tester.view.devicePixelRatio = 1;
@@ -397,9 +397,7 @@ void main() {
                 size: Size(320, 640),
                 textScaler: TextScaler.linear(2),
               ),
-              child: const Scaffold(
-                body: TextScaleControl(showPsalmodySettings: true),
-              ),
+              child: const Scaffold(body: TextScaleControl()),
             ),
           ),
         ),
@@ -407,7 +405,7 @@ void main() {
       await tester.tap(find.byKey(const Key('text-scale-open')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-font-literata')), findsNothing);
-      expect(find.byKey(const Key('psalm-marker-break')), findsOneWidget);
+      expect(find.byKey(const Key('psalm-marker-break')), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

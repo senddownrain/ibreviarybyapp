@@ -27,7 +27,7 @@ class FavoritesScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AdaptiveAppBar.text('Абраныя малітвы'),
+      appBar: AdaptiveAppBar.text('Абраныя малітвы', showOverflow: true),
       body: AmbientWash(
         seasonColor: GlassTokens.of(context).ambientBase,
         height: kToolbarHeight + 100,

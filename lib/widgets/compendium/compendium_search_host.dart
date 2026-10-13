@@ -275,7 +275,11 @@ class _CompendiumSearchResultsPage extends ConsumerWidget {
               itemBuilder: (context, index) => children[index],
             ),
           ),
-          FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
+          FloatingTopActions(
+            showBack: true,
+            showOverflow: false,
+            seasonColor: cs.tertiary,
+          ),
         ],
       ),
     );

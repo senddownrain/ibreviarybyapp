@@ -73,7 +73,10 @@ class _OrdoMonthScreenState extends ConsumerState<OrdoMonthScreen> {
     }
     final label = DateFormat('LLLL y', 'be').format(_month);
     return Scaffold(
-      appBar: AdaptiveAppBar(title: const Text('Літургічны каляндар')),
+      appBar: AdaptiveAppBar(
+        showOverflow: true,
+        title: const Text('Літургічны каляндар'),
+      ),
       body: SafeArea(
         top: false,
         child: Center(

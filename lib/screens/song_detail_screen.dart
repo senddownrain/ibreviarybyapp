@@ -11,7 +11,6 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/songs/song_chord_control.dart';
 import 'package:mybrev_flutter/widgets/songs/song_text.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 /// `/prayers/songs/:id`: one song on the shared Reader foundation.
@@ -99,10 +98,7 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
         chromeMode: ReaderChromeMode.compact,
         scrollController: _scrollController,
         showScrollToTop: true,
-        actions: [
-          _SongFavoriteControl(songId: song.id, favorite: favorite),
-          const TextScaleControl(),
-        ],
+        actions: [_SongFavoriteControl(songId: song.id, favorite: favorite)],
         contextHeader: ReaderContextHeader(
           eyebrow: 'СПЕЎНІК',
           title: song.title,

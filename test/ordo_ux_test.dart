@@ -351,6 +351,11 @@ void main() {
       (tester) async {
         final date = DateTime(year, 11, 2);
         await frame(tester, date, OrdoScreen(initialDate: date));
+        final office = find.text('Літургія гадзінаў').first;
+        await Scrollable.ensureVisible(tester.element(office), alignment: .2);
+        await tester.pumpAndSettle();
+        await tester.tap(office);
+        await tester.pumpAndSettle();
         expect(find.byKey(const Key('ordo-office-split')), findsOneWidget);
         for (final id in ['first', 'second', 'third']) {
           expect(find.byKey(ValueKey('ordo-mass-set-$id')), findsOneWidget);
@@ -472,7 +477,15 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Асаблівыя ўказанні'));
         await tester.pumpAndSettle();
-        expect(find.textContaining('Камплета:'), findsOneWidget);
+        expect(find.text('Камплета'), findsOneWidget);
+        expect(
+          find.text(
+            date.month == 6
+                ? 'пасля першых нешпараў нядзелі'
+                : 'з гэтага дня тыдня',
+          ),
+          findsOneWidget,
+        );
         await capture(tester, 'selected-${date.month}-${date.day}-directions');
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox());
@@ -729,8 +742,13 @@ void main() {
       find.byKey(const Key('ordo-row-our-lady-rosary-primary')),
       findsOneWidget,
     );
-    expect(find.textContaining('• З дня'), findsOneWidget);
-    expect(find.text('• Пра Найсвяцейшую Панну Марыю'), findsOneWidget);
+    final office = find.text('Літургія гадзінаў').first;
+    await Scrollable.ensureVisible(tester.element(office), alignment: .2);
+    await tester.pumpAndSettle();
+    await tester.tap(office);
+    await tester.pumpAndSettle();
+    expect(find.text('З дня'), findsOneWidget);
+    expect(find.text('Пра Найсвяцейшую Панну Марыю'), findsOneWidget);
     expect(
       find.textContaining('Год II · III тыдзень Псалтыра'),
       findsOneWidget,

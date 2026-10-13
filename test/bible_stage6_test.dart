@@ -168,7 +168,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.byKey(const Key('bible-search-open')), findsOneWidget);
-        expect(find.byKey(const Key('text-scale-open')), findsOneWidget);
+        expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
       },
     );
 
@@ -442,10 +442,11 @@ void main() {
       tester,
     ) async {
       await _pumpBible(tester);
-      await tester.tap(find.byKey(const Key('text-scale-open')));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
-      expect(find.text('Выгляд тэксту'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('app-overflow-open')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Шрыфт'));
+      await tester.pumpAndSettle();
+      expect(find.text('Шрыфт'), findsOneWidget);
       await tester.tap(find.byKey(const Key('text-scale-increase')));
       await tester.pump();
       expect(find.text('110%'), findsOneWidget);

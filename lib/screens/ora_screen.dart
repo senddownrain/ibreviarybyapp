@@ -28,7 +28,6 @@ import 'package:mybrev_flutter/widgets/alternative_text.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -332,7 +331,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   Widget _loadingState(BuildContext context) => Scaffold(
     extendBodyBehindAppBar: true,
-    appBar: AdaptiveAppBar.text(_oraTitle(widget.oraType)),
+    appBar: AdaptiveAppBar.text(
+      _oraTitle(widget.oraType),
+      showOverflow: true,
+      showTextScale: true,
+      showPsalmody: true,
+    ),
     body: Stack(
       children: [
         AmbientWash(seasonColor: ref.watch(liturgicalSeasonColorProvider)),
@@ -390,7 +394,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           hourTitle: _oraTitle(widget.oraType),
           hourTitleAnchor: _hourTitleAnchor,
           onChangeHour: () => _changeHour(day),
-          actions: const [TextScaleControl(showPsalmodySettings: true)],
+          showPsalmody: true,
           contextHeader: _buildReaderContext(context, day),
           content: _buildContent(context, day, allInvit, comp, textStyle),
         ),
@@ -402,7 +406,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AdaptiveAppBar.text(_oraTitle(widget.oraType)),
+      appBar: AdaptiveAppBar.text(
+        _oraTitle(widget.oraType),
+        showOverflow: true,
+        showTextScale: true,
+        showPsalmody: true,
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -431,7 +440,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AdaptiveAppBar.text(_oraTitle(widget.oraType)),
+      appBar: AdaptiveAppBar.text(
+        _oraTitle(widget.oraType),
+        showOverflow: true,
+        showTextScale: true,
+        showPsalmody: true,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

@@ -11,7 +11,6 @@ import 'package:mybrev_flutter/widgets/compendium/compendium_search_host.dart';
 import 'package:mybrev_flutter/widgets/compendium/compendium_widgets.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 
 Widget _readerMessage({
@@ -92,7 +91,6 @@ class _CompendiumQuestionScreenState
           chromeMode: ReaderChromeMode.compact,
           scrollController: _scrollController,
           showScrollToTop: true,
-          actions: const [TextScaleControl()],
           onSwipePrevious: previous == null ? null : () => open(previous),
           onSwipeNext: next == null ? null : () => open(next),
           contextHeader: ReaderContextHeader(

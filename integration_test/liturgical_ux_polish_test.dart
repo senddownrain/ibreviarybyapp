@@ -245,7 +245,9 @@ void main() {
         await shot('$theme-hour-picker');
         await tester.binding.handlePopRoute();
         await settle();
-        await tap(find.byKey(const Key('text-scale-open')));
+        await tap(find.byKey(const Key('app-overflow-open')));
+        await shot('$theme-hour-menu');
+        await tap(find.text('Шрыфт'));
         await shot('$theme-hour-aa');
         await tester.binding.handlePopRoute();
         await settle();

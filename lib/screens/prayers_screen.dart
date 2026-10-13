@@ -249,6 +249,7 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
     );
     return _PrayerListPage(
       title: widget.searchInitially ? 'Пошук' : 'Усе малітвы',
+      showOverflow: !widget.searchInitially,
       subtitle: widget.searchInitially
           ? 'Назва або тэкст малітвы'
           : 'Увесь малітоўнік адным спісам',
@@ -582,6 +583,7 @@ class _PrayerListPage extends StatelessWidget {
     required this.scrollController,
     required this.scrollKey,
     this.topAction,
+    this.showOverflow = true,
     this.searchDock,
     this.categories = const [],
   });
@@ -593,6 +595,7 @@ class _PrayerListPage extends StatelessWidget {
   final ScrollController scrollController;
   final PageStorageKey<String> scrollKey;
   final Widget? topAction;
+  final bool showOverflow;
   final Widget? searchDock;
   final List<PrayerMenuCategory> categories;
 
@@ -641,6 +644,7 @@ class _PrayerListPage extends StatelessWidget {
           ),
           FloatingTopActions(
             showBack: true,
+            showOverflow: showOverflow,
             seasonColor: cs.tertiary,
             actions: topAction == null ? const [] : [topAction!],
           ),

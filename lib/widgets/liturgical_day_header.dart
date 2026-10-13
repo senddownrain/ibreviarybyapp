@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
@@ -40,42 +40,12 @@ class LiturgicalDayHeader extends StatelessWidget {
       children: [
         Text(sectionTitle, style: ReaderTheme.of(context).documentTitle()),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            IconButton(
-              key: Key('$keyPrefix-previous-day'),
-              tooltip: 'Папярэдні дзень',
-              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-              onPressed: p.date.isAfter(kCalendarFirstDate) ? onPrevious : null,
-              icon: const Icon(Icons.chevron_left, size: 22),
-            ),
-            Expanded(
-              child: TextButton(
-                key: Key('$keyPrefix-date-action'),
-                style: TextButton.styleFrom(
-                  foregroundColor: ink,
-                  minimumSize: const Size(48, 48),
-                ),
-                onPressed: onDateTap,
-                child: Text(
-                  p.dateLabel,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: ink,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              key: Key('$keyPrefix-next-day'),
-              tooltip: 'Наступны дзень',
-              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-              onPressed: p.date.isBefore(kCalendarLastDate) ? onNext : null,
-              icon: const Icon(Icons.chevron_right, size: 22),
-            ),
-          ],
+        LiturgicalDateNavigationRow(
+          date: p.date,
+          keyPrefix: keyPrefix,
+          onDateTap: onDateTap,
+          onPrevious: onPrevious,
+          onNext: onNext,
         ),
         const SizedBox(height: 12),
         IntrinsicHeight(

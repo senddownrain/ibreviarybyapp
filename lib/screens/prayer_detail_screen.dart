@@ -17,7 +17,6 @@ import 'package:mybrev_flutter/utils/prayer_link.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
@@ -289,7 +288,6 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
             )
           else
             _PrayerFavoriteControl(prayerId: p.id, favorite: isFav),
-          const TextScaleControl(),
         ],
         secondaryActions: [
           if (p.isLocal)
