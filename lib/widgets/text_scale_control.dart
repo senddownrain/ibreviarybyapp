@@ -124,34 +124,41 @@ class _TextScalePanel extends ConsumerWidget {
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Text(
-                            'Шрыфт',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        AnimatedContainer(
-                          key: const Key('text-scale-value'),
-                          duration: const Duration(milliseconds: 160),
-                          curve: Curves.easeOut,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: cs.tertiary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: Text(
-                            '$percent%',
-                            style: Theme.of(context).textTheme.labelLarge
-                                ?.copyWith(
-                                  color: accent,
-                                  fontWeight: FontWeight.w700,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures(),
-                                  ],
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                'Шрыфт',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              AnimatedContainer(
+                                key: const Key('text-scale-value'),
+                                duration: const Duration(milliseconds: 160),
+                                curve: Curves.easeOut,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
                                 ),
+                                decoration: BoxDecoration(
+                                  color: cs.tertiary.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: Text(
+                                  '$percent%',
+                                  style: Theme.of(context).textTheme.labelLarge
+                                      ?.copyWith(
+                                        color: accent,
+                                        fontWeight: FontWeight.w700,
+                                        fontFeatures: const [
+                                          FontFeature.tabularFigures(),
+                                        ],
+                                      ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 4),

@@ -65,8 +65,17 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
-    final width = math.min(360.0, media.size.width - 32);
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
+    final leftInset = math.max(media.padding.left, media.viewPadding.left);
+    final rightInset = math.max(media.padding.right, media.viewPadding.right);
+    var availableWidth = media.size.width - leftInset - rightInset - 16;
+    if (origin.dx >= media.size.width / 2) {
+      availableWidth = math.min(
+        availableWidth,
+        origin.dx + button.size.width - leftInset - 8,
+      );
+    }
+    final width = math.min(360.0, availableWidth);
     final bottom =
         media.size.height -
         math.max(media.viewInsets.bottom, media.viewPadding.bottom);
@@ -195,13 +204,21 @@ class _OverflowContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showTextScale)
+          if (showTextScale) ...[
             _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
+            if (showPsalmody)
+              const Divider(
+                height: 12,
+                thickness: .7,
+                indent: 12,
+                endIndent: 12,
+              ),
+          ],
           if (showPsalmody) const PsalmodyOverflowControls(),
           for (var index = 0; index < actions.length; index++)
             _item(actions[index].label, actions[index].icon, '$index'),
           if (showTextScale || showPsalmody || actions.isNotEmpty)
-            const Divider(height: 16),
+            const Divider(height: 12, thickness: .7, indent: 12, endIndent: 12),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
         ],
@@ -209,12 +226,105 @@ class _OverflowContent extends StatelessWidget {
     ),
   );
 
-  Widget _item(String label, IconData icon, String value) => ListTile(
-    minTileHeight: 48,
-    leading: Icon(icon, size: 22),
-    title: Text(label),
-    trailing: const Icon(Icons.chevron_right_rounded, size: 20),
-    onTap: () => onSelected(value),
+  Widget _item(String label, IconData icon, String value) => Builder(
+    builder: (context) => InkWell(
+      onTap: () => onSelected(value),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Text(label, style: _menuLabelStyle(context))),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right_rounded, size: 18),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+// Explicit platform UI typography keeps reader faces and reader size out of
+// the popup. System text scaling is still applied by Text and TextPainter.
+TextStyle _menuLabelStyle(BuildContext context) => TextStyle(
+  inherit: false,
+  fontFamily: usesCupertinoGlass(context) ? '.AppleSystemUIFont' : 'Roboto',
+  fontFamilyFallback: const ['sans-serif'],
+  fontSize: 15,
+  fontWeight: FontWeight.w500,
+  height: 1.3,
+  color: Theme.of(context).colorScheme.onSurface,
+);
+
+class _OverflowSwitchTile extends StatelessWidget {
+  const _OverflowSwitchTile({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: label,
+    enabled: true,
+    toggled: value,
+    onTap: () => onChanged(!value),
+    child: ExcludeSemantics(
+      child: InkWell(
+        onTap: () => onChanged(!value),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final style = _menuLabelStyle(context);
+              final painter = TextPainter(
+                text: TextSpan(text: label, style: style),
+                textScaler: MediaQuery.textScalerOf(context),
+                textDirection: Directionality.of(context),
+              )..layout();
+              final stacked = painter.width > constraints.maxWidth - 60 - 12;
+              painter.dispose();
+              final title = Text(label, style: style);
+              final control = SizedBox(
+                width: 60,
+                height: 48,
+                child: Switch.adaptive(value: value, onChanged: onChanged),
+              );
+              if (stacked) {
+                return Column(
+                  key: ValueKey('$label-stacked'),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    title,
+                    Align(alignment: Alignment.centerRight, child: control),
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  Expanded(child: title),
+                  const SizedBox(width: 12),
+                  control,
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    ),
   );
 }
 
@@ -228,9 +338,9 @@ class PsalmodyOverflowControls extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SwitchListTile.adaptive(
+        _OverflowSwitchTile(
           key: const Key('overflow-psalm-marker-break'),
-          title: const Text('Перанос пасля * і †'),
+          label: 'Перанос пасля * і †',
           value:
               settings.psalmMarkerBreakMode ==
               PsalmMarkerBreakMode.breakAfterMarker,
@@ -240,9 +350,9 @@ class PsalmodyOverflowControls extends ConsumerWidget {
                 : PsalmMarkerBreakMode.inline,
           ),
         ),
-        SwitchListTile.adaptive(
+        _OverflowSwitchTile(
           key: const Key('overflow-psalm-aligned-left'),
-          title: const Text('Па левым краі'),
+          label: 'Па левым краі',
           value: settings.psalmVerseLayout == PsalmVerseLayout.alignedLeft,
           onChanged: (value) => notifier.setPsalmVerseLayout(
             value

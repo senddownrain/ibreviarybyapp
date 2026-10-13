@@ -15,6 +15,10 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  bool switchValue(WidgetTester tester, Finder tile) => tester
+      .widget<Switch>(find.descendant(of: tile, matching: find.byType(Switch)))
+      .value;
+
   testWidgets(
     'Ora switches apply immediately and survive reopening the popup',
     (tester) async {
@@ -38,10 +42,10 @@ void main() {
       await openMenu(tester);
       final marker = find.byKey(const Key('overflow-psalm-marker-break'));
       final layout = find.byKey(const Key('overflow-psalm-aligned-left'));
-      expect(tester.widget<SwitchListTile>(marker).value, isFalse);
-      expect(tester.widget<SwitchListTile>(layout).value, isFalse);
+      expect(switchValue(tester, marker), isFalse);
+      expect(switchValue(tester, layout), isFalse);
       expect(find.text('Перанос пасля * і †'), findsOneWidget);
-      expect(find.byType(SwitchListTile), findsNWidgets(2));
+      expect(find.byType(Switch), findsNWidgets(2));
       expect(find.byType(ChoiceChip), findsNothing);
       final semantics = tester.ensureSemantics();
       expect(
@@ -76,7 +80,7 @@ void main() {
       );
       await tester.tap(layout);
       await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(marker).value, isTrue);
+      expect(switchValue(tester, marker), isTrue);
       expect(
         tester
                 .getSemantics(marker)
@@ -86,12 +90,12 @@ void main() {
             Tristate.isTrue,
         isTrue,
       );
-      expect(tester.widget<SwitchListTile>(layout).value, isTrue);
+      expect(switchValue(tester, layout), isTrue);
       await tester.tapAt(const Offset(10, 500));
       await tester.pumpAndSettle();
       await openMenu(tester);
-      expect(tester.widget<SwitchListTile>(marker).value, isTrue);
-      expect(tester.widget<SwitchListTile>(layout).value, isTrue);
+      expect(switchValue(tester, marker), isTrue);
+      expect(switchValue(tester, layout), isTrue);
       semantics.dispose();
     },
   );
@@ -117,7 +121,7 @@ void main() {
     await tester.tap(find.text('Шрыфт'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('app-overflow-content')), findsNothing);
-    expect(find.byType(SwitchListTile), findsNothing);
+    expect(find.byType(Switch), findsNothing);
     expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pumpAndSettle();
@@ -126,12 +130,12 @@ void main() {
     await tester.tap(find.byTooltip('Закрыць'));
     await tester.pumpAndSettle();
     await openMenu(tester);
-    expect(find.byType(SwitchListTile), findsNWidgets(2));
+    expect(find.byType(Switch), findsNWidgets(2));
   });
 
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
     for (final brightness in Brightness.values) {
-      for (final width in [320.0, 390.0]) {
+      for (final width in [320.0, 360.0, 390.0, 430.0]) {
         for (final scale in [1.0, 1.5, 2.0]) {
           testWidgets(
             'popup fits $platform $brightness $width dp at $scale scale',
@@ -224,6 +228,75 @@ void main() {
     await tester.ensureVisible(find.text('Інфармацыя'));
     await tester.pumpAndSettle();
     expect(tester.getRect(find.text('Інфармацыя')).bottom, lessThan(340));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'menu uses 15sp UI text independently of reader size and serif theme',
+    (tester) async {
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith(_Settings.new)],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: ThemeData(
+              textTheme: ThemeData().textTheme.apply(fontFamily: 'Literata'),
+            ),
+            home: const Scaffold(
+              body: AppOverflowMenu(showTextScale: true, showPsalmody: true),
+            ),
+          ),
+        ),
+      );
+      await openMenu(tester);
+      for (final size in [kMinReaderFontSize, kMaxReaderFontSize]) {
+        container.read(settingsProvider.notifier).setFontSize(size);
+        await tester.pumpAndSettle();
+        for (final label in [
+          'Шрыфт',
+          'Перанос пасля * і †',
+          'Па левым краі',
+          'Налады',
+          'Інфармацыя',
+        ]) {
+          final text = tester.widget<Text>(find.text(label));
+          expect(text.style!.fontSize, 15);
+          expect(text.style!.fontFamily, 'Roboto');
+          expect(text.style!.inherit, isFalse);
+        }
+      }
+    },
+  );
+
+  testWidgets('popup accounts for asymmetric side cutouts', (tester) async {
+    tester.view.physicalSize = const Size(390, 760);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            padding: const EdgeInsets.fromLTRB(28, 44, 40, 34),
+            viewPadding: const EdgeInsets.fromLTRB(28, 44, 40, 34),
+          ),
+          child: child!,
+        ),
+        home: const ReaderScaffold(
+          showTextScale: false,
+          content: Text('Тэкст'),
+        ),
+      ),
+    );
+    final button = tester.getRect(find.byKey(const Key('app-overflow-open')));
+    await openMenu(tester);
+    final menu = tester.getRect(find.byKey(const Key('app-overflow-content')));
+    expect(menu.left, greaterThanOrEqualTo(28 + 8));
+    expect(menu.right, lessThanOrEqualTo(390 - 40 - 8));
+    expect(menu.right, closeTo(button.right + .8, 1));
     expect(tester.takeException(), isNull);
   });
 
