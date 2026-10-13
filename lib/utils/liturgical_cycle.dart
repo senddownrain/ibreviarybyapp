@@ -27,8 +27,11 @@ int _liturgicalYear(DateTime date) {
 
 DateTime _firstSundayOfAdvent(int year) {
   final christmas = DateTime(year, 12, 25);
-  final weekday = christmas.weekday;
-  final daysToLastSunday = weekday % 7;
+  // The Sunday BEFORE Christmas: a Christmas on a Sunday is preceded by
+  // the Sunday a week earlier (Advent I 2033 = 27 November, not 4 December).
+  final daysToLastSunday = christmas.weekday == DateTime.sunday
+      ? 7
+      : christmas.weekday;
   final lastSundayBeforeXmas = addCivilDays(christmas, -daysToLastSunday);
   return addCivilDays(lastSundayBeforeXmas, -21);
 }

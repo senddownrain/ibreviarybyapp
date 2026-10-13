@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/parsed_reading.dart';
+import 'package:mybrev_flutter/ordo/runtime.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -14,6 +16,7 @@ class ReadingsLoadResult {
     required this.sundayCycle,
     required this.weekdayCycle,
     this.linkDayId = true,
+    this.optionId,
   });
 
   final List<ParsedReading> readings;
@@ -24,6 +27,10 @@ class ReadingsLoadResult {
   /// for a memorial: its default readings are the weekday's (the engine
   /// order); its own readings stay a choice.
   final bool linkDayId;
+
+  /// The legal Mass option the route stands for, whose readings open first;
+  /// null for a memorial (weekday-first) or without an Ordo selection.
+  final String? optionId;
 }
 
 /// Whether the readings linked to the route's day id open first: not for a
@@ -66,25 +73,19 @@ final readingsLoaderProvider = Provider<ReadingsLoader>((ref) {
     }
 
     final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
-    final calendar = ref.read(calendarServiceProvider);
-    final diocese = readingsDiocese(ref);
-    final readings = await service.fetchForDate(
-      date,
-      calendar.getYearOptionsCached(date.year),
-      calendar.getYearOptionsCached(date.year + 1),
-      calendar.getDynamicDatesCached(date.year),
-      includeAlternatives: true,
-      dayId: dayId,
-      diocese: diocese,
-    );
-    return ReadingsLoadResult(
-      readings: readings,
-      sundayCycle: getCycleForDate(date, dayOfWeek: 1),
-      weekdayCycle: getWeekdayCycleForDate(date),
-      linkDayId: _linksDayId(
-        service.ordoSelection(date, dayId: dayId, diocese: diocese),
-      ),
-    );
+    await ContentStore.instance.ensureLoaded(const ['readings', 'days']);
+    return loadReadingsForDate(
+          service: service,
+          calendar: ref.read(calendarServiceProvider),
+          date: date,
+          dayId: dayId,
+          diocese: readingsDiocese(ref),
+        ) ??
+        ReadingsLoadResult(
+          readings: const [],
+          sundayCycle: getCycleForDate(date, dayOfWeek: 1),
+          weekdayCycle: getWeekdayCycleForDate(date),
+        );
   };
 });
 
@@ -117,26 +118,51 @@ final readingsLocalLoaderProvider = Provider<ReadingsLocalLoader>((ref) {
       );
     }
     final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
-    final calendar = ref.read(calendarServiceProvider);
-    final diocese = readingsDiocese(ref);
-    final readings = service.cachedForDate(
-      date,
-      calendar.getYearOptionsCached(date.year),
-      calendar.getYearOptionsCached(date.year + 1),
-      calendar.getDynamicDatesCached(date.year),
-      includeAlternatives: true,
+    final result = loadReadingsForDate(
+      service: service,
+      calendar: ref.read(calendarServiceProvider),
+      date: date,
       dayId: dayId,
-      diocese: diocese,
+      diocese: readingsDiocese(ref),
     );
-    if (readings == null) return null;
-    DataLog.cacheHit(() => 'readings $dateStr');
-    return ReadingsLoadResult(
-      readings: readings,
-      sundayCycle: getCycleForDate(date, dayOfWeek: 1),
-      weekdayCycle: getWeekdayCycleForDate(date),
-      linkDayId: _linksDayId(
-        service.ordoSelection(date, dayId: dayId, diocese: diocese),
-      ),
-    );
+    if (result != null) DataLog.cacheHit(() => 'readings $dateStr');
+    return result;
   };
 });
+
+/// The readings of a date for the Readings screen, synchronously: every
+/// document of every legal option in the engine's order, the cycles of the
+/// date and whether the route's day id links the readings. Null while the
+/// content is not decoded yet. The ONE path of the screen (and of the web
+/// parity test): both loaders above call it.
+ReadingsLoadResult? loadReadingsForDate({
+  required ParsedReadingsService service,
+  required CalendarService calendar,
+  required DateTime date,
+  required String? dayId,
+  required String diocese,
+}) {
+  final readings = service.cachedForDate(
+    date,
+    calendar.getYearOptionsCached(date.year),
+    calendar.getYearOptionsCached(date.year + 1),
+    calendar.getDynamicDatesCached(date.year),
+    includeAlternatives: true,
+    dayId: dayId,
+    diocese: diocese,
+  );
+  if (readings == null) return null;
+  final selection = service.ordoSelection(date, dayId: dayId, diocese: diocese);
+  // The lectionary cycles of the date are the ENGINE's (the web
+  // `readingCycle`), the same ones the plan was built with.
+  final cycle = OrdoRuntime.engine.resolve(date, diocese: diocese).readingCycle;
+  return ReadingsLoadResult(
+    readings: readings,
+    sundayCycle: cycle.sunday,
+    weekdayCycle: cycle.weekday,
+    linkDayId: _linksDayId(selection),
+    optionId: selection == null || selection.memorial
+        ? null
+        : selection.optionId,
+  );
+}

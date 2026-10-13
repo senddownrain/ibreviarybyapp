@@ -118,6 +118,7 @@ DefaultReadingsSelection resolveDefaultReadings({
   required String sundayCycle,
   required String weekdayCycle,
   String? dayId,
+  String? optionId,
   String? groupKey,
   String? manualCycle,
   String? requestedSetId,
@@ -157,7 +158,18 @@ DefaultReadingsSelection resolveDefaultReadings({
   if (groupKey != null) {
     selected = groups.where((group) => group.key == groupKey).firstOrNull;
   }
-  selected ??= linked ?? preferredReadingGroup(groups);
+  // The celebration chosen in the calendar (mybrev `?option=`): the group
+  // of the readings its lookups named.
+  final ofOption = optionId == null || optionId.isEmpty
+      ? null
+      : groups
+            .where(
+              (group) => group.documents.any(
+                (reading) => reading.ordoOptionId == optionId,
+              ),
+            )
+            .firstOrNull;
+  selected ??= linked ?? ofOption ?? preferredReadingGroup(groups);
   final documents = selected?.documents ?? visible;
 
   final setDocument = documents

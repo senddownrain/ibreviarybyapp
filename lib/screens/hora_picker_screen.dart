@@ -8,6 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/models/parsed_reading.dart';
+import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
+import 'package:mybrev_flutter/utils/reading_view.dart';
+import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
@@ -134,34 +138,35 @@ class _HoraPickerScreenState extends ConsumerState<HoraPickerScreen> {
     DynamicDates? dynamicDates,
   ) async {
     try {
-      final readings = await ParsedReadingsService().fetchForDate(
-        widget.date,
-        calendar.getYearOptionsCached(widget.date.year),
-        calendar.getYearOptionsCached(widget.date.year + 1),
-        dynamicDates,
-        includeAlternatives: true,
+      await ContentStore.instance.ensureLoaded(const ['readings', 'days']);
+      // The SAME selection the Readings screen opens for this day id.
+      final loaded = loadReadingsForDate(
+        service: ParsedReadingsService(),
+        calendar: calendar,
+        date: widget.date,
         dayId: widget.dayId,
         diocese: _diocese,
       );
-      final references = <String>{};
-      for (final reading in readings) {
-        for (final reference in [
-          reading.firstReading?.bible,
-          reading.reading2?.bible,
-          reading.gospel?.bible,
-        ]) {
-          if ((reference ?? '').trim().isNotEmpty) {
-            references.add(reference!.trim());
-          }
-        }
-      }
+      final readings = loaded?.readings ?? const <ParsedReading>[];
+      final selection = loaded == null
+          ? null
+          : resolveDefaultReadings(
+              readings: loaded.readings,
+              sundayCycle: loaded.sundayCycle,
+              weekdayCycle: loaded.weekdayCycle,
+              dayId: loaded.linkDayId ? widget.dayId : null,
+              optionId: loaded.optionId,
+            );
+      final citations = readingCitationLine(
+        selection == null ? null : readingViewOf(selection),
+      );
       if (!mounted) return;
       setState(() {
-        _readingSubtitle = references.isNotEmpty
-            ? references.join(' · ')
-            : readings.isEmpty
-            ? 'Чытанні для гэтай даты не знойдзены'
-            : 'Чытанні і Евангелле';
+        _readingSubtitle =
+            citations ??
+            (readings.isEmpty
+                ? 'Чытанні для гэтай даты не знойдзены'
+                : 'Чытанні і Евангелле');
       });
     } catch (_) {
       // The subtitle is secondary; the readings route stays available.

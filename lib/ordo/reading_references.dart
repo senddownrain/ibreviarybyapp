@@ -191,7 +191,9 @@ List<ParsedReading> selectLectionaryVariants(
   ];
 }
 
-List<ParsedReading> _calendarDayVariants(List<ParsedReading> docs, int dow) {
+/// Weekday documents of a date-keyed season keep the variant of the
+/// calendar weekday (mybrev `selectCalendarDayVariants`).
+List<ParsedReading> calendarDayVariants(List<ParsedReading> docs, int dow) {
   final exact = docs.where((doc) => doc.calendarDayOfWeek == dow).toList();
   if (exact.isNotEmpty) return exact;
   return docs.where((doc) => doc.calendarDayOfWeek == null).toList();
@@ -296,7 +298,7 @@ List<String> orderedReadingIdsForOption(
       if (option != selected && entry.purpose != 'weekday') continue;
       var found = selectReadingDocuments(entry, option.option, pool);
       if (entry.where['_date'] != null) {
-        found = _calendarDayVariants(found, day.dayOfWeek);
+        found = calendarDayVariants(found, day.dayOfWeek);
       }
       final picked = selectLectionaryVariants(
         found,
@@ -357,7 +359,7 @@ List<OptionReadingReferences> readingReferencesForDay(
       () {
         final found = selectReadingDocuments(entry, option.option, pool);
         return entry.where['_date'] != null
-            ? _calendarDayVariants(found, day.dayOfWeek)
+            ? calendarDayVariants(found, day.dayOfWeek)
             : found;
       }(),
   ];

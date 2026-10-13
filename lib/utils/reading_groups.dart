@@ -45,12 +45,11 @@ String readingCelebrationKey(ParsedReading reading) {
     return 'days:${ids.join(',')}$variantSuffix';
   }
   if (reading.date != null && reading.date!.isNotEmpty) {
-    final places = [...reading.places]..sort();
     return [
       'date:${reading.date}',
       normalizeReadingTitle(reading.title),
-      (reading.rank ?? '').trim().toLowerCase(),
-      places.join(','),
+      normalizeLiturgicalRank(reading.rank),
+      normalizeDayPlaces(reading.places),
       variant,
     ].join('|');
   }
@@ -76,14 +75,86 @@ String _groupLabel(List<ParsedReading> documents) {
   return 'Чытанні дня';
 }
 
-String normalizeReadingTitle(String? value) => (value ?? '')
-    .toLowerCase()
-    .replaceFirst(RegExp(r'^\d{1,2}\s+[^—–-]+[—–-]\s*'), '')
-    .replaceAll(RegExp(r'\bгод\s+[abcавс]\b'), ' ')
-    .replaceAll(RegExp(r'\b(урачыстасць|свята|успамін)\b'), ' ')
-    .replaceAll(RegExp(r'[^a-zа-яёіў0-9]+', caseSensitive: false), ' ')
-    .replaceAll(RegExp(r'\s+'), ' ')
-    .trim();
+const _rankAliases = {
+  'урачыстасць': 'solemnitas',
+  'solemnity': 'solemnitas',
+  'solemnitas': 'solemnitas',
+  'свята': 'festum',
+  'feast': 'festum',
+  'festum': 'festum',
+  'успамін': 'memoria',
+  'memorial': 'memoria',
+  'memoria': 'memoria',
+  'memoria-ad-libitum': 'memoria-ad-libitum',
+  'успамін усіх памерлых': 'commemoratio-defunctorum',
+  'commemoratio-defunctorum': 'commemoratio-defunctorum',
+};
+
+/// mybrev `normalizeRank`: a missing rank is an optional memorial, an unknown
+/// one is '' .
+String normalizeLiturgicalRank(String? value) {
+  final key = (value ?? '').trim().toLowerCase();
+  if (key.isEmpty) return 'memoria-ad-libitum';
+  return _rankAliases[key] ?? '';
+}
+
+const _placeCodes = {
+  'гродзенская дыяцэзія': 'grodno',
+  'гродзенскай дыяцэзіі': 'grodno',
+  'віцебская дыяцэзія': 'vitebsk',
+  'віцебскай дыяцэзіі': 'vitebsk',
+  'пінская дыяцэзія': 'pinsk',
+  'пінскай дыяцэзіі': 'pinsk',
+  'мінска-магілёўская архідыяцэзія': 'minsk-mohilev',
+  'мінска-магілёўскай архідыяцэзіі': 'minsk-mohilev',
+};
+
+/// mybrev `normalizeDayPlaces`: diocese codes, sorted, comma-joined.
+String normalizeDayPlaces(Iterable<String> places) {
+  final codes = <String>{};
+  for (final item in places) {
+    final key = item.trim().toLowerCase();
+    if (key.isEmpty) continue;
+    if (_placeCodes.containsValue(key)) {
+      codes.add(key);
+      continue;
+    }
+    for (final entry in _placeCodes.entries) {
+      if (key.contains(entry.key)) codes.add(entry.value);
+    }
+  }
+  return (codes.toList()..sort()).join(',');
+}
+
+/// mybrev `normalizeReadingTitle` (without NFKC: the texts are NFC).
+String normalizeReadingTitle(String? value) =>
+    (value ?? '')
+        .toLowerCase()
+        .replaceFirst(
+          RegExp(r'^\d{1,2}\s+[\p{L}.]+\s*[—–-]\s*', unicode: true),
+          '',
+        )
+        .replaceAll(
+          RegExp(r'(?:^|[\s,])год\s+[abcавс](?=\s|,|$)', unicode: true),
+          ' ',
+        )
+        .replaceAll(
+          RegExp(
+            r'(?:^|[\s,])(?:урачыстасць|свята|успамін)(?=[\s,]|$)',
+            unicode: true,
+          ),
+          ' ',
+        )
+        .replaceAll(
+          RegExp(
+            r'юзаф\p{L}*\s+(?:работнік|рамеснік)\p{L}*',
+            unicode: true,
+          ),
+          'юзаф рамеснік',
+        )
+        .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
 
 String normalizeReadingCycle(String? value) {
   final cycle = (value ?? '').trim().toUpperCase();

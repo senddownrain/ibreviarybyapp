@@ -10,6 +10,11 @@
 /// hidden when the canonical document is also present.
 library;
 
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart' show canonicalJson;
+
 /// Set contexts celebrated in the evening: preferred when the date also has
 /// a morning/day set.
 const kEveningSetContexts = {'vigil', 'evening'};
@@ -67,11 +72,16 @@ List<Map<String, dynamic>> _maps(Object? value) => value is List
     : const <Map<String, dynamic>>[];
 
 class PassionRun {
-  const PassionRun(this.role, this.text);
+  const PassionRun(this.role, this.text, {String? rawRole})
+    : rawRole = rawRole ?? '';
 
   /// Null for a role this version does not know (rendered as narration).
   final PassionRole? role;
   final String text;
+
+  /// The role exactly as stored (kept for the content hash even when this
+  /// version does not know the role).
+  final String rawRole;
 }
 
 class PassionBlock {
@@ -106,7 +116,11 @@ class PassionText {
           blocks.add(
             PassionBlock.paragraph([
               for (final run in _maps(block['runs']))
-                PassionRun(PassionRole.parse(run['role']), _text(run['text'])),
+                PassionRun(
+                  PassionRole.parse(run['role']),
+                  _text(run['text']),
+                  rawRole: _text(run['role']),
+                ),
             ]),
           );
       }
@@ -117,6 +131,24 @@ class PassionText {
       blocks: blocks,
     );
   }
+
+  /// Normalised semantic form (the content hash input).
+  Map<String, Object?> canonical() => {
+    if (legend.isNotEmpty) 'legend': legend,
+    'blocks': [
+      for (final block in blocks)
+        if (block.isParagraph)
+          {
+            'type': 'paragraph',
+            'runs': [
+              for (final run in block.runs)
+                {'role': run.rawRole, 'text': run.text},
+            ],
+          }
+        else
+          {'type': block.type, 'text': block.text},
+    ],
+  };
 
   /// Roles that occur in the Passion.
   Set<PassionRole> get roles => {
@@ -146,6 +178,8 @@ class MassReadingSection {
     required this.kind,
     this.role,
     this.cycle,
+    this.year,
+    this.form,
     this.label,
     this.bible,
     this.comment,
@@ -156,6 +190,7 @@ class MassReadingSection {
     this.rubrics = const [],
     this.chorus,
     this.altChorus,
+    this.altChorusRef,
     this.verses = const [],
     this.acclamation,
     this.verse,
@@ -172,6 +207,15 @@ class MassReadingSection {
 
   /// A/B/C: part of one cycle only (shared base + cycle-specific Gospel).
   final String? cycle;
+
+  /// Weekday year `1`/`2` the page assigns the reading to (stored by the
+  /// parser; the web does not filter by it, weekday years are separate
+  /// documents `<id>--1` / `<id>--2`). Kept, never dropped.
+  final String? year;
+
+  /// `long` | `short`: the form of a reading offered in two lengths (the
+  /// shorter one is an alternative of the longer one).
+  final String? form;
   final String? label;
   final String? bible;
   final String? comment;
@@ -185,6 +229,9 @@ class MassReadingSection {
   final List<String> rubrics;
   final String? chorus;
   final String? altChorus;
+
+  /// Citation printed with the alternative refrain («Р.: 9а»).
+  final String? altChorusRef;
   final List<String> verses;
   final String? acclamation;
   final String? verse;
@@ -203,6 +250,8 @@ class MassReadingSection {
       kind: _text(map['kind']),
       role: _opt(map['role']),
       cycle: _opt(map['cycle'])?.toUpperCase(),
+      year: _opt(map['year']),
+      form: _opt(map['form']),
       label: _opt(map['label']),
       bible: _opt(map['bible']),
       comment: _opt(map['comment']),
@@ -221,6 +270,7 @@ class MassReadingSection {
           : const [],
       chorus: _opt(map['chorus']),
       altChorus: _opt(map['altChorus']),
+      altChorusRef: _opt(map['altChorusRef']),
       verses: verses is List
           ? [
               for (final item in verses)
@@ -237,6 +287,51 @@ class MassReadingSection {
     );
   }
 
+  /// Normalised semantic form of everything the Readings screen can show
+  /// (the input of the parity content hash, equal to the web fixture's
+  /// `normalizeSection`). [withMeta] false: an alternative (no kind/role).
+  Map<String, Object?> canonical({bool withMeta = true}) {
+    String? keep(String? value) {
+      final trimmed = value?.trim() ?? '';
+      return trimmed.isEmpty ? null : trimmed;
+    }
+
+    final alternatives = [
+      for (final item in this.alternatives) item.canonical(withMeta: false),
+    ];
+    final verses = [
+      for (final item in this.verses)
+        if (item.trim().isNotEmpty) item.trim(),
+    ];
+    return {
+      if (withMeta && kind.isNotEmpty) 'kind': kind,
+      if (withMeta && role != null) 'role': role,
+      if (cycle != null) 'cycle': cycle,
+      'year': ?keep(year),
+      'form': ?keep(form),
+      'label': ?keep(label),
+      'bible': ?keep(bible),
+      'comment': ?keep(comment),
+      'title': ?keep(title),
+      'text': ?keep(text),
+      'chorus': ?keep(chorus),
+      'altChorus': ?keep(altChorus),
+      'altChorusRef': ?keep(altChorusRef),
+      'acclamation': ?keep(acclamation),
+      'verse': ?keep(verse),
+      'conclusion': ?conclusion,
+      if (rubrics.isNotEmpty) 'rubrics': rubrics,
+      if (verses.isNotEmpty) 'verses': verses,
+      if (legend) 'legend': true,
+      if (passion != null && passion!.blocks.isNotEmpty)
+        'passion': passion!.canonical(),
+      if (alternatives.isNotEmpty) 'alternatives': alternatives,
+    };
+  }
+
+  /// 16 hex chars of sha256 over [canonical] (the web `sectionHash`).
+  String get contentHash => canonicalHash(canonical());
+
   /// Label of the section on the Readings screen.
   String get displayLabel =>
       label ??
@@ -245,6 +340,36 @@ class MassReadingSection {
       (RegExp(r'^psalm\d+$').hasMatch(role ?? '')
           ? kMassSectionLabels['psalm']!
           : '');
+}
+
+/// 16 hex characters of sha256 over the canonical JSON of [value].
+String canonicalHash(Object? value) => sha256
+    .convert(utf8.encode(canonicalJson(value)))
+    .toString()
+    .substring(0, 16);
+
+/// A prayer of the formulary printed with a set (collect, over the gifts,
+/// after communion…): `{kind, label, text}`.
+class MassReadingPrayer {
+  const MassReadingPrayer({required this.kind, this.label, this.text});
+
+  final String kind;
+  final String? label;
+  final String? text;
+
+  static List<MassReadingPrayer> parseAll(Object? raw) => raw is List
+      ? [
+          for (final item in raw)
+            if (item is Map)
+              MassReadingPrayer(
+                kind: _text(item['kind']),
+                label: _opt(item['label']),
+                text: _opt(item['text']),
+              ),
+        ]
+      : const [];
+
+  String get displayLabel => label ?? kind;
 }
 
 class MassReadingSet {
@@ -258,6 +383,8 @@ class MassReadingSet {
     this.referenceOnly = false,
     this.note,
     this.sourceUrl,
+    this.preface = const [],
+    this.prayers = const [],
     this.sections = const [],
   });
 
@@ -270,6 +397,13 @@ class MassReadingSet {
   final bool referenceOnly;
   final String? note;
   final String? sourceUrl;
+
+  /// Page rubrics printed before the first reading (rank, Common, source of
+  /// the formulary).
+  final List<String> preface;
+
+  /// Prayers of the formulary printed with the set.
+  final List<MassReadingPrayer> prayers;
   final List<MassReadingSection> sections;
 
   factory MassReadingSet.fromMap(Map<String, dynamic> map) => MassReadingSet(
@@ -282,6 +416,12 @@ class MassReadingSet {
     referenceOnly: map['referenceOnly'] == true,
     note: _opt(map['note']),
     sourceUrl: _opt(_map(map['source'])?['url']),
+    preface: [
+      if (map['preface'] case final List items)
+        for (final item in items)
+          if (_text(item).isNotEmpty) _text(item),
+    ],
+    prayers: MassReadingPrayer.parseAll(map['prayers']),
     sections: [
       for (final section in _maps(map['sections']))
         MassReadingSection.fromMap(section),
