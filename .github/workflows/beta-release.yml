@@ -1,8 +1,15 @@
-# MyBrev Beta Release — manual only. Runs the same fastlane lanes as the
-# developer Mac (docs/RELEASE_BETA.md).
+# MyBrev Beta Release — manual only (workflow_dispatch; never on push / PR).
+# Same fastlane lanes as the developer Mac (docs/RELEASE_BETA.md).
 #   iOS      → the self-hosted Mac runner (Apple signing needs macOS).
 #   Android  → a GitHub-hosted Linux runner: no Mac needed for Google Play.
-# Never production: TestFlight and Google Play testing tracks only.
+# Never production: TestFlight and Google Play internal/beta only (allow-list
+# here, in tool/release/check_ref.sh and in fastlane/Fastfile).
+#
+# Shape:  prepare → quality → preflight-<platform> → <platform> → summary
+# Each platform has its own preflight, its own concurrency group and its own
+# verdict in the summary; neither depends on the other's success. `prepare`
+# and `quality` are about the commit itself (same code for both stores).
+# The Flutter version comes from ONE place: pubspec.yaml environment.flutter.
 name: MyBrev Beta Release
 
 on:
@@ -14,7 +21,7 @@ on:
         options: [both, ios, android]
         default: both
       android_track:
-        description: Google Play track
+        description: Google Play track (never production)
         type: choice
         options: [internal, beta]
         default: internal
@@ -22,41 +29,123 @@ on:
         description: What testers should check (optional)
         type: string
         required: false
+      allow_non_main:
+        description: Release from a branch other than main (testing the release pipeline itself)
+        type: boolean
+        default: false
+      run_full_tests:
+        description: Run the whole test suite (slow, ~6+ min) instead of the quick release subset
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
-# One release at a time; a second run waits instead of racing the first.
-concurrency:
-  group: mybrev-beta-release
-  cancel-in-progress: false
-
 env:
   LC_ALL: en_US.UTF-8
   LANG: en_US.UTF-8
-  RELEASE_NOTES: ${{ inputs.release_notes }}
 
 jobs:
-  # ---- iOS: the Mac runner ---------------------------------------------------
+  # ---- Which commit, which Flutter: shared, cheap, no secrets -----------------
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      flutter_version: ${{ steps.flutter.outputs.version }}
+      app_version: ${{ steps.pubspec.outputs.version }}
+      app_build: ${{ steps.pubspec.outputs.build }}
+      reason: ${{ steps.ref.outputs.reason || steps.flutter.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ref is a fresh tip, tree is clean, track is allowed
+        id: ref
+        env:
+          ALLOW_NON_MAIN: ${{ inputs.allow_non_main }}
+          ANDROID_TRACK: ${{ inputs.android_track }}
+        run: tool/release/check_ref.sh
+      - name: Flutter version (pubspec.yaml is the source of truth)
+        id: flutter
+        run: |
+          if ! version=$(tool/release/flutter_version.sh); then
+            echo "reason=flutter_mismatch" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Flutter $version (pubspec.yaml environment.flutter)"
+      - name: Version from pubspec.yaml
+        id: pubspec
+        run: |
+          line=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' pubspec.yaml)
+          echo "version=${line%%+*}" >> "$GITHUB_OUTPUT"
+          echo "build=${line#*+}" >> "$GITHUB_OUTPUT"
+          echo "Commit $GITHUB_SHA, pubspec version $line"
+
+  # ---- The commit itself: analysis and the quick tests ------------------------
+  # A critical error (analyzer error/warning, failing test) stops here, before
+  # any signing or store upload. Analyzer *infos* (style hints) do not block:
+  # they are old and non-critical; errors and warnings do.
+  quality:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      reason: ${{ steps.analyze.outputs.reason || steps.tests.outputs.reason || steps.pub.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
+          cache: true
+      - name: Installed Flutter equals the pubspec requirement
+        run: |
+          installed=$(flutter --version --machine | sed -nE 's/.*"frameworkVersion": *"([^"]+)".*/\1/p')
+          EXPECT_FLUTTER="$installed" tool/release/flutter_version.sh >/dev/null
+          echo "Flutter $installed"
+      - name: flutter pub get
+        id: pub
+        run: flutter pub get --enforce-lockfile || { echo "reason=pub_get_failed" >> "$GITHUB_OUTPUT"; exit 1; }
+      - name: flutter analyze (errors and warnings are fatal, infos are not)
+        id: analyze
+        run: flutter analyze --no-fatal-infos || { echo "reason=analyze_failed" >> "$GITHUB_OUTPUT"; exit 1; }
+      - name: Tests (quick release subset, or all with run_full_tests)
+        id: tests
+        env:
+          RUN_FULL_TESTS: ${{ inputs.run_full_tests }}
+        run: tool/release/run_tests.sh || { echo "reason=tests_failed" >> "$GITHUB_OUTPUT"; exit 1; }
+
+  # ---- iOS: the Mac runner ----------------------------------------------------
   preflight-ios:
+    needs: [prepare, quality]
     if: inputs.platform != 'android'
     runs-on: [self-hosted, macOS, mybrev-release]
     timeout-minutes: 15
+    outputs:
+      reason: ${{ steps.check.outputs.reason }}
     steps:
       - uses: actions/checkout@v4
       - name: Runner, tools and secrets (names only)
+        id: check
         shell: bash -l {0}
         env:
           HAS_ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID != '' }}
           HAS_ASC_ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID != '' }}
           HAS_ASC_P8: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 != '' }}
+          FLUTTER: ${{ vars.IOS_FLUTTER_BIN }}
         run: |
           set -euo pipefail
+          fail() { echo "reason=$1" >> "$GITHUB_OUTPUT"; echo "::error::$2"; exit 1; }
           echo "ref: $GITHUB_REF  commit: $GITHUB_SHA  runner: $(hostname)"
-          test -z "$(git status --porcelain)" || { echo "::error::checkout is not clean"; exit 1; }
+          test -z "$(git status --porcelain)" || fail dirty_tree "checkout is not clean"
           avail_gb=$(df -g / | awk 'NR==2 {print $4}')
-          [ "$avail_gb" -ge 8 ] || { echo "::error::only ${avail_gb} GB free on the runner"; exit 1; }
-          flutter --version | head -1
+          [ "$avail_gb" -ge 8 ] || fail runner_space "only ${avail_gb} GB free on the runner"
+          flutter_bin="${FLUTTER:-flutter}"
+          installed=$("$flutter_bin" --version --machine | sed -nE 's/.*"frameworkVersion": *"([^"]+)".*/\1/p')
+          EXPECT_FLUTTER="$installed" tool/release/flutter_version.sh >/dev/null \
+            || fail flutter_mismatch "Flutter on the runner is $installed; pubspec.yaml requires ${{ needs.prepare.outputs.flutter_version }}. Upgrade it or set variable IOS_FLUTTER_BIN to another SDK's bin/flutter"
+          echo "Flutter $installed"
           java -version 2>&1 | head -1
           xcodebuild -version | head -1
           missing=()
@@ -64,8 +153,7 @@ jobs:
           [ "$HAS_ASC_ISSUER" = true ] || missing+=(APP_STORE_CONNECT_ISSUER_ID)
           [ "$HAS_ASC_P8" = true ] || missing+=(APP_STORE_CONNECT_PRIVATE_KEY_BASE64)
           if [ ${#missing[@]} -gt 0 ]; then
-            echo "::error::missing in repository secrets (Settings → Secrets and variables → Actions): ${missing[*]}"
-            exit 1
+            fail missing_secret "missing in repository secrets (Settings → Secrets and variables → Actions): ${missing[*]}"
           fi
           export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
           bundle config set --local path "$HOME/.cache/mybrev-release-bundle"
@@ -73,16 +161,25 @@ jobs:
           bundle exec fastlane --version | tail -1
 
   ios:
-    needs: preflight-ios
+    needs: [prepare, quality, preflight-ios]
     if: inputs.platform != 'android'
     runs-on: [self-hosted, macOS, mybrev-release]
     timeout-minutes: 90
+    # iOS releases are serialized among themselves, independent of Android.
+    concurrency:
+      group: mybrev-beta-release-ios
+      cancel-in-progress: false
     outputs:
       build: ${{ steps.release.outputs.IOS_BUILD }}
       version: ${{ steps.release.outputs.IOS_VERSION }}
       groups: ${{ steps.release.outputs.IOS_GROUPS }}
+      error_code: ${{ steps.classify.outputs.code }}
+      error_text: ${{ steps.classify.outputs.text }}
+      error_next: ${{ steps.classify.outputs.next }}
     steps:
       - uses: actions/checkout@v4
+      - name: Building exactly the commit of this run
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
       - name: fastlane ios beta
         id: release
         shell: bash -l {0}
@@ -91,21 +188,37 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
           IOS_TESTFLIGHT_GROUPS: ${{ vars.IOS_TESTFLIGHT_GROUPS }}
+          FLUTTER: ${{ vars.IOS_FLUTTER_BIN }}
+          RELEASE_NOTES: ${{ inputs.release_notes }}
         run: |
           set -euo pipefail
           export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
           bundle config set --local path "$HOME/.cache/mybrev-release-bundle"
           bundle install --quiet
-          bundle exec fastlane ios beta
+          bundle exec fastlane ios beta 2>&1 | tee "$RUNNER_TEMP/fastlane-ios.log"
           cat fastlane/release-result-ios.env >> "$GITHUB_OUTPUT"
+      - name: Failure class
+        id: classify
+        if: failure() && steps.release.outcome == 'failure'
+        run: |
+          IFS='|' read -r code text next < <(tool/release/classify_failure.sh "$RUNNER_TEMP/fastlane-ios.log")
+          { echo "code=$code"; echo "text=$text"; echo "next=$next"; } >> "$GITHUB_OUTPUT"
 
   # ---- Android: GitHub-hosted Linux, the Mac is not needed --------------------
   preflight-android:
+    needs: [prepare, quality]
     if: inputs.platform != 'ios'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      reason: ${{ steps.check.outputs.reason }}
     steps:
-      - name: Secrets (names only)
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Secrets (names only) and the upload keystore
+        id: check
         env:
           HAS_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 != '' }}
           HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
@@ -113,9 +226,16 @@ jobs:
           HAS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS != '' }}
           HAS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD != '' }}
           HAS_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK != '' }}
+          BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK }}
+          PLAY_STATUS: ${{ vars.PLAY_RELEASE_STATUS }}
           ANDROID_TRACK: ${{ inputs.android_track }}
+          # Values only for the keystore check below; masked by GitHub.
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           set -euo pipefail
+          fail() { echo "reason=$1" >> "$GITHUB_OUTPUT"; echo "::error::$2"; exit 1; }
           echo "ref: $GITHUB_REF  commit: $GITHUB_SHA"
           missing=()
           [ "$HAS_PLAY_JSON" = true ] || missing+=(GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64)
@@ -127,15 +247,31 @@ jobs:
             missing+=("variable ANDROID_BETA_TRACK")
           fi
           if [ ${#missing[@]} -gt 0 ]; then
-            echo "::error::missing in repository secrets (Settings → Secrets and variables → Actions): ${missing[*]}"
-            exit 1
+            fail missing_secret "missing in repository secrets/variables (Settings → Secrets and variables → Actions): ${missing[*]}"
           fi
+          case "$ANDROID_TRACK" in internal|beta) ;; *) fail track_not_allowed "track $ANDROID_TRACK is not allowed" ;; esac
+          if echo "$BETA_TRACK" | grep -qi prod; then
+            fail track_not_allowed "variable ANDROID_BETA_TRACK must not be a production track"
+          fi
+          case "${PLAY_STATUS:-completed}" in draft|completed) ;; *) fail track_not_allowed "PLAY_RELEASE_STATUS must be draft or completed" ;; esac
+          # The upload keystore decodes and contains the alias (the key
+          # password is verified when Gradle signs, still before any upload).
+          keystore=$(mktemp)
+          trap 'rm -f "$keystore"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$keystore" || fail keystore_invalid "ANDROID_KEYSTORE_BASE64 is not valid base64"
+          keytool -list -keystore "$keystore" -storepass:env ANDROID_KEYSTORE_PASSWORD -alias "$ANDROID_KEY_ALIAS" > /dev/null 2>&1 \
+            || fail keystore_invalid "the keystore does not open with ANDROID_KEYSTORE_PASSWORD or has no alias ANDROID_KEY_ALIAS"
+          echo "Upload keystore OK (alias present)"
 
   android:
-    needs: preflight-android
+    needs: [prepare, quality, preflight-android]
     if: inputs.platform != 'ios'
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Android releases are serialized among themselves, independent of iOS.
+    concurrency:
+      group: mybrev-beta-release-android
+      cancel-in-progress: false
     env:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
@@ -143,8 +279,13 @@ jobs:
       version_code: ${{ steps.release.outputs.ANDROID_VERSION_CODE }}
       version: ${{ steps.release.outputs.ANDROID_VERSION }}
       track: ${{ steps.release.outputs.ANDROID_TRACK }}
+      error_code: ${{ steps.classify.outputs.code }}
+      error_text: ${{ steps.classify.outputs.text }}
+      error_next: ${{ steps.classify.outputs.next }}
     steps:
       - uses: actions/checkout@v4
+      - name: Building exactly the commit of this run
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -152,7 +293,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: "3.41.4"
+          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
           cache: true
       - uses: ruby/setup-ruby@v1
         with:
@@ -168,47 +309,58 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK }}
           PLAY_RELEASE_STATUS: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+          ANDROID_TRACK: ${{ inputs.android_track }}
         run: |
-          set -euo pipefail
+          set -euo pipefail   # no `set -x`: nothing may echo the environment
+          case "$ANDROID_TRACK" in internal|beta) ;; *) echo "::error::track $ANDROID_TRACK is not allowed"; exit 1 ;; esac
           flutter --version | head -1
-          bundle exec fastlane android ${{ inputs.android_track }}
+          bundle exec fastlane android "$ANDROID_TRACK" 2>&1 | tee "$RUNNER_TEMP/fastlane-android.log"
           cat fastlane/release-result-android.env >> "$GITHUB_OUTPUT"
+      - name: Failure class
+        id: classify
+        if: failure() && steps.release.outcome == 'failure'
+        run: |
+          IFS='|' read -r code text next < <(tool/release/classify_failure.sh "$RUNNER_TEMP/fastlane-android.log")
+          { echo "code=$code"; echo "text=$text"; echo "next=$next"; } >> "$GITHUB_OUTPUT"
 
-  # ---- Summary: needs no Mac, so it still reports when the Mac is off ---------
+  # ---- Summary: Linux, so it reports even when the Mac is off -----------------
   summary:
-    needs: [preflight-ios, ios, preflight-android, android]
+    needs: [prepare, quality, preflight-ios, ios, preflight-android, android]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
       - name: Release summary
-        shell: bash
         env:
-          IOS_RESULT: ${{ needs.ios.result == 'skipped' && needs.preflight-ios.result != 'skipped' && needs.preflight-ios.result || needs.ios.result }}
+          SHA: ${{ github.sha }}
+          PLATFORM: ${{ inputs.platform }}
+          ANDROID_TRACK_INPUT: ${{ inputs.android_track }}
+          PUBSPEC_VERSION: ${{ needs.prepare.outputs.app_version }}
+          PUBSPEC_BUILD: ${{ needs.prepare.outputs.app_build }}
+          PREPARE_RESULT: ${{ needs.prepare.result }}
+          PREPARE_REASON: ${{ needs.prepare.outputs.reason }}
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          QUALITY_REASON: ${{ needs.quality.outputs.reason }}
+          IOS_PREFLIGHT_RESULT: ${{ needs.preflight-ios.result }}
+          IOS_PREFLIGHT_REASON: ${{ needs.preflight-ios.outputs.reason }}
+          IOS_RESULT: ${{ needs.ios.result }}
           IOS_VERSION: ${{ needs.ios.outputs.version }}
           IOS_BUILD: ${{ needs.ios.outputs.build }}
           IOS_GROUPS: ${{ needs.ios.outputs.groups }}
-          ANDROID_RESULT: ${{ needs.android.result == 'skipped' && needs.preflight-android.result != 'skipped' && needs.preflight-android.result || needs.android.result }}
+          IOS_ERROR_CODE: ${{ needs.ios.outputs.error_code }}
+          IOS_ERROR_TEXT: ${{ needs.ios.outputs.error_text }}
+          IOS_ERROR_NEXT: ${{ needs.ios.outputs.error_next }}
+          ANDROID_PREFLIGHT_RESULT: ${{ needs.preflight-android.result }}
+          ANDROID_PREFLIGHT_REASON: ${{ needs.preflight-android.outputs.reason }}
+          ANDROID_RESULT: ${{ needs.android.result }}
           ANDROID_VERSION: ${{ needs.android.outputs.version }}
           ANDROID_VERSION_CODE: ${{ needs.android.outputs.version_code }}
           ANDROID_TRACK: ${{ needs.android.outputs.track }}
-        run: |
-          status() { case "$1" in success) echo SUCCESS;; skipped) echo SKIPPED;; *) echo "FAILED ($1)";; esac; }
-          {
-            echo "## MyBrev Beta Release"
-            echo
-            echo "**Commit:** \`$GITHUB_SHA\`"
-            echo
-            echo "### iOS — $(status "$IOS_RESULT")"
-            echo "- Version: ${IOS_VERSION:-—}"
-            echo "- Build: ${IOS_BUILD:-—}"
-            echo "- TestFlight: by.mybrev.testflight2026 · ${IOS_GROUPS:-—}"
-            echo
-            echo "### Android — $(status "$ANDROID_RESULT")"
-            echo "- Version: ${ANDROID_VERSION:-—}"
-            echo "- VersionCode: ${ANDROID_VERSION_CODE:-—}"
-            echo "- Google Play track: ${ANDROID_TRACK:-—} (by.mybrev.playtest2026)"
-            echo
-            echo "### Manual actions still required"
-            echo "- TestFlight external groups / Beta App Review and Play testers are managed in the consoles (docs/RELEASE_BETA.md)."
-          } >> "$GITHUB_STEP_SUMMARY"
+          ANDROID_ERROR_CODE: ${{ needs.android.outputs.error_code }}
+          ANDROID_ERROR_TEXT: ${{ needs.android.outputs.error_text }}
+          ANDROID_ERROR_NEXT: ${{ needs.android.outputs.error_next }}
+          PLAY_RELEASE_STATUS: ${{ vars.PLAY_RELEASE_STATUS }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: tool/release/summary.sh >> "$GITHUB_STEP_SUMMARY"
