@@ -67,7 +67,18 @@ Json temporalReadingsRef(Season season) {
   final dateOnly =
       isSeasonalDateException(date, season.period) ||
       isChristmasDateExceptionExclusion(date);
-  if (dateOnly) return {'_date': fixedDateKey(season.date), 'dateOnly': true};
+  // The weekday pages of 17–24 December and of Christmas time are keyed by
+  // date. A SUNDAY there (IV Sunday of Advent, III when it falls on the 17th,
+  // II Sunday after Christmas) is a Sunday of the A/B/C lectionary: its
+  // documents are the period documents (`advent-w4-d1--A`, `christmas-w2-d1`),
+  // not the weekday of that date (web audit 2026-10-12, WRONG_CONTEXT).
+  final sundayOfPeriod =
+      season.dayOfWeek == 1 &&
+      (season.period == 'advent' || season.period == 'christmas') &&
+      !isChristmasDateExceptionExclusion(date);
+  if (dateOnly && !sundayOfPeriod) {
+    return {'_date': fixedDateKey(season.date), 'dateOnly': true};
+  }
   return {
     '_periodType': season.period,
     '_periodWeekNumber': season.periodWeek == 0 ? [0, null] : season.periodWeek,

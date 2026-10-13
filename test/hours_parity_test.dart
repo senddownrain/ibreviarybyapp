@@ -1,6 +1,6 @@
 // Web ↔ Flutter parity of the Hours: the same legal Office cards, the same
 // assemblies («З дня» / Commons), the same Proper source and the same
-// Office text (hash) as the web pipeline on the same snapshot, 2025–2032 ×
+// Office text (hash) as the web pipeline on the same snapshot, 2025–2035 ×
 // 4 dioceses (fixture: mybrev `npm run ordo:flutter-fixture`).
 //
 // HOURS_PARITY_REPORT=1 also writes reports/flutter-hours-parity.json.
@@ -61,7 +61,7 @@ void main() {
   });
 
   test(
-    'Hours cards and assemblies equal the web, 2025–2032 × 4 dioceses',
+    'Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses',
     () {
       final fixture = ordoParityFixture();
       final days = (fixture['days'] as Map).cast<String, dynamic>();

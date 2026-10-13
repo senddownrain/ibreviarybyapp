@@ -3,7 +3,8 @@ import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/engine.dart';
-import 'package:mybrev_flutter/ordo/reading_references.dart';
+import 'package:mybrev_flutter/ordo/readings_runtime.dart';
+import 'package:mybrev_flutter/ordo/runtime.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -43,6 +44,27 @@ class ParsedReadingsService {
     if (!ContentStore.instance.areLoaded(const ['readings', 'days'])) {
       return null;
     }
+    if (includeAlternatives) {
+      // The ENGINE's plan: every document the lookups of every legal Mass
+      // option name, in the engine's order, each remembering its option.
+      // Nothing else of the date (another diocese's cathedral dedication,
+      // the weekday readings of a solemnity) is offered.
+      if (!ContentStore.instance.areLoaded(const ['liturgicalCelebrations'])) {
+        return null;
+      }
+      final day = OrdoRuntime.engine.resolve(date, diocese: diocese);
+      final plan = day.readingsPlan;
+      // The route's day id never ADDS a document: a document linked to the
+      // Hours day but named by no lookup of a legal option (the seasonal
+      // date document of a Sunday, an obsolete copy) is not a reading of
+      // the day. The selected option is found by its tag instead.
+      final ordered = orderReadingsByPlan(
+        plan,
+        fetchReadingDocuments(plan),
+        dayOfWeek: day.dayOfWeek,
+      );
+      return ordered.isEmpty ? null : ordered;
+    }
     final context = computeLiturgicalContext(
       date,
       opts,
@@ -55,20 +77,13 @@ class ParsedReadingsService {
       _getCachedForDate(context, ddmm, dynamicDates, date, dayId: dayId),
     );
     if (cached.isEmpty) return null;
-    return includeAlternatives
-        ? _orderByOrdo(
-            _sortForDate(cached, dayId: dayId),
-            date,
-            dayId: dayId,
-            diocese: diocese,
-          )
-        : _selectActiveForDate(
-            cached,
-            date: date,
-            context: context,
-            feastCodes: getDynamicFeastCodesForDate(date, dynamicDates),
-            dayId: dayId,
-          );
+    return _selectActiveForDate(
+      cached,
+      date: date,
+      context: context,
+      feastCodes: getDynamicFeastCodesForDate(date, dynamicDates),
+      dayId: dayId,
+    );
   }
 
   /// Readings of a period day from the device, or null.
@@ -143,36 +158,6 @@ class ParsedReadingsService {
   static bool isOfficeOnlySource(OrdoDay day, String? officeOptionId) {
     if (officeOptionId == null || officeOptionId.isEmpty) return false;
     return !day.options.any((option) => option.id == officeOptionId);
-  }
-
-  /// The readings of the selected option first, in the engine's order
-  /// (mybrev `orderReadingsByPlan`); the others keep their order.
-  List<ParsedReading> _orderByOrdo(
-    List<ParsedReading> docs,
-    DateTime date, {
-    String? dayId,
-    required String diocese,
-  }) {
-    final selection = ordoSelection(date, dayId: dayId, diocese: diocese);
-    if (selection == null) return docs;
-    final content = LiturgicalContentService().contentForDate(
-      date,
-      diocese: diocese,
-    );
-    final first = orderedReadingIdsForOption(
-      content.ordo,
-      selection.optionId,
-      docs,
-    );
-    if (first.isEmpty) return docs;
-    final rank = {for (final (i, id) in first.indexed) id: i};
-    final indexed = docs.indexed.toList()
-      ..sort((a, b) {
-        final left = rank[a.$2.id] ?? first.length + a.$1;
-        final right = rank[b.$2.id] ?? first.length + b.$1;
-        return left.compareTo(right);
-      });
-    return [for (final item in indexed) item.$2];
   }
 
   static String currentCycle(DateTime date, {int? dayOfWeek}) {
@@ -333,25 +318,6 @@ class ParsedReadingsService {
       ..._selectLectionaryVariants(fixed, date),
       ..._selectLectionaryVariants(period, date),
     ];
-  }
-
-  List<ParsedReading> _sortForDate(List<ParsedReading> docs, {String? dayId}) {
-    final indexed = docs.indexed.toList();
-    indexed.sort((left, right) {
-      int rank(ParsedReading reading) {
-        if (dayId != null && dayId.isNotEmpty && _isLinked(reading, dayId)) {
-          return 0;
-        }
-        if ((reading.feast ?? '').isNotEmpty) return 1;
-        if ((reading.date ?? '').isNotEmpty) return 2;
-        if ((reading.periodType ?? '').isNotEmpty) return 3;
-        return 4;
-      }
-
-      final source = rank(left.$2).compareTo(rank(right.$2));
-      return source != 0 ? source : left.$1.compareTo(right.$1);
-    });
-    return indexed.map((entry) => entry.$2).toList();
   }
 
   bool _isLinked(ParsedReading reading, String dayId) {

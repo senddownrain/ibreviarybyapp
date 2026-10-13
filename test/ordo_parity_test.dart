@@ -1,5 +1,5 @@
 // Web ↔ Flutter parity of the Ordo engine: the Dart port must give exactly
-// the liturgical day of the web engine on every date 2025–2032 in all four
+// the liturgical day of the web engine on every date 2025–2035 in all four
 // dioceses (fixture: mybrev `npm run ordo:flutter-fixture`, generated from
 // the same snapshot the bundle is built from).
 //
@@ -115,7 +115,7 @@ void main() {
     'notes',
   ];
 
-  test('the Dart Ordo engine equals the web engine, 2025–2032 × 4 dioceses', () {
+  test('the Dart Ordo engine equals the web engine, 2025–2035 × 4 dioceses', () {
     final mismatches = <String, List<String>>{};
     var compared = 0;
     final watch = Stopwatch()..start();

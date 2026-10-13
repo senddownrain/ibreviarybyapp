@@ -100,6 +100,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   String _sundayCycle = 'A';
   String _weekdayCycle = '1';
   int _loadGeneration = 0;
+  String? _optionId;
+  bool _linkDayId = true;
   final ScrollController _scrollController = ScrollController();
   String? _manualCycle;
   // Rebuild the open modal from this reader's state, never a second selection.
@@ -170,8 +172,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       weekdayCycle: result.weekdayCycle,
       // A memorial opens with the weekday readings (engine order first).
       dayId: result.linkDayId ? dayId : null,
+      optionId: result.optionId,
       groupByCelebration: byDate,
     );
+    _optionId = result.optionId;
+    _linkDayId = result.linkDayId;
     _readings = result.readings;
     _groups = selection.groups;
     _activeGroupKey = selection.activeGroupKey;
@@ -338,7 +343,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     readings: _readings,
     sundayCycle: _sundayCycle,
     weekdayCycle: _weekdayCycle,
-    dayId: widget.dayId,
+    dayId: _linkDayId ? widget.dayId : null,
+    optionId: _optionId,
     groupKey: _activeGroupKey,
     manualCycle: _manualCycle,
     requestedSetId: widget.requestedSetId,
@@ -1395,8 +1401,16 @@ ParsedSection _flatSection(MassReadingSection section) => ParsedSection(
   text: section.text,
   chorus: section.chorus,
   altChorus: section.altChorus,
+  altChorusRef: section.altChorusRef,
   verses: section.verses,
   verse: section.verse,
+  acclamation: section.acclamation,
+  conclusion: section.conclusion,
+  rubrics: section.rubrics,
+  alternatives: [for (final item in section.alternatives) _flatSection(item)],
+  form: section.form,
+  year: section.year,
+  passion: section.passion,
 );
 
 /// One set in source order: readings, psalms, acclamation, sequence,
@@ -1447,6 +1461,9 @@ class _MassSetContent extends StatelessWidget {
               style: reader.metadata(base, italic: true),
             ),
           ),
+        if (!set.referenceOnly)
+          for (final line in set.preface)
+            _RubricText(line, textStyle: textStyle, reader: reader),
         if (set.referenceOnly)
           _ReferenceOnlyCitations(
             citations: set.citations(selection.cycle),
@@ -1456,6 +1473,16 @@ class _MassSetContent extends StatelessWidget {
         else ...[
           for (final (index, section) in sections.indexed)
             _section(section, '${set.id}-${section.cycle ?? ''}-$index'),
+          for (final prayer in set.prayers)
+            if ((prayer.text ?? '').isNotEmpty) ...[
+              _SectionLabel(
+                prayer.displayLabel.toUpperCase(),
+                textStyle: textStyle,
+                reader: reader,
+              ),
+              const SizedBox(height: 6),
+              _ReadingText(text: prayer.text!, textStyle: textStyle),
+            ],
           const SizedBox(height: 32),
         ],
       ],
@@ -1608,6 +1635,11 @@ class _AlternativeReading extends StatelessWidget {
                       family: textStyle.fontFamily,
                     ),
                   ),
+                if (_formLabel(section.form) case final form?)
+                  TextSpan(
+                    text: '  ·  $form',
+                    style: reader.metadata(base, italic: true),
+                  ),
               ],
             ),
           ),
@@ -1643,6 +1675,14 @@ class _AlternativeReading extends StatelessWidget {
     );
   }
 }
+
+/// «карацейшая форма» / «даўжэйшая форма» of a reading offered in two
+/// lengths (`form` of the section).
+String? _formLabel(String? form) => switch (form) {
+  'short' => 'карацейшая форма',
+  'long' => 'даўжэйшая форма',
+  _ => null,
+};
 
 /// Sequence: a first-class section (Easter Sunday, Pentecost).
 class _SequenceSection extends StatelessWidget {
@@ -2106,9 +2146,15 @@ class _ReadingSectionState extends State<_ReadingSection> {
 
     final display = bodyText;
     final isGospel = widget.gospel ?? widget.label == 'ЕВАНГЕЛЛЕ';
-    final passion = widget.passion;
+    // A flat (legacy) section carries its own conclusion / rubrics /
+    // alternatives / Passion exactly like a section of a set.
+    final passion = widget.passion ?? s.passion;
+    final rubrics = widget.rubrics.isNotEmpty ? widget.rubrics : s.rubrics;
+    final alternatives = widget.alternatives.isNotEmpty
+        ? widget.alternatives
+        : s.alternatives;
     final hasPassion = passion != null && passion.blocks.isNotEmpty;
-    final structuredConclusion = widget.conclusion;
+    final structuredConclusion = widget.conclusion ?? s.conclusion;
     final hasAcclamation = RegExp(
       r'Гэта\s+слова\s+(Пана|Бога|Божае|Пана\s+Бога)',
       caseSensitive: false,
@@ -2127,6 +2173,15 @@ class _ReadingSectionState extends State<_ReadingSection> {
             s.bible!,
             textStyle: widget.textStyle,
             reader: widget.reader,
+          ),
+        if (_formLabel(s.form) case final form?)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              form,
+              key: const ValueKey('reading-form'),
+              style: widget.reader.metadata(base, italic: true),
+            ),
           ),
         if (s.comment != null)
           Padding(
@@ -2167,7 +2222,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
             onSentenceTap: widget.onSentenceTap,
           ),
         ],
-        for (final rubric in widget.rubrics)
+        for (final rubric in rubrics)
           _RubricText(
             rubric,
             textStyle: widget.textStyle,
@@ -2196,7 +2251,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
             style: widget.textStyle.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
-        for (final (index, alternative) in widget.alternatives.indexed)
+        for (final (index, alternative) in alternatives.indexed)
           _AlternativeReading(
             key: ValueKey('reading-alternative-$index'),
             section: alternative,
@@ -2264,6 +2319,7 @@ class _PsalmSection extends StatelessWidget {
               chorus: psalm.altChorus!,
               textStyle: textStyle,
               alternate: true,
+              reference: psalm.altChorusRef,
             ),
           ],
           if (psalm.text?.isNotEmpty == true) ...[
@@ -2289,6 +2345,7 @@ class _PsalmSection extends StatelessWidget {
               chorus: _cleanChorus(psalm.altChorus!),
               textStyle: textStyle,
               alternate: true,
+              reference: psalm.altChorusRef,
             ),
           for (var i = 0; i < psalm.verses.length; i++) ...[
             Padding(
@@ -2317,6 +2374,7 @@ class _PsalmSection extends StatelessWidget {
                 chorus: psalm.altChorus!,
                 textStyle: textStyle,
                 alternate: true,
+                reference: psalm.altChorusRef,
               )
             else
               _ChorusBox(
@@ -2358,6 +2416,9 @@ class _ChorusBox extends StatelessWidget {
   final bool alternate;
   final bool isFinal;
 
+  /// Citation printed with the refrain («Р.: 9а»).
+  final String? reference;
+
   const _ChorusBox({
     required this.label,
     required this.chorus,
@@ -2365,6 +2426,7 @@ class _ChorusBox extends StatelessWidget {
     this.compact = false,
     this.alternate = false,
     this.isFinal = false,
+    this.reference,
   });
 
   @override
@@ -2390,7 +2452,7 @@ class _ChorusBox extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              label,
+              (reference ?? '').isEmpty ? label : '$label  $reference',
               style: textStyle.copyWith(
                 fontSize: reader.metadata(base).fontSize,
                 height: 1.2,

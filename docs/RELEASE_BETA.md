@@ -94,6 +94,14 @@ cd ~/actions-runner-mybrev && ./svc.sh start
 The service has its own PATH: `runner-smoke.yml` shows what it sees
 (Flutter, Xcode, Java 17, Homebrew Ruby).
 
+**Flutter version.** `pubspec.yaml` requires Flutter `>=3.41.4`, the Android
+job pins `3.41.4` and Codemagic uses `3.41.4`. The Mac that builds iOS needs
+the same Flutter: either upgrade the Flutter on the runner's PATH, or keep a
+second SDK and point the release at it, e.g.
+`FLUTTER=$HOME/.cache/flutter-3.41.4/bin/flutter bundle exec fastlane ios`
+(`fastlane/Fastfile` reads the `FLUTTER` environment variable; default
+`flutter` from PATH). Check with `$FLUTTER --version` before a release.
+
 ## Known local issue
 
 `flutter build appbundle` may end with «failed to strip debug symbols» on this

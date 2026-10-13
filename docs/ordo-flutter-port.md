@@ -43,6 +43,8 @@ assets/content (bundle) ⊕ Hive overlay  →  ContentStore (атомарные 
 
 ## Parity web ↔ Flutter
 
+> Octobre 2026: фікстура Ordo перагенеравана з web `e2deccc` на 2025–2035 (16 068 дзён). Чытанні, змест і дастаўка: `docs/flutter-lectionary-audit.md`, `reports/flutter-lectionary-parity.json`.
+
 Генератор (MyBrev, read-only): `npm run ordo:flutter-fixture -- --snapshot
 backups/firestore-snapshot --out ../ibreviarybyapp/test/fixtures/ordo_parity.json.gz`
 — web-движок, web-сборка Гадзін и web reading references на том же snapshot,

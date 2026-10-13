@@ -284,9 +284,11 @@ void main() {
       );
       await tester.pumpAndSettle();
       await _openOptions(tester);
-      await _scrollTo(
-        tester,
+      // The options sheet is the topmost scrollable.
+      await tester.scrollUntilVisible(
         find.byKey(const ValueKey('readings-mass-set-day')),
+        200,
+        scrollable: find.byType(Scrollable).last,
       );
       expect(_chip(tester, 'day').selected, isTrue);
       for (final id in ['night', 'dawn', 'day']) {

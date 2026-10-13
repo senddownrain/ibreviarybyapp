@@ -128,7 +128,8 @@ void main() {
       includeAlternatives: true,
       dayId: '06-10-sv-bruno',
     )!;
-    expect(docs.first.id, 'ordinary-w27-d3--2');
+    // The weekday readings come first; the screen picks the cycle.
+    expect(docs.first.id, startsWith('ordinary-w27-d3--'));
     final selection = readings.ordoSelection(bruno, dayId: '06-10-sv-bruno');
     expect(selection?.optionId, 'sv-bruno');
     expect(selection?.memorial, isTrue);
@@ -141,7 +142,7 @@ void main() {
       dayId: '06-10-sv-bruno',
     )!;
     expect(result.linkDayId, isFalse);
-    expect(result.readings.first.id, 'ordinary-w27-d3--2');
+    expect(result.readings.first.id, startsWith('ordinary-w27-d3--'));
   });
 
   test('a solemnity opens its own readings', () {

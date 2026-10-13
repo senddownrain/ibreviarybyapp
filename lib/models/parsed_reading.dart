@@ -28,10 +28,33 @@ class ParsedSection {
   // Psalm
   final String? chorus;
   final String? altChorus;
+
+  /// Citation printed with the alternative refrain («Р.: 9а»).
+  final String? altChorusRef;
   final List<String> verses;
 
   // Alleluia
   final String? verse;
+  final String? acclamation;
+
+  /// Closing acclamation: null = the default one, '' = none is said.
+  final String? conclusion;
+
+  /// Rubrics after the text.
+  final List<String> rubrics;
+
+  /// «Або …» second reading of the same slot (a shorter form, another text).
+  final List<ParsedSection> alternatives;
+
+  /// `long` | `short` (an alternative offered in two lengths).
+  final String? form;
+
+  /// Weekday year `1`/`2` the page gave the section to (never filtered:
+  /// weekday years are separate documents).
+  final String? year;
+
+  /// Passion by roles instead of the plain text.
+  final PassionText? passion;
 
   const ParsedSection({
     this.bible,
@@ -40,11 +63,51 @@ class ParsedSection {
     this.text,
     this.chorus,
     this.altChorus,
+    this.altChorusRef,
     this.verses = const [],
     this.verse,
+    this.acclamation,
+    this.conclusion,
+    this.rubrics = const [],
+    this.alternatives = const [],
+    this.form,
+    this.year,
+    this.passion,
   });
 
+  static String? _keep(String? value) {
+    final trimmed = value?.trim() ?? '';
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  /// This flat (legacy) section as the structured section the Readings
+  /// screen renders it as: [kind] `reading` | `psalm` | `acclamation` |
+  /// `sequence` | `gospel`, [role] the flat field name.
+  MassReadingSection toSection(String kind, String role) => MassReadingSection(
+    kind: kind,
+    role: role,
+    year: _keep(year),
+    form: _keep(form),
+    bible: _keep(bible),
+    comment: _keep(comment),
+    title: _keep(title),
+    text: _keep(text),
+    conclusion: conclusion?.trim(),
+    alternatives: [for (final item in alternatives) item.toSection(kind, role)],
+    rubrics: rubrics,
+    chorus: _keep(chorus),
+    altChorus: _keep(altChorus),
+    altChorusRef: _keep(altChorusRef),
+    verses: verses,
+    acclamation: _keep(acclamation),
+    verse: _keep(verse),
+    passion: passion,
+  );
+
   factory ParsedSection.fromMap(Map<String, dynamic> map) {
+    final conclusion = map['conclusion'];
+    final rubrics = map['rubrics'];
+    final alternatives = map['alternatives'];
     return ParsedSection(
       bible: map['bible'] as String?,
       comment: map['comment'] as String?,
@@ -52,8 +115,31 @@ class ParsedSection {
       text: map['text'] as String?,
       chorus: map['chorus'] as String?,
       altChorus: map['altChorus'] as String?,
+      altChorusRef: map['altChorusRef'] as String?,
       verses: _parseVerses(map['verses']),
       verse: map['verse'] as String?,
+      acclamation: map['acclamation'] as String?,
+      conclusion: conclusion is String ? conclusion : null,
+      rubrics: rubrics is List
+          ? [
+              for (final item in rubrics)
+                if ('$item'.trim().isNotEmpty) '$item'.trim(),
+            ]
+          : const [],
+      alternatives: alternatives is List
+          ? [
+              for (final item in alternatives)
+                if (item is Map)
+                  ParsedSection.fromMap(Map<String, dynamic>.from(item)),
+            ]
+          : const [],
+      form: map['form']?.toString(),
+      year: map['year']?.toString(),
+      passion: map['passion'] is Map
+          ? PassionText.fromMap(
+              Map<String, dynamic>.from(map['passion'] as Map),
+            )
+          : null,
     );
   }
 }
@@ -96,6 +182,11 @@ class ParsedReading {
   final int? calendarDayOfWeek;
   final bool hasReadings; // false = commune stub without own readings
 
+  /// The legal Ordo option whose readings lookup named this document (set
+  /// when the readings of a date are ordered by the engine's plan; never
+  /// stored).
+  final String? ordoOptionId;
+
   const ParsedReading({
     required this.id,
     this.year,
@@ -122,7 +213,38 @@ class ParsedReading {
     this.variant,
     this.calendarDayOfWeek,
     this.hasReadings = true,
+    this.ordoOptionId,
   });
+
+  /// This document, remembered as belonging to the legal option [optionId].
+  ParsedReading withOrdoOption(String optionId) => ParsedReading(
+    id: id,
+    year: year,
+    reading: reading,
+    reading1: reading1,
+    reading2: reading2,
+    psalm: psalm,
+    alleluia: alleluia,
+    gospel: gospel,
+    sequence: sequence,
+    massReadings: massReadings,
+    massReadingsRef: massReadingsRef,
+    title: title,
+    periodType: periodType,
+    periodWeekNumber: periodWeekNumber,
+    dayOfWeek: dayOfWeek,
+    date: date,
+    feast: feast,
+    sourceId: sourceId,
+    dayId: dayId,
+    dayIds: dayIds,
+    rank: rank,
+    places: places,
+    variant: variant,
+    calendarDayOfWeek: calendarDayOfWeek,
+    hasReadings: hasReadings,
+    ordoOptionId: optionId,
+  );
 
   /// First reading regardless of field name (reading or reading1).
   ParsedSection? get firstReading => reading ?? reading1;
@@ -238,5 +360,13 @@ class ParsedReading {
     if (s.altChorus != null) 'altChorus': s.altChorus,
     if (s.verses.isNotEmpty) 'verses': s.verses,
     if (s.verse != null) 'verse': s.verse,
+    if (s.altChorusRef != null) 'altChorusRef': s.altChorusRef,
+    if (s.acclamation != null) 'acclamation': s.acclamation,
+    if (s.conclusion != null) 'conclusion': s.conclusion,
+    if (s.rubrics.isNotEmpty) 'rubrics': s.rubrics,
+    if (s.alternatives.isNotEmpty)
+      'alternatives': [for (final item in s.alternatives) _sectionToMap(item)],
+    if (s.form != null) 'form': s.form,
+    if (s.year != null) 'year': s.year,
   };
 }
