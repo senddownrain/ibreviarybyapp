@@ -8,6 +8,8 @@ import argparse
 import json
 import subprocess
 import time
+from PIL import Image
+import io
 
 ROOT=Path(__file__).resolve().parents[1]
 OUTPUT=ROOT/'branding/validation'
@@ -22,6 +24,12 @@ def main():
     def adb(*cmd,**kwargs):
         return subprocess.run([args.adb,'-s',args.device,*cmd],check=True,**kwargs)
     adb('install','-r',str(args.apk),capture_output=True)
+    # Emulator bootstrap may fail to set this when another AVD is running.
+    # Keep this dedicated test display awake; sleeping frames are not evidence.
+    adb('shell','settings','put','system','screen_off_timeout','2147483647')
+    adb('shell','svc','power','stayon','true')
+    adb('shell','input','keyevent','KEYCODE_WAKEUP')
+    adb('shell','wm','dismiss-keyguard')
     # The explicit test device is a read-only AVD clone. No baseline data or
     # snapshot is overwritten; its transient user partition is discarded.
     adb('shell','cmd','connectivity','airplane-mode','enable')
@@ -37,12 +45,17 @@ def main():
             activity='by.mybrev.playtest2026/com.example.mybrev_flutter.MainActivity'
             launch=subprocess.Popen([args.adb,'-s',args.device,'shell','am','start','-n',activity],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             started=time.monotonic()
+            visible_frames=0
             for index,offset in enumerate([.15,.4,.8,1.6,3.5]):
                 time.sleep(max(0,offset-(time.monotonic()-started)))
                 data=adb('exec-out','screencap','-p',capture_output=True).stdout
+                with Image.open(io.BytesIO(data)) as im:
+                    if any(hi>0 for lo,hi in im.convert('RGB').getextrema()):
+                        visible_frames+=1
                 (OUTPUT/f'android-{mode}-{index}.png').write_bytes(data)
             launch.wait(timeout=30)
             recording.wait(timeout=20)
+            assert visible_frames>=3,f'{mode}: display is asleep or frames are invalid'
             adb('pull',f'/sdcard/brand-{mode}.mp4',str(OUTPUT/f'android-{mode}.mp4'),capture_output=True)
             results.append({'theme':mode,'device':args.device,'frames':5,'recording':f'android-{mode}.mp4'})
         adb('shell','am','start','-a','android.settings.APPLICATION_DETAILS_SETTINGS','-d','package:by.mybrev.playtest2026',capture_output=True)

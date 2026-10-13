@@ -1,0 +1,14 @@
+{
+  "device": "isolated emulator-5572",
+  "api": 34,
+  "apkPackage": "by.mybrev.playtest2026",
+  "label": "MyBrev Test",
+  "lightLaunchBackground": "#F2F1EE",
+  "darkLaunchBackground": "#0F110F",
+  "visibleBrandInBothThemes": true,
+  "systemIconAndLabelInspected": true,
+  "noAndroidRuntimeFatalError": true,
+  "iosAssetsCI": "https://github.com/senddownrain/ibreviarybyapp/actions/runs/38296207387",
+  "iosAssetsCIConclusion": "success",
+  "iosFullApplicationBuild": false
+}

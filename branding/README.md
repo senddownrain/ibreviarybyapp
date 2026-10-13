@@ -94,6 +94,23 @@ actool и storyboard через ibtool на macOS. Это проверка ре�
 подписи и публикации в TestFlight; полный запуск на iPhone остаётся частью
 проверки будущей native-сборки.
 
+### Завершённая проверка 13 октября 2026
+
+На отдельном Android API 34 AVD установлена собранная APK. Визуально
+проверены light/dark cold-start кадры: знак целиком, фон `#F2F1EE` и
+`#0F110F`; белого фона в наблюдавшихся dark launch кадрах нет. Системная
+иконка и label `MyBrev Test` проверены на странице App info. AndroidRuntime
+fatal exceptions при этих запусках не обнаружены. Снимки и сводка:
+`validation/android-light-1.png`, `validation/android-dark-1.png`,
+`validation/android-installed-icon.png`, `validation/validation-summary.json`.
+Видео остаются локальными, вне Git. Эти debug-запуски на эмуляторе не служат
+измерением времени старта release-сборки на физическом телефоне.
+
+iOS ресурсы успешно скомпилированы actool и ibtool на macOS:
+[CI run 38296207387](https://github.com/senddownrain/ibreviarybyapp/actions/runs/38296207387).
+Полный результат сохранён в `validation/ios-assets-ci.json`.
+Это подтверждает сборку ресурсов и storyboard, а не полный запуск iOS app.
+
 ## Перед магазинной публикацией
 
 Сверить production app IDs, подпись и существующие карточки магазинов.
