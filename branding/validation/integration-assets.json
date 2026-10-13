@@ -1,0 +1,28 @@
+{
+  "approvedSourceSHA256": "fa8ac6990b67f4a48e5907d00c86aa7306fb44921f079dd5bc92c7bba682a294",
+  "pngExportCount": 38,
+  "appIconCount": 19,
+  "appIconsRGBWithoutAlpha": true,
+  "adaptiveAlphaBBox": [
+    86,
+    86,
+    346,
+    346
+  ],
+  "monochromeCutouts": true,
+  "maskableSafeZone": true,
+  "xmlFilesParsed": [
+    "android/app/src/main/res/drawable/launch_background.xml",
+    "android/app/src/main/res/drawable-v21/launch_background.xml",
+    "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+    "android/app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml",
+    "android/app/src/main/res/values/brand_colors.xml",
+    "android/app/src/main/res/values-night/brand_colors.xml",
+    "android/app/src/main/res/values/styles.xml",
+    "android/app/src/main/res/values-night/styles.xml",
+    "android/app/src/main/res/values-night-v31/styles.xml",
+    "android/app/src/main/res/values-v31/styles.xml"
+  ],
+  "splashMatchesCurrentIbColors": true,
+  "deterministicRegeneration": true
+}

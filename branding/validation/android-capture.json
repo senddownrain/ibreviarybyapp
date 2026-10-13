@@ -1,0 +1,14 @@
+[
+  {
+    "theme": "light",
+    "device": "emulator-5572",
+    "frames": 5,
+    "recording": "android-light.mp4"
+  },
+  {
+    "theme": "dark",
+    "device": "emulator-5572",
+    "frames": 5,
+    "recording": "android-dark.mp4"
+  }
+]
