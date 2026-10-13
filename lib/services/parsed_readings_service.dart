@@ -54,19 +54,14 @@ class ParsedReadingsService {
       }
       final day = OrdoRuntime.engine.resolve(date, diocese: diocese);
       final plan = day.readingsPlan;
-      // A memorial opens with the weekday readings (engine order): its own
-      // readings stay a choice, so its day id links nothing. Likewise an
-      // Office that is not a Mass source of the date.
-      final selection = ordoSelection(date, dayId: dayId, diocese: diocese);
-      final linkId =
-          selection == null || selection.memorial || selection.officeOnly
-          ? ''
-          : (dayId ?? '');
+      // The route's day id never ADDS a document: a document linked to the
+      // Hours day but named by no lookup of a legal option (the seasonal
+      // date document of a Sunday, an obsolete copy) is not a reading of
+      // the day. The selected option is found by its tag instead.
       final ordered = orderReadingsByPlan(
         plan,
-        fetchReadingDocuments(plan, dayId: linkId),
+        fetchReadingDocuments(plan),
         dayOfWeek: day.dayOfWeek,
-        dayId: linkId,
       );
       return ordered.isEmpty ? null : ordered;
     }

@@ -161,7 +161,9 @@ ReadingsLoadResult? loadReadingsForDate({
     sundayCycle: cycle.sunday,
     weekdayCycle: cycle.weekday,
     linkDayId: _linksDayId(selection),
-    optionId: selection == null || selection.memorial
+    // Without a chosen celebration (no day id) the default group applies
+    // (the evening Mass of 24.12 / Holy Thursday / Pentecost Saturday).
+    optionId: selection == null || selection.memorial || (dayId ?? '').isEmpty
         ? null
         : selection.optionId,
   );

@@ -61,6 +61,7 @@ void main() {
       final mismatches = <Map<String, Object?>>[];
       final accepted = <Map<String, Object?>>[];
       final byKind = <String, int>{};
+      var webModeDivergence = 0;
       var dates = 0;
       var options = 0;
       var sections = 0;
@@ -92,6 +93,15 @@ void main() {
             )
             .firstOrNull
             ?.key;
+        final memorialFirst =
+            kind == 'active-group' &&
+            '$web'.startsWith('[') &&
+            RegExp(r'^\[\d\d-\d\d-').hasMatch('$web') &&
+            !'$app'.contains(RegExp(r'\d\d-\d\d-'));
+        if (memorialFirst) {
+          accepted.add({...record, 'reason': 'memorial-weekday-first'});
+          return;
+        }
         if (reason != null) {
           accepted.add({...record, 'reason': reason});
           return;
@@ -235,6 +245,14 @@ void main() {
           }
           dates++;
           final date = DateTime.parse(iso);
+          // The Readings root without a chosen celebration.
+          compare(
+            diocese,
+            iso,
+            '(default)',
+            screens[record['d'] as int],
+            flutterScreenFor(date, diocese, null, useRouteDayId: false),
+          );
           for (final option
               in (record['o'] as List).cast<Map<String, dynamic>>()) {
             options++;
@@ -246,7 +264,14 @@ void main() {
             }
             // The Flutter route carries the Hours day id: compare with the
             // web screen of that route (the option route when there is none).
-            final webScreen = screens[(option['sd'] ?? option['so']) as int];
+            final webScreen = screens[option['so'] as int];
+            // Informational: the web's own two routes disagree (the Hours
+            // day-id link of a Sunday opens the date document).
+            if (option['sd'] != null &&
+                jsonEncode(screens[option['sd'] as int]) !=
+                    jsonEncode(webScreen)) {
+              webModeDivergence++;
+            }
             compare(
               diocese,
               iso,
@@ -266,6 +291,7 @@ void main() {
         'mismatches': mismatches.length,
         'byKind': byKind,
         'documentedDifferences': accepted.length,
+        'webDayIdRouteDiffersFromOptionRoute': webModeDivergence,
       };
       File('${directory.path}/lectionary-parity.json').writeAsStringSync(
         const JsonEncoder.withIndent(

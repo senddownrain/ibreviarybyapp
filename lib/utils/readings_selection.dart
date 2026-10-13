@@ -159,7 +159,10 @@ DefaultReadingsSelection resolveDefaultReadings({
     selected = groups.where((group) => group.key == groupKey).firstOrNull;
   }
   // The celebration chosen in the calendar (mybrev `?option=`): the group
-  // of the readings its lookups named.
+  // of the readings its lookups named. It outranks a link by the Hours day
+  // id: the seasonal date document of a Sunday (`advent-21-12`) is linked
+  // to the Hours day of the Sunday but is not its lectionary (the period
+  // document `advent-w4-d1--A` is).
   final ofOption = optionId == null || optionId.isEmpty
       ? null
       : groups
@@ -169,7 +172,7 @@ DefaultReadingsSelection resolveDefaultReadings({
               ),
             )
             .firstOrNull;
-  selected ??= linked ?? ofOption ?? preferredReadingGroup(groups);
+  selected ??= ofOption ?? linked ?? preferredReadingGroup(groups);
   final documents = selected?.documents ?? visible;
 
   final setDocument = documents
