@@ -93,9 +93,7 @@ class ParsedSection {
     title: _keep(title),
     text: _keep(text),
     conclusion: conclusion?.trim(),
-    alternatives: [
-      for (final item in alternatives) item.toSection(kind, role),
-    ],
+    alternatives: [for (final item in alternatives) item.toSection(kind, role)],
     rubrics: rubrics,
     chorus: _keep(chorus),
     altChorus: _keep(altChorus),
@@ -138,7 +136,9 @@ class ParsedSection {
       form: map['form']?.toString(),
       year: map['year']?.toString(),
       passion: map['passion'] is Map
-          ? PassionText.fromMap(Map<String, dynamic>.from(map['passion'] as Map))
+          ? PassionText.fromMap(
+              Map<String, dynamic>.from(map['passion'] as Map),
+            )
           : null,
     );
   }

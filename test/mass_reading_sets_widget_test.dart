@@ -88,6 +88,8 @@ Future<void> _openOptions(WidgetTester tester) async {
     -400,
     scrollable: find.byType(Scrollable).first,
   );
+  await tester.ensureVisible(action);
+  await tester.pumpAndSettle();
   await tester.tap(action);
   await tester.pumpAndSettle();
   final selector = find.byKey(const Key('readings-mass-set-selector'));
@@ -276,9 +278,11 @@ void main() {
       );
       await tester.pumpAndSettle();
       await _openOptions(tester);
-      await _scrollTo(
-        tester,
+      // The options sheet is the topmost scrollable.
+      await tester.scrollUntilVisible(
         find.byKey(const ValueKey('readings-mass-set-day')),
+        200,
+        scrollable: find.byType(Scrollable).last,
       );
       expect(_chip(tester, 'day').selected, isTrue);
       for (final id in ['night', 'dawn', 'day']) {

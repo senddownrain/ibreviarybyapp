@@ -123,8 +123,10 @@ void main() {
         if (jsonEncode(webKeys) != jsonEncode(appKeys)) {
           // Same documents grouped/ordered differently is its own class.
           final sameDocs =
-              jsonEncode(webGroups.map((g) => g.$2.toList()..sort()).toList()
-                    ..sort((a, b) => a.join().compareTo(b.join()))) ==
+              jsonEncode(
+                webGroups.map((g) => g.$2.toList()..sort()).toList()
+                  ..sort((a, b) => a.join().compareTo(b.join())),
+              ) ==
               jsonEncode(
                 app.groups.map((g) => g.$2.toList()..sort()).toList()
                   ..sort((a, b) => a.join().compareTo(b.join())),
@@ -157,8 +159,7 @@ void main() {
           return;
         }
         final webSets = [
-          for (final s in web['st'] as List)
-            [for (final x in s as List) x],
+          for (final s in web['st'] as List) [for (final x in s as List) x],
         ];
         sets += webSets.length;
         if (jsonEncode(webSets) != jsonEncode(app.sets)) {
@@ -166,14 +167,7 @@ void main() {
           return;
         }
         if (web['as'] != app.activeSet) {
-          miss(
-            diocese,
-            date,
-            option,
-            'active-set',
-            web['as'],
-            app.activeSet,
-          );
+          miss(diocese, date, option, 'active-set', web['as'], app.activeSet);
         }
         if (web['ac'] != app.cycles) {
           miss(diocese, date, option, 'cycles', web['ac'], app.cycles);
@@ -187,12 +181,26 @@ void main() {
         final appView = app.view;
         if (webView == null || appView == null) {
           if ((webView == null) != (appView == null)) {
-            miss(diocese, date, option, 'view', webView?['doc'], appView?.docId);
+            miss(
+              diocese,
+              date,
+              option,
+              'view',
+              webView?['doc'],
+              appView?.docId,
+            );
           }
           return;
         }
         if (webView['doc'] != appView.docId) {
-          miss(diocese, date, option, 'view-document', webView['doc'], appView.docId);
+          miss(
+            diocese,
+            date,
+            option,
+            'view-document',
+            webView['doc'],
+            appView.docId,
+          );
           return;
         }
         final webSections = [
@@ -260,19 +268,15 @@ void main() {
         'documentedDifferences': accepted.length,
       };
       File('${directory.path}/lectionary-parity.json').writeAsStringSync(
-        const JsonEncoder.withIndent('  ').convert({
-          ...report,
-          'examples': mismatches,
-          'accepted': accepted,
-        }),
+        const JsonEncoder.withIndent(
+          '  ',
+        ).convert({...report, 'examples': mismatches, 'accepted': accepted}),
       );
       if (Platform.environment['LECTIONARY_REPORT'] != null) {
         File(Platform.environment['LECTIONARY_REPORT']!).writeAsStringSync(
-          const JsonEncoder.withIndent('  ').convert({
-            ...report,
-            'examples': mismatches,
-            'accepted': accepted,
-          }),
+          const JsonEncoder.withIndent(
+            '  ',
+          ).convert({...report, 'examples': mismatches, 'accepted': accepted}),
         );
       }
       // ignore: avoid_print

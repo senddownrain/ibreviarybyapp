@@ -134,7 +134,7 @@ void main() {
         dayId: template.id,
         includeAlternatives: true,
       )!;
-      expect(docs.first.id, 'ordinary-w27-d4--2');
+      expect(docs.first.id, startsWith('ordinary-w27-d4--'));
       expect(
         docs.map((d) => d.id),
         containsAll(

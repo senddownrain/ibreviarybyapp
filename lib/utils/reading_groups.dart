@@ -127,34 +127,27 @@ String normalizeDayPlaces(Iterable<String> places) {
 }
 
 /// mybrev `normalizeReadingTitle` (without NFKC: the texts are NFC).
-String normalizeReadingTitle(String? value) =>
-    (value ?? '')
-        .toLowerCase()
-        .replaceFirst(
-          RegExp(r'^\d{1,2}\s+[\p{L}.]+\s*[—–-]\s*', unicode: true),
-          '',
-        )
-        .replaceAll(
-          RegExp(r'(?:^|[\s,])год\s+[abcавс](?=\s|,|$)', unicode: true),
-          ' ',
-        )
-        .replaceAll(
-          RegExp(
-            r'(?:^|[\s,])(?:урачыстасць|свята|успамін)(?=[\s,]|$)',
-            unicode: true,
-          ),
-          ' ',
-        )
-        .replaceAll(
-          RegExp(
-            r'юзаф\p{L}*\s+(?:работнік|рамеснік)\p{L}*',
-            unicode: true,
-          ),
-          'юзаф рамеснік',
-        )
-        .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+String normalizeReadingTitle(String? value) => (value ?? '')
+    .toLowerCase()
+    .replaceFirst(RegExp(r'^\d{1,2}\s+[\p{L}.]+\s*[—–-]\s*', unicode: true), '')
+    .replaceAll(
+      RegExp(r'(?:^|[\s,])год\s+[abcавс](?=\s|,|$)', unicode: true),
+      ' ',
+    )
+    .replaceAll(
+      RegExp(
+        r'(?:^|[\s,])(?:урачыстасць|свята|успамін)(?=[\s,]|$)',
+        unicode: true,
+      ),
+      ' ',
+    )
+    .replaceAll(
+      RegExp(r'юзаф\p{L}*\s+(?:работнік|рамеснік)\p{L}*', unicode: true),
+      'юзаф рамеснік',
+    )
+    .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), ' ')
+    .replaceAll(RegExp(r'\s+'), ' ')
+    .trim();
 
 String normalizeReadingCycle(String? value) {
   final cycle = (value ?? '').trim().toUpperCase();

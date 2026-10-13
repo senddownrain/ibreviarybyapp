@@ -54,7 +54,14 @@ class ParsedReadingsService {
       }
       final day = OrdoRuntime.engine.resolve(date, diocese: diocese);
       final plan = day.readingsPlan;
-      final linkId = dayId ?? '';
+      // A memorial opens with the weekday readings (engine order): its own
+      // readings stay a choice, so its day id links nothing. Likewise an
+      // Office that is not a Mass source of the date.
+      final selection = ordoSelection(date, dayId: dayId, diocese: diocese);
+      final linkId =
+          selection == null || selection.memorial || selection.officeOnly
+          ? ''
+          : (dayId ?? '');
       final ordered = orderReadingsByPlan(
         plan,
         fetchReadingDocuments(plan, dayId: linkId),

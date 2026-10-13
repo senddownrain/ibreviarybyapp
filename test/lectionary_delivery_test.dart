@@ -54,8 +54,10 @@ void main() {
 
   group('what ships', () {
     test('the bundle is internally consistent', () {
-      final bundled = (ContentStore.instance.bundleManifest!['collections']
-          as Map)['readings'] as Map;
+      final bundled =
+          (ContentStore.instance.bundleManifest!['collections']
+                  as Map)['readings']
+              as Map;
       expect(readings().length, bundled['count']);
       expect(readings().digest(), bundled['digest']);
       expect(
@@ -63,7 +65,10 @@ void main() {
         isEmpty,
         reason: 'every bundled document hashes to its own hash',
       );
-      expect((delivery['bundle'] as Map)['recomputedDigest'], bundled['digest']);
+      expect(
+        (delivery['bundle'] as Map)['recomputedDigest'],
+        bundled['digest'],
+      );
     });
 
     test('BUNDLE_STALE: the bundle is exactly the documented distance behind '
@@ -104,18 +109,20 @@ void main() {
   });
 
   group('what an installed phone receives', () {
-    test('the check offers a small patch of exactly the stale documents',
-        () async {
-      final remote = ProductionReadingsRemote();
-      final check = await ContentUpdater(remote: remote).check();
-      expect(check.kind, ContentCheckKind.patch);
-      final update = check.plan!.collections.single;
-      expect(update.collection, 'readings');
-      expect(update.download, changed);
-      expect(update.remove, isEmpty);
-      expect(check.plan!.isRebuildSized, isFalse);
-      expect(remote.fetched, isEmpty, reason: 'a check downloads no text');
-    });
+    test(
+      'the check offers a small patch of exactly the stale documents',
+      () async {
+        final remote = ProductionReadingsRemote();
+        final check = await ContentUpdater(remote: remote).check();
+        expect(check.kind, ContentCheckKind.patch);
+        final update = check.plan!.collections.single;
+        expect(update.collection, 'readings');
+        expect(update.download, changed);
+        expect(update.remove, isEmpty);
+        expect(check.plan!.isRebuildSized, isFalse);
+        expect(remote.fetched, isEmpty, reason: 'a check downloads no text');
+      },
+    );
 
     test('applying it makes the effective digest the published one, '
         'atomically, and a second check is current', () async {
@@ -174,8 +181,10 @@ void main() {
         final plan = (await updater.check()).plan!;
         // Stage the same generation the updater would, then stop.
         final staged = <String, Map<String, Map<String, dynamic>?>>{};
-        final docs = await remote.fetchDocuments('readings', plan
-            .collections.single.download);
+        final docs = await remote.fetchDocuments(
+          'readings',
+          plan.collections.single.download,
+        );
         staged['readings'] = readings().planUpdate(
           {for (final id in plan.collections.single.download) id: docs[id]},
           plan.collections.single.hashes,

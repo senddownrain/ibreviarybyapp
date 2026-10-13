@@ -30,6 +30,23 @@ class _Dioceses extends DioceseSelectionNotifier {
   );
 }
 
+/// The «Літургія гадзінаў» section of the Ordo day is collapsed by design:
+/// open it before looking at the Office variants.
+Future<void> expandOfficeSection(WidgetTester tester) async {
+  final tile = find.ancestor(
+    of: find.text('Літургія гадзінаў'),
+    matching: find.byType(ExpansionTile),
+  );
+  if (tile.evaluate().isEmpty) return;
+  await tester.ensureVisible(tile.first);
+  await tester.pump();
+  await tester.tap(
+    find.descendant(of: tile.first, matching: find.byType(ListTile)),
+  );
+  await tester.pump(const Duration(milliseconds: 400));
+  await tester.pump(const Duration(milliseconds: 400));
+}
+
 void main() {
   late Directory directory;
   final font = Platform.environment['ORDO_UX_FONT'];
@@ -351,6 +368,7 @@ void main() {
       (tester) async {
         final date = DateTime(year, 11, 2);
         await frame(tester, date, OrdoScreen(initialDate: date));
+        await expandOfficeSection(tester);
         expect(find.byKey(const Key('ordo-office-split')), findsOneWidget);
         for (final id in ['first', 'second', 'third']) {
           expect(find.byKey(ValueKey('ordo-mass-set-$id')), findsOneWidget);
@@ -729,6 +747,7 @@ void main() {
       find.byKey(const Key('ordo-row-our-lady-rosary-primary')),
       findsOneWidget,
     );
+    await expandOfficeSection(tester);
     expect(find.textContaining('• З дня'), findsOneWidget);
     expect(find.text('• Пра Найсвяцейшую Панну Марыю'), findsOneWidget);
     expect(
