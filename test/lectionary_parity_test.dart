@@ -387,7 +387,7 @@ void main() {
                     {'id': d['id'], 'fields': d['fields']},
               ],
               'note':
-                  'Effective content of an updated phone = bundle + manifest patch = the web dataset digest (lectionary_delivery_test). The bundle is NOT rebuilt: see docs/flutter-lectionary-audit.md.',
+                  'The bundle is the published export (bundle == manifest, readings v7): nothing is stale (lectionary_delivery_test).',
             },
             'compared': report,
             'statuses': statuses,
