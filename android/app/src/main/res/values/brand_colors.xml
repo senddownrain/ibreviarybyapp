@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_launcher_background">#F5F1E8</color>
+    <!-- Matches IbColors.light.page, not the liturgical colour of the day. -->
+    <color name="brand_launch_background">#F2F1EE</color>
+</resources>

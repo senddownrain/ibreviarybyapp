@@ -1,0 +1,157 @@
+{
+  "approved_source_sha256": "fa8ac6990b67f4a48e5907d00c86aa7306fb44921f079dd5bc92c7bba682a294",
+  "files": [
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png",
+      "sha256": "e3d2095dfe0007e59ecba389e6980d1a0fadd8cd12c92b8de169401a893f69c2"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png",
+      "sha256": "4cda564311ce00136b2e90df73ddd492433fed3c162270261d625d599e453ef0"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png",
+      "sha256": "aefeedd03ab31aaef4d12ae1be42f1b1eacb817a2ca227a4547e6de4167596a5"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png",
+      "sha256": "5a8d5c7734590477ef5fe936a76fb6908ac5a7fd545bdc7ba393c5c77d512a14"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png",
+      "sha256": "c3c6fac84a17e6203acf506bf17580ff87f30008c2ede673645fc8f4b343a69f"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png",
+      "sha256": "77e40c4d50b04b4b10bc287fa8c0d9a1789e26ea8267209c703e42c6ba0db2c5"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png",
+      "sha256": "1d8b7cdd8360b7b9ade0f17e7919279c3938cec9dbae03fe6bbb5535ff4b5c3b"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png",
+      "sha256": "1d8b7cdd8360b7b9ade0f17e7919279c3938cec9dbae03fe6bbb5535ff4b5c3b"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png",
+      "sha256": "3f0cf5db240921e80272112f4386b55f289165c92a39c9767e50e9fe3e110659"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png",
+      "sha256": "0cc942c9de8841876fe00e40e8791faa0dc9ffaa8b5ea20b3ef19a3d4fe2d7d4"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png",
+      "sha256": "e3d2095dfe0007e59ecba389e6980d1a0fadd8cd12c92b8de169401a893f69c2"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png",
+      "sha256": "86da9bf6473e7d49b77a26cf2186ee5aea565cb784fbd0e4fdb9cfca3b993cfd"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png",
+      "sha256": "9cb5ce3cfc1984d1252bc28730115dafb3e04bfd0b58fd05b35509a97e6311b4"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png",
+      "sha256": "42e55a58a55e5a293ceb5f4a0add08022fa3e26d6c40126c32c68480d935de36"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png",
+      "sha256": "b1642ab4919bc283c77dcc03e571d6801f97b9be17ed326cc2c3a9350933ebae"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "sha256": "7cc8ebc105b41b007d46723110086fb82990eeab93f2b2d17c9ce9bb08a0cf74"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-mdpi/brand_splash.png",
+      "sha256": "b7abeaa632abfb7825a8ece579f7d159b8c3361a7af4ea0c778eaf12f26a5d29"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "sha256": "bfd9388e6dc78f327943401649c77d6f6a049a2b2b3eeae55672d6f5c37d0e6c"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-hdpi/brand_splash.png",
+      "sha256": "b38a017162b9b984c7e19ff24b917e72d929292eb54db52fe558d17c9f4676a0"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "sha256": "c96060aa93fb579968bb31598afdd9e2015d59369596b1152805615db9f1c157"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-xhdpi/brand_splash.png",
+      "sha256": "5282bd36e0bc3e0a7d0e1a972202dc108d3588f6c5bde5444a389591ef8e9c1b"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "sha256": "4729f792943dd929180fd707a9481b28fa8b735bed933bae9c190455bacb6160"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-xxhdpi/brand_splash.png",
+      "sha256": "c1fdf363e49bd5caa72922f1b93740c7d2bc46780fce39af168b67e1edae6673"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "sha256": "1d834b9550913188b1182027cbb032021bab891cf869e4e31f33b1f230755a51"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-xxxhdpi/brand_splash.png",
+      "sha256": "8181572e207264c9da127a9cd5962c350777011568a4053ecd8435e330db9277"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/ic_launcher_foreground.png",
+      "sha256": "56b00b62013a3e5ed5880ad4698e707481b59ab3f8d4fb148c414e6e603b9efc"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/ic_launcher_monochrome.png",
+      "sha256": "97846623f76a8d44a1fbdcc52ef729e515a8abec1ee346b3a650bb82bdf62caa"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/brand_splash_icon.png",
+      "sha256": "43bb489b0098fc20ba287d68357b5706241e9f8883c34fae9830b391b27cd8bd"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/LaunchImage.imageset/brand-launch@1x.png",
+      "sha256": "f290b7c67aef08869c7a45f1dd423d36d0bc783c2cdb38e42d5ef2a2ab94bb16"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/LaunchImage.imageset/brand-launch@2x.png",
+      "sha256": "0b37c1ce91679fe2936ed90296e6a20314d521d669e1995c9543083dc0e3c98a"
+    },
+    {
+      "path": "ios/Runner/Assets.xcassets/LaunchImage.imageset/brand-launch@3x.png",
+      "sha256": "f04100cd069c94bd8ada6b35d8bc7777bb9ccccb567ce7d59855d38c77104b4b"
+    },
+    {
+      "path": "branding/exports/app-icon-1024.png",
+      "sha256": "b1642ab4919bc283c77dcc03e571d6801f97b9be17ed326cc2c3a9350933ebae"
+    },
+    {
+      "path": "branding/exports/launcher-monochrome.png",
+      "sha256": "d563242b24321c309f1d900b92d9ee9196ffb8b074669bae0460ef4b80783880"
+    },
+    {
+      "path": "web/icons/Icon-192.png",
+      "sha256": "1d834b9550913188b1182027cbb032021bab891cf869e4e31f33b1f230755a51"
+    },
+    {
+      "path": "web/icons/Icon-maskable-192.png",
+      "sha256": "8dfaf7391339f4dbcec7858a8f221d8e004ef2574552133ead194b76e7f0b410"
+    },
+    {
+      "path": "web/icons/Icon-512.png",
+      "sha256": "2e8030656e5d7472a9b67d7ca0c44b2cdc41946a645fe4af40e426faeb504da5"
+    },
+    {
+      "path": "web/icons/Icon-maskable-512.png",
+      "sha256": "7136118835aa1a02d1f8a23dee15e77bebfaa22b03800b6b37068cd6448d40a1"
+    },
+    {
+      "path": "web/favicon.png",
+      "sha256": "2ac3dac1e87bc238ec29a52f6a66b7673ca3b878862add460ee0a5c91ab2a1c1"
+    }
+  ]
+}
