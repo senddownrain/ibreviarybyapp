@@ -9,7 +9,9 @@ import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 
 List<String> _blockTexts(String markdown) => [
-  for (final node in parseFragment(prayerMarkdownToHtml(markdown)).nodes)
+  for (final node in parseFragment(
+    prayerMarkdownToHtml(markdown, recognizeSpeakers: false),
+  ).nodes)
     node is dom.Element ? node.text : '',
 ];
 

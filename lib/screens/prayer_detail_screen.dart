@@ -14,6 +14,8 @@ import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:mybrev_flutter/utils/prayer_link.dart';
+import 'package:mybrev_flutter/utils/prayer_html.dart';
+import 'package:mybrev_flutter/widgets/prayer_content.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -382,10 +384,18 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
       );
     }
 
+    if (!isMass) {
+      return PrayerContent(
+        prayer: prayer.copyWith(body: raw),
+        textStyle: textStyle,
+        onLinkTap: _onLinkTap,
+      );
+    }
+
     final html =
         prayer.isMarkdown || (!raw.contains('<') && raw.contains(':::rubric'))
-        ? prayerMarkdownToHtml(raw)
-        : raw;
+        ? prayerMarkdownToHtml(raw, recognizeSpeakers: false)
+        : sanitizePrayerHtml(raw);
 
     if (html.contains('<') && html.contains('>')) {
       final reader = ReaderTheme.of(context);
@@ -393,7 +403,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
       final major = reader.majorHeading(textStyle.fontSize ?? 16);
       final textColor =
           textStyle.color ?? Theme.of(context).colorScheme.onSurface;
-      final formattedHtml = formatLiturgicalHtml(html);
+      final formattedHtml = sanitizePrayerHtml(formatLiturgicalHtml(html));
       final styles = <String, Style>{
         'a': Style(
           color: Theme.of(context).colorScheme.primary,

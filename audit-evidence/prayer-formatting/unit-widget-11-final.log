@@ -1,0 +1,454 @@
+00:00 +0: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart
+00:00 +0: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: oracle is pinned to the approved web commit
+00:00 +1: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label
+00:01 +2: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label **
+00:01 +3: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label __
+00:01 +4: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label *
+00:01 +5: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label _
+00:01 +6: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label **_
+00:01 +7: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. label _**
+00:01 +8: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. utterance **
+00:01 +9: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. multiline **
+00:02 +10: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. utterance __
+00:02 +11: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. multiline __
+00:02 +12: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. utterance *
+00:02 +13: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. multiline *
+00:02 +14: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. utterance _
+00:02 +15: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. multiline _
+00:02 +16: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. quote
+00:02 +17: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. quote wrapper
+00:02 +18: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. standalone
+00:02 +19: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. isolated
+00:02 +20: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label
+00:02 +21: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label **
+00:02 +22: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label __
+00:02 +23: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label *
+00:02 +24: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label _
+00:02 +25: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label **_
+00:02 +26: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. label _**
+00:02 +27: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. utterance **
+00:02 +28: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. multiline **
+00:02 +29: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. utterance __
+00:02 +30: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. multiline __
+00:02 +31: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. utterance *
+00:02 +32: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. multiline *
+00:02 +33: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. utterance _
+00:02 +34: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. multiline _
+00:02 +35: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. quote
+00:02 +36: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. quote wrapper
+00:02 +37: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. standalone
+00:02 +38: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. isolated
+00:02 +39: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label
+00:02 +40: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label **
+00:02 +41: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label __
+00:02 +42: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label *
+00:02 +43: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label _
+00:02 +44: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label **_
+00:02 +45: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. label _**
+00:02 +46: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. utterance **
+00:02 +47: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. multiline **
+00:02 +48: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. utterance __
+00:02 +49: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. multiline __
+00:02 +50: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. utterance *
+00:02 +51: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. multiline *
+00:02 +52: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. utterance _
+00:02 +53: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. multiline _
+00:02 +54: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. quote
+00:02 +55: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. quote wrapper
+00:02 +56: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. standalone
+00:02 +57: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. isolated
+00:03 +58: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label
+00:03 +59: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label **
+00:03 +60: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label __
+00:03 +61: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label *
+00:03 +62: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label _
+00:03 +63: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label **_
+00:03 +64: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. label _**
+00:03 +65: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. utterance **
+00:03 +66: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. multiline **
+00:03 +67: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. utterance __
+00:03 +68: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. multiline __
+00:03 +69: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. utterance *
+00:03 +70: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. multiline *
+00:03 +71: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. utterance _
+00:03 +72: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. multiline _
+00:03 +73: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. quote
+00:03 +74: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. quote wrapper
+00:03 +75: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. standalone
+00:03 +76: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. isolated
+00:03 +77: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label
+00:03 +78: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label **
+00:03 +79: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label __
+00:03 +80: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label *
+00:03 +81: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label _
+00:03 +82: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label **_
+00:03 +83: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. label _**
+00:03 +84: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. utterance **
+00:03 +85: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. multiline **
+00:03 +86: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. utterance __
+00:03 +87: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. multiline __
+00:03 +88: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. utterance *
+00:03 +89: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. multiline *
+00:03 +90: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. utterance _
+00:03 +91: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. multiline _
+00:03 +92: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. quote
+00:03 +93: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. quote wrapper
+00:03 +94: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. standalone
+00:03 +95: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. isolated
+00:03 +96: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label
+00:03 +97: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label **
+00:03 +98: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label __
+00:03 +99: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label *
+00:03 +100: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label _
+00:03 +101: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label **_
+00:03 +102: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. label _**
+00:03 +103: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. utterance **
+00:03 +104: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. multiline **
+00:03 +105: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. utterance __
+00:03 +106: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. multiline __
+00:03 +107: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. utterance *
+00:03 +108: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. multiline *
+00:03 +109: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. utterance _
+00:03 +110: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. multiline _
+00:03 +111: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. quote
+00:03 +112: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. quote wrapper
+00:03 +113: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. standalone
+00:03 +114: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. isolated
+00:03 +115: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label
+00:03 +116: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label **
+00:03 +117: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label __
+00:03 +118: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label *
+00:03 +119: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label _
+00:03 +120: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label **_
+00:03 +121: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. label _**
+00:03 +122: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. utterance **
+00:03 +123: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. multiline **
+00:03 +124: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. utterance __
+00:03 +125: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. multiline __
+00:03 +126: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. utterance *
+00:03 +127: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. multiline *
+00:03 +128: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. utterance _
+00:03 +129: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. multiline _
+00:04 +130: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. quote
+00:04 +131: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. quote wrapper
+00:04 +132: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. standalone
+00:04 +133: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. isolated
+00:04 +134: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label
+00:04 +135: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label **
+00:04 +136: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label __
+00:04 +137: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label *
+00:04 +138: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label _
+00:04 +139: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label **_
+00:04 +140: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. label _**
+00:04 +141: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. utterance **
+00:04 +142: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. multiline **
+00:04 +143: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. utterance __
+00:04 +144: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. multiline __
+00:04 +145: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. utterance *
+00:04 +146: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. multiline *
+00:04 +147: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. utterance _
+00:04 +148: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. multiline _
+00:04 +149: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. quote
+00:04 +150: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. quote wrapper
+00:04 +151: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. standalone
+00:04 +152: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. isolated
+00:04 +153: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label
+00:04 +154: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label **
+00:04 +155: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label __
+00:04 +156: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label *
+00:04 +157: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label _
+00:04 +158: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label **_
+00:04 +159: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: label _**
+00:04 +160: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: utterance **
+00:04 +161: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: multiline **
+00:04 +162: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: utterance __
+00:04 +163: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: multiline __
+00:04 +164: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: utterance *
+00:04 +165: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: multiline *
+00:04 +166: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: utterance _
+00:04 +167: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: multiline _
+00:04 +168: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: quote
+00:04 +169: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: quote wrapper
+00:04 +170: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: standalone
+00:04 +171: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе: isolated
+00:04 +172: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label
+00:04 +173: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label **
+00:04 +174: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label __
+00:04 +175: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label *
+00:04 +176: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label _
+00:04 +177: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label **_
+00:04 +178: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: label _**
+00:04 +179: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: utterance **
+00:04 +180: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: multiline **
+00:04 +181: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: utterance __
+00:04 +182: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: multiline __
+00:04 +183: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: utterance *
+00:04 +184: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: multiline *
+00:04 +185: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: utterance _
+00:04 +186: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: multiline _
+00:04 +187: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: quote
+00:04 +188: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: quote wrapper
+00:04 +189: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: standalone
+00:04 +190: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант: isolated
+00:04 +191: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. inside colon **
+00:04 +192: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. outside colon **
+00:04 +193: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. inside colon _
+00:04 +194: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. outside colon _
+00:04 +195: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. inside colon **_
+00:04 +196: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: К. outside colon **_
+00:04 +197: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. inside colon **
+00:04 +198: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. outside colon **
+00:04 +199: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. inside colon _
+00:04 +200: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. outside colon _
+00:04 +201: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. inside colon **_
+00:04 +202: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: С. outside colon **_
+00:04 +203: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. inside colon **
+00:04 +204: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. outside colon **
+00:04 +205: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. inside colon _
+00:04 +206: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. outside colon _
+00:04 +207: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. inside colon **_
+00:04 +208: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Н. outside colon **_
+00:04 +209: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. inside colon **
+00:04 +210: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. outside colon **
+00:04 +211: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. inside colon _
+00:04 +212: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. outside colon _
+00:04 +213: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. inside colon **_
+00:04 +214: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Д. outside colon **_
+00:04 +215: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. inside colon **
+00:04 +216: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. outside colon **
+00:04 +217: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. inside colon _
+00:04 +218: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. outside colon _
+00:04 +219: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. inside colon **_
+00:04 +220: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Л. outside colon **_
+00:04 +221: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. inside colon **
+00:04 +222: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. outside colon **
+00:04 +223: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. inside colon _
+00:04 +224: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. outside colon _
+00:04 +225: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. inside colon **_
+00:04 +226: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Ц. outside colon **_
+00:04 +227: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. inside colon **
+00:04 +228: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. outside colon **
+00:04 +229: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. inside colon _
+00:04 +230: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. outside colon _
+00:04 +231: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. inside colon **_
+00:04 +232: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: V. outside colon **_
+00:04 +233: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. inside colon **
+00:04 +234: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. outside colon **
+00:04 +235: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. inside colon _
+00:04 +236: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. outside colon _
+00:04 +237: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. inside colon **_
+00:04 +238: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: R. outside colon **_
+00:04 +239: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе ўстаюць.
+00:04 +240: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Усе ўстаюць.
+00:04 +241: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Усе ўстаюць.
+00:04 +242: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Усе ўстаюць.
+00:04 +243: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе кленчаць.
+00:04 +244: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Усе кленчаць.
+00:04 +245: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Усе кленчаць.
+00:04 +246: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Усе кленчаць.
+00:04 +247: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе садзяцца.
+00:05 +248: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Усе садзяцца.
+00:05 +249: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Усе садзяцца.
+00:05 +250: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Усе садзяцца.
+00:05 +251: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе моляцца ў цішыні.
+00:05 +252: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Усе моляцца ў цішыні.
+00:05 +253: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Усе моляцца ў цішыні.
+00:05 +254: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Усе моляцца ў цішыні.
+00:05 +255: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Святар кажа:
+00:05 +256: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Святар кажа:
+00:05 +257: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Святар кажа:
+00:05 +258: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Святар кажа:
+00:05 +259: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Святар гаворыць:
+00:05 +260: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Святар гаворыць:
+00:05 +261: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Святар гаворыць:
+00:05 +262: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Святар гаворыць:
+00:05 +263: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант кажа:
+00:05 +264: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Цэлебрант кажа:
+00:05 +265: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Цэлебрант кажа:
+00:05 +266: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Цэлебрант кажа:
+00:05 +267: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Цэлебрант гаворыць:
+00:05 +268: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Цэлебрант гаворыць:
+00:05 +269: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Цэлебрант гаворыць:
+00:05 +270: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Цэлебрант гаворыць:
+00:05 +271: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Народ адказвае:
+00:05 +272: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Народ адказвае:
+00:05 +273: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Народ адказвае:
+00:05 +274: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Народ адказвае:
+00:05 +275: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Усе адказваюць:
+00:05 +276: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Усе адказваюць:
+00:05 +277: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Усе адказваюць:
+00:05 +278: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Усе адказваюць:
+00:05 +279: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Кантар спявае:
+00:05 +280: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Кантар спявае:
+00:05 +281: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Кантар спявае:
+00:05 +282: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Кантар спявае:
+00:05 +283: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Дыякан кажа:
+00:05 +284: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Дыякан кажа:
+00:05 +285: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Дыякан кажа:
+00:05 +286: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Дыякан кажа:
+00:05 +287: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: Лектар чытае:
+00:05 +288: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: em Лектар чытае:
+00:05 +289: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: quote Лектар чытае:
+00:05 +290: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: continuation Лектар чытае:
+00:05 +291: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 0
+00:05 +292: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 1
+00:05 +293: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 2
+00:05 +294: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 3
+00:05 +295: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 4
+00:05 +296: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 5
+00:05 +297: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 6
+00:05 +298: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 7
+00:05 +299: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 8
+00:05 +300: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 9
+00:05 +301: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 10
+00:05 +302: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 11
+00:05 +303: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 12
+00:05 +304: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 13
+00:05 +305: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 14
+00:05 +306: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 15
+00:05 +307: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 16
+00:05 +308: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 17
+00:05 +309: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 18
+00:05 +310: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 19
+00:05 +311: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 20
+00:05 +312: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 21
+00:05 +313: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 22
+00:05 +314: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 23
+00:05 +315: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 24
+00:05 +316: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 25
+00:05 +317: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 26
+00:05 +318: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 27
+00:05 +319: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 28
+00:05 +320: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 29
+00:05 +321: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 30
+00:05 +322: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 31
+00:05 +323: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 32
+00:05 +324: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: protected/context 33
+00:05 +325: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape bare-colon
+00:05 +326: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape bold-label
+00:05 +327: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape emphasized-label
+00:05 +328: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape emphasized-utterance
+00:05 +329: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape named-attribution
+00:05 +330: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape roman-section
+00:05 +331: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape imported-quotation
+00:05 +332: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: web corpus shape joined-import
+00:05 +333: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 0
+00:05 +334: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 1
+00:05 +335: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 2
+00:05 +336: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 3
+00:05 +337: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 4
+00:05 +338: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 5
+00:05 +339: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 6
+00:05 +340: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 7
+00:05 +341: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 8
+00:05 +342: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_parity_test.dart: web 1.1: legacy HTML 9
+00:05 +343: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart
+00:07 +343: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: legacy semantic conversion drops executable content and unsafe links
+00:10 +344: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: Mass opt-out includes all 1.1 compatibility projection
+00:10 +345: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.dark legacy=false
+00:12 +346: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.dark legacy=true
+00:13 +347: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.light legacy=false
+00:13 +348: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.light legacy=true
+00:13 +349: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart
+00:15 +349: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: all contract labels, colons, indentation and breaks preserve text
+00:17 +350: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: semantic exclusions protect names and structured content
+00:17 +351: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: links, nested emphasis, reference links, headings and lists use AST
+00:17 +352: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: rubrics and real quotes render structurally without mutating source
+00:17 +353: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: quoted dialogue labels preserve blockquote and source for all roles
+00:17 +354: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: quoted narrative, names, initials, explicit formatting and code stay excluded
+00:17 +355: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: unclosed rubric stays visible, fenced directives remain code
+00:17 +356: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: long multilingual litany retains responses and authored words
+00:18 +357: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: Markdown HTML is escaped and malicious URIs cannot be rendered
+00:18 +358: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: legacy HTML keeps presentation but drops active tags and attributes
+00:18 +359: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: Mass opts out of generic role semantics
+00:18 +360: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_test.dart: unmarked plain text, quotes and emphasis use Markdown; legacy uses HTML
+00:18 +361: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart
+00:21 +361: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: offline smoke harness opens reader, theme, narrow layout and preview
+00:32 +362: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.dark 16.0
+00:34 +363: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.dark 28.8
+00:35 +364: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.light 16.0
+00:37 +365: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.light 28.8
+00:38 +366: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to test-id keeps access checks and back navigation
+00:38 +367: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to missing keeps access checks and back navigation
+00:39 +368: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to restricted keeps access checks and back navigation
+00:40 +369: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_bundle_test.dart
+00:42 +369: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_bundle_test.dart: real bundled short prayer and litany render offline without source changes
+00:45 +370: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_markdown_test.dart
+00:47 +370: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_markdown_test.dart: portable editor links preserve escaped labels and encoded IDs
+00:48 +371: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_markdown_test.dart: only relative prayer reader links resolve internally
+00:48 +372: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_markdown_test.dart: prayer Markdown renders the formatting offered by the editor
+00:49 +373: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart
+00:52 +373: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: five canonical Belarusian majors in every language, before and after
+00:53 +374: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: block types, roles and labels match MyBrev, before and after
+00:54 +375: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: old cached and V4.1 Latin service text have the same semantics
+00:54 +376: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: the migration changes no wording in the rendered blocks
+00:54 +377: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: the reader pipeline (liturgical formatting) gives the same blocks
+00:55 +378: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: dialogue roles and labels mean the same in all three languages
+00:55 +379: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: speaker prefixes are metadata; labels come from roleLabels
+00:55 +380: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: labels stay off long prayers, hymns and rubric-led lines
+00:55 +381: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: the label policy is ritual metadata
+00:55 +382: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: a rubric split around a quoted phrase is one rubric
+00:55 +383: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: Latin: a bare prefix gives its role to the line after the rubric
+00:55 +384: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: English: bold people parts, comments, posture and alternatives
+00:56 +385: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: words that merely start with a role letter are not prefixes
+00:56 +386: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: chunks start at every located section
+00:56 +387: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_semantics_test.dart: markdown bold may span the lines of one paragraph
+00:57 +388: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart
+00:59 +388: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: Dart ritual data matches the shared JSON asset
+00:59 +389: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: exactly five canonical major sections with Belarusian names
+00:59 +390: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: former eucharist section id stays resolvable
+00:59 +391: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: a missing subsection lands on the nearest preceding sibling
+00:59 +392: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: markers ending with an ellipsis match as a prefix
+00:59 +393: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: existing Belarusian and Latin prayers are reused as variants
+00:59 +394: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: language resolves from link, then stored choice, then default
+00:59 +395: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: English asset exposes every configured section in order
+00:59 +396: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: Latin rubric markers become sections
+00:59 +397: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: section target falls back to parent and neighbours
+00:59 +398: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: active section never oscillates around the reading line
+00:59 +399: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_ritual_test.dart: markdown horizontal rules separate alternative forms
+01:00 +400: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart
+01:16 +400: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: Holy Mass opens in Belarusian with the section bar
+01:21 +401: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: Mass top actions are language and text scale, no favorite
+01:30 +402: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: a favorited Mass keeps its state without a top control
+01:31 +403: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: section bar shows every full section name within two lines
+01:34 +404: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: sections sheet lists the five Belarusian sections and jumps
+01:35 +405: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: scrolling updates the current section
+01:36 +406: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: switching language keeps the semantic section
+01:38 +407: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: missing section falls back to its parent
+01:40 +408: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: legacy Latin prayer id opens the Mass reader in Latin
+01:40 +409: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: controls fit a narrow phone with large text
+01:41 +410: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: English works offline from the bundled asset
+01:41 +411: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: system back closes the sections sheet before the reader
+01:42 +412: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: section bar uses the TargetPlatform.android chrome surface
+01:42 +413: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: section bar uses the TargetPlatform.iOS chrome surface
+01:42 +414: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: ordinary prayers keep the regular reader
+01:43 +415: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: Mass variant ids open the dedicated Mass reader route
+01:43 +416: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/mass_reader_test.dart: app dock is hidden in the Mass reader and restored on leave
+01:44 +417: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart
+01:47 +417: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+01:51 +418: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+01:52 +419: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: My Prayers add button stays above the app dock
+01:53 +420: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: category grouping uses tags and explicit persisted membership
+01:53 +421: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: root order is Favorites, Holy Mass, Categories, All Prayers
+01:53 +422: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+01:54 +423: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: empty favorites is compact and categories remain visible
+01:54 +424: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: missing Holy Mass stays recognizable
+01:55 +425: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: favorite toggle is shared by catalog and root providers
+01:55 +426: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: All Prayers contains built-in and user prayers
+01:55 +427: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer catalog owns the contextual bottom slot
+01:56 +428: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+01:56 +429: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: search focuses, filters title/body, and keeps query state
+01:57 +430: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: All Prayers re-entry keeps query and results synchronized
+01:57 +431: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: category page includes tag and explicit members
+01:57 +432: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: category management hides and shows defaults
+01:57 +433: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: user category can be created, renamed, and deleted
+01:59 +434: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: category editor supports quick tags and searchable prayers
+02:00 +435: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayer Detail uses shared reader and only local has edit
+02:02 +436: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer reader shows scroll-to-top only outside fullscreen
+02:02 +437: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: Holy Mass exposes section navigation without sharing
+02:03 +438: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: built-in prayer cannot be opened as a destructive edit
+02:03 +439: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer keeps editable form and detail edit action
+02:03 +440: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer editor formats text and shows preview
+02:04 +441: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayerbook remains usable at 200 percent system text
+02:04 +442: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayerbook title clears top search at narrow and wide sizes
+02:06 +443: All tests passed!
