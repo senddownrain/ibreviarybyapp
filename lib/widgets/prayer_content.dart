@@ -3,8 +3,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
-import 'package:mybrev_flutter/utils/liturgical_html.dart';
-import 'package:mybrev_flutter/utils/prayer_html.dart';
+import 'package:mybrev_flutter/utils/prayer_legacy_html.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 
 /// One document surface for ordinary prayer reading and local editor preview.
@@ -24,9 +23,7 @@ class PrayerContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
-        : sanitizePrayerHtml(
-            formatLiturgicalHtml(sanitizePrayerHtml(prayer.displayText)),
-          );
+        : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
     return SelectionArea(
       child: Html(
         data: html,
@@ -98,10 +95,7 @@ Map<String, Style> prayerDocumentStyles(BuildContext context, TextStyle body) {
       body: body,
       margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
     ),
-    '.prayer-rubric em': Style(
-      color: reader.rubric,
-      fontStyle: FontStyle.normal,
-    ),
+    '.prayer-rubric em': Style(color: reader.rubric),
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
     '.liturgical-rubric-inline': Style(color: reader.rubric),
   };

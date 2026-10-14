@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-14",
+  "contract": "MyBrev interpretation 1.1",
+  "webCommit": "0fcce378d6dd4b6f3d67a35fb45e44f49c5da4af",
+  "command": "flutter run -d chrome -t tool/prayer_formatting_smoke.dart --web-port 5237",
+  "appUrl": "http://localhost:5237/",
+  "chromeVersion": "155.0.8059.40",
+  "wide": "Flutter-launched Chrome attached through Playwright CDP",
+  "narrow": "Separate headed Google Chrome controlled by Playwright, same Flutter server, fixed viewport 320x1000 / DPR 1",
+  "fontScales": [1, 1.8],
+  "allScreenshotsObtainedAndReviewed": true,
+  "consoleErrors": [],
+  "firestoreWrites": 0,
+  "nativeSmoke": "Not run: shared UI/parser, required before native release",
+  "recovery": "Initial CDP viewport/capture was unstable; empty or clipped diagnostic frames excluded/replaced. No repeated Flutter launches; controlled Chrome used for narrow validation.",
+  "screenshots": [
+    {
+      "file": "chrome-11-light-wide-labels.png",
+      "bytes": 120321,
+      "width": 1554,
+      "height": 837,
+      "sha256": "fc2797d318d594fa8a023639aff52802718210c698079c3ac828784dd7d5740d",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-dark-wide-labels.png",
+      "bytes": 130886,
+      "width": 1554,
+      "height": 837,
+      "sha256": "f6177b91dfa2403599b299955cd4d7e93e6a6238004e6b050f9290e8556c846a",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-light-320-labels.png",
+      "bytes": 80658,
+      "width": 320,
+      "height": 1000,
+      "sha256": "3d466815e4ca9ab9890c501ee58a8529420fb0c3dcfa1585c3bf39a4f804cba2",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-dark-320-labels.png",
+      "bytes": 84930,
+      "width": 320,
+      "height": 1000,
+      "sha256": "3472e9c015820adb9bc69647f40b98edbb8fb588dcae590b3165f005bd88c343",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-font-180-control.png",
+      "bytes": 77367,
+      "width": 320,
+      "height": 1000,
+      "sha256": "783dc28355951b27b70150132361d98f1a62ccc442255ce8c6638fdf2d310f1e",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-dark-320-180-labels.png",
+      "bytes": 83241,
+      "width": 320,
+      "height": 1000,
+      "sha256": "66f0c7c3e1bc3a0cf3cccbaa01f07189cc1ce63e9a53575ca2e6261746adae13",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-dark-320-180-dialogue.png",
+      "bytes": 73152,
+      "width": 320,
+      "height": 1000,
+      "sha256": "547d41a85069cc3bf8a96679754b22f8e282bd0ed17b532ce45a90c94c38bb6a",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-dark-320-180-quotes.png",
+      "bytes": 71960,
+      "width": 320,
+      "height": 1000,
+      "sha256": "9cdcfa2b5d4c247694611ca5f3cbfb1482ef843677a6f86afeaba240132921e6",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-light-320-180-quotes.png",
+      "bytes": 73931,
+      "width": 320,
+      "height": 1000,
+      "sha256": "3c2153d5e585a20b64f77eb92919bf8bf56cf58f757dd172babf7a1cbb67d613",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-local-editor-320.png",
+      "bytes": 57302,
+      "width": 320,
+      "height": 1000,
+      "sha256": "9b52b60cc10069559b5cca2ebc68b4a6b99f853c4c7844a4aba17d1fbbe9e076",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-local-preview-light-320-180.png",
+      "bytes": 71659,
+      "width": 320,
+      "height": 1000,
+      "sha256": "21eb3676a82a45b77d57be9e5dd328da117373c21f7ca2e9f17bc334f54070ad",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-local-preview-light-quotes.png",
+      "bytes": 73331,
+      "width": 320,
+      "height": 1000,
+      "sha256": "7a14ec56934cc7e3a1e59e00aa7839d36ebf4bb645d243e12b7b15168b1326f7",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-local-preview-dark-quotes.png",
+      "bytes": 71949,
+      "width": 320,
+      "height": 1000,
+      "sha256": "980350a792e64d0128faf6f2e3a8001b4c39f2c38a85cc0f9d9974f6a51228bb",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-legacy-dark-320-180.png",
+      "bytes": 70080,
+      "width": 320,
+      "height": 1000,
+      "sha256": "355273c00c27f07f3e37568788fb1ca54a571a16198f612c6259d717c1c771db",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-legacy-link-target-320-180.png",
+      "bytes": 33632,
+      "width": 320,
+      "height": 1000,
+      "sha256": "c290b4413875d8ecfbe5038bfc2d27b4f7f8e047509ab29b9fdd85cf3b4983d0",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-real-short-dark-320-180.png",
+      "bytes": 90979,
+      "width": 320,
+      "height": 1000,
+      "sha256": "c245f6d36b3a0702aadef66615d13dd722c0a43318a089a180a703ac7fa522cd",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-real-short-light-320-180.png",
+      "bytes": 88525,
+      "width": 320,
+      "height": 1000,
+      "sha256": "1a9410022dbea4670c4daaa8cb5bf0c97e8d31a6307c630f16c57493be6ff6dc",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-real-litany-light-320-180.png",
+      "bytes": 86276,
+      "width": 320,
+      "height": 1000,
+      "sha256": "bdedf98d41139d7cb212257338a1afcbf02d49d2782d641ccf446b0fcd24dbe4",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-real-litany-middle-320-180.png",
+      "bytes": 81958,
+      "width": 320,
+      "height": 1000,
+      "sha256": "fc1ed0c8c32f3b801a7ce0230ef4366d79f53006f783e63c7a2a265827513a99",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-real-litany-end-320-180.png",
+      "bytes": 88456,
+      "width": 320,
+      "height": 1000,
+      "sha256": "d48e26dcb613d2778fe84efe278c6803cd5622191ab912a4ecfbbd96e2b0483b",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "chrome-11-real-litany-dark-end-320-180.png",
+      "bytes": 85996,
+      "width": 320,
+      "height": 1000,
+      "sha256": "4f33f3321d4cb0cc04d21d24d9a10b44dcd6d9ac355326838785034746577127",
+      "visuallyReviewed": true
+    }
+  ]
+}

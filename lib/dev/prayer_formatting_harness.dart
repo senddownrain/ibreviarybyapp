@@ -34,6 +34,48 @@ const formattingSource = '''К. Пане, адкрый вусны мае.
 ## Літанія
 ''';
 
+const parity11Source = '''## MyBrev 1.1
+
+**С.** Пан з вамі.
+**Н.:** І з духам тваім.
+_К._ Пане, пачуй нас.
+**_Д._**: Пане, пачуй нас.
+
+**С.: Словы тлустай рэплікі.**
+_Н.: Словы курсіўнага адказу._
+
+**С.: Першы радок,
+другі радок.**
+
+К.
+Пане, пачуй нас.
+Н.
+Амэн.
+
+**Усе:** Амэн.
+Цэлебрант: Пан з вамі.
+
+_Усе ўстаюць._
+
+Святар кажа:
+
+_Молімся._ _Вітай, Марыя…_
+
+> Н. І з духам тваім.
+> **Н.** Аўтарская тлустая метка.
+> Усе: Без аўтаматычнай ролі.
+
+**С. Імя:** _Словы апавядання._
+
+[Іншая малітва](/prayer/test-id)
+''';
+const parity11Prayer = Prayer(
+  id: 'local_parity11',
+  title: 'MyBrev 1.1 · кантроль',
+  body: parity11Source,
+  textFormat: 'mybrev-markdown',
+  isLocal: true,
+);
 final formattingPrayer = Prayer(
   id: 'local_formatting',
   title: 'Фарматаванне малітваў',
@@ -58,7 +100,9 @@ const legacyPrayer = Prayer(
   title: 'Спадчынны HTML',
   body:
       '<p><span style="color:red">Усе ўстаюць.</span></p><p><b>Молімся.</b><br>Пан з вамі.</p>'
-      '<blockquote>Сапраўдная цытата.</blockquote><p><a href="/prayer/test-id">Іншая малітва</a></p>'
+      '<p><strong>С.:</strong> Пан з вамі.<br><em>Н.: І з духам тваім.</em></p>'
+      '<p class="rubric">Усе ўстаюць.</p><p><em>Молімся.</em></p>'
+      '<blockquote>Н. І з духам тваім.</blockquote><p><a href="/prayer/test-id">Іншая малітва</a></p>'
       '<script>SECRET_SCRIPT</script><a href="javascript:evil()">Бяспечны тэкст</a>',
 );
 
@@ -85,7 +129,7 @@ class FormattingSettings extends SettingsNotifier {
 class FormattingLocals extends LocalPrayersNotifier {
   int _sequence = 0;
   @override
-  List<Prayer> build() => [formattingPrayer];
+  List<Prayer> build() => [formattingPrayer, parity11Prayer];
   @override
   Future<Prayer> create({
     required String title,
@@ -143,8 +187,10 @@ class _HarnessState extends State<PrayerFormattingHarness> {
           ),
           GoRoute(
             path: '/edit',
-            builder: (_, _) =>
-                const PrayerFormScreen(prayerId: 'local_formatting'),
+            builder: (_, state) => PrayerFormScreen(
+              prayerId:
+                  state.uri.queryParameters['prayerId'] ?? 'local_formatting',
+            ),
           ),
         ],
       ),
@@ -205,7 +251,13 @@ class _HarnessState extends State<PrayerFormattingHarness> {
           ),
           IconButton(
             tooltip: 'Preview',
-            onPressed: () => router.push('/edit'),
+            onPressed: () => router.push(
+              router.routeInformationProvider.value.uri.path.endsWith(
+                    '/local_parity11',
+                  )
+                  ? '/edit?prayerId=local_parity11'
+                  : '/edit',
+            ),
             icon: const Icon(Icons.edit),
           ),
           IconButton(
@@ -222,7 +274,7 @@ class _HarnessState extends State<PrayerFormattingHarness> {
               hint: const Text('Bundled public prayer'),
               isExpanded: true,
               items: [
-                for (final prayer in widget.realPrayers)
+                for (final prayer in [parity11Prayer, ...widget.realPrayers])
                   DropdownMenuItem(
                     value: prayer.id,
                     child: Text(

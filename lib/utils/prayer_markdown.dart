@@ -1,5 +1,6 @@
 import 'package:markdown/markdown.dart' as md;
 import 'package:mybrev_flutter/utils/prayer_html.dart';
+import 'package:mybrev_flutter/utils/prayer_legacy.dart';
 
 const prayerSpeakers = {
   'К.': 'cantor',
@@ -11,14 +12,10 @@ const prayerSpeakers = {
   'V.': 'versicle',
   'R.': 'response',
 };
-final _speaker = RegExp(r'^( {0,3})([КСНДЛЦVR]\.)(:)?(?=[ \t]+\S)');
-final _initial = RegExp(r'^\p{Lu}\.', unicode: true);
-final _name = RegExp(r'^\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+)*$', unicode: true);
 
-/// CommonMark with physical line breaks, rubrics and the approved quote-speaker
-/// amendment to contract 1.0. Quoted paragraphs keep their blockquote container;
-/// roles use the same conservative prefix rules as unquoted paragraphs. Mass
-/// opts out because its role metadata is language/context dependent.
+/// CommonMark prayer reader, MyBrev interpretation contract 1.1. All legacy
+/// projection is in memory. Quotes admit only bare abbreviated labels; Mass
+/// opts out of the generic compatibility rules entirely.
 String prayerMarkdownToHtml(String source, {bool recognizeSpeakers = true}) {
   if (source.trim().isEmpty) return '';
   final document = md.Document(
@@ -60,68 +57,101 @@ void _parseInlines(
   required bool recognizeSpeakers,
   bool paragraph = false,
   bool excluded = false,
+  bool quoted = false,
 }) {
   for (var i = 0; i < nodes.length; i++) {
     final node = nodes[i];
     if (node is md.UnparsedContent) {
-      final inlines = document.parseInline(node.textContent);
+      var source = node.textContent;
+      Map<int, String>? labels;
+      if (recognizeSpeakers && paragraph && !excluded && !quoted) {
+        final projection = projectPrayerParagraph(source, document);
+        source = projection.source;
+        labels = projection.labels;
+      }
+      final inlines = document.parseInline(source);
       if (recognizeSpeakers && paragraph && !excluded) {
-        _markSpeakers(inlines, node.textContent.split('\n'));
+        _markSpeakers(inlines, source.split('\n'), labels: labels);
       }
       nodes.replaceRange(i, i + 1, inlines);
       i += inlines.length - 1;
     } else if (node is md.Element && node.children != null) {
+      if (recognizeSpeakers &&
+          !excluded &&
+          !quoted &&
+          node.tag == 'p' &&
+          node.children!.length == 1 &&
+          node.children!.first is md.UnparsedContent) {
+        final source = node.children!.first.textContent;
+        if (!source.contains('\n') &&
+            prayerDirections.contains(
+              prayerInlineText(document.parseInline(source)).trim(),
+            )) {
+          nodes[i] = md.Element('aside', [node])
+            ..attributes['class'] = 'prayer-rubric';
+          _parseInlines(node.children!, document, recognizeSpeakers: false);
+          continue;
+        }
+      }
       _parseInlines(
         node.children!,
         document,
         recognizeSpeakers: recognizeSpeakers,
         paragraph: node.tag == 'p',
         excluded: excluded || {'aside', 'li', 'pre', 'code'}.contains(node.tag),
+        quoted: quoted || node.tag == 'blockquote',
       );
     }
   }
 }
 
-void _markSpeakers(List<md.Node> nodes, List<String> lines) {
+void _markSpeakers(
+  List<md.Node> nodes,
+  List<String> lines, {
+  Map<int, String>? labels,
+}) {
   var line = 0;
   var start = true;
-  for (var i = 0; i < nodes.length; i++) {
-    final node = nodes[i];
-    if (start && node is md.Text && line < lines.length) {
-      final prefix = _speaker.firstMatch(lines[line]);
-      if (prefix != null) {
-        final rest = lines[line].substring(prefix.end).trim();
-        if (!_initial.hasMatch(rest) && !_name.hasMatch(rest)) {
-          final indent = prefix.group(1)!;
-          final label = '${prefix.group(2)}${prefix.group(3) ?? ''}';
+  // Match the web's flat inline token stream. Opening/closing emphasis disables
+  // a prefix at that position, but a physical break inside emphasis starts a
+  // new reply. Author formatting remains on the words surrounding the label.
+  void visit(List<md.Node> children) {
+    for (var i = 0; i < children.length; i++) {
+      final node = children[i];
+      if (start && node is md.Text && line < lines.length) {
+        final label = labels != null ? labels[line] : prayerPrefix(lines[line]);
+        if (label != null &&
+            (labels != null || RegExp(r'^[КСНДЛЦVR]\.').hasMatch(label))) {
+          final indent = RegExp(r'^ {0,3}').firstMatch(lines[line])![0]!;
           if (node.text.startsWith('$indent$label')) {
             final span = md.Element.text('span', label)
               ..attributes['class'] = 'prayer-speaker'
-              ..attributes['data-role'] = prayerSpeakers[prefix.group(2)]!;
+              ..attributes['data-role'] =
+                  prayerRoles[label.replaceFirst(RegExp(r'\.:$'), '.')]!;
             final replacement = <md.Node>[
               if (indent.isNotEmpty) md.Text(indent),
               span,
               md.Text(node.text.substring(indent.length + label.length)),
             ];
-            nodes.replaceRange(i, i + 1, replacement);
+            children.replaceRange(i, i + 1, replacement);
             i += replacement.length - 1;
           }
         }
       }
+      if (node is md.Element && node.tag == 'br') {
+        line++;
+        start = true;
+      } else {
+        start = false;
+        if (node is md.Element && {'em', 'strong', 'a'}.contains(node.tag)) {
+          visit(node.children ?? []);
+          start = false;
+        }
+      }
     }
-    line += _breakCount(node);
-    start = node is md.Element && node.tag == 'br';
   }
-}
 
-int _breakCount(md.Node node) {
-  if (node is md.Text) return '\n'.allMatches(node.text).length;
-  if (node is md.Element) {
-    if (node.tag == 'br') return 1;
-    return node.children?.fold<int>(0, (n, child) => n + _breakCount(child)) ??
-        0;
-  }
-  return 0;
+  visit(nodes);
 }
 
 class _ReadingBreakSyntax extends md.InlineSyntax {

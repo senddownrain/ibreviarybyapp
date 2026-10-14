@@ -24,43 +24,37 @@ void main() {
     }
   });
 
-  test(
-    'semantic exclusions include explicit formatting and physical lines',
-    () {
-      final source = [
-        'С. Я. Купала',
-        'К. Купала',
-        'С. Купала Янка',
-        'Тэкст: Н. І з духам тваім.',
-        'Народ моліцца.',
-        'C. Пан з вамі.',
-        'K. Пан з вамі.',
-        'H. І з духам тваім.',
-        'N. Name',
-        'P. Dominus vobiscum.',
-        'с. пан з вамі.',
-        '[С. Пан з вамі.](/prayer/id)',
-        '`Н. І з духам тваім.`',
-        '# С. Пан з вамі.',
-        '**С.** Пан з вамі.',
-        '**С. Пан з вамі.**',
-        '**Тэкст\nН. І з духам тваім.**',
-        ':::rubric\nС. Пан з вамі.\n:::',
-        '```md\nК. Пане, пачуй нас.\n```',
-        '    Н. І з духам тваім.',
-        '- Н. І з духам тваім.',
-        r'\С. Пан з вамі.',
-        'С. ',
-        'С.Пан з вамі.',
-      ].join('\n\n');
-      expect(
-        parseFragment(
-          prayerMarkdownToHtml(source),
-        ).querySelectorAll('.prayer-speaker'),
-        isEmpty,
-      );
-    },
-  );
+  test('semantic exclusions protect names and structured content', () {
+    final source = [
+      'С. Я. Купала',
+      'К. Купала',
+      'С. Купала Янка',
+      'Тэкст: Н. І з духам тваім.',
+      'Народ моліцца.',
+      'C. Пан з вамі.',
+      'K. Пан з вамі.',
+      'H. І з духам тваім.',
+      'N. Name',
+      'P. Dominus vobiscum.',
+      'с. пан з вамі.',
+      '[С. Пан з вамі.](/prayer/id)',
+      '`Н. І з духам тваім.`',
+      '# С. Пан з вамі.',
+      ':::rubric\nС. Пан з вамі.\n:::',
+      '```md\nК. Пане, пачуй нас.\n```',
+      '    Н. І з духам тваім.',
+      '- Н. І з духам тваім.',
+      r'\С. Пан з вамі.',
+      'С. ',
+      'С.Пан з вамі.',
+    ].join('\n\n');
+    expect(
+      parseFragment(
+        prayerMarkdownToHtml(source),
+      ).querySelectorAll('.prayer-speaker'),
+      isEmpty,
+    );
+  });
 
   test(
     'links, nested emphasis, reference links, headings and lists use AST',

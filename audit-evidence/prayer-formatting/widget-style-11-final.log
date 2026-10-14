@@ -1,0 +1,17 @@
+00:00 +0: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart
+00:00 +0: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: legacy semantic conversion drops executable content and unsafe links
+00:07 +1: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: Mass opt-out includes all 1.1 compatibility projection
+00:07 +2: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.dark legacy=false
+00:10 +3: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.dark legacy=true
+00:10 +4: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.light legacy=false
+00:11 +5: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_11_safety_widget_test.dart: 1.1 words and labels keep independent styles at Brightness.light legacy=true
+00:11 +6: loading C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart
+00:15 +6: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: offline smoke harness opens reader, theme, narrow layout and preview
+00:28 +7: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.dark 16.0
+00:29 +8: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.dark 28.8
+00:30 +9: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.light 16.0
+00:30 +10: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.light 28.8
+00:31 +11: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to test-id keeps access checks and back navigation
+00:32 +12: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to missing keeps access checks and back navigation
+00:32 +13: C:/Users/User/.codex/worktrees/prayer-formatting/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to restricted keeps access checks and back navigation
+00:33 +14: All tests passed!
