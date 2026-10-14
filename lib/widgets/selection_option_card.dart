@@ -11,6 +11,7 @@ class SelectionOptionCard extends StatelessWidget {
     this.subtitle,
     this.leading,
     this.accentColor,
+    this.compact = false,
   });
 
   final String title;
@@ -19,6 +20,7 @@ class SelectionOptionCard extends StatelessWidget {
   final VoidCallback onTap;
   final Widget? leading;
   final Color? accentColor;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class SelectionOptionCard extends StatelessWidget {
       ),
       colors.surfaceContainerHigh,
     );
-    final radius = BorderRadius.circular(18);
+    final radius = BorderRadius.circular(12);
 
     return Semantics(
       button: true,
@@ -52,7 +54,7 @@ class SelectionOptionCard extends StatelessWidget {
             color: selected
                 ? accent.withValues(alpha: 0.72)
                 : colors.outlineVariant,
-            width: selected ? 1.5 : 1,
+            width: 1,
           ),
         ),
         child: Material(
@@ -63,59 +65,87 @@ class SelectionOptionCard extends StatelessWidget {
             onTap: onTap,
             borderRadius: radius,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  if (leading != null) ...[
-                    IconTheme(
-                      data: IconThemeData(
-                        color: selected ? accent : colors.onSurfaceVariant,
-                        size: 22,
-                      ),
-                      child: leading!,
-                    ),
-                    const SizedBox(width: 14),
-                  ],
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              padding: EdgeInsets.symmetric(
+                horizontal: compact ? 4 : 16,
+                vertical: 10,
+              ),
+              child: compact
+                  ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colors.onSurface,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: selected
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                           ),
                         ),
-                        if (subtitle case final subtitle?) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            subtitle,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
+                        const SizedBox(height: 6),
+                        Icon(
+                          selected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_unchecked,
+                          size: 20,
+                          color: selected ? colors.primary : colors.outline,
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        if (leading != null) ...[
+                          IconTheme(
+                            data: IconThemeData(
+                              color: selected
+                                  ? accent
+                                  : colors.onSurfaceVariant,
+                              size: 22,
                             ),
+                            child: leading!,
                           ),
+                          const SizedBox(width: 14),
                         ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                title,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: colors.onSurface,
+                                  fontWeight: selected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                              if (subtitle case final subtitle?) ...[
+                                const SizedBox(height: 3),
+                                Text(
+                                  subtitle,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 160),
+                          child: Icon(
+                            selected
+                                ? Icons.check_circle_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                            key: ValueKey(selected),
+                            color: selected ? accent : colors.outline,
+                            size: 24,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 160),
-                    child: Icon(
-                      selected
-                          ? Icons.check_circle_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      key: ValueKey(selected),
-                      color: selected ? accent : colors.outline,
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ),
