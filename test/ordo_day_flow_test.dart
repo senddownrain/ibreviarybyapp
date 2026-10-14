@@ -368,10 +368,7 @@ void main() {
     );
     expect(find.byKey(const Key('ordo-open-readings')), findsOneWidget);
     expect(find.byType(RadioListTile<String>), findsNothing);
-    await tapVisible(
-      tester,
-      find.byKey(Key('ordo-hours-${option.optionId}-alternative')),
-    );
+    await tapVisible(tester, find.byKey(const Key('ordo-open-hours')));
     await tapVisible(
       tester,
       find.byKey(ValueKey('ordo-hour-template-${template.id}')),
@@ -509,10 +506,7 @@ void main() {
       location:
           '/hours/ordo?date=2026-10-06&diocese=pinsk&dayId=06-10-sv-bruno',
     );
-    await tapVisible(
-      tester,
-      find.byKey(const Key('ordo-readings-sv-bruno-alternative')),
-    );
+    await tapVisible(tester, find.byKey(const Key('ordo-open-readings')));
     final query = GoRouterState.of(
       tester.element(find.byType(ReadingsScreen)),
     ).uri.queryParameters;
@@ -581,7 +575,7 @@ void main() {
   });
 
   testWidgets(
-    'ORDO compact calendar closes on selection and preserves shared dioceses',
+    'ORDO date-only calendar applies without closing and preserves shared dioceses',
     (tester) async {
       final (_, container) = await start(
         tester,
@@ -593,11 +587,14 @@ void main() {
       await tapVisible(tester, find.byKey(const Key('ordo-day-2026-10-07')));
       expect(
         find.byKey(const Key('compact-liturgical-calendar')),
-        findsNothing,
+        findsOneWidget,
       );
       expect(find.byType(OrdoScreen), findsOneWidget);
       expect(container.read(selectedDateProvider), DateTime(2026, 10, 7));
       expect(container.read(dioceseSelectionProvider), same(settings));
+      expect(find.byType(HoursOptionsSheet), findsNothing);
+      await tester.tap(find.text('Гатова'));
+      await tester.pumpAndSettle();
       await tapVisible(tester, find.byKey(const Key('ordo-open-hours')));
       await tapVisible(
         tester,

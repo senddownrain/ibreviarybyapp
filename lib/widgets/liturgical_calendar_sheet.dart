@@ -20,53 +20,54 @@ Future<void> showCompactLiturgicalCalendar({
   ValueChanged<DateTime>? onSelected,
 }) async {
   final router = GoRouter.of(context);
+  var activeDate = date;
   final result = await showModalBottomSheet<Object>(
     context: context,
     useRootNavigator: true,
     useSafeArea: true,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (sheetContext) => ConstrainedBox(
-      key: const Key('compact-liturgical-calendar'),
-      constraints: BoxConstraints(
-        maxWidth: 640,
-        maxHeight: MediaQuery.sizeOf(sheetContext).height * .85,
-      ),
-      child: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LiturgicalMonthCalendar(
-                initialDate: date,
-                diocese: diocese,
-                onSelected: (value) => Navigator.pop(sheetContext, value),
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (context, setSheetState) {
+        void select(DateTime value) {
+          if (onSelected == null) {
+            Navigator.pop(sheetContext, value);
+          } else {
+            onSelected(value);
+            setSheetState(() => activeDate = value);
+          }
+        }
+
+        return LiturgicalSelectorSheet(
+          key: const Key('compact-liturgical-calendar'),
+          title: 'Каляндар',
+          scrollKey: const Key('date-only-calendar-scroll'),
+          children: [
+            LiturgicalMonthCalendar(
+              initialDate: activeDate,
+              diocese: diocese,
+              onSelected: select,
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                key: const Key('liturgical-calendar-today'),
+                onPressed: () => select(DateUtils.dateOnly(DateTime.now())),
+                icon: const Icon(Icons.today, size: 18),
+                label: const Text('Сёння'),
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  key: const Key('liturgical-calendar-today'),
-                  onPressed: () => Navigator.pop(
-                    sheetContext,
-                    DateUtils.dateOnly(DateTime.now()),
-                  ),
-                  child: const Text('Сёння'),
-                ),
+            ),
+            if (pickerRoute != null)
+              ListTile(
+                key: const Key('liturgical-calendar-picker'),
+                leading: const Icon(Icons.search),
+                title: const Text('Знайсці літургічны дзень'),
+                subtitle: const Text('Пошук паводле перыяду або свята'),
+                onTap: () => Navigator.pop(sheetContext, true),
               ),
-              if (pickerRoute != null)
-                ListTile(
-                  key: const Key('liturgical-calendar-picker'),
-                  leading: const Icon(Icons.search),
-                  title: const Text('Знайсці літургічны дзень'),
-                  subtitle: const Text('Пошук паводле перыяду або свята'),
-                  onTap: () => Navigator.pop(sheetContext, true),
-                ),
-            ],
-          ),
-        ),
-      ),
+          ],
+        );
+      },
     ),
   );
   if (!context.mounted) return;
