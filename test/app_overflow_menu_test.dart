@@ -336,6 +336,121 @@ void main() {
     }
   });
 
+  for (final direction in TextDirection.values) {
+    testWidgets(
+      'open popup follows rotation, scaling and keyboard in $direction',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 760);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final keyboard = ValueNotifier<double>(0);
+        final scale = ValueNotifier<double>(1);
+        addTearDown(keyboard.dispose);
+        addTearDown(scale.dispose);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [settingsProvider.overrideWith(_Settings.new)],
+            child: MaterialApp(
+              builder: (context, child) => AnimatedBuilder(
+                animation: Listenable.merge([keyboard, scale]),
+                builder: (_, _) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    padding: const EdgeInsets.only(top: 24, bottom: 16),
+                    viewPadding: const EdgeInsets.only(top: 24, bottom: 16),
+                    viewInsets: EdgeInsets.only(bottom: keyboard.value),
+                    textScaler: TextScaler.linear(scale.value),
+                  ),
+                  child: Directionality(
+                    textDirection: direction,
+                    child: child!,
+                  ),
+                ),
+              ),
+              home: const ReaderScaffold(
+                showPsalmody: true,
+                content: Text('Псальм'),
+              ),
+            ),
+          ),
+        );
+        await openMenu(tester);
+        Rect popup() =>
+            tester.getRect(find.byKey(const Key('app-overflow-popup')));
+        // This geometry fixture uses Flutter's Ahem test font. Real-font
+        // compact widths are verified by menu_visual_preview_test.dart.
+        final initialWidth = popup().width;
+        expect(initialWidth, inInclusiveRange(316, 360));
+        tester.view.physicalSize = const Size(640, 360);
+        await tester.pumpAndSettle();
+        final button = tester.getRect(
+          find.byKey(const Key('app-overflow-open')),
+        );
+        expect(
+          direction == TextDirection.ltr ? popup().right : popup().left,
+          closeTo(
+            direction == TextDirection.ltr
+                ? button.right + .8
+                : button.left - .8,
+            1,
+          ),
+        );
+        scale.value = 2;
+        keyboard.value = 96;
+        await tester.pumpAndSettle();
+        expect(popup().width, greaterThanOrEqualTo(initialWidth));
+        expect(popup().left, greaterThanOrEqualTo(8));
+        expect(popup().right, lessThanOrEqualTo(640 - 8));
+        expect(popup().top, greaterThanOrEqualTo(24 + 8));
+        expect(popup().bottom, lessThanOrEqualTo(360 - 96 - 8));
+        await tester.ensureVisible(find.text('Інфармацыя'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.getRect(find.text('Інфармацыя')).bottom,
+          lessThanOrEqualTo(360 - 96 - 8),
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'compact popup stays inside the viewport near the bottom edge in $direction',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Directionality(
+              textDirection: direction,
+              child: const Scaffold(
+                body: SafeArea(
+                  minimum: EdgeInsets.all(12),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: AppOverflowMenu(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await openMenu(tester);
+        final popup = tester.getRect(
+          find.byKey(const Key('app-overflow-popup')),
+        );
+        expect(popup.width, closeTo(256, .01));
+        expect(popup.left, greaterThanOrEqualTo(8));
+        expect(popup.right, lessThanOrEqualTo(360 - 8));
+        expect(popup.top, greaterThanOrEqualTo(8));
+        expect(popup.bottom, lessThanOrEqualTo(640 - 8));
+        expect(find.text('Інфармацыя'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets('context action runs after popup closes', (tester) async {
     var calls = 0;
     await tester.pumpWidget(

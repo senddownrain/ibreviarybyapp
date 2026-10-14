@@ -10,6 +10,8 @@ import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 
 class _PreviewSettings extends SettingsNotifier {
   @override
@@ -54,171 +56,228 @@ void main() {
     }
   });
   final before = Platform.environment['OVERFLOW_VISUAL_STAGE'] == 'before';
-  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
-    for (final brightness in Brightness.values) {
-      for (final width in [320.0, 360.0, 390.0, 430.0]) {
-        for (final scale in [1.0, 1.5, 2.0]) {
-          testWidgets('menu ${platform.name} ${brightness.name} $width dp $scale', (
-            tester,
-          ) async {
-            tester.view.physicalSize = Size(width, 760);
-            tester.view.devicePixelRatio = 1;
-            addTearDown(tester.view.resetPhysicalSize);
-            addTearDown(tester.view.resetDevicePixelRatio);
-            await tester.pumpWidget(
-              ProviderScope(
-                overrides: [
-                  settingsProvider.overrideWith(_PreviewSettings.new),
-                ],
-                child: RepaintBoundary(
-                  key: const Key('menu-preview-capture'),
-                  child: MaterialApp(
-                    debugShowCheckedModeBanner: false,
-                    theme: ThemeData(
-                      platform: platform,
-                      colorScheme: AppPalette.scheme(brightness),
-                    ),
-                    builder: (context, child) => MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        textScaler: TextScaler.linear(scale),
-                        padding: const EdgeInsets.only(top: 44, bottom: 34),
-                        viewPadding: const EdgeInsets.only(top: 44, bottom: 34),
-                      ),
-                      child: child!,
-                    ),
-                    home: const ReaderScaffold(
-                      showPsalmody: true,
-                      contextHeader: ReaderContextHeader(
-                        eyebrow: 'ЛІТУРГІЯ ГАДЗІНАЎ',
-                        title: 'Ютрань',
-                      ),
-                      content: Text(
-                        'Пане, пачуй маю малітву *\nі няхай мой кліч дойдзе да Цябе.\n\nБо Ты — мая надзея †\nі мая абарона.',
-                        style: TextStyle(
-                          fontFamily: 'PreviewBook',
-                          fontSize: 16,
+  for (final extended in [false, true]) {
+    for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+      for (final brightness in Brightness.values) {
+        for (final width in [320.0, 360.0, 390.0, 430.0]) {
+          for (final scale in [1.0, 1.5, 2.0]) {
+            testWidgets(
+              'menu ${extended ? 'ora' : 'compact'} ${platform.name} ${brightness.name} $width dp $scale',
+              (tester) async {
+                tester.view.physicalSize = Size(width, 760);
+                tester.view.devicePixelRatio = 1;
+                addTearDown(tester.view.resetPhysicalSize);
+                addTearDown(tester.view.resetDevicePixelRatio);
+                await tester.pumpWidget(
+                  ProviderScope(
+                    overrides: [
+                      settingsProvider.overrideWith(_PreviewSettings.new),
+                    ],
+                    child: RepaintBoundary(
+                      key: const Key('menu-preview-capture'),
+                      child: MaterialApp(
+                        debugShowCheckedModeBanner: false,
+                        theme: ThemeData(
+                          platform: platform,
+                          fontFamily: 'Roboto',
+                          colorScheme: AppPalette.scheme(brightness),
                         ),
+                        builder: (context, child) => MediaQuery(
+                          data: MediaQuery.of(context).copyWith(
+                            textScaler: TextScaler.linear(scale),
+                            padding: const EdgeInsets.only(top: 44, bottom: 34),
+                            viewPadding: const EdgeInsets.only(
+                              top: 44,
+                              bottom: 34,
+                            ),
+                          ),
+                          child: child!,
+                        ),
+                        home: !extended
+                            ? Scaffold(
+                                extendBodyBehindAppBar: true,
+                                appBar: AdaptiveAppBar.text(
+                                  'Літургічны каляндар',
+                                  showOverflow: true,
+                                ),
+                                body: const AmbientWash(
+                                  seasonColor: Colors.grey,
+                                  child: Center(
+                                    child: Text('Літургічны каляндар'),
+                                  ),
+                                ),
+                              )
+                            : const ReaderScaffold(
+                                showPsalmody: true,
+                                contextHeader: ReaderContextHeader(
+                                  eyebrow: 'ЛІТУРГІЯ ГАДЗІНАЎ',
+                                  title: 'Ютрань',
+                                ),
+                                content: Text(
+                                  'Пане, пачуй маю малітву *\nі няхай мой кліч дойдзе да Цябе.\n\nБо Ты — мая надзея †\nі мая абарона.',
+                                  style: TextStyle(
+                                    fontFamily: 'PreviewBook',
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            );
-            Future<void> capture(String state) async {
-              final selected =
-                  (width == 320 &&
-                      brightness == Brightness.dark &&
-                      (scale == 1 || scale == 2)) ||
-                  (width == 390 && scale == 1);
-              if (!selected ||
-                  Platform.environment['OVERFLOW_MENU_IMAGES'] != '1') {
-                return;
-              }
-              final boundary = tester.renderObject<RenderRepaintBoundary>(
-                find.byKey(const Key('menu-preview-capture')),
-              );
-              await tester.runAsync(() async {
-                final image = await boundary.toImage(pixelRatio: 1);
-                final data = await image.toByteData(
-                  format: ui.ImageByteFormat.png,
                 );
-                final directory = Directory(
-                  'build/overflow-menu-visual-fix/${before ? 'before' : 'after'}',
-                )..createSync(recursive: true);
-                File(
-                  '${directory.path}/${platform.name}-${brightness.name}-${width.toInt()}-${(scale * 100).round()}-$state.png',
-                ).writeAsBytesSync(data!.buffer.asUint8List());
-                image.dispose();
-              });
-            }
+                Future<void> capture(String state) async {
+                  final selected =
+                      (width == 320 && scale == 2) ||
+                      (width == 390 && scale == 1);
+                  if (!selected ||
+                      Platform.environment['OVERFLOW_MENU_IMAGES'] != '1') {
+                    return;
+                  }
+                  final boundary = tester.renderObject<RenderRepaintBoundary>(
+                    find.byKey(const Key('menu-preview-capture')),
+                  );
+                  await tester.runAsync(() async {
+                    final image = await boundary.toImage(pixelRatio: 1);
+                    final data = await image.toByteData(
+                      format: ui.ImageByteFormat.png,
+                    );
+                    final directory = Directory(
+                      'build/overflow-menu-adaptive/${before ? 'before' : 'after'}',
+                    )..createSync(recursive: true);
+                    File(
+                      '${directory.path}/${extended ? 'ora' : 'compact'}-${platform.name}-${brightness.name}-${width.toInt()}-${(scale * 100).round()}-$state.png',
+                    ).writeAsBytesSync(data!.buffer.asUint8List());
+                    image.dispose();
+                  });
+                }
 
-            await tester.tap(find.byKey(const Key('app-overflow-open')));
-            await tester.pumpAndSettle();
-            if (!before) {
-              for (final label in [
-                'Шрыфт',
-                'Перанос пасля * і †',
-                'Па левым краі',
-                'Налады',
-                'Інфармацыя',
-              ]) {
-                final paragraph = tester.renderObject<RenderParagraph>(
-                  find
-                      .descendant(
-                        of: find.text(label),
-                        matching: find.byType(RichText),
-                      )
-                      .first,
-                );
-                if (scale == 1) {
-                  expect(
-                    paragraph.getBoxesForSelection(
-                      TextSelection(baseOffset: 0, extentOffset: label.length),
-                    ),
-                    hasLength(1),
-                    reason: '$label should be one line at $width',
+                await tester.tap(find.byKey(const Key('app-overflow-open')));
+                await tester.pumpAndSettle();
+                if (!before) {
+                  for (final label in [
+                    if (extended) ...[
+                      'Шрыфт',
+                      'Перанос пасля * і †',
+                      'Па левым краі',
+                    ],
+                    'Налады',
+                    'Інфармацыя',
+                  ]) {
+                    final paragraph = tester.renderObject<RenderParagraph>(
+                      find
+                          .descendant(
+                            of: find.text(label),
+                            matching: find.byType(RichText),
+                          )
+                          .first,
+                    );
+                    if (scale == 1) {
+                      expect(
+                        paragraph.getBoxesForSelection(
+                          TextSelection(
+                            baseOffset: 0,
+                            extentOffset: label.length,
+                          ),
+                        ),
+                        hasLength(1),
+                        reason: '$label should be one line at $width',
+                      );
+                    }
+                    for (final word in RegExp(r'\S+').allMatches(label)) {
+                      expect(
+                        paragraph.getBoxesForSelection(
+                          TextSelection(
+                            baseOffset: word.start,
+                            extentOffset: word.end,
+                          ),
+                        ),
+                        hasLength(1),
+                        reason: '$label: ${word.group(0)} at $width / $scale',
+                      );
+                    }
+                  }
+                  final popup = tester.getRect(
+                    find.byKey(const Key('app-overflow-content')),
                   );
-                }
-                for (final word in RegExp(r'\S+').allMatches(label)) {
-                  expect(
-                    paragraph.getBoxesForSelection(
-                      TextSelection(
-                        baseOffset: word.start,
-                        extentOffset: word.end,
+                  if (scale == 1 && width >= 360) {
+                    expect(
+                      popup.width,
+                      inInclusiveRange(
+                        extended ? 304 : 248,
+                        extended ? 328 : 264,
                       ),
+                    );
+                  }
+                  expect(
+                    find.byType(Switch),
+                    extended ? findsNWidgets(2) : findsNothing,
+                  );
+                  if (extended) {
+                    final switches = find.byType(Switch);
+                    expect(
+                      tester.getRect(switches.at(0)).right,
+                      closeTo(tester.getRect(switches.at(1)).right, .01),
+                    );
+                  }
+                }
+                await capture(extended ? 'off-off' : 'menu');
+                if (!extended) {
+                  await tester.tapAt(const Offset(4, 720));
+                  await tester.pumpAndSettle();
+                  expect(
+                    find.byKey(const Key('app-overflow-content')),
+                    findsNothing,
+                  );
+                  expect(tester.takeException(), isNull);
+                  return;
+                }
+                for (final key in [
+                  'overflow-psalm-marker-break',
+                  'overflow-psalm-aligned-left',
+                ]) {
+                  await tester.ensureVisible(find.byKey(Key(key)));
+                  await tester.tap(find.byKey(Key(key)));
+                  await tester.pumpAndSettle();
+                }
+                expect(
+                  find.byKey(const Key('app-overflow-content')),
+                  findsOneWidget,
+                );
+                await tester.ensureVisible(find.text('Шрыфт'));
+                await tester.pumpAndSettle();
+                await capture('on-on');
+                await tester.tap(find.text('Шрыфт'));
+                await tester.pumpAndSettle();
+                expect(
+                  find.byKey(const Key('app-overflow-content')),
+                  findsNothing,
+                );
+                expect(
+                  find.byKey(const Key('text-scale-slider')),
+                  findsOneWidget,
+                );
+                if (!before) {
+                  final title = tester.renderObject<RenderParagraph>(
+                    find
+                        .descendant(
+                          of: find.text('Шрыфт'),
+                          matching: find.byType(RichText),
+                        )
+                        .first,
+                  );
+                  expect(
+                    title.getBoxesForSelection(
+                      const TextSelection(baseOffset: 0, extentOffset: 5),
                     ),
                     hasLength(1),
-                    reason: '$label: ${word.group(0)} at $width / $scale',
                   );
                 }
-              }
-              expect(find.byType(Switch), findsNWidgets(2));
-              final switches = find.byType(Switch);
-              expect(
-                tester.getRect(switches.at(0)).right,
-                closeTo(tester.getRect(switches.at(1)).right, .01),
-              );
-            }
-            await capture('off-off');
-            for (final key in [
-              'overflow-psalm-marker-break',
-              'overflow-psalm-aligned-left',
-            ]) {
-              await tester.ensureVisible(find.byKey(Key(key)));
-              await tester.tap(find.byKey(Key(key)));
-              await tester.pumpAndSettle();
-            }
-            expect(
-              find.byKey(const Key('app-overflow-content')),
-              findsOneWidget,
+                expect(find.byType(Switch), findsNothing);
+                expect(tester.takeException(), isNull);
+                await capture('font');
+              },
             );
-            await tester.ensureVisible(find.text('Шрыфт'));
-            await tester.pumpAndSettle();
-            await capture('on-on');
-            await tester.tap(find.text('Шрыфт'));
-            await tester.pumpAndSettle();
-            expect(find.byKey(const Key('app-overflow-content')), findsNothing);
-            expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
-            if (!before) {
-              final title = tester.renderObject<RenderParagraph>(
-                find
-                    .descendant(
-                      of: find.text('Шрыфт'),
-                      matching: find.byType(RichText),
-                    )
-                    .first,
-              );
-              expect(
-                title.getBoxesForSelection(
-                  const TextSelection(baseOffset: 0, extentOffset: 5),
-                ),
-                hasLength(1),
-              );
-            }
-            expect(find.byType(Switch), findsNothing);
-            expect(tester.takeException(), isNull);
-            await capture('font');
-          });
+          }
         }
       }
     }

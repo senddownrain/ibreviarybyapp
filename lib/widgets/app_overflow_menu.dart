@@ -62,76 +62,101 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     final navigator = Navigator.of(context, rootNavigator: true);
     final overlay = navigator.overlay!.context.findRenderObject()! as RenderBox;
     final button = context.findRenderObject()! as RenderBox;
-    // A nested Scaffold can consume viewInsets for its body. The root overlay
-    // still knows the keyboard and the full display's safe area.
-    final media = MediaQuery.of(navigator.overlay!.context);
-    final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
-    final leftInset = math.max(media.padding.left, media.viewPadding.left);
-    final rightInset = math.max(media.padding.right, media.viewPadding.right);
-    var availableWidth = media.size.width - leftInset - rightInset - 16;
-    if (origin.dx >= media.size.width / 2) {
-      availableWidth = math.min(
-        availableWidth,
-        origin.dx + button.size.width - leftInset - 8,
-      );
-    }
-    final width = math.min(360.0, availableWidth);
-    final bottom =
-        media.size.height -
-        math.max(media.viewInsets.bottom, media.viewPadding.bottom);
-    final menuTop = origin.dy + button.size.height + 8;
-    final availableHeight = math.max(48.0, bottom - menuTop - 8);
-    var position = RelativeRect.fromRect(
-      Rect.fromLTWH(origin.dx, menuTop, button.size.width, 0),
-      Offset.zero & overlay.size,
-    );
+    var anchor =
+        button.localToGlobal(Offset.zero, ancestor: overlay) & button.size;
     final actions = widget.actions;
-    final result = await showMenu<String>(
-      context: context,
-      useRootNavigator: true,
-      semanticLabel: 'Меню',
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      clipBehavior: Clip.antiAlias,
-      menuPadding: EdgeInsets.zero,
-      constraints: BoxConstraints(
-        minWidth: width,
-        maxWidth: width,
-        maxHeight: availableHeight,
-      ),
-      positionBuilder: (_, _) {
-        // The source can disappear before the popup's removal frame.
-        if (button.attached && overlay.attached) {
-          final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
-          position = RelativeRect.fromRect(
-            Rect.fromLTWH(
-              origin.dx,
-              origin.dy + button.size.height + 8,
-              button.size.width,
-              0,
-            ),
-            Offset.zero & overlay.size,
+    final showTextScale = widget.showTextScale;
+    final showPsalmody = widget.showPsalmody;
+    final route = _OverflowPopupRoute(
+      themes: InheritedTheme.capture(from: context, to: navigator.context),
+      builder: (popupContext) => LayoutBuilder(
+        builder: (context, constraints) {
+          // Layout follows the source after rotation, text-scale and keyboard
+          // changes. Retain the last anchor during its removal frame.
+          if (button.attached && overlay.attached && button.hasSize) {
+            anchor =
+                button.localToGlobal(Offset.zero, ancestor: overlay) &
+                button.size;
+          }
+          final media = MediaQuery.of(context);
+          final size = constraints.biggest;
+          final left = math.max(media.padding.left, media.viewPadding.left) + 8;
+          final right =
+              size.width -
+              math.max(media.padding.right, media.viewPadding.right) -
+              8;
+          final top = math.max(media.padding.top, media.viewPadding.top) + 8;
+          final bottom =
+              size.height -
+              math.max(media.viewInsets.bottom, media.viewPadding.bottom) -
+              8;
+          final growLeft =
+              anchor.center.dx > size.width / 2 ||
+              (anchor.center.dx == size.width / 2 &&
+                  Directionality.of(context) == TextDirection.rtl);
+          final preferred = _preferredMenuWidth(
+            context,
+            showTextScale,
+            showPsalmody,
+            actions,
           );
-        }
-        return position;
-      },
-      items: [
-        _OverflowEntry(
-          child: Builder(
-            builder: (popupContext) {
-              _popupRoute = ModalRoute.of(popupContext);
-              return _OverflowContent(
-                showTextScale: widget.showTextScale,
-                showPsalmody: widget.showPsalmody,
-                actions: actions,
-                onSelected: (value) => Navigator.pop(popupContext, value),
-              );
-            },
-          ),
-        ),
-      ],
+          final anchorSpace = growLeft
+              ? anchor.right - left
+              : right - anchor.left;
+          final width = math.min(
+            preferred,
+            math.max(48.0, math.min(right - left, anchorSpace)),
+          );
+          final x = (growLeft ? anchor.right - width : anchor.left)
+              .clamp(left, math.max(left, right - width))
+              .toDouble();
+          final minimumVisible = math.min(160.0, math.max(48.0, bottom - top));
+          final y = (anchor.bottom + 8)
+              .clamp(top, math.max(top, bottom - minimumVisible))
+              .toDouble();
+          return Stack(
+            children: [
+              Positioned(
+                left: x,
+                top: y,
+                width: width,
+                child: ConstrainedBox(
+                  key: const Key('app-overflow-popup'),
+                  constraints: BoxConstraints(
+                    maxHeight: math.max(48.0, bottom - y),
+                  ),
+                  child: Semantics(
+                    scopesRoute: true,
+                    namesRoute: true,
+                    explicitChildNodes: true,
+                    label: 'Меню',
+                    child: AdaptiveChromeSurface(
+                      role: ChromeSurfaceRole.group,
+                      borderRadius: BorderRadius.circular(24),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: SingleChildScrollView(
+                          child: _OverflowContent(
+                            showTextScale: showTextScale,
+                            showPsalmody: showPsalmody,
+                            actions: actions,
+                            onSelected: (value) =>
+                                Navigator.pop(popupContext, value),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
-    final route = _popupRoute;
-    if (route is TransitionRoute) await route.completed;
+    _popupRoute = route;
+    final result = await navigator.push<String>(route);
+    await route.completed;
     _popupRoute = null;
     _open = false;
     if (!mounted || result == null) return;
@@ -160,26 +185,73 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
   );
 }
 
-/// Keep each action and switch as its own accessible node. A disabled
-/// PopupMenuItem would merge all of these controls into one disabled item.
-class _OverflowEntry extends PopupMenuEntry<String> {
-  const _OverflowEntry({required this.child});
+// Unlike Material showMenu's intrinsic 56dp width steps, this route accepts
+// exact, content-dependent sizes and recomputes geometry while it is open.
+class _OverflowPopupRoute extends PopupRoute<String> {
+  _OverflowPopupRoute({required this.themes, required this.builder})
+    : super(traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop);
 
-  final Widget child;
-
+  final CapturedThemes themes;
+  final WidgetBuilder builder;
   @override
-  double get height => 48;
-
+  Color? get barrierColor => null;
   @override
-  bool represents(String? value) => false;
-
+  bool get barrierDismissible => true;
   @override
-  State<_OverflowEntry> createState() => _OverflowEntryState();
+  String get barrierLabel => 'Закрыць меню';
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 160);
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) => themes.wrap(Builder(builder: builder));
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => MediaQuery.disableAnimationsOf(context)
+      ? child
+      : FadeTransition(opacity: animation, child: child);
 }
 
-class _OverflowEntryState extends State<_OverflowEntry> {
-  @override
-  Widget build(BuildContext context) => widget.child;
+// Normal menus stay compact; only content and accessibility scaling widen them.
+double _preferredMenuWidth(
+  BuildContext context,
+  bool showTextScale,
+  bool showPsalmody,
+  List<ReaderSecondaryAction> actions,
+) {
+  double measure(String label) {
+    final painter = TextPainter(
+      text: TextSpan(text: label, style: _menuLabelStyle(context)),
+      textScaler: MediaQuery.textScalerOf(context),
+      textDirection: Directionality.of(context),
+    )..layout();
+    final width = painter.width;
+    painter.dispose();
+    return width;
+  }
+
+  var width = showPsalmody ? 316.0 : 256.0;
+  for (final label in [
+    'Налады',
+    'Інфармацыя',
+    if (showTextScale) 'Шрыфт',
+    ...actions.map((action) => action.label),
+  ]) {
+    // Include row chrome, the surface border and glyph rounding at large scales.
+    width = math.max(width, measure(label) + 100);
+  }
+  if (showPsalmody) {
+    for (final label in ['Перанос пасля * і †', 'Па левым краі']) {
+      width = math.max(width, measure(label) + 96);
+    }
+  }
+  return math.min(width, 360);
 }
 
 class _OverflowContent extends StatelessWidget {
@@ -197,7 +269,7 @@ class _OverflowContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Theme.of(context).colorScheme.surfaceContainer,
+    color: Colors.transparent,
     child: Padding(
       key: const Key('app-overflow-content'),
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -243,7 +315,12 @@ class _OverflowContent extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(child: Text(label, style: _menuLabelStyle(context))),
               const SizedBox(width: 8),
-              const Icon(Icons.chevron_right_rounded, size: 18),
+              Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? Icons.chevron_left_rounded
+                    : Icons.chevron_right_rounded,
+                size: 18,
+              ),
             ],
           ),
         ),
@@ -309,7 +386,10 @@ class _OverflowSwitchTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     title,
-                    Align(alignment: Alignment.centerRight, child: control),
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: control,
+                    ),
                   ],
                 );
               }

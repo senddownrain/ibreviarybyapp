@@ -1,0 +1,62 @@
+00:00 +0: loading C:/Users/User/.codex/worktrees/overflow-menu-visual-fix/ibreviarybyapp/test/app_overflow_menu_test.dart
+00:00 +0: Ora switches apply immediately and survive reopening the popup
+00:01 +1: font dismisses popup and opens only the saved size panel
+00:01 +2: popup fits TargetPlatform.android Brightness.dark 320.0 dp at 1.0 scale
+00:01 +3: popup fits TargetPlatform.android Brightness.dark 320.0 dp at 1.5 scale
+00:01 +4: popup fits TargetPlatform.android Brightness.dark 320.0 dp at 2.0 scale
+00:01 +5: popup fits TargetPlatform.android Brightness.dark 360.0 dp at 1.0 scale
+00:01 +6: popup fits TargetPlatform.android Brightness.dark 360.0 dp at 1.5 scale
+00:02 +7: popup fits TargetPlatform.android Brightness.dark 360.0 dp at 2.0 scale
+00:02 +8: popup fits TargetPlatform.android Brightness.dark 390.0 dp at 1.0 scale
+00:02 +9: popup fits TargetPlatform.android Brightness.dark 390.0 dp at 1.5 scale
+00:02 +10: popup fits TargetPlatform.android Brightness.dark 390.0 dp at 2.0 scale
+00:02 +11: popup fits TargetPlatform.android Brightness.dark 430.0 dp at 1.0 scale
+00:02 +12: popup fits TargetPlatform.android Brightness.dark 430.0 dp at 1.5 scale
+00:02 +13: popup fits TargetPlatform.android Brightness.dark 430.0 dp at 2.0 scale
+00:02 +14: popup fits TargetPlatform.android Brightness.light 320.0 dp at 1.0 scale
+00:02 +15: popup fits TargetPlatform.android Brightness.light 320.0 dp at 1.5 scale
+00:02 +16: popup fits TargetPlatform.android Brightness.light 320.0 dp at 2.0 scale
+00:03 +17: popup fits TargetPlatform.android Brightness.light 360.0 dp at 1.0 scale
+00:03 +18: popup fits TargetPlatform.android Brightness.light 360.0 dp at 1.5 scale
+00:03 +19: popup fits TargetPlatform.android Brightness.light 360.0 dp at 2.0 scale
+00:03 +20: popup fits TargetPlatform.android Brightness.light 390.0 dp at 1.0 scale
+00:03 +21: popup fits TargetPlatform.android Brightness.light 390.0 dp at 1.5 scale
+00:03 +22: popup fits TargetPlatform.android Brightness.light 390.0 dp at 2.0 scale
+00:03 +23: popup fits TargetPlatform.android Brightness.light 430.0 dp at 1.0 scale
+00:03 +24: popup fits TargetPlatform.android Brightness.light 430.0 dp at 1.5 scale
+00:04 +25: popup fits TargetPlatform.android Brightness.light 430.0 dp at 2.0 scale
+00:04 +26: popup fits TargetPlatform.iOS Brightness.dark 320.0 dp at 1.0 scale
+00:04 +27: popup fits TargetPlatform.iOS Brightness.dark 320.0 dp at 1.5 scale
+00:04 +28: popup fits TargetPlatform.iOS Brightness.dark 320.0 dp at 2.0 scale
+00:04 +29: popup fits TargetPlatform.iOS Brightness.dark 360.0 dp at 1.0 scale
+00:04 +30: popup fits TargetPlatform.iOS Brightness.dark 360.0 dp at 1.5 scale
+00:04 +31: popup fits TargetPlatform.iOS Brightness.dark 360.0 dp at 2.0 scale
+00:04 +32: popup fits TargetPlatform.iOS Brightness.dark 390.0 dp at 1.0 scale
+00:05 +33: popup fits TargetPlatform.iOS Brightness.dark 390.0 dp at 1.5 scale
+00:05 +34: popup fits TargetPlatform.iOS Brightness.dark 390.0 dp at 2.0 scale
+00:05 +35: popup fits TargetPlatform.iOS Brightness.dark 430.0 dp at 1.0 scale
+00:05 +36: popup fits TargetPlatform.iOS Brightness.dark 430.0 dp at 1.5 scale
+00:05 +37: popup fits TargetPlatform.iOS Brightness.dark 430.0 dp at 2.0 scale
+00:05 +38: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 1.0 scale
+00:05 +39: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 1.5 scale
+00:05 +40: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 2.0 scale
+00:05 +41: popup fits TargetPlatform.iOS Brightness.light 360.0 dp at 1.0 scale
+00:06 +42: popup fits TargetPlatform.iOS Brightness.light 360.0 dp at 1.5 scale
+00:06 +43: popup fits TargetPlatform.iOS Brightness.light 360.0 dp at 2.0 scale
+00:06 +44: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 1.0 scale
+00:06 +45: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 1.5 scale
+00:06 +46: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 2.0 scale
+00:06 +47: popup fits TargetPlatform.iOS Brightness.light 430.0 dp at 1.0 scale
+00:06 +48: popup fits TargetPlatform.iOS Brightness.light 430.0 dp at 1.5 scale
+00:06 +49: popup fits TargetPlatform.iOS Brightness.light 430.0 dp at 2.0 scale
+00:06 +50: popup stays above an open keyboard on a small viewport
+00:06 +51: menu uses 15sp UI text independently of reader size and serif theme
+00:07 +52: popup accounts for asymmetric side cutouts
+00:07 +53: root menu has no font and routes to settings and information
+00:07 +54: open popup follows rotation, scaling and keyboard in TextDirection.rtl
+00:07 +55: compact popup stays inside the viewport near the bottom edge in TextDirection.rtl
+00:07 +56: open popup follows rotation, scaling and keyboard in TextDirection.ltr
+00:07 +57: compact popup stays inside the viewport near the bottom edge in TextDirection.ltr
+00:07 +58: context action runs after popup closes
+00:07 +59: switching preserves reader scroll and hidden chrome dismisses popup
+00:08 +60: All tests passed!
