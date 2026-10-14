@@ -1,0 +1,117 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/widgets/floating_top_actions_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/widgets/floating_top_actions_test.dart: single floating action icon is centred in its circle (android)
+00:01 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/widgets/floating_top_actions_test.dart: single floating action icon is centred in its circle (iOS)
+00:01 +2: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart
+00:02 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary menu contains only product-level destinations
+00:03 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary bottom sheet stays above system navigation
+00:04 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary menu remains reachable at 320 dp and 200% text
+00:04 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/secondary_menu_test.dart: secondary menu is shown above the app navigation dock
+00:04 +6: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart
+00:06 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 76 ms
+[ContentStore] prayers: 115 docs in 166 ms
+[ContentStore] invitatoriums: 4 docs in 187 ms
+[ContentStore] completoriums: 35 docs in 166 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 150 ms
+[ContentStore] liturgicalTemplates: 16 docs in 200 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 100 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 115 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 131 ms
+[ContentStore] compendiumMeta: 1 docs in 34 ms
+[ContentStore] songs: 447 docs in 69 ms
+[ContentStore] compendium: 27 docs in 69 ms
+[ContentStore] readings: 822 docs in 277 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 157 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 95 ms
+[ContentStore] days: 736 docs in 606 ms
+00:07 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: route builders keep the old path and add the context as a query
+00:07 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: Hours option and Common choice open by their ids; an old link to a former per-template copy still opens the Office
+00:08 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: Ordo → Hours: an option opens with its diocese, Settings unchanged
+00:08 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: Ora/Ordo → Readings: a memorial opens the weekday readings first; its own readings stay a choice
+[data] CACHE HIT  readings 2026-10-06
+00:08 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: a solemnity opens its own readings
+00:08 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/route_identity_test.dart: (tearDownAll)
+00:08 +11: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart
+00:11 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart: footer clears Android dock at inset 0.0, scale 1.0
+00:12 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart: footer clears Android dock at inset 0.0, scale 2.0
+00:12 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart: footer clears Android dock at inset 24.0, scale 1.0
+00:12 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart: footer clears Android dock at inset 24.0, scale 2.0
+00:12 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart: footer clears Android dock at inset 48.0, scale 1.0
+00:13 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/source_footer_test.dart: footer clears Android dock at inset 48.0, scale 2.0
+00:13 +17: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart
+00:15 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) roots, lowercase minors, suffixes and slash bass
+00:15 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) major chords move by semitones
+00:15 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) minor forms: lowercase, m, min and dash
+00:15 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) H is B natural and B is B natural
+00:15 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) sharps, flats and Unicode accidentals
+00:15 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) slash bass transposes independently
+00:15 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChord (port of MyBrev song-chords.test.mjs) +12 and -12 return the original pitch
+00:15 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChordLine compact progressions transpose; chorus words and punctuation stay
+00:15 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChordLine compact chord run DGea
+00:15 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChordLine non-chord words remain unchanged
+00:15 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChordLine whitespace and separators are preserved
+00:15 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: transposeChordLine original input is never mutated
+00:15 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: songLines keeps blank lines and overflow chord rows
+00:15 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: songLines missing chords yield lyric-only rows
+00:15 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: categories and normalization numeric export categories map to names
+00:15 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: categories and normalization category and custom tags merge without duplicates
+00:15 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: categories and normalization robust against missing chord, empty tags and CRLF
+00:15 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: filterSongs favorite songs sort first
+00:15 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: filterSongs search and tags combine while favorites remain a sort key
+00:15 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: filterSongs title, text and tag search
+00:15 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: filterSongs multi-tag filter uses OR semantics
+00:15 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: filterSongs favorites never hide songs
+00:15 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: filterSongs alphabetical order follows the Belarusian alphabet
+00:15 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: bundled seed contains all 447 songs with unique IDs, text and categories
+00:15 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/song_chords_test.dart: bundled seed saved documents override by ID and new songs are appended
+00:15 +42: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart
+00:20 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song filter state search and tags alone determine activity and badge count
+00:20 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+00:23 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections section tiles open Mass, Songbook, Compendium, placeholder
+00:26 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections missing Mass says so on the tile
+00:26 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections tiles do not overflow at 200 percent system text
+00:26 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list lists songs, favorites first then alphabetical
+00:26 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list search covers title, lyrics and tag names
+00:27 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list filter sheet supports tags, removal and reset
+00:28 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.android)
+00:28 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.iOS)
+00:28 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list list is always compact and has no songbook settings
+00:29 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list seed failure without synced songs shows an error state
+00:29 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail uses the reader, shares favorites and returns
+00:29 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail transpose changes displayed chords only and resets
+00:31 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail song without chords shows no chord control
+00:31 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord toggle shows and hides chords and persists choice
+00:31 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail layout toggle switches between above and right
+00:31 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right falls back above on narrow width and keeps preference
+00:32 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control semantics name the state and the actions
+00:32 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.android)
+00:33 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.iOS)
+00:35 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control scales down instead of overflowing
+00:35 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap beside the chords in landscape and on tablets (variant: TargetPlatform.android)
+00:35 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap beside the chords in landscape and on tablets (variant: TargetPlatform.iOS)
+00:36 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap without overflow on a 320 dp phone
+00:36 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.android)
+00:39 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+00:41 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail layout button uses distinct above and right glyphs
+00:42 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.android)
+00:42 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.iOS)
+00:43 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right layout rule uses real constraints
+00:43 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.android)
+00:44 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.iOS)
+00:45 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.android)
+00:45 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.iOS)
+00:46 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail unknown song shows a not found state
+00:46 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence favorites, chords and layout survive restart
+00:46 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence song favorites are independent from prayer favorites
+00:46 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored left layout migrates to right
+00:47 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored right and unknown layouts are read safely
+00:47 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence migration is idempotent and writes nothing once applied
+00:47 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence old compact list setting is ignored and removed
+00:47 +84: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart
+00:48 +84: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+00:50 +85: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: direct link activates its owning branch
+00:50 +86: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart
+00:51 +86: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: reader font preferences are compact and legacy-safe
+00:51 +87: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: opens the slider panel and respects reader-size limits
+00:52 +88: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/text_scale_control_test.dart: appearance panel fits 320 px at 200 percent system text
+00:53 +89: All tests passed!

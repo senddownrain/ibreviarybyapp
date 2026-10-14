@@ -1,0 +1,10 @@
+Launching integration_test/liturgical_selector_redesign_test.dart on Web Server in debug mode...
+Waiting for connection from debug service on Web Server...         35,7s
+integration_test/liturgical_selector_redesign_test.dart is being served at http://localhost:7357
+The web-server device requires the Dart Debug Chrome extension for debugging. Consider using the Chrome or Edge devices for an improved development workflow.
+Debug service listening on ws://127.0.0.1:64801/[REDACTED]/ws
+A Dart VM Service on Web Server is available at: http://127.0.0.1:64801/[REDACTED]
+The Flutter DevTools debugger and profiler on Web Server is available at: http://127.0.0.1:64801/[REDACTED]/devtools/?uri=ws://127.0.0.1:64801/[REDACTED]/ws
+Integration result received; screenshots saved separately.
+All tests passed.
+Application finished.

@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "preferencesRestored": true,
+  "states": {
+    "chrome-360-light-hours-collapsed": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-hours-expanded": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-month-picker": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-year-picker": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-office-variants": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-readings-two-cycles": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-readings-three-cycles": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-multiple-mass-sets": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-ordo-alternatives": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-light-ordo-date-only": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-hours-collapsed": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-hours-expanded": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-month-picker": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-year-picker": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-office-variants": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-readings-two-cycles": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-readings-three-cycles": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-multiple-mass-sets": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-ordo-alternatives": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-dark-ordo-date-only": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-360-text-1.5-hours": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1.5
+    },
+    "chrome-360-text-1.5-calendar": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1.5
+    },
+    "chrome-360-text-1.5-ordo": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1.5
+    },
+    "chrome-360-text-2-hours": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 2
+    },
+    "chrome-360-text-2-calendar": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 2
+    },
+    "chrome-360-text-2-ordo": {
+      "viewportWidth": 360,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 2
+    }
+  }
+}

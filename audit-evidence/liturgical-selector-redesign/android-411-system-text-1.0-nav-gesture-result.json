@@ -1,0 +1,125 @@
+{
+  "passed": true,
+  "states": {
+    "android-411-system-text-1.0-nav-gesture-light-hours-collapsed": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-hours-expanded": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-month-picker": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-year-picker": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-office-variants": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-readings-two-cycles": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-readings-three-cycles": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-multiple-mass-sets": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-ordo-alternatives": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-light-ordo-date-only": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-hours-collapsed": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-hours-expanded": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-month-picker": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-year-picker": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-office-variants": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-readings-two-cycles": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-readings-three-cycles": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-multiple-mass-sets": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-ordo-alternatives": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    },
+    "android-411-system-text-1.0-nav-gesture-dark-ordo-date-only": {
+      "viewportWidth": 411.42857142857144,
+      "viewportHeight": 914.2857142857143,
+      "bottomInset": 24.0,
+      "textScaleAt16": 1.0
+    }
+  }
+}

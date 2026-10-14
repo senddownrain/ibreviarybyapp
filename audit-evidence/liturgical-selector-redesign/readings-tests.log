@@ -1,0 +1,120 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (setUpAll)
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter keeps first sorted group and calendar cycle fallback
+00:00 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter linked dayId wins and manual cycle can return to automatic
+00:00 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter weekday and non-cycle groups expose only real cycles
+00:00 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+00:02 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load
+Unhandled exception:
+FileSystemException: writeFrom failed, path = 'C:\Users\User\AppData\Local\Temp\flutter_tools.9bf5b414\flutter_test_compiler.e17d7b03\output.dill' (OS Error: Недостаточно места на диске, errno = 112)
+#0      _checkForErrorResponse (dart:io/common.dart:58)
+#1      _RandomAccessFile.writeFrom.<anonymous closure> (dart:io/file_impl.dart:976)
+<asynchronous suspension>
+#2      _FileStreamConsumer.addStream.<anonymous closure>.<anonymous closure>.<anonymous closure> (dart:io/file_impl.dart:237)
+<asynchronous suspension>
+00:02 +4 -1: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart [E]
+  Error: The Dart compiler exited unexpectedly.
+  package:flutter_tools/src/base/common.dart 34:3  throwToolExit
+  package:flutter_tools/src/compile.dart 927:15    DefaultResidentCompiler._compile.<fn>
+  dart:async/zone_root.dart 27:47                  _rootRun
+  dart:async/zone.dart 726:19                      _CustomZone.run
+  dart:async/zone.dart 625:7                       _CustomZone.runGuarded
+  dart:async/stream_impl.dart 434:13               _BufferingStreamSubscription._sendDone.sendDone
+  dart:async/stream_impl.dart 444:7                _BufferingStreamSubscription._sendDone
+  dart:async/stream_impl.dart 333:7                _BufferingStreamSubscription._close
+  dart:async/stream_transformers.dart 91:11        _SinkTransformerStreamSubscription._close
+  dart:async/stream_transformers.dart 21:11        _EventSinkWrapper.close
+  dart:convert/string_conversion.dart 241:11       _StringAdapterSink.close
+  dart:convert/line_splitter.dart 144:11           _LineSplitterSink.close
+  dart:async/stream_transformers.dart 136:24       _SinkTransformerStreamSubscription._handleDone
+  dart:async/zone_root.dart 27:47                  _rootRun
+  dart:async/zone.dart 726:19                      _CustomZone.run
+  dart:async/zone.dart 625:7                       _CustomZone.runGuarded
+  dart:async/stream_impl.dart 434:13               _BufferingStreamSubscription._sendDone.sendDone
+  dart:async/stream_impl.dart 444:7                _BufferingStreamSubscription._sendDone
+  dart:async/stream_impl.dart 333:7                _BufferingStreamSubscription._close
+  dart:async/stream_transformers.dart 91:11        _SinkTransformerStreamSubscription._close
+  dart:async/stream_transformers.dart 21:11        _EventSinkWrapper.close
+  dart:async/stream_transformers.dart 258:12       _HandlerEventSink.close
+  dart:async/stream_transformers.dart 136:24       _SinkTransformerStreamSubscription._handleDone
+  dart:async/zone_root.dart 27:47                  _rootRun
+  dart:async/zone.dart 726:19                      _CustomZone.run
+  dart:async/zone.dart 625:7                       _CustomZone.runGuarded
+  dart:async/stream_impl.dart 434:13               _BufferingStreamSubscription._sendDone.sendDone
+  dart:async/stream_impl.dart 444:7                _BufferingStreamSubscription._sendDone
+  dart:async/stream_impl.dart 333:7                _BufferingStreamSubscription._close
+  dart:async/stream_transformers.dart 91:11        _SinkTransformerStreamSubscription._close
+  dart:async/stream_transformers.dart 21:11        _EventSinkWrapper.close
+  dart:convert/string_conversion.dart 241:11       _StringAdapterSink.close
+  dart:convert/string_conversion.dart 301:20       _Utf8ConversionSink.close
+  dart:convert/chunked_conversion.dart 79:18       _ConverterStreamEventSink.close
+  dart:async/stream_transformers.dart 136:24       _SinkTransformerStreamSubscription._handleDone
+  dart:async/zone_root.dart 27:47                  _rootRun
+  dart:async/zone.dart 726:19                      _CustomZone.run
+  dart:async/zone.dart 625:7                       _CustomZone.runGuarded
+  dart:async/stream_impl.dart 434:13               _BufferingStreamSubscription._sendDone.sendDone
+  dart:async/stream_impl.dart 444:7                _BufferingStreamSubscription._sendDone
+  dart:async/stream_impl.dart 333:7                _BufferingStreamSubscription._close
+  dart:async/stream_controller.dart 806:19         _SyncStreamControllerDispatch._sendDone
+  dart:async/stream_controller.dart 652:7          _StreamController._closeUnchecked
+  dart:async/stream_controller.dart 645:5          _StreamController.close
+  dart:io-patch/socket_patch.dart 2881:21          _Socket._onData
+  dart:async/zone_root.dart 56:13                  _rootRunUnary
+  dart:async/zone.dart 733:19                      _CustomZone.runUnary
+  dart:async/zone.dart 633:7                       _CustomZone.runUnaryGuarded
+  dart:async/stream_impl.dart 381:11               _BufferingStreamSubscription._sendData
+  dart:async/stream_impl.dart 312:7                _BufferingStreamSubscription._add
+  dart:async/stream_controller.dart 798:19         _SyncStreamControllerDispatch._sendData
+  dart:async/stream_controller.dart 663:7          _StreamController._add
+  dart:async/stream_controller.dart 618:5          _StreamController.add
+  dart:io-patch/socket_patch.dart 2319:33          new _RawSocket.<fn>
+  dart:io-patch/socket_patch.dart 1640:18          _NativeSocket.issueReadEvent.issue
+  dart:async/schedule_microtask.dart 40:35         _microtaskLoop
+  dart:async/schedule_microtask.dart 49:5          _startMicrotaskLoop
+  dart:isolate-patch/isolate_patch.dart 127:13     _runPendingImmediateCallback
+  dart:isolate-patch/isolate_patch.dart 194:5      _RawReceivePort._handleMessage
+  
+  Null check operator used on a null value
+  package:flutter_tools/src/test/test_compiler.dart 257:34  TestCompiler._onCompilationRequest
+  
+  Error: The Dart compiler exited unexpectedly.
+  package:flutter_tools/src/base/common.dart 34:3  throwToolExit
+  package:flutter_tools/src/compile.dart 939:11    DefaultResidentCompiler._compile.<fn>
+  dart:async/zone_root.dart 48:47                  _rootRunUnary
+  dart:async/zone.dart 733:19                      _CustomZone.runUnary
+  dart:async/future_impl.dart 948:45               Future._propagateToListeners.handleValueCallback
+  dart:async/future_impl.dart 977:13               Future._propagateToListeners
+  dart:async/future_impl.dart 720:5                Future._completeWithValue
+  dart:async/future_impl.dart 804:7                Future._asyncCompleteWithValue.<fn>
+  dart:async/zone_root.dart 35:13                  _rootRun
+  dart:async/zone.dart 726:19                      _CustomZone.run
+  dart:async/zone.dart 625:7                       _CustomZone.runGuarded
+  dart:async/zone.dart 666:23                      _CustomZone.bindCallbackGuarded.<fn>
+  dart:async/schedule_microtask.dart 40:35         _microtaskLoop
+  dart:async/schedule_microtask.dart 49:5          _startMicrotaskLoop
+  dart:isolate-patch/isolate_patch.dart 127:13     _runPendingImmediateCallback
+  dart:isolate-patch/isolate_patch.dart 194:5      _RawReceivePort._handleMessage
+  
+00:02 +5 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: period reading uses the Liturgy of the Hours title
+00:03 +6 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: celebration titles do not get a lectionary year suffix
+00:03 +7 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: liturgical route formats its title with a Roman week number
+00:03 +8 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: (setUpAll)
+00:03 +8 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: synthetic fallback keeps alleluia text and lone alt chorus
+00:03 +9 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: MassSetSelector labels from the source, selection and callback
+00:05 +10 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: MassSetSelector labels from the source, selection and callback
+00:05 +11 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+00:05 +12 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+00:05 +13 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+00:07 +14 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen 15.08 opens the day Mass; the vigil is one tap away and stays chosen when the date is opened again
+00:09 +15 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen 15.08 opens the day Mass; the vigil is one tap away and stays chosen when the date is opened again
+00:09 +16 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen 15.08 opens the day Mass; the vigil is one tap away and stays chosen when the date is opened again
+00:09 +17 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen three sets fit a 320 px phone at double text size
+00:10 +18 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen the route can ask for a set (?set=vigil)
+00:10 +19 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen 24.12 opens the Christmas vigil Mass; the covered legacy document is not a second choice
+00:11 +20 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen Palm Sunday: rubrics, the Passion by roles, one Gospel
+00:11 +21 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen a procession set shows only its Gospel of the cycle
+00:12 +22 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen Easter Vigil: ordered sections, no conclusion after the third reading
+00:12 +23 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen the sequence is rendered as its own section
+00:13 +24 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen a reference-only set shows citations and says the text is not loaded yet
+00:13 +25 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen a document without sets keeps the flat rendering
+00:13 +26 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: (tearDownAll)

@@ -1,0 +1,7 @@
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:58370/[REDACTED]/
+VMServiceFlutterDriver: Isolate found with number: 7490299239183347
+VMServiceFlutterDriver: Isolate 7490299239183347 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+VMServiceFlutterDriver: Connected to Flutter application.
+VMServiceFlutterDriver: request_data message is taking a long time to complete...

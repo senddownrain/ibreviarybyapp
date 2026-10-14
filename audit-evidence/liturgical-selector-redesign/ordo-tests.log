@@ -1,0 +1,192 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 25 ms
+[ContentStore] prayers: 115 docs in 74 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 49 ms
+[ContentStore] invitatoriums: 4 docs in 54 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 49 ms
+[ContentStore] compendiumMeta: 1 docs in 43 ms
+[ContentStore] completoriums: 35 docs in 57 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 57 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 73 ms
+[ContentStore] liturgicalTemplates: 16 docs in 94 ms
+[ContentStore] compendium: 27 docs in 102 ms
+[ContentStore] songs: 447 docs in 112 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 134 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 157 ms
+[ContentStore] readings: 822 docs in 200 ms
+[ContentStore] days: 736 docs in 420 ms
+00:01 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Rosary memorial has default weekday and assembled Marian Office
+00:01 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Office assemblies share memorial readings in ORDO order
+00:02 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:09 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:11 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:13 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:15 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:16 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:17 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours date action updates the visible selected day
+00:18 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO reused route adopts its new date and source
+00:20 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar icon opens the day; arrows keep one route
+00:21 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO date-only calendar applies without closing and preserves shared dioceses
+00:23 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO dioceses persist through the shared settings and Month context
+[data] CACHE HIT  readings 2026-08-26
+00:25 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 24.0 at 200 percent text
+00:26 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 48.0 at 200 percent text
+00:27 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar search reaches the existing period and feast picker
+00:28 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+00:30 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+00:32 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Period notes are collapsed and can be opened
+00:33 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.android
+00:33 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.iOS
+00:34 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.0
+00:36 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.3
+00:37 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.5
+00:39 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 2.0
+00:40 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+00:41 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+00:41 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+00:41 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+00:41 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (tearDownAll)
+00:41 +29: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart
+00:43 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 23 ms
+[ContentStore] prayers: 115 docs in 72 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] invitatoriums: 4 docs in 56 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 45 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 49 ms
+[ContentStore] completoriums: 35 docs in 56 ms
+[ContentStore] compendiumMeta: 1 docs in 37 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 67 ms
+[ContentStore] songs: 447 docs in 63 ms
+[ContentStore] liturgicalTemplates: 16 docs in 83 ms
+[ContentStore] compendium: 27 docs in 71 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 101 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 151 ms
+[ContentStore] readings: 822 docs in 186 ms
+[ContentStore] days: 736 docs in 337 ms
+00:44 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 1.0
+00:46 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 2.0
+00:47 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 1.0
+00:48 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 2.0
+00:49 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+00:51 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: All Souls 2025 displays three Mass sets and Sunday Office once
+00:52 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: All Souls 2031 displays three Mass sets and Sunday Office once
+00:52 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year dialog stays usable at 320px, text x2, Brightness.dark
+00:53 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year dialog stays usable at 320px, text x2, Brightness.light
+00:53 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selected alternative and competing memorials keep one heading and collapsed details
+00:54 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: diocesan differences remain visible and identical readings appear once
+00:55 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.dark, scale 1.0
+00:55 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.dark, scale 1.5
+00:55 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.light, scale 1.0
+00:56 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.light, scale 1.5
+00:56 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.dark, scale 1.0
+00:56 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.dark, scale 1.5
+00:56 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.light, scale 1.0
+00:56 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.light, scale 1.5
+00:56 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.0
+00:57 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.5
+00:58 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.0
+00:59 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.5
+01:00 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.0
+01:00 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.5
+01:01 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.0
+01:02 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.5
+01:03 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector keeps distinct diocesan rows of the same celebration
+01:03 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: ORDO October 7 keeps memorial data and both Office variants
+01:03 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month lists all days, crosses year and respects calendar bounds
+01:04 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0
+01:05 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5
+01:06 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.0
+01:06 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.5
+01:07 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: (tearDownAll)
+01:07 +63: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart
+01:08 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 23 ms
+[ContentStore] prayers: 115 docs in 69 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 45 ms
+[ContentStore] invitatoriums: 4 docs in 48 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 36 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] completoriums: 35 docs in 48 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 74 ms
+[ContentStore] liturgicalTemplates: 16 docs in 80 ms
+[ContentStore] songs: 447 docs in 73 ms
+[ContentStore] compendium: 27 docs in 87 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 106 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 125 ms
+[ContentStore] readings: 822 docs in 174 ms
+[ContentStore] days: 736 docs in 356 ms
+01:09 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: Guardian Angels: vestment colour named, celebrations, notes and reading references
+01:10 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: books are collapsed; All Souls on Sunday names the Office of the Sunday
+01:11 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: Sunday suppressed celebrations stay inside collapsed notes
+01:12 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: 13.06.2026: two memorial choices, no demotion badge
+01:12 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: each celebration displays its own legal colour
+01:12 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: the selected dioceses that differ are explained, not mixed
+01:13 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 320 px, text ×1.0, light
+01:13 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 320 px, text ×1.0, dark
+01:14 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 320 px, text ×1.4, light
+01:14 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 320 px, text ×1.4, dark
+01:14 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 320 px, text ×2.0, light
+01:15 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 320 px, text ×2.0, dark
+01:15 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 360 px, text ×1.0, light
+01:16 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 360 px, text ×1.0, dark
+01:16 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 360 px, text ×1.4, light
+01:16 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 360 px, text ×1.4, dark
+01:17 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 360 px, text ×2.0, light
+01:17 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 360 px, text ×2.0, dark
+01:17 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 390 px, text ×1.0, light
+01:18 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 390 px, text ×1.0, dark
+01:18 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 390 px, text ×1.4, light
+01:18 +84: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 390 px, text ×1.4, dark
+01:19 +85: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 390 px, text ×2.0, light
+01:19 +86: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 390 px, text ×2.0, dark
+01:19 +87: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 430 px, text ×1.0, light
+01:20 +88: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 430 px, text ×1.0, dark
+01:20 +89: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 430 px, text ×1.4, light
+01:20 +90: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 430 px, text ×1.4, dark
+01:20 +91: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 430 px, text ×2.0, light
+01:21 +92: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 430 px, text ×2.0, dark
+01:21 +93: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×1.0, light
+01:21 +94: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×1.0, dark
+01:21 +95: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×1.4, light
+01:22 +96: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×1.4, dark
+01:22 +97: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×2.0, light
+01:22 +98: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: no overflow at 820 px, text ×2.0, dark
+01:22 +99: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: one colour vocabulary: no blue vestment, Marian blue is an accent
+01:22 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_screen_test.dart: (tearDownAll)
+01:22 +100: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart
+01:25 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 27 ms
+[ContentStore] prayers: 115 docs in 75 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 13 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 12 ms
+[ContentStore] invitatoriums: 4 docs in 14 ms
+[ContentStore] completoriums: 35 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 58 ms
+[ContentStore] liturgicalTemplates: 16 docs in 60 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 109 ms
+[ContentStore] readings: 822 docs in 156 ms
+[ContentStore] days: 736 docs in 311 ms
+01:25 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: lazy notes show loading while the day and directions stay usable
+01:25 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: (setUpAll)
+[ContentStore] compendiumMeta: 1 docs in 2 ms
+01:27 +101: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: failed notes retain the primary day and an explicit status
+01:27 +101: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: (setUpAll)
+[ContentStore] songs: 447 docs in 1774 ms
+[ContentStore] compendium: 27 docs in 1773 ms
+01:28 +102: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: one parent hairline survives closed, one, two and all expanded sections at 200 percent
+01:29 +102: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: (setUpAll)
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 2515 ms
+01:29 +103: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: diocesan note variants, sources and long paragraphs survive grouping
+01:30 +104: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_details_refinement_test.dart: (tearDownAll)
+01:30 +104: All tests passed!

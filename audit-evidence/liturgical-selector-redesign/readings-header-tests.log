@@ -1,0 +1,14 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart
+00:00 +0 -1: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart [E]
+  FileSystemException: Cannot copy file to 'C:\Users\User\AppData\Local\Temp\flutter_tools.a318e8a6\flutter_test_listener.409bb6fc\listener.dart.dill', path = 'C:\Users\User\AppData\Local\Temp\flutter_tools.a318e8a6\flutter_test_compiler.e51f4894\output.dill' (OS Error: Недостаточно места на диске, errno = 112)
+  dart:io/common.dart 58:9                                  _checkForErrorResponse
+  dart:io/file_impl.dart 406:7                              _File.copy.<fn>
+  dart:async/zone_root.dart 48:47                           _rootRunUnary
+  dart:async/zone.dart 733:19                               _CustomZone.runUnary
+  ===== asynchronous gap ===========================
+  package:file/src/forwarding/forwarding_file.dart 29:51    ForwardingFile.copy
+  ===== asynchronous gap ===========================
+  package:file/src/forwarding/forwarding_file.dart 29:51    ForwardingFile.copy
+  ===== asynchronous gap ===========================
+  package:flutter_tools/src/test/test_compiler.dart 266:41  TestCompiler._onCompilationRequest
+  
