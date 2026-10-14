@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "preferencesRestored": true,
+  "states": {
+    "polish-android-light-bottom-safe-area": {
+      "width": 411,
+      "bottomInset": 48.0
+    }
+  },
+  "nativeVisualCheck": "NOT TESTED: System UI ANR dialog obscured the device screenshot",
+  "buildSourceSha": "de10a1c861e9dd8cecc2e0915a13b03c9bf16953",
+  "installedApkHashVerified": false
+}
