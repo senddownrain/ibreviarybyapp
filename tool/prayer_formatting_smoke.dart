@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/services/priest_access_policy.dart';
-import '../test/support/prayer_formatting_fixtures.dart';
+import 'package:mybrev_flutter/dev/prayer_formatting_harness.dart';
 
 /// Run with flutter run -d chrome -t tool/prayer_formatting_smoke.dart.
 /// Reads the existing public bundle; never connects to Firebase or writes data.

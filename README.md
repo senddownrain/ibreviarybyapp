@@ -64,7 +64,8 @@ flutter run -d chrome
 unit/widget-тестами, общий UI — также визуально в Chrome; нативные функции
 и мобильный релиз требуют проверки на соответствующем устройстве.
 Изолированный экран для проверки форматирования молитв:
-`flutter run -d chrome -t tool/prayer_formatting_smoke.dart`.
+`flutter run -d chrome -t tool/prayer_formatting_smoke.dart --web-port 5237`
+(локальный URL `http://localhost:5237/`).
 
 Все тексты (Литургия часов, чтения, молитвы, Библия, Спеўнік, Кампендый)
 входят в приложение и работают без сети с первого запуска. Сеть нужна только

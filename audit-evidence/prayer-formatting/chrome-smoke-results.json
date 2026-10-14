@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-14",
+  "command": "flutter run -d chrome -t tool/prayer_formatting_smoke.dart --web-port 5237",
+  "appUrl": "http://localhost:5237/",
+  "chromeVersion": "155.0.8059.40",
+  "browserExecutable": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "connection": "Playwright CDP attached to Flutter-launched Google Chrome; page URL checked",
+  "viewportStates": [
+    {
+      "width": 1280,
+      "height": 1000,
+      "fontScale": 1
+    },
+    {
+      "width": 320,
+      "height": 1000,
+      "fontScale": 1
+    },
+    {
+      "width": 320,
+      "height": 1000,
+      "fontScale": 1.8
+    }
+  ],
+  "checkedOnScreen": [
+    "bare role in preserved blockquote",
+    "light and dark themes",
+    "320 px layout",
+    "180% font via reader controls",
+    "real public short prayer and litany",
+    "50-response litany scrolling to last response",
+    "local editor source contains >",
+    "same local preview in light and dark",
+    "legacy HTML with script removed",
+    "internal prayer link and back",
+    "missing ID message",
+    "restricted ID message without SECRET"
+  ],
+  "consoleErrors": [],
+  "firestoreWrites": 0,
+  "nativeSmoke": "Not run: shared UI/parser change; required before native release",
+  "screenshots": [
+    {
+      "file": "chrome-dark-320-180-quote.png",
+      "bytes": 73585,
+      "sha256": "82224ed488a0ac6ccb912ba726f1ef02b6dd8f6ac5c4335775d59725ef120eca"
+    },
+    {
+      "file": "chrome-dark-320-reader.png",
+      "bytes": 76885,
+      "sha256": "f3216779e9edbe727d176992369e6832e7aa246d5e680ca73b59ece92835ed70"
+    },
+    {
+      "file": "chrome-font-180-control.png",
+      "bytes": 81325,
+      "sha256": "6a48ebe7772e45e8721c91af5fb25a9d1f2e665dffcf8db1a00c57054b907569"
+    },
+    {
+      "file": "chrome-internal-link-target-320-180.png",
+      "bytes": 33632,
+      "sha256": "c290b4413875d8ecfbe5038bfc2d27b4f7f8e047509ab29b9fdd85cf3b4983d0"
+    },
+    {
+      "file": "chrome-legacy-dark-320-180.png",
+      "bytes": 55104,
+      "sha256": "7850a687fef3199767dae65fd54fa23d8fcd71358c9d7d767bcf5c13bf1b3366"
+    },
+    {
+      "file": "chrome-light-320-180-litany-end.png",
+      "bytes": 77408,
+      "sha256": "b4f3c189c63ac6a0af24e5b61bfa4ae43c8bb452abd5943b39f33e0e3dc6bf32"
+    },
+    {
+      "file": "chrome-light-320-180-quote.png",
+      "bytes": 75532,
+      "sha256": "30ffcbb6c307a2b88c09f3e4045f23d6dc70dcfb43c05538ae5a1a749a2fbbcc"
+    },
+    {
+      "file": "chrome-local-editor-320.png",
+      "bytes": 56113,
+      "sha256": "3d2eaa6291091cb82d9f3cb24ab5e45a05de4ee68f189b83a9aabc2006a32c4b"
+    },
+    {
+      "file": "chrome-local-preview-dark-320-180.png",
+      "bytes": 67361,
+      "sha256": "1d46514af3fe98e749022c12a3341f770f3d639dd9f568bcbc2b280429adbdbd"
+    },
+    {
+      "file": "chrome-local-preview-light-320-180.png",
+      "bytes": 68752,
+      "sha256": "d6021bfc9e47cd04adc6f03c9c5eb35086bf0a05fac56bfacb7663d7fd4dac30"
+    },
+    {
+      "file": "chrome-missing-link-320.png",
+      "bytes": 21802,
+      "sha256": "41accdf0d5136360a1b25c67e64c000fe0a21484eea9c96aa40893979d72c732"
+    },
+    {
+      "file": "chrome-quote-fixed-dark.png",
+      "bytes": 126632,
+      "sha256": "ce4cd8506363d50c50d665ab06556e14f474c81c45b71335f70c7416d9c5726b"
+    },
+    {
+      "file": "chrome-quote-fixed-light.png",
+      "bytes": 118913,
+      "sha256": "fb89340ead524a6b2bb802706e7ae63aeb8d634924e5975983a777088f0caddb"
+    },
+    {
+      "file": "chrome-real-litany-320-180.png",
+      "bytes": 85819,
+      "sha256": "2b23f705d5834906feeecbf678d9e80be81c13dae6846068db94ca1abdd5bf76"
+    },
+    {
+      "file": "chrome-real-litany-middle-320-180.png",
+      "bytes": 84983,
+      "sha256": "eb3a14d6868e9d2108f80138167225c5a2a30c7bb12a744369d658e0ce585872"
+    },
+    {
+      "file": "chrome-real-short-320-180.png",
+      "bytes": 88112,
+      "sha256": "26414c002cbc9b8f0ecea166fe4181e1066e4d4ef904c660350e5d2ab29a1d0f"
+    },
+    {
+      "file": "chrome-real-short-end-320-180.png",
+      "bytes": 77810,
+      "sha256": "2f4f9c1da2b6f45c4ad70e032f9d3aeda2ad18972af07c32425eaf3f4161e34b"
+    },
+    {
+      "file": "chrome-restricted-link-320.png",
+      "bytes": 24123,
+      "sha256": "ea8861b1735d2f38b53aa6dc086cbb8f6250a8507d3fa4ee06d8bb2605515c34"
+    }
+  ]
+}

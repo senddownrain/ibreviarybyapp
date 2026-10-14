@@ -15,9 +15,10 @@ final _speaker = RegExp(r'^( {0,3})([КСНДЛЦVR]\.)(:)?(?=[ \t]+\S)');
 final _initial = RegExp(r'^\p{Lu}\.', unicode: true);
 final _name = RegExp(r'^\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+)*$', unicode: true);
 
-/// Contract 1.0: CommonMark, physical line breaks and explicit rubrics.
-/// Recognition is confined to ordinary paragraph AST nodes. Mass opts out
-/// because its role metadata is language/context dependent.
+/// CommonMark with physical line breaks, rubrics and the approved quote-speaker
+/// amendment to contract 1.0. Quoted paragraphs keep their blockquote container;
+/// roles use the same conservative prefix rules as unquoted paragraphs. Mass
+/// opts out because its role metadata is language/context dependent.
 String prayerMarkdownToHtml(String source, {bool recognizeSpeakers = true}) {
   if (source.trim().isEmpty) return '';
   final document = md.Document(
@@ -75,9 +76,7 @@ void _parseInlines(
         document,
         recognizeSpeakers: recognizeSpeakers,
         paragraph: node.tag == 'p',
-        excluded:
-            excluded ||
-            {'aside', 'blockquote', 'li', 'pre', 'code'}.contains(node.tag),
+        excluded: excluded || {'aside', 'li', 'pre', 'code'}.contains(node.tag),
       );
     }
   }

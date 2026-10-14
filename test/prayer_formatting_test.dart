@@ -39,7 +39,6 @@ void main() {
         'N. Name',
         'P. Dominus vobiscum.',
         'с. пан з вамі.',
-        '> С. Пан з вамі.\nН. І з духам тваім.',
         '[С. Пан з вамі.](/prayer/id)',
         '`Н. І з духам тваім.`',
         '# С. Пан з вамі.',
@@ -105,19 +104,87 @@ void main() {
     expect(doc.outerHtml, isNot(contains('&gt;')));
     expect(prayer.toMap()['text'], source);
     expect(prayer.displayText, contains('> Гэта'));
-    // A mistaken import is still interpreted as a quote. Only an author can
-    // decide whether that source marker should be removed.
+    // A mistaken import is still a quote, with semantic speaker styling inside
+    // it. Only an author can decide whether the source marker should be removed.
     expect(
       parseFragment(
         prayerMarkdownToHtml('> Н. І з духам тваім.'),
-      ).querySelectorAll('.prayer-speaker'),
-      isEmpty,
+      ).querySelectorAll('blockquote .prayer-speaker').map((e) => e.text),
+      ['Н.'],
     );
     expect(
       parseFragment(prayerMarkdownToHtml(r'\> Н. І з духам тваім.')).text,
       contains('> Н.'),
     );
   });
+
+  test(
+    'quoted dialogue labels preserve blockquote and source for all roles',
+    () {
+      for (final entry in prayerSpeakers.entries) {
+        final source = '> Гэта цытата.\n> ${entry.key}: І з духам тваім.';
+        final prayer = Prayer(
+          id: 'quote',
+          title: '',
+          body: source,
+          textFormat: 'mybrev-markdown',
+        );
+        final doc = parseFragment(prayerMarkdownToHtml(prayer.displayText));
+        final quote = doc.querySelector('blockquote')!;
+        final label = quote.querySelector('.prayer-speaker')!;
+        expect(label.text, '${entry.key}:');
+        expect(label.attributes['data-role'], entry.value);
+        expect(label.parent!.localName, 'p');
+        expect(quote.querySelectorAll('.prayer-speaker'), hasLength(1));
+        expect(quote.innerHtml, contains('</span> І з духам тваім.'));
+        expect(quote.querySelectorAll('br'), hasLength(1));
+        expect(prayer.toMap()['text'], source);
+        expect(doc.outerHtml, isNot(contains('&gt;')));
+      }
+      final exact = parseFragment(
+        prayerMarkdownToHtml('> Н. І з духам тваім.'),
+      );
+      expect(exact.querySelector('blockquote .prayer-speaker')!.text, 'Н.');
+      expect(
+        exact.querySelector('blockquote')!.text.trim(),
+        'Н. І з духам тваім.',
+      );
+    },
+  );
+
+  test(
+    'quoted narrative, names, initials, explicit formatting and code stay excluded',
+    () {
+      final source = [
+        '> С. Я. Купала',
+        '> К. Купала',
+        '> Тэкст: Н. І з духам тваім.',
+        '> C. Пан з вамі.',
+        '> N. Name',
+        '> **Н.** І з духам тваім.',
+        '> `Н. І з духам тваім.`',
+        '> [Н. І з духам тваім.](/prayer/id)',
+        '> # Н. І з духам тваім.',
+        '> - Н. І з духам тваім.',
+        '> ```md\n> Н. І з духам тваім.\n> ```',
+        '>     Н. І з духам тваім.',
+        '> :::rubric\n> Н. І з духам тваім.\n> :::',
+      ].join('\n\n');
+      expect(
+        parseFragment(
+          prayerMarkdownToHtml(source),
+        ).querySelectorAll('.prayer-speaker'),
+        isEmpty,
+      );
+      final nested = parseFragment(
+        prayerMarkdownToHtml('> > Н. І з духам тваім.'),
+      );
+      expect(
+        nested.querySelector('blockquote blockquote .prayer-speaker')!.text,
+        'Н.',
+      );
+    },
+  );
 
   test('unclosed rubric stays visible, fenced directives remain code', () {
     final doc = parseFragment(prayerMarkdownToHtml(':::rubric\nУсе ўстаюць.'));

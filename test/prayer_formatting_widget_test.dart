@@ -13,7 +13,7 @@ import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayer_form_screen.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
-import 'support/prayer_formatting_fixtures.dart';
+import 'package:mybrev_flutter/dev/prayer_formatting_harness.dart';
 
 void main() {
   testWidgets(
@@ -22,12 +22,48 @@ void main() {
       await tester.pumpWidget(const PrayerFormattingHarness(systemFonts: true));
       await tester.pumpAndSettle();
       expect(find.byType(Html), findsOneWidget);
+      List<TextSpan> readerSpans() {
+        final spans = <TextSpan>[];
+        void visit(InlineSpan span) {
+          if (span is TextSpan) {
+            spans.add(span);
+            for (final child in span.children ?? <InlineSpan>[]) {
+              visit(child);
+            }
+          }
+        }
+
+        for (final rich in tester.widgetList<RichText>(find.byType(RichText))) {
+          visit(rich.text);
+        }
+        return spans;
+      }
+
+      void expectQuotedDialogue() {
+        final spans = readerSpans();
+        final spoken = spans.firstWhere(
+          (s) => s.text?.contains('І з духам тваім.') ?? false,
+        );
+        expect(
+          spoken.style?.fontWeight ?? FontWeight.normal,
+          FontWeight.normal,
+        );
+        expect(
+          spans
+              .where((s) => s.text == 'Н.')
+              .every((s) => s.style?.fontWeight == FontWeight.w700),
+          isTrue,
+        );
+      }
+
+      expectQuotedDialogue();
       await tester.tap(find.byTooltip('Theme'));
       await tester.pumpAndSettle();
       expect(
         Theme.of(tester.element(find.byType(Html))).brightness,
         Brightness.dark,
       );
+      expectQuotedDialogue();
       await tester.tap(find.byTooltip('320px'));
       await tester.pumpAndSettle();
       expect(tester.getSize(find.byType(Html)).width, lessThanOrEqualTo(320));
@@ -82,8 +118,8 @@ void main() {
           await tester.pumpAndSettle();
           final reader = tester.widget<Html>(find.byType(Html));
           final doc = parseFragment(reader.data!);
-          expect(doc.querySelectorAll('.prayer-speaker'), hasLength(55));
-          expect(doc.querySelector('blockquote .prayer-speaker'), isNull);
+          expect(doc.querySelectorAll('.prayer-speaker'), hasLength(56));
+          expect(doc.querySelector('blockquote .prayer-speaker')!.text, 'Н.');
           expect(find.byType(SelectionArea), findsOneWidget);
           final readerStyles = reader.style;
           final richTexts = tester.widgetList<RichText>(find.byType(RichText));

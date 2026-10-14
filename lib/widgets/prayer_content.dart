@@ -46,6 +46,8 @@ Map<String, Style> prayerDocumentStyles(BuildContext context, TextStyle body) {
     'body': Style(
       fontSize: FontSize(size),
       fontFamily: body.fontFamily,
+      fontWeight: body.fontWeight ?? FontWeight.normal,
+      fontStyle: body.fontStyle ?? FontStyle.normal,
       color: body.color ?? reader.ink,
       lineHeight: LineHeight(ReaderTheme.bodyHeight),
       margin: Margins.zero,
