@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 
 const _weekdays = ['Пн', 'Аў', 'Ср', 'Чц', 'Пт', 'Сб', 'Нд'];
 
@@ -43,6 +44,29 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
   bool _pickingMonth = false;
   bool _pickingYear = false;
   late int _pickerYear = _month.year;
+  ScrollController? _yearScroll;
+
+  @override
+  void dispose() {
+    _yearScroll?.dispose();
+    super.dispose();
+  }
+
+  void _toggleYears() {
+    if (!_pickingYear) {
+      _yearScroll?.dispose();
+      _yearScroll = ScrollController(
+        keepScrollOffset: false,
+        initialScrollOffset:
+            ((_pickerYear - kCalendarFirstDate.year) * 48.0 - 96).clamp(
+              0.0,
+              (kCalendarLastDate.year - kCalendarFirstDate.year + 1) * 48.0 -
+                  240,
+            ),
+      );
+    }
+    setState(() => _pickingYear = !_pickingYear);
+  }
 
   void _jumpToMonth() => setState(() {
     _pickerYear = _month.year;
@@ -68,7 +92,7 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
             Expanded(
               child: TextButton(
                 key: const Key('ordo-pick-year'),
-                onPressed: () => setState(() => _pickingYear = !_pickingYear),
+                onPressed: _toggleYears,
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -101,15 +125,7 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
             height: 240,
             child: ListView(
               key: const Key('ordo-year-list'),
-              controller: ScrollController(
-                initialScrollOffset:
-                    ((_pickerYear - kCalendarFirstDate.year) * 48.0 - 96).clamp(
-                      0.0,
-                      ((kCalendarLastDate.year - kCalendarFirstDate.year + 1) *
-                              48.0 -
-                          240),
-                    ),
-              ),
+              controller: _yearScroll,
               itemExtent: 48,
               children: [
                 for (
@@ -130,21 +146,54 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
             ),
           )
         else
-          for (var row = 0; row < 4; row++)
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Measure names with the real theme/font scaler; never break a
+              // month name just to keep three columns at large system text.
+              var widestName = 0.0;
+              for (var month = 1; month <= 12; month++) {
+                final name = DateFormat(
+                  'LLLL',
+                  'be',
+                ).format(DateTime(_pickerYear, month));
+                final measurement = TextPainter(
+                  text: TextSpan(
+                    text: '${name[0].toUpperCase()}${name.substring(1)}',
+                    style: theme.textTheme.labelLarge,
+                  ),
+                  textScaler: MediaQuery.textScalerOf(context),
+                  textDirection: Directionality.of(context),
+                  maxLines: 1,
+                )..layout();
+                if (measurement.width > widestName) {
+                  widestName = measurement.width;
+                }
+                measurement.dispose();
+              }
+              final columns = (constraints.maxWidth / (widestName + 16))
+                  .floor()
+                  .clamp(1, 3);
+              return Column(
                 children: [
-                  for (var column = 0; column < 3; column++)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(3),
-                        child: _monthButton(row * 3 + column + 1),
+                  for (var row = 0; row < 12 ~/ columns; row++)
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (var column = 0; column < columns; column++)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: _monthButton(row * columns + column + 1),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                 ],
-              ),
-            ),
+              );
+            },
+          ),
         TextButton(
           key: const Key('ordo-picker-days'),
           onPressed: () => setState(() {
@@ -266,36 +315,84 @@ class _MonthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = DateFormat('LLLL y', 'be').format(month);
-    return Row(
-      children: [
-        IconButton(
-          key: const Key('ordo-previous-month'),
-          tooltip: 'Папярэдні месяц',
-          onPressed: onPrevious,
-          icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
-        ),
-        Expanded(
-          child: TextButton(
-            key: const Key('ordo-jump-month'),
-            onPressed: onJump,
+    final monthLabel = DateFormat('LLLL', 'be').format(month);
+    String capitalise(String text) =>
+        '${text[0].toUpperCase()}${text.substring(1)}';
+    final style = Theme.of(context).textTheme.titleLarge?.copyWith(
+      fontSize: LiturgicalSelectorTokens.titleSize,
+      fontWeight: FontWeight.w600,
+    );
+    final previous = IconButton(
+      key: const Key('ordo-previous-month'),
+      tooltip: 'Папярэдні месяц',
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      onPressed: onPrevious,
+      icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
+    );
+    final next = IconButton(
+      key: const Key('ordo-next-month'),
+      tooltip: 'Наступны месяц',
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      onPressed: onNext,
+      icon: const PhosphorIcon(PhosphorIconsRegular.caretRight),
+    );
+    Widget heading(String text) => TextButton(
+      key: const Key('ordo-jump-month'),
+      onPressed: onJump,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
             child: Text(
-              '${label[0].toUpperCase()}${label.substring(1)} ⌄',
+              text,
               key: const Key('ordo-month-label'),
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
+              style: style,
             ),
           ),
-        ),
-        IconButton(
-          key: const Key('ordo-next-month'),
-          tooltip: 'Наступны месяц',
-          onPressed: onNext,
-          icon: const PhosphorIcon(PhosphorIconsRegular.caretRight),
-        ),
-      ],
+          const SizedBox(width: 4),
+          const Icon(Icons.keyboard_arrow_down, size: 20),
+        ],
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final measurement = TextPainter(
+          text: TextSpan(text: capitalise(monthLabel), style: style),
+          textScaler: MediaQuery.textScalerOf(context),
+          textDirection: Directionality.of(context),
+          maxLines: 1,
+        )..layout();
+        final separateYear = measurement.width > constraints.maxWidth - 96 - 48;
+        measurement.dispose();
+        if (separateYear) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              heading(capitalise(monthLabel)),
+              Row(
+                children: [
+                  previous,
+                  Expanded(
+                    child: TextButton(
+                      onPressed: onJump,
+                      child: Text('${month.year}', style: style),
+                    ),
+                  ),
+                  next,
+                ],
+              ),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            previous,
+            Expanded(child: heading(capitalise(label))),
+            next,
+          ],
+        );
+      },
     );
   }
 }
@@ -386,7 +483,7 @@ class _MonthGrid extends ConsumerWidget {
                                       }
                                     }
                                   }
-                                  return colors.take(3).toList();
+                                  return colors;
                                 }(),
                                 isToday: iso == today,
                                 isSelected: iso == selected,

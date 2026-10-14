@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
+import 'package:mybrev_flutter/widgets/liturgical_heading_text.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
@@ -35,130 +36,135 @@ class LiturgicalDayHeader extends StatelessWidget {
     final p = presentation;
     final cs = Theme.of(context).colorScheme;
     final ink = cs.onSurface;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(sectionTitle, style: ReaderTheme.of(context).documentTitle()),
-        const SizedBox(height: 12),
-        LiturgicalDateNavigationRow(
-          date: p.date,
-          keyPrefix: keyPrefix,
-          onDateTap: onDateTap,
-          onPrevious: onPrevious,
-          onNext: onNext,
-        ),
-        const SizedBox(height: 12),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AnimatedContainer(
-                key: Key('$keyPrefix-celebration-accent'),
-                duration: const Duration(milliseconds: 300),
-                width: 4,
-                margin: const EdgeInsets.symmetric(vertical: 3),
-                decoration: BoxDecoration(
-                  color: p.accent,
-                  borderRadius: BorderRadius.circular(99),
+    return LayoutBuilder(
+      builder: (context, constraints) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LiturgicalHeadingText(
+            sectionTitle,
+            style: ReaderTheme.of(context).documentTitle(),
+          ),
+          const SizedBox(height: 12),
+          LiturgicalDateNavigationRow(
+            date: p.date,
+            keyPrefix: keyPrefix,
+            onDateTap: onDateTap,
+            onPrevious: onPrevious,
+            onNext: onNext,
+          ),
+          const SizedBox(height: 12),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AnimatedContainer(
+                  key: Key('$keyPrefix-celebration-accent'),
+                  duration: const Duration(milliseconds: 300),
+                  width: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 3),
+                  decoration: BoxDecoration(
+                    color: p.accent,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      p.title,
-                      key: Key('$keyPrefix-celebration-title'),
-                      style: ReaderTheme.of(context)
-                          .displayTitle(29)
-                          .copyWith(color: cs.onSurface, height: 1.18),
-                    ),
-                    const SizedBox(height: 8),
-                    Text.rich(
-                      key: Key('$keyPrefix-day-metadata'),
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: p.weekday,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: cs.onSurface,
-                                ),
-                          ),
-                          TextSpan(
-                            text: (metadata ?? p.metadata).replaceFirst(
-                              p.weekday,
-                              '',
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LiturgicalHeadingText(
+                        p.title,
+                        key: Key('$keyPrefix-celebration-title'),
+                        maxWidth: constraints.maxWidth - 18,
+                        style: ReaderTheme.of(context)
+                            .displayTitle(29)
+                            .copyWith(color: cs.onSurface, height: 1.18),
+                      ),
+                      const SizedBox(height: 8),
+                      Text.rich(
+                        key: Key('$keyPrefix-day-metadata'),
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: p.weekday,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: cs.onSurface,
+                                  ),
                             ),
-                          ),
-                        ],
-                      ),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 14.5,
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ),
-                    if (p.badges.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          for (final badge in p.badges)
-                            Chip(label: Text(badge)),
-                        ],
-                      ),
-                    ],
-                    if (p.place.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        p.place,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            TextSpan(
+                              text: (metadata ?? p.metadata).replaceFirst(
+                                p.weekday,
+                                '',
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 14.5,
                           color: cs.onSurfaceVariant,
                         ),
                       ),
+                      if (p.badges.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            for (final badge in p.badges)
+                              Chip(label: Text(badge)),
+                          ],
+                        ),
+                      ],
+                      if (p.place.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          p.place,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: cs.onSurfaceVariant),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        if (onToday != null)
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              key: Key('$keyPrefix-today'),
-              onPressed: onToday,
-              icon: const Icon(Icons.history, size: 18),
-              label: const Text('Сёння'),
-            ),
-          ),
-        if (showVariants) ...[
-          const SizedBox(height: 2),
-          TextButton(
-            key: Key('$keyPrefix-alternatives-control'),
-            style: TextButton.styleFrom(
-              foregroundColor: ink,
-              textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-              minimumSize: const Size(48, 48),
-            ),
-            onPressed: onVariants,
-            child: const Row(
-              children: [
-                Expanded(child: Text('Іншыя варыянты')),
-                Icon(Icons.chevron_right, size: 20),
               ],
             ),
           ),
+          if (onToday != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                key: Key('$keyPrefix-today'),
+                onPressed: onToday,
+                icon: const Icon(Icons.history, size: 18),
+                label: const Text('Сёння'),
+              ),
+            ),
+          if (showVariants) ...[
+            const SizedBox(height: 2),
+            TextButton(
+              key: Key('$keyPrefix-alternatives-control'),
+              style: TextButton.styleFrom(
+                foregroundColor: ink,
+                textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                minimumSize: const Size(48, 48),
+              ),
+              onPressed: onVariants,
+              child: const Row(
+                children: [
+                  Expanded(child: Text('Іншыя варыянты')),
+                  Icon(Icons.chevron_right, size: 20),
+                ],
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

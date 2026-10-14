@@ -163,17 +163,18 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
             onSelected: selectDate,
           ),
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            key: const Key('liturgical-calendar-today'),
-            onPressed: () {
-              selectDate(DateTime.now());
-              setState(() => _calendarExpanded = true);
-            },
-            child: const Text('Сёння'),
+        if (_calendarExpanded)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              key: const Key('liturgical-calendar-today'),
+              onPressed: () {
+                selectDate(DateTime.now());
+                setState(() => _calendarExpanded = true);
+              },
+              child: const Text('Сёння'),
+            ),
           ),
-        ),
         if (ready.hasValue)
           HoursOptionsSheet(
             date: presentation.date,

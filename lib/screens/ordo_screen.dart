@@ -29,6 +29,7 @@ import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
+import 'package:mybrev_flutter/widgets/liturgical_heading_text.dart';
 import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/mass_reading_sets.dart';
@@ -383,7 +384,36 @@ class _DayDetail extends ConsumerWidget {
         },
     };
 
-    final primaryRefs = references[day.diocese]?[day.primary.id];
+    final legal = union.rows
+        .where((row) => row.role != 'commemoration')
+        .toList();
+    final selectedOffice = ref.watch(hoursLiturgicalSelectionProvider).selected;
+    final chosen = legal.firstWhere(
+      (row) =>
+          row.option.id == selectedOffice?.optionId &&
+          row.dioceses.contains(
+            selectedOffice?.contextDiocese ?? contextDiocese,
+          ),
+      orElse: () => legal.firstWhere(
+        (row) =>
+            row.role == 'primary' &&
+            row.dioceses.contains(day.diocese) &&
+            row.option.id == day.primary.id,
+      ),
+    );
+    final chosenDiocese = chosen.dioceses.contains(contextDiocese)
+        ? contextDiocese!
+        : chosen.dioceses.first;
+    final officeContent = LiturgicalContentService().contentForDate(
+      date,
+      diocese: chosenDiocese,
+    );
+    final officeSelection = resolveHoursLiturgicalSelection(
+      officeContent.options,
+      selectedDayId: dayId,
+      selectedDiocese: chosenDiocese,
+    );
+    final primaryRefs = references[chosenDiocese]?[chosen.option.id];
     final year = primaryRefs?.documents
         .map((doc) => doc.year ?? '')
         .where((year) => const {'1', '2', 'A', 'B', 'C'}.contains(year))
@@ -445,35 +475,6 @@ class _DayDetail extends ConsumerWidget {
     final officeNotes = groups.remove('Літургія гадзін') ?? const <Widget>[];
     final directionNotes =
         groups.remove('Літургічныя ўказанні') ?? const <Widget>[];
-    final legal = union.rows
-        .where((row) => row.role != 'commemoration')
-        .toList();
-    final selectedOffice = ref.watch(hoursLiturgicalSelectionProvider).selected;
-    final chosen = legal.firstWhere(
-      (row) =>
-          row.option.id == selectedOffice?.optionId &&
-          row.dioceses.contains(
-            selectedOffice?.contextDiocese ?? contextDiocese,
-          ),
-      orElse: () => legal.firstWhere(
-        (row) =>
-            row.role == 'primary' &&
-            row.dioceses.contains(day.diocese) &&
-            row.option.id == day.primary.id,
-      ),
-    );
-    final chosenDiocese = chosen.dioceses.contains(contextDiocese)
-        ? contextDiocese!
-        : chosen.dioceses.first;
-    final officeContent = LiturgicalContentService().contentForDate(
-      date,
-      diocese: chosenDiocese,
-    );
-    final officeSelection = resolveHoursLiturgicalSelection(
-      officeContent.options,
-      selectedDayId: dayId,
-      selectedDiocese: chosenDiocese,
-    );
     final readingGroups =
         <String, (OptionReadingReferences, Set<OrdoUnionRow>, Set<String>)>{};
     for (final row in legal) {
@@ -696,7 +697,7 @@ class _DayDetail extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              LiturgicalHeadingText(
                 'Літургічны дзень',
                 style: ReaderTheme.of(context).documentTitle(),
               ),
@@ -1256,27 +1257,6 @@ String _noteSource(Json note, String diocese) {
   ].where((part) => part.isNotEmpty).join(' · ');
 }
 
-class _Action extends StatelessWidget {
-  const _Action({super.key, required this.label, required this.onTap});
-  final String label;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => TextButton(
-    style: TextButton.styleFrom(
-      minimumSize: const Size(48, 48),
-      alignment: Alignment.centerLeft,
-    ),
-    onPressed: onTap,
-    child: Row(
-      children: [
-        Expanded(child: Text(label)),
-        const SizedBox(width: 8),
-        const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
-      ],
-    ),
-  );
-}
-
 String _complineLabel(String value) => switch (value) {
   'current-weekday' => 'з гэтага дня тыдня',
   'sunday-after-first-vespers' => 'пасля першых нешпараў нядзелі',
@@ -1436,7 +1416,14 @@ class _CelebrationRow extends StatelessWidget {
   final String? weekday;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => heading
+      ? LayoutBuilder(
+          builder: (context, constraints) =>
+              _buildContent(context, constraints.maxWidth),
+        )
+      : _buildContent(context, null);
+
+  Widget _buildContent(BuildContext context, double? headingWidth) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final option = row.option;
@@ -1477,19 +1464,28 @@ class _CelebrationRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title ?? option.title,
-                style:
-                    (heading
-                            ? ReaderTheme.of(context).displayTitle(29)
-                            : theme.textTheme.titleMedium)
-                        ?.copyWith(
-                          fontSize: heading ? 29 : 16,
-                          fontWeight: heading || row.role == 'primary'
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                        ),
-              ),
+              if (heading)
+                LiturgicalHeadingText(
+                  title ?? option.title,
+                  maxWidth: headingWidth! - 16,
+                  style: ReaderTheme.of(
+                    context,
+                  ).displayTitle(29).copyWith(fontWeight: FontWeight.w600),
+                )
+              else
+                Text(
+                  title ?? option.title,
+                  style:
+                      (heading
+                              ? ReaderTheme.of(context).displayTitle(29)
+                              : theme.textTheme.titleMedium)
+                          ?.copyWith(
+                            fontSize: heading ? 29 : 16,
+                            fontWeight: heading || row.role == 'primary'
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                          ),
+                ),
               if (!heading ||
                   (option.rank != 'feria' && option.rank != 'dominica')) ...[
                 const SizedBox(height: 3),
@@ -1522,6 +1518,7 @@ class _CelebrationRow extends StatelessWidget {
                           text: weekday,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
+                            fontSize: 18,
                             color: cs.onSurface,
                           ),
                         ),

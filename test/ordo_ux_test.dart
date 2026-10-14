@@ -355,6 +355,40 @@ void main() {
     },
   );
 
+  testWidgets('year list centres the browsed year after reopening', (
+    tester,
+  ) async {
+    await frame(
+      tester,
+      DateTime(2026, 10, 13),
+      Scaffold(
+        body: SingleChildScrollView(
+          child: LiturgicalMonthCalendar(
+            initialDate: DateTime(2026, 10, 13),
+            onSelected: (_) {},
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const Key('ordo-jump-month')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ordo-pick-year')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ordo-year-2026')));
+    await tester.pumpAndSettle();
+    for (var step = 0; step < 5; step++) {
+      await tester.tap(find.byKey(const Key('ordo-next-year')));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(find.byKey(const Key('ordo-pick-year')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('ordo-year-2031')).hitTestable(),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   for (final year in [2025, 2031]) {
     testWidgets(
       'All Souls $year displays three Mass sets and Sunday Office once',

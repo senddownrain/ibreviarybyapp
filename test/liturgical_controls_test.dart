@@ -112,6 +112,7 @@ void main() {
                 builder: (context, setState) => LiturgicalCalendarDisclosure(
                   controlKey: const Key('calendar-toggle'),
                   expanded: expanded,
+                  date: DateTime(2026, 10, 13),
                   onChanged: (value) => setState(() => expanded = value),
                   calendar: const Text('Calendar content'),
                 ),
@@ -119,12 +120,8 @@ void main() {
             ),
           ),
         );
-        expect(
-          find.text(
-            initiallyExpanded ? 'Схаваць каляндар' : 'Паказаць каляндар',
-          ),
-          findsOneWidget,
-        );
+        expect(find.text('Каляндар'), findsOneWidget);
+        expect(find.text('13 кастрычніка 2026'), findsOneWidget);
         expect(
           tester.getSize(find.byKey(const Key('calendar-toggle'))).height,
           greaterThanOrEqualTo(48),
@@ -132,8 +129,12 @@ void main() {
         for (var i = 0; i < 2; i++) {
           await tester.tap(find.byKey(const Key('calendar-toggle')));
           await tester.pumpAndSettle();
+          expect(find.text('Каляндар'), findsOneWidget);
           expect(
-            find.text(expanded ? 'Схаваць каляндар' : 'Паказаць каляндар'),
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is Semantics && widget.properties.expanded == expanded,
+            ),
             findsOneWidget,
           );
           expect(

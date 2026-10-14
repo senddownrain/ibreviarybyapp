@@ -37,7 +37,10 @@ class LiturgicalSelectorSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16, right: 4),
+            padding: const EdgeInsets.only(
+              left: LiturgicalSelectorTokens.inset,
+              right: 4,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -60,7 +63,9 @@ class LiturgicalSelectorSheet extends StatelessWidget {
           Flexible(
             child: SingleChildScrollView(
               key: scrollKey,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                horizontal: LiturgicalSelectorTokens.inset,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: children,
@@ -70,7 +75,12 @@ class LiturgicalSelectorSheet extends StatelessWidget {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              padding: const EdgeInsets.fromLTRB(
+                LiturgicalSelectorTokens.inset,
+                8,
+                LiturgicalSelectorTokens.inset,
+                12,
+              ),
               child: FilledButton(
                 key: doneKey,
                 style: FilledButton.styleFrom(
@@ -133,7 +143,9 @@ class LiturgicalCelebrationChoice extends StatelessWidget {
         value: value,
         selected: selected,
         selectedTileColor: Colors.transparent,
-        contentPadding: const EdgeInsets.only(right: 16),
+        contentPadding: const EdgeInsets.only(
+          right: LiturgicalSelectorTokens.inset,
+        ),
         controlAffinity: ListTileControlAffinity.leading,
         title: Text(
           title,

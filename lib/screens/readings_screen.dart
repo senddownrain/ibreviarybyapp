@@ -1004,6 +1004,16 @@ class _ReadingsOptionsSheetState extends State<_ReadingsOptionsSheet> {
             onSelected: widget.onDateSelected,
           ),
         ),
+      if (widget.date != null && _calendarExpanded)
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            key: const Key('readings-calendar-today'),
+            onPressed: () =>
+                widget.onDateSelected(DateUtils.dateOnly(DateTime.now())),
+            child: const Text('Сёння'),
+          ),
+        ),
       if (widget.celebrations.isNotEmpty) ...[
         const LiturgicalSelectorHeading('Святкаванне'),
         RadioGroup<String>(
@@ -1049,6 +1059,7 @@ class _ReadingsOptionsSheetState extends State<_ReadingsOptionsSheet> {
             padding: const EdgeInsets.only(bottom: 6),
             child: SelectionOptionCard(
               key: ValueKey('readings-group-${group.key}'),
+              dense: true,
               selected: group.key == widget.activeGroupKey,
               title: group.label,
               onTap: () => widget.onGroupSelected(group.key),

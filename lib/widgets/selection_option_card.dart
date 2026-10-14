@@ -12,6 +12,7 @@ class SelectionOptionCard extends StatelessWidget {
     this.leading,
     this.accentColor,
     this.compact = false,
+    this.dense = false,
   });
 
   final String title;
@@ -21,6 +22,7 @@ class SelectionOptionCard extends StatelessWidget {
   final Widget? leading;
   final Color? accentColor;
   final bool compact;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class SelectionOptionCard extends StatelessWidget {
       ),
       colors.surfaceContainerHigh,
     );
-    final radius = BorderRadius.circular(12);
+    final radius = BorderRadius.circular(compact || dense ? 12 : 18);
 
     return Semantics(
       button: true,
@@ -54,7 +56,7 @@ class SelectionOptionCard extends StatelessWidget {
             color: selected
                 ? accent.withValues(alpha: 0.72)
                 : colors.outlineVariant,
-            width: 1,
+            width: selected && !compact && !dense ? 1.5 : 1,
           ),
         ),
         child: Material(
@@ -67,7 +69,7 @@ class SelectionOptionCard extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: compact ? 4 : 16,
-                vertical: 10,
+                vertical: compact || dense ? 10 : 14,
               ),
               child: compact
                   ? Column(
