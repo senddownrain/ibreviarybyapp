@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// A controlled disclosure; the owning selector retains its date and choices.
 class LiturgicalCalendarDisclosure extends StatelessWidget {
@@ -8,12 +9,14 @@ class LiturgicalCalendarDisclosure extends StatelessWidget {
     required this.onChanged,
     required this.calendar,
     required this.controlKey,
+    required this.date,
   });
 
   final bool expanded;
   final ValueChanged<bool> onChanged;
   final Widget calendar;
   final Key controlKey;
+  final DateTime date;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +42,20 @@ class LiturgicalCalendarDisclosure extends StatelessWidget {
             onPressed: () => onChanged(!expanded),
             child: Row(
               children: [
+                const Icon(Icons.calendar_month_outlined, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    expanded ? 'Схаваць каляндар' : 'Паказаць каляндар',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Каляндар'),
+                      Text(
+                        DateFormat('d MMMM y', 'be').format(date),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 12),

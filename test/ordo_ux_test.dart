@@ -155,8 +155,15 @@ void main() {
               .first;
           final row = find.byKey(ValueKey('hours-celebration-${first.key}'));
           expect(
-            tester.widget<RadioListTile<String>>(row).contentPadding,
-            EdgeInsets.zero,
+            tester
+                .widget<RadioListTile<String>>(
+                  find.descendant(
+                    of: row,
+                    matching: find.byType(RadioListTile<String>),
+                  ),
+                )
+                .contentPadding,
+            const EdgeInsets.only(right: 16),
           );
           final radioX = tester
               .getTopLeft(
@@ -285,23 +292,26 @@ void main() {
       Future<void> jump(int year, int month) async {
         await tester.tap(find.byKey(const Key('ordo-jump-month')));
         await tester.pumpAndSettle();
-        final yearField = find.byWidgetPredicate(
-          (w) =>
-              w is DropdownButtonFormField<int> &&
-              w.decoration.labelText == 'Год',
-        );
-        tester.widget<DropdownButtonFormField<int>>(yearField).onChanged!(year);
+        await tester.tap(find.byKey(const Key('ordo-pick-year')));
         await tester.pumpAndSettle();
-        final monthField = find.byWidgetPredicate(
-          (w) =>
-              w is DropdownButtonFormField<int> &&
-              w.decoration.labelText == 'Месяц',
+        final list = tester.state<ScrollableState>(
+          find
+              .descendant(
+                of: find.byKey(const Key('ordo-year-list')),
+                matching: find.byType(Scrollable),
+              )
+              .first,
         );
-        tester.widget<DropdownButtonFormField<int>>(monthField).onChanged!(
-          month,
+        list.position.jumpTo(
+          ((year - kCalendarFirstDate.year) * 48.0).clamp(
+            0.0,
+            list.position.maxScrollExtent,
+          ),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const Key('ordo-jump-apply')));
+        await tester.tap(find.byKey(Key('ordo-year-$year')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(Key('ordo-month-$month')));
         await tester.pumpAndSettle();
         expect(picked, isNull);
       }
@@ -326,9 +336,9 @@ void main() {
       await tester.tap(find.byKey(const Key('ordo-jump-month')));
       await tester.pumpAndSettle();
       await capture(tester, 'month-year-jump');
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      expect(find.byKey(const Key('ordo-day-2026-10-09')), findsNothing);
+      await tester.tap(find.byKey(const Key('ordo-picker-days')));
       await tester.pumpAndSettle();
-      expect(find.byType(AlertDialog), findsNothing);
       expect(picked, isNull);
       await tester.tap(find.byKey(const Key('ordo-day-2026-10-09')));
       await tester.pumpAndSettle();
@@ -397,18 +407,12 @@ void main() {
         await tester.pumpAndSettle();
         await capture(tester, 'month-year-jump-${brightness.name}-2.0');
         expect(tester.takeException(), isNull);
-        await tester.tap(
-          find.byWidgetPredicate(
-            (w) =>
-                w is DropdownButtonFormField<int> &&
-                w.decoration.labelText == 'Месяц',
-          ),
-        );
+        await tester.tap(find.byKey(const Key('ordo-pick-year')));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.tap(find.byKey(const Key('ordo-year-2026')));
         await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const Key('ordo-jump-apply')));
+        await tester.tap(find.byKey(const Key('ordo-month-10')));
         await tester.pumpAndSettle();
         expect(find.byKey(const Key('ordo-day-2026-10-07')), findsOneWidget);
         expect(tester.takeException(), isNull);
@@ -659,16 +663,12 @@ void main() {
             }
             expect(
               tester
-                  .getSize(
-                    find.widgetWithText(FilledButton, 'Літургія гадзінаў'),
-                  )
+                  .getSize(find.widgetWithText(FilledButton, 'Гатова'))
                   .height,
               greaterThanOrEqualTo(48),
             );
             expect(
-              find
-                  .widgetWithText(FilledButton, 'Літургія гадзінаў')
-                  .hitTestable(),
+              find.widgetWithText(FilledButton, 'Гатова').hitTestable(),
               findsOneWidget,
             );
             expect(tester.takeException(), isNull);
@@ -678,11 +678,9 @@ void main() {
             final applied = container
                 .read(hoursLiturgicalSelectionProvider)
                 .dayId;
-            await tester.tap(
-              find.widgetWithText(FilledButton, 'Літургія гадзінаў'),
-            );
+            await tester.tap(find.widgetWithText(FilledButton, 'Гатова'));
             await tester.pumpAndSettle();
-            expect(find.byType(HoursOptionsSheet), findsNothing);
+            expect(find.text('Гатова'), findsNothing);
             expect(
               container.read(hoursLiturgicalSelectionProvider).dayId,
               applied,
