@@ -400,7 +400,7 @@ void main() {
         isTrue,
       );
       await tester.scrollUntilVisible(
-        find.text('Паказаць каляндар'),
+        find.byKey(const Key('readings-calendar-disclosure')),
         -300,
         scrollable: find
             .descendant(
@@ -409,7 +409,7 @@ void main() {
             )
             .first,
       );
-      await tester.tap(find.text('Паказаць каляндар'));
+      await tester.tap(find.byKey(const Key('readings-calendar-disclosure')));
       await tester.pumpAndSettle();
       await choose('ordo-day-2026-10-10');
       expect(container.read(selectedDateProvider), DateTime(2026, 10, 10));

@@ -1017,6 +1017,7 @@ class _ReadingsOptionsSheetState extends State<_ReadingsOptionsSheet> {
             children: [
               if (widget.date != null)
                 LiturgicalCalendarDisclosure(
+                  date: widget.date!,
                   controlKey: const Key('readings-calendar-disclosure'),
                   expanded: _calendarExpanded,
                   onChanged: (expanded) =>

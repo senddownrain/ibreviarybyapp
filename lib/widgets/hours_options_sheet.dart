@@ -5,8 +5,8 @@ import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
-import 'package:mybrev_flutter/utils/liturgical_visual.dart';
-import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
+import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 
 /// Standalone selector entry point. Calendar callers can keep their own API.
 Future<void> showHoursOptionsSheet({
@@ -18,7 +18,7 @@ Future<void> showHoursOptionsSheet({
   useRootNavigator: true,
   isScrollControlled: true,
   useSafeArea: true,
-  backgroundColor: Colors.transparent,
+  showDragHandle: true,
   builder: (_) => HoursOptionsSheet(date: date, color: color),
 );
 
@@ -60,7 +60,7 @@ class HoursOptionsSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _Label('Варыянт літургіі гадзінаў'),
+          const LiturgicalSelectorHeading('Варыянт літургіі гадзінаў'),
           RadioGroup<String>(
             groupValue: selection.template?.id ?? selection.dayId,
             onChanged: (id) {
@@ -91,34 +91,13 @@ class HoursOptionsSheet extends ConsumerWidget {
         if (ordo != null) ordo.color,
         ...?ordo?.colorAlternatives,
       }.toList();
-      final accent =
-          liturgicalVisual(
-            color: ordo?.color,
-            category: ordo?.category,
-            rank: ordo?.rank,
-          )?.accent ??
-          color;
-      return Material(
-        color: selected?.key == option.key
-            ? accent.withValues(alpha: .08)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        child: RadioListTile<String>(
-          key: ValueKey('hours-celebration-${option.key}'),
-          value: option.key,
-          contentPadding: EdgeInsets.zero,
-          controlAffinity: ListTileControlAffinity.leading,
-          title: Text(
-            option.title,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          secondary: VestmentMarker(colors: colors, size: 14),
-          subtitle: _metadata(option).isEmpty
-              ? null
-              : Text(_metadata(option), style: theme.textTheme.bodyMedium),
-        ),
+      return LiturgicalCelebrationChoice(
+        key: ValueKey('hours-celebration-${option.key}'),
+        value: option.key,
+        title: option.title,
+        subtitle: _metadata(option),
+        selected: selected?.key == option.key,
+        colors: colors,
       );
     }
 
@@ -131,7 +110,7 @@ class HoursOptionsSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _Label('СВЯТКАВАННЕ'),
+          const LiturgicalSelectorHeading('СВЯТКАВАННЕ'),
           for (final option in celebrations) ...[
             optionRow(option),
             if (selected?.key == option.key && option.templates.length > 1)
@@ -139,7 +118,7 @@ class HoursOptionsSheet extends ConsumerWidget {
           ],
           if (offices.isNotEmpty) ...[
             const Divider(height: 24),
-            const _Label('ІНШЫЯ АФІЦЫІ'),
+            const LiturgicalSelectorHeading('ІНШЫЯ АФІЦЫІ'),
             for (final option in offices) ...[
               optionRow(option),
               if (selected?.key == option.key && option.templates.length > 1)
@@ -151,67 +130,7 @@ class HoursOptionsSheet extends ConsumerWidget {
     );
     if (embedded) return optionsList;
 
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 640,
-          maxHeight: MediaQuery.sizeOf(context).height * .88,
-        ),
-        child: Material(
-          color: theme.colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Іншыя варыянты',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: 'Закрыць',
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  key: const Key('hours-options-scroll'),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: optionsList,
-                ),
-              ),
-              SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Літургія гадзінаў'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return const LiturgicalCalendarSheet(focusVariants: true);
   }
 }
 
@@ -223,20 +142,3 @@ String _metadata(DayOption option) => <String>{
   if (option.placeLabel != null) option.placeLabel!,
   ...option.badges,
 }.where((s) => s.isNotEmpty).join(' · ');
-
-class _Label extends StatelessWidget {
-  const _Label(this.text);
-  final String text;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 12, bottom: 4),
-    child: Text(
-      text,
-      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-    ),
-  );
-}
