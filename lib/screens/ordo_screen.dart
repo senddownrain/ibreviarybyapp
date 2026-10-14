@@ -29,6 +29,7 @@ import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
+import 'package:mybrev_flutter/widgets/liturgical_heading_text.dart';
 import 'package:mybrev_flutter/utils/civil_date.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/mass_reading_sets.dart';
@@ -383,7 +384,36 @@ class _DayDetail extends ConsumerWidget {
         },
     };
 
-    final primaryRefs = references[day.diocese]?[day.primary.id];
+    final legal = union.rows
+        .where((row) => row.role != 'commemoration')
+        .toList();
+    final selectedOffice = ref.watch(hoursLiturgicalSelectionProvider).selected;
+    final chosen = legal.firstWhere(
+      (row) =>
+          row.option.id == selectedOffice?.optionId &&
+          row.dioceses.contains(
+            selectedOffice?.contextDiocese ?? contextDiocese,
+          ),
+      orElse: () => legal.firstWhere(
+        (row) =>
+            row.role == 'primary' &&
+            row.dioceses.contains(day.diocese) &&
+            row.option.id == day.primary.id,
+      ),
+    );
+    final chosenDiocese = chosen.dioceses.contains(contextDiocese)
+        ? contextDiocese!
+        : chosen.dioceses.first;
+    final officeContent = LiturgicalContentService().contentForDate(
+      date,
+      diocese: chosenDiocese,
+    );
+    final officeSelection = resolveHoursLiturgicalSelection(
+      officeContent.options,
+      selectedDayId: dayId,
+      selectedDiocese: chosenDiocese,
+    );
+    final primaryRefs = references[chosenDiocese]?[chosen.option.id];
     final year = primaryRefs?.documents
         .map((doc) => doc.year ?? '')
         .where((year) => const {'1', '2', 'A', 'B', 'C'}.contains(year))
@@ -445,28 +475,6 @@ class _DayDetail extends ConsumerWidget {
     final officeNotes = groups.remove('Літургія гадзін') ?? const <Widget>[];
     final directionNotes =
         groups.remove('Літургічныя ўказанні') ?? const <Widget>[];
-    final legal = union.rows
-        .where((row) => row.role != 'commemoration')
-        .toList();
-    // ORDO's primary is calculated by the engine, independent of a manual Office.
-    final chosen = legal.firstWhere(
-      (row) =>
-          row.role == 'primary' &&
-          row.dioceses.contains(day.diocese) &&
-          row.option.id == day.primary.id,
-    );
-    final chosenDiocese = chosen.dioceses.contains(contextDiocese)
-        ? contextDiocese!
-        : chosen.dioceses.first;
-    final officeContent = LiturgicalContentService().contentForDate(
-      date,
-      diocese: chosenDiocese,
-    );
-    final officeSelection = resolveHoursLiturgicalSelection(
-      officeContent.options,
-      selectedDayId: dayId,
-      selectedDiocese: chosenDiocese,
-    );
     final readingGroups =
         <String, (OptionReadingReferences, Set<OrdoUnionRow>, Set<String>)>{};
     for (final row in legal) {
@@ -541,6 +549,11 @@ class _DayDetail extends ConsumerWidget {
     }
     final shownReferences = <String>{};
     Widget celebration(OrdoUnionRow row, {bool main = false}) {
+      final ordinaryWeekday =
+          row.option.isTemporal &&
+          row.option.rank == 'feria' &&
+          day.period == 'ordinary' &&
+          day.week > 0;
       final diocese = row.dioceses.contains(contextDiocese)
           ? contextDiocese!
           : row.dioceses.first;
@@ -559,7 +572,9 @@ class _DayDetail extends ConsumerWidget {
                     ? 'Чытанні з дня'
                     : 'Чытанні супадаюць з прыведзенымі вышэй',
                 key: Key('ordo-shared-readings-${row.option.id}'),
-                style: theme.textTheme.bodyMedium,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             );
           }
@@ -580,13 +595,16 @@ class _DayDetail extends ConsumerWidget {
           );
         }
       }
-      return Column(
+      final content = Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (main) Text('Абрана', style: theme.textTheme.labelLarge),
           _CelebrationRow(
             row: row,
             heading: main,
+            weekday: main || ordinaryWeekday
+                ? '${weekday[0].toUpperCase()}${weekday.substring(1)}'
+                : null,
             metadata: main
                 ? [
                     if (!row.option.isTemporal &&
@@ -596,7 +614,14 @@ class _DayDetail extends ConsumerWidget {
                     if (psalter.isNotEmpty) '$psalter тыдзень Псалтыра',
                   ].join(' · ')
                 : null,
-            title: main
+            title: ordinaryWeekday
+                ? formatLiturgicalPeriodTitle(
+                    periodType: day.period,
+                    periodWeek: day.week,
+                    dayOfWeek: null,
+                    date: date,
+                  )
+                : main
                 ? row.option.title.replaceFirst(
                     RegExp(
                       ',\\s*${RegExp.escape(weekday)}\$',
@@ -661,6 +686,28 @@ class _DayDetail extends ConsumerWidget {
           ],
         ],
       );
+      return main
+          ? Container(
+              key: const Key('ordo-selected-celebration'),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: content,
+            )
+          : Padding(
+              key: Key('ordo-alternative-${row.option.id}'),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  content,
+                  const SizedBox(height: 8),
+                  const Divider(height: 1, thickness: .5),
+                ],
+              ),
+            );
     }
 
     return Column(
@@ -672,7 +719,7 @@ class _DayDetail extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              LiturgicalHeadingText(
                 'Літургічны дзень',
                 style: ReaderTheme.of(context).documentTitle(),
               ),
@@ -685,28 +732,41 @@ class _DayDetail extends ConsumerWidget {
                 onNext: onNext,
               ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Text(
-                      '${weekday[0].toUpperCase()}${weekday.substring(1)}',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                    child: TextButton(
+                      key: const Key('ordo-dioceses'),
+                      style: TextButton.styleFrom(
+                        alignment: Alignment.centerLeft,
+                        foregroundColor: theme.colorScheme.onSurface,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 10,
+                        ),
+                      ),
+                      onPressed: onDioceses,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Дыяцэзіі · $dioceseLabel',
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                          const Icon(Icons.keyboard_arrow_down, size: 18),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(width: 4),
                   TextButton.icon(
                     key: const Key('ordo-today'),
                     onPressed: onToday,
-                    icon: const Icon(Icons.history, size: 18),
+                    icon: const Icon(Icons.today, size: 18),
                     label: const Text('Сёння'),
                   ),
                 ],
-              ),
-              _Action(
-                key: const Key('ordo-dioceses'),
-                label: 'Дыяцэзіі · $dioceseLabel',
-                onTap: onDioceses,
               ),
               const SizedBox(height: 12),
               celebration(chosen, main: true),
@@ -1219,27 +1279,6 @@ String _noteSource(Json note, String diocese) {
   ].where((part) => part.isNotEmpty).join(' · ');
 }
 
-class _Action extends StatelessWidget {
-  const _Action({super.key, required this.label, required this.onTap});
-  final String label;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => TextButton(
-    style: TextButton.styleFrom(
-      minimumSize: const Size(48, 48),
-      alignment: Alignment.centerLeft,
-    ),
-    onPressed: onTap,
-    child: Row(
-      children: [
-        Expanded(child: Text(label)),
-        const SizedBox(width: 8),
-        const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
-      ],
-    ),
-  );
-}
-
 String _complineLabel(String value) => switch (value) {
   'current-weekday' => 'з гэтага дня тыдня',
   'sunday-after-first-vespers' => 'пасля першых нешпараў нядзелі',
@@ -1389,15 +1428,24 @@ class _CelebrationRow extends StatelessWidget {
     this.heading = false,
     this.title,
     this.metadata,
+    this.weekday,
   });
 
   final OrdoUnionRow row;
   final bool heading;
   final String? title;
   final String? metadata;
+  final String? weekday;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => heading
+      ? LayoutBuilder(
+          builder: (context, constraints) =>
+              _buildContent(context, constraints.maxWidth),
+        )
+      : _buildContent(context, null);
+
+  Widget _buildContent(BuildContext context, double? headingWidth) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final option = row.option;
@@ -1422,11 +1470,14 @@ class _CelebrationRow extends StatelessWidget {
               label: vestmentColorsLabel(option),
               child: Container(
                 width: 4,
-                color: liturgicalVisual(
-                  color: option.color,
-                  category: option.category,
-                  rank: option.rank,
-                )?.accent,
+                decoration: BoxDecoration(
+                  color: kVestmentColors[option.color]?.swatch,
+                  border: Border.all(
+                    color: kVestmentColors[option.color]?.ring ?? cs.outline,
+                    width: .5,
+                  ),
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
             ),
           ),
@@ -1435,21 +1486,31 @@ class _CelebrationRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title ?? option.title,
-                style:
-                    (heading
-                            ? ReaderTheme.of(context).displayTitle(29)
-                            : theme.textTheme.titleMedium)
-                        ?.copyWith(
-                          fontSize: heading ? 29 : 16,
-                          fontWeight: heading || row.role == 'primary'
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                        ),
-              ),
-              if (!heading ||
-                  (option.rank != 'feria' && option.rank != 'dominica')) ...[
+              if (heading)
+                LiturgicalHeadingText(
+                  title ?? option.title,
+                  maxWidth: headingWidth! - 16,
+                  style: ReaderTheme.of(
+                    context,
+                  ).displayTitle(29).copyWith(fontWeight: FontWeight.w600),
+                )
+              else
+                Text(
+                  title ?? option.title,
+                  style:
+                      (heading
+                              ? ReaderTheme.of(context).displayTitle(29)
+                              : theme.textTheme.titleMedium)
+                          ?.copyWith(
+                            fontSize: heading ? 29 : 16,
+                            fontWeight: heading || row.role == 'primary'
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                          ),
+                ),
+              if ((!heading ||
+                      (option.rank != 'feria' && option.rank != 'dominica')) &&
+                  !(option.rank == 'feria' && weekday != null)) ...[
                 const SizedBox(height: 3),
                 Text(
                   [
@@ -1470,10 +1531,26 @@ class _CelebrationRow extends StatelessWidget {
                   children: [for (final chip in chips) _Badge(chip)],
                 ),
               ],
-              if (metadata?.isNotEmpty ?? false) ...[
+              if (weekday != null || (metadata?.isNotEmpty ?? false)) ...[
                 const SizedBox(height: 8),
-                Text(
-                  metadata!,
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      if (weekday != null)
+                        TextSpan(
+                          text: weekday,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: heading ? 18 : 14,
+                            color: cs.onSurface,
+                          ),
+                        ),
+                      if (metadata?.isNotEmpty ?? false)
+                        TextSpan(
+                          text: '${weekday == null ? '' : ' · '}$metadata',
+                        ),
+                    ],
+                  ),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: cs.onSurfaceVariant,
                   ),

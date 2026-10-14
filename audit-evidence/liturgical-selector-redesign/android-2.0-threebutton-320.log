@@ -1,0 +1,294 @@
+Installing build\app\outputs\flutter-apk\app-debug.apk...           4,5s
+D/FlutterRenderer( 4380): Width is zero. 0,0
+W/OpenGLRenderer( 4380): Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+W/OpenGLRenderer( 4380): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+I/Gralloc4( 4380): mapper 4.x is not supported
+E/OpenGLRenderer( 4380): Unable to match the desired swap behavior.
+I/Choreographer( 4380): Skipped 241 frames!  The application may be doing too much work on its main thread.
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+D/ProfileInstaller( 4380): Installing profile for by.mybrev.playtest2026
+I/flutter ( 4380): 00:00 +0: shared liturgical selectors on the running application
+I/Choreographer( 4380): Skipped 40 frames!  The application may be doing too much work on its main thread.
+I/Choreographer( 4380): Skipped 51 frames!  The application may be doing too much work on its main thread.
+I/OpenGLRenderer( 4380): Davey! duration=958ms; Flags=1, FrameTimelineVsyncId=19438, IntendedVsync=404683351718, Vsync=405533351684, InputEventId=0, HandleInputStart=405548773366, AnimationStart=405548778064, PerformTraversalsStart=405548780891, DrawStart=405552156580, FrameDeadline=404700018384, FrameInterval=405543029252, FrameStartTime=16666666, SyncQueued=405555236406, SyncStart=405566428835, IssueDrawCommandsStart=405567887285, SwapBuffers=405619603151, FrameCompleted=405653143908, DequeueBufferDuration=9202752, QueueBufferDuration=301985, GpuCompleted=405650744856, SwapBuffersCompleted=405653143908, DisplayPresentTime=0, CommandSubmissionCompleted=405619603151, 
+D/CompatibilityChangeReporter( 4380): Compat change id reported: 3400644; UID 10198; state: ENABLED
+D/EGL_emulation( 4380): app_time_stats: avg=146.37ms min=104.62ms max=212.07ms count=8
+I/flutter ( 4380): [ContentStore] prayerCategories: 5 docs in 79 ms
+I/flutter ( 4380): [ContentStore] prayers: 115 docs in 305 ms
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+I/flutter ( 4380): [ContentStore] liturgicalYearOverrides: 15 docs in 3718 ms
+I/flutter ( 4380): [ContentStore] liturgicalCalendarMeta: 1 docs in 3724 ms
+I/flutter ( 4380): [ContentStore] invitatoriums: 4 docs in 3732 ms
+I/flutter ( 4380): [ContentStore] completoriums: 35 docs in 3736 ms
+I/flutter ( 4380): [ContentStore] liturgicalCelebrations: 241 docs in 3739 ms
+I/flutter ( 4380): [ContentStore] liturgicalDioceseOverrides: 75 docs in 3743 ms
+I/flutter ( 4380): [ContentStore] liturgicalTemplates: 16 docs in 3749 ms
+I/Choreographer( 4380): Skipped 203 frames!  The application may be doing too much work on its main thread.
+I/flutter ( 4380): [ContentStore] liturgicalProperTexts: 291 docs in 3750 ms
+I/flutter ( 4380): [ContentStore] readings: 822 docs in 3759 ms
+I/flutter ( 4380): [ContentStore] days: 736 docs in 3762 ms
+I/flutter ( 4380): [ContentStore] compendium: 27 docs in 156 ms
+I/flutter ( 4380): [ContentStore] songs: 447 docs in 164 ms
+I/flutter ( 4380): [ContentStore] compendiumMeta: 1 docs in 173 ms
+I/flutter ( 4380): [ContentStore] liturgicalOrdoNotes: 1337 docs in 174 ms
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+D/EGL_emulation( 4380): app_time_stats: avg=3279.58ms min=1932.95ms max=4626.21ms count=2
+I/FirebaseApp( 4380): Device unlocked: initializing all Firebase APIs for app mybrev-priest
+W/DynamiteModule( 4380): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
+I/DynamiteModule( 4380): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
+W/ProviderInstaller( 4380): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
+D/nativeloader( 4380): Configuring clns-7 for other apk /system/framework/org.apache.http.legacy.jar. target_sdk_version=33, uses_libraries=ALL, library_path=/product/priv-app/PrebuiltGmsCore/lib/x86_64:/product/priv-app/PrebuiltGmsCore/PrebuiltGmsCore.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader( 4380): Configuring clns-8 for other apk /system/framework/com.android.media.remotedisplay.jar. target_sdk_version=33, uses_libraries=ALL, library_path=/product/priv-app/PrebuiltGmsCore/lib/x86_64:/product/priv-app/PrebuiltGmsCore/PrebuiltGmsCore.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader( 4380): Configuring clns-9 for other apk /system/framework/com.android.location.provider.jar. target_sdk_version=33, uses_libraries=ALL, library_path=/product/priv-app/PrebuiltGmsCore/lib/x86_64:/product/priv-app/PrebuiltGmsCore/PrebuiltGmsCore.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/ApplicationLoaders( 4380): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/ApplicationLoaders( 4380): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+D/nativeloader( 4380): InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-x86_64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvndksupport.so:libvulkan.so
+D/nativeloader( 4380): Configuring product-clns-10 for unbundled product apk /product/priv-app/PrebuiltGmsCore/PrebuiltGmsCore.apk. target_sdk_version=33, uses_libraries=, library_path=/product/priv-app/PrebuiltGmsCore/lib/x86_64:/product/priv-app/PrebuiltGmsCore/PrebuiltGmsCore.apk!/lib/x86_64:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms:/product/lib64:/system/product/lib64
+D/nativeloader( 4380): InitVndkspLibrariesProduct: android.hardware.common-V2-ndk.so:android.hardware.common.fmq-V1-ndk.so:android.hardware.graphics.allocator-V2-ndk.so:android.hardware.graphics.common-V4-ndk.so:android.hardware.graphics.common@1.0.so:android.hardware.graphics.common@1.1.so:android.hardware.graphics.common@1.2.so:android.hardware.graphics.composer3-V1-ndk.so:android.hardware.graphics.mapper@2.0.so:android.hardware.graphics.mapper@2.1.so:android.hardware.graphics.mapper@3.0.so:android.hardware.graphics.mapper@4.0.so:android.hardware.renderscript@1.0.so:android.hidl.memory.token@1.0.so:android.hidl.memory@1.0-impl.so:android.hidl.memory@1.0.so:android.hidl.safe_union@1.0.so:libRSCpuRef.so:libRSDriver.so:libRS_internal.so:libbase.so:libbcinfo.so:libblas.so:libc++.so:libcompiler_rt.so:libcutils.so:libdmabufheap.so:libgralloctypes.so:libhardware.so:libhidlbase.so:libhidlmemory.so:libion.so:libjsoncpp.so:liblzma.so:libprocessgroup.so:libunwindstack.so:libutils.so:libutilscallstack.so:libz.so
+V/NativeCrypto( 4380): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 295 native methods...
+D/EGL_emulation( 4380): app_time_stats: avg=425.36ms min=116.85ms max=1086.14ms count=4
+W/ev.playtest2026( 4380): Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (unsupported, reflection, allowed)
+W/ev.playtest2026( 4380): Long monitor contention with owner FirestoreWorker (4474) at java.util.Set java.security.Provider.getServices()(Provider.java:1119) waiters=0 in java.security.Provider$Service java.security.Provider.getService(java.lang.String, java.lang.String) for 192ms
+I/ProviderInstaller( 4380): Installed default security provider GmsCore_OpenSSL
+I/ev.playtest2026( 4380): Background young concurrent copying GC freed 27759(1823KB) AllocSpace objects, 15(440KB) LOS objects, 9% free, 6632KB/7340KB, paused 1.411ms,38us total 108.875ms
+I/ev.playtest2026( 4380): Background concurrent copying GC freed 7568(419KB) AllocSpace objects, 41(1236KB) LOS objects, 49% free, 8253KB/16MB, paused 127us,25us total 170.541ms
+D/EGL_emulation( 4380): app_time_stats: avg=147.03ms min=111.38ms max=218.56ms count=7
+D/TrafficStats( 4380): tagSocket(119) with statsTag=0xffffffff, statsUid=-1
+W/ev.playtest2026( 4380): Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (unsupported, reflection, allowed)
+W/ev.playtest2026( 4380): Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (unsupported, reflection, allowed)
+D/EGL_emulation( 4380): app_time_stats: avg=131.08ms min=69.65ms max=259.74ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=372.35ms min=115.72ms max=885.49ms count=3
+I/ev.playtest2026( 4380): Background young concurrent copying GC freed 42732(2212KB) AllocSpace objects, 64(2576KB) LOS objects, 0% free, 18MB/18MB, paused 193us,122us total 189.646ms
+I/ev.playtest2026( 4380): Background concurrent copying GC freed 2892(773KB) AllocSpace objects, 46(5132KB) LOS objects, 50% free, 14MB/29MB, paused 343us,136us total 278.446ms
+D/EGL_emulation( 4380): app_time_stats: avg=222.89ms min=22.32ms max=504.06ms count=5
+W/DynamiteModule( 4380): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
+I/DynamiteModule( 4380): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
+W/ProviderInstaller( 4380): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
+D/TrafficStats( 4380): tagSocket(224) with statsTag=0xffffffff, statsUid=-1
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-hours-collapsed
+D/EGL_emulation( 4380): app_time_stats: avg=130.59ms min=106.00ms max=188.79ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=124.62ms min=112.40ms max=168.92ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=119.79ms min=109.89ms max=136.51ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=117.80ms min=111.05ms max=131.33ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=118.69ms min=50.55ms max=150.76ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=172.89ms min=6.92ms max=501.96ms count=6
+I/flutter ( 4380): SELECTOR_NATIVE_BACK_READY
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=144.24ms min=114.16ms max=233.84ms count=8
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=91.26ms min=28.06ms max=143.28ms count=11
+D/EGL_emulation( 4380): app_time_stats: avg=105.25ms min=38.37ms max=155.39ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=128.87ms min=13.68ms max=296.03ms count=8
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-hours-expanded
+D/EGL_emulation( 4380): app_time_stats: avg=119.51ms min=108.81ms max=149.13ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=126.98ms min=109.00ms max=207.58ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=117.34ms min=111.29ms max=131.93ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=134.25ms min=16.03ms max=487.18ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=116.59ms min=33.45ms max=238.67ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.42ms min=113.49ms max=120.03ms count=9
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-month-picker
+D/EGL_emulation( 4380): app_time_stats: avg=118.08ms min=110.50ms max=137.42ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=117.33ms min=114.93ms max=119.78ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=172.81ms min=112.12ms max=510.02ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=92.12ms min=4.00ms max=209.99ms count=11
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-year-picker
+D/EGL_emulation( 4380): app_time_stats: avg=125.65ms min=110.85ms max=164.79ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=118.46ms min=95.94ms max=137.89ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.18ms min=112.25ms max=118.40ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.65ms min=115.24ms max=117.92ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=147.62ms min=4.77ms max=490.86ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=131.89ms min=4.07ms max=442.96ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=116.38ms min=34.90ms max=277.25ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=174.94ms min=115.59ms max=428.43ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=90.50ms min=7.78ms max=182.05ms count=11
+D/EGL_emulation( 4380): app_time_stats: avg=107.00ms min=32.40ms max=149.94ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=115.07ms min=46.45ms max=142.28ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=120.36ms min=28.37ms max=172.57ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=133.80ms min=23.84ms max=424.85ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=146.11ms min=8.58ms max=493.21ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=100.46ms min=17.30ms max=122.35ms count=10
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-office-variants
+D/EGL_emulation( 4380): app_time_stats: avg=140.11ms min=4.29ms max=476.92ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=116.96ms min=102.04ms max=132.25ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.63ms min=109.01ms max=127.71ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.71ms min=113.08ms max=119.09ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=138.06ms min=109.19ms max=310.32ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=76.75ms min=14.49ms max=119.74ms count=13
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-13
+D/EGL_emulation( 4380): app_time_stats: avg=386.84ms min=115.86ms max=1185.79ms count=4
+D/EGL_emulation( 4380): app_time_stats: avg=186.11ms min=114.58ms max=518.94ms count=6
+D/EGL_emulation( 4380): app_time_stats: avg=120.31ms min=114.29ms max=136.13ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=108.40ms min=12.23ms max=220.55ms count=10
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-readings-two-cycles
+D/EGL_emulation( 4380): app_time_stats: avg=117.20ms min=105.48ms max=132.57ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.64ms min=113.52ms max=120.70ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.81ms min=105.34ms max=130.76ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.31ms min=113.45ms max=119.93ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=148.03ms min=113.11ms max=228.57ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=140.32ms min=46.63ms max=239.75ms count=8
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=98.43ms min=35.08ms max=190.69ms count=11
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-11
+D/EGL_emulation( 4380): app_time_stats: avg=205.07ms min=116.31ms max=536.14ms count=5
+D/EGL_emulation( 4380): app_time_stats: avg=128.91ms min=108.92ms max=184.36ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=116.54ms min=94.79ms max=136.35ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=101.39ms min=28.34ms max=125.22ms count=11
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-readings-three-cycles
+D/EGL_emulation( 4380): app_time_stats: avg=120.55ms min=101.57ms max=135.21ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=155.42ms min=110.21ms max=471.55ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=132.59ms min=7.32ms max=460.40ms count=8
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=74.48ms min=3.73ms max=127.55ms count=13
+I/flutter ( 4380): [data] CACHE HIT  readings 2025-11-02
+D/EGL_emulation( 4380): app_time_stats: avg=276.47ms min=116.40ms max=754.89ms count=4
+D/EGL_emulation( 4380): app_time_stats: avg=130.55ms min=114.14ms max=199.67ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=118.49ms min=111.65ms max=130.70ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=119.34ms min=23.01ms max=216.23ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=145.60ms min=109.54ms max=235.27ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=127.60ms min=62.32ms max=232.77ms count=8
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-multiple-mass-sets
+D/EGL_emulation( 4380): app_time_stats: avg=118.38ms min=106.27ms max=147.23ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=141.10ms min=4.97ms max=493.75ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=115.38ms min=103.24ms max=119.43ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.26ms min=109.51ms max=123.71ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=173.75ms min=29.09ms max=830.03ms count=9
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-09
+D/EGL_emulation( 4380): app_time_stats: avg=1021.53ms min=1021.53ms max=1021.53ms count=1
+D/EGL_emulation( 4380): app_time_stats: avg=123.90ms min=111.06ms max=181.04ms count=9
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-ordo-alternatives
+D/EGL_emulation( 4380): app_time_stats: avg=116.72ms min=113.40ms max=119.71ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.59ms min=114.12ms max=117.99ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=133.08ms min=2.61ms max=490.61ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=138.69ms min=3.74ms max=497.57ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=112.72ms min=25.58ms max=198.09ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=115.98ms min=106.66ms max=125.57ms count=9
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:light-ordo-date-only
+D/EGL_emulation( 4380): app_time_stats: avg=121.33ms min=104.03ms max=143.34ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=173.18ms min=96.34ms max=474.91ms count=6
+D/EGL_emulation( 4380): app_time_stats: avg=95.94ms min=8.13ms max=134.98ms count=11
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-10
+D/EGL_emulation( 4380): app_time_stats: avg=313.90ms min=112.40ms max=1078.98ms count=5
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=126.98ms min=6.11ms max=455.96ms count=8
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-09
+D/EGL_emulation( 4380): app_time_stats: avg=197.72ms min=7.37ms max=1091.23ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/FlutterJNI( 4380): Sending viewport metrics to the engine.
+D/EGL_emulation( 4380): app_time_stats: avg=173.77ms min=112.26ms max=395.07ms count=6
+D/EGL_emulation( 4380): app_time_stats: avg=146.13ms min=33.46ms max=515.29ms count=10
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-hours-collapsed
+D/EGL_emulation( 4380): app_time_stats: avg=162.79ms min=112.68ms max=494.56ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=96.58ms min=11.96ms max=119.16ms count=11
+D/EGL_emulation( 4380): app_time_stats: avg=139.40ms min=4.34ms max=492.89ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=121.73ms min=102.50ms max=159.44ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=88.29ms min=10.66ms max=131.60ms count=12
+I/flutter ( 4380): SELECTOR_NATIVE_BACK_READY
+D/EGL_emulation( 4380): app_time_stats: avg=126.91ms min=40.67ms max=277.30ms count=10
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=118.26ms min=38.56ms max=262.93ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=86.23ms min=25.02ms max=139.01ms count=12
+D/EGL_emulation( 4380): app_time_stats: avg=109.28ms min=49.12ms max=158.30ms count=10
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-hours-expanded
+D/EGL_emulation( 4380): app_time_stats: avg=119.15ms min=109.56ms max=148.90ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.89ms min=102.06ms max=138.81ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.50ms min=113.98ms max=119.61ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=140.41ms min=14.96ms max=519.05ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=105.14ms min=34.71ms max=173.48ms count=10
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-month-picker
+D/EGL_emulation( 4380): app_time_stats: avg=118.39ms min=108.22ms max=131.79ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=119.15ms min=98.62ms max=143.77ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=182.16ms min=113.46ms max=494.39ms count=6
+D/EGL_emulation( 4380): app_time_stats: avg=95.30ms min=4.83ms max=120.54ms count=11
+D/EGL_emulation( 4380): app_time_stats: avg=115.15ms min=4.04ms max=503.11ms count=9
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-year-picker
+D/EGL_emulation( 4380): app_time_stats: avg=119.80ms min=109.98ms max=131.57ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=119.28ms min=112.91ms max=130.40ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=115.73ms min=108.08ms max=120.90ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.80ms min=113.76ms max=119.74ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=98.22ms min=18.81ms max=123.69ms count=11
+D/EGL_emulation( 4380): app_time_stats: avg=145.14ms min=4.09ms max=505.29ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=113.90ms min=32.52ms max=157.31ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=105.30ms min=32.89ms max=150.08ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=104.41ms min=26.62ms max=173.04ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=103.05ms min=32.51ms max=158.07ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=144.50ms min=9.05ms max=514.55ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=120.89ms min=94.75ms max=151.76ms count=9
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-07
+D/EGL_emulation( 4380): app_time_stats: avg=262.59ms min=82.34ms max=632.65ms count=4
+D/EGL_emulation( 4380): app_time_stats: avg=106.79ms min=28.07ms max=150.31ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=91.21ms min=23.52ms max=130.44ms count=12
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-office-variants
+D/EGL_emulation( 4380): app_time_stats: avg=118.17ms min=110.80ms max=130.62ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.53ms min=114.85ms max=118.34ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.50ms min=114.47ms max=119.46ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.67ms min=111.68ms max=122.17ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=87.91ms min=16.18ms max=119.14ms count=12
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-13
+D/EGL_emulation( 4380): app_time_stats: avg=127.40ms min=21.89ms max=476.37ms count=10
+D/EGL_emulation( 4380): app_time_stats: avg=138.94ms min=113.49ms max=286.32ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=120.35ms min=112.25ms max=137.32ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=119.02ms min=23.45ms max=259.74ms count=9
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-readings-two-cycles
+D/EGL_emulation( 4380): app_time_stats: avg=118.68ms min=111.10ms max=134.19ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=118.17ms min=106.85ms max=137.14ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.03ms min=112.46ms max=120.52ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=119.16ms min=113.47ms max=134.37ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=120.76ms min=34.75ms max=165.48ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=110.45ms min=43.17ms max=142.24ms count=10
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=101.02ms min=18.38ms max=146.83ms count=10
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-11
+D/EGL_emulation( 4380): app_time_stats: avg=371.76ms min=132.04ms max=828.93ms count=3
+D/EGL_emulation( 4380): app_time_stats: avg=164.65ms min=113.78ms max=455.02ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=84.84ms min=4.85ms max=132.31ms count=12
+D/EGL_emulation( 4380): app_time_stats: avg=132.70ms min=5.50ms max=480.77ms count=8
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-readings-three-cycles
+D/EGL_emulation( 4380): app_time_stats: avg=118.80ms min=114.43ms max=128.18ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.44ms min=114.27ms max=118.63ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.40ms min=113.55ms max=119.12ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=93.85ms min=25.06ms max=130.15ms count=11
+I/flutter ( 4380): [data] CACHE HIT  readings 2025-11-02
+D/EGL_emulation( 4380): app_time_stats: avg=229.28ms min=114.90ms max=591.98ms count=5
+D/EGL_emulation( 4380): app_time_stats: avg=120.97ms min=111.50ms max=149.42ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=145.36ms min=112.25ms max=299.33ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=99.95ms min=26.08ms max=131.44ms count=11
+D/EGL_emulation( 4380): app_time_stats: avg=89.78ms min=8.55ms max=151.29ms count=12
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-multiple-mass-sets
+D/EGL_emulation( 4380): app_time_stats: avg=129.04ms min=111.19ms max=199.02ms count=8
+D/EGL_emulation( 4380): app_time_stats: avg=116.95ms min=115.60ms max=118.84ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.34ms min=113.72ms max=119.05ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=118.92ms min=110.72ms max=129.39ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=119.51ms min=16.17ms max=482.08ms count=10
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-09
+D/EGL_emulation( 4380): app_time_stats: avg=366.69ms min=129.71ms max=830.53ms count=3
+D/EGL_emulation( 4380): app_time_stats: avg=116.67ms min=114.05ms max=120.19ms count=9
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-ordo-alternatives
+D/EGL_emulation( 4380): app_time_stats: avg=138.60ms min=3.22ms max=492.90ms count=7
+D/EGL_emulation( 4380): app_time_stats: avg=116.64ms min=112.58ms max=120.97ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=115.85ms min=110.05ms max=119.15ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=122.26ms min=115.43ms max=168.46ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=105.61ms min=47.01ms max=140.86ms count=10
+I/flutter ( 4380): SELECTOR_NATIVE_SCREENSHOT_READY:dark-ordo-date-only
+D/EGL_emulation( 4380): app_time_stats: avg=120.65ms min=111.17ms max=148.97ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=114.72ms min=96.39ms max=129.64ms count=9
+D/EGL_emulation( 4380): app_time_stats: avg=116.16ms min=104.76ms max=128.06ms count=9
+I/flutter ( 4380): [data] CACHE HIT  readings 2026-10-10
+D/EGL_emulation( 4380): app_time_stats: avg=178.22ms min=113.18ms max=658.38ms count=9
+W/WindowOnBackDispatcher( 4380): sendCancelIfRunning: isInProgress=falsecallback=io.flutter.embedding.android.FlutterActivity$1@4bd7de3
+D/EGL_emulation( 4380): app_time_stats: avg=89.80ms min=27.72ms max=143.86ms count=12
+I/flutter ( 4380): 03:17 +1: (tearDownAll)
+I/flutter ( 4380): 03:17 +2: All tests passed!
+All tests passed.
+Physical Android Back events sent: 2
+Whole-device screenshots saved: 20

@@ -1,0 +1,126 @@
+{
+  "passed": true,
+  "preferencesRestored": true,
+  "states": {
+    "android-320-system-text-2.0-nav-threebutton-light-hours-collapsed": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-hours-expanded": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-month-picker": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-year-picker": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-office-variants": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-readings-two-cycles": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-readings-three-cycles": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-multiple-mass-sets": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-ordo-alternatives": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-light-ordo-date-only": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-hours-collapsed": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-hours-expanded": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-month-picker": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-year-picker": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-office-variants": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-readings-two-cycles": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-readings-three-cycles": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-multiple-mass-sets": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-ordo-alternatives": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    },
+    "android-320-system-text-2.0-nav-threebutton-dark-ordo-date-only": {
+      "viewportWidth": 320.0,
+      "viewportHeight": 844.0,
+      "bottomInset": 48.0,
+      "textScaleAt16": 2.0
+    }
+  }
+}

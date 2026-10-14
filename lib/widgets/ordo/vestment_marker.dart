@@ -8,7 +8,7 @@ import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 ///
 /// One colour is a dot; several legal colours are equal segments of one
 /// ring (never a gradient that invents a colour). White is drawn as its
-/// fabric with a gold rim, so it stays visible on a light surface. The
+/// white fabric with a neutral rim, so it stays visible on a light surface. The
 /// colour is never the only carrier of meaning: callers give a label.
 class VestmentMarker extends StatelessWidget {
   const VestmentMarker({
@@ -52,7 +52,7 @@ class _VestmentPainter extends CustomPainter {
     if (colors.isEmpty) return;
     final center = size.center(Offset.zero);
     final radius = size.shortestSide / 2;
-    final rim = math.max(1.0, radius * 0.22);
+    final rim = math.max(1.0, radius * 0.12);
     final sweep = 2 * math.pi / colors.length;
     for (var i = 0; i < colors.length; i++) {
       final vestment =

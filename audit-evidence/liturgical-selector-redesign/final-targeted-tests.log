@@ -1,0 +1,243 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 42 ms
+[ContentStore] prayers: 115 docs in 131 ms
+[ContentStore] invitatoriums: 4 docs in 187 ms
+[ContentStore] completoriums: 35 docs in 174 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 160 ms
+[ContentStore] liturgicalTemplates: 16 docs in 205 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 107 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 122 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 140 ms
+[ContentStore] compendiumMeta: 1 docs in 40 ms
+[ContentStore] songs: 447 docs in 74 ms
+[ContentStore] compendium: 27 docs in 81 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 107 ms
+[ContentStore] readings: 822 docs in 308 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 185 ms
+[ContentStore] days: 736 docs in 609 ms
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Rosary memorial has default weekday and assembled Marian Office
+00:01 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Office assemblies share memorial readings in ORDO order
+00:01 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:15 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:19 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:22 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:25 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:27 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:29 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours date action updates the visible selected day
+00:30 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO reused route adopts its new date and source
+00:33 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar icon opens the day; arrows keep one route
+00:35 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO date-only calendar applies without closing and preserves shared dioceses
+00:38 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO dioceses persist through the shared settings and Month context
+[data] CACHE HIT  readings 2026-08-26
+00:42 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 24.0 at 200 percent text
+00:43 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 48.0 at 200 percent text
+00:45 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar search reaches the existing period and feast picker
+00:47 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+00:50 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+00:52 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Period notes are collapsed and can be opened
+00:53 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.android
+00:53 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.iOS
+00:53 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.0
+00:56 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.3
+00:57 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.5
+00:59 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 2.0
+01:01 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+01:01 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+01:01 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+01:01 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+01:02 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (tearDownAll)
+01:02 +29: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart
+01:04 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 34 ms
+[ContentStore] prayers: 115 docs in 95 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 21 ms
+[ContentStore] invitatoriums: 4 docs in 27 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] completoriums: 35 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 24 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 34 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 79 ms
+[ContentStore] songs: 447 docs in 80 ms
+[ContentStore] liturgicalTemplates: 16 docs in 97 ms
+[ContentStore] compendium: 27 docs in 133 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 136 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 207 ms
+[ContentStore] readings: 822 docs in 275 ms
+[ContentStore] days: 736 docs in 523 ms
+01:04 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 1.0
+01:08 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 2.0
+01:10 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 1.0
+01:11 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 2.0
+01:12 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year jump browses independently, supports keyboard and calendar bounds
+01:15 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: year list centres the browsed year after reopening
+01:17 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: All Souls 2025 displays three Mass sets and Sunday Office once
+01:18 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: All Souls 2031 displays three Mass sets and Sunday Office once
+01:18 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year dialog stays usable at 320px, text x2, Brightness.dark
+01:19 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month/year dialog stays usable at 320px, text x2, Brightness.light
+01:20 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selected alternative and competing memorials keep one heading and collapsed details
+01:22 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: diocesan differences remain visible and identical readings appear once
+01:22 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.dark, scale 1.0
+01:23 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.dark, scale 1.5
+01:23 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.light, scale 1.0
+01:23 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 360.0, Brightness.light, scale 1.5
+01:23 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.dark, scale 1.0
+01:24 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.dark, scale 1.5
+01:24 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.light, scale 1.0
+01:24 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 7, 430.0, Brightness.light, scale 1.5
+01:24 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.0
+01:25 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.dark, scale 1.5
+01:27 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.0
+01:28 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 360.0, Brightness.light, scale 1.5
+01:29 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.0
+01:30 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.dark, scale 1.5
+01:31 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.0
+01:32 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector Oct 9, 430.0, Brightness.light, scale 1.5
+01:33 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: selector keeps distinct diocesan rows of the same celebration
+01:33 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: ORDO October 7 keeps memorial data and both Office variants
+01:33 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: month lists all days, crosses year and respects calendar bounds
+01:34 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0
+01:35 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5
+01:35 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.0
+01:36 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.5
+01:37 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_ux_test.dart: (tearDownAll)
+01:37 +64: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart
+01:39 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 27 ms
+[ContentStore] prayers: 115 docs in 78 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 12 ms
+[ContentStore] invitatoriums: 4 docs in 17 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 53 ms
+[ContentStore] completoriums: 35 docs in 61 ms
+[ContentStore] compendiumMeta: 1 docs in 48 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 61 ms
+[ContentStore] liturgicalTemplates: 16 docs in 97 ms
+[ContentStore] songs: 447 docs in 83 ms
+[ContentStore] compendium: 27 docs in 100 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 109 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 161 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 210 ms
+[ContentStore] readings: 822 docs in 244 ms
+[ContentStore] days: 736 docs in 459 ms
+01:39 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real weekday and Marian memorial share canonical presentation
+01:40 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: manual Office survives date round trip and calendar bounds
+01:40 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: both headers retain title and blue accent after Office selection
+[data] CACHE HIT  readings 2026-10-07
+01:45 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Hours date expands the same chooser; Today and deep search remain available
+01:47 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings chooser stays reactive across celebrations, years and dates
+01:50 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: shell calendar shortcut opens the liturgical day
+01:51 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: headers and variants allow 200 percent text
+[data] CACHE HIT  readings 2026-10-07
+01:52 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings calendar survives date change and opens its Picker
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-06
+01:54 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: 14 October Office header keeps weekday, celebration and applicable psalter
+[data] CACHE HIT  hour invitatorium 14-10-sv-callistus-i
+01:56 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Readings variants keep calendar celebrations separate from sets and Office templates
+[data] CACHE HIT  readings 2026-10-09
+01:57 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: festal own texts do not advertise the seasonal psalter
+01:57 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 320.0 px and text 1.0
+[data] CACHE HIT  readings 2026-10-13
+02:00 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 320.0 px and text 1.5
+[data] CACHE HIT  readings 2026-10-13
+02:02 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 320.0 px and text 2.0
+[data] CACHE HIT  readings 2026-10-13
+02:04 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 360.0 px and text 1.0
+[data] CACHE HIT  readings 2026-10-13
+02:07 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 360.0 px and text 1.5
+[data] CACHE HIT  readings 2026-10-13
+02:09 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 360.0 px and text 2.0
+[data] CACHE HIT  readings 2026-10-13
+02:11 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 390.0 px and text 1.0
+[data] CACHE HIT  readings 2026-10-13
+02:13 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 390.0 px and text 1.5
+[data] CACHE HIT  readings 2026-10-13
+02:15 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 390.0 px and text 2.0
+[data] CACHE HIT  readings 2026-10-13
+02:17 +84: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 430.0 px and text 1.0
+[data] CACHE HIT  readings 2026-10-13
+02:20 +85: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 430.0 px and text 1.5
+[data] CACHE HIT  readings 2026-10-13
+02:22 +86: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 430.0 px and text 2.0
+[data] CACHE HIT  readings 2026-10-13
+02:24 +87: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 800.0 px and text 1.0
+[data] CACHE HIT  readings 2026-10-13
+02:27 +88: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 800.0 px and text 1.5
+[data] CACHE HIT  readings 2026-10-13
+02:30 +89: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real selectors at 800.0 px and text 2.0
+[data] CACHE HIT  readings 2026-10-13
+02:33 +90: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: real Sunday cycles, All Souls Mass sets and Office sources
+[data] CACHE HIT  readings 2026-10-11
+[data] CACHE HIT  readings 2025-11-02
+02:34 +91: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 320.0 1.0
+02:37 +92: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 320.0 1.5
+02:39 +93: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 320.0 2.0
+02:41 +94: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 360.0 1.0
+02:43 +95: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 360.0 1.5
+02:45 +96: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 360.0 2.0
+02:47 +97: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 390.0 1.0
+02:49 +98: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 390.0 1.5
+02:51 +99: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 390.0 2.0
+02:53 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 430.0 1.0
+02:55 +101: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 430.0 1.5
+02:57 +102: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 430.0 2.0
+02:59 +103: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 800.0 1.0
+03:01 +104: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 800.0 1.5
+03:04 +105: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.dark 800.0 2.0
+03:06 +106: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 320.0 1.0
+03:08 +107: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 320.0 1.5
+03:10 +108: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 320.0 2.0
+03:12 +109: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 360.0 1.0
+03:14 +110: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 360.0 1.5
+03:15 +111: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 360.0 2.0
+03:17 +112: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 390.0 1.0
+03:19 +113: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 390.0 1.5
+03:21 +114: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 390.0 2.0
+03:23 +115: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 430.0 1.0
+03:25 +116: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 430.0 1.5
+03:27 +117: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 430.0 2.0
+03:29 +118: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 800.0 1.0
+03:32 +119: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 800.0 1.5
+03:34 +120: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: Ordo four dioceses and date-only calendar Brightness.light 800.0 2.0
+03:36 +121: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: required real dates expose their permitted celebration and Office data
+03:40 +122: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_header_flow_test.dart: (tearDownAll)
+03:41 +122: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart
+03:42 +122: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (setUpAll)
+03:42 +122: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter keeps first sorted group and calendar cycle fallback
+03:42 +123: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter linked dayId wins and manual cycle can return to automatic
+03:42 +124: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter weekday and non-cycle groups expose only real cycles
+03:42 +125: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+03:43 +126: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load
+03:44 +127: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: period reading uses the Liturgy of the Hours title
+03:44 +128: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: celebration titles do not get a lectionary year suffix
+03:44 +129: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: liturgical route formats its title with a Roman week number
+03:44 +130: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: synthetic fallback keeps alleluia text and lone alt chorus
+03:44 +131: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: a reading sentence opens an accessible color palette
+03:45 +132: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+03:47 +133: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: manual cycle and reading group survive leaving the date
+03:48 +134: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: Today moves Readings and Hours to the same date
+03:48 +135: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (tearDownAll)
+03:48 +135: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart
+03:49 +135: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: (setUpAll)
+03:50 +135: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: MassSetSelector labels from the source, selection and callback
+03:50 +136: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: MassSetSelector a single set has no selector
+03:50 +137: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: MassSetSelector Belarusian plural of «варыянт»
+03:50 +138: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen 15.08 opens the day Mass; the vigil is one tap away and stays chosen when the date is opened again
+03:53 +139: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen three sets fit a 320 px phone at double text size
+03:53 +140: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen the route can ask for a set (?set=vigil)
+03:54 +141: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen 24.12 opens the Christmas vigil Mass; the covered legacy document is not a second choice
+03:54 +142: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen Palm Sunday: rubrics, the Passion by roles, one Gospel
+03:55 +143: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen a procession set shows only its Gospel of the cycle
+03:55 +144: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen Easter Vigil: ordered sections, no conclusion after the third reading
+03:56 +145: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen the sequence is rendered as its own section
+03:56 +146: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen a reference-only set shows citations and says the text is not loaded yet
+03:56 +147: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: Readings screen a document without sets keeps the flat rendering
+03:56 +148: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/mass_reading_sets_widget_test.dart: (tearDownAll)
+03:56 +148: All tests passed!

@@ -1,0 +1,8 @@
+Analyzing 4 items...                                            
+
+warning - The declaration '_Action' isn't referenced - lib\screens\ordo_screen.dart:1259:7 - unused_element
+warning - A value for optional parameter 'key' isn't ever given - lib\screens\ordo_screen.dart:1260:24 - unused_element_parameter
+   info - Statements in an if should be enclosed in a block - lib\widgets\ordo\liturgical_month_calendar.dart:169:19 - curly_braces_in_flow_control_structures
+  error - The named parameter 'date' is required, but there's no corresponding argument - test\liturgical_controls_test.dart:112:49 - missing_required_argument
+
+4 issues found. (ran in 135.3s)

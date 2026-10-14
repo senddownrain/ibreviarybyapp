@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "preferencesRestored": true,
+  "states": {
+    "chrome-320-light-hours-collapsed": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-hours-expanded": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-month-picker": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-year-picker": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-office-variants": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-readings-two-cycles": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-readings-three-cycles": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-multiple-mass-sets": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-ordo-alternatives": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-light-ordo-date-only": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-hours-collapsed": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-hours-expanded": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-month-picker": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-year-picker": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-office-variants": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-readings-two-cycles": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-readings-three-cycles": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-multiple-mass-sets": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-ordo-alternatives": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-dark-ordo-date-only": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1
+    },
+    "chrome-320-text-1.5-hours": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1.5
+    },
+    "chrome-320-text-1.5-calendar": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1.5
+    },
+    "chrome-320-text-1.5-ordo": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 1.5
+    },
+    "chrome-320-text-2-hours": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 2
+    },
+    "chrome-320-text-2-calendar": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 2
+    },
+    "chrome-320-text-2-ordo": {
+      "viewportWidth": 320,
+      "viewportHeight": 844,
+      "bottomInset": 0,
+      "textScaleAt16": 2
+    }
+  }
+}

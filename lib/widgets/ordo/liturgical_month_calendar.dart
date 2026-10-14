@@ -40,12 +40,204 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
   void _move(int delta) =>
       setState(() => _month = DateTime(_month.year, _month.month + delta));
 
-  Future<void> _jumpToMonth() async {
-    final month = await showDialog<DateTime>(
-      context: context,
-      builder: (_) => _MonthJumpDialog(month: _month),
+  bool _pickingMonth = false;
+  bool _pickingYear = false;
+  late int _pickerYear = _month.year;
+  ScrollController? _yearScroll;
+
+  @override
+  void dispose() {
+    _yearScroll?.dispose();
+    super.dispose();
+  }
+
+  void _toggleYears() {
+    if (!_pickingYear) {
+      _yearScroll?.dispose();
+      _yearScroll = ScrollController(
+        keepScrollOffset: false,
+        initialScrollOffset:
+            ((_pickerYear - kCalendarFirstDate.year) * 48.0 - 96).clamp(
+              0.0,
+              (kCalendarLastDate.year - kCalendarFirstDate.year + 1) * 48.0 -
+                  240,
+            ),
+      );
+    }
+    setState(() => _pickingYear = !_pickingYear);
+  }
+
+  void _jumpToMonth() => setState(() {
+    _pickerYear = _month.year;
+    _pickingMonth = !_pickingMonth;
+    _pickingYear = false;
+  });
+
+  Widget _picker(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              key: const Key('ordo-previous-year'),
+              tooltip: 'Папярэдні год',
+              onPressed: _pickerYear > kCalendarFirstDate.year
+                  ? () => setState(() => _pickerYear--)
+                  : null,
+              icon: const Icon(Icons.chevron_left),
+            ),
+            Expanded(
+              child: TextButton(
+                key: const Key('ordo-pick-year'),
+                onPressed: _toggleYears,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      '$_pickerYear',
+                      style: theme.textTheme.titleLarge?.copyWith(fontSize: 19),
+                    ),
+                    Icon(
+                      _pickingYear
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            IconButton(
+              key: const Key('ordo-next-year'),
+              tooltip: 'Наступны год',
+              onPressed: _pickerYear < kCalendarLastDate.year
+                  ? () => setState(() => _pickerYear++)
+                  : null,
+              icon: const Icon(Icons.chevron_right),
+            ),
+          ],
+        ),
+        if (_pickingYear)
+          SizedBox(
+            height: 240,
+            child: ListView(
+              key: const Key('ordo-year-list'),
+              controller: _yearScroll,
+              itemExtent: 48,
+              children: [
+                for (
+                  var year = kCalendarFirstDate.year;
+                  year <= kCalendarLastDate.year;
+                  year++
+                )
+                  ListTile(
+                    key: Key('ordo-year-$year'),
+                    selected: year == _pickerYear,
+                    title: Text('$year', textAlign: TextAlign.center),
+                    onTap: () => setState(() {
+                      _pickerYear = year;
+                      _pickingYear = false;
+                    }),
+                  ),
+              ],
+            ),
+          )
+        else
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Measure names with the real theme/font scaler; never break a
+              // month name just to keep three columns at large system text.
+              var widestName = 0.0;
+              for (var month = 1; month <= 12; month++) {
+                final name = DateFormat(
+                  'LLLL',
+                  'be',
+                ).format(DateTime(_pickerYear, month));
+                final measurement = TextPainter(
+                  text: TextSpan(
+                    text: '${name[0].toUpperCase()}${name.substring(1)}',
+                    style: theme.textTheme.labelLarge,
+                  ),
+                  textScaler: MediaQuery.textScalerOf(context),
+                  textDirection: Directionality.of(context),
+                  maxLines: 1,
+                )..layout();
+                if (measurement.width > widestName) {
+                  widestName = measurement.width;
+                }
+                measurement.dispose();
+              }
+              final columns = (constraints.maxWidth / (widestName + 16))
+                  .floor()
+                  .clamp(1, 3);
+              return Column(
+                children: [
+                  for (var row = 0; row < 12 ~/ columns; row++)
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (var column = 0; column < columns; column++)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: _monthButton(row * columns + column + 1),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        TextButton(
+          key: const Key('ordo-picker-days'),
+          onPressed: () => setState(() {
+            _pickingMonth = false;
+            _pickingYear = false;
+          }),
+          child: const Text('Да дзён месяца'),
+        ),
+      ],
     );
-    if (mounted && month != null) setState(() => _month = month);
+  }
+
+  Widget _monthButton(int month) {
+    final cs = Theme.of(context).colorScheme;
+    final selected = _month.year == _pickerYear && _month.month == month;
+    final available =
+        !DateTime(_pickerYear, month + 1, 0).isBefore(kCalendarFirstDate) &&
+        !DateTime(_pickerYear, month).isAfter(kCalendarLastDate);
+    final label = DateFormat('LLLL', 'be').format(DateTime(_pickerYear, month));
+    return Semantics(
+      selected: selected,
+      child: OutlinedButton(
+        key: Key('ordo-month-$month'),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(48, 52),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+          backgroundColor: selected ? cs.surfaceContainerHigh : null,
+          foregroundColor: cs.onSurface,
+          side: BorderSide(color: selected ? cs.outline : cs.outlineVariant),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: available
+            ? () => setState(() {
+                _month = DateTime(_pickerYear, month);
+                _pickingMonth = false;
+              })
+            : null,
+        child: Text(
+          '${label[0].toUpperCase()}${label.substring(1)}',
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   @override
@@ -63,24 +255,29 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _MonthHeader(
-          month: _month,
-          onJump: _jumpToMonth,
-          onPrevious:
-              _month.isAfter(
-                DateTime(kCalendarFirstDate.year, kCalendarFirstDate.month),
-              )
-              ? () => _move(-1)
-              : null,
-          onNext:
-              _month.isBefore(
-                DateTime(kCalendarLastDate.year, kCalendarLastDate.month),
-              )
-              ? () => _move(1)
-              : null,
-        ),
+        if (_pickingMonth)
+          _picker(context)
+        else
+          _MonthHeader(
+            month: _month,
+            onJump: _jumpToMonth,
+            onPrevious:
+                _month.isAfter(
+                  DateTime(kCalendarFirstDate.year, kCalendarFirstDate.month),
+                )
+                ? () => _move(-1)
+                : null,
+            onNext:
+                _month.isBefore(
+                  DateTime(kCalendarLastDate.year, kCalendarLastDate.month),
+                )
+                ? () => _move(1)
+                : null,
+          ),
         const SizedBox(height: 8),
-        if (ready.hasError)
+        if (_pickingMonth)
+          const SizedBox.shrink()
+        else if (ready.hasError)
           const Text('Не ўдалося адкрыць каляндар')
         else if (!ready.hasValue)
           const Padding(
@@ -117,124 +314,85 @@ class _MonthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = DateFormat('LLLL y', 'be').format(month);
-    return Row(
-      children: [
-        IconButton(
-          key: const Key('ordo-previous-month'),
-          tooltip: 'Папярэдні месяц',
-          onPressed: onPrevious,
-          icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
-        ),
-        Expanded(
-          child: TextButton(
-            key: const Key('ordo-jump-month'),
-            onPressed: onJump,
+    final monthLabel = DateFormat('LLLL', 'be').format(month);
+    String capitalise(String text) =>
+        '${text[0].toUpperCase()}${text.substring(1)}';
+    final style = Theme.of(
+      context,
+    ).textTheme.titleLarge?.copyWith(fontSize: 19, fontWeight: FontWeight.w600);
+    final previous = IconButton(
+      key: const Key('ordo-previous-month'),
+      tooltip: 'Папярэдні месяц',
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      onPressed: onPrevious,
+      icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
+    );
+    final next = IconButton(
+      key: const Key('ordo-next-month'),
+      tooltip: 'Наступны месяц',
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      onPressed: onNext,
+      icon: const PhosphorIcon(PhosphorIconsRegular.caretRight),
+    );
+    Widget heading(String text) => TextButton(
+      key: const Key('ordo-jump-month'),
+      onPressed: onJump,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
             child: Text(
-              '${label[0].toUpperCase()}${label.substring(1)}',
+              text,
               key: const Key('ordo-month-label'),
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
+              style: style,
             ),
           ),
-        ),
-        IconButton(
-          key: const Key('ordo-next-month'),
-          tooltip: 'Наступны месяц',
-          onPressed: onNext,
-          icon: const PhosphorIcon(PhosphorIconsRegular.caretRight),
-        ),
-      ],
-    );
-  }
-}
-
-/// Browsing a month never commits a daily selection.
-class _MonthJumpDialog extends StatefulWidget {
-  const _MonthJumpDialog({required this.month});
-  final DateTime month;
-
-  @override
-  State<_MonthJumpDialog> createState() => _MonthJumpDialogState();
-}
-
-class _MonthJumpDialogState extends State<_MonthJumpDialog> {
-  late int _year = widget.month.year;
-  late int _month = widget.month.month;
-
-  List<int> get _months => [
-    for (var month = 1; month <= 12; month++)
-      if (!DateTime(_year, month + 1, 0).isBefore(kCalendarFirstDate) &&
-          !DateTime(_year, month).isAfter(kCalendarLastDate))
-        month,
-  ];
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Перайсці да месяца'),
-    scrollable: true,
-    content: SizedBox(
-      width: 320,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonFormField<int>(
-            key: ValueKey('ordo-jump-year-$_year'),
-            initialValue: _year,
-            isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Год'),
-            items: [
-              for (
-                var year = kCalendarFirstDate.year;
-                year <= kCalendarLastDate.year;
-                year++
-              )
-                DropdownMenuItem(value: year, child: Text('$year')),
-            ],
-            onChanged: (year) {
-              if (year == null) return;
-              setState(() {
-                _year = year;
-                _month = _month.clamp(_months.first, _months.last);
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<int>(
-            key: ValueKey('ordo-jump-month-$_year-$_month'),
-            initialValue: _month,
-            isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Месяц'),
-            items: [
-              for (final month in _months)
-                DropdownMenuItem(
-                  value: month,
-                  child: Text(
-                    DateFormat('LLLL', 'be').format(DateTime(_year, month)),
-                  ),
-                ),
-            ],
-            onChanged: (month) {
-              if (month != null) setState(() => _month = month);
-            },
-          ),
+          const SizedBox(width: 4),
+          const Icon(Icons.keyboard_arrow_down, size: 20),
         ],
       ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Скасаваць'),
-      ),
-      FilledButton(
-        key: const Key('ordo-jump-apply'),
-        onPressed: () => Navigator.pop(context, DateTime(_year, _month)),
-        child: const Text('Паказаць'),
-      ),
-    ],
-  );
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final measurement = TextPainter(
+          text: TextSpan(text: capitalise(monthLabel), style: style),
+          textScaler: MediaQuery.textScalerOf(context),
+          textDirection: Directionality.of(context),
+          maxLines: 1,
+        )..layout();
+        final separateYear = measurement.width > constraints.maxWidth - 96 - 48;
+        measurement.dispose();
+        if (separateYear) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              heading(capitalise(monthLabel)),
+              Row(
+                children: [
+                  previous,
+                  Expanded(
+                    child: TextButton(
+                      onPressed: onJump,
+                      child: Text('${month.year}', style: style),
+                    ),
+                  ),
+                  next,
+                ],
+              ),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            previous,
+            Expanded(child: heading(capitalise(label))),
+            next,
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _MonthGrid extends ConsumerWidget {
@@ -272,74 +430,68 @@ class _MonthGrid extends ConsumerWidget {
     }
     final theme = Theme.of(context);
     return LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        // Keep the grid's scroll offset separate from an enclosing
-        // ExpansionTile's boolean PageStorage value.
-        key: const PageStorageKey('liturgical-month-grid-scroll'),
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: constraints.maxWidth.clamp(322.0, 696.0),
-          child: GlassSurface(
-            seasonColor: accent,
-            padding: const EdgeInsets.fromLTRB(2, 10, 2, 8),
-            child: Column(
-              children: [
+      builder: (context, constraints) => SizedBox(
+        width: constraints.maxWidth,
+        child: GlassSurface(
+          seasonColor: accent,
+          padding: const EdgeInsets.fromLTRB(2, 10, 2, 8),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  for (final (index, label) in _weekdays.indexed)
+                    Expanded(
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: index == 6
+                              ? theme.colorScheme.error
+                              : theme.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              for (var row = 0; row < cells.length ~/ 7; row++)
                 Row(
                   children: [
-                    for (final (index, label) in _weekdays.indexed)
+                    for (final iso in cells.sublist(row * 7, row * 7 + 7))
                       Expanded(
-                        child: Text(
-                          label,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: index == 6
-                                ? theme.colorScheme.error
-                                : theme.colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        child: iso == null
+                            ? const SizedBox(height: 52)
+                            : _DayCell(
+                                iso: iso,
+                                colors: () {
+                                  final colors = <String>[];
+                                  for (final diocese in dioceses) {
+                                    final day = engine.resolve(
+                                      iso,
+                                      diocese: diocese,
+                                    );
+                                    for (final color in {
+                                      ...day.legalColors,
+                                      for (final option in day.options)
+                                        ...option.colorAlternatives,
+                                    }) {
+                                      if (!colors.contains(color)) {
+                                        colors.add(color);
+                                      }
+                                    }
+                                  }
+                                  return colors;
+                                }(),
+                                isToday: iso == today,
+                                isSelected: iso == selected,
+                                accent: accent,
+                                onTap: () => onSelect(iso),
+                              ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                for (var row = 0; row < cells.length ~/ 7; row++)
-                  Row(
-                    children: [
-                      for (final iso in cells.sublist(row * 7, row * 7 + 7))
-                        Expanded(
-                          child: iso == null
-                              ? const SizedBox(height: 52)
-                              : _DayCell(
-                                  iso: iso,
-                                  colors: () {
-                                    final colors = <String>[];
-                                    for (final diocese in dioceses) {
-                                      final day = engine.resolve(
-                                        iso,
-                                        diocese: diocese,
-                                      );
-                                      for (final color in {
-                                        ...day.legalColors,
-                                        for (final option in day.options)
-                                          ...option.colorAlternatives,
-                                      }) {
-                                        if (!colors.contains(color)) {
-                                          colors.add(color);
-                                        }
-                                      }
-                                    }
-                                    return colors.take(3).toList();
-                                  }(),
-                                  isToday: iso == today,
-                                  isSelected: iso == selected,
-                                  accent: accent,
-                                  onTap: () => onSelect(iso),
-                                ),
-                        ),
-                    ],
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -387,12 +539,7 @@ class _DayCell extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 6),
           margin: const EdgeInsets.all(1),
           decoration: BoxDecoration(
-            color: isSelected
-                ? Color.alphaBlend(
-                    cs.onSurface.withValues(alpha: .08),
-                    cs.secondaryContainer,
-                  )
-                : null,
+            color: isSelected ? cs.surfaceContainerHighest : null,
             borderRadius: BorderRadius.circular(14),
             border: isSelected
                 ? Border.all(color: cs.outline.withValues(alpha: .8))
@@ -409,11 +556,8 @@ class _DayCell extends StatelessWidget {
                   fontWeight: isSelected || sunday
                       ? FontWeight.w800
                       : FontWeight.w500,
-                  color: isSelected
-                      ? cs.onSecondaryContainer
-                      : sunday
-                      ? cs.error
-                      : cs.onSurface,
+                  color: sunday ? cs.error : cs.onSurface,
+                  decoration: isToday ? TextDecoration.underline : null,
                 ),
                 maxLines: 1,
               ),

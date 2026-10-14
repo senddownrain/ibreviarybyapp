@@ -9,6 +9,7 @@ import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_disclosure.dart';
+import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 
 /// Date-only entry. Browsing months does not change the underlying reader.
 Future<void> showCompactLiturgicalCalendar({
@@ -19,53 +20,54 @@ Future<void> showCompactLiturgicalCalendar({
   ValueChanged<DateTime>? onSelected,
 }) async {
   final router = GoRouter.of(context);
+  var activeDate = date;
   final result = await showModalBottomSheet<Object>(
     context: context,
     useRootNavigator: true,
     useSafeArea: true,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (sheetContext) => ConstrainedBox(
-      key: const Key('compact-liturgical-calendar'),
-      constraints: BoxConstraints(
-        maxWidth: 640,
-        maxHeight: MediaQuery.sizeOf(sheetContext).height * .85,
-      ),
-      child: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LiturgicalMonthCalendar(
-                initialDate: date,
-                diocese: diocese,
-                onSelected: (value) => Navigator.pop(sheetContext, value),
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (context, setSheetState) {
+        void select(DateTime value) {
+          if (onSelected == null) {
+            Navigator.pop(sheetContext, value);
+          } else {
+            onSelected(value);
+            setSheetState(() => activeDate = value);
+          }
+        }
+
+        return LiturgicalSelectorSheet(
+          key: const Key('compact-liturgical-calendar'),
+          title: 'Каляндар',
+          scrollKey: const Key('date-only-calendar-scroll'),
+          children: [
+            LiturgicalMonthCalendar(
+              initialDate: activeDate,
+              diocese: diocese,
+              onSelected: select,
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                key: const Key('liturgical-calendar-today'),
+                onPressed: () => select(DateUtils.dateOnly(DateTime.now())),
+                icon: const Icon(Icons.today, size: 18),
+                label: const Text('Сёння'),
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  key: const Key('liturgical-calendar-today'),
-                  onPressed: () => Navigator.pop(
-                    sheetContext,
-                    DateUtils.dateOnly(DateTime.now()),
-                  ),
-                  child: const Text('Сёння'),
-                ),
+            ),
+            if (pickerRoute != null)
+              ListTile(
+                key: const Key('liturgical-calendar-picker'),
+                leading: const Icon(Icons.search),
+                title: const Text('Знайсці літургічны дзень'),
+                subtitle: const Text('Пошук паводле перыяду або свята'),
+                onTap: () => Navigator.pop(sheetContext, true),
               ),
-              if (pickerRoute != null)
-                ListTile(
-                  key: const Key('liturgical-calendar-picker'),
-                  leading: const Icon(Icons.search),
-                  title: const Text('Знайсці літургічны дзень'),
-                  subtitle: const Text('Пошук паводле перыяду або свята'),
-                  onTap: () => Navigator.pop(sheetContext, true),
-                ),
-            ],
-          ),
-        ),
-      ),
+          ],
+        );
+      },
     ),
   );
   if (!context.mounted) return;
@@ -146,100 +148,53 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
       navigation.openDate(date, dayId: id, diocese: diocese);
     }
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: 640,
-        maxHeight: MediaQuery.sizeOf(context).height * .85,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    presentation.dateLabel,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Закрыць',
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
+    return LiturgicalSelectorSheet(
+      scrollKey: const Key('liturgical-calendar-scroll'),
+      children: [
+        LiturgicalCalendarDisclosure(
+          date: presentation.date,
+          controlKey: const Key('liturgical-calendar-toggle'),
+          expanded: _calendarExpanded,
+          onChanged: (expanded) => setState(() => _calendarExpanded = expanded),
+          calendar: LiturgicalMonthCalendar(
+            initialDate: presentation.date,
+            seasonColor: presentation.accent,
+            diocese: widget.diocese,
+            onSelected: selectDate,
+          ),
+        ),
+        if (_calendarExpanded)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              key: const Key('liturgical-calendar-today'),
+              onPressed: () {
+                selectDate(DateTime.now());
+                setState(() => _calendarExpanded = true);
+              },
+              child: const Text('Сёння'),
             ),
           ),
-          Flexible(
-            child: SingleChildScrollView(
-              key: const Key('liturgical-calendar-scroll'),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  LiturgicalCalendarDisclosure(
-                    controlKey: const Key('liturgical-calendar-toggle'),
-                    expanded: _calendarExpanded,
-                    onChanged: (expanded) =>
-                        setState(() => _calendarExpanded = expanded),
-                    calendar: LiturgicalMonthCalendar(
-                      initialDate: presentation.date,
-                      seasonColor: presentation.accent,
-                      diocese: widget.diocese,
-                      onSelected: selectDate,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      key: const Key('liturgical-calendar-today'),
-                      onPressed: () {
-                        selectDate(DateTime.now());
-                        setState(() => _calendarExpanded = true);
-                      },
-                      child: const Text('Сёння'),
-                    ),
-                  ),
-                  if (ready.hasValue)
-                    HoursOptionsSheet(
-                      date: presentation.date,
-                      color: presentation.accent,
-                      embedded: true,
-                    )
-                  else if (ready.hasError)
-                    const Text('Не ўдалося адкрыць тэксты')
-                  else
-                    const Center(child: CircularProgressIndicator.adaptive()),
-                  const Divider(),
-                  ListTile(
-                    key: const Key('liturgical-calendar-picker'),
-                    leading: const Icon(Icons.search),
-                    title: const Text('Знайсці літургічны дзень'),
-                    subtitle: const Text('Пошук паводле перыяду або свята'),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
-                    onTap: () => Navigator.pop(context, true),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Гатова'),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+        if (ready.hasValue)
+          HoursOptionsSheet(
+            date: presentation.date,
+            color: presentation.accent,
+            embedded: true,
+          )
+        else if (ready.hasError)
+          const Text('Не ўдалося адкрыць тэксты')
+        else
+          const Center(child: CircularProgressIndicator.adaptive()),
+        const Divider(),
+        ListTile(
+          key: const Key('liturgical-calendar-picker'),
+          leading: const Icon(Icons.search),
+          title: const Text('Знайсці літургічны дзень'),
+          subtitle: const Text('Пошук паводле перыяду або свята'),
+          trailing: const Icon(Icons.chevron_right, size: 20),
+          onTap: () => Navigator.pop(context, true),
+        ),
+      ],
     );
   }
 }

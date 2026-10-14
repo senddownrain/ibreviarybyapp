@@ -1,0 +1,33 @@
+Analyzing ibreviarybyapp...                                     
+../../runtime/vm/os_thread.cc: 364: error: Could not start thread DartWorker: 22 (���������� �� �������� �������.
+
+)
+version=3.11.1 (stable) (Tue Feb 24 00:03:07 2026 -0800) on "windows_x64"
+pid=19388, thread=144, isolate_group=(nil)(0000000000000000), isolate=(nil)(0000000000000000)
+os=windows, arch=x64, comp=no, sim=no
+isolate_instructions=0, vm_instructions=7ff64c7c8400
+fp=93723fed20, sp=93723fecd8, pc=7ff64caacca3
+  pc 0x00007ff64caacca3 fp 0x00000093723fed20 Dart_DetectNullSafety+0x2dc1c3
+-- End of DumpStackTrace
+
+Oops; flutter has exited unexpectedly: "Exception: analysis server exited with code -1073740791 and output:
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\songbook_test.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\song_chords_test.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\source_footer_test.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\stateful_shell_navigation_test.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\support\\compendium_fixture.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\support\\lectionary_fixture.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\support\\lectionary_run.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\support\\ordo_fixture.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\text_scale_control_test.dart","errors":[]}}
+[stdout] {"event":"analysis.errors","params":{"file":"C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\test\\widgets\\floating_top_actions_test.dart","errors":[]}}
+[stderr] ../../runtime/vm/os_thread.cc: 364: error: Could not start thread DartWorker: 22 (���������� �� �������� �������.
+[stderr] 
+[stderr] )
+[stderr] version=3.11.1 (stable) (Tue Feb 24 00:03:07 2026 -0800) on "windows_x64"
+[stderr] pid=19388, thread=144, isolate_group=(nil)(0000000000000000), isolate=(nil)(0000000000000000)
+[stderr] os=windows, arch=x64, comp=no, sim=no
+[stderr] isolate_instructions=0, vm_instructions=7ff64c7c8400
+[stderr] fp=93723fed20, sp=93723fecd8, pc=7ff64caacca3
+[stderr]   pc 0x00007ff64caacca3 fp 0x00000093723fed20 Dart_DetectNullSafety+0x2dc1c3
+[stderr] -- End of DumpStackTrace".

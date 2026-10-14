@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "preferencesRestored": true,
+  "states": {
+    "polish-chrome-320-light-hedwig": {
+      "width": 320,
+      "bottomInset": 0
+    },
+    "polish-chrome-320-light-calendar": {
+      "width": 320,
+      "bottomInset": 0
+    },
+    "polish-chrome-320-light-alternatives": {
+      "width": 320,
+      "bottomInset": 0
+    }
+  }
+}

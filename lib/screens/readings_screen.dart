@@ -16,7 +16,7 @@ import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dar
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
-import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
+import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -558,7 +558,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       useSafeArea: true,
       showDragHandle: true,
       isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (sheetContext) => ValueListenableBuilder<int>(
         valueListenable: _optionsRevision,
         builder: (_, revision, child) {
@@ -988,184 +988,153 @@ class _ReadingsOptionsSheetState extends State<_ReadingsOptionsSheet> {
   late bool _calendarExpanded = widget.calendarExpanded;
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
+  Widget build(BuildContext context) => LiturgicalSelectorSheet(
     key: const Key('readings-options-sheet'),
-    constraints: BoxConstraints(
-      maxWidth: 620,
-      maxHeight: MediaQuery.sizeOf(context).height * .85,
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          title: Text(
-            'Іншыя варыянты',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          trailing: IconButton(
-            tooltip: 'Закрыць',
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.close),
+    scrollKey: const Key('readings-options-scroll'),
+    doneKey: const Key('readings-options-done'),
+    children: [
+      if (widget.date != null)
+        LiturgicalCalendarDisclosure(
+          date: widget.date!,
+          controlKey: const Key('readings-calendar-disclosure'),
+          expanded: _calendarExpanded,
+          onChanged: (expanded) => setState(() => _calendarExpanded = expanded),
+          calendar: LiturgicalMonthCalendar(
+            initialDate: widget.date!,
+            onSelected: widget.onDateSelected,
           ),
         ),
-        Flexible(
-          child: ListView(
-            key: const Key('readings-options-scroll'),
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+      if (widget.date != null && _calendarExpanded)
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            key: const Key('readings-calendar-today'),
+            onPressed: () =>
+                widget.onDateSelected(DateUtils.dateOnly(DateTime.now())),
+            child: const Text('Сёння'),
+          ),
+        ),
+      if (widget.celebrations.isNotEmpty) ...[
+        const LiturgicalSelectorHeading('Святкаванне'),
+        RadioGroup<String>(
+          groupValue: widget.selectedCelebration,
+          onChanged: (key) {
+            final option = widget.celebrations
+                .where((o) => o.key == key)
+                .firstOrNull;
+            if (option != null) widget.onCelebrationSelected(option);
+          },
+          child: Column(
             children: [
-              if (widget.date != null)
-                LiturgicalCalendarDisclosure(
-                  controlKey: const Key('readings-calendar-disclosure'),
-                  expanded: _calendarExpanded,
-                  onChanged: (expanded) =>
-                      setState(() => _calendarExpanded = expanded),
-                  calendar: LiturgicalMonthCalendar(
-                    initialDate: widget.date!,
-                    onSelected: widget.onDateSelected,
-                  ),
-                ),
-              if (widget.celebrations.isNotEmpty) ...[
-                const _OptionsHeading('Святкаванне'),
-                RadioGroup<String>(
-                  groupValue: widget.selectedCelebration,
-                  onChanged: (key) {
-                    final option = widget.celebrations
-                        .where((o) => o.key == key)
-                        .firstOrNull;
-                    if (option != null) widget.onCelebrationSelected(option);
-                  },
-                  child: Column(
-                    children: [
-                      for (final option in widget.celebrations)
-                        RadioListTile<String>(
-                          key: ValueKey('readings-celebration-${option.key}'),
-                          value: option.key,
-                          selected: option.key == widget.selectedCelebration,
-                          contentPadding: EdgeInsets.zero,
-                          secondary: VestmentMarker(
-                            colors: [
-                              option.ordo!.color,
-                              ...option.ordo!.colorAlternatives,
-                            ],
-                            size: 14,
-                          ),
-                          title: Text(
-                            option.title,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                          subtitle: Text(
-                            [
-                              liturgicalOptionRank(option),
-                              ...option.badges,
-                            ].where((s) => s.isNotEmpty).join(' · '),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-              if (widget.loading) const LinearProgressIndicator(),
-              if (!widget.loading && widget.readingNote != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Text(widget.readingNote!),
-                ),
-              if (widget.groups.length > 1) ...[
-                const SizedBox(height: 18),
-                const _OptionsHeading('Набор чытанняў'),
-                for (final group in widget.groups)
-                  ListTile(
-                    key: ValueKey('readings-group-${group.key}'),
-                    selected: group.key == widget.activeGroupKey,
-                    title: Text(group.label),
-                    trailing: group.key == widget.activeGroupKey
-                        ? const Icon(Icons.check_rounded)
-                        : null,
-                    onTap: () => widget.onGroupSelected(group.key),
-                  ),
-              ],
-              if (widget.massSet != null &&
-                  widget.massSet!.sets.length > 1) ...[
-                const SizedBox(height: 18),
-                MassSetSelector(
-                  sets: widget.massSet!.sets,
-                  selectedId: widget.massSet!.set.id,
-                  accentColor: widget.accentColor,
-                  onSelected: widget.onSetSelected,
-                ),
-              ],
-              if (widget.cycles.length > 1) ...[
-                const SizedBox(height: 18),
-                const _OptionsHeading('Выбар чытанняў'),
-                const SizedBox(height: 6),
-                for (final cycle in widget.cycles)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: SelectionOptionCard(
-                      key: ValueKey('readings-cycle-$cycle'),
-                      title: 'Год ${_readingsCycleLabel(cycle)}',
-                      leading: const Icon(Icons.auto_stories_outlined),
-                      accentColor: widget.accentColor,
-                      selected:
-                          cycle ==
-                          (widget.manualCycle ?? widget.automaticCycle),
-                      onTap: () => widget.onCycleSelected(
-                        cycle == widget.automaticCycle ? null : cycle,
-                      ),
-                    ),
-                  ),
-              ],
-              if (widget.groups.length < 2 &&
-                  (widget.massSet?.sets.length ?? 0) < 2 &&
-                  widget.cycles.length < 2 &&
-                  widget.celebrations.length < 2)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('Для гэтай даты іншых набораў чытанняў няма'),
-                ),
-              if (widget.date != null)
-                ListTile(
-                  key: const Key('readings-calendar-picker'),
-                  leading: const Icon(Icons.search),
-                  title: const Text('Знайсці літургічны дзень'),
-                  subtitle: const Text('Пошук паводле перыяду або свята'),
-                  onTap: widget.onFindDay,
+              for (final option in widget.celebrations)
+                LiturgicalCelebrationChoice(
+                  key: ValueKey('readings-celebration-${option.key}'),
+                  value: option.key,
+                  selected: option.key == widget.selectedCelebration,
+                  title: option.title,
+                  colors: [
+                    option.ordo!.color,
+                    ...option.ordo!.colorAlternatives,
+                  ],
+                  subtitle: [
+                    liturgicalOptionRank(option),
+                    ...option.badges,
+                  ].where((s) => s.isNotEmpty).join(' · '),
                 ),
             ],
           ),
         ),
+      ],
+      if (widget.loading) const LinearProgressIndicator(),
+      if (!widget.loading && widget.readingNote != null)
         Padding(
-          padding: EdgeInsets.only(bottom: systemBottomInset(context)),
-          child: TextButton(
-            key: const Key('readings-options-done'),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Гатова'),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(widget.readingNote!),
+        ),
+      if (widget.groups.length > 1) ...[
+        const SizedBox(height: 18),
+        const LiturgicalSelectorHeading('Набор чытанняў'),
+        for (final group in widget.groups)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: SelectionOptionCard(
+              key: ValueKey('readings-group-${group.key}'),
+              dense: true,
+              selected: group.key == widget.activeGroupKey,
+              title: group.label,
+              onTap: () => widget.onGroupSelected(group.key),
+            ),
           ),
+      ],
+      if (widget.massSet != null && widget.massSet!.sets.length > 1) ...[
+        const SizedBox(height: 18),
+        MassSetSelector(
+          sets: widget.massSet!.sets,
+          selectedId: widget.massSet!.set.id,
+          accentColor: widget.accentColor,
+          onSelected: widget.onSetSelected,
         ),
       ],
-    ),
-  );
-}
-
-class _OptionsHeading extends StatelessWidget {
-  const _OptionsHeading(this.label);
-  final String label;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-    child: Text(
-      label.toUpperCase(),
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.05,
-      ),
-    ),
+      if (widget.cycles.length > 1) ...[
+        const SizedBox(height: 18),
+        const LiturgicalSelectorHeading('Выбар чытанняў'),
+        const SizedBox(height: 6),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final cycle in widget.cycles)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: SelectionOptionCard(
+                    key: ValueKey('readings-cycle-$cycle'),
+                    compact: true,
+                    title: 'Год ${_readingsCycleLabel(cycle)}',
+                    selected:
+                        cycle == (widget.manualCycle ?? widget.automaticCycle),
+                    onTap: () => widget.onCycleSelected(
+                      cycle == widget.automaticCycle ? null : cycle,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          widget.manualCycle == null
+              ? 'Паводле календара · Год ${_readingsCycleLabel(widget.automaticCycle)}'
+              : 'Прагляд іншага года · Год ${_readingsCycleLabel(widget.manualCycle!)}',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        if (widget.manualCycle != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              key: const Key('readings-cycle-automatic'),
+              onPressed: () => widget.onCycleSelected(null),
+              icon: const Icon(Icons.restore, size: 18),
+              label: const Text('Паводле календара'),
+            ),
+          ),
+      ],
+      if (widget.groups.length < 2 &&
+          (widget.massSet?.sets.length ?? 0) < 2 &&
+          widget.cycles.length < 2 &&
+          widget.celebrations.length < 2)
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text('Для гэтай даты іншых набораў чытанняў няма'),
+        ),
+      if (widget.date != null)
+        ListTile(
+          key: const Key('readings-calendar-picker'),
+          leading: const Icon(Icons.search),
+          title: const Text('Знайсці літургічны дзень'),
+          subtitle: const Text('Пошук паводле перыяду або свята'),
+          onTap: widget.onFindDay,
+        ),
+    ],
   );
 }
 

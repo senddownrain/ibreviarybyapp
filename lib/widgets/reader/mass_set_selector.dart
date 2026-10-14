@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 
 import 'package:mybrev_flutter/models/mass_reading_sets.dart';
 
@@ -36,7 +37,6 @@ class MassSetSelector extends StatelessWidget {
     if (sets.length < 2) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final accent = accentColor ?? cs.primary;
     return Semantics(
       container: true,
       label: 'Набор чытанняў',
@@ -46,14 +46,7 @@ class MassSetSelector extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'ЧЫТАННІ ІМШЫ',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: accent,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.05,
-              ),
-            ),
+            const LiturgicalSelectorHeading('ЧЫТАННІ ІМШЫ'),
             const SizedBox(height: 2),
             Text(
               '${sets.length} ${massSetVariantWord(sets.length)} '
@@ -72,15 +65,15 @@ class MassSetSelector extends StatelessWidget {
                     key: ValueKey('readings-mass-set-${set.id}'),
                     label: Text(set.label),
                     selected: set.id == selectedId,
-                    showCheckmark: false,
-                    selectedColor: accent.withValues(alpha: 0.16),
+                    showCheckmark: true,
+                    selectedColor: cs.surfaceContainerHigh,
                     side: BorderSide(
                       color: set.id == selectedId
-                          ? accent.withValues(alpha: 0.45)
+                          ? cs.outline
                           : cs.outlineVariant,
                     ),
                     labelStyle: theme.textTheme.labelLarge?.copyWith(
-                      color: set.id == selectedId ? accent : cs.onSurface,
+                      color: cs.onSurface,
                       fontWeight: set.id == selectedId
                           ? FontWeight.w700
                           : FontWeight.w500,

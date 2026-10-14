@@ -45,7 +45,7 @@ class VestmentColor {
   /// The fabric colour.
   final Color swatch;
 
-  /// Calendar ring/dot: white is drawn as gold — a white dot would vanish on
+  /// Calendar ring/dot: white has a neutral contrast outline on
   /// a light surface.
   final Color ring;
 
@@ -57,8 +57,8 @@ const kVestmentColors = <String, VestmentColor>{
   'albus': VestmentColor(
     key: 'albus',
     label: 'Белы',
-    swatch: Color(0xFFF3ECD9),
-    ring: Color(0xFFD2B15F),
+    swatch: Color(0xFFFFFFFF),
+    ring: Color(0xFF858585),
     theme: LiturgicalAccents.white,
   ),
   'ruber': VestmentColor(

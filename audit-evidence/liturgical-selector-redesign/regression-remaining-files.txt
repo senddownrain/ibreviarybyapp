@@ -1,0 +1,8 @@
+test\widgets\floating_top_actions_test.dart
+test\secondary_menu_test.dart
+test\route_identity_test.dart
+test\source_footer_test.dart
+test\song_chords_test.dart
+test\songbook_test.dart
+test\stateful_shell_navigation_test.dart
+test\text_scale_control_test.dart
