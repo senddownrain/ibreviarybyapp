@@ -549,6 +549,11 @@ class _DayDetail extends ConsumerWidget {
     }
     final shownReferences = <String>{};
     Widget celebration(OrdoUnionRow row, {bool main = false}) {
+      final ordinaryWeekday =
+          row.option.isTemporal &&
+          row.option.rank == 'feria' &&
+          day.period == 'ordinary' &&
+          day.week > 0;
       final diocese = row.dioceses.contains(contextDiocese)
           ? contextDiocese!
           : row.dioceses.first;
@@ -567,7 +572,9 @@ class _DayDetail extends ConsumerWidget {
                     ? 'Чытанні з дня'
                     : 'Чытанні супадаюць з прыведзенымі вышэй',
                 key: Key('ordo-shared-readings-${row.option.id}'),
-                style: theme.textTheme.bodyMedium,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             );
           }
@@ -595,7 +602,7 @@ class _DayDetail extends ConsumerWidget {
           _CelebrationRow(
             row: row,
             heading: main,
-            weekday: main
+            weekday: main || ordinaryWeekday
                 ? '${weekday[0].toUpperCase()}${weekday.substring(1)}'
                 : null,
             metadata: main
@@ -607,7 +614,14 @@ class _DayDetail extends ConsumerWidget {
                     if (psalter.isNotEmpty) '$psalter тыдзень Псалтыра',
                   ].join(' · ')
                 : null,
-            title: main
+            title: ordinaryWeekday
+                ? formatLiturgicalPeriodTitle(
+                    periodType: day.period,
+                    periodWeek: day.week,
+                    dayOfWeek: null,
+                    date: date,
+                  )
+                : main
                 ? row.option.title.replaceFirst(
                     RegExp(
                       ',\\s*${RegExp.escape(weekday)}\$',
@@ -683,8 +697,16 @@ class _DayDetail extends ConsumerWidget {
               child: content,
             )
           : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: content,
+              key: Key('ordo-alternative-${row.option.id}'),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  content,
+                  const SizedBox(height: 8),
+                  const Divider(height: 1, thickness: .5),
+                ],
+              ),
             );
     }
 
@@ -1486,8 +1508,9 @@ class _CelebrationRow extends StatelessWidget {
                                 : FontWeight.w500,
                           ),
                 ),
-              if (!heading ||
-                  (option.rank != 'feria' && option.rank != 'dominica')) ...[
+              if ((!heading ||
+                      (option.rank != 'feria' && option.rank != 'dominica')) &&
+                  !(option.rank == 'feria' && weekday != null)) ...[
                 const SizedBox(height: 3),
                 Text(
                   [
@@ -1518,7 +1541,7 @@ class _CelebrationRow extends StatelessWidget {
                           text: weekday,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 18,
+                            fontSize: heading ? 18 : 14,
                             color: cs.onSurface,
                           ),
                         ),

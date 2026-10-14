@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:integration_test/integration_test_driver_extended.dart';
 
 Future<void> main() async {
-  final directory = Directory('audit-evidence/liturgical-selector-redesign');
+  final directory = Directory(
+    Platform.environment['SELECTOR_EVIDENCE_DIR'] ??
+        'audit-evidence/liturgical-selector-redesign',
+  );
   await directory.create(recursive: true);
   await runZoned(
     () => integrationDriver(

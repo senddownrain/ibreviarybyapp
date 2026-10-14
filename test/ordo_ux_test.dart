@@ -21,6 +21,7 @@ import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/ordo/reading_references.dart';
+import 'package:mybrev_flutter/ordo/runtime.dart';
 
 class _Dioceses extends DioceseSelectionNotifier {
   @override
@@ -763,6 +764,110 @@ void main() {
       options.last.key,
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'polish October 16 Hedwig keeps separated weekday and shared readings',
+    (tester) async {
+      final date = DateTime(2026, 10, 16);
+      final option = LiturgicalContentService()
+          .contentForDate(date)
+          .options
+          .firstWhere((option) => option.title.contains('Ядвіг'));
+      tester.view.viewPadding = const FakeViewPadding(bottom: 48);
+      await frame(
+        tester,
+        date,
+        OrdoScreen(initialDate: date, dayId: option.dayId),
+        width: 390,
+      );
+      final main = find.byKey(const Key('ordo-selected-celebration'));
+      expect(
+        find.descendant(of: main, matching: find.text(option.title)),
+        findsOneWidget,
+      );
+      final temporal = OrdoRuntime.engine
+          .resolve('2026-10-16')
+          .options
+          .singleWhere((option) => option.isTemporal);
+      final alternative = find.byKey(Key('ordo-alternative-${temporal.id}'));
+      expect(
+        find.descendant(
+          of: alternative,
+          matching: find.text('XXVIII звычайны тыдзень'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: alternative,
+          matching: find.text('Пятніца', findRichText: true),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: alternative, matching: find.text('Будзень')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: alternative, matching: find.byType(Divider)),
+        findsOneWidget,
+      );
+      final note = tester.widget<Text>(
+        find.byKey(Key('ordo-shared-readings-${temporal.id}')),
+      );
+      expect(note.data, 'Чытанні з дня');
+      expect(
+        note.style?.color,
+        Theme.of(tester.element(alternative)).colorScheme.onSurfaceVariant,
+      );
+      expect(find.byKey(const Key('ordo-reading-references')), findsOneWidget);
+      final list = tester.widget<ListView>(
+        find.byKey(const Key('ordo-scroll')),
+      );
+      expect((list.padding! as EdgeInsets).bottom, 72);
+      await tester.drag(
+        find.byKey(const Key('ordo-scroll')),
+        const Offset(0, -3000),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('polish calendar heading is 19sp and retains picker targets', (
+    tester,
+  ) async {
+    await frame(
+      tester,
+      DateTime(2026, 10, 16),
+      Scaffold(
+        body: LiturgicalMonthCalendar(
+          initialDate: DateTime(2026, 10, 16),
+          onSelected: (_) {},
+        ),
+      ),
+      width: 390,
+    );
+    expect(
+      tester
+          .widget<Text>(find.byKey(const Key('ordo-month-label')))
+          .style
+          ?.fontSize,
+      19,
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('ordo-next-month'))).height,
+      greaterThanOrEqualTo(48),
+    );
+    await tester.tap(find.byKey(const Key('ordo-jump-month')));
+    await tester.pumpAndSettle();
+    final year = find.descendant(
+      of: find.byKey(const Key('ordo-pick-year')),
+      matching: find.text('2026'),
+    );
+    expect(tester.widget<Text>(year).style?.fontSize, 19);
+    expect(find.byKey(const Key('ordo-month-10')), findsOneWidget);
   });
 
   testWidgets('ORDO October 7 keeps memorial data and both Office variants', (

@@ -5,6 +5,7 @@ param(
   [ValidateSet('gesture','threebutton')][string]$Navigation = 'gesture',
   [ValidateSet('native','320')][string]$Viewport = 'native',
   [switch]$FocusOnly,
+  [switch]$Polish,
   [switch]$UseExistingApk
 )
 $ErrorActionPreference = 'Stop'
@@ -16,6 +17,7 @@ $taskDart = Join-Path $taskFlutter 'bin/cache/dart-sdk/bin/dart.exe'
 $taskTool = Join-Path $taskFlutter 'bin/cache/flutter_tools.snapshot'
 $taskPackages = Join-Path $taskFlutter 'packages/flutter_tools/.dart_tool/package_config.json'
 $taskEvidence = Join-Path $taskProject 'audit-evidence/liturgical-selector-redesign'
+if ($Polish) { $taskEvidence = Join-Path $taskProject 'audit-evidence/liturgical-selector-polish' }
 $taskLabel = "android-$FontScale-$Navigation"
 if ($Viewport -eq '320') { $taskLabel += '-320' }
 if ($FocusOnly) { $taskLabel += '-focused' }
@@ -26,9 +28,11 @@ $taskSavedNavigation = (& $taskAdb -s $Device shell settings get secure navigati
 $taskSavedSize = (& $taskAdb -s $Device shell wm size) -join ' '
 $taskViewportChanged = $false
 $taskSavedGradle = $env:GRADLE_OPTS
+$taskSavedEvidence = $env:SELECTOR_EVIDENCE_DIR
 $taskOldLocation = Get-Location
 try {
   Set-Location -LiteralPath $taskProject
+  if ($Polish) { $env:SELECTOR_EVIDENCE_DIR = $taskEvidence }
   if ($Viewport -eq '320') {
     $taskDensityOutput = (& $taskAdb -s $Device shell wm density) -join ' '
     $taskDensity = [int]([regex]::Matches($taskDensityOutput, 'density: (\d+)')[-1].Groups[1].Value)
@@ -47,7 +51,8 @@ try {
   if ($taskActualMode -ne $taskExpectedMode) { throw 'Navigation overlay did not apply' }
   $env:GRADLE_OPTS = '-Dorg.gradle.jvmargs="-Xmx1536m -XX:MaxMetaspaceSize=512m -XX:ReservedCodeCacheSize=128m" -Dorg.gradle.workers.max=1 -Dorg.gradle.daemon=false'
   $taskArguments = @("--packages=$taskPackages", $taskTool, 'drive', '-d', $Device, '--no-pub',
-    '--driver=test_driver/liturgical_selector_driver.dart', '--target=integration_test/liturgical_selector_redesign_test.dart')
+    '--driver=test_driver/liturgical_selector_driver.dart',
+    $(if ($Polish) { '--target=integration_test/liturgical_selector_polish_test.dart' } else { '--target=integration_test/liturgical_selector_redesign_test.dart' }))
   if ($FocusOnly) { $taskArguments += '--dart-define=SELECTOR_FOCUS_ONLY=true' }
   if ($UseExistingApk) {
     $taskApk = Join-Path $taskProject $(if ($FocusOnly) { 'build/selector-driver/selector-focused.apk' } else { 'build/app/outputs/flutter-apk/app-debug.apk' })
@@ -82,12 +87,13 @@ try {
   "Physical Android Back events sent: $taskBackCount" | Add-Content -LiteralPath $taskOutput
   "Whole-device screenshots saved: $($taskCaptured.Count)" | Add-Content -LiteralPath $taskOutput
   if ($taskProcess.ExitCode -ne 0) { throw "Native integration failed with exit $($taskProcess.ExitCode)" }
-  $taskExpectedBack = if ($FocusOnly) { 0 } else { 2 }
-  $taskExpectedShots = if ($FocusOnly) { 8 } else { 20 }
+  $taskExpectedBack = if ($FocusOnly -or $Polish) { 0 } else { 2 }
+  $taskExpectedShots = if ($Polish) { 1 } elseif ($FocusOnly) { 8 } else { 20 }
   if ($taskBackCount -ne $taskExpectedBack) { throw 'Native Back checks did not execute as expected' }
   if ($taskCaptured.Count -ne $taskExpectedShots) { throw 'All native states must have whole-device screenshots' }
 } finally {
   $env:GRADLE_OPTS = $taskSavedGradle
+  $env:SELECTOR_EVIDENCE_DIR = $taskSavedEvidence
   if ($taskViewportChanged) {
     $taskOriginalSize = [regex]::Match($taskSavedSize, 'Override size: (\d+x\d+)')
     if ($taskOriginalSize.Success) {

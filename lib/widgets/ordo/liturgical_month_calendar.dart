@@ -12,7 +12,6 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
-import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 
 const _weekdays = ['Пн', 'Аў', 'Ср', 'Чц', 'Пт', 'Сб', 'Нд'];
 
@@ -99,7 +98,7 @@ class _CalendarState extends ConsumerState<LiturgicalMonthCalendar> {
                   children: [
                     Text(
                       '$_pickerYear',
-                      style: theme.textTheme.titleLarge?.copyWith(fontSize: 21),
+                      style: theme.textTheme.titleLarge?.copyWith(fontSize: 19),
                     ),
                     Icon(
                       _pickingYear
@@ -318,10 +317,9 @@ class _MonthHeader extends StatelessWidget {
     final monthLabel = DateFormat('LLLL', 'be').format(month);
     String capitalise(String text) =>
         '${text[0].toUpperCase()}${text.substring(1)}';
-    final style = Theme.of(context).textTheme.titleLarge?.copyWith(
-      fontSize: LiturgicalSelectorTokens.titleSize,
-      fontWeight: FontWeight.w600,
-    );
+    final style = Theme.of(
+      context,
+    ).textTheme.titleLarge?.copyWith(fontSize: 19, fontWeight: FontWeight.w600);
     final previous = IconButton(
       key: const Key('ordo-previous-month'),
       tooltip: 'Папярэдні месяц',
