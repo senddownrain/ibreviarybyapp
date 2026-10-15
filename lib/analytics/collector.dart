@@ -144,7 +144,7 @@ class AnalyticsCollector {
     _addCell(day, {
       'e': 'screen_view',
       'section': v.section,
-      if (contentId != null) 'content_id': contentId,
+      'content_id': ?contentId,
       'n': 1,
     });
     if (contentId == null) return;
