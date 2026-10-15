@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
@@ -68,6 +69,8 @@ void main() async {
   }
 
   runApp(const ProviderScope(child: MyBrevApp()));
+  // Test builds only (--dart-define=ANALYTICS_LOCAL=true); decision D-10 = B.
+  if (kAnalyticsLocal) unawaited(LocalAnalytics.start(router));
   unawaited(
     HiveService.migrateFormerCache().catchError((Object error) {
       debugPrint('[ContentMigration] $error');
@@ -314,8 +317,12 @@ class MyBrevApp extends ConsumerWidget {
       restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      builder: (context, child) =>
-          PriestAccessLifecycle(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) {
+        final app = PriestAccessLifecycle(
+          child: child ?? const SizedBox.shrink(),
+        );
+        return kAnalyticsLocal ? AnalyticsScrollListener(child: app) : app;
+      },
       themeMode: themeMode,
       themeAnimationDuration: Duration.zero,
       theme: makeTheme(light),
