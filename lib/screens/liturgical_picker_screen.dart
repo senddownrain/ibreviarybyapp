@@ -22,12 +22,14 @@ import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 
-/// Celebrations of a year for the selected dioceses (computed once).
-final pickerFeastsProvider =
-    Provider.family<List<PickerFeast>, (int, List<String>)>((ref, key) {
-      ref.watch(cacheEpochProvider);
-      return pickerFeastsOfYear(OrdoRuntime.engine, key.$1, key.$2);
-    });
+/// Search all Belarusian dioceses; Settings still control liturgical days.
+final pickerFeastsProvider = Provider.family<List<PickerFeast>, int>((
+  ref,
+  year,
+) {
+  ref.watch(cacheEpochProvider);
+  return pickerFeastsOfYear(OrdoRuntime.engine, year, kDioceses);
+});
 
 /// Opens [date] (optionally one celebration) in the Hours or the Readings.
 void openPickedDate(
@@ -40,12 +42,24 @@ void openPickedDate(
 }) {
   String? dayId;
   if (optionId != null) {
+    final day = OrdoRuntime.engine.resolve(
+      isoOf(date),
+      diocese: diocese ?? kDioceses.first,
+    );
+    final legal = readingsMode ? day.options : day.officeOptions;
+    if (!legal.any((option) => option.id == optionId)) return;
     dayId = LiturgicalContentService()
         .contentForDate(date, diocese: diocese ?? kDioceses.first)
         .options
         .where((option) => option.ordo?.optionId == optionId)
         .firstOrNull
         ?.dayId;
+    if (!readingsMode && dayId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Тэксты гэтага святкавання недаступныя')),
+      );
+      return;
+    }
   }
   if (readingsMode) {
     AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
@@ -53,7 +67,7 @@ void openPickedDate(
       readingsRouteForContext(
         date: date,
         dayId: dayId,
-        diocese: dayId == null ? null : diocese,
+        diocese: optionId == null ? null : diocese,
         optionId: optionId,
       ),
     );
@@ -694,8 +708,7 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
 
   @override
   Widget build(BuildContext context) {
-    final dioceses = ref.watch(dioceseSelectionProvider).ordered;
-    final all = ref.watch(pickerFeastsProvider((widget.year, dioceses)));
+    final all = ref.watch(pickerFeastsProvider(widget.year));
     final query = _query.trim().toLowerCase();
     final filtered = query.isEmpty
         ? all
@@ -703,7 +716,12 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
               .where(
                 (f) =>
                     f.title.toLowerCase().contains(query) ||
-                    dayMonthLabel(f.date).contains(query),
+                    [f.nominalDate, f.date].nonNulls.any(
+                      (date) =>
+                          date.contains(query) ||
+                          dayMonthLabel(date).contains(query) ||
+                          fixedDateKey(date).contains(query),
+                    ),
               )
               .toList();
 
@@ -759,14 +777,17 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                   itemCount: filtered.length,
                   itemBuilder: (context, i) => _FeastRow(
                     feast: filtered[i],
-                    onTap: () => openPickedDate(
-                      context,
-                      ref,
-                      dateOfIso(filtered[i].date),
-                      readingsMode: widget.readingsMode,
-                      optionId: filtered[i].id,
-                      diocese: filtered[i].dioceses.first,
-                    ),
+                    onTap:
+                        filtered[i].canOpen(readingsMode: widget.readingsMode)
+                        ? () => openPickedDate(
+                            context,
+                            ref,
+                            dateOfIso(filtered[i].date!),
+                            readingsMode: widget.readingsMode,
+                            optionId: filtered[i].id,
+                            diocese: filtered[i].dioceses.first,
+                          )
+                        : null,
                   ),
                 ),
         ),
@@ -776,20 +797,31 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
 }
 
 /// A celebration of the year: its real vestment colour as a quiet marker,
-/// title, final date and rank; transfers and dioceses as small badges.
+/// title, nominal date and rank; transfers, status and dioceses as small badges.
 class _FeastRow extends StatelessWidget {
   const _FeastRow({required this.feast, required this.onTap});
 
   final PickerFeast feast;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final weekday = DateFormat('EEEE', 'be').format(dateOfIso(feast.date));
+    final displayDate = feast.nominalDate ?? feast.date;
+    final weekday = displayDate != null && displayDate == feast.date
+        ? DateFormat('EEEE', 'be').format(dateOfIso(displayDate))
+        : null;
     final rank = ordoRankLabel(feast.option);
-    final badges = [...feast.badges, ...ordoOptionNotes(feast.option)];
+    final badges = [
+      ...feast.badges,
+      ...ordoOptionNotes(feast.option).where(
+        (note) => !feast.transferred || !note.startsWith('Перанесена з '),
+      ),
+      if (feast.transferred && feast.date != null)
+        'Перанесена на ${dayMonthLabel(feast.date!)}',
+      if (feast.status != null) feast.status!,
+    ];
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -817,10 +849,13 @@ class _FeastRow extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         [
-                          '${dayMonthLabel(feast.date)}, $weekday',
+                          if (displayDate != null)
+                            '${dayMonthLabel(displayDate)}${weekday == null ? '' : ', $weekday'}'
+                          else
+                            'Дата ў гэтым годзе не вызначана',
                           if (rank.isNotEmpty) rank,
                           vestmentColorsLabel(feast.option),
-                        ].join(' · '),
+                        ].where((label) => label.isNotEmpty).join(' · '),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -856,7 +891,8 @@ class _FeastRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
+                if (onTap != null)
+                  const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
               ],
             ),
           ),

@@ -3,18 +3,21 @@
 ///
 /// ```text
 /// Перыяды → a liturgical position (period · week · day) → its civil date
-/// Святы   → every celebration actually kept in the chosen year, on its
-///           final date (transfers, year overrides, selected dioceses)
+/// Святы   → active calendar definitions, including impeded celebrations;
+///           the existing Ordo alone decides dates and permission to open.
 /// ```
 ///
-/// No legacy `days` source, no second calendar algorithm: both lists are
-/// read from the resolved days of the year.
+/// No legacy `days` source and no second calendar algorithm.
 library;
 
+import 'dart:convert';
+
 import 'package:mybrev_flutter/ordo/dates.dart';
+import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/engine.dart';
 import 'package:mybrev_flutter/ordo/movable_feasts.dart';
 import 'package:mybrev_flutter/ordo/season.dart';
+import 'package:mybrev_flutter/ordo/year_plan.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 
 /// Years of the selector: strictly ascending, a window around today, and
@@ -39,25 +42,42 @@ class PickerFeast {
     required this.option,
     required this.date,
     required this.dioceses,
+    this.nominalDate,
+    this.hoursAllowed = false,
+    this.readingsAllowed = false,
   });
 
   final OrdoOption option;
 
   /// Final ISO date (after transfers / year overrides).
-  final String date;
+  final String? date;
+  final String? nominalDate;
+  final bool hoursAllowed;
+  final bool readingsAllowed;
   final List<String> dioceses;
   int _all = 1;
 
   String get id => option.id;
   String get title => option.title;
 
+  bool canOpen({required bool readingsMode}) =>
+      readingsMode ? readingsAllowed : hoursAllowed;
+
+  String? get status => option.role == 'commemoration'
+      ? 'Толькі памінанне'
+      : !hoursAllowed && !readingsAllowed
+      ? 'Не адзначаецца ў гэтым годзе'
+      : hoursAllowed
+      ? null
+      : 'Толькі чытанні';
+
   /// fixed | movable | diocesan
   String get kind {
     if (option.dioceseId != null || option.layer == 'diocese') {
       return 'diocesan';
     }
-    final dateRule = option.daysRef?['source'];
-    return dateRule == 'dynamic' || option.feastCode != null
+    return option.data['date'] is Map &&
+            (option.data['date'] as Map)['type'] != 'fixed'
         ? 'movable'
         : 'fixed';
   }
@@ -65,43 +85,120 @@ class PickerFeast {
   bool get transferred =>
       option.transferredFrom != null || option.movedFrom != null;
 
-  List<String> get colors => [option.color, ...option.colorAlternatives];
+  List<String> get colors => {
+    option.color,
+    ...option.colorAlternatives,
+  }.where(kLiturgicalColors.contains).toList();
 
   List<String> get badges => dioceses.length == _all
       ? const []
       : [for (final id in dioceses) kDioceseBadges[id] ?? id];
 }
 
-/// Every celebration kept in [year] for [dioceses] (primary first), in
-/// date order. A celebration that is only suppressed (impeded, omitted) is
-/// not kept that year and is not listed; one with another rank in another
-/// diocese is its own row.
+/// Full definitions for [dioceses], with dates and permissions from [year].
+/// Different definitions or local permissions remain separate rows: a legal
+/// choice in one diocese must never enable an impeded choice in another.
 List<PickerFeast> pickerFeastsOfYear(
   OrdoEngine engine,
   int year,
   List<String> dioceses,
 ) {
   final rows = <String, PickerFeast>{};
-  for (final diocese in dioceses) {
-    for (final day in engine.year(year, diocese: diocese)) {
-      for (final option in [...day.options, ...day.commemorations]) {
-        if (option.isTemporal) continue;
-        if (option.kind == 'votive-memorial') continue;
-        final key = '${option.id}|${option.rank}|${day.date}';
-        (rows[key] ??= PickerFeast(
-          option: option,
-          date: day.date,
-          dioceses: [],
-        )).dioceses.add(diocese);
-      }
+  for (final diocese in dioceses.toSet()) {
+    final definitions = buildCalendarLayers(
+      engine.definitions,
+      diocese: diocese,
+    ).celebrations;
+    final plan = engine.plan(year, diocese);
+    final placements = <String, Placement>{
+      for (final list in plan.removedByDate.values)
+        for (final placement in list) placement.id: placement,
+      for (final list in plan.byDate.values)
+        for (final placement in list)
+          if (!placement.transferredOut) placement.id: placement,
+    };
+    // Year-only additions supplement, rather than replace, full definitions.
+    for (final entry in {...plan.celebrations, ...definitions}.entries) {
+      final definition = entry.value;
+      final placement = placements[entry.key];
+      final date = placement?.date;
+      final day = date == null ? null : engine.resolve(date, diocese: diocese);
+      final resolved = day == null
+          ? null
+          : [
+              ...day.options,
+              ...day.commemorations,
+              ...day.suppressed,
+            ].where((option) => option.id == entry.key).firstOrNull;
+      final effective = placement?.celebration ?? definition;
+      final option = OrdoOption({
+        ...effective,
+        ...?resolved?.data,
+        // Candidates default missing colours to white; search must not.
+        'color': effective['color'] ?? '',
+        'colorAlternatives': effective['colorAlternatives'] ?? const [],
+      });
+      final rule = definition['date'];
+      final nominalDate = rule is Map && rule['type'] == 'fixed'
+          ? '$year-${rule['month'].toString().padLeft(2, '0')}-'
+                '${rule['day'].toString().padLeft(2, '0')}'
+          : placement?.originalDate;
+      final hoursAllowed =
+          day?.officeOptions.any((o) => o.id == option.id) ?? false;
+      final readingsAllowed =
+          day?.options.any((o) => o.id == option.id) ?? false;
+      final key = jsonEncode(
+        _pickerVariantKey([
+          for (final fields in [definition, effective])
+            {
+              for (final entry in fields.entries)
+                if (!const [
+                  'dioceseId',
+                  'layerTrail',
+                  'inheritedFrom',
+                  'suppressedBy',
+                ].contains(entry.key))
+                  entry.key: entry.value,
+            },
+          option.rank,
+          option.role,
+          option.officeKind,
+          nominalDate,
+          date,
+          hoursAllowed,
+          readingsAllowed,
+        ]),
+      );
+      (rows[key] ??= PickerFeast(
+        option: option,
+        date: date,
+        nominalDate: nominalDate,
+        hoursAllowed: hoursAllowed,
+        readingsAllowed: readingsAllowed,
+        dioceses: [],
+      )).dioceses.add(diocese);
     }
   }
   final list = rows.values.toList();
-  stableSort(list, (a, b) => a.date.compareTo(b.date));
+  stableSort(
+    list,
+    (a, b) => (a.nominalDate ?? a.date ?? '9999').compareTo(
+      b.nominalDate ?? b.date ?? '9999',
+    ),
+  );
   for (final row in list) {
-    row._all = dioceses.length;
+    row._all = dioceses.toSet().length;
   }
   return list;
+}
+
+// Ignore provenance of the diocese itself, but preserve source, title, rank,
+// colour, date rule and content references (including nested source fields).
+Object? _pickerVariantKey(Object? value) {
+  if (value is List) return value.map(_pickerVariantKey).toList();
+  if (value is! Map) return value;
+  final keys = value.keys.cast<String>().toList()..sort();
+  return {for (final key in keys) key: _pickerVariantKey(value[key])};
 }
 
 /// Liturgical positions of a period that exist in the chosen year:
