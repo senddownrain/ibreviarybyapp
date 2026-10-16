@@ -878,7 +878,12 @@ Widget _pickerOptions(GoRouterState state) {
   final period = state.uri.queryParameters['period'] ?? '';
   final week = int.tryParse(state.uri.queryParameters['week'] ?? '') ?? 0;
   final day = int.tryParse(state.uri.queryParameters['day'] ?? '') ?? 1;
-  return LiturgicalDayOptionsScreen(period: period, week: week, day: day);
+  return LiturgicalDayOptionsScreen(
+    period: period,
+    week: week,
+    day: day,
+    mode: state.uri.path.startsWith('/readings') ? 'readings' : 'hours',
+  );
 }
 
 DateTime? _parseDate(String? value) {

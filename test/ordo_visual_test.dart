@@ -110,7 +110,7 @@ void main() {
             ),
           );
           await tester.pump();
-          await tester.tap(find.text('Святы'));
+          await tester.tap(find.text('Па свяце'));
           await tester.pumpAndSettle();
           final list = find.byKey(const Key('picker-feasts'));
           expect(list, findsOneWidget);

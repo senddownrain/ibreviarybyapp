@@ -159,6 +159,7 @@ void main() {
     double scale = 1,
     double width = 360,
     bool onlyRosary = false,
+    bool allDioceses = false,
     DateTime? selectedDate,
     Brightness brightness = Brightness.light,
   }) async {
@@ -169,6 +170,8 @@ void main() {
       overrides: [
         selectedDateProvider.overrideWith((ref) => selectedDate ?? date),
         if (onlyRosary) dayOptionsProvider.overrideWithValue([rosary()]),
+        if (allDioceses)
+          dioceseSelectionProvider.overrideWith(_AllDioceses.new),
         liturgicalContentReadyProvider.overrideWith((ref) async {}),
         contentUpdatesProvider.overrideWith(_Idle.new),
         settingsProvider.overrideWith(_Settings.new),
@@ -703,13 +706,90 @@ void main() {
       );
       expect(find.byType(LiturgicalCalendarSheet), findsNothing);
       expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
-      expect(find.text('Перыяды'), findsOneWidget);
-      expect(find.text('Святы'), findsOneWidget);
+      expect(find.text('Па перыядзе'), findsOneWidget);
+      expect(find.text('Па свяце'), findsOneWidget);
       router.pop();
       await tester.pumpAndSettle();
       expect(find.byType(HomeScreen), findsOneWidget);
     },
   );
+
+  for (final mode in ['hours', 'readings']) {
+    testWidgets(
+      'catalog Nicholas 2026 blocked / 2027 real $mode route and back',
+      (tester) async {
+        final (router, container) = await start(
+          tester,
+          location: '/$mode/picker',
+          allDioceses: true,
+        );
+        await tapVisible(tester, find.text('Па свяце'));
+        await tester.enterText(
+          find.byKey(const Key('picker-feast-search')),
+          'Мікалая',
+        );
+        tester.testTextInput.hide();
+        await tester.pumpAndSettle();
+        await tapVisible(
+          tester,
+          find.byKey(const Key('picker-entry-sv-nicholas')),
+        );
+        await tapVisible(tester, find.byKey(const Key('catalog-calendar')));
+        await tapVisible(tester, find.byKey(const Key('picker-year')));
+        await tapVisible(tester, find.byKey(const Key('picker-year-2026')));
+        await tapVisible(
+          tester,
+          find.byKey(const Key('catalog-open-occurrence')),
+        );
+        expect(
+          tester
+              .widget<FilledButton>(
+                find.byKey(const Key('catalog-open-occurrence')),
+              )
+              .onPressed,
+          isNull,
+        );
+        await tapVisible(tester, find.byKey(const Key('picker-year-next')));
+        expect(find.text('2027'), findsWidgets);
+        expect(
+          tester
+              .widget<FilledButton>(
+                find.byKey(const Key('catalog-open-occurrence')),
+              )
+              .onPressed,
+          isNotNull,
+        );
+        await tapVisible(
+          tester,
+          find.byKey(const Key('catalog-open-occurrence')),
+        );
+        if (mode == 'hours') {
+          expect(find.byType(HomeScreen), findsOneWidget);
+          expect(container.read(selectedDateProvider), DateTime(2027, 12, 6));
+          expect(
+            container.read(hoursLiturgicalSelectionProvider).selected!.optionId,
+            'sv-nicholas',
+          );
+        } else {
+          expect(find.byType(ReadingsScreen), findsOneWidget);
+          final query = GoRouterState.of(
+            tester.element(find.byType(ReadingsScreen)),
+          ).uri.queryParameters;
+          expect(query['option'], 'sv-nicholas');
+          expect(query['date'], '2027-12-06');
+          expect(query['diocese'], 'vitebsk');
+        }
+        expect(container.read(dioceseSelectionProvider).primary, 'vitebsk');
+        router.pop();
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('picker-entry-sv-nicholas')),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   for (final year in [2025, 2031]) {
     testWidgets(

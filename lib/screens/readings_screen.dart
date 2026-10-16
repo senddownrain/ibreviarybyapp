@@ -405,7 +405,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   void _resetDocumentScroll() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) _scrollController.jumpTo(0);
+      if (!mounted) {
+        return;
+      }
+      // A pushed calendar context can attach before its viewport lays out.
+      // jumpTo invokes scroll physics, which requires initialized extents.
+      for (final position in _scrollController.positions) {
+        if (position.hasContentDimensions) position.jumpTo(0);
+      }
     });
   }
 

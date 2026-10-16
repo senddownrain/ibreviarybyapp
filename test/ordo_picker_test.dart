@@ -3,13 +3,9 @@
 // found by the engine, never from the legacy `days`.
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/ordo/ordo_picker.dart';
-import 'package:mybrev_flutter/providers/liturgical_provider.dart';
-import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
 
 import 'support/ordo_fixture.dart';
 
@@ -28,43 +24,6 @@ void main() {
       final far = pickerYears(2061, today: 2026);
       expect(far, contains(2061));
       expect(far, [...far]..sort());
-    });
-
-    testWidgets('the year grid is numeric, shows the selected year, and '
-        '2027 is one tap away', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            selectedDateProvider.overrideWith((ref) => DateTime(2026, 10, 7)),
-            pickerFeastsProvider.overrideWith((ref, key) => const []),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(body: LiturgicalPickerScreen()),
-          ),
-        ),
-      );
-      await tester.pump();
-      expect(find.text('2026'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('picker-year')));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('picker-year-grid')), findsOneWidget);
-      expect(find.byKey(const Key('picker-year-2026')), findsOneWidget);
-      final y2026 = tester.getTopLeft(
-        find.byKey(const Key('picker-year-2026')),
-      );
-      final y2027 = tester.getTopLeft(
-        find.byKey(const Key('picker-year-2027')),
-      );
-      expect(
-        y2027.dy > y2026.dy || (y2027.dy == y2026.dy && y2027.dx > y2026.dx),
-        isTrue,
-      );
-      await tester.tap(find.byKey(const Key('picker-year-2027')));
-      await tester.pumpAndSettle();
-      expect(find.text('2027'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('picker-year-next')));
-      await tester.pump();
-      expect(find.text('2028'), findsOneWidget);
     });
   });
 
