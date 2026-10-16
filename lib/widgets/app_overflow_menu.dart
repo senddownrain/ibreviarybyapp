@@ -65,7 +65,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
-    final width = math.min(360.0, media.size.width - 32);
+    final width = math.min(300.0, media.size.width - 32);
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
     final bottom =
         media.size.height -
