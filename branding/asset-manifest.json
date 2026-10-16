@@ -103,7 +103,7 @@
     },
     {
       "path": "android/app/src/main/res/drawable-nodpi/ic_launcher_foreground.png",
-      "sha256": "56b00b62013a3e5ed5880ad4698e707481b59ab3f8d4fb148c414e6e603b9efc"
+      "sha256": "3bc1ec062867653360e50292f7f403fbed15d3a81aa252be353716fc77263b80"
     },
     {
       "path": "android/app/src/main/res/drawable-nodpi/ic_launcher_monochrome.png",
