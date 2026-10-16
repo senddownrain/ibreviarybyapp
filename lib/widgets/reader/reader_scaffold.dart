@@ -4,6 +4,9 @@ import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature, kAnalyticsLocal;
+import 'package:mybrev_flutter/analytics/reader_hooks.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 import 'package:mybrev_flutter/widgets/reader/hour_switcher_pill.dart';
 
@@ -199,7 +202,10 @@ class ReaderScaffold extends StatelessWidget {
             maxContentWidth: maxContentWidth,
             semanticLabel: semanticLabel,
             topSpacing: hasHourSwitcher ? 16 : 25,
-            child: content,
+            // Test builds only (ANALYTICS_LOCAL): counts the rendered text.
+            child: kAnalyticsLocal
+                ? AnalyticsTextMeter(child: content)
+                : content,
           ),
         ),
         SliverFillRemaining(
@@ -208,6 +214,9 @@ class ReaderScaffold extends StatelessWidget {
         ),
       ],
     );
+
+    // Test builds only (ANALYTICS_LOCAL): forwards this scroll view's metrics.
+    if (kAnalyticsLocal) scrollView = AnalyticsReaderScroll(child: scrollView);
 
     if (hasHourSwitcher) {
       // Keep scrolling ink out of the system status area without painting a
@@ -461,11 +470,14 @@ class _ReaderScrollToTopControlState extends State<_ReaderScrollToTopControl> {
           child: IconButton(
             key: const Key('reader-scroll-to-top'),
             tooltip: 'Вярнуцца ўверх',
-            onPressed: () => widget.controller.animateTo(
-              0,
-              duration: const Duration(milliseconds: 360),
-              curve: Curves.easeOutCubic,
-            ),
+            onPressed: () {
+              analyticsFeature('back_to_top');
+              widget.controller.animateTo(
+                0,
+                duration: const Duration(milliseconds: 360),
+                curve: Curves.easeOutCubic,
+              );
+            },
             icon: const Icon(Icons.keyboard_arrow_up_rounded, size: 28),
           ),
         ),

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/analytics/collector.dart';
+import 'package:mybrev_flutter/analytics/contract.dart';
 import 'package:mybrev_flutter/analytics/transport.dart';
 
 void main() {
@@ -38,22 +39,70 @@ void main() {
   );
 
   test(
-    'stage guard: only main.dart reaches local_analytics; no network or ID code',
+    'stage guard: only known files reach the analytics; calls carry feature ids only',
     () {
-      final offenders = <String>[];
+      const allowed = {
+        'lib/main.dart',
+        'lib/providers/settings_provider.dart',
+        'lib/providers/songs_provider.dart',
+        'lib/screens/prayer_detail_screen.dart',
+        'lib/screens/bible_chapter_screen.dart',
+        'lib/screens/reading_detail_screen.dart',
+        'lib/widgets/reader/reader_scaffold.dart',
+      };
+      final importers = <String>[];
+      final featureCalls = <String>[];
       for (final entity in Directory('lib').listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         if (entity.path.startsWith('lib/analytics/')) continue;
         final text = entity.readAsStringSync();
-        if (text.contains('analytics/')) offenders.add(entity.path);
+        if (text.contains('analytics/')) importers.add(entity.path);
+        for (final m in RegExp(
+          r'analyticsFeature\(([^)]*)\)',
+        ).allMatches(text)) {
+          featureCalls.add(m.group(1)!);
+        }
       }
-      expect(offenders, ['lib/main.dart']);
+      expect(
+        importers.toSet().difference(allowed).isEmpty,
+        isTrue,
+        reason: '$importers',
+      );
+      expect(
+        featureCalls.length >= 14,
+        isTrue,
+        reason: '${featureCalls.length}',
+      );
+      for (final arg in featureCalls) {
+        expect(RegExp(r"^'[a-z_]+'$").hasMatch(arg), isTrue, reason: arg);
+        expect(
+          featureIds.contains(arg.substring(1, arg.length - 1)),
+          isTrue,
+          reason: arg,
+        );
+      }
 
       final main = File('lib/main.dart').readAsStringSync();
       expect(
         RegExp(
           r'if \(kAnalyticsLocal\) unawaited\(LocalAnalytics\.start\(router\)\)',
         ).hasMatch(main),
+        isTrue,
+      );
+      // Whitespace-normalised: the formatter may wrap these lines.
+      final scaffold = File(
+        'lib/widgets/reader/reader_scaffold.dart',
+      ).readAsStringSync().replaceAll(RegExp(r'\s+'), ' ');
+      expect(
+        scaffold.contains(
+          'kAnalyticsLocal ? AnalyticsTextMeter(child: content) : content',
+        ),
+        isTrue,
+      );
+      expect(
+        scaffold.contains(
+          'if (kAnalyticsLocal) scrollView = AnalyticsReaderScroll(child: scrollView)',
+        ),
         isTrue,
       );
 

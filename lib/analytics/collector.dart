@@ -28,6 +28,8 @@ String coarseAppVersion(String? version) {
 
 class _Visit {
   _Visit({
+    required this.key,
+    required this.catalogId,
     required this.section,
     required this.contentId,
     required this.totalChars,
@@ -35,13 +37,28 @@ class _Visit {
     required this.runningSince,
   });
 
-  final String section;
+  final String key;
+  final String? catalogId;
+  final String? section;
   final String? contentId;
   int? totalChars;
   bool fits;
   double? maxScroll;
   int visibleMs = 0;
   int? runningSince;
+
+  _Visit copy() =>
+      _Visit(
+          key: key,
+          catalogId: catalogId,
+          section: section,
+          contentId: contentId,
+          totalChars: totalChars,
+          fits: fits,
+          runningSince: runningSince,
+        )
+        ..maxScroll = maxScroll
+        ..visibleMs = visibleMs;
 }
 
 class _Closed {
@@ -71,7 +88,7 @@ class AnalyticsCollector {
 
   bool _enabled;
   // day -> (cellKey -> cell)
-  final Map<String, Map<String, Map<String, Object?>>> _days = {};
+  Map<String, Map<String, Map<String, Object?>>> _days = {};
   int _cellCount = 0;
   _Visit? _visit;
   _Closed? _pending;
@@ -140,6 +157,11 @@ class AnalyticsCollector {
     final seconds = raw < maxVisitSeconds ? raw : maxVisitSeconds.toDouble();
     if (seconds < minCountedVisitSeconds) return;
     final day = utcDay(endedAt);
+    final catalog = v.catalogId;
+    if (catalog != null) {
+      _addCell(day, {'e': 'catalog_open', 'catalog_id': catalog, 'n': 1});
+      return;
+    }
     final contentId = v.contentId;
     _addCell(day, {
       'e': 'screen_view',
@@ -208,22 +230,28 @@ class AnalyticsCollector {
 
   /// A material or section came on screen. [totalChars] / [fits] describe the text.
   void enterView({
-    required String section,
+    String? section,
     String? contentId,
+    String? catalogId,
     int? totalChars,
     bool fits = false,
   }) {
     if (!_enabled) return;
     final at = _now();
-    if (!_measurable(section, contentId)) {
+    final isCatalog = catalogId != null;
+    final measurable = isCatalog
+        ? catalogIds.contains(catalogId)
+        : section != null && _measurable(section, contentId);
+    if (!measurable) {
       _closeActive(at);
       _commitPending();
       return;
     }
+    final key = isCatalog
+        ? 'catalog:$catalogId'
+        : '$section|${contentId ?? ''}';
     final active = _visit;
-    if (active != null &&
-        active.section == section &&
-        active.contentId == contentId) {
+    if (active != null && active.key == key) {
       // Same material again while its visit is active (lang/hash change, double
       // trigger): one visit.
       if (totalChars != null) active.totalChars = totalChars;
@@ -233,8 +261,7 @@ class AnalyticsCollector {
     _closeActive(at);
     final pending = _pending;
     if (pending != null &&
-        pending.visit.section == section &&
-        pending.visit.contentId == contentId &&
+        pending.visit.key == key &&
         at - pending.closedAt <= doubleTriggerMs) {
       // Resume: the earlier close was a double trigger.
       _visit = pending.visit;
@@ -244,12 +271,22 @@ class AnalyticsCollector {
     }
     _commitPending();
     _visit = _Visit(
-      section: section,
+      key: key,
+      catalogId: catalogId,
+      section: isCatalog ? null : section,
       contentId: contentId,
       totalChars: totalChars,
       fits: fits,
       runningSince: _visible ? at : null,
     );
+  }
+
+  /// Whether the active text needs no scrolling (`sd=fit`); can change back when
+  /// content that fitted grows after late loading.
+  void reportFits(bool fits) {
+    final visit = _visit;
+    if (!_enabled || visit == null) return;
+    visit.fits = fits;
   }
 
   void leaveView() {
@@ -298,6 +335,7 @@ class AnalyticsCollector {
     if (visit == null) return;
     if (away >= backgroundCloseMs) {
       final section = visit.section;
+      final catalogId = visit.catalogId;
       final contentId = visit.contentId;
       final totalChars = visit.totalChars;
       final fits = visit.fits;
@@ -305,6 +343,7 @@ class AnalyticsCollector {
       _commitPending();
       enterView(
         section: section,
+        catalogId: catalogId,
         contentId: contentId,
         totalChars: totalChars,
         fits: fits,
@@ -338,8 +377,35 @@ class AnalyticsCollector {
   }
 
   /// Validated contract packets for all collected days. Does not send.
-  List<Map<String, Object?>> snapshot() {
+  ///
+  /// With [includeOpen] the visit still in progress is counted as if it ended
+  /// now, without ending it (used when the app goes to the background, so a
+  /// system kill does not lose the last read).
+  List<Map<String, Object?>> snapshot({bool includeOpen = false}) {
     if (!_enabled) return [];
+    if (!includeOpen || (_visit == null && _pending == null)) return _packets();
+    final savedDays = _days;
+    final savedCount = _cellCount;
+    _days = {
+      for (final day in savedDays.entries)
+        day.key: {
+          for (final cell in day.value.entries)
+            cell.key: Map<String, Object?>.of(cell.value),
+        },
+    };
+    try {
+      final pending = _pending;
+      if (pending != null) _finalize(pending.visit.copy(), pending.closedAt);
+      final visit = _visit;
+      if (visit != null) _finalize(visit.copy(), _now());
+      return _packets();
+    } finally {
+      _days = savedDays;
+      _cellCount = savedCount;
+    }
+  }
+
+  List<Map<String, Object?>> _packets() {
     final packets = <Map<String, Object?>>[];
     final days = _days.keys.toList()..sort();
     for (final day in days) {

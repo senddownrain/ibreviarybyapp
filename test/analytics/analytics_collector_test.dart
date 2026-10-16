@@ -4,7 +4,7 @@ import 'package:mybrev_flutter/analytics/contract.dart';
 
 const _prayer = 'prayer:AbCdEfGhIjKlMnOpQrSt';
 const _closed = 'prayer:ZZZZZZZZZZZZZZZZZZZZ';
-final _publicIds = {_prayer, 'hour:laudes'};
+final _publicIds = {_prayer, 'hour:laudes', 'reading:day'};
 
 class _Setup {
   _Setup({
@@ -341,5 +341,111 @@ void main() {
     expect(coarseAppVersion('4.5.2'), '4.5');
     expect(coarseAppVersion('garbage'), '0.0');
     expect(coarseAppVersion(null), '0.0');
+  });
+
+  test(
+    'daily readings are one generic material with fv, sd and er; no date',
+    () {
+      final s = _Setup();
+      s.collector.enterView(
+        section: 'readings',
+        contentId: 'reading:day',
+        totalChars: 2400,
+      );
+      s.tick(40);
+      s.collector.reportScroll(0.9);
+      s.collector.flush();
+      final cells = s.cells;
+      expect(
+        _find(
+          cells,
+          (c) => c['e'] == 'screen_view' && c['content_id'] == 'reading:day',
+        ),
+        isNotNull,
+      );
+      expect(_find(cells, (c) => c['metric'] == 'sd')!['bucket'], 'p75_99');
+      expect(_find(cells, (c) => c['metric'] == 'er'), isNotNull);
+      expect(RegExp(r'20\d\d-\d\d').hasMatch(cells.toString()), isFalse);
+    },
+  );
+
+  test(
+    'catalog screens count catalog_open once per visit and never a material',
+    () {
+      final s = _Setup();
+      s.collector.enterView(catalogId: 'prayers_home');
+      s.tick(3);
+      s.collector.enterView(catalogId: 'prayers_home');
+      s.tick(2);
+      s.collector.leaveView();
+      s.collector.enterView(
+        section: 'prayers',
+        contentId: _prayer,
+        totalChars: 500,
+      );
+      s.tick(6);
+      s.collector.flush();
+      final cells = s.cells;
+      expect(
+        _find(
+          cells,
+          (c) => c['e'] == 'catalog_open' && c['catalog_id'] == 'prayers_home',
+        )!['n'],
+        1,
+      );
+      expect(cells.where((c) => c['e'] == 'screen_view').length, 1);
+      s.collector.enterView(catalogId: 'not_a_catalog');
+      s.tick(3);
+      s.collector.flush();
+      expect(_find(s.cells, (c) => c['catalog_id'] == 'not_a_catalog'), isNull);
+    },
+  );
+
+  test('catalog visit under one second is discarded', () {
+    final s = _Setup();
+    s.collector.enterView(catalogId: 'songs');
+    s.tick(0.4);
+    s.collector.flush();
+    expect(s.collector.snapshot(), isEmpty);
+  });
+
+  test('fits can change back when content grows after late loading', () {
+    final s = _Setup();
+    s.collector.enterView(
+      section: 'prayers',
+      contentId: _prayer,
+      totalChars: 900,
+    );
+    s.collector.reportFits(true);
+    s.collector.reportFits(false);
+    s.collector.reportScroll(0.6);
+    s.tick(10);
+    s.collector.flush();
+    expect(_find(s.cells, (c) => c['metric'] == 'sd')!['bucket'], 'p50_75');
+  });
+
+  test('snapshot(includeOpen) counts the open visit without ending it', () {
+    final s = _Setup();
+    s.collector.enterView(
+      section: 'prayers',
+      contentId: _prayer,
+      totalChars: 900,
+    );
+    s.tick(20);
+    s.collector.reportScroll(0.6);
+    expect(s.collector.snapshot(), isEmpty);
+    final preview = [
+      for (final p in s.collector.snapshot(includeOpen: true))
+        ...(p['cells']! as List).cast<Map<String, Object?>>(),
+    ];
+    expect(_find(preview, (c) => c['metric'] == 'fv')!['bucket'], '15_60s');
+    expect(_find(preview, (c) => c['metric'] == 'sd')!['bucket'], 'p50_75');
+    // Nothing was committed: the visit goes on and is counted once when it ends.
+    expect(s.collector.snapshot(), isEmpty);
+    s.tick(10);
+    s.collector.flush();
+    final cells = s.cells;
+    expect(_find(cells, (c) => c['e'] == 'screen_view')!['n'], 1);
+    expect(_find(cells, (c) => c['metric'] == 'fv')!['bucket'], '15_60s');
   });
 }

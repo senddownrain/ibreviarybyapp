@@ -15,6 +15,8 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsBibleBook, analyticsFeature;
 
 class BibleChapterScreen extends ConsumerStatefulWidget {
   final String versionId;
@@ -83,11 +85,13 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
     super.initState();
     _createScrollController();
     _loadState();
+    analyticsBibleBook(widget.versionId, widget.bookId);
   }
 
   @override
   void didUpdateWidget(covariant BibleChapterScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    analyticsBibleBook(widget.versionId, widget.bookId);
     if (oldWidget.versionId != widget.versionId ||
         oldWidget.bookId != widget.bookId ||
         oldWidget.chapter != widget.chapter) {
@@ -549,6 +553,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   }
 
   void _navigate(String bookId, int chapter, {int? verse}) {
+    analyticsFeature('bible_chapter_nav');
     final searchResult = GoRouterState.of(
       context,
     ).uri.path.startsWith('/bible/search/result');

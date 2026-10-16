@@ -8,6 +8,8 @@ import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/song_repository.dart';
 import 'package:mybrev_flutter/utils/song_chords.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -184,17 +186,24 @@ class SongPreferencesNotifier extends Notifier<SongPreferences> {
 
   void toggleFavorite(String id) {
     final favorites = [...state.favoriteSongIds];
-    if (!favorites.remove(id)) favorites.add(id);
+    if (favorites.remove(id)) {
+      analyticsFeature('favorite_remove');
+    } else {
+      favorites.add(id);
+      analyticsFeature('favorite_add');
+    }
     state = state.copyWith(favoriteSongIds: favorites);
     _box?.put(favoritesKey, jsonEncode(favorites));
   }
 
   void setShowChords(bool value) {
+    if (state.showChords != value) analyticsFeature('chords_toggle');
     state = state.copyWith(showChords: value);
     _box?.put(showChordsKey, value);
   }
 
   void setChordLayout(SongChordLayout layout) {
+    if (state.chordLayout != layout) analyticsFeature('chord_layout_change');
     state = state.copyWith(chordLayout: layout);
     _box?.put(chordLayoutKey, layout.storageValue);
   }
