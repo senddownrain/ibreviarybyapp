@@ -11,6 +11,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 String _stripHtml(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -83,6 +85,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
               final text =
                   (title.isNotEmpty ? '$title\n\n' : '') +
                   _stripHtml(reading.text);
+              analyticsFeature('share_use');
               Share.share(text);
             },
           ),

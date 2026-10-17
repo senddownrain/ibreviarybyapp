@@ -3,10 +3,10 @@
 // src/utils/analytics/public-inventory.json).
 //
 // source bundle content version: 1791877294111
-// sha256 of the sorted id list: 7115a201753d4640349ffbdfe35502cfe0432feaf6ab85e6426de00e33acb3f6
+// sha256 of the sorted id list: 480dfd96459e5c79515e695aa2135e61b549479b18a8e95d34dc2b14e2011311
 
 const String kAnalyticsInventorySha256 =
-    '7115a201753d4640349ffbdfe35502cfe0432feaf6ab85e6426de00e33acb3f6';
+    '480dfd96459e5c79515e695aa2135e61b549479b18a8e95d34dc2b14e2011311';
 
 const Set<String> kAnalyticsPublicIds = {
   'bible:bel:1ch',
@@ -155,6 +155,7 @@ const Set<String> kAnalyticsPublicIds = {
   'bible:ru:wis',
   'bible:ru:zc',
   'bible:ru:zp',
+  'comp:p1',
   'comp:p1-s1-ch1',
   'comp:p1-s1-ch2',
   'comp:p1-s1-ch3',
@@ -162,6 +163,7 @@ const Set<String> kAnalyticsPublicIds = {
   'comp:p1-s2-ch1',
   'comp:p1-s2-ch2',
   'comp:p1-s2-ch3',
+  'comp:p2',
   'comp:p2-s1-ch1',
   'comp:p2-s1-ch2',
   'comp:p2-s1-intro',
@@ -170,6 +172,7 @@ const Set<String> kAnalyticsPublicIds = {
   'comp:p2-s2-ch3',
   'comp:p2-s2-ch4',
   'comp:p2-s2-intro',
+  'comp:p3',
   'comp:p3-s1-ch1',
   'comp:p3-s1-ch2',
   'comp:p3-s1-ch3',
@@ -177,6 +180,7 @@ const Set<String> kAnalyticsPublicIds = {
   'comp:p3-s2-ch1',
   'comp:p3-s2-ch2',
   'comp:p3-s2-intro',
+  'comp:p4',
   'comp:p4-s1-ch1',
   'comp:p4-s1-ch2',
   'comp:p4-s1-ch3',
@@ -307,6 +311,7 @@ const Set<String> kAnalyticsPublicIds = {
   'prayer:xGfztLXGNqKqlcjHSNZY',
   'prayer:zdro66KYVuQ9p2KbqizD',
   'prayer:zvkoIQoxh7ilXp7oUjFg',
+  'reading:day',
   'song:holysongs-0027665fbaf1422fd4dc',
   'song:holysongs-00ec18f77eb2a39a8a81',
   'song:holysongs-01829a0e046a22524263',

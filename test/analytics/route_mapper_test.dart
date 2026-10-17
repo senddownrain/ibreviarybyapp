@@ -12,8 +12,11 @@ void main() {
     expect(_map('/hours/ordo'), const AnalyticsTarget('ordo'));
     expect(_map('/hours/ordo/month'), const AnalyticsTarget('ordo'));
     expect(_map('/hours/picker/options'), const AnalyticsTarget('picker'));
-    expect(_map('/readings'), const AnalyticsTarget('readings'));
-    expect(_map('/readings/reading/abc'), const AnalyticsTarget('readings'));
+    expect(_map('/readings'), const AnalyticsTarget('readings', 'reading:day'));
+    expect(
+      _map('/readings/reading/abc'),
+      const AnalyticsTarget('readings', 'reading:day'),
+    );
     expect(_map('/readings/picker'), const AnalyticsTarget('picker'));
     expect(_map('/settings'), const AnalyticsTarget('settings'));
     expect(_map('/about'), const AnalyticsTarget('about'));
@@ -29,7 +32,10 @@ void main() {
       const AnalyticsTarget('hours', 'hour:vesper'),
     );
     expect(_map('/hours/ora/2026-10-15/x/unknown'), isNull);
-    expect(_map('/hours/hora/2026-10-15/x'), isNull);
+    expect(
+      _map('/hours/hora/2026-10-15/x'),
+      const AnalyticsTarget.catalog('hours_list'),
+    );
   });
 
   test('prayers, mass, songs, compendium and Bible map to content ids', () {
@@ -60,18 +66,12 @@ void main() {
     () {
       for (final location in [
         '/',
-        '/prayers',
-        '/prayers/all',
         '/prayers/search',
-        '/prayers/categories',
-        '/prayers/favorites',
         '/prayers/my',
         '/prayers/prayer/add',
         '/prayers/prayer/abc123def/edit',
-        '/prayers/songs',
-        '/prayers/compendium',
         '/prayers/compendium/question/5',
-        '/bible',
+        '/prayers/category/abc',
         '/bible/search',
         '/bible?version=xx&book=gn&chapter=1',
         '/bible?version=bel&book=gn',
@@ -88,7 +88,7 @@ void main() {
       final song = _map('/prayers/songs/holysongs-0027665fbaf1422fd4dc')!;
       expect(
         validateContentId(
-          song.section,
+          song.section!,
           song.contentId,
           publicIds: kAnalyticsPublicIds,
         ),
@@ -97,7 +97,7 @@ void main() {
       final stranger = _map('/prayers/prayer/someClosedPriestPrayer1')!;
       expect(
         validateContentId(
-          stranger.section,
+          stranger.section!,
           stranger.contentId,
           publicIds: kAnalyticsPublicIds,
         ),

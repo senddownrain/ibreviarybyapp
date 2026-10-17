@@ -1,4 +1,4 @@
-// Analytics contract v1 (WEB + Flutter). Dart port of the web reference
+// Analytics contract v2 (WEB + Flutter). Dart port of the web reference
 // `src/utils/analytics/contract.js` (mybrev repository, docs/analytics-contract.md).
 //
 // Pure Dart: no Flutter imports, no I/O, no network. The web contract is the
@@ -7,7 +7,7 @@
 // the shared golden vectors.
 import 'dart:convert';
 
-const int schemaVersion = 1;
+const int schemaVersion = 2;
 
 const List<String> platforms = ['web', 'android', 'ios'];
 const List<String> regions = ['BY', 'OTHER', 'UNKNOWN'];
@@ -30,6 +30,7 @@ const List<String> sections = [
 
 /// section -> content_id kind. Sections absent from the map carry no content_id.
 const Map<String, String> sectionContentKind = {
+  'readings': 'reading',
   'prayers': 'prayer',
   'mass': 'mass',
   'songs': 'song',
@@ -51,6 +52,8 @@ const List<String> hourIds = [
 ];
 
 final Map<String, RegExp> _contentIdPatterns = {
+  // The daily readings screen as one generic material: no date, day id or text.
+  'reading': RegExp(r'^reading:day$'),
   'prayer': RegExp(r'^prayer:[A-Za-z0-9][A-Za-z0-9_-]{5,100}$'),
   'song': RegExp(r'^song:holysongs-[0-9a-f]{20}$'),
   'comp': RegExp(r'^comp:[a-z0-9]+(?:-[a-z0-9]+){0,4}$'),
@@ -97,10 +100,23 @@ const List<String> errorIds = [
   'scroll_unmeasurable',
 ];
 
+/// Catalog / landing screens that have no single material. Counted by
+/// `catalog_open` (opens of the screen, not people).
+const List<String> catalogIds = [
+  'hours_list',
+  'prayers_home',
+  'prayers_all',
+  'favorites',
+  'songs',
+  'bible_books',
+  'compendium_home',
+];
+
 const List<String> events = [
   'screen_view',
   'text_read',
   'feature_use',
+  'catalog_open',
   'measurement_error',
 ];
 const List<String> textMetrics = ['fv', 'er', 'sd'];
@@ -153,6 +169,7 @@ const Map<String, List<String>> _cellKeys = {
   'screen_view': ['e', 'section', 'content_id', 'n'],
   'text_read': ['e', 'section', 'content_id', 'metric', 'bucket', 'n'],
   'feature_use': ['e', 'feature_id', 'section', 'n'],
+  'catalog_open': ['e', 'catalog_id', 'n'],
   'measurement_error': ['e', 'error_id', 'n'],
 };
 
@@ -239,6 +256,12 @@ List<String> validateCell(Object? cell, {Set<String>? publicIds}) {
   if (e == 'measurement_error') {
     if (!errorIds.contains(cell['error_id'])) {
       errors.add('unknown error_id "${cell['error_id']}"');
+    }
+    return errors;
+  }
+  if (e == 'catalog_open') {
+    if (!catalogIds.contains(cell['catalog_id'])) {
+      errors.add('unknown catalog_id "${cell['catalog_id']}"');
     }
     return errors;
   }

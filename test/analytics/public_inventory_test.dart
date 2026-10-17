@@ -22,6 +22,7 @@ void main() {
     'mass': 'mass',
     'hour': 'hours',
     'bible': 'bible',
+    'reading': 'readings',
   };
 
   test('the generated Dart set equals the web inventory copy', () {
@@ -53,6 +54,7 @@ void main() {
     'fixed sets are present: mass order, nine hours, both Bible languages',
     () {
       expect(kAnalyticsPublicIds.contains('mass:order'), isTrue);
+      expect(kAnalyticsPublicIds.contains('reading:day'), isTrue);
       for (final hour in hourIds) {
         expect(
           kAnalyticsPublicIds.contains('hour:$hour'),

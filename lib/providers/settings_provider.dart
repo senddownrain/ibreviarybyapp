@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 class ReaderFontOption {
   const ReaderFontOption({
@@ -265,13 +267,16 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void setThemeMode(ThemeMode mode) {
+    if (state.themeMode != mode) analyticsFeature('theme_change');
     state = state.copyWith(themeMode: mode);
     setActiveThemeMode(mode);
     _save();
   }
 
   void setFontSize(double size) {
-    state = state.copyWith(fontSize: normalizeReaderFontSize(size));
+    final next = normalizeReaderFontSize(size);
+    if (state.fontSize != next) analyticsFeature('text_scale_change');
+    state = state.copyWith(fontSize: next);
     _save();
   }
 
@@ -290,21 +295,30 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void setFontFamily(String family) {
-    state = state.copyWith(fontFamily: normalizeReaderFontFamily(family));
+    final next = normalizeReaderFontFamily(family);
+    if (state.fontFamily != next) analyticsFeature('font_family_change');
+    state = state.copyWith(fontFamily: next);
     _save();
   }
 
   void setKeepScreenOn(bool value) {
+    if (state.keepScreenOn != value) analyticsFeature('keep_screen_on_toggle');
     state = state.copyWith(keepScreenOn: value);
     _save();
   }
 
   Future<void> setPsalmVerseLayout(PsalmVerseLayout value) {
+    if (state.psalmVerseLayout != value) {
+      analyticsFeature('psalmody_layout_change');
+    }
     state = state.copyWith(psalmVerseLayout: value);
     return _save();
   }
 
   Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) {
+    if (state.psalmMarkerBreakMode != value) {
+      analyticsFeature('psalmody_layout_change');
+    }
     state = state.copyWith(psalmMarkerBreakMode: value);
     return _save();
   }
@@ -312,8 +326,10 @@ class SettingsNotifier extends Notifier<SettingsState> {
   Future<void> toggleFavorite(String id) {
     final favs = List<String>.from(state.favoriteIds);
     if (favs.contains(id)) {
+      analyticsFeature('favorite_remove');
       favs.remove(id);
     } else {
+      analyticsFeature('favorite_add');
       favs.add(id);
     }
     state = state.copyWith(favoriteIds: favs);
@@ -385,6 +401,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void setBibleVersion(String versionId) {
+    if (state.bibleVersionId != versionId) {
+      analyticsFeature('bible_language_change');
+    }
     state = state.copyWith(bibleVersionId: versionId);
     _save();
   }

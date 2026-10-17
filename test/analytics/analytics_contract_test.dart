@@ -7,7 +7,7 @@ import 'package:mybrev_flutter/analytics/contract.dart';
 Map<String, dynamic> _fixture() =>
     jsonDecode(
           File(
-            'test/fixtures/analytics/analytics-contract-v1.json',
+            'test/fixtures/analytics/analytics-contract-v2.json',
           ).readAsStringSync(),
         )
         as Map<String, dynamic>;
@@ -15,8 +15,8 @@ Map<String, dynamic> _fixture() =>
 void main() {
   final fixture = _fixture();
 
-  test('contract is v1 and matches the shared fixture version', () {
-    expect(schemaVersion, 1);
+  test('contract is v2 and matches the shared fixture version', () {
+    expect(schemaVersion, 2);
     expect(fixture['schema_version'], schemaVersion);
   });
 
@@ -72,7 +72,7 @@ void main() {
     expect(validatePacket(packet()..['app_version'] = '4.5.2'), isNotEmpty);
     expect(validatePacket(packet()..['region'] = 'EU'), isNotEmpty);
     expect(validatePacket(packet()..['day'] = '2026-02-30'), isNotEmpty);
-    expect(validatePacket(packet()..['schema_version'] = 2), isNotEmpty);
+    expect(validatePacket(packet()..['schema_version'] = 1), isNotEmpty);
     expect(validatePacket(packet()..['cells'] = []), isNotEmpty);
     final duplicated = packet();
     final cells = duplicated['cells'] as List;
@@ -94,6 +94,7 @@ void main() {
       expect(sections.contains(forbidden), isFalse, reason: forbidden);
     }
     expect(featureIds.length, 27);
+    expect(catalogIds.length, 7);
     expect(hourIds.contains('vespers'), isFalse);
   });
 }

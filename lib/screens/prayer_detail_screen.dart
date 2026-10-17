@@ -25,6 +25,8 @@ import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/mass_semantics.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 String _stripHtmlText(String html) => html
     .replaceAll(RegExp(r'<[^>]*>'), '')
@@ -166,6 +168,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
 
   void _selectMassLanguage(String language) {
     if (language == _massLanguage) return;
+    analyticsFeature('mass_language_change');
     HapticFeedback.selectionClick();
     _massNav.pendingSection = _massNav.active;
     setState(() => _massLanguage = language);

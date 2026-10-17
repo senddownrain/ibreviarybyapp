@@ -317,12 +317,8 @@ class MyBrevApp extends ConsumerWidget {
       restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      builder: (context, child) {
-        final app = PriestAccessLifecycle(
-          child: child ?? const SizedBox.shrink(),
-        );
-        return kAnalyticsLocal ? AnalyticsScrollListener(child: app) : app;
-      },
+      builder: (context, child) =>
+          PriestAccessLifecycle(child: child ?? const SizedBox.shrink()),
       themeMode: themeMode,
       themeAnimationDuration: Duration.zero,
       theme: makeTheme(light),
