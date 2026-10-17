@@ -405,7 +405,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   void _resetDocumentScroll() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) _scrollController.jumpTo(0);
+      if (mounted &&
+          _scrollController.hasClients &&
+          _scrollController.position.hasContentDimensions) {
+        _scrollController.jumpTo(0);
+      }
     });
   }
 
@@ -426,8 +430,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         icon: const Icon(Icons.arrow_back_rounded),
       );
     }
-    if (!(AppRouteEntryScope.maybeOf(context)?.entry.descriptor.isBranchRoot ??
-        true)) {
+    if (context.canPop() ||
+        !(AppRouteEntryScope.maybeOf(context)?.entry.descriptor.isBranchRoot ??
+            true)) {
       return IconButton(
         tooltip: 'Назад',
         icon: const Icon(Icons.arrow_back_rounded),

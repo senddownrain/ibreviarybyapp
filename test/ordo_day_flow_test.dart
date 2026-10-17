@@ -55,6 +55,14 @@ class _AllDioceses extends DioceseSelectionNotifier {
   );
 }
 
+class _MinskDiocese extends DioceseSelectionNotifier {
+  @override
+  DioceseSelection build() => const DioceseSelection(
+    selected: ['minsk-mohilev'],
+    primary: 'minsk-mohilev',
+  );
+}
+
 void main() {
   final date = DateTime(2026, 10, 7);
   final service = LiturgicalContentService();
@@ -159,6 +167,7 @@ void main() {
     double scale = 1,
     double width = 360,
     bool onlyRosary = false,
+    bool onlyMinsk = false,
     DateTime? selectedDate,
     Brightness brightness = Brightness.light,
   }) async {
@@ -169,6 +178,7 @@ void main() {
       overrides: [
         selectedDateProvider.overrideWith((ref) => selectedDate ?? date),
         if (onlyRosary) dayOptionsProvider.overrideWithValue([rosary()]),
+        if (onlyMinsk) dioceseSelectionProvider.overrideWith(_MinskDiocese.new),
         liturgicalContentReadyProvider.overrideWith((ref) async {}),
         contentUpdatesProvider.overrideWith(_Idle.new),
         settingsProvider.overrideWith(_Settings.new),
@@ -708,6 +718,280 @@ void main() {
       router.pop();
       await tester.pumpAndSettle();
       expect(find.byType(HomeScreen), findsOneWidget);
+    },
+  );
+
+  for (final readingsMode in [false, true]) {
+    final branch = readingsMode ? 'readings' : 'hours';
+    testWidgets(
+      '$branch search opens impeded Nicholas texts and keeps search on Back',
+      (tester) async {
+        final (router, container) = await start(
+          tester,
+          location: '/$branch/picker',
+          selectedDate: DateTime(2026, 12, 6),
+          onlyMinsk: true,
+        );
+        final settings = container.read(dioceseSelectionProvider);
+        await tester.tap(find.text('Святы'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('picker-feast-filter')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('picker-filter-fixed')));
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const Key('picker-feast-search')),
+          '06.12',
+        );
+        await tester.pumpAndSettle();
+        await tapVisible(
+          tester,
+          find.byKey(const Key('picker-feast-sv-nicholas-2026-12-06')),
+        );
+        final uri = GoRouterState.of(
+          tester.element(
+            find.byType(readingsMode ? ReadingsScreen : HoraPickerScreen).last,
+          ),
+        ).uri;
+        expect(uri.queryParameters['diocese'], 'minsk-mohilev');
+        if (readingsMode) {
+          expect(uri.queryParameters['date'], '2027-12-06');
+          expect(uri.queryParameters['option'], 'sv-nicholas');
+          expect(find.byType(ReadingsScreen), findsWidgets);
+          expect(find.textContaining('Уласных чытанняў няма.'), findsOneWidget);
+          final dayId = uri.queryParameters['dayId']!;
+          final docs = ParsedReadingsService().cachedForDate(
+            DateTime(2027, 12, 6),
+            null,
+            null,
+            null,
+            includeAlternatives: true,
+            dayId: dayId,
+          )!;
+          expect(
+            docs.any(
+              (r) => r.ordoOptionRoles['sv-nicholas']?.purpose == 'weekday',
+            ),
+            isTrue,
+          );
+        } else {
+          final picker = tester.widget<HoraPickerScreen>(
+            find.byType(HoraPickerScreen),
+          );
+          expect(picker.date, DateTime(2027, 12, 6));
+          expect(picker.diocese, 'minsk-mohilev');
+          final content = service.contentForDate(
+            picker.date,
+            diocese: picker.diocese!,
+          );
+          final option = content.optionOwning(picker.dayId)!;
+          expect(option.optionId, 'sv-nicholas');
+          expect(
+            option.templates.map((t) => t.label),
+            contains('Пра пастыраў'),
+          );
+          expect(
+            content.dayById(picker.dayId)!.field('laudesHymn'),
+            isNotEmpty,
+          );
+          await tapVisible(tester, find.text('Ютрань'));
+          expect(find.byType(OraScreen), findsOneWidget);
+          expect(tester.takeException(), isNull);
+          router.pop();
+          await tester.pumpAndSettle();
+        }
+        if (readingsMode) {
+          await tester.tap(find.byTooltip('Назад').last);
+        } else {
+          router.pop();
+        }
+        await tester.pumpAndSettle();
+        expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
+        final search = tester.widget<TextField>(
+          find.byKey(const Key('picker-feast-search')),
+        );
+        expect(search.controller!.text, '06.12');
+        expect(find.byTooltip('Фільтр: Нерухомыя'), findsOneWidget);
+        expect(
+          container.read(dioceseSelectionProvider).selected,
+          settings.selected,
+        );
+        expect(
+          container.read(dioceseSelectionProvider).primary,
+          settings.primary,
+        );
+        expect(
+          OrdoRuntime.engine
+              .resolve('2026-12-06')
+              .officeOptions
+              .any((o) => o.id == 'sv-nicholas'),
+          isFalse,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('$branch periods keep Ordinary II Tuesday navigation', (
+      tester,
+    ) async {
+      final (router, container) = await start(
+        tester,
+        location: '/$branch/picker',
+        selectedDate: DateTime(2026, 10, 7),
+      );
+      await tapVisible(tester, find.byKey(const Key('picker-period-ordinary')));
+      await tapVisible(tester, find.byKey(const Key('picker-week-2')));
+      await tapVisible(tester, find.byKey(const Key('picker-day-3')));
+      expect(router.routeInformationProvider.value.uri.path, '/$branch');
+      expect(container.read(selectedDateProvider), DateTime(2026, 1, 20));
+      expect(find.byType(LiturgicalPickerScreen), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    for (final januaryDay in [1, 2]) {
+      final iso = '2027-01-0$januaryDay';
+      testWidgets('$branch Christmas opens $iso on its canonical day', (
+        tester,
+      ) async {
+        final (router, container) = await start(
+          tester,
+          location: '/$branch/picker',
+          selectedDate: DateTime(2026, 12, 26),
+          onlyMinsk: true,
+        );
+        await tapVisible(
+          tester,
+          find.byKey(const Key('picker-period-christmas')),
+        );
+        await tapVisible(tester, find.byKey(Key('picker-date-$iso')));
+        final date = DateTime(2027, 1, januaryDay);
+        expect(router.routeInformationProvider.value.uri.path, '/$branch');
+        expect(container.read(selectedDateProvider), date);
+        expect(find.byType(LiturgicalPickerScreen), findsNothing);
+        final canonical = OrdoRuntime.engine.resolve(iso);
+        expect(canonical.period, 'christmas');
+        if (readingsMode) {
+          final screen = tester.widget<ReadingsScreen>(
+            find.byType(ReadingsScreen),
+          );
+          expect(screen.dateStr, iso);
+          expect(
+            ParsedReadingsService()
+                .ordoSelection(date, dayId: screen.dayId)!
+                .optionId,
+            canonical.primary.id,
+          );
+        } else {
+          expect(find.byType(HomeScreen), findsOneWidget);
+          expect(
+            service
+                .contentForDate(date)
+                .options
+                .any((o) => o.optionId == canonical.primary.id),
+            isTrue,
+          );
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  testWidgets(
+    'movable feast search opens its proper readings in the existing reader',
+    (tester) async {
+      final (_, container) = await start(
+        tester,
+        location: '/readings/picker',
+        selectedDate: DateTime(2026, 10, 7),
+      );
+      await tester.tap(find.text('Святы'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('picker-feast-filter')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('picker-filter-movable')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('picker-feast-search')),
+        '05.04',
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Рухомае'), findsWidgets);
+      await tapVisible(
+        tester,
+        find.byKey(const Key('picker-feast-easter-sunday-2026-04-05')),
+      );
+      final screen = tester.widget<ReadingsScreen>(
+        find.byType(ReadingsScreen).last,
+      );
+      expect(screen.dateStr, '2026-04-05');
+      final selection = ParsedReadingsService().ordoSelection(
+        DateTime(2026, 4, 5),
+        dayId: screen.dayId,
+      )!;
+      expect(selection.optionId, 'easter-sunday');
+      final docs = ParsedReadingsService().cachedForDate(
+        DateTime(2026, 4, 5),
+        null,
+        null,
+        null,
+        includeAlternatives: true,
+        dayId: screen.dayId,
+      )!;
+      expect(
+        docs.any(
+          (r) => r.ordoOptionRoles['easter-sunday']?.purpose == 'proper',
+        ),
+        isTrue,
+      );
+      expect(container.read(readingsMassSetSelectionProvider), isNotEmpty);
+      expect(find.textContaining('Уласных чытанняў няма.'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'Grodno impeded in 2027 opens Grodno in 2028, preserving Settings',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        location: '/hours/picker',
+        selectedDate: DateTime(2027, 12, 6),
+      );
+      final selection = container.read(dioceseSelectionProvider);
+      await tester.tap(find.text('Святы'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('picker-feast-search')),
+        '06.12',
+      );
+      await tester.pumpAndSettle();
+      final rows = find.byKey(const Key('picker-feast-sv-nicholas-2027-12-06'));
+      expect(rows, findsNWidgets(2));
+      await tapVisible(tester, rows.last);
+      final screen = tester.widget<HoraPickerScreen>(
+        find.byType(HoraPickerScreen),
+      );
+      expect(screen.diocese, 'grodno');
+      expect(screen.date, DateTime(2028, 12, 6));
+      expect(
+        service
+            .contentForDate(screen.date, diocese: 'grodno')
+            .optionOwning(screen.dayId)!
+            .optionId,
+        'sv-nicholas',
+      );
+      expect(
+        container.read(dioceseSelectionProvider).selected,
+        selection.selected,
+      );
+      expect(
+        OrdoRuntime.engine
+            .resolve('2027-12-06', diocese: 'grodno')
+            .options
+            .any((o) => o.id == 'sv-nicholas'),
+        isFalse,
+      );
+      expect(router.canPop(), isTrue);
     },
   );
 
