@@ -4,7 +4,7 @@
 /// ```text
 /// Перыяды → a liturgical position (period · week · day) → its civil date
 /// Святы   → active calendar definitions, including impeded celebrations;
-///           the existing Ordo alone decides dates and permission to open.
+///           Ordo supplies dates and legal contexts for existing readers.
 /// ```
 ///
 /// No legacy `days` source and no second calendar algorithm.
@@ -12,6 +12,7 @@ library;
 
 import 'dart:convert';
 
+import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/engine.dart';
@@ -19,22 +20,6 @@ import 'package:mybrev_flutter/ordo/movable_feasts.dart';
 import 'package:mybrev_flutter/ordo/season.dart';
 import 'package:mybrev_flutter/ordo/year_plan.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
-
-/// Years of the selector: strictly ascending, a window around today, and
-/// the selected year always included (also outside the window).
-List<int> pickerYears(
-  int selected, {
-  int? today,
-  int before = 6,
-  int after = 12,
-}) {
-  final now = today ?? DateTime.now().year;
-  final years = {
-    for (var year = now - before; year <= now + after; year++) year,
-    selected,
-  }.toList()..sort();
-  return years;
-}
 
 /// One celebration of the year in the «Святы» list.
 class PickerFeast {
@@ -60,7 +45,7 @@ class PickerFeast {
   String get id => option.id;
   String get title => option.title;
 
-  bool canOpen({required bool readingsMode}) =>
+  bool allowedInYear({required bool readingsMode}) =>
       readingsMode ? readingsAllowed : hoursAllowed;
 
   String? get status => option.role == 'commemoration'
@@ -71,11 +56,10 @@ class PickerFeast {
       ? null
       : 'Толькі чытанні';
 
-  /// fixed | movable | diocesan
+  bool get isDiocesan => option.dioceseId != null || option.layer == 'diocese';
+
+  /// fixed | movable, independently of diocesan provenance.
   String get kind {
-    if (option.dioceseId != null || option.layer == 'diocese') {
-      return 'diocesan';
-    }
     return option.data['date'] is Map &&
             (option.data['date'] as Map)['type'] != 'fixed'
         ? 'movable'
@@ -199,6 +183,71 @@ Object? _pickerVariantKey(Object? value) {
   if (value is! Map) return value;
   final keys = value.keys.cast<String>().toList()..sort();
   return {for (final key in keys) key: _pickerVariantKey(value[key])};
+}
+
+// Compare the definition, excluding computed placement and diocesan provenance.
+String _pickerTextKey(Map<String, dynamic> fields) => jsonEncode(
+  _pickerVariantKey({
+    for (final key in const [
+      'id',
+      'title',
+      'rank',
+      'category',
+      'layer',
+      'date',
+      'source',
+      'daysRef',
+      'readingsRef',
+      'fallbackDaysRefs',
+      'templates',
+      'defaultTemplate',
+      'feastCode',
+      'properKind',
+      'readingsReference',
+      'contentStatus',
+    ])
+      if (fields.containsKey(key)) key: fields[key],
+    'color': fields['color'] ?? '',
+    'colorAlternatives': fields['colorAlternatives'] ?? const [],
+    'rules': fields['rules'] ?? const {},
+  }),
+);
+
+/// Real legal occurrences of exactly this definition in the same diocese.
+/// Search readers may use another year; the current calendar stays unchanged.
+Iterable<OrdoDay> pickerFeastTextDays(
+  OrdoEngine engine,
+  PickerFeast feast,
+  int year,
+  String diocese, {
+  required bool readingsMode,
+}) sync* {
+  if (!feast.dioceses.contains(diocese)) return;
+  final first = kCalendarFirstDate.year;
+  final last = kCalendarLastDate.year;
+  final center = year.clamp(first, last);
+  final identity = _pickerTextKey(feast.option.data);
+  for (var offset = 0; offset <= last - first; offset++) {
+    for (final candidate in [
+      center + offset,
+      if (offset > 0) center - offset,
+    ]) {
+      if (candidate < first || candidate > last) continue;
+      final plan = engine.plan(candidate, diocese);
+      final date = plan.celebrationDates[feast.id];
+      if (date == null) continue;
+      final placement = plan.byDate[date]
+          ?.where((p) => p.id == feast.id && !p.transferredOut)
+          .firstOrNull;
+      if (placement == null ||
+          _pickerTextKey(placement.celebration) != identity) {
+        continue;
+      }
+      final day = engine.resolve(date, diocese: diocese);
+      final options = readingsMode ? day.options : day.officeOptions;
+      if (options.any((o) => o.id == feast.id)) yield day;
+    }
+  }
 }
 
 /// Liturgical positions of a period that exist in the chosen year:

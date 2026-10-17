@@ -20,58 +20,112 @@ void main() {
   setUpAll(() => initializeDateFormatting('be'));
   final engine = bundledOrdoEngine();
 
-  group('years', () {
-    test('strictly ascending, 2027 included, the selected year added', () {
-      final years = pickerYears(2026, today: 2026);
-      expect(years, [...years]..sort());
-      expect(years.toSet().length, years.length);
-      expect(years, contains(2027));
-      expect(years.indexOf(2027), years.indexOf(2026) + 1);
-      expect(years.last, greaterThan(2030));
-      final far = pickerYears(2061, today: 2026);
-      expect(far, contains(2061));
-      expect(far, [...far]..sort());
-    });
-
-    testWidgets('the year grid is numeric, shows the selected year, and '
-        '2027 is one tap away', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            selectedDateProvider.overrideWith((ref) => DateTime(2026, 10, 7)),
-            pickerFeastsProvider.overrideWith((ref, key) => const []),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(body: LiturgicalPickerScreen()),
-          ),
+  testWidgets('search has no visible year control', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          selectedDateProvider.overrideWith((ref) => DateTime(2026, 10, 7)),
+          pickerFeastsProvider.overrideWith((ref, year) => const []),
+        ],
+        child: const MaterialApp(
+          home: Scaffold(body: LiturgicalPickerScreen()),
         ),
-      );
-      await tester.pump();
-      expect(find.text('2026'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('picker-year')));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('picker-year-grid')), findsOneWidget);
-      expect(find.byKey(const Key('picker-year-2026')), findsOneWidget);
-      final y2026 = tester.getTopLeft(
-        find.byKey(const Key('picker-year-2026')),
-      );
-      final y2027 = tester.getTopLeft(
-        find.byKey(const Key('picker-year-2027')),
-      );
-      expect(
-        y2027.dy > y2026.dy || (y2027.dy == y2026.dy && y2027.dx > y2026.dx),
-        isTrue,
-      );
-      await tester.tap(find.byKey(const Key('picker-year-2027')));
-      await tester.pumpAndSettle();
-      expect(find.text('2027'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('picker-year-next')));
-      await tester.pump();
-      expect(find.text('2028'), findsOneWidget);
-    });
+      ),
+    );
+    await tester.pump();
+    expect(find.byKey(const Key('picker-year')), findsNothing);
+    expect(find.byKey(const Key('picker-year-previous')), findsNothing);
+    expect(find.byKey(const Key('picker-year-next')), findsNothing);
+    expect(find.text('Перыяды'), findsOneWidget);
+    expect(find.text('Святы'), findsOneWidget);
   });
 
   group('«Святы» from the Ordo of the year', () {
+    test('text search finds the same diocesan variant in a legal year', () {
+      for (final readingsMode in [false, true]) {
+        final omitted = pickerFeastsOfYear(
+          engine,
+          2026,
+          kDioceses,
+        ).singleWhere((f) => f.id == 'sv-nicholas');
+        final minsk = pickerFeastTextDays(
+          engine,
+          omitted,
+          2026,
+          'minsk-mohilev',
+          readingsMode: readingsMode,
+        ).first;
+        expect(minsk.date, '2027-12-06');
+        expect(minsk.diocese, 'minsk-mohilev');
+        final grodno = pickerFeastsOfYear(engine, 2027, kDioceses).singleWhere(
+          (f) => f.id == 'sv-nicholas' && f.dioceses.contains('grodno'),
+        );
+        final next = pickerFeastTextDays(
+          engine,
+          grodno,
+          2027,
+          'grodno',
+          readingsMode: readingsMode,
+        ).first;
+        expect(next.date, '2028-12-06');
+        expect(next.diocese, 'grodno');
+        expect(
+          pickerFeastTextDays(
+            engine,
+            grodno,
+            2027,
+            'minsk-mohilev',
+            readingsMode: readingsMode,
+          ),
+          isEmpty,
+        );
+      }
+      expect(
+        engine
+            .resolve('2026-12-06')
+            .officeOptions
+            .any((o) => o.id == 'sv-nicholas'),
+        isFalse,
+      );
+      expect(
+        engine
+            .resolve('2027-12-06', diocese: 'grodno')
+            .options
+            .any((o) => o.id == 'sv-nicholas'),
+        isFalse,
+      );
+    });
+
+    test('text identity never substitutes another source or rank', () {
+      final feast = pickerFeastsOfYear(
+        engine,
+        2026,
+        kDioceses,
+      ).singleWhere((f) => f.id == 'sv-nicholas');
+      for (final changes in [
+        {'rank': 'solemnitas'},
+        {'source': 'a different published source'},
+        {'color': 'ruber'},
+      ]) {
+        final variant = PickerFeast(
+          option: OrdoOption({...feast.option.data, ...changes}),
+          date: feast.date,
+          nominalDate: feast.nominalDate,
+          dioceses: feast.dioceses,
+        );
+        expect(
+          pickerFeastTextDays(
+            engine,
+            variant,
+            2026,
+            'minsk-mohilev',
+            readingsMode: false,
+          ),
+          isEmpty,
+        );
+      }
+    });
+
     test('no legacy days source in the picker', () {
       final source = File(
         'lib/screens/liturgical_picker_screen.dart',
@@ -104,7 +158,7 @@ void main() {
       expect(annunciation.transferred, isTrue);
       expect(annunciation.option.transferredFrom, '2027-03-25');
       // Diocesan: with its badge when only one selected diocese keeps it.
-      final diocesan = feasts.where((f) => f.kind == 'diocesan').toList();
+      final diocesan = feasts.where((f) => f.isDiocesan).toList();
       expect(diocesan, isNotEmpty);
       expect(diocesan.any((f) => f.badges.length == 1), isTrue);
       // No duplicate copies of one celebration on one date.
@@ -143,8 +197,8 @@ void main() {
         expect(omitted.nominalDate, '2026-12-06');
         expect(omitted.colors, ['albus']);
         expect(omitted.status, 'Не адзначаецца ў гэтым годзе');
-        expect(omitted.canOpen(readingsMode: false), isFalse);
-        expect(omitted.canOpen(readingsMode: true), isFalse);
+        expect(omitted.allowedInYear(readingsMode: false), isFalse);
+        expect(omitted.allowedInYear(readingsMode: true), isFalse);
         expect(engine.resolve('2026-12-06').legalColors, ['violaceus']);
         final next = pickerFeastsOfYear(
           engine,
@@ -282,6 +336,7 @@ void main() {
           isFalse,
         );
         expect(rows.singleWhere((f) => f.id == 'pinsk-only').badges, ['Пінск']);
+        expect(rows.singleWhere((f) => f.id == 'pinsk-only').kind, 'fixed');
         expect(
           rows.where((f) => f.id == 'no-color').every((f) => f.colors.isEmpty),
           isTrue,
@@ -306,13 +361,14 @@ void main() {
           rows.singleWhere((f) => f.id == 'last-weekday').date,
           '2026-10-25',
         );
+        expect(rows.singleWhere((f) => f.id == 'last-weekday').kind, 'movable');
         for (final row in rows) {
           expect(row.dioceses.toSet().length, row.dioceses.length);
         }
       },
     );
 
-    for (final width in [320.0, 390.0]) {
+    for (final width in [320.0, 390.0, 430.0]) {
       for (final brightness in Brightness.values) {
         testWidgets('impeded search at $width, $brightness, large text', (
           tester,
@@ -354,7 +410,7 @@ void main() {
             const Key('picker-feast-sv-nicholas-2026-12-06'),
           );
           expect(row, findsOneWidget);
-          expect(tester.widget<InkWell>(row).onTap, isNull);
+          expect(tester.widget<InkWell>(row).onTap, isNotNull);
           expect(find.text('Не адзначаецца ў гэтым годзе'), findsOneWidget);
           expect(
             tester
@@ -367,6 +423,26 @@ void main() {
                 .colors,
             ['albus'],
           );
+          expect(tester.takeException(), isNull);
+          await tester.tap(find.byKey(const Key('picker-feast-filter')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const Key('picker-filter-movable')));
+          await tester.pumpAndSettle();
+          expect(row, findsNothing);
+          await tester.tap(find.byKey(const Key('picker-feast-filter')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const Key('picker-filter-fixed')));
+          await tester.pumpAndSettle();
+          expect(row, findsOneWidget);
+          expect(find.byTooltip('Фільтр: Нерухомыя'), findsOneWidget);
+          await tester.tap(find.byTooltip('Ачысціць пошук'));
+          await tester.pumpAndSettle();
+          expect(find.byTooltip('Фільтр: Нерухомыя'), findsOneWidget);
+          await tester.tap(find.text('Перыяды'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Святы'));
+          await tester.pumpAndSettle();
+          expect(find.byTooltip('Фільтр: Нерухомыя'), findsOneWidget);
           expect(tester.takeException(), isNull);
         });
       }

@@ -4,21 +4,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/ordo/ordo_picker.dart';
 import 'package:mybrev_flutter/ordo/runtime.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
+import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
+import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
+import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 
@@ -79,6 +87,130 @@ void openPickedDate(
   context.go('/hours');
 }
 
+/// Opens existing readers on a real legal occurrence of the chosen definition.
+/// Content is checked before navigating; an unrelated day is never a fallback.
+Future<void> openPickedFeast(
+  BuildContext context,
+  WidgetRef ref,
+  PickerFeast feast,
+  int year, {
+  required bool readingsMode,
+}) async {
+  await ContentStore.instance.ensureLoaded(kLiturgicalCollections);
+  if (!context.mounted) return;
+  final diocese =
+      ref
+          .read(dioceseSelectionProvider)
+          .ordered
+          .where(feast.dioceses.contains)
+          .firstOrNull ??
+      feast.dioceses.first;
+  final service = LiturgicalContentService();
+  for (final day in pickerFeastTextDays(
+    OrdoRuntime.engine,
+    feast,
+    year,
+    diocese,
+    readingsMode: readingsMode,
+  )) {
+    if (!context.mounted) return;
+    final date = dateOfIso(day.date);
+    final content = service.contentForDate(date, diocese: diocese);
+    final office = content.options
+        .where((o) => o.optionId == feast.id)
+        .firstOrNull;
+    if (office == null) continue;
+    if (!readingsMode) {
+      final templates = office.templates
+          .where((t) => kHoraItems.any((hour) => isHourAvailable(t.day, hour)))
+          .toList();
+      final template =
+          templates.where((t) => t.choice != 'current-day').firstOrNull ??
+          templates.firstOrNull;
+      final text = template?.day ?? office.day;
+      final dayId = template?.id ?? office.dayId;
+      if (office.disabled ||
+          dayId == null ||
+          text == null ||
+          !kHoraItems.any((hour) => isHourAvailable(text, hour)) ||
+          content.optionOwning(dayId)?.optionId != feast.id) {
+        continue;
+      }
+      await context.push<void>(
+        horaRouteForContext(
+          date: date,
+          dayId: dayId,
+          diocese: diocese,
+          optionId: feast.id,
+        ),
+      );
+      return;
+    }
+    final dayId = office.dayId;
+    if (dayId == null) continue;
+    final loaded = loadReadingsForDate(
+      service: ParsedReadingsService(),
+      calendar: ref.read(calendarServiceProvider),
+      date: date,
+      dayId: dayId,
+      diocese: diocese,
+    );
+    if (loaded == null || loaded.optionId != feast.id) continue;
+    final selection = resolveDefaultReadings(
+      readings: loaded.readings,
+      sundayCycle: loaded.sundayCycle,
+      weekdayCycle: loaded.weekdayCycle,
+      optionId: feast.id,
+    );
+    final proper = selection.groups
+        .where(
+          (g) => g.documents.any(
+            (r) => r.ordoOptionRoles[feast.id]?.purpose == 'proper',
+          ),
+        )
+        .firstOrNull;
+    final plan = day.readingsPlan
+        .where((p) => p.optionId == feast.id)
+        .firstOrNull;
+    final weekday = plan?.isMemorial == true
+        ? selection.groups
+              .where(
+                (g) => g.documents.any(
+                  (r) => r.ordoOptionRoles[feast.id]?.purpose == 'weekday',
+                ),
+              )
+              .firstOrNull
+        : null;
+    final group = proper ?? weekday;
+    if (group == null) continue;
+    // Reuse the reader's existing group choice, keeping all sets and cycles.
+    final choices = ref.read(readingsMassSetSelectionProvider.notifier);
+    choices.state = {...choices.state, '${day.date}|$dayId|@group': group.key};
+    if (proper == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Уласных чытанняў няма. Адкрываем чытанні з дня.'),
+        ),
+      );
+    }
+    AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
+    await context.push<void>(
+      readingsRouteForContext(
+        date: date,
+        dayId: dayId,
+        diocese: diocese,
+        optionId: feast.id,
+      ),
+    );
+    return;
+  }
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Тэксты гэтага святкавання недаступныя')),
+    );
+  }
+}
+
 class LiturgicalPickerScreen extends ConsumerStatefulWidget {
   const LiturgicalPickerScreen({super.key, this.mode = 'hours'});
 
@@ -93,7 +225,7 @@ class LiturgicalPickerScreen extends ConsumerStatefulWidget {
 
 class _LiturgicalPickerScreenState
     extends ConsumerState<LiturgicalPickerScreen> {
-  late int _year;
+  late final int _year;
 
   @override
   void initState() {
@@ -151,59 +283,27 @@ class _LiturgicalPickerScreenState
                           style: GlassStyle.soft,
                           borderRadius: BorderRadius.circular(20),
                           padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              final label = Row(
-                                children: [
-                                  PhosphorIcon(
-                                    widget.isReadingsMode
-                                        ? PhosphorIconsRegular.bookOpenText
-                                        : PhosphorIconsRegular.handsPraying,
-                                    color: seasonColor,
-                                    size: 20,
+                          child: Row(
+                            children: [
+                              PhosphorIcon(
+                                widget.isReadingsMode
+                                    ? PhosphorIconsRegular.bookOpenText
+                                    : PhosphorIconsRegular.handsPraying,
+                                color: seasonColor,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 9),
+                              Expanded(
+                                child: Text(
+                                  widget.isReadingsMode
+                                      ? 'Рэжым чытанняў'
+                                      : 'Рэжым літургіі гадзінаў',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  const SizedBox(width: 9),
-                                  Expanded(
-                                    child: Text(
-                                      widget.isReadingsMode
-                                          ? 'Рэжым чытанняў'
-                                          : 'Рэжым літургіі гадзінаў',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                              final years = _YearSelector(
-                                year: _year,
-                                onChanged: (year) =>
-                                    setState(() => _year = year),
-                              );
-                              final scale = MediaQuery.textScalerOf(
-                                context,
-                              ).scale(1);
-                              // Narrow or large text: the year gets its own
-                              // line, never squeezed.
-                              if (constraints.maxWidth < 300 * scale) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    label,
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: years,
-                                    ),
-                                  ],
-                                );
-                              }
-                              return Row(
-                                children: [
-                                  Expanded(child: label),
-                                  years,
-                                ],
-                              );
-                            },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -569,120 +669,6 @@ class _ExactDateChoices extends StatelessWidget {
   }
 }
 
-/// Year: «‹ 2027 ›» with a grid of years in numeric order (the selected
-/// one highlighted and scrolled into view).
-class _YearSelector extends StatelessWidget {
-  const _YearSelector({required this.year, required this.onChanged});
-
-  final int year;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          key: const Key('picker-year-previous'),
-          tooltip: 'Папярэдні год',
-          onPressed: () => onChanged(year - 1),
-          icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft, size: 18),
-        ),
-        TextButton(
-          key: const Key('picker-year'),
-          style: TextButton.styleFrom(minimumSize: const Size(64, 48)),
-          onPressed: () async {
-            final picked = await showModalBottomSheet<int>(
-              context: context,
-              useRootNavigator: true,
-              useSafeArea: true,
-              isScrollControlled: true,
-              builder: (_) => _YearGrid(selected: year),
-            );
-            if (picked != null) onChanged(picked);
-          },
-          child: Text(
-            '$year',
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
-          ),
-        ),
-        IconButton(
-          key: const Key('picker-year-next'),
-          tooltip: 'Наступны год',
-          onPressed: () => onChanged(year + 1),
-          icon: const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
-        ),
-      ],
-    );
-  }
-}
-
-class _YearGrid extends StatelessWidget {
-  const _YearGrid({required this.selected});
-  final int selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final years = pickerYears(selected);
-    const columns = 4;
-    const rowHeight = 56.0;
-    final row = years.indexOf(selected) ~/ columns;
-    final controller = ScrollController(
-      initialScrollOffset: (row - 1).clamp(0, 1000) * rowHeight,
-    );
-    final cs = Theme.of(context).colorScheme;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Год', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: rowHeight * 5),
-              child: GridView.builder(
-                key: const Key('picker-year-grid'),
-                controller: controller,
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columns,
-                  mainAxisExtent: rowHeight,
-                ),
-                itemCount: years.length,
-                itemBuilder: (context, index) {
-                  final year = years[index];
-                  final isSelected = year == selected;
-                  return Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: isSelected
-                        ? FilledButton(
-                            key: Key('picker-year-$year'),
-                            onPressed: () => Navigator.pop(context, year),
-                            child: Text('$year'),
-                          )
-                        : OutlinedButton(
-                            key: Key('picker-year-$year'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: year == DateTime.now().year
-                                  ? cs.primary
-                                  : null,
-                            ),
-                            onPressed: () => Navigator.pop(context, year),
-                            child: Text('$year'),
-                          ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 // ─── Combined feasts picker (dynamic + fixed) ──────────────────────────────────
 
 class _FeastsPickerCombined extends ConsumerStatefulWidget {
@@ -696,9 +682,46 @@ class _FeastsPickerCombined extends ConsumerStatefulWidget {
       _FeastsPickerCombinedState();
 }
 
-class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
+class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined>
+    with AutomaticKeepAliveClientMixin<_FeastsPickerCombined> {
   final _searchCtrl = TextEditingController();
   String _query = '';
+  String _filter = 'all';
+  bool _opening = false;
+
+  static const _filters = {
+    'all': 'Усе',
+    'fixed': 'Нерухомыя',
+    'movable': 'Рухомыя',
+  };
+
+  @override
+  bool get wantKeepAlive => true;
+
+  Future<void> _openFeast(PickerFeast feast) async {
+    if (_opening) return;
+    _opening = true;
+    try {
+      await openPickedFeast(
+        context,
+        ref,
+        feast,
+        widget.year,
+        readingsMode: widget.readingsMode,
+      );
+    } catch (error) {
+      debugPrint('Picker texts: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Не ўдалося адкрыць тэксты святкавання'),
+          ),
+        );
+      }
+    } finally {
+      _opening = false;
+    }
+  }
 
   @override
   void dispose() {
@@ -708,22 +731,23 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final all = ref.watch(pickerFeastsProvider(widget.year));
     final query = _query.trim().toLowerCase();
-    final filtered = query.isEmpty
-        ? all
-        : all
-              .where(
-                (f) =>
-                    f.title.toLowerCase().contains(query) ||
-                    [f.nominalDate, f.date].nonNulls.any(
-                      (date) =>
-                          date.contains(query) ||
-                          dayMonthLabel(date).contains(query) ||
-                          fixedDateKey(date).contains(query),
-                    ),
-              )
-              .toList();
+    final filtered = all
+        .where(
+          (f) =>
+              (_filter == 'all' || f.kind == _filter) &&
+              (query.isEmpty ||
+                  f.title.toLowerCase().contains(query) ||
+                  [f.nominalDate, f.date].nonNulls.any(
+                    (date) =>
+                        date.contains(query) ||
+                        dayMonthLabel(date).contains(query) ||
+                        fixedDateKey(date).contains(query),
+                  )),
+        )
+        .toList();
 
     return Column(
       children: [
@@ -738,8 +762,12 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                 PhosphorIconsRegular.magnifyingGlass,
                 size: 20,
               ),
-              suffixIcon: _query.isNotEmpty
-                  ? IconButton(
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_query.isNotEmpty)
+                    IconButton(
+                      tooltip: 'Ачысціць пошук',
                       icon: const PhosphorIcon(
                         PhosphorIconsRegular.x,
                         size: 20,
@@ -748,8 +776,27 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                         _searchCtrl.clear();
                         setState(() => _query = '');
                       },
-                    )
-                  : null,
+                    ),
+                  PopupMenuButton<String>(
+                    key: const Key('picker-feast-filter'),
+                    tooltip: 'Фільтр: ${_filters[_filter]}',
+                    icon: Badge(
+                      isLabelVisible: _filter != 'all',
+                      child: const Icon(Icons.filter_list, size: 20),
+                    ),
+                    onSelected: (value) => setState(() => _filter = value),
+                    itemBuilder: (context) => [
+                      for (final entry in _filters.entries)
+                        CheckedPopupMenuItem(
+                          key: Key('picker-filter-${entry.key}'),
+                          value: entry.key,
+                          checked: _filter == entry.key,
+                          child: Text(entry.value),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
               border: const OutlineInputBorder(),
               isDense: true,
             ),
@@ -777,17 +824,7 @@ class _FeastsPickerCombinedState extends ConsumerState<_FeastsPickerCombined> {
                   itemCount: filtered.length,
                   itemBuilder: (context, i) => _FeastRow(
                     feast: filtered[i],
-                    onTap:
-                        filtered[i].canOpen(readingsMode: widget.readingsMode)
-                        ? () => openPickedDate(
-                            context,
-                            ref,
-                            dateOfIso(filtered[i].date!),
-                            readingsMode: widget.readingsMode,
-                            optionId: filtered[i].id,
-                            diocese: filtered[i].dioceses.first,
-                          )
-                        : null,
+                    onTap: () => _openFeast(filtered[i]),
                   ),
                 ),
         ),
@@ -808,10 +845,14 @@ class _FeastRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final displayDate = feast.nominalDate ?? feast.date;
-    final weekday = displayDate != null && displayDate == feast.date
-        ? DateFormat('EEEE', 'be').format(dateOfIso(displayDate))
-        : null;
+    final displayDate = feast.kind == 'fixed'
+        ? feast.nominalDate ?? feast.date
+        : feast.date;
+    final visual = liturgicalVisual(
+      color: feast.option.color,
+      category: feast.option.category,
+      rank: feast.option.rank,
+    );
     final rank = ordoRankLabel(feast.option);
     final badges = [
       ...feast.badges,
@@ -819,7 +860,7 @@ class _FeastRow extends StatelessWidget {
         (note) => !feast.transferred || !note.startsWith('Перанесена з '),
       ),
       if (feast.transferred && feast.date != null)
-        'Перанесена на ${dayMonthLabel(feast.date!)}',
+        'Перанесена на ${fixedDateKey(feast.date!)}',
       if (feast.status != null) feast.status!,
     ];
     return Card(
@@ -849,10 +890,8 @@ class _FeastRow extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         [
-                          if (displayDate != null)
-                            '${dayMonthLabel(displayDate)}${weekday == null ? '' : ', $weekday'}'
-                          else
-                            'Дата ў гэтым годзе не вызначана',
+                          if (displayDate != null) fixedDateKey(displayDate),
+                          if (feast.kind == 'movable') 'Рухомае',
                           if (rank.isNotEmpty) rank,
                           vestmentColorsLabel(feast.option),
                         ].where((label) => label.isNotEmpty).join(' · '),
@@ -892,7 +931,11 @@ class _FeastRow extends StatelessWidget {
                   ),
                 ),
                 if (onTap != null)
-                  const PhosphorIcon(PhosphorIconsRegular.caretRight, size: 18),
+                  PhosphorIcon(
+                    PhosphorIconsRegular.caretRight,
+                    size: 18,
+                    color: visual?.accent,
+                  ),
               ],
             ),
           ),
