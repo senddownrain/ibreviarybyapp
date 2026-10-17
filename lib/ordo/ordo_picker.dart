@@ -289,9 +289,16 @@ List<String> pickerExactDates(int year, String period) {
     case 'advent':
       return [for (var day = 17; day <= 24; day++) isoFromParts(year, 12, day)];
     case 'christmas':
+      // Calendar dates must not collapse into repeated week/weekday positions.
+      final end = yearAnchors(year + 1).baptismOfLord;
       return [
-        for (final week in pickerPositions(year, period).values) ...week.values,
-      ]..sort();
+        for (
+          var iso = isoFromParts(year, 12, 25);
+          iso.compareTo(end) <= 0;
+          iso = addDays(iso, 1)
+        )
+          if (computeSeason(iso).period == period) iso,
+      ];
     case 'lent':
       final ash = yearAnchors(year).ashWednesday;
       return [for (var day = 0; day < 4; day++) addDays(ash, day)];

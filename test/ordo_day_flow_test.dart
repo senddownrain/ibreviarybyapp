@@ -847,6 +847,53 @@ void main() {
       expect(find.byType(LiturgicalPickerScreen), findsNothing);
       expect(tester.takeException(), isNull);
     });
+
+    for (final januaryDay in [1, 2]) {
+      final iso = '2027-01-0$januaryDay';
+      testWidgets('$branch Christmas opens $iso on its canonical day', (
+        tester,
+      ) async {
+        final (router, container) = await start(
+          tester,
+          location: '/$branch/picker',
+          selectedDate: DateTime(2026, 12, 26),
+          onlyMinsk: true,
+        );
+        await tapVisible(
+          tester,
+          find.byKey(const Key('picker-period-christmas')),
+        );
+        await tapVisible(tester, find.byKey(Key('picker-date-$iso')));
+        final date = DateTime(2027, 1, januaryDay);
+        expect(router.routeInformationProvider.value.uri.path, '/$branch');
+        expect(container.read(selectedDateProvider), date);
+        expect(find.byType(LiturgicalPickerScreen), findsNothing);
+        final canonical = OrdoRuntime.engine.resolve(iso);
+        expect(canonical.period, 'christmas');
+        if (readingsMode) {
+          final screen = tester.widget<ReadingsScreen>(
+            find.byType(ReadingsScreen),
+          );
+          expect(screen.dateStr, iso);
+          expect(
+            ParsedReadingsService()
+                .ordoSelection(date, dayId: screen.dayId)!
+                .optionId,
+            canonical.primary.id,
+          );
+        } else {
+          expect(find.byType(HomeScreen), findsOneWidget);
+          expect(
+            service
+                .contentForDate(date)
+                .options
+                .any((o) => o.optionId == canonical.primary.id),
+            isTrue,
+          );
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
   }
 
   testWidgets(

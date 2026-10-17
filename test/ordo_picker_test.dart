@@ -459,6 +459,43 @@ void main() {
   });
 
   group('«Перыяды»: exact dates by the engine', () {
+    for (final entry in const {
+      2025: '2026-01-11',
+      2026: '2027-01-10',
+      2027: '2028-01-09',
+    }.entries) {
+      test(
+        'Christmas ${entry.key} includes every date through Baptism once',
+        () {
+          String iso(DateTime day) => day.toIso8601String().substring(0, 10);
+          final start = DateTime.utc(entry.key, 12, 25);
+          final end = DateTime.parse('${entry.value}T00:00:00Z');
+          final expected = [
+            for (var i = 0; i <= end.difference(start).inDays; i++)
+              iso(start.add(Duration(days: i))),
+          ];
+          final dates = pickerExactDates(entry.key, 'christmas');
+          expect(dates, expected);
+          expect(dates.toSet().length, dates.length);
+          expect(
+            dates,
+            containsAll(['${entry.key + 1}-01-01', '${entry.key + 1}-01-02']),
+          );
+          for (final date in dates) {
+            expect(engine.resolve(date).period, 'christmas', reason: date);
+          }
+          expect(
+            engine.resolve(iso(start.subtract(const Duration(days: 1)))).period,
+            'advent',
+          );
+          expect(
+            engine.resolve(iso(end.add(const Duration(days: 1)))).period,
+            'ordinary',
+          );
+        },
+      );
+    }
+
     test('Advent, 17–24 December, Christmas, Lent, Holy Week, Easter, '
         'Ordinary Time before and after Lent', () {
       expect(pickerDateForPosition(2026, 'advent', 1, 1), '2026-11-29');
