@@ -921,8 +921,6 @@ class _FeastRow extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: theme.textTheme.labelMedium,
                         ),
-                      const SizedBox(height: 8),
-                      VestmentMarker(colors: feast.colors, size: 16),
                     ],
                   ),
                 ),
@@ -942,7 +940,6 @@ class _FeastRow extends StatelessWidget {
                         [
                           if (feast.kind == 'movable') 'Рухомае',
                           if (rank.isNotEmpty) rank,
-                          vestmentColorsLabel(feast.option),
                         ].where((label) => label.isNotEmpty).join(' · '),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: cs.onSurfaceVariant,
