@@ -413,15 +413,15 @@ void main() {
           expect(tester.widget<InkWell>(row).onTap, isNotNull);
           expect(find.text('Не адзначаецца ў гэтым годзе'), findsOneWidget);
           expect(
-            tester
-                .widget<VestmentMarker>(
-                  find.descendant(
-                    of: row,
-                    matching: find.byType(VestmentMarker),
-                  ),
-                )
-                .colors,
-            ['albus'],
+            find.descendant(
+              of: row,
+              matching: find.byType(VestmentMarker),
+            ),
+            findsNothing,
+          );
+          expect(
+            find.descendant(of: row, matching: find.text('Белы')),
+            findsNothing,
           );
           expect(tester.takeException(), isNull);
           await tester.tap(find.byKey(const Key('picker-feast-filter')));
