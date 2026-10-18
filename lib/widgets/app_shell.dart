@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -99,6 +100,33 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     if (entryId != null) controller.request(entryId, mode);
   }
 
+  Future<void> _selectBranch(BuildContext context, AppBranch branch) async {
+    if (branch == AppBranch.readings &&
+        widget.activeBranch == AppBranch.hours) {
+      final date = ref.read(selectedDateProvider);
+      final choice = ref.read(
+        hoursLiturgicalOverridesProvider,
+      )[liturgicalDateKey(date)];
+      final selection = ref.read(hoursLiturgicalSelectionProvider);
+      if (choice?.fromSearch == true &&
+          selection.dayId != null &&
+          selection.diocese != null &&
+          selection.selected?.optionId != null) {
+        if (!await preparePickedFeastReadings(
+          context,
+          ref,
+          date: date,
+          dayId: selection.dayId!,
+          diocese: selection.diocese!,
+          optionId: selection.selected!.optionId!,
+        ))
+          return;
+        if (!context.mounted) return;
+      }
+    }
+    AppNavigationScope.of(context).selectBranch(branch);
+  }
+
   @override
   void dispose() {
     _liturgicalDateSubscription.close();
@@ -180,7 +208,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                       ? ReaderChromeMode.hidden
                       : mode,
                   seasonColor: Theme.of(context).colorScheme.primary,
-                  onSelect: AppNavigationScope.of(context).selectBranch,
+                  onSelect: (branch) => _selectBranch(context, branch),
                   onExpand: () => _requestActiveMode(ReaderChromeMode.full),
                 ),
               ),

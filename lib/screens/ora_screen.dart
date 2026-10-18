@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
 import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -598,11 +599,31 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       actions: [
         TextButton.icon(
           key: const Key('ora-readings-action'),
-          onPressed: () => AppNavigationScope.of(context).openReadingsFromOra(
-            context,
-            date: widget.date,
-            dayId: widget.dayId,
-          ),
+          onPressed: () async {
+            final choice = ref.read(
+              hoursLiturgicalOverridesProvider,
+            )[liturgicalDateKey(widget.date)];
+            final selection = ref.read(hoursLiturgicalSelectionProvider);
+            if (choice?.fromSearch == true &&
+                selection.diocese != null &&
+                selection.selected?.optionId != null) {
+              if (!await preparePickedFeastReadings(
+                context,
+                ref,
+                date: widget.date,
+                dayId: widget.dayId,
+                diocese: selection.diocese!,
+                optionId: selection.selected!.optionId!,
+              ))
+                return;
+              if (!context.mounted) return;
+            }
+            AppNavigationScope.of(context).openReadingsFromOra(
+              context,
+              date: widget.date,
+              dayId: widget.dayId,
+            );
+          },
           icon: const PhosphorIcon(PhosphorIconsRegular.bookOpenText, size: 19),
           label: const Text('Чытанні'),
         ),

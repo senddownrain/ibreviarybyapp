@@ -10,10 +10,19 @@
 
 `Гадзіны → час → Ora`.
 
-`HoraPickerScreen` больше не входит в обычный primary flow. Его файл,
-`/hours/hora/:date/:dayId` и alias `/hora/:date/:dayId` сохранены для
-совместимости, fallback и старых deep links. Статус: **KEEP / DEPRECATE /
-REMOVE LATER**; cleanup не входит в Stage 3.
+Обновление 18.10.2026: `HoraPickerScreen` удалён. Поиск «Святы» открывает
+существующий `HomeScreen` через общий navigation controller; варианты Office
+остаются в штатном Hours options sheet. Оба старых URL
+`/hours/hora/:date/:dayId` и `/hora/:date/:dayId` перенаправляют на
+`/hours?date=…&dayId=…&diocese=…`. Контекст применяется после build; Settings
+не меняются. Недоступный ID показывает штатное отсутствие литургического дня,
+без подстановки primary. URL-encoded ID сохраняется.
+
+Поиск чтений открывает существующий `ReadingsScreen`, предпочитая собственный
+набор. При отсутствии собственных чтений переход к чтениям дня требует
+подтверждения. То же подтверждение действует при переходе из выбранного в
+поиске Home на вкладку чтений. Другой разрешённый год сообщается однократным
+нижним SnackBar; дата экрана всегда фактическая. «Перыяды» не изменены.
 
 ## Primary, alternatives и state
 
@@ -63,7 +72,7 @@ canonical Ora parameters, one-tap Today, независимости дат и 20
 Существующие suites продолжают покрывать branch preservation, contextual
 Ora → Readings → Ora, compatibility/deep links и iOS/Android date surfaces.
 
-Legacy после Stage 3: `HoraPickerScreen`, compatibility aliases, старый chrome
+Исторический legacy после Stage 3 (до cleanup 18.10.2026): compatibility aliases, старый chrome
 advanced Liturgical Picker и немигрированные roots Readings, Prayerbook и
 Bible. Рекомендуемый следующий этап — отдельная миграция **Readings root**, без
 изменения его production resolver и без автоматического начала в этом commit.

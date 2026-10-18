@@ -67,24 +67,49 @@ final dayOptionsProvider = Provider<List<DayOption>>((ref) {
 /// diocese it was chosen in (a temporary route context — Settings never
 /// change).
 class HoursChoice {
-  const HoursChoice(this.dayId, {this.diocese});
+  const HoursChoice(
+    this.dayId, {
+    this.diocese,
+    this.requireExact = false,
+    this.fromSearch = false,
+  });
   final String dayId;
   final String? diocese;
+  final bool requireExact;
+  final bool fromSearch;
 
   @override
   bool operator ==(Object other) =>
-      other is HoursChoice && other.dayId == dayId && other.diocese == diocese;
+      other is HoursChoice &&
+      other.dayId == dayId &&
+      other.diocese == diocese &&
+      other.requireExact == requireExact &&
+      other.fromSearch == fromSearch;
 
   @override
-  int get hashCode => Object.hash(dayId, diocese);
+  int get hashCode => Object.hash(dayId, diocese, requireExact, fromSearch);
 }
 
 class HoursLiturgicalOverrideNotifier
     extends StateNotifier<Map<String, HoursChoice>> {
   HoursLiturgicalOverrideNotifier() : super(const {});
 
-  void select(DateTime date, String dayId, {String? diocese}) {
-    state = {...state, _dateKey(date): HoursChoice(dayId, diocese: diocese)};
+  void select(
+    DateTime date,
+    String dayId, {
+    String? diocese,
+    bool requireExact = false,
+    bool fromSearch = false,
+  }) {
+    state = {
+      ...state,
+      _dateKey(date): HoursChoice(
+        dayId,
+        diocese: diocese,
+        requireExact: requireExact,
+        fromSearch: fromSearch,
+      ),
+    };
   }
 
   void clear(DateTime date) {
@@ -139,6 +164,7 @@ final hoursLiturgicalSelectionProvider = Provider<HoursLiturgicalSelection>((
   return resolveHoursLiturgicalSelection(
     ref.watch(dayOptionsProvider),
     selectedDayId: choice?.dayId,
+    requireExact: choice?.requireExact ?? false,
     selectedDiocese: choice?.diocese,
     primaryDiocese: ref.watch(dioceseSelectionProvider).primary,
   );

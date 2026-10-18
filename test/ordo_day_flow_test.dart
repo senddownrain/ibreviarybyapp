@@ -16,7 +16,6 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart' as production;
-import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
 import 'package:mybrev_flutter/screens/ora_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
 import 'package:mybrev_flutter/widgets/hours_options_sheet.dart';
@@ -289,7 +288,6 @@ void main() {
     await tester.pumpAndSettle();
     await openOrdo(tester);
     expect(find.byType(OrdoScreen), findsOneWidget);
-    expect(find.byType(HoraPickerScreen), findsNothing);
     expect(
       tester.widget<OrdoScreen>(find.byType(OrdoScreen)).dayId,
       option.templates.last.id,
@@ -748,17 +746,30 @@ void main() {
           tester,
           find.byKey(const Key('picker-feast-sv-nicholas-2026-12-06')),
         );
+        if (readingsMode) {
+          expect(find.byType(AlertDialog), findsOneWidget);
+          await tester.tap(find.text('Скасаваць'));
+          await tester.pumpAndSettle();
+          expect(find.byType(LiturgicalPickerScreen), findsOneWidget);
+          await tapVisible(
+            tester,
+            find.byKey(const Key('picker-feast-sv-nicholas-2026-12-06')),
+          );
+          await tester.tap(find.text('Адкрыць чытанні дня'));
+          await tester.pumpAndSettle();
+        }
         final uri = GoRouterState.of(
           tester.element(
-            find.byType(readingsMode ? ReadingsScreen : HoraPickerScreen).last,
+            find.byType(readingsMode ? ReadingsScreen : HomeScreen).last,
           ),
         ).uri;
-        expect(uri.queryParameters['diocese'], 'minsk-mohilev');
+        if (readingsMode)
+          expect(uri.queryParameters['diocese'], 'minsk-mohilev');
         if (readingsMode) {
           expect(uri.queryParameters['date'], '2027-12-06');
           expect(uri.queryParameters['option'], 'sv-nicholas');
           expect(find.byType(ReadingsScreen), findsWidgets);
-          expect(find.textContaining('Уласных чытанняў няма.'), findsOneWidget);
+          expect(find.byType(AlertDialog), findsNothing);
           final dayId = uri.queryParameters['dayId']!;
           final docs = ParsedReadingsService().cachedForDate(
             DateTime(2027, 12, 6),
@@ -775,24 +786,19 @@ void main() {
             isTrue,
           );
         } else {
-          final picker = tester.widget<HoraPickerScreen>(
-            find.byType(HoraPickerScreen),
-          );
-          expect(picker.date, DateTime(2027, 12, 6));
-          expect(picker.diocese, 'minsk-mohilev');
-          final content = service.contentForDate(
-            picker.date,
-            diocese: picker.diocese!,
-          );
-          final option = content.optionOwning(picker.dayId)!;
-          expect(option.optionId, 'sv-nicholas');
+          expect(uri.path, '/hours');
+          final picked = container.read(hoursLiturgicalSelectionProvider);
+          expect(container.read(selectedDateProvider), DateTime(2027, 12, 6));
+          expect(picked.diocese, 'minsk-mohilev');
+          expect(picked.selected!.optionId, 'sv-nicholas');
+          expect(picked.day!.field('laudesHymn'), isNotEmpty);
           expect(
-            option.templates.map((t) => t.label),
+            picked.selected!.templates.map((t) => t.label),
             contains('Пра пастыраў'),
           );
           expect(
-            content.dayById(picker.dayId)!.field('laudesHymn'),
-            isNotEmpty,
+            find.textContaining('Адкрыты тэксты за 2027 год.'),
+            findsOneWidget,
           );
           await tapVisible(tester, find.text('Ютрань'));
           expect(find.byType(OraScreen), findsOneWidget);
@@ -968,17 +974,14 @@ void main() {
       final rows = find.byKey(const Key('picker-feast-sv-nicholas-2027-12-06'));
       expect(rows, findsNWidgets(2));
       await tapVisible(tester, rows.last);
-      final screen = tester.widget<HoraPickerScreen>(
-        find.byType(HoraPickerScreen),
-      );
-      expect(screen.diocese, 'grodno');
-      expect(screen.date, DateTime(2028, 12, 6));
+      expect(find.byType(HomeScreen), findsOneWidget);
+      final picked = container.read(hoursLiturgicalSelectionProvider);
+      expect(picked.diocese, 'grodno');
+      expect(container.read(selectedDateProvider), DateTime(2028, 12, 6));
+      expect(picked.selected!.optionId, 'sv-nicholas');
       expect(
-        service
-            .contentForDate(screen.date, diocese: 'grodno')
-            .optionOwning(screen.dayId)!
-            .optionId,
-        'sv-nicholas',
+        find.textContaining('Адкрыты тэксты за 2028 год.'),
+        findsOneWidget,
       );
       expect(
         container.read(dioceseSelectionProvider).selected,
@@ -994,6 +997,48 @@ void main() {
       expect(router.canPop(), isTrue);
     },
   );
+
+  for (final prefix in ['/hora', '/hours/hora']) {
+    testWidgets(
+      '$prefix preserves encoded id and rejects an unavailable Office',
+      (tester) async {
+        final id = rosary().templates.last.id;
+        final (router, container) = await start(
+          tester,
+          location: Uri(
+            pathSegments: [
+              '',
+              ...prefix.substring(1).split('/'),
+              '2026-10-07',
+              id,
+            ],
+            queryParameters: {'diocese': 'minsk-mohilev'},
+          ).toString(),
+        );
+        expect(router.routeInformationProvider.value.uri.path, '/hours');
+        expect(find.byType(HomeScreen), findsOneWidget);
+        expect(container.read(hoursLiturgicalSelectionProvider).dayId, id);
+        router.go(
+          Uri(
+            pathSegments: [
+              '',
+              ...prefix.substring(1).split('/'),
+              '2026-10-07',
+              'missing/id',
+            ],
+            queryParameters: {'diocese': 'grodno'},
+          ).toString(),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          container.read(hoursLiturgicalSelectionProvider).selected,
+          isNull,
+        );
+        expect(find.text('Няма літургічнага дня'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   for (final year in [2025, 2031]) {
     testWidgets(
@@ -1113,7 +1158,7 @@ void main() {
         scale: scale,
         location: '/hours/hora/2026-10-07/${rosary().dayId}',
       );
-      await tapVisible(tester, find.byKey(const Key('hora-open-ordo')));
+      await openOrdo(tester);
       await tapVisible(tester, find.byKey(const Key('ordo-open-month')));
       final cell = tester.getSize(find.byKey(const Key('ordo-day-2026-10-07')));
       expect(cell.width, greaterThanOrEqualTo(44));

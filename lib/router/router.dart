@@ -13,7 +13,6 @@ import 'package:mybrev_flutter/screens/compendium_screen.dart';
 import 'package:mybrev_flutter/screens/design_bottom_navigation_lab_screen.dart';
 import 'package:mybrev_flutter/screens/favorites_screen.dart';
 import 'package:mybrev_flutter/screens/home_screen.dart';
-import 'package:mybrev_flutter/screens/hora_picker_screen.dart';
 import 'package:mybrev_flutter/screens/liturgical_day_options_screen.dart';
 import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
 import 'package:mybrev_flutter/screens/my_prayers_screen.dart';
@@ -102,13 +101,6 @@ const _hoursPickerOptionsRoute = AppRouteDescriptor(
   branch: AppBranch.hours,
   defaultChromeMode: ReaderChromeMode.full,
   topChromeOwner: TopChromeOwner.legacy,
-);
-const _horaRoute = AppRouteDescriptor(
-  id: 'hours.hora',
-  branch: AppBranch.hours,
-  defaultChromeMode: ReaderChromeMode.full,
-  topChromeOwner: TopChromeOwner.legacy,
-  showsNavigationDock: false,
 );
 const _oraRoute = AppRouteDescriptor(
   id: 'hours.ora',
@@ -244,11 +236,8 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: '/hours',
-              pageBuilder: (context, state) => _branchPage(
-                state,
-                hoursRootRoute,
-                const HomeScreen(key: PageStorageKey('hours-root')),
-              ),
+              pageBuilder: (context, state) =>
+                  _branchPage(state, hoursRootRoute, _hoursHost(state)),
               routes: [
                 GoRoute(
                   path: 'picker',
@@ -299,22 +288,7 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: 'hora/:date/:dayId',
-                  pageBuilder: (context, state) => _branchPage(
-                    state,
-                    _horaRoute,
-                    HoursDateContext(
-                      date:
-                          _parseDate(state.pathParameters['date']) ??
-                          DateTime.now(),
-                      child: HoraPickerScreen(
-                        dayId: state.pathParameters['dayId']!,
-                        diocese: state.uri.queryParameters['diocese'],
-                        date:
-                            _parseDate(state.pathParameters['date']) ??
-                            DateTime.now(),
-                      ),
-                    ),
-                  ),
+                  redirect: (_, state) => _legacyHoursLocation(state),
                 ),
                 GoRoute(
                   path: 'ora/:date/:dayId/:type',
@@ -652,15 +626,7 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/hora/:date/:dayId',
-      redirect: (_, state) => _withSameQuery(
-        _encodedPath([
-          'hours',
-          'hora',
-          state.pathParameters['date']!,
-          state.pathParameters['dayId']!,
-        ]),
-        state,
-      ),
+      redirect: (_, state) => _legacyHoursLocation(state),
     ),
     GoRoute(
       path: '/reading/:readingId',
@@ -808,6 +774,28 @@ Page<void> _branchPage(
       controller: appShellState.branches[descriptor.branch]!,
       child: child,
     ),
+  );
+}
+
+String _legacyHoursLocation(GoRouterState state) => _withQuery('/hours', {
+  ...state.uri.queryParameters,
+  'date': state.pathParameters['date']!,
+  'dayId': state.pathParameters['dayId']!,
+});
+
+Widget _hoursHost(GoRouterState state) {
+  final query = state.uri.queryParameters;
+  final rawDate = query['date'];
+  if (rawDate == null)
+    return const HomeScreen(key: PageStorageKey('hours-root'));
+  final date = _parseDate(rawDate);
+  if (date == null)
+    return const _InvalidRoute(message: 'Некарэктная дата гадзінаў.');
+  return HoursDateContext(
+    date: date,
+    dayId: query['dayId'],
+    diocese: query['diocese'],
+    child: const HomeScreen(key: PageStorageKey('hours-root')),
   );
 }
 

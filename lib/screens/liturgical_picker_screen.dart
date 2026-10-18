@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,19 +15,15 @@ import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/ordo/ordo_picker.dart';
 import 'package:mybrev_flutter/ordo/runtime.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
-import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
-import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
-import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
-import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/widgets/ordo/vestment_marker.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 
@@ -136,65 +133,34 @@ Future<void> openPickedFeast(
           content.optionOwning(dayId)?.optionId != feast.id) {
         continue;
       }
-      await context.push<void>(
-        horaRouteForContext(
-          date: date,
-          dayId: dayId,
-          diocese: diocese,
-          optionId: feast.id,
-        ),
-      );
+      ref
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(date, dayId: dayId, diocese: diocese, fromSearch: true);
+      final selected = ref.read(hoursLiturgicalSelectionProvider);
+      if (selected.dayId != dayId || selected.selected?.optionId != feast.id) {
+        continue;
+      }
+      final messenger = ScaffoldMessenger.of(context);
+      final opened = context.push<void>('/hours');
+      _notifyPickedYear(messenger, year, date.year);
+      await opened;
       return;
     }
     final dayId = office.dayId;
     if (dayId == null) continue;
-    final loaded = loadReadingsForDate(
-      service: ParsedReadingsService(),
-      calendar: ref.read(calendarServiceProvider),
+    if (!await preparePickedFeastReadings(
+      context,
+      ref,
       date: date,
       dayId: dayId,
       diocese: diocese,
-    );
-    if (loaded == null || loaded.optionId != feast.id) continue;
-    final selection = resolveDefaultReadings(
-      readings: loaded.readings,
-      sundayCycle: loaded.sundayCycle,
-      weekdayCycle: loaded.weekdayCycle,
       optionId: feast.id,
-    );
-    final proper = selection.groups
-        .where(
-          (g) => g.documents.any(
-            (r) => r.ordoOptionRoles[feast.id]?.purpose == 'proper',
-          ),
-        )
-        .firstOrNull;
-    final plan = day.readingsPlan
-        .where((p) => p.optionId == feast.id)
-        .firstOrNull;
-    final weekday = plan?.isMemorial == true
-        ? selection.groups
-              .where(
-                (g) => g.documents.any(
-                  (r) => r.ordoOptionRoles[feast.id]?.purpose == 'weekday',
-                ),
-              )
-              .firstOrNull
-        : null;
-    final group = proper ?? weekday;
-    if (group == null) continue;
-    // Reuse the reader's existing group choice, keeping all sets and cycles.
-    final choices = ref.read(readingsMassSetSelectionProvider.notifier);
-    choices.state = {...choices.state, '${day.date}|$dayId|@group': group.key};
-    if (proper == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Уласных чытанняў няма. Адкрываем чытанні з дня.'),
-        ),
-      );
-    }
+    ))
+      return;
+    if (!context.mounted) return;
     AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
-    await context.push<void>(
+    final messenger = ScaffoldMessenger.of(context);
+    final opened = context.push<void>(
       readingsRouteForContext(
         date: date,
         dayId: dayId,
@@ -202,6 +168,8 @@ Future<void> openPickedFeast(
         optionId: feast.id,
       ),
     );
+    _notifyPickedYear(messenger, year, date.year);
+    await opened;
     return;
   }
   if (context.mounted) {
@@ -209,6 +177,27 @@ Future<void> openPickedFeast(
       const SnackBar(content: Text('Тэксты гэтага святкавання недаступныя')),
     );
   }
+}
+
+void _notifyPickedYear(
+  ScaffoldMessengerState messenger,
+  int searched,
+  int opened,
+) {
+  if (searched == opened) return;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!messenger.mounted) return;
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 5),
+        content: Text(
+          'У $searched годзе гэтае святкаванне не адзначаецца. '
+          'Адкрыты тэксты за $opened год.',
+        ),
+      ),
+    );
+  });
 }
 
 class LiturgicalPickerScreen extends ConsumerStatefulWidget {
@@ -860,10 +849,21 @@ class _FeastRow extends StatelessWidget {
         (note) => !feast.transferred || !note.startsWith('Перанесена з '),
       ),
       if (feast.transferred && feast.date != null)
-        'Перанесена на ${fixedDateKey(feast.date!)}',
+        'Перанесена на ${dayMonthLabel(feast.date!)}',
       if (feast.status != null) feast.status!,
     ];
+    final accent = visual?.accent ?? cs.primary;
+    final ink = Color.lerp(
+      accent,
+      cs.onSurface,
+      theme.brightness == Brightness.dark ? 0.48 : 0.18,
+    )!;
     return Card(
+      color: Color.alphaBlend(accent.withValues(alpha: 0.035), cs.surface),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: accent.withValues(alpha: 0.25)),
+      ),
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         key: Key('picker-feast-${feast.id}-${feast.date}'),
@@ -875,8 +875,57 @@ class _FeastRow extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
             child: Row(
               children: [
-                VestmentMarker(colors: feast.colors, size: 16),
-                const SizedBox(width: 14),
+                Container(
+                  key: Key('picker-date-tile-${feast.id}'),
+                  width: MediaQuery.sizeOf(context).width <= 340 ? 76 : 92,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (displayDate != null) ...[
+                        Semantics(
+                          label: dayMonthLabel(displayDate),
+                          excludeSemantics: true,
+                          child: Column(
+                            children: [
+                              Text(
+                                '${dateOfIso(displayDate).day}',
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: ink,
+                                ),
+                              ),
+                              Text(
+                                dayMonthLabel(
+                                  displayDate,
+                                ).split(' ').skip(1).join(' '),
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: ink,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else
+                        Text(
+                          'Дата не вызначана',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.labelMedium,
+                        ),
+                      const SizedBox(height: 8),
+                      VestmentMarker(colors: feast.colors, size: 16),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -890,7 +939,6 @@ class _FeastRow extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         [
-                          if (displayDate != null) fixedDateKey(displayDate),
                           if (feast.kind == 'movable') 'Рухомае',
                           if (rank.isNotEmpty) rank,
                           vestmentColorsLabel(feast.option),

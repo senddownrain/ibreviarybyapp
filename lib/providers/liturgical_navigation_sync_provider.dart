@@ -17,7 +17,13 @@ class LiturgicalNavigationController {
 
   final Ref ref;
 
-  void openDate(DateTime value, {String? dayId, String? diocese}) {
+  void openDate(
+    DateTime value, {
+    String? dayId,
+    String? diocese,
+    bool requireExact = false,
+    bool fromSearch = false,
+  }) {
     final date = DateUtils.dateOnly(value);
     if (date.isBefore(kCalendarFirstDate) || date.isAfter(kCalendarLastDate)) {
       return;
@@ -32,7 +38,13 @@ class LiturgicalNavigationController {
     if (dayId != null) {
       ref
           .read(hoursLiturgicalOverridesProvider.notifier)
-          .select(date, dayId, diocese: diocese);
+          .select(
+            date,
+            dayId,
+            diocese: diocese,
+            requireExact: requireExact,
+            fromSearch: fromSearch,
+          );
     }
     ref.read(selectedDateProvider.notifier).state = date;
 

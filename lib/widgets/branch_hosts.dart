@@ -19,9 +19,17 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
 
 class HoursDateContext extends ConsumerStatefulWidget {
-  const HoursDateContext({super.key, required this.date, required this.child});
+  const HoursDateContext({
+    super.key,
+    required this.date,
+    required this.child,
+    this.dayId,
+    this.diocese,
+  });
 
   final DateTime date;
+  final String? dayId;
+  final String? diocese;
   final Widget child;
 
   @override
@@ -38,7 +46,10 @@ class _HoursDateContextState extends ConsumerState<HoursDateContext> {
   @override
   void didUpdateWidget(covariant HoursDateContext oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!DateUtils.isSameDay(oldWidget.date, widget.date)) _applyDate();
+    if (!DateUtils.isSameDay(oldWidget.date, widget.date) ||
+        oldWidget.dayId != widget.dayId ||
+        oldWidget.diocese != widget.diocese)
+      _applyDate();
   }
 
   void _applyDate() {
@@ -47,11 +58,25 @@ class _HoursDateContextState extends ConsumerState<HoursDateContext> {
     // the provider here would notify sync listeners mid-build.
     final binding = WidgetsBinding.instance;
     if (binding.schedulerPhase == SchedulerPhase.idle) {
-      ref.read(selectedDateProvider.notifier).state = date;
+      ref
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(
+            date,
+            dayId: widget.dayId,
+            diocese: widget.diocese,
+            requireExact: widget.dayId != null,
+          );
     } else {
       binding.addPostFrameCallback((_) {
         if (!mounted) return;
-        ref.read(selectedDateProvider.notifier).state = date;
+        ref
+            .read(liturgicalNavigationControllerProvider)
+            .openDate(
+              date,
+              dayId: widget.dayId,
+              diocese: widget.diocese,
+              requireExact: widget.dayId != null,
+            );
       });
     }
   }
