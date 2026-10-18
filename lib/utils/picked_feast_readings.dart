@@ -24,8 +24,9 @@ Future<bool> preparePickedFeastReadings(
     dayId: dayId,
     diocese: diocese,
   );
-  if (loaded == null || loaded.optionId != optionId)
+  if (loaded == null || loaded.optionId != optionId) {
     return _unavailable(context);
+  }
   final selection = resolveDefaultReadings(
     readings: loaded.readings,
     sundayCycle: loaded.sundayCycle,

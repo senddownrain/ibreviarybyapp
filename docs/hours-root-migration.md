@@ -46,8 +46,8 @@ prototype. Ручной `dayId` хранится в session-state с ключо�
 Нажатие на дату открывает упрощённый adaptive sheet: сегодня, предыдущий день,
 следующий день, platform-adaptive calendar и отдельный вход в полный
 `LiturgicalPickerScreen`. На иной дате корень показывает one-tap «Сёння»; на
-сегодняшней это действие скрыто. Изменяется только `selectedDateProvider`
-Hours branch. Независимый `readingsBranchStateProvider` не затрагивается.
+сегодняшней это действие скрыто. Контекст даты и выбранного Office синхронизируется общим
+`liturgicalNavigationControllerProvider` с `readingsBranchStateProvider`.
 
 ## Ora и визуальный язык
 

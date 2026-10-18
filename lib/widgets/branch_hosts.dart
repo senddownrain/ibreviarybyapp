@@ -48,8 +48,9 @@ class _HoursDateContextState extends ConsumerState<HoursDateContext> {
     super.didUpdateWidget(oldWidget);
     if (!DateUtils.isSameDay(oldWidget.date, widget.date) ||
         oldWidget.dayId != widget.dayId ||
-        oldWidget.diocese != widget.diocese)
+        oldWidget.diocese != widget.diocese) {
       _applyDate();
+    }
   }
 
   void _applyDate() {

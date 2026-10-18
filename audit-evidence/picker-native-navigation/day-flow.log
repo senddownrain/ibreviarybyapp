@@ -1,0 +1,111 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart
+00:00 +0: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 61 ms
+[ContentStore] prayers: 115 docs in 255 ms
+[ContentStore] invitatoriums: 4 docs in 397 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 366 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 338 ms
+[ContentStore] completoriums: 35 docs in 398 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 353 ms
+[ContentStore] compendiumMeta: 1 docs in 299 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 362 ms
+[ContentStore] songs: 447 docs in 498 ms
+[ContentStore] compendium: 27 docs in 508 ms
+[ContentStore] liturgicalTemplates: 16 docs in 691 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 980 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 1128 ms
+[ContentStore] readings: 822 docs in 1256 ms
+[ContentStore] days: 736 docs in 2998 ms
+00:04 +0: Rosary memorial has default weekday and assembled Marian Office
+00:04 +1: Office assemblies share memorial readings in ORDO order
+00:05 +2: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:26 +3: October 9 selector and ORDO keep the chosen memorial Office
+00:30 +4: Day → ORDO → Month → Day → back preserves month cursor
+00:36 +5: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:40 +6: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:46 +7: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:49 +8: Hours date action updates the visible selected day
+00:53 +9: ORDO reused route adopts its new date and source
+00:58 +10: Hours calendar icon opens the day; arrows keep one route
+01:04 +11: ORDO date-only calendar applies without closing and preserves shared dioceses
+01:07 +12: ORDO dioceses persist through the shared settings and Month context
+[data] CACHE HIT  readings 2026-08-26
+01:11 +13: ORDO last action clears Android bottom obstruction 24.0 at 200 percent text
+01:13 +14: ORDO last action clears Android bottom obstruction 48.0 at 200 percent text
+01:14 +15: Hours calendar search reaches the existing period and feast picker
+01:16 +16: hours search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  hour laudes 06-12-sv-nicholas--pastors
+01:29 +17: hours periods keep Ordinary II Tuesday navigation
+01:33 +18: hours Christmas opens 2027-01-01 on its canonical day
+01:35 +19: hours Christmas opens 2027-01-02 on its canonical day
+01:37 +20: readings search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2027-12-06
+[data] CACHE HIT  readings 2027-12-06
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextContainingWidgetFinder:<Found 0 widgets with text containing Уласных чытанняў няма.:
+[]>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart:785:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart line 785
+The test description was:
+  readings search opens impeded Nicholas texts and keeps search on Back
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:47 +20 -1: readings search opens impeded Nicholas texts and keeps search on Back [E]
+  Test failed. See exception logs above.
+  The test description was: readings search opens impeded Nicholas texts and keeps search on Back
+  
+01:47 +20 -1: readings periods keep Ordinary II Tuesday navigation
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-01-20
+01:50 +21 -1: readings Christmas opens 2027-01-01 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-01
+01:52 +22 -1: readings Christmas opens 2027-01-02 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-02
+01:55 +23 -1: movable feast search opens its proper readings in the existing reader
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-04-05
+[data] CACHE HIT  readings 2026-04-05
+02:00 +24 -1: Grodno impeded in 2027 opens Grodno in 2028, preserving Settings
+02:03 +25 -1: /hora preserves encoded id and rejects an unavailable Office
+02:04 +26 -1: /hours/hora preserves encoded id and rejects an unavailable Office
+02:05 +27 -1: production route tree hides dock and hit-tests readings palette
+[data] CACHE HIT  readings 2026-10-07
+02:07 +28 -1: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+02:13 +29 -1: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+02:17 +30 -1: Period notes are collapsed and can be opened
+02:18 +31 -1: colour date picker returns date on TargetPlatform.android
+02:19 +32 -1: colour date picker returns date on TargetPlatform.iOS
+02:20 +33 -1: day and month fit 320px at text scale 1.0
+02:23 +34 -1: day and month fit 320px at text scale 1.3
+02:25 +35 -1: day and month fit 320px at text scale 1.5
+02:28 +36 -1: day and month fit 320px at text scale 2.0
+02:31 +37 -1: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+02:31 +38 -1: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+02:32 +39 -1: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+02:32 +40 -1: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+02:32 +41 -1: (tearDownAll)

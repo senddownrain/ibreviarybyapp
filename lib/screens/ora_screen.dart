@@ -613,9 +613,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
                 date: widget.date,
                 dayId: widget.dayId,
                 diocese: selection.diocese!,
-                optionId: selection.selected!.optionId!,
-              ))
+                optionId: selection.selected!.optionId,
+              )) {
                 return;
+              }
               if (!context.mounted) return;
             }
             AppNavigationScope.of(context).openReadingsFromOra(

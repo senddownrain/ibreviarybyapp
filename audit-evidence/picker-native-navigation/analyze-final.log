@@ -1,0 +1,31 @@
+Analyzing ibreviarybyapp...                                     
+
+   info - Statements in an if should be enclosed in a block - lib\router\router.dart:790:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\router\router.dart:790:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\router\router.dart:793:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\router\router.dart:793:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\liturgical_picker_screen.dart:159:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\liturgical_picker_screen.dart:159:7 - curly_braces_in_flow_control_structures
+warning - The '!' will have no effect because the receiver can't be null - lib\screens\ora_screen.dart:616:55 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\screens\ora_screen.dart:616:55 - unnecessary_non_null_assertion
+   info - Statements in an if should be enclosed in a block - lib\screens\ora_screen.dart:618:17 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\ora_screen.dart:618:17 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\utils\picked_feast_readings.dart:28:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\utils\picked_feast_readings.dart:28:5 - curly_braces_in_flow_control_structures
+warning - The '!' will have no effect because the receiver can't be null - lib\widgets\app_shell.dart:121:49 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\widgets\app_shell.dart:121:49 - unnecessary_non_null_assertion
+   info - Statements in an if should be enclosed in a block - lib\widgets\app_shell.dart:123:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\app_shell.dart:123:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\branch_hosts.dart:52:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\branch_hosts.dart:52:7 - curly_braces_in_flow_control_structures
+warning - Unused import: 'package:mybrev_flutter/navigation/app_navigation.dart' - test\ordo_day_flow_test.dart:20:8 - unused_import
+warning - Unused import: 'package:mybrev_flutter/navigation/app_navigation.dart' - test\ordo_day_flow_test.dart:20:8 - unused_import
+warning - Unused import: 'package:mybrev_flutter/navigation/app_navigation.dart' - test\ordo_day_flow_test.dart:20:8 - unused_import
+   info - Statements in an if should be enclosed in a block - test\ordo_day_flow_test.dart:70:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - test\ordo_day_flow_test.dart:70:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - test\ordo_day_flow_test.dart:70:5 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - test\ordo_day_flow_test.dart:800:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - test\ordo_day_flow_test.dart:800:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - test\ordo_day_flow_test.dart:800:11 - curly_braces_in_flow_control_structures
+
+27 issues found. (ran in 520.7s)

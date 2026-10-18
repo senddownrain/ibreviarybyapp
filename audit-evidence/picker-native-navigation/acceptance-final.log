@@ -1,0 +1,138 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 59 ms
+[ContentStore] prayers: 115 docs in 179 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms
+[ContentStore] invitatoriums: 4 docs in 38 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] compendiumMeta: 1 docs in 67 ms
+[ContentStore] completoriums: 35 docs in 93 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 95 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 103 ms
+[ContentStore] songs: 447 docs in 114 ms
+[ContentStore] liturgicalTemplates: 16 docs in 166 ms
+[ContentStore] compendium: 27 docs in 162 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 248 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 288 ms
+[ContentStore] readings: 822 docs in 421 ms
+[ContentStore] days: 736 docs in 855 ms
+00:01 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Rosary memorial has default weekday and assembled Marian Office
+00:01 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Office assemblies share memorial readings in ORDO order
+00:02 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:14 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:17 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:20 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:23 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:25 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:27 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours date action updates the visible selected day
+00:28 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO reused route adopts its new date and source
+00:30 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar icon opens the day; arrows keep one route
+00:31 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO date-only calendar applies without closing and preserves shared dioceses
+00:33 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO dioceses persist through the shared settings and Month context
+[data] CACHE HIT  readings 2026-08-26
+00:36 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 24.0 at 200 percent text
+00:38 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 48.0 at 200 percent text
+00:39 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar search reaches the existing period and feast picker
+00:40 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  hour laudes 06-12-sv-nicholas--pastors
+00:45 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours periods keep Ordinary II Tuesday navigation
+00:47 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours Christmas opens 2027-01-01 on its canonical day
+00:48 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours Christmas opens 2027-01-02 on its canonical day
+00:49 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2027-12-06
+[data] CACHE HIT  readings 2027-12-06
+00:53 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings periods keep Ordinary II Tuesday navigation
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-01-20
+00:55 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings Christmas opens 2027-01-01 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-01
+00:57 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings Christmas opens 2027-01-02 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-02
+00:58 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: movable feast search opens its proper readings in the existing reader
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-04-05
+[data] CACHE HIT  readings 2026-04-05
+01:00 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Grodno impeded in 2027 opens Grodno in 2028, preserving Settings
+01:02 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours search confirms day readings before changing tabs
+[data] CACHE HIT  readings 2027-12-06
+01:05 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: /hora preserves encoded id and rejects an unavailable Office
+01:05 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: /hours/hora preserves encoded id and rejects an unavailable Office
+01:06 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: production route tree hides dock and hit-tests readings palette
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-08
+[data] CACHE HIT  readings 2026-10-07
+01:09 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+01:11 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+01:13 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Period notes are collapsed and can be opened
+01:14 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.android
+01:14 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.iOS
+01:15 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.0
+01:16 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.3
+01:18 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.5
+01:19 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 2.0
+01:21 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+01:21 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+01:21 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+01:22 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+01:22 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (tearDownAll)
+01:22 +43: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart
+01:25 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (setUpAll)
+01:25 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter keeps first sorted group and calendar cycle fallback
+01:25 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter linked dayId wins and manual cycle can return to automatic
+01:25 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter weekday and non-cycle groups expose only real cycles
+01:25 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+01:28 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load
+01:29 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: period reading uses the Liturgy of the Hours title
+01:29 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: celebration titles do not get a lectionary year suffix
+01:29 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: liturgical route formats its title with a Roman week number
+01:29 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: synthetic fallback keeps alleluia text and lone alt chorus
+01:30 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: a reading sentence opens an accessible color palette
+01:31 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+01:33 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: manual cycle and reading group survive leaving the date
+01:35 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: Today moves Readings and Hours to the same date
+01:35 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (tearDownAll)
+01:36 +56: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart
+01:38 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: route entry owns Full Compact Hidden and pop restores previous mode
+01:38 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: each branch owns an independent chrome controller
+01:38 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: Full to Full route change publishes descriptor ownership
+01:38 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: contextual bottom slot does not change the reader chrome mode
+01:38 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: live bottom slot survives URI reset and inactive owner can release it
+01:38 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: Ora return token is valid only while its route entry exists
+01:38 +62: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart
+01:41 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: (setUpAll)
+01:41 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: search has no visible year control
+01:44 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year text search finds the same diocesan variant in a legal year
+01:47 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year text identity never substitutes another source or rank
+01:49 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year no legacy days source in the picker
+01:49 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year fixed, movable, transferred and diocesan, on final dates, with their colours
+01:50 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year Nicholas stays white and visible when impeded; permission is local
+01:51 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year all active layered definitions survive, without merging variants
+01:51 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 320.0, Brightness.dark, large text
+01:54 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 320.0, Brightness.light, large text
+01:56 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.dark, large text
+01:58 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.light, large text
+01:59 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.dark, large text
+02:01 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+02:02 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year a year override moves a diocesan celebration (Grodno 2027)
+02:03 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Christmas 2025 includes every date through Baptism once
+02:03 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Christmas 2026 includes every date through Baptism once
+02:03 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Christmas 2027 includes every date through Baptism once
+02:03 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Advent, 17–24 December, Christmas, Lent, Holy Week, Easter, Ordinary Time before and after Lent
+02:03 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: (tearDownAll)
+02:03 +80: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart
+02:06 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: readings route preserves the Ora date and selected day context
+02:06 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: readings route omits an empty optional day context
+02:06 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: Ora route safely carries the selected day and hour
+02:06 +83: All tests passed!

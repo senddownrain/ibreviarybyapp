@@ -118,9 +118,10 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
           date: date,
           dayId: selection.dayId!,
           diocese: selection.diocese!,
-          optionId: selection.selected!.optionId!,
-        ))
+          optionId: selection.selected!.optionId,
+        )) {
           return;
+        }
         if (!context.mounted) return;
       }
     }

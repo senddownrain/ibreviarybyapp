@@ -786,11 +786,13 @@ String _legacyHoursLocation(GoRouterState state) => _withQuery('/hours', {
 Widget _hoursHost(GoRouterState state) {
   final query = state.uri.queryParameters;
   final rawDate = query['date'];
-  if (rawDate == null)
+  if (rawDate == null) {
     return const HomeScreen(key: PageStorageKey('hours-root'));
+  }
   final date = _parseDate(rawDate);
-  if (date == null)
+  if (date == null) {
     return const _InvalidRoute(message: 'Некарэктная дата гадзінаў.');
+  }
   return HoursDateContext(
     date: date,
     dayId: query['dayId'],

@@ -147,6 +147,33 @@ void main() {
     expect(hours.value, ReaderChromeMode.compact);
   });
 
+  test(
+    'live bottom slot survives URI reset and inactive owner can release it',
+    () {
+      final controller = BranchShellController(
+        AppBranch.readings,
+        _readingsRoot,
+      );
+      addTearDown(controller.dispose);
+      const reader = AppRouteEntry(id: 'reader', descriptor: _readingsRoot);
+      const chooser = AppRouteEntry(id: 'chooser', descriptor: _readingsRoot);
+      controller.activate(reader);
+      controller.requestContextualBottomSlot(reader.id, visible: true);
+      controller.resetEntry(
+        const AppRouteEntry(
+          id: 'reader',
+          descriptor: _readingsRoot,
+          documentKey: 'normalized-query',
+        ),
+      );
+      expect(controller.navigationDockSuppressed, isTrue);
+      controller.activate(chooser);
+      controller.requestContextualBottomSlot(reader.id, visible: false);
+      controller.reveal(reader);
+      expect(controller.navigationDockSuppressed, isFalse);
+    },
+  );
+
   test('Ora return token is valid only while its route entry exists', () {
     final shell = AppShellState(
       roots: const [_hoursRoot, _readingsRoot, _prayerbookRoot, _bibleRoot],

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/gestures.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,6 +61,18 @@ class _MinskDiocese extends DioceseSelectionNotifier {
     selected: ['minsk-mohilev'],
     primary: 'minsk-mohilev',
   );
+}
+
+TapGestureRecognizer? _tapIn(InlineSpan span) {
+  if (span is! TextSpan) return null;
+  if (span.recognizer is TapGestureRecognizer) {
+    return span.recognizer as TapGestureRecognizer;
+  }
+  for (final child in span.children ?? <InlineSpan>[]) {
+    final tap = _tapIn(child);
+    if (tap != null) return tap;
+  }
+  return null;
 }
 
 void main() {
@@ -230,6 +243,26 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(target);
     await tester.pumpAndSettle();
+  }
+
+  Future<void> checkPalette(WidgetTester tester) async {
+    final text = find.byWidgetPredicate(
+      (widget) => widget is RichText && _tapIn(widget.text) != null,
+    );
+    final target = text.first;
+    await Scrollable.ensureVisible(tester.element(target), alignment: 0.5);
+    await tester.pumpAndSettle();
+    _tapIn(tester.widget<RichText>(target).text)!.onTap!();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-highlight-palette')), findsOneWidget);
+    expect(find.byKey(const Key('app-dock-android')), findsNothing);
+    expect(
+      find.byKey(const Key('readings-highlight-amber')).hitTestable(),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const Key('readings-highlight-cancel')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
   }
 
   // ORDO is a separate route. Header calendar actions now open the shared
@@ -763,11 +796,13 @@ void main() {
             find.byType(readingsMode ? ReadingsScreen : HomeScreen).last,
           ),
         ).uri;
-        if (readingsMode)
+        if (readingsMode) {
           expect(uri.queryParameters['diocese'], 'minsk-mohilev');
+        }
         if (readingsMode) {
           expect(uri.queryParameters['date'], '2027-12-06');
           expect(uri.queryParameters['option'], 'sv-nicholas');
+          await checkPalette(tester);
           expect(find.byType(ReadingsScreen), findsWidgets);
           expect(find.byType(AlertDialog), findsNothing);
           final dayId = uri.queryParameters['dayId']!;
@@ -848,6 +883,7 @@ void main() {
       await tapVisible(tester, find.byKey(const Key('picker-period-ordinary')));
       await tapVisible(tester, find.byKey(const Key('picker-week-2')));
       await tapVisible(tester, find.byKey(const Key('picker-day-3')));
+      if (readingsMode) await checkPalette(tester);
       expect(router.routeInformationProvider.value.uri.path, '/$branch');
       expect(container.read(selectedDateProvider), DateTime(2026, 1, 20));
       expect(find.byType(LiturgicalPickerScreen), findsNothing);
@@ -998,6 +1034,43 @@ void main() {
     },
   );
 
+  testWidgets('Hours search confirms day readings before changing tabs', (
+    tester,
+  ) async {
+    final (_, container) = await start(
+      tester,
+      location: '/hours/picker',
+      selectedDate: DateTime(2026, 12, 6),
+      onlyMinsk: true,
+    );
+    await tester.tap(find.text('Святы'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('picker-feast-search')),
+      '06.12',
+    );
+    await tester.pumpAndSettle();
+    await tapVisible(
+      tester,
+      find.byKey(const Key('picker-feast-sv-nicholas-2026-12-06')),
+    );
+    expect(find.byType(HomeScreen), findsOneWidget);
+    await tester.tap(find.byKey(const Key('app-destination-Чытанні')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.tap(find.text('Скасаваць'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeScreen), findsOneWidget);
+    await tester.tap(find.byKey(const Key('app-destination-Чытанні')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Адкрыць чытанні дня'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ReadingsScreen), findsOneWidget);
+    expect(container.read(selectedDateProvider), DateTime(2027, 12, 6));
+    await checkPalette(tester);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final prefix in ['/hora', '/hours/hora']) {
     testWidgets(
       '$prefix preserves encoded id and rejects an unavailable Office',
@@ -1039,6 +1112,78 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    'production route tree hides dock and hit-tests readings palette',
+    (tester) async {
+      final (router, _) = await start(
+        tester,
+        location: '/readings?date=2026-10-07',
+      );
+      expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
+      final text = find.byWidgetPredicate(
+        (widget) =>
+            widget is RichText &&
+            widget.text is TextSpan &&
+            _tapIn(widget.text) != null,
+      );
+      await Scrollable.ensureVisible(
+        tester.element(text.first),
+        alignment: 0.5,
+      );
+      await tester.pumpAndSettle();
+      _tapIn(tester.widget<RichText>(text.first).text)!.onTap!();
+      await tester.pumpAndSettle();
+      final palette = find.byKey(const Key('readings-highlight-palette'));
+      expect(palette, findsOneWidget);
+      expect(find.byKey(const Key('app-dock-android')), findsNothing);
+      // Query normalization reuses the same live reader and its selection.
+      router.go('/readings?date=2026-10-07&option=our-lady-rosary');
+      await tester.pumpAndSettle();
+      production.appShellState.notifyListeners();
+      await tester.pumpAndSettle();
+      expect(palette, findsOneWidget);
+      expect(find.byKey(const Key('app-dock-android')), findsNothing);
+      expect(
+        find.byKey(const Key('readings-highlight-amber')).hitTestable(),
+        findsOneWidget,
+      );
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const Key('readings-highlight-amber')));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      });
+      await tester.pumpAndSettle();
+      expect(palette, findsNothing);
+      expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
+      final saved = HiveService.settingsBox.keys.where(
+        (key) => key.toString().startsWith('readingsHighlight:'),
+      );
+      expect(
+        saved.any(
+          (key) => (HiveService.settingsBox.get(key) as Map).values.contains(
+            'amber',
+          ),
+        ),
+        isTrue,
+      );
+      _tapIn(tester.widget<RichText>(text.first).text)!.onTap!();
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(palette, findsNothing);
+      expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
+      _tapIn(tester.widget<RichText>(text.first).text)!.onTap!();
+      await tester.pumpAndSettle();
+      router.go('/readings?date=2026-10-08');
+      await tester.pumpAndSettle();
+      expect(palette, findsNothing);
+      expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
+      router.go('/readings?date=2026-10-07');
+      await tester.pumpAndSettle();
+      await checkPalette(tester);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   for (final year in [2025, 2031]) {
     testWidgets(

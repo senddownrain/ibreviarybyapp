@@ -155,8 +155,9 @@ Future<void> openPickedFeast(
       dayId: dayId,
       diocese: diocese,
       optionId: feast.id,
-    ))
+    )) {
       return;
+    }
     if (!context.mounted) return;
     AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
     final messenger = ScaffoldMessenger.of(context);

@@ -1,0 +1,2510 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 64 ms
+[ContentStore] prayers: 115 docs in 214 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms
+[ContentStore] invitatoriums: 4 docs in 133 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 121 ms
+[ContentStore] completoriums: 35 docs in 139 ms
+[ContentStore] compendiumMeta: 1 docs in 112 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 130 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 133 ms
+[ContentStore] compendium: 27 docs in 159 ms
+[ContentStore] liturgicalTemplates: 16 docs in 189 ms
+[ContentStore] songs: 447 docs in 174 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 277 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 339 ms
+[ContentStore] readings: 822 docs in 464 ms
+[ContentStore] days: 736 docs in 1016 ms
+00:01 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Rosary memorial has default weekday and assembled Marian Office
+00:02 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Office assemblies share memorial readings in ORDO order
+00:02 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:18 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: October 9 selector and ORDO keep the chosen memorial Office
+00:22 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor
+00:26 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:30 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:32 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:34 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours date action updates the visible selected day
+00:35 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO reused route adopts its new date and source
+00:38 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar icon opens the day; arrows keep one route
+00:40 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO date-only calendar applies without closing and preserves shared dioceses
+00:43 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO dioceses persist through the shared settings and Month context
+[data] CACHE HIT  readings 2026-08-26
+00:46 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 24.0 at 200 percent text
+00:48 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: ORDO last action clears Android bottom obstruction 48.0 at 200 percent text
+00:49 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Hours calendar search reaches the existing period and feast picker
+00:51 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  hour laudes 06-12-sv-nicholas--pastors
+00:57 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours periods keep Ordinary II Tuesday navigation
+00:59 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours Christmas opens 2027-01-01 on its canonical day
+01:00 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: hours Christmas opens 2027-01-02 on its canonical day
+01:02 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2027-12-06
+[data] CACHE HIT  readings 2027-12-06
+01:06 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings periods keep Ordinary II Tuesday navigation
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-01-20
+01:09 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings Christmas opens 2027-01-01 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-01
+01:11 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: readings Christmas opens 2027-01-02 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-02
+01:12 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: movable feast search opens its proper readings in the existing reader
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-04-05
+[data] CACHE HIT  readings 2026-04-05
+01:15 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Grodno impeded in 2027 opens Grodno in 2028, preserving Settings
+01:17 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: /hora preserves encoded id and rejects an unavailable Office
+01:18 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: /hours/hora preserves encoded id and rejects an unavailable Office
+01:19 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: production route tree hides dock and hit-tests readings palette
+[data] CACHE HIT  readings 2026-10-07
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: no matching candidates
+  Actual: _KeyWidgetFinder:<Found 1 widget with key [<'readings-highlight-palette'>]: [
+            AdaptiveChromeSurface-[<'readings-highlight-palette'>](dependencies:
+[InheritedCupertinoTheme, _InheritedTheme, _LocalizationsScope-[GlobalKey#890dd]]),
+          ]>
+   Which: means one was found but none were expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart:1135:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart line 1135
+The test description was:
+  production route tree hides dock and hit-tests readings palette
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:23 +28 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: production route tree hides dock and hit-tests readings palette [E]
+  Test failed. See exception logs above.
+  The test description was: production route tree hides dock and hit-tests readings palette
+  
+01:23 +28 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+01:25 +29 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+01:28 +30 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: Period notes are collapsed and can be opened
+01:29 +31 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.android
+01:29 +32 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: colour date picker returns date on TargetPlatform.iOS
+01:30 +33 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.0
+01:31 +34 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.3
+01:33 +35 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 1.5
+01:35 +36 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: day and month fit 320px at text scale 2.0
+01:37 +37 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+01:37 +38 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+01:37 +39 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+01:37 +40 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+01:38 +41 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_day_flow_test.dart: (tearDownAll)
+01:38 +41 -1: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart
+01:42 +41 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: route entry owns Full Compact Hidden and pop restores previous mode
+01:42 +42 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: each branch owns an independent chrome controller
+01:42 +43 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: Full to Full route change publishes descriptor ownership
+01:42 +44 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: contextual bottom slot does not change the reader chrome mode
+01:42 +45 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: live bottom slot survives URI reset and inactive owner can release it
+01:42 +46 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: Ora return token is valid only while its route entry exists
+01:43 +47 -1: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart
+01:45 +47 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: (setUpAll)
+01:45 +47 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: Bible selection temporarily owns the bottom slot
+01:46 +48 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+[ContentUpdates] check failed: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+01:51 +49 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+01:52 +50 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: (tearDownAll)
+01:52 +50 -1: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart
+01:56 +50 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (setUpAll)
+01:56 +50 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter keeps first sorted group and calendar cycle fallback
+01:56 +51 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter linked dayId wins and manual cycle can return to automatic
+01:56 +52 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: current production default adapter weekday and non-cycle groups expose only real cycles
+01:56 +53 -1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#70c09):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:144:26
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (266 frames)
+#279    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#280    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#281    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#754    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#763    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#764    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#765    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#768    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#769    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#770    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#771    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#772    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#773    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#774    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#775    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#778    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#779    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#780    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#781    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#782    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#783    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#784    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#785    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#786    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#787    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#788    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#789    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#790    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#791    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#792    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#793    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#794    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#795    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#796    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#797    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#798    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#799    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#800    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#801    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#802    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#803    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#804    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#805    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#806    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#807    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#808    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#809    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#810    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#811    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#812    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#813    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#814    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#815    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#818    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#819    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#820    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#821    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#822    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#823    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#824    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#825    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#826    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#827    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#828    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#829    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#830    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#833    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#834    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#835    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#838    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#839    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#840    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:129:18)
+#841    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#842    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#70c09):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:144:26
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:149:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _KeyWidgetFinder:<Found 0 widgets with key [<'reader-content-surface'>]: []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:151:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart line 151
+The test description was:
+  root is the shared reader and immediately shows content
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:59 +53 -2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: root is the shared reader and immediately shows content [E]
+  Test failed. See exception logs above.
+  The test description was: root is the shared reader and immediately shows content
+  
+01:59 +53 -2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#57bd9):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:199:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:186:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 0 widgets with key [<'readings-context-header'>]: []" (used in a call to
+"getTopLeft()") could not find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2090:7)
+#1      WidgetController.getTopLeft (package:flutter_test/src/controller.dart:1958:12)
+#2      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:204:32)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  context header keeps its left edge while readings load
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (2) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:59 +53 -3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: context header keeps its left edge while readings load [E]
+  Test failed. See exception logs above.
+  The test description was: context header keeps its left edge while readings load
+  
+01:59 +53 -3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: period reading uses the Liturgy of the Hours title
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#76e4f):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:251:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:241:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#76e4f):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:251:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:254:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "XXIII звычайны тыдзень": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:256:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart line 256
+The test description was:
+  period reading uses the Liturgy of the Hours title
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:59 +53 -4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: period reading uses the Liturgy of the Hours title [E]
+  Test failed. See exception logs above.
+  The test description was: period reading uses the Liturgy of the Hours title
+  
+01:59 +53 -4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: celebration titles do not get a lectionary year suffix
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#507db):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:281:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:271:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#507db):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:281:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:284:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "XXIII звычайны тыдзень": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:286:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart line 286
+The test description was:
+  celebration titles do not get a lectionary year suffix
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+02:00 +53 -5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: celebration titles do not get a lectionary year suffix [E]
+  Test failed. See exception logs above.
+  The test description was: celebration titles do not get a lectionary year suffix
+  
+02:00 +53 -5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: liturgical route formats its title with a Roman week number
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[InheritedCupertinoTheme, UncontrolledProviderScope, _InheritedTheme,
+_LocalizationsScope-[GlobalKey#0f8f8]], state: _ReadingsScreenState#a6ae4):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:305:17
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:294:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[InheritedCupertinoTheme, UncontrolledProviderScope, _InheritedTheme,
+_LocalizationsScope-[GlobalKey#0f8f8]], state: _ReadingsScreenState#a6ae4):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:305:17
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:309:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "XXIII звычайны тыдзень, серада": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:311:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart line 311
+The test description was:
+  liturgical route formats its title with a Roman week number
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+02:00 +53 -6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: liturgical route formats its title with a Roman week number [E]
+  Test failed. See exception logs above.
+  The test description was: liturgical route formats its title with a Roman week number
+  
+02:00 +53 -6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: synthetic fallback keeps alleluia text and lone alt chorus
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#66768):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:339:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:329:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#66768):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:339:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:342:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextContainingWidgetFinder:<Found 0 widgets with text containing Верш з поля text.: []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:344:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart line 344
+The test description was:
+  synthetic fallback keeps alleluia text and lone alt chorus
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+02:00 +53 -7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: synthetic fallback keeps alleluia text and lone alt chorus [E]
+  Test failed. See exception logs above.
+  The test description was: synthetic fallback keeps alleluia text and lone alt chorus
+  
+02:00 +53 -7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: a reading sentence opens an accessible color palette
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#ace7f):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:367:38
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:370:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#ace7f):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:367:38
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:371:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      Iterable.single (dart:core/iterable.dart:694:25)
+#1      WidgetController.renderObject (package:flutter_test/src/controller.dart:985:30)
+#2      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:383:30)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  a reading sentence opens an accessible color palette
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+02:01 +53 -8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: a reading sentence opens an accessible color palette [E]
+  Test failed. See exception logs above.
+  The test description was: a reading sentence opens an accessible color palette
+  
+02:01 +53 -8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#c1a28):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:435:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+...     Normal element mounting (9 frames)
+#757    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#758    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#759    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#760    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#761    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#762    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#763    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#764    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#765    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#766    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#767    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#780    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#781    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#782    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#786    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#798    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#799    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#800    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#801    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#802    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#803    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#804    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#805    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#806    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#807    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#808    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#809    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#810    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#811    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#813    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#814    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#815    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#816    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#817    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#818    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#819    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#820    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#821    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#822    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#823    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#824    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#827    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#828    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#829    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#832    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#833    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#834    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:425:18)
+#835    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#836    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen(dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#c1a28):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:435:40
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:438:18)
+<asynchronous suspension>
+#29     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#30     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "XXIII звычайны тыдзень": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:440:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart line 440
+The test description was:
+  options separate groups and expose only selectable cycles
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+02:01 +53 -9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: options separate groups and expose only selectable cycles [E]
+  Test failed. See exception logs above.
+  The test description was: options separate groups and expose only selectable cycles
+  
+02:01 +53 -9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: manual cycle and reading group survive leaving the date
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen-[<'2026-09-09'>](dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#7d478):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen-[<'2026-09-09'>]
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:540:19
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5799:5)
+#12     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5973:11)
+#13     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5793:5)
+...     Normal element mounting (260 frames)
+#273    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#274    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#275    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (473 frames)
+#748    _UncontrolledProviderScopeElement.mount (package:flutter_riverpod/src/framework.dart:315:11)
+#749    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#750    Element.updateChild (package:flutter/src/widgets/framework.dart:4053:20)
+#751    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#752    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#753    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#754    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#755    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#756    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#757    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#758    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#759    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#760    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#761    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#762    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#763    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#764    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#765    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#766    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#767    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#768    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#769    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#770    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#771    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#772    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#773    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#774    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#775    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#776    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#777    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#778    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#779    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#780    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#781    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#782    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#783    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#784    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#785    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#786    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#787    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#788    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#789    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#791    ProxyElement.update (package:flutter/src/widgets/framework.dart:6149:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#793    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#794    _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#795    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#796    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#797    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#798    StatelessElement.update (package:flutter/src/widgets/framework.dart:5895:5)
+#799    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#800    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5841:16)
+#801    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#802    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#803    StatefulElement.update (package:flutter/src/widgets/framework.dart:6007:5)
+#804    Element.updateChild (package:flutter/src/widgets/framework.dart:4037:15)
+#805    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1822:16)
+#806    RootElement.update (package:flutter/src/widgets/binding.dart:1800:5)
+#807    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1814:7)
+#808    Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#809    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#810    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#811    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#812    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#813    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#814    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#815    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#816    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#819    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#820    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#821    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#824    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#825    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#826    main.<anonymous closure>.openDate (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:536:20)
+#827    main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:547:11)
+#828    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#829    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building ReadingsScreen-[<'2026-09-09'>](dirty, dependencies:
+[UncontrolledProviderScope], state: _ReadingsScreenState#7d478):
+No GoRouter found in context
+'package:go_router/src/router.dart':
+Failed assertion: line 521 pos 12: 'inherited != null'
+
+The relevant error-causing widget was:
+  ReadingsScreen-[<'2026-09-09'>]
+  ReadingsScreen:file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:540:19
+
+When the exception was thrown, this was the stack:
+#2      GoRouter.of (package:go_router/src/router.dart:521:12)
+#3      GoRouterHelper.canPop (package:go_router/src/misc/extensions.dart:70:29)
+#4      _ReadingsScreenState._menuLeading (package:mybrev_flutter/screens/readings_screen.dart:434:17)
+#5      _ReadingsScreenState.build (package:mybrev_flutter/screens/readings_screen.dart:772:18)
+#6      StatefulElement.build (package:flutter/src/widgets/framework.dart:5931:27)
+#7      ConsumerStatefulElement.build (package:flutter_riverpod/src/consumer.dart:539:20)
+#8      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5817:15)
+#9      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5982:11)
+#10     Element.rebuild (package:flutter/src/widgets/framework.dart:5529:7)
+#11     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2750:15)
+#12     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2807:11)
+#13     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3111:18)
+#14     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2131:19)
+#15     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#16     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#17     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#18     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1960:9)
+#21     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#22     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1949:27)
+#23     WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:719:23)
+#26     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#27     WidgetTester.pumpAndSettle (package:flutter_test/src/widget_tester.dart:712:27)
+#28     main.<anonymous closure>.openDate (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:544:20)
+<asynchronous suspension>
+#29     main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:547:5)
+<asynchronous suspension>
+#30     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#31     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from class _AssertionError, dart:async, and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 0 widgets with key [<'readings-alternatives-control'>]: []" (used in a call to
+"tap()") could not find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2090:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1942:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1075:7)
+#3      main.<anonymous closure> (file:///C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart:548:18)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  manual cycle and reading group survive leaving the date
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+02:01 +53 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: manual cycle and reading group survive leaving the date [E]
+  Test failed. See exception logs above.
+  The test description was: manual cycle and reading group survive leaving the date
+  
+02:01 +53 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: Today moves Readings and Hours to the same date
+02:03 +54 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/readings_stage4_test.dart: (tearDownAll)
+02:04 +54 -10: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart
+02:07 +54 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (setUpAll)
+02:08 +54 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation first run uses a sensible first-book default
+02:08 +55 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation root restores last location and clamps a corrupt chapter
+02:08 +56 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation translation switch preserves the canonical book and chapter
+02:08 +57 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation translation fallback uses the saved target location
+02:08 +58 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation previous and next cross book boundaries
+02:08 +59 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation first and last chapter boundaries disable navigation
+02:08 +60 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation canonical and search-result routes preserve a verse target
+02:08 +61 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible location and navigation missing and corrupt local data produce an empty graceful state
+02:08 +62 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+02:11 +63 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions BEL and RUS switch keeps the reading location
+02:12 +64 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+02:17 +65 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions inline chapter center opens the existing full-name picker
+02:19 +66 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions manual downward scroll compacts the Bible dock and a new chapter resets it
+02:19 +67 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions next and previous chapter controls navigate
+02:20 +68 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse selection adds, removes, and persists a highlight
+02:21 +69 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions double tap enters fullscreen without selecting a verse
+02:22 +70 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse palette exposes names, state, and 48dp targets
+02:23 +71 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse announces its number, text, and selected state
+02:23 +72 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions verse palette uses reported zero system inset
+02:24 +73 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions system TextScaler increases rendered verse body
+02:25 +74 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions Aa changes shared text size without exposing font settings
+02:26 +75 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions search result opens the verse and Back restores query state
+02:28 +76 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions scroll offset survives recreation and branch-style return
+02:28 +77 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions Compact and Hidden chrome remain shell-controlled
+02:29 +78 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions iOS and Android use their native chrome interpretations
+02:30 +79 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: Bible reader interactions large text and narrow screens do not overflow
+02:30 +80 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/bible_stage6_test.dart: (tearDownAll)
+02:30 +80 -10: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart
+02:33 +80 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+02:38 +81 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+02:41 +82 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: My Prayers add button stays above the app dock
+02:41 +83 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category grouping uses tags and explicit persisted membership
+02:41 +84 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: root order is Favorites, Holy Mass, Categories, All Prayers
+02:42 +85 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+02:44 +86 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: empty favorites is compact and categories remain visible
+02:44 +87 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: missing Holy Mass stays recognizable
+02:45 +88 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: favorite toggle is shared by catalog and root providers
+02:45 +89 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: All Prayers contains built-in and user prayers
+02:46 +90 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer catalog owns the contextual bottom slot
+02:46 +91 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+02:46 +92 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: search focuses, filters title/body, and keeps query state
+02:47 +93 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: All Prayers re-entry keeps query and results synchronized
+02:47 +94 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category page includes tag and explicit members
+02:47 +95 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category management hides and shows defaults
+02:47 +96 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: user category can be created, renamed, and deleted
+02:49 +97 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: category editor supports quick tags and searchable prayers
+02:50 +98 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayer Detail uses shared reader and only local has edit
+02:51 +99 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: prayer reader shows scroll-to-top only outside fullscreen
+02:52 +100 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Holy Mass exposes section navigation without sharing
+02:53 +101 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: built-in prayer cannot be opened as a destructive edit
+02:53 +102 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer keeps editable form and detail edit action
+02:53 +103 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: local prayer editor formats text and shows preview
+02:54 +104 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayerbook remains usable at 200 percent system text
+02:54 +105 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/prayerbook_stage5_test.dart: Prayerbook title clears top search at narrow and wide sizes
+02:56 +106 -10: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart
+02:59 +106 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song filter state search and tags alone determine activity and badge count
+02:59 +107 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections root shows four section tiles after Favorites
+03:04 +108 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections section tiles open Mass, Songbook, Compendium, placeholder
+03:10 +109 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections missing Mass says so on the tile
+03:11 +110 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Prayerbook sections tiles do not overflow at 200 percent system text
+03:12 +111 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list lists songs, favorites first then alphabetical
+03:13 +112 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list search covers title, lyrics and tag names
+03:16 +113 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list filter sheet supports tags, removal and reset
+03:18 +114 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.android)
+03:18 +115 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list tag chips fit a 320 dp phone at 200 percent text (variant: TargetPlatform.iOS)
+03:19 +116 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list list is always compact and has no songbook settings
+03:20 +117 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Songbook list seed failure without synced songs shows an error state
+03:20 +118 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail uses the reader, shares favorites and returns
+03:21 +119 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail transpose changes displayed chords only and resets
+03:24 +120 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail song without chords shows no chord control
+03:24 +121 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord toggle shows and hides chords and persists choice
+03:25 +122 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail layout toggle switches between above and right
+03:25 +123 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right falls back above on narrow width and keeps preference
+03:26 +124 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control semantics name the state and the actions
+03:26 +125 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.android)
+03:29 +126 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control keeps 48 dp targets on a 320 dp phone (variant: TargetPlatform.iOS)
+03:33 +127 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control scales down instead of overflowing
+03:33 +128 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap beside the chords in landscape and on tablets (variant: TargetPlatform.android)
+03:33 +129 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap beside the chords in landscape and on tablets (variant: TargetPlatform.iOS)
+03:34 +130 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long lyrics wrap without overflow on a 320 dp phone
+03:34 +131 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.android)
+03:41 +132 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+03:46 +133 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail layout button uses distinct above and right glyphs
+03:47 +134 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.android)
+03:48 +135 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.iOS)
+03:49 +136 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail right layout rule uses real constraints
+03:49 +137 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.android)
+03:51 +138 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.iOS)
+03:52 +139 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.android)
+03:54 +140 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.iOS)
+03:55 +141 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song detail unknown song shows a not found state
+03:55 +142 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence favorites, chords and layout survive restart
+03:55 +143 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence song favorites are independent from prayer favorites
+03:56 +144 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored left layout migrates to right
+03:56 +145 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored right and unknown layouts are read safely
+03:56 +146 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence migration is idempotent and writes nothing once applied
+03:56 +147 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence old compact list setting is ignored and removed
+03:57 +148 -10: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart
+03:59 +148 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution every collection ships with the app and matches its manifest
+[ContentStore] prayerCategories: 5 docs in 68 ms
+[ContentStore] prayers: 115 docs in 213 ms
+[ContentStore] invitatoriums: 4 docs in 50 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 41 ms
+[ContentStore] completoriums: 35 docs in 51 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] compendiumMeta: 1 docs in 86 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 117 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 129 ms
+[ContentStore] songs: 447 docs in 126 ms
+[ContentStore] compendium: 27 docs in 132 ms
+[ContentStore] liturgicalTemplates: 16 docs in 165 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 213 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 316 ms
+[ContentStore] readings: 822 docs in 406 ms
+[ContentStore] days: 736 docs in 867 ms
+04:01 +149 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution a fresh install opens the Hours and the Readings offline, far outside the former ±7-day window
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 73 ms
+[ContentStore] invitatoriums: 4 docs in 48 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 46 ms
+[ContentStore] completoriums: 35 docs in 47 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 35 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 16 ms
+[ContentStore] songs: 447 docs in 63 ms
+[ContentStore] compendium: 27 docs in 58 ms
+[ContentStore] liturgicalTemplates: 16 docs in 102 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 115 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 220 ms
+[ContentStore] readings: 822 docs in 318 ms
+[ContentStore] days: 736 docs in 798 ms
+04:03 +150 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution the app and the bundle builder agree on collections and schema
+04:03 +151 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution the Compendium is content: validated from the store, patched with the rest
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 89 ms
+[ContentStore] invitatoriums: 4 docs in 29 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms
+[ContentStore] completoriums: 35 docs in 35 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 33 ms
+[ContentStore] compendiumMeta: 1 docs in 22 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 35 ms
+[ContentStore] songs: 447 docs in 73 ms
+[ContentStore] liturgicalTemplates: 16 docs in 108 ms
+[ContentStore] compendium: 27 docs in 89 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 133 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 206 ms
+[ContentStore] readings: 822 docs in 365 ms
+[ContentStore] days: 736 docs in 801 ms
+04:04 +152 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution Hive holds no copy of the bundled corpus
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 109 ms
+[ContentStore] invitatoriums: 4 docs in 31 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms
+[ContentStore] completoriums: 35 docs in 50 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 44 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 49 ms
+[ContentStore] songs: 447 docs in 110 ms
+[ContentStore] compendium: 27 docs in 113 ms
+[ContentStore] liturgicalTemplates: 16 docs in 144 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 151 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 299 ms
+[ContentStore] readings: 822 docs in 423 ms
+[ContentStore] days: 736 docs in 1039 ms
+04:06 +153 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 88 ms
+[ContentStore] invitatoriums: 4 docs in 57 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 55 ms
+[ContentStore] completoriums: 35 docs in 57 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 52 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 54 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 55 ms
+[ContentStore] compendiumMeta: 1 docs in 30 ms
+[ContentStore] songs: 447 docs in 89 ms
+[ContentStore] compendium: 27 docs in 86 ms
+[ContentStore] liturgicalTemplates: 16 docs in 114 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 124 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 266 ms
+[ContentStore] readings: 822 docs in 403 ms
+[ContentStore] days: 736 docs in 915 ms
+04:13 +154 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 86 ms
+[ContentStore] invitatoriums: 4 docs in 41 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] completoriums: 35 docs in 43 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 36 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 38 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 44 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] songs: 447 docs in 76 ms
+[ContentStore] compendium: 27 docs in 77 ms
+[ContentStore] liturgicalTemplates: 16 docs in 114 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 141 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 244 ms
+[ContentStore] readings: 822 docs in 354 ms
+[ContentStore] days: 736 docs in 961 ms
+04:34 +155 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 85 ms
+[ContentStore] invitatoriums: 4 docs in 31 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms
+[ContentStore] completoriums: 35 docs in 32 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 26 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 28 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 30 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] compendium: 27 docs in 77 ms
+[ContentStore] songs: 447 docs in 82 ms
+[ContentStore] liturgicalTemplates: 16 docs in 112 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 147 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 204 ms
+[ContentStore] readings: 822 docs in 307 ms
+[ContentStore] days: 736 docs in 779 ms
+04:42 +156 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a document that does not match the manifest is rejected; nothing changes
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 87 ms
+[ContentStore] invitatoriums: 4 docs in 33 ms
+[ContentStore] completoriums: 35 docs in 53 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 50 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 46 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 48 ms
+[ContentStore] compendiumMeta: 1 docs in 28 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 52 ms
+[ContentStore] compendium: 27 docs in 74 ms
+[ContentStore] songs: 447 docs in 109 ms
+[ContentStore] liturgicalTemplates: 16 docs in 162 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 178 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 245 ms
+[ContentStore] readings: 822 docs in 407 ms
+[ContentStore] days: 736 docs in 976 ms
+04:57 +157 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a missing document rejects the update
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 78 ms
+[ContentStore] invitatoriums: 4 docs in 73 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 65 ms
+[ContentStore] completoriums: 35 docs in 73 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 62 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 63 ms
+[ContentStore] compendiumMeta: 1 docs in 30 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 65 ms
+[ContentStore] songs: 447 docs in 62 ms
+[ContentStore] compendium: 27 docs in 97 ms
+[ContentStore] liturgicalTemplates: 16 docs in 139 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 119 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 256 ms
+[ContentStore] readings: 822 docs in 370 ms
+[ContentStore] days: 736 docs in 888 ms
+05:05 +158 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a newer local update survives a restart
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 97 ms
+[ContentStore] invitatoriums: 4 docs in 44 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 39 ms
+[ContentStore] completoriums: 35 docs in 43 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 18 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] liturgicalTemplates: 16 docs in 137 ms
+[ContentStore] songs: 447 docs in 108 ms
+[ContentStore] compendium: 27 docs in 110 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 169 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 274 ms
+[ContentStore] readings: 822 docs in 392 ms
+[ContentStore] days: 736 docs in 926 ms
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 83 ms
+[ContentStore] invitatoriums: 4 docs in 49 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 46 ms
+[ContentStore] completoriums: 35 docs in 48 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 42 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] compendiumMeta: 1 docs in 34 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] songs: 447 docs in 50 ms
+[ContentStore] compendium: 27 docs in 81 ms
+[ContentStore] liturgicalTemplates: 16 docs in 108 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 173 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 249 ms
+[ContentStore] readings: 822 docs in 402 ms
+[ContentStore] days: 736 docs in 987 ms
+05:08 +159 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions an app update with a newer bundle supersedes an older local update
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 82 ms
+[ContentStore] invitatoriums: 4 docs in 35 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 34 ms
+[ContentStore] completoriums: 35 docs in 36 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 32 ms
+[ContentStore] compendiumMeta: 1 docs in 20 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 36 ms
+[ContentStore] songs: 447 docs in 52 ms
+[ContentStore] compendium: 27 docs in 57 ms
+[ContentStore] liturgicalTemplates: 16 docs in 76 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 118 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 223 ms
+[ContentStore] readings: 822 docs in 340 ms
+[ContentStore] days: 736 docs in 834 ms
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 87 ms
+[ContentStore] invitatoriums: 4 docs in 28 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] completoriums: 35 docs in 27 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 22 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 24 ms
+[ContentStore] compendiumMeta: 1 docs in 13 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 26 ms
+[ContentStore] songs: 447 docs in 53 ms
+[ContentStore] compendium: 27 docs in 61 ms
+[ContentStore] liturgicalTemplates: 16 docs in 90 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 110 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 203 ms
+[ContentStore] readings: 822 docs in 310 ms
+[ContentStore] days: 736 docs in 870 ms
+05:10 +160 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: former download cache newer documents are kept, older ones dropped, the cache removed, user data untouched — and running again changes nothing
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 95 ms
+[ContentStore] invitatoriums: 4 docs in 46 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 44 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] completoriums: 35 docs in 46 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] songs: 447 docs in 57 ms
+[ContentStore] compendium: 27 docs in 62 ms
+[ContentStore] liturgicalTemplates: 16 docs in 87 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 137 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 244 ms
+[ContentStore] readings: 822 docs in 338 ms
+[ContentStore] days: 736 docs in 879 ms
+[ContentMigration] done, 1 newer documents kept
+05:11 +161 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy 100 new prayers: only those are downloaded, by themselves
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 69 ms
+[ContentStore] invitatoriums: 4 docs in 43 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] completoriums: 35 docs in 44 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 40 ms
+[ContentStore] compendiumMeta: 1 docs in 22 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] songs: 447 docs in 63 ms
+[ContentStore] compendium: 27 docs in 64 ms
+[ContentStore] liturgicalTemplates: 16 docs in 95 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 106 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 228 ms
+[ContentStore] readings: 822 docs in 328 ms
+[ContentStore] days: 736 docs in 761 ms
+05:20 +162 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a rebuild-sized diff is left to the next app release
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 86 ms
+[ContentStore] invitatoriums: 4 docs in 46 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 44 ms
+[ContentStore] completoriums: 35 docs in 46 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 37 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 17 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 45 ms
+[ContentStore] compendium: 27 docs in 72 ms
+[ContentStore] songs: 447 docs in 85 ms
+[ContentStore] liturgicalTemplates: 16 docs in 110 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 144 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 258 ms
+[ContentStore] readings: 822 docs in 360 ms
+[ContentStore] days: 736 docs in 852 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+05:33 +163 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a newer schema is never installed as a patch
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 74 ms
+[ContentStore] invitatoriums: 4 docs in 39 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 37 ms
+[ContentStore] completoriums: 35 docs in 39 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 34 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 44 ms
+[ContentStore] compendiumMeta: 1 docs in 22 ms
+[ContentStore] songs: 447 docs in 84 ms
+[ContentStore] compendium: 27 docs in 86 ms
+[ContentStore] liturgicalTemplates: 16 docs in 117 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 145 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 248 ms
+[ContentStore] readings: 822 docs in 362 ms
+[ContentStore] days: 736 docs in 847 ms
+05:41 +164 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy new schema: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 75 ms
+[ContentStore] invitatoriums: 4 docs in 38 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 37 ms
+[ContentStore] completoriums: 35 docs in 38 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 35 ms
+[ContentStore] compendiumMeta: 1 docs in 14 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 37 ms
+[ContentStore] songs: 447 docs in 83 ms
+[ContentStore] compendium: 27 docs in 92 ms
+[ContentStore] liturgicalTemplates: 16 docs in 120 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 153 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 234 ms
+[ContentStore] readings: 822 docs in 339 ms
+[ContentStore] days: 736 docs in 895 ms
+[ContentUpdates] schema: content 1893445200000 needs the next app release
+05:50 +165 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy mass rebuild: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 87 ms
+[ContentStore] invitatoriums: 4 docs in 68 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 65 ms
+[ContentStore] completoriums: 35 docs in 68 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 62 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 63 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 65 ms
+[ContentStore] compendiumMeta: 1 docs in 49 ms
+[ContentStore] compendium: 27 docs in 83 ms
+[ContentStore] songs: 447 docs in 142 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 163 ms
+[ContentStore] liturgicalTemplates: 16 docs in 204 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 273 ms
+[ContentStore] readings: 822 docs in 429 ms
+[ContentStore] days: 736 docs in 922 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+06:05 +166 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a compatible current check clears the status — at the next launch, even within the day
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 81 ms
+[ContentStore] invitatoriums: 4 docs in 28 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] completoriums: 35 docs in 27 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 26 ms
+[ContentStore] compendiumMeta: 1 docs in 15 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 25 ms
+[ContentStore] songs: 447 docs in 50 ms
+[ContentStore] compendium: 27 docs in 65 ms
+[ContentStore] liturgicalTemplates: 16 docs in 131 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 118 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 310 ms
+[ContentStore] readings: 822 docs in 461 ms
+[ContentStore] days: 736 docs in 1083 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+06:27 +167 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy the daily check runs once a day
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 93 ms
+[ContentStore] invitatoriums: 4 docs in 29 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 33 ms
+[ContentStore] completoriums: 35 docs in 35 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 28 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 30 ms
+[ContentStore] compendiumMeta: 1 docs in 15 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 34 ms
+[ContentStore] songs: 447 docs in 72 ms
+[ContentStore] compendium: 27 docs in 79 ms
+[ContentStore] liturgicalTemplates: 16 docs in 105 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 135 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 236 ms
+[ContentStore] readings: 822 docs in 334 ms
+[ContentStore] days: 736 docs in 890 ms
+06:45 +168 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings only the reader's questions: offline, current, check
+06:50 +169 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings a failed check is calm
+06:51 +170 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings a rebuild waits for the app; nothing about Wi-Fi or sizes
+06:52 +171 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings offline: the texts work, the check waits
+06:53 +172 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation a completed update is new in every collection
+[ContentStore] prayerCategories: 5 docs in 21 ms
+[ContentStore] prayers: 115 docs in 122 ms
+[ContentStore] invitatoriums: 4 docs in 59 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 131 ms
+[ContentStore] completoriums: 35 docs in 137 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 121 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 122 ms
+[ContentStore] compendiumMeta: 1 docs in 95 ms
+[ContentStore] songs: 447 docs in 100 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 153 ms
+[ContentStore] liturgicalTemplates: 16 docs in 210 ms
+[ContentStore] compendium: 27 docs in 139 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 423 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 571 ms
+[ContentStore] readings: 822 docs in 1291 ms
+[ContentStore] days: 736 docs in 1466 ms
+06:55 +173 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash while staging: old content, before and after a restart
+[ContentStore] prayerCategories: 5 docs in 10 ms
+[ContentStore] prayers: 115 docs in 103 ms
+[ContentStore] invitatoriums: 4 docs in 128 ms
+[ContentStore] completoriums: 35 docs in 125 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 111 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 97 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 104 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 107 ms
+[ContentStore] compendiumMeta: 1 docs in 45 ms
+[ContentStore] songs: 447 docs in 118 ms
+[ContentStore] compendium: 27 docs in 107 ms
+[ContentStore] liturgicalTemplates: 16 docs in 370 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 454 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 589 ms
+[ContentStore] readings: 822 docs in 1322 ms
+[ContentStore] days: 736 docs in 1513 ms
+[ContentStore] dropping an unfinished update
+[ContentStore] prayerCategories: 5 docs in 14 ms
+[ContentStore] prayers: 115 docs in 146 ms
+[ContentStore] invitatoriums: 4 docs in 97 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 89 ms
+[ContentStore] completoriums: 35 docs in 90 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 71 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 81 ms
+[ContentStore] compendiumMeta: 1 docs in 26 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 90 ms
+[ContentStore] songs: 447 docs in 185 ms
+[ContentStore] compendium: 27 docs in 167 ms
+[ContentStore] liturgicalTemplates: 16 docs in 305 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 357 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 410 ms
+[ContentStore] readings: 822 docs in 701 ms
+[ContentStore] days: 736 docs in 1225 ms
+07:00 +174 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash after READY: old until restart, then new everywhere
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 92 ms
+[ContentStore] invitatoriums: 4 docs in 69 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 67 ms
+[ContentStore] completoriums: 35 docs in 69 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 58 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 63 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 64 ms
+[ContentStore] compendiumMeta: 1 docs in 46 ms
+[ContentStore] songs: 447 docs in 91 ms
+[ContentStore] compendium: 27 docs in 113 ms
+[ContentStore] liturgicalTemplates: 16 docs in 149 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 182 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 317 ms
+[ContentStore] readings: 822 docs in 450 ms
+[ContentStore] days: 736 docs in 1068 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 135 ms
+[ContentStore] invitatoriums: 4 docs in 67 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 70 ms
+[ContentStore] completoriums: 35 docs in 72 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 60 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 67 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 69 ms
+[ContentStore] compendiumMeta: 1 docs in 25 ms
+[ContentStore] songs: 447 docs in 135 ms
+[ContentStore] compendium: 27 docs in 147 ms
+[ContentStore] liturgicalTemplates: 16 docs in 261 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 266 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 305 ms
+[ContentStore] readings: 822 docs in 562 ms
+[ContentStore] days: 736 docs in 1177 ms
+07:03 +175 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation a READY generation left by a failed commit is finished before the next one starts
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 103 ms
+[ContentStore] invitatoriums: 4 docs in 56 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 55 ms
+[ContentStore] completoriums: 35 docs in 57 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 49 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 52 ms
+[ContentStore] compendiumMeta: 1 docs in 36 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 59 ms
+[ContentStore] songs: 447 docs in 61 ms
+[ContentStore] liturgicalTemplates: 16 docs in 89 ms
+[ContentStore] compendium: 27 docs in 80 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 229 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 250 ms
+[ContentStore] readings: 822 docs in 540 ms
+[ContentStore] days: 736 docs in 985 ms
+[ContentStore] finishing an interrupted update
+07:05 +176 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash while writing overlays: readers never see a mix; the restart finishes it
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 89 ms
+[ContentStore] invitatoriums: 4 docs in 50 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 45 ms
+[ContentStore] completoriums: 35 docs in 49 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 36 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 40 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 45 ms
+[ContentStore] compendium: 27 docs in 78 ms
+[ContentStore] songs: 447 docs in 120 ms
+[ContentStore] liturgicalTemplates: 16 docs in 164 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 212 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 324 ms
+[ContentStore] readings: 822 docs in 411 ms
+[ContentStore] days: 736 docs in 1044 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 11 ms
+[ContentStore] prayers: 115 docs in 100 ms
+[ContentStore] invitatoriums: 4 docs in 66 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 64 ms
+[ContentStore] completoriums: 35 docs in 65 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 59 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 61 ms
+[ContentStore] compendiumMeta: 1 docs in 43 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 64 ms
+[ContentStore] songs: 447 docs in 121 ms
+[ContentStore] compendium: 27 docs in 119 ms
+[ContentStore] liturgicalTemplates: 16 docs in 142 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 162 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 276 ms
+[ContentStore] readings: 822 docs in 554 ms
+[ContentStore] days: 736 docs in 1052 ms
+07:08 +177 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 89 ms
+[ContentStore] invitatoriums: 4 docs in 64 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 60 ms
+[ContentStore] completoriums: 35 docs in 93 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 88 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 87 ms
+[ContentStore] compendiumMeta: 1 docs in 66 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 92 ms
+[ContentStore] liturgicalTemplates: 16 docs in 145 ms
+[ContentStore] compendium: 27 docs in 111 ms
+[ContentStore] songs: 447 docs in 150 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 231 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 358 ms
+[ContentStore] readings: 822 docs in 491 ms
+[ContentStore] days: 736 docs in 1034 ms
+07:36 +178 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 89 ms
+[ContentStore] invitatoriums: 4 docs in 30 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 30 ms
+[ContentStore] completoriums: 35 docs in 32 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 30 ms
+[ContentStore] compendiumMeta: 1 docs in 20 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 31 ms
+[ContentStore] compendium: 27 docs in 59 ms
+[ContentStore] songs: 447 docs in 70 ms
+[ContentStore] liturgicalTemplates: 16 docs in 114 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 179 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 260 ms
+[ContentStore] readings: 822 docs in 369 ms
+[ContentStore] days: 736 docs in 851 ms
+08:11 +179 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases every collection keeps the version of its own snapshot
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 93 ms
+[ContentStore] invitatoriums: 4 docs in 57 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 54 ms
+[ContentStore] completoriums: 35 docs in 56 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 50 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 52 ms
+[ContentStore] compendiumMeta: 1 docs in 34 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 56 ms
+[ContentStore] songs: 447 docs in 87 ms
+[ContentStore] compendium: 27 docs in 89 ms
+[ContentStore] liturgicalTemplates: 16 docs in 132 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 151 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 245 ms
+[ContentStore] readings: 822 docs in 410 ms
+[ContentStore] days: 736 docs in 1036 ms
+08:13 +180 -10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 97 ms
+[ContentStore] invitatoriums: 4 docs in 52 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 50 ms
+[ContentStore] completoriums: 35 docs in 52 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 31 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] songs: 447 docs in 57 ms
+[ContentStore] compendium: 27 docs in 76 ms
+[ContentStore] liturgicalTemplates: 16 docs in 127 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 162 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 271 ms
+[ContentStore] readings: 822 docs in 507 ms
+[ContentStore] days: 736 docs in 1193 ms
+08:43 +180 -11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays [E]
+  TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts
+  dart:isolate  _RawReceivePort._handleMessage
+  
+  HiveError: Box has already been closed.
+  package:hive/src/box/box_base_impl.dart 76:7              BoxBaseImpl.checkOpen
+  package:hive/src/box/box_impl.dart 83:5                   BoxImpl._writeFrames
+  package:hive/src/box/box_impl.dart 67:12                  BoxImpl.putAll
+  package:mybrev_flutter/content/content_store.dart 163:19  ContentStore._commit
+  
+08:43 +180 -11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases a new app bundle absorbs the patches it contains
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 98 ms
+[ContentStore] invitatoriums: 4 docs in 30 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 45 ms
+[ContentStore] completoriums: 35 docs in 46 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 36 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 42 ms
+[ContentStore] compendiumMeta: 1 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] songs: 447 docs in 74 ms
+[ContentStore] compendium: 27 docs in 78 ms
+[ContentStore] liturgicalTemplates: 16 docs in 106 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 182 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 257 ms
+[ContentStore] readings: 822 docs in 396 ms
+[ContentStore] days: 736 docs in 957 ms
+09:15 +180 -12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases a new app bundle absorbs the patches it contains [E]
+  TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts
+  dart:isolate  _RawReceivePort._handleMessage
+  
+  HiveError: Box has already been closed.
+  package:hive/src/box/box_base_impl.dart 76:7              BoxBaseImpl.checkOpen
+  package:hive/src/box/box_impl.dart 83:5                   BoxImpl._writeFrames
+  package:hive/src/box/box_impl.dart 67:12                  BoxImpl.putAll
+  package:mybrev_flutter/content/content_store.dart 163:19  ContentStore._commit
+  
+09:15 +180 -12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: former download cache at full size an almost complete old database: newer kept, the rest freed, user data intact
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 90 ms
+[ContentStore] invitatoriums: 4 docs in 33 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 35 ms
+[ContentStore] completoriums: 35 docs in 36 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 28 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 31 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 39 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] compendium: 27 docs in 89 ms
+[ContentStore] liturgicalTemplates: 16 docs in 120 ms
+[ContentStore] songs: 447 docs in 145 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 186 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 321 ms
+[ContentStore] readings: 822 docs in 470 ms
+[ContentStore] days: 736 docs in 970 ms
+[ContentMigration] done, 1 newer documents kept
+MIGRATION 2120 documents, 58.3 MB → 0.1 MB in 142 ms
+09:19 +181 -12: Some tests failed.
