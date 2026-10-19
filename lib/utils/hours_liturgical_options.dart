@@ -61,6 +61,7 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
   String? selectedDayId,
   String? selectedDiocese,
   String? primaryDiocese,
+  bool requireExact = false,
 }) {
   final primary = resolvePrimaryLiturgicalOption(
     sortedOptions,
@@ -70,6 +71,7 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
   DayTemplate? template;
 
   if (selectedDayId != null) {
+    if (requireExact) selected = null;
     bool inDiocese(DayOption option) =>
         selectedDiocese == null ||
         option.dioceses.isEmpty ||

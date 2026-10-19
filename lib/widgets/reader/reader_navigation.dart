@@ -48,16 +48,3 @@ String oraRouteForContext({
     queryParameters: _context(diocese, optionId),
   ).toString();
 }
-
-String horaRouteForContext({
-  required DateTime date,
-  required String dayId,
-  String? diocese,
-  String? optionId,
-}) {
-  final dateKey = DateFormat('yyyy-MM-dd').format(date);
-  return Uri(
-    pathSegments: ['', 'hours', 'hora', dateKey, dayId],
-    queryParameters: _context(diocese, optionId),
-  ).toString();
-}

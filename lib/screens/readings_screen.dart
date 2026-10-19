@@ -263,7 +263,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   void _loadHighlights(String readingId) {
     if (_highlightReadingId == readingId) return;
     _highlightReadingId = readingId;
-    _selectedSentenceId = null;
+    _clearSentenceSelection();
     _highlights.clear();
     final raw = HiveService.isSettingsReady
         ? HiveService.settingsBox.get(_highlightStorageKey(readingId))
@@ -279,6 +279,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _toggleSentence(String sentenceId) {
+    ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
     setState(() {
       _selectedSentenceId = _selectedSentenceId == sentenceId
           ? null
@@ -430,7 +431,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         icon: const Icon(Icons.arrow_back_rounded),
       );
     }
-    if (context.canPop() ||
+    if ((GoRouter.maybeOf(context)?.canPop() ?? false) ||
         !(AppRouteEntryScope.maybeOf(context)?.entry.descriptor.isBranchRoot ??
             true)) {
       return IconButton(
@@ -835,23 +836,49 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         content: document,
       ),
     );
-    return Stack(
-      children: [
-        reader,
-        if (_selectedSentenceId != null)
-          Positioned(
-            left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
-            right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
-            bottom: floatingOverlayBottom(
-              context,
-              gap: floatingPaletteGap(context),
+    final content = PopScope<void>(
+      canPop: _selectedSentenceId == null,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _selectedSentenceId != null) {
+          setState(() => _clearSentenceSelection());
+        }
+      },
+      child: Stack(
+        children: [
+          reader,
+          if (_selectedSentenceId != null)
+            Positioned(
+              left: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
+              right: MediaQuery.sizeOf(context).width <= 340 ? 4 : 12,
+              bottom: floatingOverlayBottom(
+                context,
+                gap: floatingPaletteGap(context),
+              ),
+              child: KeyedSubtree(
+                key: _paletteMeasureKey,
+                child: _highlightPalette(),
+              ),
             ),
-            child: KeyedSubtree(
-              key: _paletteMeasureKey,
-              child: _highlightPalette(),
-            ),
-          ),
-      ],
+        ],
+      ),
+    );
+    // At a branch root GoRouter has no page to pop. Consume Android Back
+    // before its dispatcher so a live selection still gets cancelled.
+    if (GoRouter.maybeOf(context) == null) return content;
+    return BackButtonListener(
+      onBackButtonPressed: () async {
+        final navigation = AppNavigationScope.maybeOf(context);
+        if (navigation != null &&
+            (navigation.shellState.activeBranch != AppBranch.readings ||
+                navigation.shellState.activeController.activeEntryId !=
+                    _routeScope?.entry.id)) {
+          return false;
+        }
+        if (_selectedSentenceId == null) return false;
+        setState(() => _clearSentenceSelection());
+        return true;
+      },
+      child: content,
     );
   }
 

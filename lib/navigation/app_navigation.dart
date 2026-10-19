@@ -123,13 +123,15 @@ class BranchShellController extends ReaderChromeModeController {
     if (_disposed) return;
     if (_activeEntryId != entry.id) return;
     _overrides.remove(entry.id);
-    _contextualBottomSlots.remove(entry.id);
+    // A URI/document update may reuse a reader with a live selection. Its
+    // owner releases the bottom slot when that selection actually ends.
     activate(entry);
   }
 
   void requestContextualBottomSlot(String entryId, {required bool visible}) {
     if (_disposed) return;
-    if (_activeEntryId != entryId || !_entries.containsKey(entryId)) return;
+    if (!_entries.containsKey(entryId)) return;
+    if (visible && _activeEntryId != entryId) return;
     final changed = visible
         ? _contextualBottomSlots.add(entryId)
         : _contextualBottomSlots.remove(entryId);
@@ -384,8 +386,17 @@ class AppRouteEntryScope extends InheritedWidget {
   static AppRouteEntryScope? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AppRouteEntryScope>();
 
-  void showContextualBottomBar(bool visible) =>
+  void showContextualBottomBar(bool visible) {
+    // Document changes/disposal can release a slot during the route build.
+    // Publish after that build, just like the route's chrome controller.
+    if (SchedulerBinding.instance.schedulerPhase != SchedulerPhase.idle) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.requestContextualBottomSlot(entry.id, visible: visible);
+      });
+    } else {
       controller.requestContextualBottomSlot(entry.id, visible: visible);
+    }
+  }
 
   @override
   bool updateShouldNotify(AppRouteEntryScope oldWidget) =>

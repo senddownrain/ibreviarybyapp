@@ -37,18 +37,4 @@ void main() {
       'laudes',
     ]);
   });
-
-  test('Hora route encodes a day id as one path segment', () {
-    final route = horaRouteForContext(
-      date: DateTime(2026, 9, 9),
-      dayId: 'fixed/peter claver',
-    );
-
-    expect(Uri.parse(route).pathSegments, [
-      'hours',
-      'hora',
-      '2026-09-09',
-      'fixed/peter claver',
-    ]);
-  });
 }

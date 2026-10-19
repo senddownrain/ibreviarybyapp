@@ -29,7 +29,7 @@ Stage 2 меняет навигационный каркас. Stage 3+ мигр�
 - [Stage 1 Reader foundation](reader-foundation.md).
 - `lib/router/router.dart`, `lib/widgets/app_shell.dart`, `lib/widgets/navigation_drawer.dart`, `lib/widgets/bottom_nav.dart`.
 - `lib/widgets/reader/reader_scaffold.dart`, `lib/widgets/reader/reader_navigation.dart`, `lib/widgets/reading_scaffold.dart`.
-- Текущие Home / HoraPicker / Ora / Readings / ReadingDetail / Prayers / PrayerDetail / Bible / BibleChapter, calendar picker и settings.
+- Текущие Home / Ora / Readings / ReadingDetail / Prayers / PrayerDetail / Bible / BibleChapter, calendar picker и settings.
 
 В `pubspec.lock` установлен `go_router 14.8.1`. Проверен также его локальный исходник: `StatefulShellRoute.indexedStack` сохраняет посещённые branch Navigator, `goBranch` восстанавливает match list, неактивные branches используют `Offstage` и отключённый `TickerMode`.
 
@@ -71,7 +71,7 @@ Root Navigator
 │  │     ├─ ora/:date/:dayId/:type
 │  │     ├─ picker
 │  │     │  └─ options
-│  │     └─ hora/:date/:dayId       [временный HoraPicker]
+│  │     └─ hora/:date/:dayId       [redirect на /hours с контекстом]
 │  ├─ readings
 │  │  └─ /readings
 │  │     ├─ reading/:readingId
@@ -277,7 +277,7 @@ Stage 2 один раз меняет владельцев маршрутов, с
 | --- | --- |
 | `/` | `/hours` |
 | `/ora/:date/:dayId/:type` | Hours → Ora |
-| `/hora/:date/:dayId` | Временный HoraPicker внутри Hours |
+| `/hora/:date/:dayId` | Redirect на /hours с date/dayId/diocese |
 | `/readings/:dateStr` | Readings root с date/dayId |
 | `/readings/liturgical/:period/:week/:day` | Readings root в liturgical mode |
 | `/reading/:readingId` | Readings → Reading Detail |
