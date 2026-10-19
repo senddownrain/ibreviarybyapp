@@ -60,8 +60,8 @@ def native(tasks):
         queue(tasks,res/f'mipmap-{density}/ic_launcher.png',art_svg(background=IVORY,circle=True),size)
         queue(tasks,res/f'drawable-{density}/brand_splash.png',art_svg(circle=True,crop=True),round(160*factor))
     # Adaptive foreground sits inside the central 66/108 dp safe zone:
-    # circle diameter is .72 * 852 / 1024 * 108 = 64.70 dp.
-    queue(tasks,res/'drawable-nodpi/ic_launcher_foreground.png',art_svg(scale=.72,circle=True),432)
+    # circle diameter is .65 * 852 / 1024 * 108 = 58.42 dp.
+    queue(tasks,res/'drawable-nodpi/ic_launcher_foreground.png',art_svg(scale=.65,circle=True),432)
     queue(tasks,res/'drawable-nodpi/ic_launcher_monochrome.png',mono_svg(scale=.75),432)
     # Android 12+: bitmap canvas 288 dp; approved badge diameter 179.72 dp
     # fits inside the required 192 dp circle without a second icon background.

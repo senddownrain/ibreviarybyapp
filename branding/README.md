@@ -41,8 +41,9 @@ python tools/preview_brand_assets.py
 - Android legacy: PNG mdpi–xxxhdpi. Adaptive icon: отдельный ivory background,
   прозрачный цветной foreground 432×432 и monochrome 432×432. XML v26 и v33
   подключают подходящие слои. Реальные альфа-границы foreground:
-  `(86,86)..(346,346)` — 260×260 px, внутри центральной зоны 264×264 px
-  (66/108 от 432). Цветной круг является частью выбранного знака, а не второй
+  `(99,99)..(333,333)` — 234×234 px, внутри центральной зоны 264×264 px
+  (66/108 от 432). Диаметр круга — 58,5 dp в холсте 108 dp; масштаб
+  цветного слоя 0,65. Цветной круг является частью выбранного знака, а не второй
   системной маской. См. [Android adaptive icons](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive).
 - Android до 12: центрированный статичный знак 160 dp в `launch_background`.
   Android 12+: один системный splash, без следующего брендового Flutter-экрана.

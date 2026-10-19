@@ -45,7 +45,7 @@ def main():
     with Image.open(foreground) as image:
         assert image.size == (432, 432) and image.mode == 'RGBA'
         bbox = image.getchannel('A').getbbox()
-        assert bbox == (86, 86, 346, 346), bbox
+        assert bbox == (99, 99, 333, 333), bbox
         assert all(v >= 84 for v in bbox[:2]) and all(v <= 348 for v in bbox[2:])
     with Image.open(ANDROID / 'drawable-nodpi/ic_launcher_monochrome.png') as image:
         assert image.size == (432, 432) and image.mode == 'RGBA'
