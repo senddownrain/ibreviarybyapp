@@ -7,10 +7,10 @@ on:
   workflow_dispatch:
     inputs:
       android_track:
-        description: Google Play testing track (never production)
+        description: Google Play closed testing track only
         type: choice
-        options: [internal, beta]
-        default: beta
+        options: [alpha]
+        default: alpha
       release_notes:
         description: What testers should check (optional)
         type: string
@@ -133,13 +133,16 @@ jobs:
           [ "$HAS_KEYSTORE_PASSWORD" = true ] || missing+=(ANDROID_KEYSTORE_PASSWORD)
           [ "$HAS_KEY_ALIAS" = true ] || missing+=(ANDROID_KEY_ALIAS)
           [ "$HAS_KEY_PASSWORD" = true ] || missing+=(ANDROID_KEY_PASSWORD)
-          if [ "$ANDROID_TRACK" = beta ] && [ "$HAS_BETA_TRACK" != true ]; then
+          if [ "$ANDROID_TRACK" = alpha ] && [ "$HAS_BETA_TRACK" != true ]; then
             missing+=("variable ANDROID_BETA_TRACK")
           fi
           if [ ${#missing[@]} -gt 0 ]; then
             fail missing_secret "missing in repository secrets/variables (Settings → Secrets and variables → Actions): ${missing[*]}"
           fi
-          case "$ANDROID_TRACK" in internal|beta) ;; *) fail track_not_allowed "track $ANDROID_TRACK is not allowed" ;; esac
+          case "$ANDROID_TRACK" in
+            alpha) ;;
+            *) fail track_not_allowed "Only the closed testing track alpha is allowed" ;;
+          esac
           if echo "$BETA_TRACK" | grep -qi prod; then
             fail track_not_allowed "variable ANDROID_BETA_TRACK must not be a production track"
           fi
@@ -199,7 +202,10 @@ jobs:
           ANDROID_TRACK: ${{ inputs.android_track }}
         run: |
           set -euo pipefail
-          case "$ANDROID_TRACK" in internal|beta) ;; *) echo "::error::track $ANDROID_TRACK is not allowed"; exit 1 ;; esac
+          case "$ANDROID_TRACK" in
+            alpha) ;;
+            *) echo "::error::Only the closed testing track alpha is allowed"; exit 1 ;;
+          esac
           flutter --version | head -1
           bundle exec fastlane android "$ANDROID_TRACK" 2>&1 | tee "$RUNNER_TEMP/fastlane-android.log"
           cat fastlane/release-result-android.env >> "$GITHUB_OUTPUT"
