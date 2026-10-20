@@ -1,13 +1,13 @@
 # MyBrev Android Beta Release — manual only.
 # iOS is built and uploaded locally on the developer Mac.
-# Android uses GitHub-hosted Ubuntu and never targets production.
+# Android uses GitHub-hosted Ubuntu and only targets closed testing alpha.
 name: MyBrev Android Beta Release
 
 on:
   workflow_dispatch:
     inputs:
       android_track:
-        description: Google Play closed testing track only
+        description: Google Play closed testing track (alpha only)
         type: choice
         options: [alpha]
         default: alpha
@@ -133,8 +133,8 @@ jobs:
           [ "$HAS_KEYSTORE_PASSWORD" = true ] || missing+=(ANDROID_KEYSTORE_PASSWORD)
           [ "$HAS_KEY_ALIAS" = true ] || missing+=(ANDROID_KEY_ALIAS)
           [ "$HAS_KEY_PASSWORD" = true ] || missing+=(ANDROID_KEY_PASSWORD)
-          if [ "$ANDROID_TRACK" = alpha ] && [ "$HAS_BETA_TRACK" != true ]; then
-            missing+=("variable ANDROID_BETA_TRACK")
+          if [ "$ANDROID_TRACK" = alpha ]; then
+            [ "$HAS_BETA_TRACK" = true ] || missing+=("variable ANDROID_BETA_TRACK")
           fi
           if [ ${#missing[@]} -gt 0 ]; then
             fail missing_secret "missing in repository secrets/variables (Settings → Secrets and variables → Actions): ${missing[*]}"
@@ -143,8 +143,8 @@ jobs:
             alpha) ;;
             *) fail track_not_allowed "Only the closed testing track alpha is allowed" ;;
           esac
-          if echo "$BETA_TRACK" | grep -qi prod; then
-            fail track_not_allowed "variable ANDROID_BETA_TRACK must not be a production track"
+          if [ "$BETA_TRACK" != alpha ]; then
+            fail track_not_allowed "variable ANDROID_BETA_TRACK must be alpha, got '${BETA_TRACK:-missing}'"
           fi
           case "${PLAY_STATUS:-completed}" in draft|completed) ;; *) fail track_not_allowed "PLAY_RELEASE_STATUS must be draft or completed" ;; esac
           keystore=$(mktemp)
@@ -168,6 +168,7 @@ jobs:
       version_code: ${{ steps.release.outputs.ANDROID_VERSION_CODE }}
       version: ${{ steps.release.outputs.ANDROID_VERSION }}
       track: ${{ steps.release.outputs.ANDROID_TRACK }}
+      release_status: ${{ steps.release.outputs.ANDROID_RELEASE_STATUS }}
       error_code: ${{ steps.classify.outputs.code }}
       error_text: ${{ steps.classify.outputs.text }}
       error_next: ${{ steps.classify.outputs.next }}
@@ -228,6 +229,7 @@ jobs:
           SHA: ${{ github.sha }}
           PLATFORM: android
           ANDROID_TRACK_INPUT: ${{ inputs.android_track }}
+          ANDROID_BETA_TRACK: ${{ vars.ANDROID_BETA_TRACK }}
           PUBSPEC_VERSION: ${{ needs.prepare.outputs.app_version }}
           PUBSPEC_BUILD: ${{ needs.prepare.outputs.app_build }}
           PREPARE_RESULT: ${{ needs.prepare.result }}
@@ -240,6 +242,7 @@ jobs:
           ANDROID_VERSION: ${{ needs.android.outputs.version }}
           ANDROID_VERSION_CODE: ${{ needs.android.outputs.version_code }}
           ANDROID_TRACK: ${{ needs.android.outputs.track }}
+          ANDROID_RELEASE_STATUS: ${{ needs.android.outputs.release_status }}
           ANDROID_ERROR_CODE: ${{ needs.android.outputs.error_code }}
           ANDROID_ERROR_TEXT: ${{ needs.android.outputs.error_text }}
           ANDROID_ERROR_NEXT: ${{ needs.android.outputs.error_next }}

@@ -10,14 +10,14 @@ has 'Missing environment' && say missing_secret \
   "Не хватает секрета или переменной (имя указано в логе шага)." \
   "Добавьте его: Settings → Secrets and variables → Actions (docs/RELEASE_BETA.md) и запустите заново."
 has 'Not on production|production track|not allowed' && say track_not_allowed \
-  "Трек не разрешён: релизы только в internal/beta, production запрещён." \
-  "Выберите android_track internal или beta; ANDROID_BETA_TRACK не должна быть production."
+  "Трек не разрешён: релиз возможен только в закрытое тестирование alpha." \
+  "Запустите android_track=alpha; ANDROID_BETA_TRACK должна быть alpha, не production."
 has 'Version ?code .* has already been used|versionCode .*already|already been used|version code .*conflict|Version code conflict' && say version_code_conflict \
   "Конфликт versionCode: такой номер уже есть в Google Play." \
   "Запустите workflow ещё раз: номер берётся из магазина (+1). Если повторяется — проверьте fastlane android check."
 has 'draft app|Only releases with status draft|app is in draft|Draft app' && say play_draft_state \
   "Приложение в Google Play ещё в состоянии draft: релиз можно создать только как draft." \
-  "Поставьте переменную PLAY_RELEASE_STATUS=draft; затем раскатайте релиз вручную в Play Console (Internal testing → Release → Rollout)."
+  "Поставьте переменную PLAY_RELEASE_STATUS=draft; затем раскатайте релиз вручную в Play Console (Closed testing → alpha → Release → Rollout)."
 has 'debug key|CN=Android Debug|not signed' && say debug_signing \
   "AAB подписан не ключом загрузки (debug) или не подписан." \
   "Проверьте секреты ANDROID_KEYSTORE_*, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD."

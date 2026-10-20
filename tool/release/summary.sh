@@ -6,17 +6,18 @@
 #   IOS_PREFLIGHT_RESULT, IOS_PREFLIGHT_REASON, IOS_RESULT, IOS_VERSION, IOS_BUILD,
 #   IOS_GROUPS, IOS_ERROR_CODE, IOS_ERROR_TEXT, IOS_ERROR_NEXT
 #   ANDROID_PREFLIGHT_RESULT, ANDROID_PREFLIGHT_REASON, ANDROID_RESULT, ANDROID_VERSION,
-#   ANDROID_VERSION_CODE, ANDROID_TRACK, ANDROID_ERROR_*, PLAY_RELEASE_STATUS, RUN_URL
+#   ANDROID_VERSION_CODE, ANDROID_TRACK, ANDROID_RELEASE_STATUS, ANDROID_BETA_TRACK,
+#   ANDROID_ERROR_*, PLAY_RELEASE_STATUS, RUN_URL
 set -uo pipefail
 
-PLAY_URL="https://play.google.com/console/u/0/developers/5871364558640668686/app/4976052836403427313/tracks/internal-testing"
+PLAY_CONSOLE_APP_URL="https://play.google.com/console/u/0/developers/5871364558640668686/app/4976052836403427313"
 TF_URL="https://appstoreconnect.apple.com/apps/6819272902/testflight/ios"
 sha="${SHA:-unknown}"; short="${sha:0:12}"
 
 reason_text() { # code -> "message|next step"
   case "$1" in
     missing_secret) echo "Не хватает секрета или переменной (имена в аннотации ::error::).|Добавьте в Settings → Secrets and variables → Actions и запустите заново." ;;
-    track_not_allowed) echo "Трек не разрешён: только internal и beta, production запрещён.|Выберите internal или beta." ;;
+    track_not_allowed) echo "Трек не разрешён: релиз возможен только в закрытое тестирование alpha.|Запустите android_track=alpha; ANDROID_BETA_TRACK должна быть alpha." ;;
     ref_not_branch) echo "Запуск не с ветки.|Запускайте workflow с ветки main." ;;
     not_main) echo "Запуск не с main.|Запускайте с main или осознанно включите allow_non_main." ;;
     branch_moved|sha_mismatch) echo "Ветка ушла вперёд после запуска; релиз собрал бы не тот коммит.|Запустите workflow заново на актуальной ветке." ;;
@@ -32,6 +33,27 @@ reason_text() { # code -> "message|next step"
 }
 
 verdict() { case "$1" in success) echo SUCCESS;; skipped|'') echo SKIPPED;; cancelled) echo "FAILED (cancelled)";; *) echo FAILED;; esac; }
+
+android_track_value() {
+  local track="${ANDROID_TRACK:-}"
+  [ -n "$track" ] || track="${ANDROID_TRACK_INPUT:-}"
+  [ -n "$track" ] || track="${ANDROID_BETA_TRACK:-alpha}"
+  printf '%s\n' "$track"
+}
+
+android_track_url() {
+  echo "${PLAY_CONSOLE_APP_URL}/tracks/$1"
+}
+
+android_console_section() {
+  echo "Closed testing → $1"
+}
+
+android_install_help() {
+  local track="$1" section
+  section=$(android_console_section "$track")
+  echo "Установка: тестировщик открывает ссылку-приглашение ${section} (Play Console → ${section} → Testers → Copy link), принимает участие и обновляет «MyBrev Test» в Google Play."
+}
 
 # platform block: name result version build channel link tester preflight_result preflight_reason code text next
 block() {
@@ -73,7 +95,7 @@ block() {
 
 echo "## MyBrev Beta Release"
 echo
-echo "Release builds exactly commit \`$sha\` (short \`$short\`). Production is not possible: only TestFlight and Play internal/beta."
+echo "Release builds exactly commit \`$sha\` (short \`$short\`). Android is limited to Google Play closed testing alpha; production is not possible."
 echo
 
 block iOS "${IOS_RESULT:-}" "${IOS_VERSION:-}" "${IOS_BUILD:-}" \
@@ -81,13 +103,18 @@ block iOS "${IOS_RESULT:-}" "${IOS_VERSION:-}" "${IOS_BUILD:-}" \
   "Установка: приложение TestFlight на iPhone → «MyBrev Test»; новая сборка появится после обработки Apple (обычно 5–30 мин)." \
   "${IOS_PREFLIGHT_RESULT:-}" "${IOS_PREFLIGHT_REASON:-}" "${IOS_ERROR_CODE:-}" "${IOS_ERROR_TEXT:-}" "${IOS_ERROR_NEXT:-}" "Build number"
 
+android_track=$(android_track_value)
+android_url=$(android_track_url "$android_track")
+android_help=$(android_install_help "$android_track")
+
 block Android "${ANDROID_RESULT:-}" "${ANDROID_VERSION:-}" "${ANDROID_VERSION_CODE:-}" \
-  "Google Play ${ANDROID_TRACK:-${ANDROID_TRACK_INPUT:-internal}} (by.mybrev.playtest2026)" "$PLAY_URL" \
-  "Установка: тестировщик открывает ссылку-приглашение internal testing (Play Console → Internal testing → Testers → Copy link), принимает участие и обновляет «MyBrev Test» в Google Play." \
+  "Google Play closed testing (${android_track}) (by.mybrev.playtest2026)" "$android_url" \
+  "$android_help" \
   "${ANDROID_PREFLIGHT_RESULT:-}" "${ANDROID_PREFLIGHT_REASON:-}" "${ANDROID_ERROR_CODE:-}" "${ANDROID_ERROR_TEXT:-}" "${ANDROID_ERROR_NEXT:-}" "VersionCode"
 
-if [ "${ANDROID_RESULT:-}" = success ] && [ "${PLAY_RELEASE_STATUS:-}" = draft ]; then
-  echo "> **Android: релиз создан как draft.** Пока Google не проверил приложение, откройте Play Console → Internal testing → релиз → «Review/Roll out» и раскатайте его вручную; до этого тестировщики его не получат."
+android_status="${ANDROID_RELEASE_STATUS:-${PLAY_RELEASE_STATUS:-completed}}"
+if [ "${ANDROID_RESULT:-}" = success ] && [ "$android_status" = draft ]; then
+  echo "> **Android: релиз создан как draft.** Пока Google не проверил приложение, откройте Play Console → $(android_console_section "$android_track") → релиз → «Review/Roll out» и раскатайте его вручную; до этого тестировщики его не получат."
   echo
 fi
 echo "### Manual actions still required"

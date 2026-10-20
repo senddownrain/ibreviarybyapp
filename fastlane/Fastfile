@@ -2,8 +2,7 @@
 # self-hosted GitHub runner (docs/RELEASE_BETA.md).
 #
 #   bundle exec fastlane ios beta            TestFlight
-#   bundle exec fastlane android internal    Google Play internal testing
-#   bundle exec fastlane android beta        Google Play closed testing (ANDROID_BETA_TRACK)
+#   bundle exec fastlane android alpha       Google Play closed testing (alpha)
 #   bundle exec fastlane android check       credentials + track version codes only
 #   bundle exec fastlane android tracks      track ids of the app
 #   bundle exec fastlane ios check           App Store Connect access + latest build
@@ -22,9 +21,9 @@ ANDROID_PACKAGE = "by.mybrev.playtest2026"
 # Every track a version code may already be used on.
 PLAY_STANDARD_TRACKS = %w[internal alpha beta production].freeze
 
-# Tracks a release may go to: an explicit allow-list (production is never one).
-# `beta` is the closed-testing track id from ANDROID_BETA_TRACK.
-PLAY_RELEASE_TRACKS = %w[internal beta].freeze
+# The only release target is Google Play closed testing. Production, internal
+# and open testing are never release targets from this workflow.
+PLAY_RELEASE_TRACKS = %w[alpha].freeze
 PLAY_RELEASE_STATUSES = %w[draft completed].freeze
 
 FLUTTER = ENV["FLUTTER"].to_s.strip.empty? ? "flutter" : ENV["FLUTTER"].strip
@@ -270,7 +269,7 @@ platform :android do
     UI.success("Bundle OK: #{ANDROID_PACKAGE}, versionCode #{version_code}, upload-signed")
   end
 
-  # `kind` is the allow-listed lane (internal / beta); `track` the Play track id.
+  # `kind` is the allow-listed lane (alpha); `track` the Play track id.
   def release(kind, track)
     UI.user_error!("Track #{kind} is not allowed (only #{PLAY_RELEASE_TRACKS.join(', ')}; never production)") unless PLAY_RELEASE_TRACKS.include?(kind)
     UI.user_error!("Not on production (track id #{track})") if track.to_s.strip.empty? || track.to_s =~ /prod/i
@@ -322,6 +321,7 @@ platform :android do
     report("android", {
       "ANDROID_VERSION" => name, "ANDROID_VERSION_CODE" => version_code,
       "ANDROID_TRACK" => track, "ANDROID_COMMIT" => sha,
+      "ANDROID_RELEASE_STATUS" => status,
     })
   end
 
@@ -346,17 +346,11 @@ platform :android do
     client.abort_current_edit
   end
 
-  desc "Signed AAB → Google Play internal testing"
-  lane :internal do
-    release("internal", "internal")
-  end
-
-  desc "Signed AAB → Google Play closed testing «MyBrev Beta» (ANDROID_BETA_TRACK)"
-  lane :beta do
-    # The closed track id comes from `fastlane android tracks`, never guessed.
+  desc "Signed AAB → Google Play closed testing (alpha)"
+  lane :alpha do
     require_env("ANDROID_BETA_TRACK")
     track = ENV.fetch("ANDROID_BETA_TRACK")
-    UI.user_error!("Not on production") if track =~ /prod/i
-    release("beta", track)
+    UI.user_error!("ANDROID_BETA_TRACK must be alpha, got #{track}") unless track == "alpha"
+    release("alpha", track)
   end
 end

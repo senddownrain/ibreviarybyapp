@@ -7,10 +7,10 @@ cd "$(dirname "$0")/../.."
 out="${GITHUB_OUTPUT:-/dev/null}"
 fail() { echo "reason=$1" >> "$out"; echo "::error::$2"; exit 1; }
 
-# Tracks: an explicit allow-list. Production is never a release target.
-case "${ANDROID_TRACK:-internal}" in
-  internal|beta) ;;
-  *) fail track_not_allowed "android_track '${ANDROID_TRACK}' is not allowed: only internal and beta (never production)" ;;
+# Only the closed-testing alpha track is a release target.
+case "${ANDROID_TRACK:-alpha}" in
+  alpha) ;;
+  *) fail track_not_allowed "android_track '${ANDROID_TRACK}' is not allowed: only closed testing alpha (never production)" ;;
 esac
 
 [ "${GITHUB_REF_TYPE:-branch}" = branch ] || fail ref_not_branch "Run from a branch, not ${GITHUB_REF_TYPE} '${GITHUB_REF_NAME}'"

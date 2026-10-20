@@ -8,7 +8,7 @@ Test identities (temporary, bound to their store entries — never rename):
 | Id | `by.mybrev.testflight2026` | `by.mybrev.playtest2026` |
 | Team / signing | `QYGFV6QH5U`; Apple Distribution certificate + App Store profile from the API key (no devices needed), Runner only, per build | upload key → Play App Signing |
 | Firebase app | `1:344097781816:ios:e3feba9d3a782b7dfd8ecd` | `1:344097781816:android:92f6c24311cce114fd8ecd` |
-| Destination | TestFlight (never App Store review) | `internal`, then closed testing «MyBrev Beta» (never production) |
+| Destination | TestFlight (never App Store review) | closed testing `alpha` only (never production) |
 
 The Android code namespace stays `com.example.mybrev_flutter`: it only names
 the Kotlin/R classes, Google Play never sees it, and changing it would move
@@ -23,9 +23,8 @@ bundle config set --local path vendor/bundle && bundle install
 bundle exec fastlane ios check          # API access + latest TestFlight build
 bundle exec fastlane ios beta           # signed IPA → TestFlight
 bundle exec fastlane android check      # service account + version codes in use
-bundle exec fastlane android internal   # signed AAB → internal testing
 bundle exec fastlane android tracks     # track ids (closed testing has its own)
-bundle exec fastlane android beta       # → closed testing (ANDROID_BETA_TRACK)
+bundle exec fastlane android alpha      # signed AAB → closed testing alpha
 ```
 
 A release refuses uncommitted changes (`ALLOW_DIRTY=1` overrides on
@@ -47,36 +46,32 @@ lost upload key can only be replaced through Google Play support.
 ## Как выпустить тестовую версию (кратко)
 
 1. GitHub → **Actions** → **MyBrev Beta Release** → **Run workflow** (ветка `main`).
-2. Выберите `platform` (both / android / ios), `android_track` (internal — по умолчанию; beta — закрытое тестирование), при желании `release_notes` — что проверить тестировщикам.
-3. Нажмите **Run workflow** и дождитесь окончания (Android ≈ 15 мин, iOS ≈ 20–40 мин).
-4. Откройте запуск → **Summary**: по каждой платформе `SUCCESS` / `FAILED` / `SKIPPED`, коммит, версия, номер сборки, канал, ссылка на консоль и, при ошибке, причина и следующий шаг.
-5. Тестировщики ставят: Android — по ссылке-приглашению internal testing в Google Play; iOS — из приложения TestFlight. Пока `PLAY_RELEASE_STATUS=draft`, релиз Android нужно один раз раскатать вручную: Play Console → Internal testing → релиз → Roll out.
+2. `android_track` всегда `alpha`; при желании заполните `release_notes` — что проверить тестировщикам.
+3. Нажмите **Run workflow** и дождитесь окончания (Android ≈ 15 мин).
+4. Откройте запуск → **Summary**: `SUCCESS` / `FAILED`, коммит, версия, номер сборки, канал, ссылка на консоль и, при ошибке, причина и следующий шаг.
+5. Тестировщики ставят Android по ссылке-приглашению Closed testing → alpha в Google Play. Пока `PLAY_RELEASE_STATUS=draft`, раскатайте релиз вручную: Play Console → Closed testing → alpha → релиз → Roll out. iOS выпускается локально через `fastlane ios beta`.
 
 Запуск с другой ветки (проверка самого пайплайна) возможен только с `allow_non_main=true`.
 
 ## Through GitHub
 
-`platform` (both / ios / android), `android_track` (internal / beta),
-`release_notes`, `allow_non_main` (default false), `run_full_tests` (default
-false). Manual only (`workflow_dispatch`): pushes and pull requests never
-publish. The summary shows the commit, versions, build numbers and
-destinations; iOS and Android report separately.
+`android_track` (`alpha` only), `release_notes`, `allow_non_main` (default
+false), `run_full_tests` (default false). Manual only (`workflow_dispatch`):
+pushes and pull requests never publish. The summary shows the commit, version,
+versionCode and the actual Play track. iOS is built locally on the Mac.
 
-Pipeline: `prepare → quality → preflight-<platform> → <platform> → summary`.
+Pipeline: `prepare → quality → preflight-android → android → summary`.
 
 | Job | Where | What it guarantees |
 |---|---|---|
-| `prepare` | ubuntu | the ref is a **branch tip**: `main` at the current `origin/main`, or another branch only with `allow_non_main=true`; the checkout equals the SHA of the run and is clean; track is `internal`/`beta`; the Flutter version is derived from `pubspec.yaml` and must agree with `codemagic.yaml` |
+| `prepare` | ubuntu | the ref is a **branch tip**: `main` at the current `origin/main`, or another branch only with `allow_non_main=true`; the checkout equals the SHA of the run and is clean; track is `alpha`; the Flutter version is derived from `pubspec.yaml` and must agree with `codemagic.yaml` |
 | `quality` | ubuntu | installed Flutter equals the pubspec requirement; `pub get --enforce-lockfile`; `flutter analyze --no-fatal-infos`; the quick tests |
-| `preflight-android` | ubuntu | secrets present (names only), track/status allow-list, the upload keystore decodes and has the alias |
-| `preflight-ios` | Mac runner | clean checkout, free disk, Flutter/Xcode/Java/fastlane on the runner, App Store Connect secrets present |
-| `android` / `ios` | ubuntu / Mac runner | build exactly the SHA of the run; fastlane lane; `jarsigner` check of the AAB (no debug key); version code / build number is the store maximum + 1 and is **checked again right before the upload** |
-| `summary` | ubuntu | per-platform verdict, runs `always()` |
+| `preflight-android` | ubuntu | secrets present (names only), `ANDROID_BETA_TRACK=alpha`, status allow-list, the upload keystore decodes and has the alias |
+| `android` | ubuntu | build exactly the SHA of the run; `fastlane android alpha`; `jarsigner` check of the AAB (no debug key); version code is the store maximum + 1 and is **checked again right before the upload** |
+| `summary` | ubuntu | Android verdict, runs `always()` |
 
-A critical error in `prepare`, `quality` or a preflight stops everything
-before signing and any store upload. Neither platform needs the other's
-success: each has its own preflight and release job; `prepare`/`quality` only
-judge the commit that both stores would receive.
+A critical error in `prepare`, `quality` or `preflight-android` stops everything
+before signing and any store upload; `prepare`/`quality` judge the exact commit.
 
 **What does not block.** `flutter analyze --no-fatal-infos`: analyzer
 *infos* (style hints, deprecations) are old and non-critical and do not stop
@@ -93,10 +88,9 @@ parity suites (`*_parity_test.dart`, several minutes). Set `run_full_tests`
 for the full `flutter test` before a significant release.
 
 **Concurrency.** Android releases queue behind each other
-(`mybrev-beta-release-android`), iOS releases behind each other
-(`mybrev-beta-release-ios`); `cancel-in-progress: false`, so a running upload
+(`mybrev-beta-release-android`); `cancel-in-progress: false`, so a running upload
 is never killed. (GitHub keeps one pending run per group: a third dispatch
-replaces a waiting second one.) Android and iOS never wait for each other.
+replaces a waiting second one.)
 
 **Build numbers.** next = highest number in the store + 1 (never below the
 pubspec build number), computed at the start and re-checked right before the
@@ -104,16 +98,15 @@ upload; a number that has been taken meanwhile stops the release with
 «Version code conflict» (just run it again).
 
 **Production is impossible.** Allow-lists in the workflow, in
-`tool/release/check_ref.sh` and in `fastlane/Fastfile`: Play track only
-`internal` or `beta` (`ANDROID_BETA_TRACK` must not contain `prod`), release
-status only `draft`/`completed`, and no lane calls App Store review or a
-production rollout.
+`tool/release/check_ref.sh` and in `fastlane/Fastfile`: Play track only closed
+testing `alpha` (`ANDROID_BETA_TRACK=alpha`), release status only
+`draft`/`completed`, and no lane calls App Store review or a production rollout.
 
 **Flutter version: one source.** `pubspec.yaml` `environment.flutter`
 (`>=3.41.4`): the lower bound is what CI installs
 (`tool/release/flutter_version.sh`). `prepare` fails with «Flutter version
-drift» if `codemagic.yaml` pins another version, `quality` and
-`preflight-ios` fail if the installed SDK differs. To move to a new Flutter:
+drift» if `codemagic.yaml` pins another version, and `quality` fails if the
+installed SDK differs. To move to a new Flutter:
 edit `pubspec.yaml` and `codemagic.yaml`, nothing else.
 
 Toolchain (checked against Flutter 3.41.4): Dart `^3.11.1`, Java 17 (AGP 8.11.1,
@@ -123,13 +116,9 @@ CocoaPods 1.16.2, Xcode 26.4 on the Mac.
 
 Where it runs:
 
-- **Android** — a GitHub-hosted Linux runner (`ubuntu-latest`): no Mac needed.
-- **iOS** — the self-hosted runner with labels `self-hosted, macOS,
-  mybrev-release` (the Mac must be on; Apple signing needs macOS). Check it
-  first with **Release runner smoke test**. If the Mac is off, the iOS job
-  waits in the queue (no timeout until a runner appears); Android and the
-  summary are not affected. An optional variable `IOS_FLUTTER_BIN` points the
-  runner to a Flutter 3.41.4 `bin/flutter` when its PATH has an older one.
+- **Android** — `MyBrev Android Beta Release` on a GitHub-hosted Linux runner
+  (`ubuntu-latest`): no Mac needed.
+- **iOS** — locally on the developer Mac via `bundle exec fastlane ios beta`.
 
 Known failures and what the summary tells you: missing secret name · track not
 allowed · stale branch/SHA · Flutter mismatch · keystore does not open · debug
@@ -149,10 +138,10 @@ log lines into outputs.
 | `ANDROID_KEYSTORE_BASE64` | `base64 -i ~/.mybrev-release/upload-keystore.jks` |
 | `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | from `~/.mybrev-release/key.properties` |
 
-Repository variables: `ANDROID_BETA_TRACK` (closed testing track id
-from `fastlane android tracks`), `IOS_TESTFLIGHT_GROUPS` (optional,
-comma-separated), `IOS_FLUTTER_BIN` (optional), `PLAY_RELEASE_STATUS`
-(`draft` until Google has reviewed the app once, then empty = `completed`).
+Repository variables: `ANDROID_BETA_TRACK=alpha` (checked by both workflow and
+Fastfile), `IOS_TESTFLIGHT_GROUPS` (optional, comma-separated),
+`IOS_FLUTTER_BIN` (optional), `PLAY_RELEASE_STATUS` (`draft` until Google has
+reviewed the app once, then empty = `completed`).
 
 Secrets become temporary files (0600) only for the run and are deleted when
 fastlane exits; nothing is uploaded as an artifact; no step uses `set -x`;
@@ -180,7 +169,7 @@ GitHub masks secret values; the keystore check prints nothing from the file.
    base64 -i ~/.mybrev-release/AuthKey_2NFRMNSHJU.p8 | tr -d '\n' | gh secret set APP_STORE_CONNECT_PRIVATE_KEY_BASE64 --repo senddownrain/ibreviarybyapp
    ```
 3. **Flutter на Mac-раннере** должен быть 3.41.4 (`flutter --version` из сервиса, см. smoke-тест) либо задайте переменную `IOS_FLUTTER_BIN=/Users/<user>/.cache/flutter-3.41.4/bin/flutter`.
-4. Запустите **Release runner smoke test**, затем MyBrev Beta Release с `platform=ios`. Сертификат Apple Distribution должен быть в связке ключей пользователя раннера (как на Mac разработчика).
+4. iOS-релиз запускается локально: `bundle exec fastlane ios beta`. Сертификат Apple Distribution должен быть в связке ключей пользователя Mac.
 
 Первый запуск на Mac-раннере делается из `~/.mybrev-release`-окружения владельца;
 до этого iOS-сборки выпускаются локально: `bundle exec fastlane ios beta`
@@ -192,7 +181,7 @@ GitHub masks secret values; the keystore check prints nothing from the file.
 подключён с правами на выпуск; ключ загрузки (upload key) создан, включён
 Play App Signing; секреты Android лежат в репозитории; `PLAY_RELEASE_STATUS=draft`
 (пока приложение не проверено Google, релиз остаётся черновиком и раскатывается
-вручную в Play Console → Internal testing). Подтверждено: versionCode 10
+вручную в Play Console → Closed testing → alpha). Подтверждено: versionCode 10
 загружен запуском GitHub Actions 38387005961 (ubuntu, Flutter 3.41.4).
 
 ## The runner after a reboot
