@@ -1,0 +1,37 @@
+{
+  "display": "1080x2400",
+  "emulatorVersion": "36.4.10.0",
+  "ramMB": 4096,
+  "apkApplicationId": "by.mybrev.playtest2026",
+  "avd": "MyBrev_Test_API34",
+  "dpi": 420,
+  "abi": "x86_64",
+  "apks": [
+    {
+      "templatesRevision": 2,
+      "properTextsRevision": 2,
+      "lastWriteTime": "2026-10-17T21:35:02.9414551+03:00",
+      "path": "C:\\Users\\User\\Documents\\GitHub\\mybrev-apk-check\\build\\app\\outputs\\flutter-apk\\app-debug.apk",
+      "sha256": "52d1979442968b5fca47bd7da6416befd7c9b1e5e9ba52f594bddffeb9a55a56",
+      "bytes": 179007185
+    },
+    {
+      "templatesRevision": 3,
+      "properTextsRevision": 4,
+      "lastWriteTime": "2026-10-21T04:29:12.3795824+03:00",
+      "path": "C:\\Users\\User\\Documents\\GitHub\\ibreviarybyapp\\build\\app\\outputs\\flutter-apk\\app-debug.apk",
+      "sha256": "49b9fd2f8e97c7c695e9c8919a251ca31bf89db3a398601a01b55b87dda49633",
+      "bytes": 200202815
+    }
+  ],
+  "versionCode": 6,
+  "acceleration": "WHPX",
+  "signerCertificateSha256": "21b8f556979f25f321a3f6f21d8fe347ef1ac7d5ddd5b9738cae1e95ee408c3f",
+  "builtCommit": "a5a0396ded3a9a47e0f4bc1088e2444c401d3d40",
+  "versionName": "1.0.0",
+  "deviceProfile": "pixel_7",
+  "api": 34,
+  "cores": 4,
+  "serial": "emulator-5554",
+  "bootCompleted": true
+}

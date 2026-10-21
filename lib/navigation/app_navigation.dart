@@ -96,6 +96,10 @@ class BranchShellController extends ReaderChromeModeController {
     _entries.remove(entry.id);
     _overrides.remove(entry.id);
     _contextualBottomSlots.remove(entry.id);
+    // Page replacement can push the new reader before removing the old one.
+    // Cleanup of that inactive route must not reveal its previous (root) page
+    // over the reader which is already active.
+    if (_activeEntryId != entry.id) return;
     if (revealed != null) {
       reveal(revealed);
     } else if (_activeEntryId == entry.id) {

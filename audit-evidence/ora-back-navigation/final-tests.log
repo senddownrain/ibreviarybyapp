@@ -1,0 +1,150 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 32 ms
+[ContentStore] prayers: 115 docs in 118 ms
+[ContentStore] invitatoriums: 4 docs in 175 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 130 ms
+[ContentStore] completoriums: 35 docs in 171 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 123 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 62 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 79 ms
+[ContentStore] liturgicalTemplates: 16 docs in 250 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 192 ms
+[ContentStore] readings: 822 docs in 447 ms
+[ContentStore] days: 736 docs in 647 ms
+[ContentStore] songs: 447 docs in 58 ms
+[ContentStore] compendiumMeta: 1 docs in 35 ms
+[ContentStore] compendium: 27 docs in 48 ms
+00:01 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: direct list entry, system Back (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+[data] CACHE HIT  hour laudes 19-10-sv-paul-of-cross--religious
+00:10 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: one replacement, system Back (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+00:10 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: (setUpAll)
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 9316 ms
+00:18 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: one replacement, system Back (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+[data] CACHE HIT  hour laudes 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour vespers 19-10-sv-paul-of-cross--religious
+00:18 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: repeated replacements never accumulate hours (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+[data] CACHE HIT  hour morning 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour vespers 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour lectionis 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour laudes 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour vespers 19-10-sv-paul-of-cross--religious
+00:28 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: screen Back agrees after replacement (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+[data] CACHE HIT  hour laudes 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour vespers 19-10-sv-paul-of-cross--religious
+00:30 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: direct route without previous visit, system Back (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+[data] CACHE HIT  hour laudes 19-10-sv-paul-of-cross--religious
+00:31 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: direct route and repeated replacements, screen Back (minsk-mohilev, 19-10-sv-paul-of-cross--religious)
+[data] CACHE HIT  hour morning 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour vespers 19-10-sv-paul-of-cross--religious
+[data] CACHE HIT  hour laudes 19-10-sv-paul-of-cross--religious
+00:37 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: direct list entry, system Back (pinsk, ordinary-w29-d3)
+[data] CACHE HIT  hour laudes ordinary-w29-d3
+00:39 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: one replacement, system Back (pinsk, ordinary-w29-d3)
+[data] CACHE HIT  hour laudes ordinary-w29-d3
+[data] CACHE HIT  hour vespers ordinary-w29-d3
+00:41 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: repeated replacements never accumulate hours (pinsk, ordinary-w29-d3)
+[data] CACHE HIT  hour morning ordinary-w29-d3
+[data] CACHE HIT  hour vespers ordinary-w29-d3
+[data] CACHE HIT  hour lectionis ordinary-w29-d3
+[data] CACHE HIT  hour laudes ordinary-w29-d3
+[data] CACHE HIT  hour vespers ordinary-w29-d3
+00:51 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: screen Back agrees after replacement (pinsk, ordinary-w29-d3)
+[data] CACHE HIT  hour laudes ordinary-w29-d3
+[data] CACHE HIT  hour vespers ordinary-w29-d3
+00:57 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: direct route without previous visit, system Back (pinsk, ordinary-w29-d3)
+[data] CACHE HIT  hour laudes ordinary-w29-d3
+00:59 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: direct route and repeated replacements, screen Back (pinsk, ordinary-w29-d3)
+[data] CACHE HIT  hour morning ordinary-w29-d3
+[data] CACHE HIT  hour vespers ordinary-w29-d3
+[data] CACHE HIT  hour laudes ordinary-w29-d3
+01:11 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ora_back_navigation_test.dart: (tearDownAll)
+01:12 +12: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart
+01:15 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: removing replaced inactive reader keeps new reader chrome active
+01:15 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: route entry owns Full Compact Hidden and pop restores previous mode
+01:15 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: each branch owns an independent chrome controller
+01:15 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: Full to Full route change publishes descriptor ownership
+01:15 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: contextual bottom slot does not change the reader chrome mode
+01:15 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: live bottom slot survives URI reset and inactive owner can release it
+01:15 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_state_test.dart: Ora return token is valid only while its route entry exists
+01:15 +19: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart
+01:19 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: readings route preserves the Ora date and selected day context
+01:19 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: readings route omits an empty optional day context
+01:19 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/reader_navigation_test.dart: Ora route safely carries the selected day and hour
+01:19 +22: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart
+01:21 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: branch switch preserves stacks and active repeat returns root
+01:25 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/stateful_shell_navigation_test.dart: direct link activates its owning branch
+01:25 +24: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart
+01:28 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: router has four stable restored StatefulShell branches
+01:28 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: reader deep links are descendants of the correct branch
+01:28 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: canonical direct links match the navigator of their owning branch
+01:28 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: the former Катэхізіс route redirects to the Compendium
+01:28 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: legacy compatibility aliases remain registered
+01:28 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: Hours and Readings dates are independent branch state
+01:28 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/router_architecture_test.dart: start section preference resolves only to the four branch roots
+01:28 +31: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart
+01:33 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: (setUpAll)
+01:33 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: Bible selection temporarily owns the bottom slot
+01:33 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+[ContentUpdates] check failed: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+01:40 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+01:41 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/app_shell_restoration_test.dart: (tearDownAll)
+01:41 +34: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart
+01:44 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: (setUpAll)
+01:44 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter sorted first option becomes primary and empty is explicit
+01:44 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter alternatives count excludes primary and manual choice is resolved
+01:44 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter template choice updates effective day without changing option
+01:44 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter hour availability keeps production checkFields rule
+01:44 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter Compline availability uses its separate record source
+01:44 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter manual overrides are session-scoped per date
+01:44 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter Hours and Readings share date and selected celebration
+01:44 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: single option hides alternatives and hour opens correct Ora
+01:48 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours title has no calendar capsule
+01:49 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: local celebration shows its Belarusian diocese name
+01:50 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: alternatives sheet updates the selected celebration in place
+01:50 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Today moves Hours and Readings to the same date
+01:51 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours layout supports 200 percent text on a narrow surface
+01:51 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: (tearDownAll)
+01:51 +47: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart
+01:54 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 156 ms
+[ContentStore] prayers: 115 docs in 255 ms
+[ContentStore] invitatoriums: 4 docs in 27 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 22 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 26 ms
+[ContentStore] completoriums: 35 docs in 49 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 58 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 85 ms
+[ContentStore] liturgicalTemplates: 16 docs in 241 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 277 ms
+[ContentStore] readings: 822 docs in 394 ms
+[ContentStore] days: 736 docs in 776 ms
+01:56 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: real A–F inputs: every text value and source equals production Web
+01:56 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (setUpAll)
+[ContentStore] compendiumMeta: 1 docs in 33 ms
+[ContentStore] songs: 447 docs in 36 ms
+[ContentStore] compendium: 27 docs in 35 ms
+01:56 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: explicit bases win; conflicting, invalid and inferred sources never guess
+01:56 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (setUpAll)
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 446 ms
+01:56 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: Proper precedes Common; absent base, ref and Common stay diagnosed gaps
+01:56 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: seasonal base, omission, rule and Marian section do not mutate cache
+01:56 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: choice survives hour navigation and date switching; cache rebuild keeps dioceses separate
+01:57 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: offline bundle contains revision 4, 29 bases, rules and seasonal Commons
+01:57 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 91 ms
+[ContentStore] invitatoriums: 4 docs in 26 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 24 ms
+[ContentStore] completoriums: 35 docs in 26 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 17 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 20 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 35 ms
+[ContentStore] liturgicalTemplates: 16 docs in 197 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 227 ms
+[ContentStore] readings: 822 docs in 631 ms
+[ContentStore] days: 736 docs in 1084 ms
+01:59 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (tearDownAll)
+01:59 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] compendiumMeta: 1 docs in 9 ms
+01:59 +54: All tests passed!

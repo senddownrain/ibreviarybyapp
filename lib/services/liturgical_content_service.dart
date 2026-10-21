@@ -5,6 +5,7 @@ import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
 import 'package:mybrev_flutter/ordo/engine.dart';
 import 'package:mybrev_flutter/ordo/runtime.dart';
+import 'package:mybrev_flutter/ordo/season.dart';
 import 'package:mybrev_flutter/services/days_index.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
@@ -578,6 +579,7 @@ class LiturgicalContentService {
               isSunday: date.weekday == DateTime.sunday,
               choice: choice,
               office: office,
+              season: computeSeason(isoOf(date)),
             );
             final choiceId = assemblyDayId(proper.id, choice, isDefault: false);
             final id = index == 0 ? proper.id : choiceId;
@@ -1244,6 +1246,7 @@ LiturgicalDay assembleSparseDay(
     templates: HiveService.isCacheReady ? HiveService.templates() : const {},
     isSunday: date.weekday == DateTime.sunday,
     choice: choice,
+    season: computeSeason(isoOf(date)),
   );
   return LiturgicalDay.fromMap({...assembly.data, 'id': doc.id});
 }
