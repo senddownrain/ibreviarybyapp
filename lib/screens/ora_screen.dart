@@ -673,7 +673,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         diocese: widget.diocese,
       ),
     );
-    context.replace(
+    // A different hour is a new reader page, replacing the current one. Reusing
+    // its page key with replace leaves the branch Navigator unchanged after
+    // the root choice sheet closes: Android can retain its canHandlePop=false
+    // notification even though the branch still has the day list underneath.
+    context.pushReplacement(
       route
           .replace(queryParameters: {...currentQuery, ...route.queryParameters})
           .toString(),

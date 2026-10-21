@@ -1,0 +1,41 @@
+{
+  "avd": "MyBrev_Test_API34",
+  "existingAvdReused": true,
+  "api": 34,
+  "abi": "x86_64",
+  "ramMB": 4096,
+  "cores": 4,
+  "apkSha256": "6849e3c3f80228ef5f3597a8b0db96a62281ccdddf0626f2f5b8f1114bbabb19",
+  "entrypoint": "lib/main.dart",
+  "tests": [
+    {
+      "path": "day -> laudes -> adb KEYCODE_BACK",
+      "result": "same day list"
+    },
+    {
+      "path": "day -> morning -> hour picker vespers -> adb KEYCODE_BACK",
+      "result": "same day list; MyBrev activity remains foreground"
+    },
+    {
+      "path": "day -> laudes -> hour picker vespers -> adb KEYCODE_BACK",
+      "result": "same day list"
+    },
+    {
+      "path": "day -> laudes -> vespers -> lectionis -> laudes -> screen Back",
+      "result": "same day list in one step"
+    }
+  ],
+  "commonRetained": "religious; checked radio verified after Back",
+  "dateRetained": "2026-10-19",
+  "readerChromeAfterReplacement": "compact; no duplicate day-list controls",
+  "settings": {
+    "theme": "dark",
+    "fontSize": "180%"
+  },
+  "airplaneMode": true,
+  "environmentIssue": "Android System UI ANR on full emulator boot, recovered before navigation checks; initial am start -W timed out; actual screen readiness verified with UIAutomator",
+  "scope": "navigation only; direct URL and alternate date/diocese covered by production-router widget tests",
+  "emulatorStopped": true,
+  "avdRetained": true,
+  "nativeScreenshotsViewed": 3
+}

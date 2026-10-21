@@ -303,6 +303,8 @@ final router = GoRouter(
                             )
                           : HoursDateContext(
                               date: date,
+                              dayId: state.pathParameters['dayId'],
+                              diocese: state.uri.queryParameters['diocese'],
                               child: OraScreen(
                                 key: ValueKey('ora-${state.uri}'),
                                 dayId: state.pathParameters['dayId']!,

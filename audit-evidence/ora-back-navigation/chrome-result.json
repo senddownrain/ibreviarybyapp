@@ -1,0 +1,27 @@
+{
+  "browser": "Google Chrome launched by Flutter",
+  "baseUrl": "http://localhost:5238/",
+  "debuggingPort": 49736,
+  "viewportCSS": [
+    411,
+    915
+  ],
+  "harness": "tool/common_office_smoke.dart",
+  "firebaseInitialized": false,
+  "scope": "navigation fix visual smoke only; previous full Common visual matrix remains partial",
+  "states": [
+    "light day list",
+    "light religious lauds",
+    "light religious vespers after picker replacement",
+    "dark 180% lauds after scroll"
+  ],
+  "actions": [
+    "select religious in existing picker",
+    "list -> lauds -> hour picker -> vespers -> screen Back -> same day",
+    "reload harness with theme=dark&scale=large",
+    "select religious -> lauds -> scroll -> return to top",
+    "readings link -> Return to Ora -> screen Back -> same day"
+  ],
+  "screenshotsViewed": 4,
+  "cdpVisibility": "focus emulation enabled for occluded page; persistent CDP connection"
+}

@@ -44,6 +44,27 @@ const _bibleRoot = AppRouteDescriptor(
 );
 
 void main() {
+  test('removing replaced inactive reader keeps new reader chrome active', () {
+    final hours = BranchShellController(AppBranch.hours, _hoursRoot);
+    addTearDown(hours.dispose);
+    const root = AppRouteEntry(id: 'root', descriptor: _hoursRoot);
+    const oldHour = AppRouteEntry(id: 'old-hour', descriptor: _ora);
+    const newHour = AppRouteEntry(id: 'new-hour', descriptor: _ora);
+    hours.activate(root);
+    hours.activate(oldHour);
+    hours.request(oldHour.id, ReaderChromeMode.hidden);
+    hours.activate(newHour);
+    // Navigator replacement pushes the new page, then removes the old page.
+    hours.remove(oldHour, revealed: root);
+    expect(hours.activeEntryId, newHour.id);
+    expect(hours.isAtRoot, isFalse);
+    expect(hours.value, ReaderChromeMode.compact);
+    expect(hours.containsEntry(oldHour.id), isFalse);
+    hours.remove(newHour, revealed: root);
+    expect(hours.activeEntryId, root.id);
+    expect(hours.value, ReaderChromeMode.full);
+  });
+
   test(
     'route entry owns Full Compact Hidden and pop restores previous mode',
     () {
