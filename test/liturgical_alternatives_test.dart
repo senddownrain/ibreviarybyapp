@@ -67,6 +67,30 @@ void main() {
       expect(options.first.html, isNot(contains('Год А:')));
     });
 
+    test('keeps Psalm 26:7-14 whole when verse 8 begins with “Пра ...:”', () {
+      final psalm = [
+        '<p>II (7-14)</p>',
+        '<p>Пачуй, Пане, мой голас, калі я клічу, * змілуйся нада мною і адкажы мне.</p>',
+        '<p>Пра Цябе кажа маё сэрца: † «Шукай Ягонага аблічча!» * Буду шукаць Твайго аблічча, Пане.</p>',
+        '<p>Не хавай ад мяне свайго твару.</p>',
+      ].join();
+      final options = getLiturgicalAlternatives(psalm, kind: 'psalm');
+
+      expect(options, hasLength(1));
+      expect(hasLiturgicalAlternatives(psalm, kind: 'psalm'), isFalse);
+      expect(options.single.html, contains('Пачуй, Пане, мой голас'));
+      expect(options.single.html, contains('Пра Цябе кажа маё сэрца:'));
+      expect(options.single.html, contains('Не хавай ад мяне'));
+    });
+
+    test('still permits explicit hr-delimited psalm alternatives', () {
+      final options = getLiturgicalAlternatives(
+        '<p>Псальм 1.</p><hr><p>Або:</p><p>Іншы псальм.</p>',
+        kind: 'psalm',
+      );
+      expect(options, hasLength(2));
+    });
+
     test('does not split narrative “У тыя дні” as a category', () {
       final options = getLiturgicalAlternatives(
         '<p>У тыя дні: Езус сказаў вучням.</p><p>Працяг чытання.</p>',
