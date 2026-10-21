@@ -1,0 +1,35 @@
+name: Flutter PR checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/flutter-pr-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  flutter-check:
+    name: Flutter analyze and alternatives regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.41.4'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Check changed Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+      - name: Unit regression
+        run: flutter test test/liturgical_alternatives_test.dart
