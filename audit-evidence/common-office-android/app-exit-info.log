@@ -1,0 +1,12 @@
+ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)
+Last Timestamp of Persistence Into Persistent Storage: 2026-10-21 01:59:11.057
+  package: by.mybrev.playtest2026
+    Historical Process Exit for uid=10192
+        ApplicationExitInfo #0:
+          timestamp=2026-10-21 01:57:09.032 pid=6444 realUid=10192 packageUid=10192 definingUid=10192 user=0
+          process=by.mybrev.playtest2026 reason=10 (USER REQUESTED) subreason=21 (FORCE STOP) status=0
+          importance=100 pss=459MB rss=600MB description=stop by.mybrev.playtest2026 due to from pid 10872 state=empty trace=null
+        ApplicationExitInfo #1:
+          timestamp=2026-10-21 01:34:35.204 pid=5553 realUid=10192 packageUid=10192 definingUid=10192 user=0
+          process=by.mybrev.playtest2026 reason=10 (USER REQUESTED) subreason=21 (FORCE STOP) status=0
+          importance=100 pss=365MB rss=501MB description=stop by.mybrev.playtest2026 due to from pid 6391 state=empty trace=null

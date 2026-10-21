@@ -1,0 +1,439 @@
+{
+  "method": "Native accessibility body against bundled source prefixes (90 normalized characters; first antiphon 45; psalm title only), case-insensitive; not a full-document hash comparison",
+  "checks": [
+    {
+      "variant": "current-day",
+      "hour": "lauds",
+      "fields": [
+        {
+          "field": "laudesHymn",
+          "source": "day",
+          "expectedStart": "ЗзяннебляскуБожайхвалы,Той,хтоадСвятлапаходзіць,БляскуіжыццяСтварыцель,Дзень,якіўседніства",
+          "matched": true
+        },
+        {
+          "field": "laudesAnt1",
+          "source": "day",
+          "expectedStart": "1ант.Пане,даЦябемалюся,*выслухайраніцаймойголас.",
+          "matched": true
+        },
+        {
+          "field": "laudesPs1",
+          "source": "day",
+          "expectedStart": "Псальм 5",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "current-day",
+      "hour": "officeOfReadings",
+      "fields": [
+        {
+          "field": "officeOfReadingsR1",
+          "source": "day",
+          "expectedStart": "ПершаечытаннеКнігаЭстэры3,1-15ПагрозадлягабрэяўПаслягэтагакарольАхашверошузвысіўАмана,сына",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsR2",
+          "source": "proper",
+          "expectedStart": "ДругоечытаннеЛістсв.ПаўлаадКрыжа,прэзбітэра(Epist.1,43;2,440.825)АбвяшчаемХрыстаўкрыжавана",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "current-day",
+      "hour": "vespers",
+      "fields": [
+        {
+          "field": "vesperHymn",
+          "source": "day",
+          "expectedStart": "Творца,ТысяродбязладдзяАддзяліўзямлюаднеба,Длявадыакрэсліўмежы,Кабнезмешваласязсушай.Месца",
+          "matched": true
+        },
+        {
+          "field": "vesperAnt1",
+          "source": "day",
+          "expectedStart": "1ант.ВочыПана*глядзяцьнаўбогага.",
+          "matched": true
+        },
+        {
+          "field": "vesperPs1",
+          "source": "day",
+          "expectedStart": "Псальм 11 (10)",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "pastors",
+      "hour": "lauds",
+      "fields": [
+        {
+          "field": "laudesHymn",
+          "source": "pastors",
+          "expectedStart": "Прааднагопастыра:Гімнампастырапраславім,Мудрагаайца,вызнаўцу,БоёнразамзНайвышэйшымВаладары",
+          "matched": true
+        },
+        {
+          "field": "laudesAnt1",
+          "source": "pastors",
+          "expectedStart": "1ант.Вы–святлосвету.*Неможасхаваццагорад,/якістаіцьнавяршынігары.",
+          "matched": true
+        },
+        {
+          "field": "laudesPs1",
+          "source": "sunday-week-1",
+          "expectedStart": "Псальм 63 (62)",
+          "matched": true
+        },
+        {
+          "field": "laudesR",
+          "source": "pastors",
+          "expectedStart": "КароткаечытаннеГбр13,7-9аПамятайцепранастаўнікаўвашых,якіяабвяшчалівамБожаеслова,і,разважа",
+          "matched": true
+        },
+        {
+          "field": "laudesInter",
+          "source": "pastors",
+          "expectedStart": "ЗудзячнасцюпраславімХрыста–добрагапастыра,якіаддаўсваёжыццёзаавечак.ПакорнапросімЯго:Пасві",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "pastors",
+      "hour": "officeOfReadings",
+      "fields": [
+        {
+          "field": "officeOfReadingsHymn",
+          "source": "pastors",
+          "expectedStart": "Прааднагопастыра:Ты,Хрыстэ,дляпастыраўпрыклад,Вядзешіхіімікіруеш,ТамумызналежнайпашанайГім",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsR1",
+          "source": "pastors",
+          "expectedStart": "ПраПапуцібіскупа:Пасланнесв.апосталаПаўладаЦіта1,7-11;2,1-8ВучэннеАпосталаўпрабіскупскаесл",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsR2",
+          "source": "proper",
+          "expectedStart": "ДругоечытаннеЛістсв.ПаўлаадКрыжа,прэзбітэра(Epist.1,43;2,440.825)АбвяшчаемХрыстаўкрыжавана",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": true
+    },
+    {
+      "variant": "pastors",
+      "hour": "vespers",
+      "fields": [
+        {
+          "field": "vesperHymn",
+          "source": "pastors",
+          "expectedStart": "Прааднагопастыра:Муждастойны,вобразцноты,Прыкладсвятасцідляверных,Гімн,якітабеспяваем,Хайп",
+          "matched": true
+        },
+        {
+          "field": "vesperAnt1",
+          "source": "pastors",
+          "expectedStart": "1ант.ЯстаўслугойЕвангелля,*дзякуючыдаруласкіБожай.",
+          "matched": true
+        },
+        {
+          "field": "vesperPs1",
+          "source": "pastors",
+          "expectedStart": "Псальм   15 (14)",
+          "matched": true
+        },
+        {
+          "field": "vesperR",
+          "source": "pastors",
+          "expectedStart": "Кароткаечытанне1П5,1-4Старэйшыхсяродвасязаклікаюякадзінсастарэйшых,яксведкацярпенняўХрысто",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "religious",
+      "hour": "lauds",
+      "fields": [
+        {
+          "field": "laudesHymn",
+          "source": "religious",
+          "expectedStart": "Годныпашаны,нашЗбаўца,ТысэрцылюдзейкіруешМоцайлюбовіпразДухаДаеднасцізнашымАйцом.ПаволіТва",
+          "matched": true
+        },
+        {
+          "field": "laudesAnt1",
+          "source": "holy-men",
+          "expectedStart": "1ант.Панадарыўіхвечнымсвятлом*ідаўімуспадчынувечнуюславу.",
+          "matched": true
+        },
+        {
+          "field": "laudesPs1",
+          "source": "sunday-week-1",
+          "expectedStart": "Псальм 63 (62)",
+          "matched": true
+        },
+        {
+          "field": "laudesR",
+          "source": "holy-men",
+          "expectedStart": "КароткаечытаннеРым12,1-2Прашувас,браты,празлітасцьБожую,аддайцевашыяцелынаахвяружывую,свят",
+          "matched": true
+        },
+        {
+          "field": "laudesInter",
+          "source": "holy-men",
+          "expectedStart": "ПраславімХрыста,СвятогаБога,імолімся,кабмыслужыліЯмуўсвятасціісправядлівасціваўседнінашага",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "religious",
+      "hour": "officeOfReadings",
+      "fields": [
+        {
+          "field": "officeOfReadingsHymn",
+          "source": "religious",
+          "expectedStart": "ГімнСённярадаснаспяваем,Табе,Пане,гімнлюбові,ПраслаўляемТваіхслугаў,ШтозТабойнавекз’яднаны",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsAnt1",
+          "source": "holy-men",
+          "expectedStart": "1ант.ЁнпрасіўуЦябежыцця,*іТыдаўяму,Пане;/Тыадарыўяговеліччуігонарам.",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPs1",
+          "source": "holy-men",
+          "expectedStart": "Псальм   21 (20)",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsR1",
+          "source": "religious",
+          "expectedStart": "Пасланнесв.апосталаПаўладаФіліпянаў3,7–4,1.4-9РадуйцесязаўсёдыўПануБраты:Штобылодлямяненаб",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsR2",
+          "source": "proper",
+          "expectedStart": "ДругоечытаннеЛістсв.ПаўлаадКрыжа,прэзбітэра(Epist.1,43;2,440.825)АбвяшчаемХрыстаўкрыжавана",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": true
+    },
+    {
+      "variant": "religious",
+      "hour": "vespers",
+      "fields": [
+        {
+          "field": "vesperHymn",
+          "source": "religious",
+          "expectedStart": "ГімнСённярадаснаспяваем,Табе,Пане,гімнлюбові,ПраслаўляемТваіхслугаў,ШтозТабойнавекз’яднаны",
+          "matched": true
+        },
+        {
+          "field": "vesperAnt1",
+          "source": "holy-men",
+          "expectedStart": "1ант.Хтобудзебеззаганнымідасканалым,*тойатрымаехвалунавекі.",
+          "matched": true
+        },
+        {
+          "field": "vesperPs1",
+          "source": "holy-men",
+          "expectedStart": "Псальм   15 (14)",
+          "matched": true
+        },
+        {
+          "field": "vesperR",
+          "source": "holy-men",
+          "expectedStart": "КароткаечытаннеРым8,28-30Мыведаемтаксама,штотым,хтолюбіцьБога–пакліканымпаЯгопастанове–усё",
+          "matched": true
+        },
+        {
+          "field": "officeOfReadingsPr",
+          "source": "proper",
+          "expectedStart": "МіласэрныБожа,ТыдаўсвятомуПаўлувялікуюлюбоўдакрыжаТвайгоСына,празягозаступніцтваадарынасТв",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "religious",
+      "hour": "tertia",
+      "fields": [
+        {
+          "field": "sext1Hymn",
+          "source": "day",
+          "expectedStart": "ЦяпермызаклікаемДуха,АдзінагазАйцоміСынам:ПрыйдзііжыватворнайласкайНапоўнішчодранашысэрцы.",
+          "matched": true
+        },
+        {
+          "field": "sext1Ant1",
+          "source": "day",
+          "expectedStart": "1ант.ЗаконПанарадуесэрца*іпрасвятляевочы.",
+          "matched": true
+        },
+        {
+          "field": "sext1Ps1",
+          "source": "day",
+          "expectedStart": "Псальм 19 (18)",
+          "matched": true
+        },
+        {
+          "field": "sext1R",
+          "source": "day",
+          "expectedStart": "КАРОТКАЕЧЫТАННЕРым13,8.10Нікомунічоганебудзьцепавінныя,апрочузаемнайлюбові,ботой,хтолюбіць",
+          "matched": true
+        },
+        {
+          "field": "sext1Pr",
+          "source": "day",
+          "expectedStart": "Божа,найлепшыОйча,Тыдаўлюдзямпрацу,кабяныпразяемагліразвіваццаідапамагацьадноаднаму,учыні,",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "current-day",
+      "hour": "sexta",
+      "fields": [
+        {
+          "field": "sext2Hymn",
+          "source": "day",
+          "expectedStart": "Божа,Валадармагутны,Тыкіруешзменайчасу:РаніцайдаешзаранкуІапоўдніззяннесонца.Пагасіагоньня",
+          "matched": true
+        },
+        {
+          "field": "sext2Ant1",
+          "source": "day",
+          "expectedStart": "1ант.ЗаконПанарадуесэрца*іпрасвятляевочы.",
+          "matched": true
+        },
+        {
+          "field": "sext2Pr",
+          "source": "day",
+          "expectedStart": "Божа,Гаспадарвінаграднікаіжніва,Тыкожнамудаешягопрацуісправядліваўзнагароджваеш.Дайнамцярп",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "current-day",
+      "hour": "nona",
+      "fields": [
+        {
+          "field": "sext3Hymn",
+          "source": "day",
+          "expectedStart": "Божамоцны,усёстварэннеУТваіхрукахтрывае.ДзённагасвятлагадзінаўТыпарадаквызначаеш.Вечарнашн",
+          "matched": true
+        },
+        {
+          "field": "sext3Ant1",
+          "source": "day",
+          "expectedStart": "1ант.ЗаконПанарадуесэрца*іпрасвятляевочы.",
+          "matched": true
+        },
+        {
+          "field": "sext3Pr",
+          "source": "day",
+          "expectedStart": "Божа,наТвойзаклікмыстановімсяперадТабоюўтуюгадзіну,каліАпосталыпрыходзіліўсвятыню,учыні,ка",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "religious",
+      "hour": "invitatorium",
+      "fields": [
+        {
+          "field": "invitatoriumAnt",
+          "source": "holy-men",
+          "expectedStart": "Ант.ЦудоўныБогусваёйсвятыні,/хадземце,паклоні",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    },
+    {
+      "variant": "pastors",
+      "hour": "invitatorium",
+      "fields": [
+        {
+          "field": "invitatoriumAnt",
+          "source": "pastors",
+          "expectedStart": "Ант.Хадземце,паклонімсяПану,/Валадарупастыраў",
+          "matched": true
+        }
+      ],
+      "teDeum": false
+    }
+  ]
+}

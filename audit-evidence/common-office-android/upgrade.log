@@ -1,0 +1,12 @@
+BASELINE PACKAGE
+    appId=10192
+    lastUpdateTime=2026-10-21 01:30:38
+      firstInstallTime=2026-10-21 01:30:38
+e30aa09a33e92b7cf2c956682b9cf748f8937bdc0ba58d09b49b6f8da280ec60  app_flutter/settings.hive
+INSTALL CURRENT APK WITH -r
+Performing Streamed Install
+Success
+    appId=10192
+    lastUpdateTime=2026-10-21 01:34:39
+      firstInstallTime=2026-10-21 01:30:38
+e30aa09a33e92b7cf2c956682b9cf748f8937bdc0ba58d09b49b6f8da280ec60  app_flutter/settings.hive

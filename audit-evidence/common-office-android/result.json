@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-21",
+  "testedCommit": "a5a0396ded3a9a47e0f4bc1088e2444c401d3d40",
+  "status": "completed-with-navigation-finding",
+  "mainHourVariantCases": 9,
+  "sourcePrefixChecks": 56,
+  "sourcePrefixMismatches": 0,
+  "screenshots": 8,
+  "offline": {
+    "airplaneMode": true,
+    "activeDefaultNetwork": "none",
+    "wifi": false,
+    "mobileData": false,
+    "coldStartVerified": true
+  },
+  "upgrade": {
+    "performed": true,
+    "method": "adb install -r",
+    "sameVersionCode": 6,
+    "settingsRetained": true,
+    "releaseStoreUpgradeVerified": false
+  },
+  "navigationFinding": {
+    "reproduced": 2,
+    "steps": "Open reader from day -> change hour using reader picker -> Android Back",
+    "actual": "Android Launcher",
+    "expected": "day list",
+    "directReaderBackControl": "returns to day list"
+  },
+  "avd": {
+    "name": "MyBrev_Test_API34",
+    "createdCount": 1,
+    "deletedOldAvdsRestored": false,
+    "stopped": true,
+    "retained": true
+  },
+  "appCodeChanged": false,
+  "firestoreChanged": false,
+  "manifestChanged": false,
+  "merged": false,
+  "deployed": false,
+  "published": false
+}
