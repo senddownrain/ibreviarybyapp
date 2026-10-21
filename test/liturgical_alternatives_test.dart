@@ -77,6 +77,7 @@ void main() {
       final options = getLiturgicalAlternatives(psalm, kind: 'psalm');
 
       expect(options, hasLength(1));
+      expect(hasLiturgicalAlternatives(psalm, kind: 'psalm'), isFalse);
       expect(options.single.html, contains('Пачуй, Пане, мой голас'));
       expect(options.single.html, contains('Пра Цябе кажа маё сэрца:'));
       expect(options.single.html, contains('Не хавай ад мяне'));
