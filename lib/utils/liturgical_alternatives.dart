@@ -49,7 +49,7 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
   final structured = kind == 'gospel-antiphon'
       ? (_gospelCycleAlternatives(root) ?? _structuredAlternatives(root))
       : _structuredAlternatives(root);
-  final raw = structured ?? _splitAtRules(root);
+  final raw = structured ?? _splitAtRules(root, kind);
   final unique = <_RawAlternative>[];
   final seen = <String>{};
   for (final option in raw) {
@@ -104,10 +104,17 @@ bool _isMarkerText(String text) =>
     _categoryMarker.hasMatch(text) ||
     _instructionMarker.hasMatch(text);
 
-bool _isAlternativeBoundary(Element element) =>
-    element.localName == 'p' && _isMarkerText(_textOf(element.outerHtml));
+bool _isAlternativeBoundary(Element element, String kind) {
+  if (element.localName != 'p') return false;
+  final text = _textOf(element.outerHtml);
+  // A Scripture verse such as "Пра Цябе кажа маё сэрца:" is not a
+  // psalm alternative. Preserve explicit "Або:" and <hr> alternatives.
+  return _alternativeMarker.hasMatch(text) ||
+      _instructionMarker.hasMatch(text) ||
+      (kind != 'psalm' && _categoryMarker.hasMatch(text));
+}
 
-List<_RawAlternative> _splitAtRules(DocumentFragment root) {
+List<_RawAlternative> _splitAtRules(DocumentFragment root, String kind) {
   final nodes = _directNodes(root);
   final hasRule = nodes.any(
     (node) => node is Element && node.localName == 'hr',
@@ -140,7 +147,7 @@ List<_RawAlternative> _splitAtRules(DocumentFragment root) {
     final startsNew =
         !hasRule &&
         groups.last.isNotEmpty &&
-        ((node is Element && _isAlternativeBoundary(node)) ||
+        ((node is Element && _isAlternativeBoundary(node, kind)) ||
             (marker.isNotEmpty && (repeated[marker] ?? 0) > 1));
     if (startsNew) groups.add([]);
     groups.last.add(_nodeHtml(node));
