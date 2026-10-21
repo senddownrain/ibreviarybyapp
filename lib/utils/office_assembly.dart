@@ -1,5 +1,7 @@
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/ordo/office.dart';
+import 'package:mybrev_flutter/ordo/season.dart';
+import 'package:mybrev_flutter/utils/common_seasons.dart';
 
 export 'package:mybrev_flutter/ordo/office.dart' show OfficeSlot;
 
@@ -224,6 +226,47 @@ String defaultTemplateOf(Map<String, dynamic> proper) {
   return templates.isEmpty ? '' : templates.first;
 }
 
+/// Confirmed Common bindings, never inferred from a name, title or saint ID.
+/// An explicit binding takes precedence over the existing category bindings.
+({String? template, String? reason})? commonBaseRule(
+  Map<String, dynamic> proper,
+  String templateId,
+) {
+  if (!const {
+    'religious',
+    'educators',
+    'works-of-mercy',
+  }.contains(templateId)) {
+    return null;
+  }
+  const allowed = {'holy-men', 'holy-women'};
+  final explicit = proper['_commonBase'];
+  if (explicit is Map && explicit.containsKey(templateId)) {
+    return allowed.contains(explicit[templateId])
+        ? (template: explicit[templateId] as String, reason: null)
+        : (template: null, reason: 'base-common-invalid');
+  }
+  const bindings = {
+    'holy-men': 'holy-men',
+    'pastors': 'holy-men',
+    'holy-women': 'holy-women',
+    'virgins': 'holy-women',
+  };
+  final candidates = proper['_templatesInferred'] == true
+      ? <String>{}
+      : _templatesOf(
+          proper,
+        ).map((id) => bindings[id]).whereType<String>().toSet();
+  return candidates.length == 1
+      ? (template: candidates.single, reason: null)
+      : (
+          template: null,
+          reason: candidates.isEmpty
+              ? 'base-common-unconfirmed'
+              : 'base-common-ambiguous',
+        );
+}
+
 /// Legal assemblies, default first: memorial `[day, …Commons]`,
 /// solemnity/feast `[default Common, …other Commons]`.
 List<String> assemblyChoices(
@@ -249,7 +292,7 @@ class AssemblyIntegrityError {
   final String field;
   final String source;
 
-  /// `template-missing` | `field-missing` | `proper-text-missing`.
+  /// Missing template/field/Proper, or an unconfirmed, ambiguous or invalid base.
   final String reason;
 
   Map<String, String> toJson() => {
@@ -293,6 +336,7 @@ const _identity = {
   '_rank',
   '_place',
   '_templates',
+  '_commonBase',
   '_defaultTemplate',
   '_currentVersion',
   '_celebrationId',
@@ -319,6 +363,7 @@ OfficeAssembly assembleOffice({
   required bool isSunday,
   String? choice,
   OfficeDescriptor? office,
+  Season? season,
 }) {
   final officeKind =
       office?.officeKind ?? officeKindOfRank(proper['_rank']?.toString());
@@ -327,11 +372,35 @@ OfficeAssembly assembleOffice({
       : _descriptorSlots(office);
   final choices = assemblyChoices(proper, officeKind, office: office);
   final selected = choices.contains(choice) ? choice! : choices.first;
+  final festiveCommon =
+      (office?.hasDayChoice ?? officeKind == 'memorial') &&
+      selected != kCurrentDayChoice &&
+      const {'memorial', 'optional-memorial'}.contains(officeKind);
+  bool isMainHourField(String field) => const {
+    'lauds',
+    'vespers',
+    'officeOfReadings',
+  }.contains(kOfficeFieldSlots[field]?.$1);
   final templateId = selected == kCurrentDayChoice
       ? defaultTemplateOf(proper)
       : selected;
-  final common = templates[templateId];
-  final sunday = templates[kSundayWeek1Template];
+  final seasonalTemplates = <String, Map<String, dynamic>?>{};
+  Map<String, dynamic>? getTemplate(String? id) => id == null
+      ? null
+      : seasonalTemplates.putIfAbsent(
+          id,
+          () => materializeCommonForSeason(templates[id], season, {
+            ...kOfficeFieldSlots.keys,
+            ...kFirstVesperFields,
+          }),
+        );
+  final common = getTemplate(templateId);
+  final sunday = getTemplate(kSundayWeek1Template);
+  final base = selected == kCurrentDayChoice
+      ? null
+      : commonBaseRule(proper, templateId);
+  bool isStrictCommonField(String field) =>
+      isMainHourField(field) && (festiveCommon || base != null);
   final rules = proper['_fieldRules'] is Map
       ? Map<String, dynamic>.from(proper['_fieldRules'] as Map)
       : const <String, dynamic>{};
@@ -370,19 +439,47 @@ OfficeAssembly assembleOffice({
     if (template == null) return null;
     final templateRules = template['_fieldRules'];
     final rule = templateRules is Map ? templateRules[field] : null;
+    if (rule is Map && rule['omit'] == true) return ('', '$origin:omit');
     if (rule is Map && rule['ref'] != null) {
       refs.add((field, refNames(rule['ref'])));
       return (null, 'pending');
     }
     if (rule is Map && rule['source'] != null) {
       final source = rule['source'].toString();
+      if (source == 'common' && isStrictCommonField(field)) return null;
       return sourceOf(
         source == 'common' ? kCurrentDayChoice : source,
         field,
         rule['template']?.toString(),
       );
     }
-    return _blank(template[field]) ? null : (template[field], origin);
+    if (_blank(template[field])) {
+      if (identical(template, common) &&
+          isMainHourField(field) &&
+          base != null) {
+        if (base.template != null) {
+          return sourceOf('template', field, base.template);
+        }
+        integrity.add(
+          AssemblyIntegrityError(field, 'common:$templateId', base.reason!),
+        );
+        return missingRequired;
+      }
+      return null;
+    }
+    final seasonal = template['_seasonal'];
+    final seasonalField =
+        seasonal is Map &&
+        seasonal['fields'] is List &&
+        (seasonal['fields'] as List).contains(field);
+    final main = template['_mainSection'];
+    if (office?.optionId != 'saturday-blessed-virgin-mary' &&
+        !seasonalField &&
+        main is Map &&
+        !_blank(main[field])) {
+      return (main[field], origin);
+    }
+    return (template[field], origin);
   }
 
   (Object?, String)? fromSource(String source, String field, [String? named]) {
@@ -390,19 +487,29 @@ OfficeAssembly assembleOffice({
       case 'common':
         return fromTemplate(common, field, 'common:$templateId');
       case 'template':
-        return fromTemplate(templates[named], field, 'common:$named');
+        final template = getTemplate(named);
+        final found = fromTemplate(template, field, 'common:$named');
+        if (found != null || !isStrictCommonField(field)) return found;
+        integrity.add(
+          AssemblyIntegrityError(
+            field,
+            'common:$named',
+            template == null ? 'template-missing' : 'field-missing',
+          ),
+        );
+        return missingRequired;
       case kSundayWeek1Template:
         return sunday != null && !_blank(sunday[field])
             ? (sunday[field], kSundayWeek1Template)
             : null;
       case 'office-for-dead':
         return fromTemplate(
-          templates['office-for-dead'],
+          getTemplate('office-for-dead'),
           field,
           'common:office-for-dead',
         );
       case 'complementary':
-        final complementary = templates[kComplementaryPsalmodyTemplate];
+        final complementary = getTemplate(kComplementaryPsalmodyTemplate);
         if (complementary != null && !_blank(complementary[field])) {
           return (complementary[field], 'complementary');
         }
@@ -466,6 +573,30 @@ OfficeAssembly assembleOffice({
       );
       if (found != null && found.$2 != 'missing-required') return found;
     }
+    if (selected != kCurrentDayChoice &&
+        field == 'officeOfReadingsPr' &&
+        rule == null &&
+        !_blank(proper['laudesPr'])) {
+      refs.add((field, ['laudesPr']));
+      return (null, 'pending');
+    }
+    if (festiveCommon && isMainHourField(field)) {
+      final slot = kOfficeFieldSlots[field]!;
+      final source = slot.$1 == 'lauds' && slot.$2 == 'psalmody'
+          ? kSundayWeek1Template
+          : 'common';
+      final found = fromSource(source, field);
+      if (found != null) return found;
+      final template = source == 'common' ? common : sunday;
+      integrity.add(
+        AssemblyIntegrityError(
+          field,
+          source == 'common' ? 'common:$templateId' : source,
+          template == null ? 'template-missing' : 'field-missing',
+        ),
+      );
+      return null;
+    }
     final (hour, component) = kOfficeFieldSlots[field]!;
     final slot = slots['$hour.$component'];
     if (slot == null) return firstOf(['common', kCurrentDayChoice], field);
@@ -520,7 +651,7 @@ OfficeAssembly assembleOffice({
       ..remove('${hour}Ant3');
   }
 
-  if (proper['_omitFirstVespers'] != true) {
+  if (proper['_omitFirstVespers'] != true && !festiveCommon) {
     for (final field in kFirstVesperFields) {
       if (!_blank(proper[field])) {
         day[field] = proper[field];
@@ -556,12 +687,23 @@ OfficeAssembly assembleOffice({
       day[field] = day[target];
       provenance[field] = 'ref:$target';
     } else {
-      final fallback = fromSource(kCurrentDayChoice, field);
+      final fallback = isStrictCommonField(field)
+          ? null
+          : fromSource(kCurrentDayChoice, field);
       day[field] = fallback?.$1 ?? '';
       if (fallback != null) {
         provenance[field] = fallback.$2;
       } else if (kOfficeFieldSlots.containsKey(field)) {
         missing.add(field);
+      }
+      if (isStrictCommonField(field)) {
+        integrity.add(
+          AssemblyIntegrityError(
+            field,
+            'ref:${names.join(',')}',
+            'field-missing',
+          ),
+        );
       }
     }
   }
@@ -571,9 +713,10 @@ OfficeAssembly assembleOffice({
   } else if (proper[_teDeum] != null && proper[_teDeum] != '') {
     day[_teDeum] = proper[_teDeum] == true;
   } else if (office != null) {
-    day[_teDeum] = office.teDeum ? true : '';
+    day[_teDeum] = festiveCommon || office.teDeum ? true : '';
   } else {
-    day[_teDeum] = officeKind == 'solemnity' || officeKind == 'feast'
+    day[_teDeum] =
+        festiveCommon || officeKind == 'solemnity' || officeKind == 'feast'
         ? true
         : '';
   }
@@ -597,6 +740,9 @@ OfficeAssembly assembleOffice({
     'choice': selected,
     'template': selected == kCurrentDayChoice ? '' : templateId,
     'sparse': true,
+    if (festiveCommon) 'festiveCommon': true,
+    if (commonSeasonVariant(season) case final String variant)
+      'season': variant,
   };
   if (integrity.isNotEmpty) {
     day['_integrityErrors'] = [for (final error in integrity) error.toJson()];

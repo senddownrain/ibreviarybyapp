@@ -1,0 +1,852 @@
+00:00 +0: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart
+00:00 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 60 ms
+[ContentStore] prayers: 115 docs in 198 ms
+[ContentStore] invitatoriums: 4 docs in 86 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 80 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 60 ms
+[ContentStore] completoriums: 35 docs in 112 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 88 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 139 ms
+[ContentStore] liturgicalTemplates: 16 docs in 311 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 332 ms
+[ContentStore] readings: 822 docs in 504 ms
+[ContentStore] days: 736 docs in 1021 ms
+00:01 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: real A–F inputs: every text value and source equals production Web
+00:01 +0: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (setUpAll)
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+00:02 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: explicit bases win; conflicting, invalid and inferred sources never guess
+00:02 +1: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (setUpAll)
+[ContentStore] songs: 447 docs in 717 ms
+[ContentStore] compendium: 27 docs in 713 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 705 ms
+00:02 +2: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: Proper precedes Common; absent base, ref and Common stay diagnosed gaps
+00:02 +3: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: seasonal base, omission, rule and Marian section do not mutate cache
+00:02 +4: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: choice survives hour navigation and date switching; cache rebuild keeps dioceses separate
+00:03 +5: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: offline bundle contains revision 4, 29 bases, rules and seasonal Commons
+00:03 +6: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 79 ms
+[ContentStore] invitatoriums: 4 docs in 19 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 16 ms
+[ContentStore] completoriums: 35 docs in 18 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 7 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 17 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 31 ms
+[ContentStore] liturgicalTemplates: 16 docs in 182 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 215 ms
+[ContentStore] readings: 822 docs in 309 ms
+[ContentStore] days: 736 docs in 834 ms
+00:05 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: (tearDownAll)
+00:05 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] compendiumMeta: 1 docs in 13 ms
+00:05 +7: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart
+00:07 +7: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: assembly equals the web for memorial, feast and solemnity
+00:08 +8: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: choice ids round-trip and the default id is the document id
+00:08 +9: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: with the device cache one card with «З дня» and the Commons; old copies hidden
+00:09 +10: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: with the device cache a choice id resolves locally, like a route from an old link
+00:09 +11: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: with the device cache an obligatory memorial is primary; the weekday is no choice
+00:10 +12: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: with the device cache obsolete documents are never offered
+00:10 +13: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/office_assembly_test.dart: with the device cache without the Commons the Office is still complete, from the day
+00:11 +14: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart
+00:13 +14: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: a completed publication: definitions and Proper together
+[ContentStore] prayerCategories: 5 docs in 50 ms
+[ContentStore] prayers: 115 docs in 193 ms
+[ContentStore] invitatoriums: 4 docs in 106 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 103 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 88 ms
+[ContentStore] completoriums: 35 docs in 106 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 95 ms
+[ContentStore] compendiumMeta: 1 docs in 131 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 169 ms
+[ContentStore] songs: 447 docs in 148 ms
+[ContentStore] liturgicalTemplates: 16 docs in 271 ms
+[ContentStore] compendium: 27 docs in 232 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 260 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 315 ms
+[ContentStore] readings: 822 docs in 463 ms
+[ContentStore] days: 736 docs in 875 ms
+00:15 +15: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: crash after staged: never new colour with old text
+[ContentStore] prayerCategories: 5 docs in 6 ms
+[ContentStore] prayers: 115 docs in 95 ms
+[ContentStore] invitatoriums: 4 docs in 59 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 70 ms
+[ContentStore] completoriums: 35 docs in 73 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 84 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 93 ms
+[ContentStore] compendiumMeta: 1 docs in 62 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 95 ms
+[ContentStore] compendium: 27 docs in 102 ms
+[ContentStore] songs: 447 docs in 132 ms
+[ContentStore] liturgicalTemplates: 16 docs in 221 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 244 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 304 ms
+[ContentStore] readings: 822 docs in 424 ms
+[ContentStore] days: 736 docs in 1047 ms
+[ContentStore] dropping an unfinished update
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 90 ms
+[ContentStore] invitatoriums: 4 docs in 100 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 99 ms
+[ContentStore] completoriums: 35 docs in 100 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 92 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 95 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 99 ms
+[ContentStore] compendiumMeta: 1 docs in 47 ms
+[ContentStore] songs: 447 docs in 81 ms
+[ContentStore] compendium: 27 docs in 108 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 206 ms
+[ContentStore] liturgicalTemplates: 16 docs in 311 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 360 ms
+[ContentStore] readings: 822 docs in 468 ms
+[ContentStore] days: 736 docs in 1141 ms
+00:19 +16: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: crash after ready: never new colour with old text
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 76 ms
+[ContentStore] invitatoriums: 4 docs in 51 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 61 ms
+[ContentStore] completoriums: 35 docs in 63 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 54 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 59 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 61 ms
+[ContentStore] compendiumMeta: 1 docs in 33 ms
+[ContentStore] compendium: 27 docs in 68 ms
+[ContentStore] songs: 447 docs in 90 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 144 ms
+[ContentStore] liturgicalTemplates: 16 docs in 251 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 274 ms
+[ContentStore] readings: 822 docs in 367 ms
+[ContentStore] days: 736 docs in 990 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 91 ms
+[ContentStore] invitatoriums: 4 docs in 63 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 54 ms
+[ContentStore] completoriums: 35 docs in 60 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 45 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 48 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 68 ms
+[ContentStore] compendiumMeta: 1 docs in 35 ms
+[ContentStore] songs: 447 docs in 131 ms
+[ContentStore] compendium: 27 docs in 126 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 213 ms
+[ContentStore] liturgicalTemplates: 16 docs in 270 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 313 ms
+[ContentStore] readings: 822 docs in 418 ms
+[ContentStore] days: 736 docs in 1001 ms
+00:22 +17: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_content_update_test.dart: crash after written: never new colour with old text
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 70 ms
+[ContentStore] invitatoriums: 4 docs in 50 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 47 ms
+[ContentStore] completoriums: 35 docs in 52 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 31 ms
+[ContentStore] songs: 447 docs in 98 ms
+[ContentStore] compendium: 27 docs in 96 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 193 ms
+[ContentStore] liturgicalTemplates: 16 docs in 280 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 307 ms
+[ContentStore] readings: 822 docs in 413 ms
+[ContentStore] days: 736 docs in 934 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 105 ms
+[ContentStore] invitatoriums: 4 docs in 126 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 119 ms
+[ContentStore] completoriums: 35 docs in 125 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 94 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 120 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 117 ms
+[ContentStore] compendiumMeta: 1 docs in 70 ms
+[ContentStore] songs: 447 docs in 88 ms
+[ContentStore] liturgicalTemplates: 16 docs in 273 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 202 ms
+[ContentStore] compendium: 27 docs in 227 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 417 ms
+[ContentStore] readings: 822 docs in 598 ms
+[ContentStore] days: 736 docs in 1081 ms
+00:25 +18: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart
+00:35 +18: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution every collection ships with the app and matches its manifest
+[ContentStore] prayerCategories: 5 docs in 65 ms
+[ContentStore] prayers: 115 docs in 173 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 147 ms
+[ContentStore] invitatoriums: 4 docs in 153 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 145 ms
+[ContentStore] compendiumMeta: 1 docs in 89 ms
+[ContentStore] completoriums: 35 docs in 150 ms
+[ContentStore] songs: 447 docs in 102 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 147 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 154 ms
+[ContentStore] liturgicalTemplates: 16 docs in 278 ms
+[ContentStore] compendium: 27 docs in 216 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 282 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 254 ms
+[ContentStore] readings: 822 docs in 418 ms
+[ContentStore] days: 736 docs in 926 ms
+00:36 +19: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution a fresh install opens the Hours and the Readings offline, far outside the former ±7-day window
+[ContentStore] prayerCategories: 5 docs in 7 ms
+[ContentStore] prayers: 115 docs in 93 ms
+[ContentStore] invitatoriums: 4 docs in 49 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 52 ms
+[ContentStore] completoriums: 35 docs in 57 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 46 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 49 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 55 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] songs: 447 docs in 110 ms
+[ContentStore] compendium: 27 docs in 106 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 256 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 263 ms
+[ContentStore] liturgicalTemplates: 16 docs in 322 ms
+[ContentStore] readings: 822 docs in 440 ms
+[ContentStore] days: 736 docs in 817 ms
+00:39 +20: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution the app and the bundle builder agree on collections and schema
+00:39 +21: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution the Compendium is content: validated from the store, patched with the rest
+[ContentStore] prayerCategories: 5 docs in 7 ms
+[ContentStore] prayers: 115 docs in 66 ms
+[ContentStore] invitatoriums: 4 docs in 44 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 43 ms
+[ContentStore] completoriums: 35 docs in 48 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 45 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 49 ms
+[ContentStore] compendiumMeta: 1 docs in 25 ms
+[ContentStore] songs: 447 docs in 140 ms
+[ContentStore] compendium: 27 docs in 141 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 168 ms
+[ContentStore] liturgicalTemplates: 16 docs in 238 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 301 ms
+[ContentStore] readings: 822 docs in 431 ms
+[ContentStore] days: 736 docs in 863 ms
+00:40 +22: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: distribution Hive holds no copy of the bundled corpus
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 97 ms
+[ContentStore] invitatoriums: 4 docs in 91 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 83 ms
+[ContentStore] completoriums: 35 docs in 85 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 65 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 75 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 80 ms
+[ContentStore] compendiumMeta: 1 docs in 28 ms
+[ContentStore] songs: 447 docs in 54 ms
+[ContentStore] compendium: 27 docs in 134 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 290 ms
+[ContentStore] liturgicalTemplates: 16 docs in 403 ms
+[ContentStore] readings: 822 docs in 427 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 427 ms
+[ContentStore] days: 736 docs in 1271 ms
+00:42 +23: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 109 ms
+[ContentStore] invitatoriums: 4 docs in 83 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 73 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 54 ms
+[ContentStore] completoriums: 35 docs in 79 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 56 ms
+[ContentStore] compendiumMeta: 1 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 85 ms
+[ContentStore] songs: 447 docs in 153 ms
+[ContentStore] compendium: 27 docs in 148 ms
+[ContentStore] liturgicalTemplates: 16 docs in 270 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 317 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 429 ms
+[ContentStore] readings: 822 docs in 678 ms
+[ContentStore] days: 736 docs in 1970 ms
+00:53 +24: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 94 ms
+[ContentStore] invitatoriums: 4 docs in 53 ms
+[ContentStore] completoriums: 35 docs in 51 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 50 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 51 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 56 ms
+[ContentStore] compendiumMeta: 1 docs in 29 ms
+[ContentStore] songs: 447 docs in 66 ms
+[ContentStore] compendium: 27 docs in 121 ms
+[ContentStore] liturgicalTemplates: 16 docs in 191 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 236 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 261 ms
+[ContentStore] readings: 822 docs in 368 ms
+[ContentStore] days: 736 docs in 1784 ms
+01:13 +25: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 76 ms
+[ContentStore] invitatoriums: 4 docs in 22 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 27 ms
+[ContentStore] completoriums: 35 docs in 32 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 29 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 33 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] songs: 447 docs in 61 ms
+[ContentStore] compendium: 27 docs in 71 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 142 ms
+[ContentStore] liturgicalTemplates: 16 docs in 198 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 223 ms
+[ContentStore] readings: 822 docs in 298 ms
+[ContentStore] days: 736 docs in 718 ms
+01:19 +26: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a document that does not match the manifest is rejected; nothing changes
+[ContentStore] prayerCategories: 5 docs in 7 ms
+[ContentStore] prayers: 115 docs in 73 ms
+[ContentStore] invitatoriums: 4 docs in 41 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 38 ms
+[ContentStore] completoriums: 35 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 35 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 37 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 39 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] songs: 447 docs in 66 ms
+[ContentStore] compendium: 27 docs in 152 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 243 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 296 ms
+[ContentStore] liturgicalTemplates: 16 docs in 334 ms
+[ContentStore] readings: 822 docs in 469 ms
+[ContentStore] days: 736 docs in 1088 ms
+01:31 +27: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a missing document rejects the update
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 67 ms
+[ContentStore] invitatoriums: 4 docs in 31 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 27 ms
+[ContentStore] completoriums: 35 docs in 30 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 21 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 22 ms
+[ContentStore] compendiumMeta: 1 docs in 14 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 25 ms
+[ContentStore] songs: 447 docs in 71 ms
+[ContentStore] compendium: 27 docs in 77 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 159 ms
+[ContentStore] liturgicalTemplates: 16 docs in 222 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 241 ms
+[ContentStore] readings: 822 docs in 336 ms
+[ContentStore] days: 736 docs in 793 ms
+01:37 +28: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions a newer local update survives a restart
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 78 ms
+[ContentStore] invitatoriums: 4 docs in 59 ms
+[ContentStore] completoriums: 35 docs in 56 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 56 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 48 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 56 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 61 ms
+[ContentStore] compendiumMeta: 1 docs in 22 ms
+[ContentStore] songs: 447 docs in 115 ms
+[ContentStore] compendium: 27 docs in 127 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 151 ms
+[ContentStore] liturgicalTemplates: 16 docs in 264 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 241 ms
+[ContentStore] readings: 822 docs in 413 ms
+[ContentStore] days: 736 docs in 882 ms
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 56 ms
+[ContentStore] invitatoriums: 4 docs in 21 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 19 ms
+[ContentStore] completoriums: 35 docs in 20 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 18 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 21 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 22 ms
+[ContentStore] compendiumMeta: 1 docs in 6 ms
+[ContentStore] songs: 447 docs in 64 ms
+[ContentStore] compendium: 27 docs in 60 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 148 ms
+[ContentStore] liturgicalTemplates: 16 docs in 176 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 197 ms
+[ContentStore] readings: 822 docs in 279 ms
+[ContentStore] days: 736 docs in 781 ms
+01:39 +29: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: versions an app update with a newer bundle supersedes an older local update
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 68 ms
+[ContentStore] invitatoriums: 4 docs in 44 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 49 ms
+[ContentStore] completoriums: 35 docs in 53 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 45 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 47 ms
+[ContentStore] compendiumMeta: 1 docs in 30 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 49 ms
+[ContentStore] compendium: 27 docs in 97 ms
+[ContentStore] songs: 447 docs in 103 ms
+[ContentStore] liturgicalTemplates: 16 docs in 183 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 160 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 243 ms
+[ContentStore] readings: 822 docs in 356 ms
+[ContentStore] days: 736 docs in 980 ms
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 93 ms
+[ContentStore] invitatoriums: 4 docs in 72 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 61 ms
+[ContentStore] completoriums: 35 docs in 67 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 57 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 60 ms
+[ContentStore] compendiumMeta: 1 docs in 35 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 62 ms
+[ContentStore] songs: 447 docs in 161 ms
+[ContentStore] compendium: 27 docs in 170 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 207 ms
+[ContentStore] liturgicalTemplates: 16 docs in 274 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 416 ms
+[ContentStore] readings: 822 docs in 562 ms
+[ContentStore] days: 736 docs in 1041 ms
+01:42 +30: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: former download cache newer documents are kept, older ones dropped, the cache removed, user data untouched — and running again changes nothing
+[ContentStore] prayerCategories: 5 docs in 6 ms
+[ContentStore] prayers: 115 docs in 94 ms
+[ContentStore] invitatoriums: 4 docs in 71 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 68 ms
+[ContentStore] completoriums: 35 docs in 73 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 67 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 74 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 77 ms
+[ContentStore] compendiumMeta: 1 docs in 25 ms
+[ContentStore] songs: 447 docs in 63 ms
+[ContentStore] compendium: 27 docs in 67 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 128 ms
+[ContentStore] liturgicalTemplates: 16 docs in 237 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 258 ms
+[ContentStore] readings: 822 docs in 370 ms
+[ContentStore] days: 736 docs in 835 ms
+[ContentMigration] done, 1 newer documents kept
+01:43 +31: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy 100 new prayers: only those are downloaded, by themselves
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 62 ms
+[ContentStore] invitatoriums: 4 docs in 56 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 53 ms
+[ContentStore] completoriums: 35 docs in 56 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 55 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 57 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 59 ms
+[ContentStore] compendiumMeta: 1 docs in 24 ms
+[ContentStore] compendium: 27 docs in 66 ms
+[ContentStore] songs: 447 docs in 81 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 99 ms
+[ContentStore] liturgicalTemplates: 16 docs in 220 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 264 ms
+[ContentStore] readings: 822 docs in 392 ms
+[ContentStore] days: 736 docs in 782 ms
+01:49 +32: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a rebuild-sized diff is left to the next app release
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 65 ms
+[ContentStore] invitatoriums: 4 docs in 31 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms
+[ContentStore] completoriums: 35 docs in 31 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 20 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 22 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 27 ms
+[ContentStore] compendiumMeta: 1 docs in 11 ms
+[ContentStore] songs: 447 docs in 49 ms
+[ContentStore] compendium: 27 docs in 59 ms
+[ContentStore] liturgicalTemplates: 16 docs in 157 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 186 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 217 ms
+[ContentStore] readings: 822 docs in 304 ms
+[ContentStore] days: 736 docs in 716 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+02:01 +33: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a newer schema is never installed as a patch
+[ContentStore] prayerCategories: 5 docs in 26 ms
+[ContentStore] prayers: 115 docs in 104 ms
+[ContentStore] invitatoriums: 4 docs in 317 ms
+[ContentStore] completoriums: 35 docs in 293 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 263 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 237 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 213 ms
+[ContentStore] liturgicalTemplates: 16 docs in 352 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 184 ms
+[ContentStore] songs: 447 docs in 124 ms
+[ContentStore] compendiumMeta: 1 docs in 68 ms
+[ContentStore] readings: 822 docs in 384 ms
+[ContentStore] compendium: 27 docs in 93 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 187 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 115 ms
+[ContentStore] days: 736 docs in 896 ms
+02:08 +34: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy new schema: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 54 ms
+[ContentStore] invitatoriums: 4 docs in 24 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 22 ms
+[ContentStore] completoriums: 35 docs in 26 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 23 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 62 ms
+[ContentStore] compendiumMeta: 1 docs in 48 ms
+[ContentStore] songs: 447 docs in 58 ms
+[ContentStore] compendium: 27 docs in 112 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 135 ms
+[ContentStore] liturgicalTemplates: 16 docs in 207 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 207 ms
+[ContentStore] readings: 822 docs in 328 ms
+[ContentStore] days: 736 docs in 732 ms
+[ContentUpdates] schema: content 1893445200000 needs the next app release
+02:13 +35: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy mass rebuild: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 55 ms
+[ContentStore] invitatoriums: 4 docs in 39 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 44 ms
+[ContentStore] completoriums: 35 docs in 46 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 43 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 49 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] songs: 447 docs in 84 ms
+[ContentStore] compendium: 27 docs in 88 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 162 ms
+[ContentStore] liturgicalTemplates: 16 docs in 207 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 247 ms
+[ContentStore] readings: 822 docs in 333 ms
+[ContentStore] days: 736 docs in 741 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+02:24 +36: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy a compatible current check clears the status — at the next launch, even within the day
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 43 ms
+[ContentStore] invitatoriums: 4 docs in 32 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms
+[ContentStore] completoriums: 35 docs in 32 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 29 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 30 ms
+[ContentStore] compendiumMeta: 1 docs in 15 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 34 ms
+[ContentStore] songs: 447 docs in 72 ms
+[ContentStore] compendium: 27 docs in 86 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 147 ms
+[ContentStore] liturgicalTemplates: 16 docs in 188 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 220 ms
+[ContentStore] readings: 822 docs in 337 ms
+[ContentStore] days: 736 docs in 675 ms
+[ContentUpdates] rebuild: content 1893445200000 needs the next app release
+02:41 +37: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: update policy the daily check runs once a day
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 85 ms
+[ContentStore] invitatoriums: 4 docs in 50 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 48 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 43 ms
+[ContentStore] completoriums: 35 docs in 49 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 47 ms
+[ContentStore] songs: 447 docs in 83 ms
+[ContentStore] compendium: 27 docs in 102 ms
+[ContentStore] liturgicalTemplates: 16 docs in 270 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 237 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 327 ms
+[ContentStore] readings: 822 docs in 408 ms
+[ContentStore] days: 736 docs in 953 ms
+02:56 +38: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings only the reader's questions: offline, current, check
+02:59 +39: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings a failed check is calm
+02:59 +40: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings a rebuild waits for the app; nothing about Wi-Fi or sizes
+02:59 +41: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: settings offline: the texts work, the check waits
+03:00 +42: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation a completed update is new in every collection
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 81 ms
+[ContentStore] invitatoriums: 4 docs in 52 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 45 ms
+[ContentStore] completoriums: 35 docs in 56 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 34 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 18 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 53 ms
+[ContentStore] songs: 447 docs in 93 ms
+[ContentStore] compendium: 27 docs in 98 ms
+[ContentStore] liturgicalTemplates: 16 docs in 197 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 169 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 347 ms
+[ContentStore] readings: 822 docs in 446 ms
+[ContentStore] days: 736 docs in 987 ms
+03:01 +43: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash while staging: old content, before and after a restart
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 131 ms
+[ContentStore] invitatoriums: 4 docs in 79 ms
+[ContentStore] completoriums: 35 docs in 71 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 65 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 51 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 52 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 54 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] songs: 447 docs in 74 ms
+[ContentStore] compendium: 27 docs in 84 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 129 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 257 ms
+[ContentStore] liturgicalTemplates: 16 docs in 375 ms
+[ContentStore] readings: 822 docs in 815 ms
+[ContentStore] days: 736 docs in 1685 ms
+[ContentStore] dropping an unfinished update
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 98 ms
+[ContentStore] invitatoriums: 4 docs in 39 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 33 ms
+[ContentStore] completoriums: 35 docs in 35 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 32 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 34 ms
+[ContentStore] compendiumMeta: 1 docs in 18 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 36 ms
+[ContentStore] compendium: 27 docs in 86 ms
+[ContentStore] songs: 447 docs in 87 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 274 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 344 ms
+[ContentStore] liturgicalTemplates: 16 docs in 380 ms
+[ContentStore] readings: 822 docs in 529 ms
+[ContentStore] days: 736 docs in 1243 ms
+03:05 +44: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash after READY: old until restart, then new everywhere
+[ContentStore] prayerCategories: 5 docs in 7 ms
+[ContentStore] prayers: 115 docs in 102 ms
+[ContentStore] invitatoriums: 4 docs in 141 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 132 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 111 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 131 ms
+[ContentStore] completoriums: 35 docs in 141 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 110 ms
+[ContentStore] compendiumMeta: 1 docs in 12 ms
+[ContentStore] songs: 447 docs in 93 ms
+[ContentStore] compendium: 27 docs in 83 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 134 ms
+[ContentStore] liturgicalTemplates: 16 docs in 367 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 365 ms
+[ContentStore] readings: 822 docs in 649 ms
+[ContentStore] days: 736 docs in 1106 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 67 ms
+[ContentStore] invitatoriums: 4 docs in 67 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 73 ms
+[ContentStore] completoriums: 35 docs in 76 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 65 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 71 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 80 ms
+[ContentStore] compendiumMeta: 1 docs in 48 ms
+[ContentStore] songs: 447 docs in 56 ms
+[ContentStore] compendium: 27 docs in 52 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 149 ms
+[ContentStore] liturgicalTemplates: 16 docs in 287 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 384 ms
+[ContentStore] readings: 822 docs in 483 ms
+[ContentStore] days: 736 docs in 941 ms
+03:08 +45: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation a READY generation left by a failed commit is finished before the next one starts
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 82 ms
+[ContentStore] invitatoriums: 4 docs in 55 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 53 ms
+[ContentStore] completoriums: 35 docs in 54 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 50 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 52 ms
+[ContentStore] compendiumMeta: 1 docs in 49 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 65 ms
+[ContentStore] songs: 447 docs in 87 ms
+[ContentStore] compendium: 27 docs in 87 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 217 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 286 ms
+[ContentStore] liturgicalTemplates: 16 docs in 340 ms
+[ContentStore] readings: 822 docs in 480 ms
+[ContentStore] days: 736 docs in 931 ms
+[ContentStore] finishing an interrupted update
+03:09 +46: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: activation crash while writing overlays: readers never see a mix; the restart finishes it
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 82 ms
+[ContentStore] invitatoriums: 4 docs in 52 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 48 ms
+[ContentStore] completoriums: 35 docs in 52 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 45 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 46 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 47 ms
+[ContentStore] compendiumMeta: 1 docs in 28 ms
+[ContentStore] songs: 447 docs in 99 ms
+[ContentStore] compendium: 27 docs in 97 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 244 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 229 ms
+[ContentStore] liturgicalTemplates: 16 docs in 287 ms
+[ContentStore] readings: 822 docs in 428 ms
+[ContentStore] days: 736 docs in 980 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 79 ms
+[ContentStore] invitatoriums: 4 docs in 40 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 36 ms
+[ContentStore] completoriums: 35 docs in 38 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 33 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 39 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] compendium: 27 docs in 74 ms
+[ContentStore] songs: 447 docs in 79 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 107 ms
+[ContentStore] liturgicalTemplates: 16 docs in 243 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 285 ms
+[ContentStore] readings: 822 docs in 399 ms
+[ContentStore] days: 736 docs in 885 ms
+03:12 +47: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 79 ms
+[ContentStore] invitatoriums: 4 docs in 45 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] completoriums: 35 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 34 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] songs: 447 docs in 135 ms
+[ContentStore] compendium: 27 docs in 138 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 158 ms
+[ContentStore] liturgicalTemplates: 16 docs in 227 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 238 ms
+[ContentStore] readings: 822 docs in 395 ms
+[ContentStore] days: 736 docs in 903 ms
+03:42 +48: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text
+[ContentStore] prayerCategories: 5 docs in 8 ms
+[ContentStore] prayers: 115 docs in 63 ms
+[ContentStore] invitatoriums: 4 docs in 42 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 36 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 35 ms
+[ContentStore] completoriums: 35 docs in 41 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 37 ms
+[ContentStore] compendiumMeta: 1 docs in 20 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 55 ms
+[ContentStore] compendium: 27 docs in 56 ms
+[ContentStore] songs: 447 docs in 165 ms
+[ContentStore] liturgicalTemplates: 16 docs in 347 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 318 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 382 ms
+[ContentStore] readings: 822 docs in 534 ms
+[ContentStore] days: 736 docs in 1546 ms
+04:12 +49: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases every collection keeps the version of its own snapshot
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 96 ms
+[ContentStore] invitatoriums: 4 docs in 54 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 53 ms
+[ContentStore] completoriums: 35 docs in 57 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 46 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 48 ms
+[ContentStore] compendiumMeta: 1 docs in 30 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 51 ms
+[ContentStore] songs: 447 docs in 77 ms
+[ContentStore] compendium: 27 docs in 79 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 169 ms
+[ContentStore] liturgicalTemplates: 16 docs in 248 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 312 ms
+[ContentStore] readings: 822 docs in 410 ms
+[ContentStore] days: 736 docs in 913 ms
+04:13 +50: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 93 ms
+[ContentStore] invitatoriums: 4 docs in 42 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] completoriums: 35 docs in 44 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 34 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 40 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 44 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] compendium: 27 docs in 103 ms
+[ContentStore] songs: 447 docs in 114 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 239 ms
+[ContentStore] liturgicalTemplates: 16 docs in 282 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 331 ms
+[ContentStore] readings: 822 docs in 475 ms
+[ContentStore] days: 736 docs in 990 ms
+04:39 +51: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases a new app bundle absorbs the patches it contains
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 66 ms
+[ContentStore] invitatoriums: 4 docs in 35 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 32 ms
+[ContentStore] completoriums: 35 docs in 35 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 25 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 30 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 33 ms
+[ContentStore] compendiumMeta: 1 docs in 16 ms
+[ContentStore] songs: 447 docs in 80 ms
+[ContentStore] compendium: 27 docs in 83 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 193 ms
+[ContentStore] liturgicalTemplates: 16 docs in 231 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 284 ms
+[ContentStore] readings: 822 docs in 408 ms
+[ContentStore] days: 736 docs in 850 ms
+05:15 +52: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/content_offline_test.dart: former download cache at full size an almost complete old database: newer kept, the rest freed, user data intact
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 64 ms
+[ContentStore] invitatoriums: 4 docs in 38 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 37 ms
+[ContentStore] completoriums: 35 docs in 38 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 34 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 44 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 28 ms
+[ContentStore] songs: 447 docs in 54 ms
+[ContentStore] compendium: 27 docs in 50 ms
+[ContentStore] liturgicalTemplates: 16 docs in 174 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 159 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 208 ms
+[ContentStore] readings: 822 docs in 294 ms
+[ContentStore] days: 736 docs in 729 ms
+[ContentMigration] done, 1 newer documents kept
+MIGRATION 2120 documents, 58.3 MB → 0.1 MB in 147 ms
+05:21 +53: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart
+05:26 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 38 ms
+[ContentStore] prayers: 115 docs in 129 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 65 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 64 ms
+[ContentStore] invitatoriums: 4 docs in 123 ms
+[ContentStore] completoriums: 35 docs in 130 ms
+[ContentStore] compendium: 27 docs in 98 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 149 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 157 ms
+[ContentStore] compendiumMeta: 1 docs in 129 ms
+[ContentStore] liturgicalTemplates: 16 docs in 211 ms
+[ContentStore] songs: 447 docs in 220 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 297 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 261 ms
+[ContentStore] readings: 822 docs in 388 ms
+[ContentStore] days: 736 docs in 623 ms
+05:27 +53: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: Guardian Angels 02.10.2026: Proper antiphons, Lauds psalms of Sunday I, never the raw instruction
+05:27 +54: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: St Bruno 06.10.2026: «З дня» (default) / «Пра пастыраў» / «Пра законнікаў»; the own Proper survives every Common
+05:27 +55: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: All Souls: the Office for the Dead, not the weekday
+05:28 +56: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: All Souls on a Sunday: the Hours are of the Sunday, the Mass of All Souls (§11.1)
+05:29 +57: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: Immaculate Heart + St Anthony (13.06.2026): exactly two memorial Offices, no weekday card (§11.2)
+05:29 +58: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: a memorial defaults to «З дня»; a feast takes the Lauds psalms of Sunday I
+05:29 +59: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: solemnity on a weekday: complementary psalmody; missing template is an integrity error, never the day
+05:29 +60: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 17–24 December: weekday primary, memorials only commemorations
+05:30 +61: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 25 December – 12 January: octave, Mary Mother of God, Epiphany, Baptism of the Lord
+05:32 +62: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years Holy Week and the Easter octave
+05:32 +63: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: legacy fixed days are a fallback only: no tested date needs them
+05:41 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_regression_test.dart: (tearDownAll)
+05:41 +64: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart
+05:49 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: (setUpAll)
+05:49 +64: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter sorted first option becomes primary and empty is explicit
+05:49 +65: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter alternatives count excludes primary and manual choice is resolved
+05:49 +66: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter template choice updates effective day without changing option
+05:49 +67: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter hour availability keeps production checkFields rule
+05:50 +68: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter Compline availability uses its separate record source
+05:50 +69: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter manual overrides are session-scoped per date
+05:50 +70: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours liturgical adapter Hours and Readings share date and selected celebration
+05:50 +71: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: single option hides alternatives and hour opens correct Ora
+05:54 +72: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours title has no calendar capsule
+05:54 +73: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: local celebration shows its Belarusian diocese name
+05:54 +74: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: alternatives sheet updates the selected celebration in place
+05:55 +75: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Today moves Hours and Readings to the same date
+05:56 +76: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: Hours layout supports 200 percent text on a narrow surface
+05:56 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/hours_root_test.dart: (tearDownAll)
+05:56 +77: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart
+05:58 +77: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart: resolves explicit from-day and missing proper fields
+05:58 +78: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart: daytime hours inherit individual fields from Terce
+05:58 +79: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart: expands seasonal weekday antiphons into Lauds and Vespers
+05:58 +80: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart: Completorium uses Sunday only for solemnities and aliases Holy Week
+05:58 +81: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart: Te Deum follows rank, octave and Sunday rules
+05:58 +82: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/liturgical_resolution_test.dart: Christmas psalter keeps Advent IV until the first Sunday
+05:58 +83: loading C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart
+06:10 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: (setUpAll)
+06:10 +83: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: search has no visible year control
+06:13 +84: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year text search finds the same diocesan variant in a legal year
+06:17 +85: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year text identity never substitutes another source or rank
+06:20 +86: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year no legacy days source in the picker
+06:20 +87: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year fixed, movable, transferred and diocesan, on final dates, with their colours
+06:21 +88: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year Nicholas stays white and visible when impeded; permission is local
+06:23 +89: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year all active layered definitions survive, without merging variants
+06:23 +90: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 320.0, Brightness.dark, large text
+06:29 +91: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 320.0, Brightness.light, large text
+06:32 +92: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.dark, large text
+06:35 +93: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.light, large text
+06:38 +94: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.dark, large text
+06:42 +95: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+06:44 +96: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year a year override moves a diocesan celebration (Grodno 2027)
+06:44 +97: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Christmas 2025 includes every date through Baptism once
+06:44 +98: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Christmas 2026 includes every date through Baptism once
+06:44 +99: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Christmas 2027 includes every date through Baptism once
+06:44 +100: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Advent, 17–24 December, Christmas, Lent, Holy Week, Easter, Ordinary Time before and after Lent
+06:45 +101: C:/Users/User/Documents/GitHub/ibreviarybyapp/test/ordo_picker_test.dart: (tearDownAll)
+06:45 +101: All tests passed!

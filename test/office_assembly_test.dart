@@ -152,7 +152,10 @@ void main() {
       expect(option.day!.data['laudesHymn'], 'day:laudesHymn');
       final pastors = option.templates[1].day.data;
       expect(pastors['laudesHymn'], templates['pastors']!['laudesHymn']);
-      expect(pastors['laudesPs1'], 'day:laudesPs1');
+      expect(
+        pastors['laudesPs1'],
+        templates[kSundayWeek1Template]!['laudesPs1'],
+      );
       expect(
         pastors['officeOfReadingsR2'],
         option.day!.data['officeOfReadingsR2'],
