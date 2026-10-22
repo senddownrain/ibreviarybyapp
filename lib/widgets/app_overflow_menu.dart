@@ -1,12 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import 'package:mybrev_flutter/models/psalmody_preferences.dart';
-import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
@@ -32,7 +29,6 @@ class AppOverflowMenu extends StatefulWidget {
   });
 
   final bool showTextScale;
-  final bool showPsalmody;
   final List<ReaderSecondaryAction> actions;
 
   @override
@@ -65,7 +61,10 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
-    final width = math.min(360.0, media.size.width - 32);
+    final width = math.min(
+      widget.showPsalmody ? 288.0 : 360.0,
+      media.size.width - 32,
+    );
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
     final bottom =
         media.size.height -
@@ -112,7 +111,6 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
               _popupRoute = ModalRoute.of(popupContext);
               return _OverflowContent(
                 showTextScale: widget.showTextScale,
-                showPsalmody: widget.showPsalmody,
                 actions: actions,
                 onSelected: (value) => Navigator.pop(popupContext, value),
               );
@@ -127,7 +125,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     _open = false;
     if (!mounted || result == null) return;
     if (result == 'font') {
-      await showTextScalePanel(context);
+      await showTextScalePanel(context, showPsalmody: widget.showPsalmody);
     } else if (result == 'settings' || result == 'about') {
       context.push('/$result');
     } else {
@@ -151,8 +149,8 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
   );
 }
 
-/// Keep each action and switch as its own accessible node. A disabled
-/// PopupMenuItem would merge all of these controls into one disabled item.
+/// Keep each menu action as its own accessible node. A disabled
+/// PopupMenuItem would merge all controls into a single disabled item.
 class _OverflowEntry extends PopupMenuEntry<String> {
   const _OverflowEntry({required this.child});
 
@@ -176,7 +174,6 @@ class _OverflowEntryState extends State<_OverflowEntry> {
 class _OverflowContent extends StatelessWidget {
   const _OverflowContent({
     required this.showTextScale,
-    required this.showPsalmody,
     required this.actions,
     required this.onSelected,
   });
@@ -197,10 +194,9 @@ class _OverflowContent extends StatelessWidget {
         children: [
           if (showTextScale)
             _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
-          if (showPsalmody) const PsalmodyOverflowControls(),
           for (var index = 0; index < actions.length; index++)
             _item(actions[index].label, actions[index].icon, '$index'),
-          if (showTextScale || showPsalmody || actions.isNotEmpty)
+          if (showTextScale || actions.isNotEmpty)
             const Divider(height: 16),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
@@ -218,39 +214,3 @@ class _OverflowContent extends StatelessWidget {
   );
 }
 
-class PsalmodyOverflowControls extends ConsumerWidget {
-  const PsalmodyOverflowControls({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsProvider);
-    final notifier = ref.read(settingsProvider.notifier);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SwitchListTile.adaptive(
-          key: const Key('overflow-psalm-marker-break'),
-          title: const Text('Перанос пасля * і †'),
-          value:
-              settings.psalmMarkerBreakMode ==
-              PsalmMarkerBreakMode.breakAfterMarker,
-          onChanged: (value) => notifier.setPsalmMarkerBreakMode(
-            value
-                ? PsalmMarkerBreakMode.breakAfterMarker
-                : PsalmMarkerBreakMode.inline,
-          ),
-        ),
-        SwitchListTile.adaptive(
-          key: const Key('overflow-psalm-aligned-left'),
-          title: const Text('Па левым краі'),
-          value: settings.psalmVerseLayout == PsalmVerseLayout.alignedLeft,
-          onChanged: (value) => notifier.setPsalmVerseLayout(
-            value
-                ? PsalmVerseLayout.alignedLeft
-                : PsalmVerseLayout.alternatingIndent,
-          ),
-        ),
-      ],
-    );
-  }
-}
