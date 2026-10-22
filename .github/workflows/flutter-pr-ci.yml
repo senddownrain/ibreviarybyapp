@@ -32,4 +32,4 @@ jobs:
       - name: Analyze
         run: flutter analyze --no-fatal-infos
       - name: Unit regression
-        run: flutter test test/liturgical_alternatives_test.dart
+        run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart

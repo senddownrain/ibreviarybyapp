@@ -39,6 +39,7 @@ import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
+import 'package:mybrev_flutter/utils/pastors_hymn.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
@@ -1127,7 +1128,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final v = (day.field(fieldName) ?? '').trim();
     if (v.isEmpty) return;
     items.add(_OraItem.blockHeader('ГІМН'));
-    items.add(_OraItem.html(v, kind: 'hymn'));
+    items.add(_OraItem.html(preparePastorsHymn(v, day.feastName), kind: 'hymn'));
   }
 
   void _addPaterAndPrayer(List<_OraItem> items, String prayer) {
