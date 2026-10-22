@@ -88,7 +88,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       ...widget.actions,
       if (isPrayerbook && routePath != '/prayers/categories')
         ReaderSecondaryAction(
-          label: 'Кіраваць катэгорыямі',
+          label: 'Катэгорыі',
           icon: Icons.category_outlined,
           onSelected: () => context.push('/prayers/categories'),
         ),
