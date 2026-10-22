@@ -29,6 +29,7 @@ class AppOverflowMenu extends StatefulWidget {
   });
 
   final bool showTextScale;
+  final bool showPsalmody;
   final List<ReaderSecondaryAction> actions;
 
   @override
@@ -179,7 +180,6 @@ class _OverflowContent extends StatelessWidget {
   });
 
   final bool showTextScale;
-  final bool showPsalmody;
   final List<ReaderSecondaryAction> actions;
   final ValueChanged<String> onSelected;
 
