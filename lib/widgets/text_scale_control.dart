@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -44,15 +45,22 @@ class TextScaleControl extends ConsumerWidget {
   }
 }
 
-/// Opens the existing size-only panel after contextual menus are dismissed.
-Future<void> showTextScalePanel(BuildContext context) {
+/// Opens the reader appearance sheet after contextual menus are dismissed.
+/// Psalmody controls are available only in the Liturgy of the Hours.
+Future<void> showTextScalePanel(
+  BuildContext context, {
+  bool showPsalmody = false,
+}) {
   if (usesCupertinoGlass(context)) {
     return showCupertinoModalPopup<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.28),
       builder: (_) => Material(
         color: Colors.transparent,
-        child: SafeArea(top: false, child: const _TextScalePanel()),
+        child: SafeArea(
+          top: false,
+          child: _TextScalePanel(showPsalmody: showPsalmody),
+        ),
       ),
     );
   }
@@ -67,19 +75,20 @@ Future<void> showTextScalePanel(BuildContext context) {
     builder: (_) => SafeArea(
       top: false,
       minimum: EdgeInsets.only(bottom: 6),
-      child: const _TextScalePanel(),
+      child: _TextScalePanel(showPsalmody: showPsalmody),
     ),
   );
 }
 
 class _TextScalePanel extends ConsumerWidget {
-  const _TextScalePanel();
+  const _TextScalePanel({this.showPsalmody = false});
+
+  final bool showPsalmody;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fontSize = ref.watch(
-      settingsProvider.select((settings) => settings.fontSize),
-    );
+    final settings = ref.watch(settingsProvider);
+    final fontSize = settings.fontSize;
     final notifier = ref.read(settingsProvider.notifier);
     final percent = readerFontScalePercent(fontSize);
     final canDecrease = fontSize > kMinReaderFontSize + 0.01;
@@ -209,6 +218,41 @@ class _TextScalePanel extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    if (showPsalmody) ...[
+                      const Divider(height: 28),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Псальмодыя',
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      SwitchListTile.adaptive(
+                        key: const Key('text-scale-psalm-marker-break'),
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Перанос пасля * і †'),
+                        value: settings.psalmMarkerBreakMode ==
+                            PsalmMarkerBreakMode.breakAfterMarker,
+                        onChanged: (value) => notifier.setPsalmMarkerBreakMode(
+                          value
+                              ? PsalmMarkerBreakMode.breakAfterMarker
+                              : PsalmMarkerBreakMode.inline,
+                        ),
+                      ),
+                      SwitchListTile.adaptive(
+                        key: const Key('text-scale-psalm-aligned-left'),
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Па левым краі'),
+                        value: settings.psalmVerseLayout ==
+                            PsalmVerseLayout.alignedLeft,
+                        onChanged: (value) => notifier.setPsalmVerseLayout(
+                          value
+                              ? PsalmVerseLayout.alignedLeft
+                              : PsalmVerseLayout.alternatingIndent,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
