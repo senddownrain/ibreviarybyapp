@@ -69,9 +69,15 @@ String preparePastorsHymn(String html, [String? feastName]) {
   final order = selected.isEmpty
       ? _kinds
       : [selected, ..._kinds.where((kind) => kind != selected)];
-  return order.map((kind) {
+  final hymns = order.map((kind) {
     final verses = content[kind]!.map(_paragraph).join('\n');
     return '<div data-alternative-title="' + _titles[kind]! +
         '" data-pastor-kind="' + kind + '">\n' + verses + '\n</div>';
   }).join('\n');
+  // An unknown title requires a manual selection, never an invented rank.
+  if (selected.isNotEmpty) return hymns;
+  return '<div data-alternative-title="Абярыце тып пастыра" '
+      'data-pastor-kind="unspecified">'
+      '<p>Абярыце адпаведны варыянт гімна паводле святога.</p>'
+      '</div>\n' + hymns;
 }
