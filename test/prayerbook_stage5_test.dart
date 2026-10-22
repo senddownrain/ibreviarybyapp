@@ -448,10 +448,10 @@ void main() {
     await tester.tap(find.byKey(const Key('app-overflow-open')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Кіраваць катэгорыямі'), findsOneWidget);
+    expect(find.text('Катэгорыі'), findsOneWidget);
     expect(find.text('Налады'), findsOneWidget);
     expect(find.text('Інфармацыя'), findsOneWidget);
-    await tester.tap(find.text('Кіраваць катэгорыямі'));
+    await tester.tap(find.text('Катэгорыі'));
     await tester.pumpAndSettle();
     expect(find.text('categories-management-destination'), findsOneWidget);
     expect(router.routeInformationProvider.value.uri.path, '/prayers/categories');
