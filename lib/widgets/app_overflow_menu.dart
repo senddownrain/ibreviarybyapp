@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
@@ -76,7 +77,22 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       Rect.fromLTWH(origin.dx, menuTop, button.size.width, 0),
       Offset.zero & overlay.size,
     );
-    final actions = widget.actions;
+    // The prayerbook shares this menu across its root, category/catalogue
+    // screens and readers. Keep category management in one place, instead of
+    // rendering a second overflow button alongside it.
+    final isPrayerbook =
+        AppRouteEntryScope.maybeOf(context)?.entry.descriptor.branch ==
+        AppBranch.prayerbook;
+    final routePath = GoRouter.maybeOf(context)?.routeInformationProvider.value.uri.path;
+    final actions = [
+      ...widget.actions,
+      if (isPrayerbook && routePath != '/prayers/categories')
+        ReaderSecondaryAction(
+          label: 'Кіраваць катэгорыямі',
+          icon: Icons.category_outlined,
+          onSelected: () => context.push('/prayers/categories'),
+        ),
+    ];
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
