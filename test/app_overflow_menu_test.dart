@@ -1,4 +1,3 @@
-import 'dart:ui' show Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +15,7 @@ void main() {
   }
 
   testWidgets(
-    'Ora switches apply immediately and survive reopening the popup',
+    'Ora popup is compact and psalmody chips toggle independently in font sheet',
     (tester) async {
       final container = ProviderContainer(
         overrides: [settingsProvider.overrideWith(_Settings.new)],
@@ -35,37 +34,28 @@ void main() {
           ),
         ),
       );
+
       await openMenu(tester);
-      final marker = find.byKey(const Key('overflow-psalm-marker-break'));
-      final layout = find.byKey(const Key('overflow-psalm-aligned-left'));
-      expect(tester.widget<SwitchListTile>(marker).value, isFalse);
-      expect(tester.widget<SwitchListTile>(layout).value, isFalse);
-      expect(find.text('Перанос пасля * і †'), findsOneWidget);
-      expect(find.byType(SwitchListTile), findsNWidgets(2));
-      expect(find.byType(ChoiceChip), findsNothing);
-      final semantics = tester.ensureSemantics();
+      expect(find.text('Шрыфт'), findsOneWidget);
+      expect(find.byType(FilterChip), findsNothing);
+      expect(find.byType(SwitchListTile), findsNothing);
       expect(
-        tester
-                .getSemantics(marker)
-                .getSemanticsData()
-                .flagsCollection
-                .isToggled !=
-            Tristate.none,
-        isTrue,
+        tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
+        lessThanOrEqualTo(288),
       );
-      expect(
-        tester
-                .getSemantics(marker)
-                .getSemanticsData()
-                .flagsCollection
-                .isToggled ==
-            Tristate.isTrue,
-        isFalse,
-      );
+
+      await tester.tap(find.text('Шрыфт'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('app-overflow-content')), findsNothing);
+      expect(find.text('Псальмодыя'), findsOneWidget);
+      expect(find.byType(FilterChip), findsNWidgets(2));
+      final marker = find.byKey(const Key('text-scale-psalm-marker-break'));
+      final layout = find.byKey(const Key('text-scale-psalm-aligned-left'));
+      expect(tester.widget<FilterChip>(marker).selected, isFalse);
+      expect(tester.widget<FilterChip>(layout).selected, isFalse);
 
       await tester.tap(marker);
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('app-overflow-content')), findsOneWidget);
       expect(
         container.read(settingsProvider).psalmMarkerBreakMode,
         PsalmMarkerBreakMode.breakAfterMarker,
@@ -74,29 +64,28 @@ void main() {
         container.read(settingsProvider).psalmVerseLayout,
         PsalmVerseLayout.alternatingIndent,
       );
+
       await tester.tap(layout);
       await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(marker).value, isTrue);
-      expect(
-        tester
-                .getSemantics(marker)
-                .getSemanticsData()
-                .flagsCollection
-                .isToggled ==
-            Tristate.isTrue,
-        isTrue,
-      );
-      expect(tester.widget<SwitchListTile>(layout).value, isTrue);
-      await tester.tapAt(const Offset(10, 500));
+      expect(tester.widget<FilterChip>(marker).selected, isTrue);
+      expect(tester.widget<FilterChip>(layout).selected, isTrue);
+
+      await tester.tap(marker);
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilterChip>(marker).selected, isFalse);
+      expect(tester.widget<FilterChip>(layout).selected, isTrue);
+
+      await tester.tap(find.byTooltip('Закрыць'));
       await tester.pumpAndSettle();
       await openMenu(tester);
-      expect(tester.widget<SwitchListTile>(marker).value, isTrue);
-      expect(tester.widget<SwitchListTile>(layout).value, isTrue);
-      semantics.dispose();
+      await tester.tap(find.text('Шрыфт'));
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilterChip>(marker).selected, isFalse);
+      expect(tester.widget<FilterChip>(layout).selected, isTrue);
     },
   );
 
-  testWidgets('font dismisses popup and opens only the saved size panel', (
+  testWidgets('font sheet keeps its size slider and separate Ora options', (
     tester,
   ) async {
     final container = ProviderContainer(
@@ -118,15 +107,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('app-overflow-content')), findsNothing);
     expect(find.byType(SwitchListTile), findsNothing);
+    expect(find.byType(FilterChip), findsNWidgets(2));
     expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pumpAndSettle();
     expect(find.text('110%'), findsOneWidget);
     expect(container.read(settingsProvider).fontSize, closeTo(17.6, .001));
-    await tester.tap(find.byTooltip('Закрыць'));
-    await tester.pumpAndSettle();
-    await openMenu(tester);
-    expect(find.byType(SwitchListTile), findsNWidgets(2));
   });
 
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
@@ -312,9 +298,14 @@ void main() {
       scroll.jumpTo(400);
       await tester.pumpAndSettle();
       await openMenu(tester);
-      await tester.tap(find.byKey(const Key('overflow-psalm-marker-break')));
+      await tester.tap(find.text('Шрыфт'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('text-scale-psalm-marker-break')));
       await tester.pumpAndSettle();
       expect(scroll.offset, 400);
+      await tester.tap(find.byTooltip('Закрыць'));
+      await tester.pumpAndSettle();
+      await openMenu(tester);
       mode.value = ReaderChromeMode.hidden;
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('app-overflow-open')), findsNothing);

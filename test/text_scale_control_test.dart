@@ -52,6 +52,7 @@ void main() {
     expect(find.text('100%'), findsOneWidget);
     expect(find.byKey(const Key('reader-font-literata')), findsNothing);
     expect(find.byKey(const Key('psalm-marker-break')), findsNothing);
+    expect(find.byType(FilterChip), findsNothing);
 
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pump();

@@ -73,8 +73,8 @@ void main() {
         );
         await tester.tap(find.byKey(const Key('app-overflow-open')));
         await tester.pumpAndSettle();
-        expect(find.text('Перанос пасля * і †'), findsOneWidget);
-        expect(find.text('Па левым краі'), findsOneWidget);
+        expect(find.text('Шрыфт'), findsOneWidget);
+        expect(find.byType(FilterChip), findsNothing);
         expect(tester.takeException(), isNull);
         Future<void> capture(String suffix) async {
           if (Platform.environment['OVERFLOW_MENU_IMAGES'] != '1') return;
@@ -94,9 +94,11 @@ void main() {
         }
 
         await capture('open');
-        await tester.ensureVisible(find.text('Інфармацыя'));
+        await tester.tap(find.text('Шрыфт'));
         await tester.pumpAndSettle();
-        await capture('scrolled');
+        expect(find.byType(FilterChip), findsNWidgets(2));
+        expect(tester.takeException(), isNull);
+        await capture('font-sheet');
       });
     }
   }

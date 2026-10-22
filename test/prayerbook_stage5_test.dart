@@ -405,6 +405,69 @@ void main() {
     expect(find.byKey(const ValueKey('prayer-row-local_one')), findsOneWidget);
   });
 
+  testWidgets('Prayer category uses a single shared menu for management', (
+    tester,
+  ) async {
+    const descriptor = AppRouteDescriptor(
+      id: 'prayerbook.category.test',
+      branch: AppBranch.prayerbook,
+      defaultChromeMode: ReaderChromeMode.full,
+      topChromeOwner: TopChromeOwner.legacy,
+    );
+    const entry = AppRouteEntry(
+      id: 'prayerbook-category-entry',
+      descriptor: descriptor,
+    );
+    final controller = BranchShellController(AppBranch.prayerbook, descriptor);
+    addTearDown(controller.dispose);
+    final router = GoRouter(
+      initialLocation: '/prayers/category/user-category',
+      routes: [
+        GoRoute(
+          path: '/prayers/category/:id',
+          builder: (_, state) => AppRouteEntryScope(
+            entry: entry,
+            controller: controller,
+            child: PrayerCategoryScreen(categoryId: state.pathParameters['id']!),
+          ),
+        ),
+        GoRoute(
+          path: '/prayers/categories',
+          builder: (_, _) => const Scaffold(
+            body: Center(child: Text('categories-management-destination')),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(_app(const SizedBox.shrink(), router: router));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('category-manage-action')), findsNothing);
+    expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('app-overflow-open')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Катэгорыі'), findsOneWidget);
+    expect(find.text('Налады'), findsOneWidget);
+    expect(find.text('Інфармацыя'), findsOneWidget);
+    await tester.tap(find.text('Катэгорыі'));
+    await tester.pumpAndSettle();
+    expect(find.text('categories-management-destination'), findsOneWidget);
+    expect(router.routeInformationProvider.value.uri.path, '/prayers/categories');
+  });
+
+  testWidgets('Prayerbook search keeps the shared overflow visible', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(const PrayerCatalogScreen(searchInitially: true)),
+    );
+    await tester.pump();
+    expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
+    expect(find.byKey(const Key('prayer-search-field')), findsOneWidget);
+  });
+
   testWidgets('category management hides and shows defaults', (tester) async {
     final notifier = _TestSettingsNotifier();
     await tester.pumpWidget(
