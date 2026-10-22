@@ -249,7 +249,6 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
     );
     return _PrayerListPage(
       title: widget.searchInitially ? 'Пошук' : 'Усе малітвы',
-      showOverflow: !widget.searchInitially,
       subtitle: widget.searchInitially
           ? 'Назва або тэкст малітвы'
           : 'Увесь малітоўнік адным спісам',
@@ -337,12 +336,6 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       subtitle: 'Малітвы гэтай катэгорыі',
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
-      topAction: IconButton(
-        key: const Key('category-manage-action'),
-        tooltip: 'Кіраваць катэгорыямі',
-        onPressed: () => context.push('/prayers/categories'),
-        icon: const Icon(Icons.more_horiz_rounded),
-      ),
       prayers: prayers,
       categories: children,
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
@@ -582,8 +575,6 @@ class _PrayerListPage extends StatelessWidget {
     required this.emptyTitle,
     required this.scrollController,
     required this.scrollKey,
-    this.topAction,
-    this.showOverflow = true,
     this.searchDock,
     this.categories = const [],
   });
@@ -594,8 +585,6 @@ class _PrayerListPage extends StatelessWidget {
   final String emptyTitle;
   final ScrollController scrollController;
   final PageStorageKey<String> scrollKey;
-  final Widget? topAction;
-  final bool showOverflow;
   final Widget? searchDock;
   final List<PrayerMenuCategory> categories;
 
@@ -644,9 +633,7 @@ class _PrayerListPage extends StatelessWidget {
           ),
           FloatingTopActions(
             showBack: true,
-            showOverflow: showOverflow,
             seasonColor: cs.tertiary,
-            actions: topAction == null ? const [] : [topAction!],
           ),
           if (searchDock != null)
             FloatingOverlayPositioned(
