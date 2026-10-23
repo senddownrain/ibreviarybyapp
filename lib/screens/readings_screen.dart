@@ -40,6 +40,8 @@ import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 const _highlightColors = <String, Color>{
   'amber': Color(0xFFE2AE34),
@@ -558,6 +560,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   Future<void> _showOptions({bool calendarExpanded = false}) async {
     if (_optionsOpen) return;
     _optionsOpen = true;
+    if (calendarExpanded) analyticsFeature('picker_open');
     final advanced = await showModalBottomSheet<bool>(
       context: context,
       useRootNavigator: true,
@@ -621,6 +624,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
               }
             },
             onDateSelected: (date) {
+              analyticsFeature('date_pick');
               ref.read(liturgicalNavigationControllerProvider).openDate(date);
             },
             massSet: _loading ? null : selection.massSet,

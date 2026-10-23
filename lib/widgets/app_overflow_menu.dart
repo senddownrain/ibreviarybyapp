@@ -7,6 +7,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 class ReaderSecondaryAction {
   const ReaderSecondaryAction({
@@ -142,6 +144,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     _open = false;
     if (!mounted || result == null) return;
     if (result == 'font') {
+      analyticsFeature('text_settings_open');
       await showTextScalePanel(context, showPsalmody: widget.showPsalmody);
     } else if (result == 'settings' || result == 'about') {
       context.push('/$result');

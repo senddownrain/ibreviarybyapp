@@ -49,6 +49,13 @@ void main() {
         'lib/screens/bible_chapter_screen.dart',
         'lib/screens/reading_detail_screen.dart',
         'lib/widgets/reader/reader_scaffold.dart',
+        'lib/providers/diocese_provider.dart',
+        'lib/screens/ora_screen.dart',
+        'lib/screens/readings_screen.dart',
+        'lib/screens/song_detail_screen.dart',
+        'lib/widgets/app_overflow_menu.dart',
+        'lib/widgets/hours_options_sheet.dart',
+        'lib/widgets/liturgical_calendar_sheet.dart',
       };
       final importers = <String>[];
       final featureCalls = <String>[];

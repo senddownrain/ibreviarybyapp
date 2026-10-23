@@ -41,6 +41,8 @@ import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/pastors_hymn.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 // ─── Static liturgical texts ──────────────────────────────────────────────────
 
@@ -665,6 +667,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   }
 
   void _openHour(String type) {
+    analyticsFeature('hour_switch');
     final currentQuery = GoRouterState.of(context).uri.queryParameters;
     final route = Uri.parse(
       oraRouteForContext(
