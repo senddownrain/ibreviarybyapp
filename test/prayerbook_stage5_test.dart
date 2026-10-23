@@ -454,7 +454,10 @@ void main() {
     await tester.tap(find.text('Катэгорыі'));
     await tester.pumpAndSettle();
     expect(find.text('categories-management-destination'), findsOneWidget);
-    expect(router.routeInformationProvider.value.uri.path, '/prayers/categories');
+    expect(
+      router.routerDelegate.currentConfiguration.last.matchedLocation,
+      '/prayers/categories',
+    );
   });
 
   testWidgets('Prayerbook search keeps the shared overflow visible', (

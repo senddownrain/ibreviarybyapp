@@ -132,9 +132,12 @@ void main() {
     expect(resolved.data['_assembly'], common.day.data['_assembly']);
     expect(resolved.field('laudesHymn'), common.day.field('laudesHymn'));
     final commonData = HiveService.templates()['blessed-virgin-mary']!;
+    // The Marian Common carries `_mainSection` (docs/common-office-web-parity.md,
+    // PR #22): a memorial assembles its main hymn, not every alternative.
+    final main = commonData['_mainSection'] as Map;
     expect(
       common.day.field('officeOfReadingsHymn'),
-      commonData['officeOfReadingsHymn'],
+      main['officeOfReadingsHymn'],
     );
   });
 
