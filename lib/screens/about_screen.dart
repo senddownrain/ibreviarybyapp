@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
+import 'package:mybrev_flutter/constants/legal_links.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -118,7 +119,14 @@ class _AboutContent extends StatelessWidget {
           textAlign: TextAlign.center,
           style: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
         ),
-        const SizedBox(height: 38),
+        const SizedBox(height: 18),
+        TextButton.icon(
+          key: const Key('about-privacy-policy-link'),
+          onPressed: () => _openPrivacyPolicy(context),
+          icon: const Icon(Icons.privacy_tip_outlined, size: 20),
+          label: const Text('Палітыка прыватнасці'),
+        ),
+        const SizedBox(height: 20),
         FutureBuilder<PackageInfo>(
           future: PackageInfo.fromPlatform(),
           builder: (context, snapshot) => Text(
@@ -141,6 +149,18 @@ class _AboutContent extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    final opened = await launchUrl(
+      Uri.parse(kPrivacyPolicyUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Не ўдалося адкрыць палітыку прыватнасці')),
+      );
+    }
   }
 
   Future<void> _openParishWebsite(BuildContext context) async {
