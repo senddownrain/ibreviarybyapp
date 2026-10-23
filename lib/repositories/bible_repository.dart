@@ -1,5 +1,39 @@
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
 
+
+// Display labels follow Catholic.by (2017 official Belarusian New Testament).
+// The four Gospel labels omit «святога» for compact navigation.
+// IDs and bundled Bible text are intentionally unchanged.
+const Map<String, String> _belarusianNewTestamentNames = {
+  'mt': 'Евангелле паводле Мацвея',
+  'mk': 'Евангелле паводле Марка',
+  'lk': 'Евангелле паводле Лукі',
+  'jn': 'Евангелле паводле Яна',
+  'acts': 'Дзеі Апосталаў',
+  'rom': 'Пасланне да Рымлянаў',
+  '1co': 'Першае пасланне да Карынцянаў',
+  '2co': 'Другое пасланне да Карынцянаў',
+  'gal': 'Пасланне да Галатаў',
+  'eph': 'Пасланне да Эфесцаў',
+  'php': 'Пасланне да Філіпянаў',
+  'col': 'Пасланне да Каласянаў',
+  '1th': 'Першае пасланне да Тэсаланікійцаў',
+  '2th': 'Другое пасланне да Тэсаланікійцаў',
+  '1ti': 'Першае пасланне да Цімафея',
+  '2ti': 'Другое пасланне да Цімафея',
+  'tit': 'Пасланне да Ціта',
+  'phm': 'Пасланне да Філімона',
+  'heb': 'Пасланне да Габрэяў',
+  'jas': 'Пасланне святога Якуба',
+  '1pe': 'Першае пасланне святога Пятра',
+  '2pe': 'Другое пасланне святога Пятра',
+  '1jn': 'Першае пасланне святога Яна',
+  '2jn': 'Другое пасланне святога Яна',
+  '3jn': 'Трэцяе пасланне святога Яна',
+  'jud': 'Пасланне святога Юды',
+  'rev': 'Апакаліпсіс святога Яна',
+};
+
 class BibleVerse {
   final int verse;
   final String text;
@@ -119,7 +153,9 @@ class BibleRepository {
       final order = (b['order'] as num?)?.toInt() ?? (entry.key + 1);
       return BibleBookInfo(
         id: b['id']?.toString() ?? '',
-        name: b['name']?.toString() ?? '',
+        name: versionId == 'bel'
+            ? (_belarusianNewTestamentNames[b['id']?.toString()] ?? b['name']?.toString() ?? '')
+            : (b['name']?.toString() ?? ''),
         chapterCount: _chapterCount(b),
         versionId: versionId,
         order: order,
