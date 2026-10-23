@@ -16,6 +16,8 @@ import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:mybrev_flutter/utils/prayer_link.dart';
 import 'package:mybrev_flutter/utils/prayer_html.dart';
 import 'package:mybrev_flutter/widgets/prayer_content.dart';
+import 'package:mybrev_flutter/widgets/devotional_office_reader.dart';
+import 'package:mybrev_flutter/utils/devotional_office.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -265,6 +267,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         ? textPrayer!.displayTitle
         : variant.title;
 
+    final office = _isMass ? null : parseDevotionalOffice(p);
     final cs = Theme.of(context).colorScheme;
     return ReadingScaffold(
       builder: (context, textStyle) => ReaderScaffold(
@@ -275,6 +278,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         chromeMode: ReaderChromeMode.compact,
         scrollController: _scrollController,
         showScrollToTop: !_isMass,
+        showPsalmody: office != null && office.profile != 'gadzinki',
         overlay: _isMass
             ? _MassNavigatorBar(
                 controller: _massNav,
@@ -318,6 +322,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
                 textPrayer,
                 textStyle,
                 massVariant: variant,
+                office: office,
               ),
       ),
     );
@@ -351,6 +356,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
     Prayer prayer,
     TextStyle textStyle, {
     MassVariant? massVariant,
+    DevotionalOfficeDocument? office,
   }) {
     final isMass = massVariant != null;
     final raw = _removeLeadingDuplicateTitle(
@@ -388,6 +394,14 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
     }
 
     if (!isMass) {
+      if (office != null) {
+        return DevotionalOfficeReader(
+          key: ValueKey('devotional-office-${prayer.id}'),
+          document: office,
+          textStyle: textStyle,
+          onLinkTap: _onLinkTap,
+        );
+      }
       return PrayerContent(
         prayer: prayer.copyWith(body: raw),
         textStyle: textStyle,
