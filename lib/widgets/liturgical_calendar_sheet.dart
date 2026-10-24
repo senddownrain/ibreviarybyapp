@@ -10,6 +10,8 @@ import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_disclosure.dart';
 import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 /// Date-only entry. Browsing months does not change the underlying reader.
 Future<void> showCompactLiturgicalCalendar({
@@ -21,6 +23,7 @@ Future<void> showCompactLiturgicalCalendar({
 }) async {
   final router = GoRouter.of(context);
   var activeDate = date;
+  analyticsFeature('picker_open');
   final result = await showModalBottomSheet<Object>(
     context: context,
     useRootNavigator: true,
@@ -30,6 +33,7 @@ Future<void> showCompactLiturgicalCalendar({
     builder: (sheetContext) => StatefulBuilder(
       builder: (context, setSheetState) {
         void select(DateTime value) {
+          analyticsFeature('date_pick');
           if (onSelected == null) {
             Navigator.pop(sheetContext, value);
           } else {
@@ -97,6 +101,7 @@ Future<void> showLiturgicalCalendarSheet({
   String? diocese,
 }) async {
   final router = GoRouter.of(context);
+  if (!focusVariants) analyticsFeature('picker_open');
   final advanced = await showModalBottomSheet<bool>(
     context: context,
     useRootNavigator: true,
@@ -132,6 +137,7 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
     final ready = ref.watch(selectedDateReadyProvider);
     final navigation = ref.read(liturgicalNavigationControllerProvider);
     void selectDate(DateTime date) {
+      analyticsFeature('date_pick');
       final saved = ref.read(
         hoursLiturgicalOverridesProvider,
       )[liturgicalDateKey(date)];

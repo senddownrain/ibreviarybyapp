@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "contract_surface_sha256": "c38c87905c0150204c4e6a5d49b1c35bec06cfb04ffb166398899224f45cd4ba",
+  "golden_sha256": "fe3e26ed3ab07f81a443c6b4a726a2be620bb55d73abaf19b78b73dc2da14eb3",
+  "sources": {
+    "contract_fixture_sha256": "af2d0176295f824d4c8d7f9b4fa7c5db47245dc8177984d0927b7fed06e55f09",
+    "inventory_sha256": "480dfd96459e5c79515e695aa2135e61b549479b18a8e95d34dc2b14e2011311",
+    "inventory_count": 750
+  },
+  "counts": {
+    "routes": 28,
+    "visits": 16,
+    "content_id_probes": 16
+  },
+  "web_feature_use": {
+    "total": 27,
+    "covered": [
+      "text_scale_change",
+      "text_settings_open",
+      "theme_change",
+      "font_family_change",
+      "keep_screen_on_toggle",
+      "favorite_add",
+      "favorite_remove",
+      "share_use",
+      "copy_use",
+      "search_open",
+      "date_pick",
+      "picker_open",
+      "hour_switch",
+      "hour_option_select",
+      "psalmody_layout_change",
+      "chords_toggle",
+      "chord_transpose",
+      "chord_layout_change",
+      "mass_language_change",
+      "mass_section_nav",
+      "ordo_diocese_change",
+      "bible_language_change",
+      "bible_chapter_nav",
+      "back_to_top"
+    ],
+    "not_covered": [
+      "search_submit",
+      "offline_update_apply",
+      "install_prompt_open"
+    ]
+  },
+  "flutter": {
+    "checked": true,
+    "dart_inventory_ids": 750
+  },
+  "problems": []
+}
