@@ -16,7 +16,7 @@ const ids = [
 ];
 const intentions = ['За аднаго памерлага', 'За адну памерлую', 'За некалькіх', 'За братоў, блізкіх і дабрадзеяў'];
 const maryPrayers = ['Агульная', 'Аб прабачэнні', 'Аб выпраўленні жыцця', 'Аб абароне', 'Аб Божай ласцы'];
-const errors = [], external = [], rows = [];
+const errors = [], requestFailures = [], external = [], rows = [];
 let page;
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function text() {
@@ -82,8 +82,12 @@ async function capture(id, settings, heading, setup) {
     page = browser.contexts()[0].pages().find(p => p.url().startsWith(base));
     assert(page, 'Use the tab launched by flutter run at localhost:5239');
     const version = await browser.version();
+    // Discard the previous run before collecting errors, including pending
+    // requests from a disconnected Flutter debug client.
+    await page.goto('about:blank');
     page.on('pageerror', e => errors.push(e.message));
-    page.on('console', m => {if (m.type() === 'error' || /EXCEPTION CAUGHT|overflowed by/.test(m.text())) errors.push(m.text());});
+    page.on('console', m => {if (m.type() === 'error' || /EXCEPTION CAUGHT|overflowed by/.test(m.text())) errors.push({text: m.text(), location: m.location(), page: page.url()});});
+    page.on('requestfailed', r => requestFailures.push({url: r.url(), failure: r.failure(), page: page.url()}));
     // Flutter's default Material fallback font is supplied from the SDK, so
     // acceptance remains offline. The book fonts come from the app bundle.
     const roboto = path.join(process.env.FLUTTER_ROOT, 'bin/cache/artifacts/material_fonts/Roboto-Regular.ttf');
@@ -144,12 +148,13 @@ async function capture(id, settings, heading, setup) {
     await capture(ids[3], {}, 'Просьбы', () => choose('Аб сям’і і тых, хто ў патрэбе'));
     await capture(ids[4], {height: 1120}, 'Гімн');
     assert.deepEqual(external, [], 'No remote service calls'); assert.deepEqual(errors, [], 'No JS/Flutter errors');
-    const report = {browser: 'Google Chrome ' + version, url: base, timestamp: new Date().toISOString(), source: 'assets/content/prayers.json.gz via decodeContentCollection, public policy checked', states: rows.length, rows, errors, externalRequests: external, fontFallback: 'Roboto-Regular.ttf from installed Flutter SDK; book fonts from unchanged app bundle', nativeSmoke: 'нужен перед мобильным релизом'};
+    assert.deepEqual(requestFailures, [], 'No failed app resource requests');
+    const report = {browser: 'Google Chrome ' + version, url: base, timestamp: new Date().toISOString(), source: 'assets/content/prayers.json.gz via decodeContentCollection, public policy checked', states: rows.length, rows, errors, requestFailures, externalRequests: external, fontFallback: 'Roboto-Regular.ttf from installed Flutter SDK; book fonts from unchanged app bundle', nativeSmoke: 'нужен перед мобильным релизом'};
     await fs.writeFile(path.join(evidence, 'chrome-smoke.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(`PASS ${rows.length} states, 5 real Chrome PNG screenshots; zero JS/Flutter errors or remote service calls`);
   } catch (error) {
     if (page) await page.screenshot({path: path.join(scratch, 'failure.png')}).catch(() => {});
-    await fs.writeFile(path.join(scratch, 'failure.json'), JSON.stringify({error: String(error), errors, external, completed: rows}, null, 2));
+    await fs.writeFile(path.join(scratch, 'failure.json'), JSON.stringify({error: String(error), errors, requestFailures, external, completed: rows}, null, 2));
     throw error;
   } finally { await browser.close(); }
 })().catch(error => {console.error(error); process.exitCode = 1;});

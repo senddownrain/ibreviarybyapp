@@ -38,7 +38,7 @@ flutter analyze --no-fatal-infos
 
 ```sh
 flutter devices
-flutter run -d chrome -t tool/devotional_office_smoke.dart --web-port 5239 --web-browser-debug-port 9222 --no-web-resources-cdn
+flutter run --release -d chrome -t tool/devotional_office_smoke.dart --web-port 5239 --web-browser-debug-port 9222 --no-web-resources-cdn
 ```
 
 Без дисплея добавить `--web-run-headless`; контейнерный Chrome требует своих стандартных параметров запуска. Автоматизация подключается через CDP к этой же вкладке `http://localhost:5239/` и не запускает другой браузер. Нужен пакет `playwright` в Node resolution path и `FLUTTER_ROOT`, указывающий на установленный SDK:
@@ -49,5 +49,7 @@ NODE_PATH="$PWD/work/chrome-smoke/node_modules" FLUTTER_ROOT=/path/to/flutter no
 ```
 
 Script проверяет 390/320 px, светлую/тёмную тему, текст 100/200%, оба отступа и оба режима переноса, все четыре намерения и марианские смысловые варианты; прокручивает до респонсория и конца. Он сохраняет пять PNG и [машинный протокол](../audit-evidence/devotional-office/chrome-smoke.json). Material fallback Roboto отдаётся локально из Flutter SDK, книжные шрифты — из неизменённых assets; обращения к внешним сервисам блокируются. Свежесть относительно live Firestore не утверждается.
+
+Итог проверки: 47 целевых тестов и 10 существующих CI-регрессий — PASS; форматирование и analyze в режиме CI — PASS. Повторный чистый Chrome run: 40/40 состояний, 0 JS/Flutter errors, 0 failed resource requests, 0 внешних обращений. Все пять итоговых PNG и пять дополнительных кадров 320 px / dark / 200% просмотрены.
 
 Native smoke = **нужен перед мобильным релизом**. Android/iOS не запускались; merge, APK и release не выполнялись.
