@@ -33,6 +33,17 @@ jobs:
         run: flutter analyze --no-fatal-infos
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
+      - name: Check devotional reader formatting
+        run: >-
+          dart format --output=none --set-exit-if-changed
+          lib/utils/devotional_office.dart lib/widgets/devotional_office_reader.dart
+          lib/widgets/prayer_content.dart lib/screens/prayer_detail_screen.dart
+          lib/dev/devotional_office_harness.dart tool/devotional_office_smoke.dart
+          test/devotional_office_test.dart test/devotional_office_widget_test.dart
+      - name: Devotional offices and reader regression
+        run: >-
+          flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
+          test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
 
   analytics-tests:
     name: Analytics tests
@@ -49,3 +60,5 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Analytics unit and widget tests
         run: flutter test test/analytics
+      - name: Analytics enabled fit and recording tests
+        run: flutter test --dart-define=ANALYTICS_LOCAL=true test/analytics

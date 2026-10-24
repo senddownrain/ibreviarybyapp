@@ -14,23 +14,26 @@ class PrayerContent extends StatelessWidget {
     required this.prayer,
     required this.textStyle,
     this.onLinkTap,
+    this.wrapInSelectionArea = true,
   });
   final Prayer prayer;
   final TextStyle textStyle;
   final OnTap? onLinkTap;
+
+  /// Composed readers provide one selection region across their whole document.
+  final bool wrapInSelectionArea;
 
   @override
   Widget build(BuildContext context) {
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
-    return SelectionArea(
-      child: Html(
-        data: html,
-        style: prayerDocumentStyles(context, textStyle),
-        onLinkTap: onLinkTap,
-      ),
+    final content = Html(
+      data: html,
+      style: prayerDocumentStyles(context, textStyle),
+      onLinkTap: onLinkTap,
     );
+    return wrapInSelectionArea ? SelectionArea(child: content) : content;
   }
 }
 
