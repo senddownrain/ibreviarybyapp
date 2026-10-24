@@ -101,7 +101,7 @@ void main() {
       );
       expect(
         scaffold.contains(
-          'if (kAnalyticsLocal) scrollView = AnalyticsReaderScroll(child: scrollView)',
+          'if (kAnalyticsLocal) { scrollView = AnalyticsReaderScroll(',
         ),
         isTrue,
       );

@@ -179,13 +179,20 @@ class LocalAnalytics with WidgetsBindingObserver {
   }
 
   /// Called from the reader scroll listener. Plain in-memory arithmetic only.
-  void onScrollMetrics(ScrollMetrics metrics, int depth) {
+  ///
+  /// [trailingBlank]: empty reserve at the end of the scroll view. A view that
+  /// scrolls by no more than that shows all of its text at once (`sd=fit`).
+  void onScrollMetrics(
+    ScrollMetrics metrics,
+    int depth, {
+    double trailingBlank = 0,
+  }) {
     if (depth != 0 || metrics.axis != Axis.vertical) return;
     if (metrics.viewportDimension < 200) return;
     final target = _target;
     if (target == null || target.contentId == null) return;
     _sawScrollable = true;
-    if (metrics.maxScrollExtent <= 1) {
+    if (metrics.maxScrollExtent <= 1 + trailingBlank) {
       if (!_fitsReported) {
         _fitsReported = true;
         _collector.reportFits(true);
