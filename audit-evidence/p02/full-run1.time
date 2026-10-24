@@ -1,0 +1,1 @@
+flutter test --reporter expanded > audit-evidence/p02/full-run1.log 2>&1  1275.61s user 71.53s system 286% cpu 7:50.23 total
