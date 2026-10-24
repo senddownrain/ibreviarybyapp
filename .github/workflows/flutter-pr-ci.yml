@@ -44,3 +44,21 @@ jobs:
         run: >-
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
           test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
+
+  analytics-tests:
+    name: Analytics tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.41.4'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Analytics unit and widget tests
+        run: flutter test test/analytics
+      - name: Analytics enabled fit and recording tests
+        run: flutter test --dart-define=ANALYTICS_LOCAL=true test/analytics

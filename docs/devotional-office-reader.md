@@ -32,7 +32,7 @@ flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
 flutter analyze --no-fatal-infos
 ```
 
-Режим analyze совпадает с существующим CI: 0 errors, 0 warnings; 8 прежних info в неизменённом `lib/utils/pastors_hymn.dart`. Новые файлы не добавляют диагностик. CI также запускает новые тесты и проверку `dart format`.
+Режим analyze совпадает с существующим CI: 0 errors, 0 warnings; 9 прежних info в неизменённых `lib/utils/pastors_hymn.dart` и `test/analytics/consent_mock_test.dart`. Новые файлы не добавляют диагностик. CI также запускает новые тесты и проверку `dart format`.
 
 Настоящий Flutter Web в Google Chrome:
 
@@ -53,3 +53,12 @@ Script проверяет 390/320 px, светлую/тёмную тему, те
 Итог проверки: 47 целевых тестов и 10 существующих CI-регрессий — PASS; форматирование и analyze в режиме CI — PASS. Повторный чистый Chrome run: 40/40 состояний, 0 JS/Flutter errors, 0 failed resource requests, 0 внешних обращений. Все пять итоговых PNG и пять дополнительных кадров 320 px / dark / 200% просмотрены.
 
 Native smoke = **нужен перед мобильным релизом**. Android/iOS не запускались; merge, APK и release не выполнялись.
+
+
+## Подготовка PR #35 к слиянию
+
+Ветка обновлена от `origin/main` (`9907479`, включая P04/P07 аналитики). В `PrayerDetailScreen` сохранены событие `mass_section_nav` и semantic reader пяти молитв. Workflow содержит исходную задачу аналитики из main и проверки ридера; дополнительно проверяется `ANALYTICS_LOCAL=true`, чтобы gated fit/recording-тесты выполнялись в CI.
+
+После объединения: 47 тестов ридера/регрессий — PASS; аналитика без флага — 68 PASS (8 тестов требуют флага), с флагом — 75 PASS (одна проверка выключенного режима пропускается, она пройдена в первом прогоне). Analyze в принятом CI режиме — PASS, 0 errors/warnings, 9 прежних info. Форматирование — PASS.
+
+Визуальная часть ридера и пять принятых PNG не изменены. Из main перенесены аналитические события и поправка подсчёта пустого резерва, без изменения геометрии или оформления. По решению владельца Chrome-матрица повторно не запускалась; сохранены принятые снимки и протокол предыдущих 40 состояний. Bundle, тексты молитв и Firebase не менялись.

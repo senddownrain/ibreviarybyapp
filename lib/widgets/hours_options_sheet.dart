@@ -7,6 +7,8 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_sheet.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 /// Standalone selector entry point. Calendar callers can keep their own API.
 Future<void> showHoursOptionsSheet({
@@ -49,6 +51,7 @@ class HoursOptionsSheet extends ConsumerWidget {
         .toList();
     final theme = Theme.of(context);
     void choose(DayOption option, [String? id]) {
+      analyticsFeature('hour_option_select');
       ref
           .read(liturgicalNavigationControllerProvider)
           .selectDay(date, id ?? option.dayId!, diocese: option.contextDiocese);

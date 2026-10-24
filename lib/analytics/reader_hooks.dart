@@ -25,21 +25,38 @@ int countRenderedText(RenderObject root) {
 
 /// Forwards the vertical scroll metrics of the reader's own scroll view (top-level
 /// scrollable only). No rebuilds, no state, never consumes a notification.
+///
+/// [trailingBlank] is the empty space the reader reserves below its content
+/// (bottom spacing plus the system / dock inset). It makes the view scrollable
+/// by up to that much without hiding any text, so it is not counted as scroll.
 class AnalyticsReaderScroll extends StatelessWidget {
-  const AnalyticsReaderScroll({super.key, required this.child});
+  const AnalyticsReaderScroll({
+    super.key,
+    required this.child,
+    this.trailingBlank = 0,
+  });
 
   final Widget child;
+  final double trailingBlank;
 
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollMetricsNotification>(
       onNotification: (n) {
-        LocalAnalytics.instance?.onScrollMetrics(n.metrics, n.depth);
+        LocalAnalytics.instance?.onScrollMetrics(
+          n.metrics,
+          n.depth,
+          trailingBlank: trailingBlank,
+        );
         return false;
       },
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
-          LocalAnalytics.instance?.onScrollMetrics(n.metrics, n.depth);
+          LocalAnalytics.instance?.onScrollMetrics(
+            n.metrics,
+            n.depth,
+            trailingBlank: trailingBlank,
+          );
           return false;
         },
         child: child,

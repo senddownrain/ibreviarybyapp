@@ -195,7 +195,10 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         activeSectionId: _massNav.active,
       ),
     );
-    if (selected != null) _massNav.jumpTo(selected);
+    if (selected != null) {
+      analyticsFeature('mass_section_nav');
+      _massNav.jumpTo(selected);
+    }
   }
 
   void _onLinkTap(

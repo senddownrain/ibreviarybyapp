@@ -1,0 +1,32 @@
+name: Flutter full suite
+
+# Manual full `flutter test` run. The PR workflow only runs selected tests.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-suite:
+    name: Full flutter test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.41.4'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Full test suite
+        run: flutter test --reporter expanded 2>&1 | tee flutter-full-test.log; exit ${PIPESTATUS[0]}
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-full-test-log
+          path: flutter-full-test.log
+          retention-days: 14

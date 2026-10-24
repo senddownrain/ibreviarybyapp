@@ -216,7 +216,15 @@ class ReaderScaffold extends StatelessWidget {
     );
 
     // Test builds only (ANALYTICS_LOCAL): forwards this scroll view's metrics.
-    if (kAnalyticsLocal) scrollView = AnalyticsReaderScroll(child: scrollView);
+    if (kAnalyticsLocal) {
+      scrollView = AnalyticsReaderScroll(
+        // The same blank reserve ReaderContentSurface leaves below the text.
+        trailingBlank:
+            ReaderContentSurface.bottomSpacing +
+            MediaQuery.paddingOf(context).bottom,
+        child: scrollView,
+      );
+    }
 
     if (hasHourSwitcher) {
       // Keep scrolling ink out of the system status area without painting a

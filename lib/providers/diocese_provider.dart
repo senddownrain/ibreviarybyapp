@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 /// Settings «Літургічны каляндар»: the dioceses whose celebrations the Hours
 /// and the Ordo show. At least one; the engine resolves one diocese per
@@ -138,12 +140,14 @@ class DioceseSelectionNotifier extends Notifier<DioceseSelection> {
         ),
       );
     }
+    analyticsFeature('ordo_diocese_change');
     return true;
   }
 
   void setPrimary(String diocese) {
     final id = normalizeDioceseId(diocese);
     if (!kDioceses.contains(id)) return;
+    if (state.primary != id) analyticsFeature('ordo_diocese_change');
     _set(
       DioceseSelection(
         selected: _canonical([...state.selected, id]),
