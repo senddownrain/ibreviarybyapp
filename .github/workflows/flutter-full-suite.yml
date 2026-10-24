@@ -3,8 +3,6 @@ name: Flutter full suite
 # Manual full `flutter test` run. The PR workflow only runs selected tests.
 on:
   workflow_dispatch:
-  pull_request: # TEMP: first run before the file exists on main; remove after
-    paths: ['.github/workflows/flutter-full-suite.yml']
 
 permissions:
   contents: read
