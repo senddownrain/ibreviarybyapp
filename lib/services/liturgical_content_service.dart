@@ -897,6 +897,10 @@ class LiturgicalContentService {
           if (ref is Map) ...?(ref['dayIds'] as List?)?.map((id) => '$id'),
   };
 
+  LiturgicalDay _firstSparseById(List<LiturgicalDay> list) =>
+      (list.where(isSparseDay).toList()..sort((a, b) => a.id.compareTo(b.id)))
+          .first;
+
   /// Documents that carry a fixed celebration option: the diocese's own
   /// (`daysRef.dayIds`), then the universal ones (`fallbackDaysRefs`), then
   /// a date + title match. Documents of other dioceses are never returned.
@@ -908,7 +912,8 @@ class LiturgicalContentService {
   ) {
     final docs = all.where((doc) => doc.data['_obsolete'] != true).toList();
     List<LiturgicalDay> preferSparse(List<LiturgicalDay> list) =>
-        list.any(isSparseDay) ? [list.firstWhere(isSparseDay)] : list;
+        // Bundle order is not stable across exports: take the smallest id of the sparse documents.
+        list.any(isSparseDay) ? [_firstSparseById(list)] : list;
     List<LiturgicalDay> byIds(Object? ids) {
       if (ids is! List) return const [];
       final wanted = ids.map((id) => '$id').toSet();
