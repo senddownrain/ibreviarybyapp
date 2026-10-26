@@ -432,6 +432,25 @@ class AnalyticsCollector {
     return packets;
   }
 
+  /// Removes the counted days from memory and returns them as packets, for the
+  /// QA sender (at-most-once: the caller persists the removal BEFORE sending).
+  /// The visit in progress is not included; it is counted when it closes.
+  /// Days older than [maxAgeDays] are dropped: the server refuses them anyway.
+  List<Map<String, Object?>> drainPackets({int maxAgeDays = 2}) {
+    if (!_enabled) return [];
+    final packets = _packets();
+    final cutoff = utcDay(_now() - maxAgeDays * 86400000);
+    final today = utcDay(_now());
+    _days = {};
+    _cellCount = 0;
+    return [
+      for (final p in packets)
+        if ((p['day']! as String).compareTo(cutoff) >= 0 &&
+            (p['day']! as String).compareTo(today) <= 0)
+          p,
+    ];
+  }
+
   /// Merges previously persisted packets (same platform) back into the counters.
   /// Invalid packets and cells are ignored.
   void importPackets(Iterable<Object?> packets) {
