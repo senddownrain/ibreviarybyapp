@@ -3,8 +3,21 @@ import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 const _maxTitleLength = 56;
+// A reading's title is a work or Scripture reference, longer than a hymn's first verse.
+const _maxReadingTitleLength = 84;
 final _alternativeMarker = RegExp(
   r'^\s*А\s*бо(?:\s+(?:інш(?:ае|ая|ыя)|яшчэ))?\s*:',
+  caseSensitive: false,
+);
+// Readings only: «Або іншае, пра святую, якая жыла ў сужэнстве:» and «Іншае, пра святую …:» also open a new choice.
+final _readingQualifiedMarker = RegExp(
+  r'^\s*(?:А\s*бо\s+)?Інш(?:ае|ая|ыя)\s*,[^:]{1,100}:\s*$',
+  caseSensitive: false,
+);
+// D-1: the volumes print «Выбіраюцца найбольш адпаведныя тэксты … з Агульных тэкстаў …, с. N» instead of a text.
+// It is the rubric of the choice, not a reading: the reader shows it as a note above the readings.
+final _readingReference = RegExp(
+  r'^\s*Выбіраюцца\s+найбольш\s+адпаведныя',
   caseSensitive: false,
 );
 final _categoryMarker = RegExp(
@@ -25,10 +38,42 @@ final _gospelCycleMarker = RegExp(
 );
 
 class LiturgicalAlternative {
-  const LiturgicalAlternative({required this.title, required this.html});
+  const LiturgicalAlternative({
+    required this.title,
+    required this.html,
+    this.reference = false,
+  });
 
   final String title;
   final String html;
+
+  /// D-1: only the volume's «Выбіраюцца найбольш адпаведныя тэксты …» sentence (office readings).
+  final bool reference;
+}
+
+/// Readings of an Office as the reader shows them: the volume's reference
+/// sentence(s) as a note and the legal readings to choose from. Nothing is
+/// added or reworded; with no real choice `options` has one item.
+class ReadingChoices {
+  const ReadingChoices({required this.notes, required this.options});
+
+  final List<LiturgicalAlternative> notes;
+  final List<LiturgicalAlternative> options;
+}
+
+ReadingChoices getReadingChoices(String html) {
+  final all = getLiturgicalAlternatives(html, kind: 'office-reading');
+  final notes = all.where((option) => option.reference).toList();
+  final options = all.where((option) => !option.reference).toList();
+  return options.isNotEmpty
+      ? ReadingChoices(notes: notes, options: options)
+      : ReadingChoices(
+          notes: const [],
+          options: [
+            for (final option in all)
+              LiturgicalAlternative(title: option.title, html: option.html),
+          ],
+        );
 }
 
 class _RawAlternative {
@@ -62,7 +107,9 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
   final options = <LiturgicalAlternative>[];
   for (var index = 0; index < unique.length; index++) {
     final option = unique[index];
-    var title = _optionTitle(option, index, kind);
+    final reference =
+        kind == 'office-reading' && _isReadingReference(option.html);
+    var title = reference ? 'Адсылка' : _optionTitle(option, index, kind);
     final count = (titleCounts[title] ?? 0) + 1;
     titleCounts[title] = count;
     if (count > 1) title = _shorten('$title · $count');
@@ -70,6 +117,7 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
       LiturgicalAlternative(
         title: title,
         html: removeBreakAfterCadenceMarker(option.html),
+        reference: reference,
       ),
     );
   }
@@ -94,13 +142,23 @@ List<Element> _directElements(DocumentFragment root) =>
 String _nodeHtml(Node node) =>
     node is Element ? node.outerHtml : node.text ?? '';
 
-String _textOf(String value) => (parseFragment(value).text ?? '')
-    .replaceAll(RegExp(r'&nbsp;|&#x0*20;', caseSensitive: false), ' ')
-    .replaceAll(RegExp(r'\s+'), ' ')
-    .trim();
+// A line break is whitespace in the text, as in the Web parser («прэзбітэра<br>(Nn. 41-42)»).
+String _textOf(String value) =>
+    (parseFragment(
+              value.replaceAll(
+                RegExp(r'<br\s*/?>', caseSensitive: false),
+                '\n',
+              ),
+            ).text ??
+            '')
+        .replaceAll(RegExp(r'&nbsp;|&#x0*20;', caseSensitive: false), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
 
 bool _isMarkerText(String text) =>
     _alternativeMarker.hasMatch(text) ||
+    _readingQualifiedMarker.hasMatch(text) ||
+    _readingReference.hasMatch(text) ||
     _categoryMarker.hasMatch(text) ||
     _instructionMarker.hasMatch(text);
 
@@ -120,6 +178,11 @@ String _firstLineText(Element element) {
 bool _isAlternativeBoundary(Element element, String kind) {
   if (element.localName != 'p') return false;
   final text = _textOf(element.outerHtml);
+  if (kind == 'office-reading' &&
+      (_readingQualifiedMarker.hasMatch(text) ||
+          _readingReference.hasMatch(text))) {
+    return true;
+  }
   // A Scripture verse such as "Пра Цябе кажа маё сэрца:" is not a
   // psalm alternative. Preserve explicit "Або:" and <hr> alternatives.
   return _alternativeMarker.hasMatch(text) ||
@@ -351,7 +414,37 @@ String _firstVerseLine(String html) {
   return '';
 }
 
-String _readingTitle(List<String> paragraphs) {
+final _sectionHeading = RegExp(
+  r'^(?:Першае|Другое)\s+чытанне$',
+  caseSensitive: false,
+);
+final _authorLine = RegExp(r'^(?:св\.|бл\.|Св\.|Бл\.)\s');
+final _hasDigit = RegExp(r'\d');
+
+bool _looksLikeReference(String text) =>
+    text.length <= 90 &&
+    _hasDigit.hasMatch(text) &&
+    !RegExp(r'^\(|[A-Za-z]{3}').hasMatch(text) &&
+    (RegExp(r'(?:пар\.|[А-ЯЁІЎ][а-яёіў]{0,5})\s*\d').hasMatch(text) ||
+        RegExp(
+          r'\p{L}\.?\s*\d{1,3}\s*[,:–-]\s*\d',
+          unicode: true,
+        ).hasMatch(text));
+
+// The source HTML sometimes glues the book and the chapter («Прыпавесцяў31, 10-31»).
+String _spaceBookAndNumber(String text) => text.replaceAllMapped(
+  RegExp(r'([а-яёіўА-ЯЁІЎ.])(\d)'),
+  (match) => '${match.group(1)} ${match.group(2)}',
+);
+
+bool _isReadingReference(String html) {
+  final paragraphs = _paragraphTexts(html);
+  return paragraphs.isNotEmpty &&
+      paragraphs.length <= 2 &&
+      _readingReference.hasMatch(paragraphs.first);
+}
+
+String _readingTitle(List<String> paragraphs, {bool office = false}) {
   for (final paragraph in paragraphs.take(4)) {
     final match = RegExp(
       r'Кароткае\s+чытанне\s+(.{1,42})$',
@@ -359,16 +452,51 @@ String _readingTitle(List<String> paragraphs) {
     ).firstMatch(paragraph);
     if (match != null) return _shorten(match.group(1)!);
   }
-  for (final paragraph in paragraphs.take(4)) {
-    if (RegExp(r'\d').hasMatch(paragraph) &&
-        RegExp(r'(?:пар\.|[А-ЯЁІЎ][а-яёіў]{0,5})\s*\d').hasMatch(paragraph)) {
-      return _shorten(
-        paragraph.replaceFirst(
+  final body = paragraphs
+      // «Або іншае: Казанне св. Аўгустына» keeps its title after the marker; a bare marker is dropped.
+      .map((text) => text.replaceFirst(_alternativeMarker, '').trim())
+      .where(
+        (text) =>
+            text.isNotEmpty &&
+            !_readingQualifiedMarker.hasMatch(text) &&
+            !_readingReference.hasMatch(text) &&
+            !_sectionHeading.hasMatch(text) &&
+            !(_categoryMarker.hasMatch(text) && text.endsWith(':')),
+      )
+      .toList();
+  final limit = office ? _maxReadingTitleLength : _maxTitleLength;
+  // A Patristic or magisterial text: its title line followed by the author line («св. Яна Хрызастома, біскупа»).
+  if (office &&
+      body.length > 1 &&
+      !_hasDigit.hasMatch(body[0]) &&
+      _authorLine.hasMatch(body[1]) &&
+      !_hasDigit.hasMatch(body[1])) {
+    return _shorten('${body[0]} ${body[1]}', limit);
+  }
+  for (var index = 0; index < body.length && index < 4; index++) {
+    final paragraph = body[index];
+    if (!_looksLikeReference(paragraph)) continue;
+    // «Першае пасланне» / «св. апостала Пятра 3, 1-6» are two paragraphs of one title.
+    final previous = index > 0 ? body[index - 1] : '';
+    final joined =
+        index > 0 && previous.length <= 40 && !_hasDigit.hasMatch(previous)
+        ? '$previous $paragraph'
+        : paragraph;
+    return _shorten(
+      _spaceBookAndNumber(
+        joined.replaceFirst(
           RegExp(r'^(?:Першае|Другое)\s+чытанне\s*', caseSensitive: false),
           '',
         ),
-      );
-    }
+      ),
+      limit,
+    );
+  }
+  if (office && body.isNotEmpty && !body[0].startsWith('(')) {
+    return _shorten(
+      body[0].replaceFirst(RegExp(r'\s*\([^)]*\)\s*$'), ''),
+      limit,
+    );
   }
   return '';
 }
@@ -377,6 +505,18 @@ String _optionTitle(_RawAlternative option, int index, String kind) {
   if (option.explicitTitle.isNotEmpty) return _shorten(option.explicitTitle);
   final paragraphs = _paragraphTexts(option.html);
   final category = _categoryTitle(paragraphs);
+  if (kind == 'office-reading') {
+    // The reading itself names the choice; the category («Пра святога, які жыў у сужэнстве») only qualifies it.
+    final reading = _readingTitle(paragraphs, office: true);
+    if (reading.isNotEmpty) {
+      return _shorten(
+        category.isNotEmpty
+            ? '$reading · ${category[0].toLowerCase()}${category.substring(1)}'
+            : reading,
+        _maxReadingTitleLength,
+      );
+    }
+  }
   if (category.isNotEmpty) return category;
   if (kind == 'reading') {
     final reading = _readingTitle(paragraphs);

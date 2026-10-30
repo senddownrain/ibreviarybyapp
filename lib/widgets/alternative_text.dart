@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
+import 'package:mybrev_flutter/utils/reading_choice.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -17,6 +18,7 @@ class AlternativeText extends StatefulWidget {
     this.kind = 'generic',
     this.controller,
     this.showPicker = true,
+    this.choice,
   });
 
   final String text;
@@ -24,6 +26,9 @@ class AlternativeText extends StatefulWidget {
   final String kind;
   final ValueNotifier<int>? controller;
   final bool showPicker;
+
+  /// D-1 (`office-reading` only): remembers the picked reading for the session.
+  final ReadingChoiceSlot? choice;
   final AlternativeContentBuilder contentBuilder;
 
   @override
@@ -32,6 +37,7 @@ class AlternativeText extends StatefulWidget {
 
 class _AlternativeTextState extends State<AlternativeText> {
   late List<LiturgicalAlternative> _options;
+  List<LiturgicalAlternative> _notes = const [];
   int _internalIndex = 0;
 
   int get _activeIndex {
@@ -44,6 +50,7 @@ class _AlternativeTextState extends State<AlternativeText> {
   void initState() {
     super.initState();
     _parse();
+    _internalIndex = widget.choice?.read(_options.length) ?? 0;
     widget.controller?.addListener(_handleExternalSelection);
   }
 
@@ -54,9 +61,15 @@ class _AlternativeTextState extends State<AlternativeText> {
       oldWidget.controller?.removeListener(_handleExternalSelection);
       widget.controller?.addListener(_handleExternalSelection);
     }
-    if (oldWidget.text != widget.text || oldWidget.kind != widget.kind) {
+    if (oldWidget.choice != widget.choice &&
+        oldWidget.text == widget.text &&
+        oldWidget.kind == widget.kind) {
+      // Another day / Office option / diocese: the choice is read afresh, never carried over.
+      _internalIndex = widget.choice?.read(_options.length) ?? 0;
+    } else if (oldWidget.text != widget.text || oldWidget.kind != widget.kind) {
       _internalIndex = 0;
       _parse();
+      widget.choice?.write(0);
       if (widget.controller != null && widget.controller!.value != 0) {
         widget.controller!.value = 0;
       }
@@ -70,7 +83,14 @@ class _AlternativeTextState extends State<AlternativeText> {
   }
 
   void _parse() {
-    _options = getLiturgicalAlternatives(widget.text, kind: widget.kind);
+    if (widget.kind == 'office-reading') {
+      final choices = getReadingChoices(widget.text);
+      _notes = choices.notes;
+      _options = choices.options;
+    } else {
+      _notes = const [];
+      _options = getLiturgicalAlternatives(widget.text, kind: widget.kind);
+    }
   }
 
   void _handleExternalSelection() {
@@ -83,6 +103,7 @@ class _AlternativeTextState extends State<AlternativeText> {
     } else {
       setState(() => _internalIndex = index);
     }
+    widget.choice?.write(index);
   }
 
   @override
@@ -92,6 +113,11 @@ class _AlternativeTextState extends State<AlternativeText> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        for (var i = 0; i < _notes.length; i++)
+          _ReadingReferenceNote(
+            key: Key('reading-reference-note-$i'),
+            child: widget.contentBuilder(context, _notes[i].html),
+          ),
         if (widget.showPicker && _options.length > 1) ...[
           _AlternativePicker(
             label: widget.label,
@@ -112,6 +138,31 @@ class _AlternativeTextState extends State<AlternativeText> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// D-1: the volume's «Выбіраюцца найбольш адпаведныя тэксты …» sentence is the rubric of the choice.
+class _ReadingReferenceNote extends StatelessWidget {
+  const _ReadingReferenceNote({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final reader = ReaderTheme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.fromLTRB(13, 6, 13, 6),
+      decoration: BoxDecoration(
+        border: Border(left: BorderSide(color: reader.rubric, width: 3)),
+        color: reader.ink.withValues(alpha: 0.035),
+        borderRadius: const BorderRadius.horizontal(
+          left: Radius.circular(4),
+          right: Radius.circular(12),
+        ),
+      ),
+      child: Semantics(container: true, child: child),
     );
   }
 }
@@ -190,7 +241,7 @@ class _AlternativePicker extends StatelessWidget {
   static String _kindLabel(String kind) => switch (kind) {
     'hymn' => 'Гімн',
     'gospel-antiphon' || 'marian-antiphon' => 'Антыфона',
-    'reading' => 'Чытанне',
+    'reading' || 'office-reading' => 'Чытанне',
     'prayer' => 'Малітва',
     'intercession' => 'Просьбы',
     'psalm' => 'Псальм',

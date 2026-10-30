@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1792491714388,
-  "contentDate": "2026-10-20T10:21:54.388Z",
+  "contentVersion": 1793343827000,
+  "contentDate": "2026-10-30T07:03:47.000Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -23,12 +23,12 @@
     },
     "liturgicalTemplates": {
       "file": "liturgicalTemplates.json.gz",
-      "contentVersion": 1792491714388,
-      "contentDate": "2026-10-20T10:21:54.388Z",
+      "contentVersion": 1793343827000,
+      "contentDate": "2026-10-30T07:03:47.000Z",
       "count": 16,
-      "digest": "fd4b4f8eac9c9902",
-      "storedBytes": 2897194,
-      "bundleBytes": 318530
+      "digest": "316b5f1487846faf",
+      "storedBytes": 2961227,
+      "bundleBytes": 339127
     },
     "invitatoriums": {
       "file": "invitatoriums.json.gz",
@@ -50,12 +50,12 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1792491714388,
-      "contentDate": "2026-10-20T10:21:54.388Z",
+      "contentVersion": 1793343827000,
+      "contentDate": "2026-10-30T07:03:47.000Z",
       "count": 1,
       "digest": "67191e93d2d4eec8",
       "storedBytes": 139,
-      "bundleBytes": 205
+      "bundleBytes": 201
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
@@ -86,12 +86,12 @@
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",
-      "contentVersion": 1792491714388,
-      "contentDate": "2026-10-20T10:21:54.388Z",
+      "contentVersion": 1793343827000,
+      "contentDate": "2026-10-30T07:03:47.000Z",
       "count": 291,
-      "digest": "16c87c1e79df5370",
-      "storedBytes": 3200285,
-      "bundleBytes": 590216
+      "digest": "e38afe1c97a7ba34",
+      "storedBytes": 3200281,
+      "bundleBytes": 590594
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",
