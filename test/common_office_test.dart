@@ -326,9 +326,9 @@ void main() {
       );
       expect(
         store.collection('liturgicalProperTexts').digest(),
-        '16c87c1e79df5370',
+        'e38afe1c97a7ba34',
       );
-      expect(HiveService.templatesBox.digest(), 'fd4b4f8eac9c9902');
+      expect(HiveService.templatesBox.digest(), '316b5f1487846faf');
       expect(
         HiveService.templates()['holy-women']!['_seasonalVariants'],
         isNotNull,
