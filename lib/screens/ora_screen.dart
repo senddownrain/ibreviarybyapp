@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/constants/hora_items.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/utils/reading_choice.dart';
 import 'package:mybrev_flutter/providers/calendar_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/data_log.dart';
@@ -1131,7 +1132,9 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final v = (day.field(fieldName) ?? '').trim();
     if (v.isEmpty) return;
     items.add(_OraItem.blockHeader('ГІМН'));
-    items.add(_OraItem.html(preparePastorsHymn(v, day.feastName), kind: 'hymn'));
+    items.add(
+      _OraItem.html(preparePastorsHymn(v, day.feastName), kind: 'hymn'),
+    );
   }
 
   void _addPaterAndPrayer(List<_OraItem> items, String prayer) {
@@ -1190,11 +1193,25 @@ class _OraScreenState extends ConsumerState<OraScreen> {
           content,
           kind: _alternativeKind(fieldName),
           startsSection: startsSection,
+          choice: _readingChoiceSlot(fieldName),
         ),
       );
     } else {
       items.add(_OraItem.html(v, kind: _alternativeKind(fieldName)));
     }
+  }
+
+  /// D-1: the picked reading is remembered per field, day, Office option and diocese.
+  ReadingChoiceSlot? _readingChoiceSlot(String fieldName) {
+    if (_alternativeKind(fieldName) != 'office-reading') return null;
+    return ReadingChoiceSlot(
+      field: fieldName,
+      context: readingChoiceContext(
+        widget.date.toIso8601String().substring(0, 10),
+        widget.dayId,
+        widget.diocese,
+      ),
+    );
   }
 
   String _alternativeKind(String fieldName) {
@@ -1460,6 +1477,7 @@ class _OraItem {
   final ValueNotifier<int>? antiphonController;
   final String? canticleCaption;
   final bool startsSection;
+  final ReadingChoiceSlot? choice;
   final double trailingSpacing;
   final double? gapHeight;
   final Widget Function(BuildContext, TextStyle)? _customWidget;
@@ -1477,6 +1495,7 @@ class _OraItem {
     this.antiphonController,
     this.canticleCaption,
     this.startsSection = false,
+    this.choice,
     this.trailingSpacing = LiturgicalSpacing.plainTextAfter,
     this.gapHeight,
     Widget Function(BuildContext, TextStyle)? customWidget,
@@ -1528,12 +1547,14 @@ class _OraItem {
     String content, {
     String kind = 'generic',
     bool startsSection = false,
+    ReadingChoiceSlot? choice,
   }) => _OraItem._(
     _OraItemType.labeled,
     content,
     label: label,
     alternativeKind: kind,
     startsSection: startsSection,
+    choice: choice,
   );
 
   factory _OraItem.html(String html, {String kind = 'generic'}) =>
@@ -1607,6 +1628,7 @@ class _OraItem {
           textStyle: textStyle,
           alternativeKind: alternativeKind,
           startsSection: startsSection,
+          choice: choice,
         );
 
       case _OraItemType.html:
@@ -1659,6 +1681,7 @@ class _OraItem {
   static String _pickerLabel(String kind) => switch (kind) {
     'hymn' => 'Выбар варыянта гімна',
     'reading' => 'Выбар чытання або рэспансорыя',
+    'office-reading' => 'Выбар чытання',
     'prayer' => 'Выбар малітвы',
     'intercession' => 'Выбар просьбаў',
     'psalm' => 'Выбар псальма',
@@ -1684,6 +1707,7 @@ class _LabeledSection extends StatelessWidget {
   final TextStyle textStyle;
   final String alternativeKind;
   final bool startsSection;
+  final ReadingChoiceSlot? choice;
 
   const _LabeledSection({
     required this.label,
@@ -1691,6 +1715,7 @@ class _LabeledSection extends StatelessWidget {
     required this.textStyle,
     this.alternativeKind = 'generic',
     this.startsSection = false,
+    this.choice,
   });
 
   @override
@@ -1712,6 +1737,7 @@ class _LabeledSection extends StatelessWidget {
             textStyle: textStyle,
             alternativeKind: alternativeKind,
             pickerLabel: _OraItem._pickerLabel(alternativeKind),
+            choice: choice,
           ),
         ),
         const SizedBox(height: LiturgicalSpacing.paragraphAfter),
@@ -1887,6 +1913,7 @@ class _HtmlOrText extends StatelessWidget {
   final bool showPicker;
   final String pickerLabel;
   final String? externalAntiphon;
+  final ReadingChoiceSlot? choice;
 
   const _HtmlOrText({
     required this.content,
@@ -1897,6 +1924,7 @@ class _HtmlOrText extends StatelessWidget {
     this.showPicker = true,
     this.pickerLabel = 'Выбар варыянта',
     this.externalAntiphon,
+    this.choice,
   });
 
   @override
@@ -1908,6 +1936,7 @@ class _HtmlOrText extends StatelessWidget {
         kind: alternativeKind,
         controller: alternativeController,
         showPicker: showPicker,
+        choice: choice,
         contentBuilder: (context, selectedHtml) {
           final displayedHtml = alternativeKind == 'intercession'
               ? formatIntercessions(selectedHtml)
