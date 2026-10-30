@@ -5,6 +5,7 @@
 // only when the app is built with `--dart-define=ANALYTICS_LOCAL=true`; every
 // entry point below is behind that compile-time constant, so a normal build
 // has nothing to run. No network, no device or installation identifiers.
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -14,11 +15,19 @@ import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/analytics/collector.dart';
 import 'package:mybrev_flutter/analytics/public_inventory.dart';
 import 'package:mybrev_flutter/analytics/route_mapper.dart';
+import 'package:mybrev_flutter/analytics/staging_http.dart';
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// Compile-time switch; false in every normal build.
 const bool kAnalyticsLocal = bool.fromEnvironment('ANALYTICS_LOCAL');
+
+/// R04: sending to the closed QA staging. Needs BOTH ANALYTICS_LOCAL=true and
+/// ANALYTICS_STAGING=true and a valid ANALYTICS_STAGING_URL; otherwise no
+/// sender and no network code is ever reached (compile-time constant).
+const bool kAnalyticsStagingActive =
+    kAnalyticsLocal && kAnalyticsStaging && _stagingUrlPresent;
+const bool _stagingUrlPresent = kAnalyticsStagingUrl != '';
 
 /// Below this much rendered text the screen is a loader or a "not found" page,
 /// not a text: such a visit is not a read.
@@ -67,6 +76,7 @@ class LocalAnalytics with WidgetsBindingObserver {
   bool _fitsReported = false;
   bool _confirmed = false;
   void Function()? _measureText;
+  StagingSender? _sender;
 
   static String? _platform() {
     if (kIsWeb) return 'web';
@@ -100,6 +110,12 @@ class LocalAnalytics with WidgetsBindingObserver {
       now: () => base + stopwatch.elapsedMilliseconds,
     );
     final analytics = LocalAnalytics._(collector, router);
+    if (kAnalyticsStagingActive) {
+      final endpoint = parseStagingUrl(kAnalyticsStagingUrl);
+      if (endpoint != null) {
+        analytics._sender = StagingSender(HttpStagingTransport(endpoint));
+      }
+    }
     await analytics._restore();
     instance = analytics;
     WidgetsBinding.instance.addObserver(analytics);
@@ -255,6 +271,7 @@ class LocalAnalytics with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         _collector.setVisible(false);
         _persist();
+        _sendToStaging();
       case AppLifecycleState.detached:
         _collector.flush();
         _persist();
@@ -263,6 +280,30 @@ class LocalAnalytics with WidgetsBindingObserver {
 
   /// Closed visits as contract packets (JSON-compatible), for testers.
   List<Map<String, Object?>> snapshot() => _collector.snapshot();
+
+  /// QA staging only. Takes the closed counts out of memory, persists that
+  /// removal first, then sends each packet once (at-most-once, no retry).
+  /// A kill-switch answer (503/426) stops sending and drops what is held.
+  void _sendToStaging() {
+    final sender = _sender;
+    if (sender == null) return;
+    if (sender.halted) {
+      _collector.clear();
+      _persist();
+      return;
+    }
+    final packets = _collector.drainPackets();
+    if (packets.isEmpty) return;
+    _persist();
+    unawaited(
+      sender.sendAll(packets).then((result) {
+        if (result.halted) {
+          _collector.clear();
+          _persist();
+        }
+      }),
+    );
+  }
 
   void _persist() {
     final box = _box;
