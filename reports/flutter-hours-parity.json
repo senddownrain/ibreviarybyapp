@@ -1,4 +1,11 @@
 {
+  "heads": {
+    "web": "08b12838fcc7a737149dccd4225a043b6efcaec3",
+    "flutter": "d17578cd196fed3a6cf5330e9667217583a9317c",
+    "flutterSdk": "3.41.4"
+  },
+  "fixtureSnapshot": "2026-10-20T10:21:54.388Z",
+  "bundleContentVersion": 1792491714388,
   "daysCompared": 16068,
   "assembliesCompared": 37738,
   "structureMismatches": 0,

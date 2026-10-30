@@ -1,5 +1,7 @@
 /** Offline Web oracle over exactly the Flutter bundle. No text duplication.
- * node scripts/build_common_parity.mjs --web ../mybrev
+ * node scripts/build_common_parity.mjs --web ../mybrev [--full] [--allow-unmerged-web] [--expect-web-commit <sha>]
+ * The Web commit is the one checked out (clean, contained in origin/main) and is
+ * recorded in the fixture together with the digests of the bundle it was built on.
  * Also creates a temporary public-only snapshot for the existing full Ordo oracle.
  */
 import fs from 'node:fs';
@@ -7,7 +9,9 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
-const web = path.resolve(process.argv[process.argv.indexOf('--web') + 1]);
+import { resolveWeb } from './lib/web_source.mjs';
+const source = resolveWeb(process.argv.slice(2));
+const web = source.web;
 const load = name => import(pathToFileURL(path.join(web, name)));
 const api = await load('scripts/content/lib/app-content.mjs');
 const { assembleOffice, assemblyChoices } = await load('src/utils/ordo/officeAssembly.js');
@@ -44,8 +48,10 @@ for (const [id, date] of [
       assembly: assembled.day._assembly });
   }
 }
+const bundleDigests = Object.fromEntries(Object.entries(manifest.collections).map(([name, c]) => [name, c.digest]));
 fs.writeFileSync('test/fixtures/common_office_parity.json', `${JSON.stringify({
-  webCommit: '0612d534cacbc847ab6c6b7e0102137333f07211', currentDay, cases }, null, 2)}\n`);
+  webCommit: source.head, webOnOriginMain: source.onOriginMain, bundleContentVersion: manifest.contentVersion,
+  bundleDigests, currentDay, cases }, null, 2)}\n`);
 // Refresh the pre-existing small oracle with its original input documents.
 const oldPath = 'test/fixtures/office_assembly_parity.json';
 const small = JSON.parse(fs.readFileSync(oldPath));
