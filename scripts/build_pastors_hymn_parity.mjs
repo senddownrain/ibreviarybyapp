@@ -1,4 +1,5 @@
-/** Offline Web oracle for the Pastors hymn selection. No text duplication: the fixture
+/** Offline Web oracle for the Pastors hymn selection (the <hr> layout of the base text;
+ * Web main does not assemble the flattened seasonal layout, see test/pastors_hymn_web_parity_test.dart). No text duplication: the fixture
  * holds only hashes of the Web output; the Dart test recomputes the same inputs from the
  * Flutter bundle (templates + Proper feast names).
  * node scripts/build_pastors_hymn_parity.mjs --web ../mybrev [--allow-unmerged-web]
