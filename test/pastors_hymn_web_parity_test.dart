@@ -60,7 +60,6 @@ void main() {
 
       final mismatches = <String>[];
       var transformed = 0;
-      var seasonal = 0;
       final cases = (fixture['cases'] as List).cast<List>();
       for (final item in cases) {
         final html = source(item[0] as String);
@@ -70,20 +69,15 @@ void main() {
           reason: '${item[0]} is missing from the bundle',
         );
         final out = preparePastorsHymn(html!, item[1] as String);
-        // Seasonal variants are one flattened paragraph without <hr>. Web main
-        // (src/utils/pastorsHymn.js) does not assemble that layout and leaves
-        // it unchanged, which the reader then splits into a bare opening and
-        // one glued block. Flutter assembles four complete hymns instead (see
-        // the next test); only the <hr> layout is compared with Web by hash.
-        if ((item[0] as String).split(':').length == 3) {
-          seasonal++;
-          continue;
-        }
         if (out != html) transformed++;
         if (hash(out) != item[2]) mismatches.add('${item[0]} | ${item[1]}');
       }
       expect(cases.length, greaterThan(1000));
-      expect(seasonal, greaterThan(1000));
+      // base (<hr>) and seasonal (flattened) layouts are both compared with Web
+      expect(
+        cases.where((c) => (c[0] as String).split(':').length == 3),
+        isNotEmpty,
+      );
       expect(transformed, fixture['transformed']);
       expect(mismatches, isEmpty, reason: mismatches.take(8).join('\n'));
     },
