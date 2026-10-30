@@ -60,6 +60,7 @@ void main() {
 
       final mismatches = <String>[];
       var transformed = 0;
+      var seasonal = 0;
       final cases = (fixture['cases'] as List).cast<List>();
       for (final item in cases) {
         final html = source(item[0] as String);
@@ -69,10 +70,20 @@ void main() {
           reason: '${item[0]} is missing from the bundle',
         );
         final out = preparePastorsHymn(html!, item[1] as String);
+        // Seasonal variants are one flattened paragraph without <hr>. Web main
+        // (src/utils/pastorsHymn.js) does not assemble that layout and leaves
+        // it unchanged, which the reader then splits into a bare opening and
+        // one glued block. Flutter assembles four complete hymns instead (see
+        // the next test); only the <hr> layout is compared with Web by hash.
+        if ((item[0] as String).split(':').length == 3) {
+          seasonal++;
+          continue;
+        }
         if (out != html) transformed++;
         if (hash(out) != item[2]) mismatches.add('${item[0]} | ${item[1]}');
       }
       expect(cases.length, greaterThan(1000));
+      expect(seasonal, greaterThan(1000));
       expect(transformed, fixture['transformed']);
       expect(mismatches, isEmpty, reason: mismatches.take(8).join('\n'));
     },
@@ -97,6 +108,19 @@ void main() {
         for (final option in options) {
           expect(option.html, isNot(contains('Пра Папу:')));
           expect(option.html, contains('Амэн'));
+        }
+        // nothing of the stored hymn is lost: every source line is in some hymn
+        final joined = options.map((o) => o.html).join('\n');
+        final lines = html
+            .replaceAll(RegExp(r'</?p\b[^>]*>'), '<br />')
+            .split(RegExp(r'<br\s*/?>'))
+            .map((line) => line.trim())
+            .where(
+              (line) =>
+                  line.isNotEmpty && !RegExp(r'^Пра [^:]+:$').hasMatch(line),
+            );
+        for (final line in lines) {
+          expect(joined, contains(line), reason: '$season $field: $line');
         }
       }
     }
