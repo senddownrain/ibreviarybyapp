@@ -29,7 +29,7 @@ void main() {
         lookups++;
         throw StateError('stub');
       },
-    ).onError<StateError>((_, __) {});
+    ).onError<StateError>((_, _) {});
     expect(lookups, 1);
   });
 
