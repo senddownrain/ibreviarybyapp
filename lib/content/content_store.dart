@@ -112,14 +112,22 @@ class ContentStore {
 
   /// Starts loading everything in the background, liturgy first.
   void preloadAll() {
-    unawaited(
-      ensureLoaded(kLiturgicalCollections).then(
-        (_) => ensureLoaded(kContentCollections),
-        onError: (Object error) {
+    _preload = ensureLoaded(kLiturgicalCollections)
+        .then((_) => ensureLoaded(kContentCollections))
+        .catchError((Object error) {
           debugPrint('[ContentStore] preload failed: $error');
-        },
-      ),
-    );
+        });
+  }
+
+  Future<void>? _preload;
+
+  /// Completes when the background preload and every load already started
+  /// have finished. Whoever closes Hive (tests, a storage reset) awaits it
+  /// first: a late load reconciles its overlay box and must not meet a
+  /// closed one.
+  Future<void> idle() async {
+    await _preload;
+    await Future.wait(_loading.values.map((f) => f.catchError((Object _) {})));
   }
 
   /// Makes one update active, all collections at once.
@@ -273,7 +281,7 @@ class ContentCollection {
   /// (same hash, or a bundle at least as new) is dropped — the bundle wins.
   Future<void> _reconcileWithBaseline() async {
     final overlay = _overlay;
-    if (overlay == null || overlay.isEmpty) return;
+    if (overlay == null || !overlay.isOpen || overlay.isEmpty) return;
     final stale = <dynamic>[];
     for (final key in overlay.keys) {
       final entry = overlay.get(key);
@@ -289,7 +297,13 @@ class ContentCollection {
       }
     }
     if (stale.isEmpty) return;
-    await overlay.deleteAll(stale);
+    try {
+      await overlay.deleteAll(stale);
+    } on HiveError {
+      // Storage was closed under a late load: nothing left to reconcile.
+      if (overlay.isOpen) rethrow;
+      return;
+    }
     _reloadView();
   }
 

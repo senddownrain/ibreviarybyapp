@@ -36,6 +36,7 @@ void main() {
             as Map<String, dynamic>;
   });
   tearDownAll(() async {
+    await ContentStore.instance.idle();
     await Hive.close();
     await directory.delete(recursive: true);
   });
@@ -361,6 +362,7 @@ void main() {
           oldVersion,
         ),
       }, oldVersion);
+      await store.idle();
       await Hive.close();
       await HiveService.init(path: directory.path, loadBundle: true);
       await store.ensureLoaded(kLiturgicalCollections);
