@@ -1,0 +1,29 @@
+Timestamp               Ty Process[PID:TID]
+2026-10-30 12:35:27.579 Df Runner[40900:266718] (Flutter) [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: [core/duplicate-app] A Firebase App named "[DEFAULT]" already exists
+#0      MethodChannelFirebase.initializeApp (package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart:131:11)
+<asynchronous suspension>
+#1      Firebase.initializeApp (package:firebase_core/src/firebase.dart:66:31)
+<asynchronous suspension>
+#2      main (package:mybrev_flutter/main.dart:25:3)
+<asynchronous suspension>
+2026-10-30 12:36:50.183 Df Runner[41892:267c9a] (Flutter) [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: [core/duplicate-app] A Firebase App named "[DEFAULT]" already exists
+#0      MethodChannelFirebase.initializeApp (package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart:131:11)
+<asynchronous suspension>
+#1      Firebase.initializeApp (package:firebase_core/src/firebase.dart:66:31)
+<asynchronous suspension>
+#2      main (package:mybrev_flutter/main.dart:25:3)
+<asynchronous suspension>
+2026-10-30 12:38:09.400 Df Runner[42233:268a7d] (Flutter) [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: [core/duplicate-app] A Firebase App named "[DEFAULT]" already exists
+#0      MethodChannelFirebase.initializeApp (package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart:131:11)
+<asynchronous suspension>
+#1      Firebase.initializeApp (package:firebase_core/src/firebase.dart:66:31)
+<asynchronous suspension>
+#2      main (package:mybrev_flutter/main.dart:25:3)
+<asynchronous suspension>
+2026-10-30 12:38:35.068 Df Runner[42328:268e4c] (Flutter) [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: [core/duplicate-app] A Firebase App named "[DEFAULT]" already exists
+#0      MethodChannelFirebase.initializeApp (package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart:131:11)
+<asynchronous suspension>
+#1      Firebase.initializeApp (package:firebase_core/src/firebase.dart:66:31)
+<asynchronous suspension>
+#2      main (package:mybrev_flutter/main.dart:25:3)
+<asynchronous suspension>
