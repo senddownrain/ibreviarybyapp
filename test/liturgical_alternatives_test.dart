@@ -3,6 +3,25 @@ import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 
 void main() {
   group('getLiturgicalAlternatives', () {
+    test('a hymn stanza «Для …» ending a later line with a colon is verse', () {
+      final stanza =
+          '<p>Для адданых слугаў Божых<br>Хай гучыць хвала й падзяка:<br>Трэці радок</p>';
+      final options = getLiturgicalAlternatives(
+        '<p>Пра аднаго святога:<br>Першы радок</p>'
+        '<p>Пра некалькіх святых:<br>Другі радок</p>$stanza',
+        kind: 'hymn',
+      );
+      expect(options, hasLength(2));
+      expect(options.last.html, contains('Для адданых слугаў Божых'));
+
+      final headings = getLiturgicalAlternatives(
+        '<p>Пра адну панну:<br>Першы радок</p>'
+        '<p>Для адданых слугаў:<br>Трэці радок</p>',
+        kind: 'hymn',
+      );
+      expect(headings, hasLength(2));
+    });
+
     test('splits legacy hr-delimited alternatives and derives titles', () {
       final options = getLiturgicalAlternatives(
         '<p><span style="color:red">Пра біскупа:</span></p>'

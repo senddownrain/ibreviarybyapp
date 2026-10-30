@@ -104,6 +104,19 @@ bool _isMarkerText(String text) =>
     _categoryMarker.hasMatch(text) ||
     _instructionMarker.hasMatch(text);
 
+// A hymn heading («Пра аднаго святога:») stands alone on the first line of its
+// paragraph. A stanza that begins with «Для …» / «За …» and ends a LATER line
+// with a colon is verse, not a heading.
+String _firstLineText(Element element) {
+  for (final part in element.innerHtml.split(
+    RegExp(r'<br\s*/?>', caseSensitive: false),
+  )) {
+    final text = _textOf(part);
+    if (text.isNotEmpty) return text;
+  }
+  return '';
+}
+
 bool _isAlternativeBoundary(Element element, String kind) {
   if (element.localName != 'p') return false;
   final text = _textOf(element.outerHtml);
@@ -111,7 +124,10 @@ bool _isAlternativeBoundary(Element element, String kind) {
   // psalm alternative. Preserve explicit "Або:" and <hr> alternatives.
   return _alternativeMarker.hasMatch(text) ||
       _instructionMarker.hasMatch(text) ||
-      (kind != 'psalm' && _categoryMarker.hasMatch(text));
+      (kind != 'psalm' &&
+          _categoryMarker.hasMatch(
+            kind == 'hymn' ? _firstLineText(element) : text,
+          ));
 }
 
 List<_RawAlternative> _splitAtRules(DocumentFragment root, String kind) {

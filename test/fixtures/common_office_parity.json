@@ -1,5 +1,25 @@
 {
-  "webCommit": "0612d534cacbc847ab6c6b7e0102137333f07211",
+  "webCommit": "08b12838fcc7a737149dccd4225a043b6efcaec3",
+  "webOnOriginMain": true,
+  "bundleContentVersion": 1792491714388,
+  "bundleDigests": {
+    "days": "b5f4b077f42f6664",
+    "readings": "93314983ba9c1bd5",
+    "liturgicalTemplates": "fd4b4f8eac9c9902",
+    "invitatoriums": "587d64f9ff8e7b0d",
+    "completoriums": "42eb55a0b377d638",
+    "liturgicalCalendarMeta": "67191e93d2d4eec8",
+    "liturgicalCelebrations": "8fb0b75436b7f528",
+    "liturgicalDioceseOverrides": "1df4e38742254f17",
+    "liturgicalYearOverrides": "62198d0893b2a40f",
+    "liturgicalProperTexts": "16c87c1e79df5370",
+    "liturgicalOrdoNotes": "db0465255c4bc5a3",
+    "prayers": "43711607f69fe4c5",
+    "prayerCategories": "2615b158b86e8582",
+    "songs": "9752aef2fd846b49",
+    "compendium": "7659d6be6ac3ead8",
+    "compendiumMeta": "879c4b7ae16cb312"
+  },
   "currentDay": {
     "invitatoriumAnt": "day:invitatoriumAnt",
     "officeOfReadingsHymn": "day:officeOfReadingsHymn",

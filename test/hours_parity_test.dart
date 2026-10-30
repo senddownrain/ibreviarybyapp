@@ -140,7 +140,18 @@ void main() {
       }
       if (Platform.environment['HOURS_PARITY_REPORT'] == '1') {
         File('reports/flutter-hours-parity.json').writeAsStringSync(
-          '${const JsonEncoder.withIndent('  ').convert({'daysCompared': compared, 'assembliesCompared': templatesCompared, 'structureMismatches': structure.length, 'officeTextMismatches': text.length, 'structureExamples': structure.take(10).toList(), 'officeTextExamples': text.take(20).toList(), 'optionsByProperSource': properSources})}\n',
+          '${const JsonEncoder.withIndent('  ').convert({
+            'heads': {'web': Platform.environment['WEB_HEAD'], 'flutter': Platform.environment['FLUTTER_HEAD'], 'flutterSdk': '3.41.4'},
+            'fixtureSnapshot': fixture['snapshot'],
+            'bundleContentVersion': (jsonDecode(File('assets/content/manifest.json').readAsStringSync()) as Map)['contentVersion'],
+            'daysCompared': compared,
+            'assembliesCompared': templatesCompared,
+            'structureMismatches': structure.length,
+            'officeTextMismatches': text.length,
+            'structureExamples': structure.take(10).toList(),
+            'officeTextExamples': text.take(20).toList(),
+            'optionsByProperSource': properSources,
+          })}\n',
         );
       }
       expect(compared, greaterThan(11000));
