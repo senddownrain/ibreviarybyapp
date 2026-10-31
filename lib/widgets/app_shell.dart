@@ -4,11 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-<<<<<<< HEAD
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
-=======
 import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
->>>>>>> origin/claude/cd-stage6-tour
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
