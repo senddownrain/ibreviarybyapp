@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:mybrev_flutter/discovery/tour/discovery_settings_section.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -260,6 +261,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ref.read(settingsProvider.notifier).setKeepScreenOn(v),
                   contentPadding: EdgeInsets.zero,
                 ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                const DiscoverySettingsSection(),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
