@@ -111,6 +111,7 @@ class DiscoveryState {
     this.sessionCount = 0,
     this.records = const {},
     this.autoShownAtMs = const [],
+    this.visits = const {},
     this.fromNewerSchema = false,
   });
 
@@ -127,10 +128,20 @@ class DiscoveryState {
   /// Epoch milliseconds of automatic displays still inside the window.
   final List<int> autoShownAtMs;
 
+  /// How often the person entered a section (`branch.bible`,
+  /// `section.songs`, …). Only counts; the basis of «ещё не знаком».
+  final Map<String, int> visits;
+
   /// Written by a newer build: read as defaults and never written back.
   final bool fromNewerSchema;
 
   HintRecord record(String id) => records[id] ?? const HintRecord();
+
+  int visitCount(String key) => visits[key] ?? 0;
+
+  DiscoveryState visited(String key) => copyWith(
+    visits: {...visits, key: (visitCount(key) + 1).clamp(0, 1000000)},
+  );
 
   int? get lastAutoShownAtMs => autoShownAtMs.isEmpty
       ? null
@@ -142,12 +153,14 @@ class DiscoveryState {
     int? sessionCount,
     Map<String, HintRecord>? records,
     List<int>? autoShownAtMs,
+    Map<String, int>? visits,
   }) => DiscoveryState(
     hintsEnabled: hintsEnabled ?? this.hintsEnabled,
     tourStatus: tourStatus ?? this.tourStatus,
     sessionCount: sessionCount ?? this.sessionCount,
     records: records ?? this.records,
     autoShownAtMs: autoShownAtMs ?? this.autoShownAtMs,
+    visits: visits ?? this.visits,
     fromNewerSchema: fromNewerSchema,
   );
 
@@ -213,7 +226,7 @@ class DiscoveryState {
   /// Test-profile reset: hint history only. Settings, the tour status and
   /// the session counter stay.
   DiscoveryState historyReset() =>
-      copyWith(records: const {}, autoShownAtMs: const []);
+      copyWith(records: const {}, autoShownAtMs: const [], visits: const {});
 
   /// A timestamp far ahead of [now] (clock moved back) is pulled to [now]
   /// so the cooldown starts again instead of blocking for months.
@@ -230,6 +243,7 @@ class DiscoveryState {
       tourStatus: tourStatus,
       sessionCount: sessionCount,
       fromNewerSchema: fromNewerSchema,
+      visits: visits,
       autoShownAtMs: [for (final s in autoShownAtMs) far(s) ? nowMs : s],
       records: {
         for (final entry in records.entries)
@@ -246,6 +260,7 @@ class DiscoveryState {
     'tourStatus': tourStatus.wire,
     'sessionCount': sessionCount,
     'autoShownAt': autoShownAtMs,
+    'visits': visits,
     'records': {for (final e in records.entries) e.key: e.value.toJson()},
   });
 
@@ -269,6 +284,16 @@ class DiscoveryState {
           }
         }
       }
+      final visits = <String, int>{};
+      final rawVisits = json['visits'];
+      if (rawVisits is Map) {
+        for (final entry in rawVisits.entries) {
+          final count = entry.value;
+          if (entry.key is String && count is int && count > 0) {
+            visits[entry.key as String] = count.clamp(0, 1000000);
+          }
+        }
+      }
       final stamps = json['autoShownAt'];
       final sessions = json['sessionCount'];
       return DiscoveryState(
@@ -276,6 +301,7 @@ class DiscoveryState {
         tourStatus: TourStatus.parse(json['tourStatus']),
         sessionCount: sessions is int ? sessions.clamp(0, 1 << 30) : 0,
         records: records,
+        visits: visits,
         autoShownAtMs: stamps is List ? [...stamps.whereType<int>()] : const [],
       );
     } catch (_) {

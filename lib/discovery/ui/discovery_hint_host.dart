@@ -19,6 +19,8 @@ class DiscoveryProbe {
     this.facts = const {},
     this.anchors = const {},
     this.invoke = const {},
+    this.actions = const {},
+    this.chromeAnchors = const {},
     this.blockedBy = const [],
   });
 
@@ -31,6 +33,14 @@ class DiscoveryProbe {
 
   /// Key of the control that «Паказаць» presses, by hint ID.
   final Map<String, Key> invoke;
+
+  /// What «Паказаць» does when no single control carries the tap (a route
+  /// change), by hint ID. Wins over [invoke].
+  final Map<String, VoidCallback> actions;
+
+  /// Anchor IDs of app chrome (the dock) that lives inside the safe-area
+  /// padding the screen reserves; they only have to be on the screen.
+  final Set<String> chromeAnchors;
 
   /// Keys that, once mounted, mean another surface is active (selection
   /// palette, dialog, …): no hint is shown.
@@ -153,9 +163,17 @@ class _DiscoveryHintHostState extends ConsumerState<DiscoveryHintHost> {
 
   Rect? _rectOf(Key key) => findAnchorRect(context, key);
 
-  bool _fullyOnScreen(Rect rect) {
+  bool _fullyOnScreen(Rect rect, {bool chrome = false}) {
     final media = MediaQuery.of(context);
     final size = media.size;
+    if (chrome) {
+      return rect.width > 0 &&
+          rect.height > 0 &&
+          rect.left >= 0 &&
+          rect.right <= size.width &&
+          rect.top >= media.viewPadding.top &&
+          rect.bottom <= size.height - media.viewPadding.bottom;
+    }
     return rect.width > 0 &&
         rect.height > 0 &&
         rect.left >= 0 &&
@@ -194,7 +212,11 @@ class _DiscoveryHintHostState extends ConsumerState<DiscoveryHintHost> {
         if (entry.value.isNotEmpty &&
             entry.value.every((key) {
               final rect = _rectOf(key);
-              return rect != null && _fullyOnScreen(rect);
+              return rect != null &&
+                  _fullyOnScreen(
+                    rect,
+                    chrome: probe.chromeAnchors.contains(entry.key),
+                  );
             }))
           entry.key,
     };
@@ -239,7 +261,12 @@ class _DiscoveryHintHostState extends ConsumerState<DiscoveryHintHost> {
     final coordinator = _coordinator;
     if (coordinator == null) return;
     final invokeKey = _lastProbe.invoke[hint.id];
+    final action = _lastProbe.actions[hint.id];
     await coordinator.respond(hint.id, response);
+    if (response == HintResponse.acted && action != null) {
+      if (mounted && _surface != null) action();
+      return;
+    }
     if (response == HintResponse.acted &&
         invokeKey != null &&
         mounted &&

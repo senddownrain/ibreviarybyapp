@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
@@ -47,6 +48,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     ref.read(liturgicalNavigationSyncProvider);
     widget.shellState.setActiveBranch(widget.activeBranch);
     _rememberActiveBranch();
+    _countBranchVisit();
     _liturgicalDateSubscription = ref.listenManual<DateTime>(
       selectedDateProvider,
       (previous, next) {
@@ -82,7 +84,25 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
         oldWidget.shellState != widget.shellState) {
       widget.shellState.setActiveBranch(widget.activeBranch);
       _rememberActiveBranch();
+      if (oldWidget.activeBranch != widget.activeBranch) _countBranchSwitch();
     }
+  }
+
+  /// A dock switch is the "safe navigation activity" P2 hints wait for.
+  void _countBranchSwitch() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(navigationSwitchCountProvider.notifier).increment();
+    });
+    _countBranchVisit();
+  }
+
+  /// Local discovery counter only: which sections the person has entered.
+  void _countBranchVisit() {
+    final key = branchVisitKey(widget.activeBranch);
+    if (key == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) recordDiscoveryVisit(ref, key);
+    });
   }
 
   void _rememberActiveBranch() {

@@ -89,6 +89,9 @@ class DiscoveryRepository {
     );
   }
 
+  /// The person entered a section; counts toward «ещё не знаком».
+  Future<void> recordVisit(String key) => _update((s) => s.visited(key));
+
   Future<void> dismiss(String id) => _update((s) => s.dismissedHint(id));
 
   Future<void> complete(String id) => _update((s) => s.completedHint(id));

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
+import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -237,8 +239,11 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: '/hours',
-              pageBuilder: (context, state) =>
-                  _branchPage(state, hoursRootRoute, _hoursHost(state)),
+              pageBuilder: (context, state) => _branchPage(
+                state,
+                hoursRootRoute,
+                LiturgyRootHintHost(child: _hoursHost(state)),
+              ),
               routes: [
                 GoRoute(
                   path: 'picker',
@@ -458,7 +463,10 @@ final router = GoRouter(
                   pageBuilder: (context, state) => _branchPage(
                     state,
                     _songbookRoute,
-                    const SongbookScreen(),
+                    const DiscoveryVisitMark(
+                      visitKey: kVisitSongs,
+                      child: SongbookScreen(),
+                    ),
                   ),
                   routes: [
                     GoRoute(
@@ -476,7 +484,10 @@ final router = GoRouter(
                   pageBuilder: (context, state) => _branchPage(
                     state,
                     _compendiumRoute,
-                    const CompendiumScreen(),
+                    const DiscoveryVisitMark(
+                      visitKey: kVisitCompendium,
+                      child: CompendiumScreen(),
+                    ),
                   ),
                   routes: [
                     GoRoute(
