@@ -1,0 +1,12 @@
+Changed lib/repositories/bible_repository.dart
+Changed lib/screens/about_screen.dart
+Changed lib/screens/prayers_screen.dart
+Changed lib/utils/pastors_hymn.dart
+Changed lib/widgets/app_overflow_menu.dart
+Changed lib/widgets/text_scale_control.dart
+Changed test/app_overflow_menu_test.dart
+Changed test/ordo_picker_test.dart
+Changed test/pastors_hymn_test.dart
+Changed test/prayerbook_stage5_test.dart
+Formatted 321 files (10 changed) in 0.80 seconds.
+format exit 1

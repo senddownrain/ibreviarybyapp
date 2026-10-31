@@ -1,0 +1,44 @@
+Running Gradle task 'assembleDebug'...                          
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Failed to execute org.gradle.cache.internal.AsyncCacheAccessDecoratedCache$$Lambda$357/0x000000880138f088@129fc811.
+org.gradle.api.UncheckedIOException: Could not add entry '/Users/gleb/Documents/GitHub/senddownrain/cd-s0/build/app/intermediates/incremental/debug-mergeJavaRes/zip-cache/YqaoLW7Ot6UEe795cApRR_nvAOk=' to cache fileHashes.bin (/Users/gleb/Documents/GitHub/senddownrain/cd-s0/android/.gradle/8.14/fileHashes/fileHashes.bin).
+	at org.gradle.cache.internal.btree.BTreePersistentIndexedCache.put(BTreePersistentIndexedCache.java:162)
+	at org.gradle.cache.internal.DefaultMultiProcessSafeIndexedCache.lambda$put$1(DefaultMultiProcessSafeIndexedCache.java:67)
+	at org.gradle.cache.internal.DefaultFileLockManager$DefaultFileLock.doWriteAction(DefaultFileLockManager.java:231)
+	at org.gradle.cache.internal.DefaultFileLockManager$DefaultFileLock.writeFile(DefaultFileLockManager.java:221)
+	at org.gradle.cache.internal.DefaultCacheCoordinator$UnitOfWorkFileAccess.writeFile(DefaultCacheCoordinator.java:475)
+	at org.gradle.cache.internal.DefaultMultiProcessSafeIndexedCache.put(DefaultMultiProcessSafeIndexedCache.java:67)
+	at org.gradle.cache.internal.AsyncCacheAccessDecoratedCache.lambda$putLater$1(AsyncCacheAccessDecoratedCache.java:56)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.cache.internal.ExclusiveCacheAccessingWorker$1.run(ExclusiveCacheAccessingWorker.java:179)
+	at org.gradle.cache.internal.DefaultCacheCoordinator.lambda$toSupplier$2(DefaultCacheCoordinator.java:228)
+	at org.gradle.cache.internal.DefaultCacheCoordinator.useCache(DefaultCacheCoordinator.java:249)
+	at org.gradle.cache.internal.DefaultCacheCoordinator.useCache(DefaultCacheCoordinator.java:223)
+	at org.gradle.cache.internal.ExclusiveCacheAccessingWorker.flushOperations(ExclusiveCacheAccessingWorker.java:169)
+	at org.gradle.cache.internal.ExclusiveCacheAccessingWorker.run(ExclusiveCacheAccessingWorker.java:139)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.gradle.api.UncheckedIOException: java.io.IOException: No space left on device
+	at org.gradle.cache.internal.btree.FileBackedBlockStore.write(FileBackedBlockStore.java:140)
+	at org.gradle.cache.internal.btree.CachingBlockStore.flush(CachingBlockStore.java:64)
+	at org.gradle.cache.internal.btree.FreeListBlockStore.flush(FreeListBlockStore.java:103)
+	at org.gradle.cache.internal.btree.StateCheckBlockStore.flush(StateCheckBlockStore.java:85)
+	at org.gradle.cache.internal.btree.BTreePersistentIndexedCache.put(BTreePersistentIndexedCache.java:160)
+	... 18 more
+Caused by: java.io.IOException: No space left on device
+	at java.base/java.io.RandomAccessFile.writeBytes(Native Method)
+	at java.base/java.io.RandomAccessFile.write(RandomAccessFile.java:558)
+	at org.gradle.internal.file.RandomAccessFileOutputStream.write(RandomAccessFileOutputStream.java:47)
+	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)
+	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:142)
+	at java.base/java.io.FilterOutputStream.flush(FilterOutputStream.java:153)
+	at org.gradle.cache.internal.btree.ByteOutput.done(ByteOutput.java:62)
+	at org.gradle.cache.internal.btree.FileBackedBlockStore$BlockImpl.write(FileBackedBlockStore.java:223)
+	at org.gradle.cache.internal.btree.FileBackedBlockStore.write(FileBackedBlockStore.java:136)
+	... 22 more
+Running Gradle task 'assembleDebug'...                             77,1s
+exit 255
