@@ -4,6 +4,7 @@ import 'package:mybrev_flutter/discovery/discovery_coordinator.dart';
 import 'package:mybrev_flutter/discovery/discovery_providers.dart';
 import 'package:mybrev_flutter/discovery/hint_definition.dart';
 import 'package:mybrev_flutter/discovery/ui/inline_hint_presenter.dart';
+import 'package:mybrev_flutter/discovery/ui/integrated_presenter.dart';
 
 /// Place right below an existing control. Renders nothing unless the engine
 /// has chosen a hint for one of [anchorIds]; [onShow] must be the very same
@@ -24,8 +25,8 @@ class _DiscoveryHintSlotState extends ConsumerState<DiscoveryHintSlot> {
   @override
   void initState() {
     super.initState();
-    final presenter = ref.read(hintPresenterProvider);
-    if (presenter is InlineHintPresenter) {
+    final presenter = inlineOf(ref.read(hintPresenterProvider));
+    if (presenter != null) {
       _presenter = presenter..registerSlot(widget.anchorIds);
       presenter.addListener(_changed);
     }

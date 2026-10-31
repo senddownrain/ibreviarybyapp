@@ -102,8 +102,7 @@ Map<String, List<String>>? _flatContent(String html) {
   for (final label in _headings) {
     final found = [
       for (var i = 0; i < lines.length; i++)
-        if (_plainText(lines[i]).replaceFirst(RegExp(r'\s*:$'), '') == label)
-          i,
+        if (_plainText(lines[i]).replaceFirst(RegExp(r'\s*:$'), '') == label) i,
     ];
     at.add(found.length == 1 ? found.first : -1);
   }

@@ -8,6 +8,10 @@ const kFactBibleNavigationReady = 'bible.navigation_ready';
 const kFactSearchReady = 'app.search_ready';
 
 /// P1 hints, owned by Stage 4. Edit only this file to add or defer one.
+///
+/// Copy and anchors follow `02-be-copy-and-scenarios.md` of the Stage 1 audit;
+/// `display.font_scale` points at the reader's «⋯» menu and `app.search` is
+/// narrowed to the prayer search (there is no global search).
 final List<HintDefinition> p1Hints = [
   HintDefinition(
     id: 'display.font_scale',
@@ -15,7 +19,7 @@ final List<HintDefinition> p1Hints = [
     priority: HintPriority.p1,
     screenId: 'hours',
     anchorId: 'display.font.button',
-    copyBe: 'Памер тэксту можна змяніць тут',
+    copyBe: 'Памер тэксту — у меню ⋯',
     actionLabelBe: 'Паказаць',
     requirements: [FactRequirement.isTrue(kFactFontControlReady)],
   ),
@@ -45,6 +49,9 @@ final List<HintDefinition> p1Hints = [
     anchorId: 'readings.date.button',
     copyBe: 'Націсніце на дату, каб адкрыць каляндар',
     actionLabelBe: 'Паказаць',
+    // Same anchor and meaning as `calendar.date_navigation` (Stage 3): never
+    // both on one screen, so only that one is switched on.
+    status: HintStatus.deferred,
     requirements: [FactRequirement.isTrue(kFactDateAnchorReady)],
   ),
   HintDefinition(
@@ -54,6 +61,7 @@ final List<HintDefinition> p1Hints = [
     screenId: 'bible',
     anchorId: 'bible.book_picker.button',
     copyBe: 'Выберыце кнігу і раздзел Святога Пісання',
+    actionLabelBe: 'Паказаць',
     requirements: [FactRequirement.isTrue(kFactBibleNavigationReady)],
   ),
   HintDefinition(
@@ -62,7 +70,7 @@ final List<HintDefinition> p1Hints = [
     priority: HintPriority.p1,
     screenId: 'prayers',
     anchorId: 'app.search.button',
-    copyBe: 'Шукаеце малітву або тэкст? Скарыстайцеся пошукам',
+    copyBe: 'Шукаеце малітву? Скарыстайцеся пошукам',
     actionLabelBe: 'Паказаць',
     requirements: [FactRequirement.isTrue(kFactSearchReady)],
   ),

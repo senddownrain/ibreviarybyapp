@@ -85,7 +85,9 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     final isPrayerbook =
         AppRouteEntryScope.maybeOf(context)?.entry.descriptor.branch ==
         AppBranch.prayerbook;
-    final routePath = GoRouter.maybeOf(context)?.routeInformationProvider.value.uri.path;
+    final routePath = GoRouter.maybeOf(
+      context,
+    )?.routeInformationProvider.value.uri.path;
     final actions = [
       ...widget.actions,
       if (isPrayerbook && routePath != '/prayers/categories')
@@ -215,8 +217,7 @@ class _OverflowContent extends StatelessWidget {
             _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
           for (var index = 0; index < actions.length; index++)
             _item(actions[index].label, actions[index].icon, '$index'),
-          if (showTextScale || actions.isNotEmpty)
-            const Divider(height: 16),
+          if (showTextScale || actions.isNotEmpty) const Divider(height: 16),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
         ],
@@ -232,4 +233,3 @@ class _OverflowContent extends StatelessWidget {
     onTap: () => onSelected(value),
   );
 }
-

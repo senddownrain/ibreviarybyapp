@@ -7,7 +7,9 @@ import 'package:mybrev_flutter/discovery/discovery_storage.dart';
 import 'package:mybrev_flutter/discovery/hint_catalog.dart';
 import 'package:mybrev_flutter/discovery/discovery_qa_mode.dart';
 import 'package:mybrev_flutter/discovery/hint_eligibility.dart';
+import 'package:mybrev_flutter/discovery/ui/coachmark.dart';
 import 'package:mybrev_flutter/discovery/ui/inline_hint_presenter.dart';
+import 'package:mybrev_flutter/discovery/ui/integrated_presenter.dart';
 
 /// Every dependency is a provider so tests and the QA harness override the
 /// same seams the app uses.
@@ -70,7 +72,10 @@ List<Override> discoveryAppOverrides() => [
   hintPresenterProvider.overrideWith((ref) {
     final presenter = InlineHintPresenter();
     ref.onDispose(presenter.dispose);
-    return presenter;
+    return IntegratedHintPresenter(
+      presenter,
+      ref.watch(coachmarkPresenterProvider),
+    );
   }),
   if (discoveryQaActive) ...[
     discoveryStorageProvider.overrideWithValue(qaDiscoveryStorage()),

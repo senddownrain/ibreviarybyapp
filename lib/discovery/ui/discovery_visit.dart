@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/discovery/discovery_coordinator.dart';
 import 'package:mybrev_flutter/discovery/discovery_providers.dart';
 import 'package:mybrev_flutter/discovery/discovery_qa_mode.dart';
 import 'package:mybrev_flutter/discovery/ui/inline_hint_presenter.dart';
+import 'package:mybrev_flutter/discovery/ui/integrated_presenter.dart';
 
 /// How long a screen must stay calm before the engine is asked.
 final discoverySettleDelayProvider = Provider<Duration>(
@@ -47,12 +48,12 @@ class DiscoveryVisit {
   DiscoveryContext? Function(int visitId)? _lastSnapshot;
   InlineHintPresenter? _presenter;
 
-  bool get enabled => _ref.read(hintPresenterProvider) is InlineHintPresenter;
+  bool get enabled => inlineOf(_ref.read(hintPresenterProvider)) != null;
 
   /// Of [wanted], the anchors whose slot is really mounted right now.
   Set<String> mounted(Set<String> wanted) {
-    final presenter = _ref.read(hintPresenterProvider);
-    if (presenter is! InlineHintPresenter) return const {};
+    final presenter = inlineOf(_ref.read(hintPresenterProvider));
+    if (presenter == null) return const {};
     return wanted.intersection(presenter.mountedAnchors);
   }
 
@@ -68,7 +69,7 @@ class DiscoveryVisit {
   Future<void> begin() async {
     if (!enabled || _disposed) return;
     if (_presenter == null) {
-      _presenter = _ref.read(hintPresenterProvider) as InlineHintPresenter;
+      _presenter = inlineOf(_ref.read(hintPresenterProvider))!;
       _presenter!.slotMounted.addListener(_slotMounted);
     }
     final generation = ++_generation;

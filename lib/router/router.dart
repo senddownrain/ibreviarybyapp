@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -305,12 +306,14 @@ final router = GoRouter(
                               date: date,
                               dayId: state.pathParameters['dayId'],
                               diocese: state.uri.queryParameters['diocese'],
-                              child: OraScreen(
-                                key: ValueKey('ora-${state.uri}'),
-                                dayId: state.pathParameters['dayId']!,
-                                diocese: state.uri.queryParameters['diocese'],
-                                oraType: state.pathParameters['type']!,
-                                date: date,
+                              child: HoursHintHost(
+                                child: OraScreen(
+                                  key: ValueKey('ora-${state.uri}'),
+                                  dayId: state.pathParameters['dayId']!,
+                                  diocese: state.uri.queryParameters['diocese'],
+                                  oraType: state.pathParameters['type']!,
+                                  date: date,
+                                ),
                               ),
                             ),
                     );
@@ -395,7 +398,9 @@ final router = GoRouter(
               pageBuilder: (context, state) => _branchPage(
                 state,
                 prayerbookRootRoute,
-                const PrayersScreen(key: PageStorageKey('prayerbook-root')),
+                const PrayersHintHost(
+                  child: PrayersScreen(key: PageStorageKey('prayerbook-root')),
+                ),
               ),
               routes: [
                 GoRoute(
@@ -573,8 +578,11 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: '/bible',
-              pageBuilder: (context, state) =>
-                  _branchPage(state, bibleRootRoute, _bibleHost(state)),
+              pageBuilder: (context, state) => _branchPage(
+                state,
+                bibleRootRoute,
+                BibleHintHost(child: _bibleHost(state)),
+              ),
               routes: [
                 GoRoute(
                   path: 'search',

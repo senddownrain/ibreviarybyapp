@@ -27,8 +27,12 @@ void main() {
 
   test('main.dart and the router do not reach the QA harness', () {
     for (final path in ['lib/main.dart', 'lib/router/router.dart']) {
-      // main.dart installs the engine (Stage 3), never the QA harness.
-      expect(File(path).readAsStringSync(), isNot(contains('discovery/qa')));
+      // main.dart installs the engine, never the QA harness.
+      expect(
+        File(path).readAsStringSync(),
+        isNot(contains('discovery/qa/')),
+        reason: path,
+      );
     }
   });
 
@@ -69,12 +73,15 @@ void main() {
 
   test('the only QA define is release-proof and in one file', () {
     const qaMode = 'lib/discovery/discovery_qa_mode.dart';
+    // The test-profile reset marker only; it is gated by discoveryQaActive.
+    const qaReset = 'lib/dev/discovery_qa_flags.dart';
     final mode = File(qaMode).readAsStringSync();
     expect(mode, contains('kDiscoveryQaDefine && !kReleaseMode'));
     for (final file in dartFiles.where(
       (f) =>
           norm(f.path).startsWith('lib/') &&
           norm(f.path) != qaMode &&
+          norm(f.path) != qaReset &&
           !norm(f.path).startsWith('lib/discovery/qa/'),
     )) {
       expect(
@@ -83,5 +90,8 @@ void main() {
         reason: file.path,
       );
     }
+    final reset = File(qaReset).readAsStringSync();
+    expect(reset, contains('discoveryQaActive'));
+    expect(reset, isNot(contains('fromEnvironment')));
   });
 }
