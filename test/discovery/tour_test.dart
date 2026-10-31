@@ -185,6 +185,17 @@ void main() {
       );
     });
 
+    test('a manual tour starts over an automatic hint', () {
+      expect(
+        manualTourCanStart(const TourScreenFacts(hintOnScreen: true)),
+        isTrue,
+      );
+      expect(
+        manualTourCanStart(const TourScreenFacts(tourRunning: true)),
+        isFalse,
+      );
+    });
+
     test('session drops missing steps and renumbers', () {
       final session = TourSession(defaultTourSteps);
       expect(session.progressBe, '1 з 6');

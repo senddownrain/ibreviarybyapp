@@ -56,5 +56,11 @@ TourOfferBlock? tourOfferBlock(DiscoveryState state, TourScreenFacts facts) {
 }
 
 /// Whether a person-initiated tour can start now. Hints being switched off or
-/// an earlier answer never block it; only a busy screen does.
-bool manualTourCanStart(TourScreenFacts facts) => facts.isCalm;
+/// an earlier answer never block it; only a busy screen does. An automatic
+/// hint on screen does not: the person asked for the tour, and starting it
+/// dismisses that hint.
+bool manualTourCanStart(TourScreenFacts facts) =>
+    facts.routeIsCurrent &&
+    !facts.keyboardVisible &&
+    !facts.scrolling &&
+    !facts.tourRunning;
