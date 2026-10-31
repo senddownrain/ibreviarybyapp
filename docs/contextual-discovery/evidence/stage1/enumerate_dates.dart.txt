@@ -1,0 +1,108 @@
+// Stage 1 audit helper (read-only): enumerates what the Readings screen
+// offers per date/diocese. Output: env CD_OUT (json lines).
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:mybrev_flutter/content/content_bundle.dart';
+import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/content/content_store.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
+
+import 'package:mybrev_flutter/providers/calendar_provider.dart';
+import 'package:mybrev_flutter/providers/readings_loader_provider.dart';
+import 'package:mybrev_flutter/services/parsed_readings_service.dart';
+import 'support/lectionary_run.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  late Directory directory;
+  setUpAll(() async {
+    await initializeDateFormatting('be');
+    directory = await Directory.systemTemp.createTemp('cd-enum-');
+    await HiveService.init(path: directory.path, loadBundle: true);
+    await ContentStore.instance.ensureLoaded(kContentCollections);
+  });
+  tearDownAll(() async {
+    await Hive.close();
+    await directory.delete(recursive: true);
+  });
+
+  test('enumerate', () {
+    final lines = <String>[];
+    final content = LiturgicalContentService();
+    for (final diocese in const [
+      'minsk-mohilev',
+      'grodno',
+      'vitebsk',
+      'pinsk',
+    ]) {
+      var d = DateTime(2026, 10, 1);
+      while (d.isBefore(DateTime(2027, 12, 31))) {
+        final day = content.contentForDate(d, diocese: diocese);
+        final celebs = day.options
+            .where(
+              (o) =>
+                  o.ordo != null &&
+                  !o.disabled &&
+                  o.source != LiturgicalOptionSource.officeForDead,
+            )
+            .toList();
+        final primary = day.options
+            .where((o) => o.ordo?.role == 'primary')
+            .firstOrNull;
+        final screen = flutterScreenFor(
+          d,
+          diocese,
+          primary?.ordo?.optionId,
+        );
+        int alts = 0;
+        final loaded = loadReadingsForDate(
+          service: ParsedReadingsService(),
+          calendar: CalendarService(),
+          date: d,
+          dayId: null,
+          diocese: diocese,
+        );
+        final roles = <String, List<String>>{};
+        for (final r in loaded?.readings ?? const []) {
+          r.ordoOptionRoles.forEach((opt, role) {
+            roles.putIfAbsent(opt, () => []).add(
+              '${r.id}:${role.purpose}${role.isDefault ? '*' : ''}',
+            );
+          });
+        }
+        roles.removeWhere((k, v) => v.length < 2);
+        final v = screen?.view;
+        lines.add(
+          jsonEncode({
+            'date':
+                '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}',
+            'dio': diocese,
+            'celebs': [
+              for (final o in celebs)
+                '${o.ordo!.optionId}|${o.title}|${o.ordo!.rank}|${o.ordo!.role}',
+            ],
+            'groups': screen == null
+                ? null
+                : [for (final g in screen.groups) g.$1],
+            'sets': screen?.sets.map((s) => s[0]).toList(),
+            'setCtx': screen?.sets.map((s) => s[2]).toList(),
+            'cycles': screen?.cycles,
+            'cycle': screen?.cycle,
+            'noScreen': screen == null,
+            'alts': alts,
+            'roles': roles,
+            'hasView': v != null,
+          }),
+        );
+        d = d.add(const Duration(days: 1));
+        d = DateTime(d.year, d.month, d.day);
+      }
+    }
+    File(Platform.environment['CD_OUT']!).writeAsStringSync(lines.join('\n'));
+  });
+}
