@@ -27,7 +27,11 @@ void main() {
 
   test('main.dart and the router do not reach the QA harness', () {
     for (final path in ['lib/main.dart', 'lib/router/router.dart']) {
-      expect(File(path).readAsStringSync(), isNot(contains('discovery')));
+      expect(
+        File(path).readAsStringSync(),
+        isNot(contains('discovery/qa/')),
+        reason: path,
+      );
     }
   });
 
