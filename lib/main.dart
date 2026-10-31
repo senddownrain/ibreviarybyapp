@@ -14,6 +14,8 @@ import 'package:mybrev_flutter/discovery/ui/coachmark.dart';
 import 'package:mybrev_flutter/dev/discovery_qa_flags.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/discovery/p2_navigation.dart';
+import 'package:mybrev_flutter/router/discovery_navigation.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/firebase_bootstrap.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -93,6 +95,7 @@ void main() async {
         hintPresenterProvider.overrideWith(
           (ref) => ref.watch(coachmarkPresenterProvider),
         ),
+        discoveryRouteOpenerProvider.overrideWithValue(openDiscoveryRoute),
         discoveryPolicyConfigProvider.overrideWithValue(
           discoveryPolicyForBuild(),
         ),

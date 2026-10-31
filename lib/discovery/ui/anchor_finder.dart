@@ -14,6 +14,9 @@ Element? findAnchorElement(BuildContext root, Key key) {
   }
 
   (root as Element).visitChildren(visit);
+  if (found != null) return found;
+  // Controls of the app shell (the dock) live outside the screen's subtree.
+  WidgetsBinding.instance.rootElement?.visitChildren(visit);
   return found;
 }
 

@@ -3,6 +3,7 @@ import 'package:mybrev_flutter/discovery/hint_definition.dart';
 import 'package:mybrev_flutter/discovery/hints/p1_hints.dart';
 import 'package:mybrev_flutter/discovery/ui/anchor_finder.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_hint_host.dart';
+import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 
 // Existing keys of the real controls; nothing here adds a widget on top of
@@ -111,12 +112,24 @@ class PrayersHintHost extends StatelessWidget {
   Widget build(BuildContext context) => DiscoveryHintHost(
     screenId: 'prayers',
     child: child,
-    probe: (context, ref, metrics) => DiscoveryProbe(
-      facts: {kFactSearchReady: ref.read(prayerCatalogProvider).isNotEmpty},
-      anchors: {
-        'app.search.button': [_prayerSearch],
-      },
-      invoke: {'app.search': _prayerSearch},
-    ),
+    probe: (context, ref, metrics) {
+      // P1 (prayer search) and P2 (other sections) share this screen; the
+      // engine lets P1 win and shows at most one hint per visit.
+      final p2 = p2Probe(context, ref, onLiturgyRoot: false);
+      return DiscoveryProbe(
+        ready: p2.ready,
+        facts: {
+          kFactSearchReady: ref.read(prayerCatalogProvider).isNotEmpty,
+          ...p2.facts,
+        },
+        anchors: {
+          'app.search.button': [_prayerSearch],
+          ...p2.anchors,
+        },
+        invoke: {'app.search': _prayerSearch},
+        actions: p2.actions,
+        chromeAnchors: p2.chromeAnchors,
+      );
+    },
   );
 }
