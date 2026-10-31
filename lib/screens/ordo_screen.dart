@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/discovery/discovery_context.dart';
+import 'package:mybrev_flutter/discovery/hints/p0_hints.dart';
+import 'package:mybrev_flutter/discovery/p0_facts.dart';
+import 'package:mybrev_flutter/discovery/ui/discovery_hint_slot.dart';
+import 'package:mybrev_flutter/discovery/ui/discovery_visit.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/ordo/definitions.dart';
@@ -59,7 +66,84 @@ class _OrdoScreenState extends ConsumerState<OrdoScreen> {
   DioceseSelection get _dioceses => ref.read(dioceseSelectionProvider);
   bool _useInitialRouteContext = true;
 
+  // Contextual Discovery (P0): inert unless the real presenter is installed.
+  late final DiscoveryVisit _discovery = DiscoveryVisit(ref, 'ordo');
+  DateTime? _discoveryDate;
+  bool _dioceseSheetOpen = false;
+  bool _discoveryScrolling = false;
+
+  Future<void> _discoveryNewVisit() async {
+    await _discovery.begin();
+    if (mounted) _discovery.schedule(_discoverySnapshot);
+  }
+
+  DiscoveryContext? _discoverySnapshot(int visitId) {
+    if (!mounted) return null;
+    final ready = ref.read(liturgicalContentReadyProvider).hasValue;
+    final ui = DiscoveryUiState(
+      scrolling: _discoveryScrolling,
+      keyboardVisible: MediaQuery.viewInsetsOf(context).bottom > 0,
+      modalOpen:
+          _dioceseSheetOpen || !(ModalRoute.of(context)?.isCurrent ?? true),
+    );
+    if (!ready) {
+      return DiscoveryContext.loading(
+        screenId: 'ordo',
+        visitId: visitId,
+        ui: ui,
+      );
+    }
+    final atTop = _scroll.hasClients ? _scroll.offset <= 24 : true;
+    return DiscoveryContext(
+      screenId: 'ordo',
+      visitId: visitId,
+      status: DiscoveryDataStatus.ready,
+      anchors: atTop
+          ? _discovery.mounted(const {'ordo.diocese.button'})
+          : const {},
+      facts: {
+        kFactDioceseDiffers: dioceseOptionsDiffer(_date, OrdoRuntime.engine),
+      },
+      ui: ui,
+    );
+  }
+
+  bool _onDiscoveryScroll(ScrollNotification notification) {
+    if (notification.metrics.axis != Axis.vertical) return false;
+    if (notification is ScrollEndNotification) {
+      if (_discoveryScrolling) {
+        _discoveryScrolling = false;
+        _discovery.schedule(_discoverySnapshot);
+      }
+    } else if (notification is ScrollStartNotification ||
+        notification is ScrollUpdateNotification) {
+      _discoveryScrolling = true;
+      _discovery.interrupt();
+    }
+    return false;
+  }
+
+  final ScrollController _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _discovery.end();
+    _scroll.dispose();
+    super.dispose();
+  }
+
   Future<void> _chooseDioceses() async {
+    _dioceseSheetOpen = true;
+    _discovery.interrupt();
+    unawaited(_discovery.actedOnPresented());
+    try {
+      await _showDioceseSheet();
+    } finally {
+      _dioceseSheetOpen = false;
+    }
+  }
+
+  Future<void> _showDioceseSheet() async {
     await showModalBottomSheet<void>(
       context: context,
       useRootNavigator: true,
@@ -192,6 +276,12 @@ class _OrdoScreenState extends ConsumerState<OrdoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_discoveryDate == null || !DateUtils.isSameDay(_discoveryDate, _date)) {
+      _discoveryDate = _date;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_discoveryNewVisit());
+      });
+    }
     ref.listen(dioceseSelectionProvider, (previous, next) {
       // Explicit links may carry a source, but a subsequent settings change
       // owns the whole calendar view.
@@ -260,36 +350,44 @@ class _OrdoScreenState extends ConsumerState<OrdoScreen> {
                 ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 720),
-                  child: ListView(
-                    key: const Key('ordo-scroll'),
-                    padding: EdgeInsets.fromLTRB(
-                      12,
-                      0,
-                      12,
-                      24 + systemBottomInset(context),
-                    ),
-                    children: [
-                      _DayDetail(
-                        union: union,
-                        marianAccent: visual?.marianAccent ?? false,
-                        dayId: effectiveDayId,
-                        notesError: notes.hasError,
-                        contextDiocese: contextDiocese,
-                        onPrevious: _date.isAfter(kCalendarFirstDate)
-                            ? () => _moveDay(-1)
-                            : null,
-                        onNext: _date.isBefore(kCalendarLastDate)
-                            ? () => _moveDay(1)
-                            : null,
-                        onDateTap: _openCalendar,
-                        onMonthTap: _openMonth,
-                        onToday: () => _selectDate(DateTime.now()),
-                        onDioceses: _chooseDioceses,
-                        dioceseLabel: _dioceses.ordered
-                            .map((id) => kDioceseBadges[id] ?? id)
-                            .join(' · '),
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: _onDiscoveryScroll,
+                    child: ListView(
+                      controller: _scroll,
+                      key: const Key('ordo-scroll'),
+                      padding: EdgeInsets.fromLTRB(
+                        12,
+                        0,
+                        12,
+                        24 + systemBottomInset(context),
                       ),
-                    ],
+                      children: [
+                        _DayDetail(
+                          union: union,
+                          marianAccent: visual?.marianAccent ?? false,
+                          dayId: effectiveDayId,
+                          notesError: notes.hasError,
+                          contextDiocese: contextDiocese,
+                          onPrevious: _date.isAfter(kCalendarFirstDate)
+                              ? () => _moveDay(-1)
+                              : null,
+                          onNext: _date.isBefore(kCalendarLastDate)
+                              ? () => _moveDay(1)
+                              : null,
+                          onDateTap: _openCalendar,
+                          onMonthTap: _openMonth,
+                          onToday: () => _selectDate(DateTime.now()),
+                          onDioceses: _chooseDioceses,
+                          dioceseLabel: _dioceses.ordered
+                              .map((id) => kDioceseBadges[id] ?? id)
+                              .join(' · '),
+                          dioceseHint: DiscoveryHintSlot(
+                            anchorIds: const ['ordo.diocese.button'],
+                            onShow: _chooseDioceses,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -314,6 +412,7 @@ class _DayDetail extends ConsumerWidget {
     required this.onToday,
     required this.onDioceses,
     required this.dioceseLabel,
+    this.dioceseHint,
   });
 
   final OrdoDayUnion union;
@@ -328,6 +427,9 @@ class _DayDetail extends ConsumerWidget {
   final VoidCallback onToday;
   final VoidCallback onDioceses;
   final String dioceseLabel;
+
+  /// Contextual-discovery slot right below the «Дыяцэзіі» row.
+  final Widget? dioceseHint;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -768,6 +870,7 @@ class _DayDetail extends ConsumerWidget {
                   ),
                 ],
               ),
+              ?dioceseHint,
               const SizedBox(height: 12),
               celebration(chosen, main: true),
               if (union.days.length > 1 && union.differs) ...[

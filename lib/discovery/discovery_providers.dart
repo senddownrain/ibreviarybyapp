@@ -5,7 +5,9 @@ import 'package:mybrev_flutter/discovery/discovery_repository.dart';
 import 'package:mybrev_flutter/discovery/discovery_state.dart';
 import 'package:mybrev_flutter/discovery/discovery_storage.dart';
 import 'package:mybrev_flutter/discovery/hint_catalog.dart';
+import 'package:mybrev_flutter/discovery/discovery_qa_mode.dart';
 import 'package:mybrev_flutter/discovery/hint_eligibility.dart';
+import 'package:mybrev_flutter/discovery/ui/inline_hint_presenter.dart';
 
 /// Every dependency is a provider so tests and the QA harness override the
 /// same seams the app uses.
@@ -61,3 +63,17 @@ final discoveryCoordinatorProvider = FutureProvider<DiscoveryCoordinator>((
     policy: HintPolicy(ref.watch(discoveryPolicyConfigProvider)),
   );
 });
+
+/// What the real app installs on top of the inert defaults: the inline
+/// presenter and, in a local QA build only, the isolated test profile.
+List<Override> discoveryAppOverrides() => [
+  hintPresenterProvider.overrideWith((ref) {
+    final presenter = InlineHintPresenter();
+    ref.onDispose(presenter.dispose);
+    return presenter;
+  }),
+  if (discoveryQaActive) ...[
+    discoveryStorageProvider.overrideWithValue(qaDiscoveryStorage()),
+    discoveryPolicyConfigProvider.overrideWithValue(qaDiscoveryPolicy),
+  ],
+];

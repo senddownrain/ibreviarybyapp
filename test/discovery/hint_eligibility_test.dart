@@ -50,7 +50,14 @@ void main() {
         anchors: {variantsAnchor, 'readings.alternatives.button'},
         extra: {kFactAllowedAlternativeCount: 5},
       );
-      expect(decide(onlyB).label, 'readings.allowed_alternatives');
+      // Stage 3: B is DEFERRED (wording not confirmed by the owner), so the
+      // fact alone never shows anything.
+      final deferred = decide(onlyB);
+      expect(deferred.label, 'none');
+      expect(
+        deferred.reasons['readings.allowed_alternatives'],
+        SuppressionReason.deferred,
+      );
       final onlyC = readings(
         variants: 0,
         anchors: {'readings.cycle.button'},

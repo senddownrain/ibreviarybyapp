@@ -169,6 +169,10 @@ class DiscoveryCoordinator {
     if (_presented?.id == hintId) _clearPresented();
   }
 
+  /// Whether [visitId] of [screenId] is still the visit that owns the engine.
+  bool isCurrentVisit(int visitId, String screenId) =>
+      _currentVisit == visitId && _currentScreen == screenId;
+
   @visibleForTesting
   int get currentVisit => _currentVisit ?? 0;
 }

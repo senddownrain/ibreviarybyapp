@@ -30,6 +30,10 @@ final List<HintDefinition> p0Hints = [
     copyBe: 'Для гэтага дня даступны іншыя варыянты чытанняў',
     actionLabelBe: 'Паказаць',
     requirements: [FactRequirement.atLeast(kFactAllowedAlternativeCount, 1)],
+    // DEFERRED (Stage 3): the wording about a choice of weekday or proper
+    // readings is a legal statement (GIRM 357 / OLM 83) that the owner has
+    // not confirmed. No screen reports the fact either.
+    status: HintStatus.deferred,
   ),
   HintDefinition(
     id: 'readings.other_year',
@@ -48,6 +52,7 @@ final List<HintDefinition> p0Hints = [
     screenId: 'ordo',
     anchorId: 'ordo.diocese.button',
     copyBe: 'Варыянты дня могуць залежаць ад дыяцэзіі',
+    actionLabelBe: 'Паказаць',
     requirements: [FactRequirement.isTrue(kFactDioceseDiffers)],
   ),
   HintDefinition(
@@ -64,10 +69,12 @@ final List<HintDefinition> p0Hints = [
     id: 'calendar.more_periods',
     version: 1,
     priority: HintPriority.p0,
-    screenId: 'readings',
+    // Shown inside the calendar sheet the person opened; the sheet is not
+    // closed by the hint, so it has «Зразумела» and no action of its own.
+    screenId: 'calendar_sheet',
     anchorId: 'calendar.search.button',
     copyBe: 'Можна шукаць па літургічных перыядах і святкаваннях',
-    actionLabelBe: 'Паказаць',
+    allowSnooze: false,
     requirements: [FactRequirement.isTrue(kFactHolidaySearchWorks)],
   ),
 ];
