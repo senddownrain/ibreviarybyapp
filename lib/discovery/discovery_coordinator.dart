@@ -81,6 +81,10 @@ class DiscoveryCoordinator {
 
   HintDefinition? get presented => _presented;
 
+  /// Set by the tour invitation while it is on screen: no automatic hint may
+  /// appear next to it.
+  bool automaticBlocked = false;
+
   /// A screen came into view. Anything shown for another visit is removed.
   int beginVisit(String screenId) {
     _clearPresented();
@@ -120,7 +124,7 @@ class DiscoveryCoordinator {
       sessionIndex: repository.sessionIndex,
       sessionAutoShown: repository.sessionAutoShown,
       autoShownThisVisit: _autoShownThisVisit,
-      presenterBusy: _requestInFlight || _presented != null,
+      presenterBusy: _requestInFlight || _presented != null || automaticBlocked,
     );
   }
 
