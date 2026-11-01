@@ -413,10 +413,7 @@ void main() {
           expect(tester.widget<InkWell>(row).onTap, isNotNull);
           expect(find.text('Не адзначаецца ў гэтым годзе'), findsOneWidget);
           expect(
-            find.descendant(
-              of: row,
-              matching: find.byType(VestmentMarker),
-            ),
+            find.descendant(of: row, matching: find.byType(VestmentMarker)),
             findsNothing,
           );
           expect(

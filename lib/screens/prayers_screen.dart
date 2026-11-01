@@ -631,10 +631,7 @@ class _PrayerListPage extends StatelessWidget {
               ],
             ),
           ),
-          FloatingTopActions(
-            showBack: true,
-            seasonColor: cs.tertiary,
-          ),
+          FloatingTopActions(showBack: true, seasonColor: cs.tertiary),
           if (searchDock != null)
             FloatingOverlayPositioned(
               gap: 12,
