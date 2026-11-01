@@ -14,10 +14,13 @@ const legacy =
 void main() {
   test('complete hymns have only one middle stanza and the shared ending', () {
     final options = getLiturgicalAlternatives(
-      preparePastorsHymn(legacy, 'Св. Яна Паўла ІІ, папы'), kind: 'hymn',
+      preparePastorsHymn(legacy, 'Св. Яна Паўла ІІ, папы'),
+      kind: 'hymn',
     );
     expect(options.map((o) => o.title), [
-      'Пра Папу', 'Пра біскупа', 'Пра прэзбітэра',
+      'Пра Папу',
+      'Пра біскупа',
+      'Пра прэзбітэра',
       'Пра некалькіх пастыраў',
     ]);
     for (var i = 0; i < options.length; i++) {
@@ -49,17 +52,21 @@ void main() {
     };
     for (final entry in cases.entries) {
       final options = getLiturgicalAlternatives(
-        preparePastorsHymn(legacy, entry.key), kind: 'hymn',
+        preparePastorsHymn(legacy, entry.key),
+        kind: 'hymn',
       );
       expect(options.first.title, entry.value);
     }
     expect(pastorKindFromTitle('Св. Яна Паўла ІІ'), isEmpty);
     final unknown = getLiturgicalAlternatives(
-      preparePastorsHymn(legacy, 'Св. Невядомага'), kind: 'hymn',
+      preparePastorsHymn(legacy, 'Св. Невядомага'),
+      kind: 'hymn',
     );
     expect(unknown.length, 5);
     expect(unknown.first.title, 'Абярыце тып пастыра');
-    expect(preparePastorsHymn('<p>Звычайны гімн</p>', 'папы'),
-        '<p>Звычайны гімн</p>');
+    expect(
+      preparePastorsHymn('<p>Звычайны гімн</p>', 'папы'),
+      '<p>Звычайны гімн</p>',
+    );
   });
 }

@@ -1,3 +1,11 @@
+import 'dart:async';
+
+import 'package:mybrev_flutter/discovery/discovery_context.dart';
+import 'package:mybrev_flutter/discovery/hints/p0_hints.dart';
+import 'package:mybrev_flutter/discovery/p0_facts.dart';
+import 'package:mybrev_flutter/discovery/ui/discovery_hint_slot.dart';
+import 'package:mybrev_flutter/discovery/ui/discovery_sheet_hint.dart';
+import 'package:mybrev_flutter/discovery/ui/discovery_visit.dart';
 import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -138,6 +146,83 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   AppRouteEntryScope? _routeScope;
 
+  // Contextual Discovery (P0): inert unless the real presenter is installed.
+  late final DiscoveryVisit _discovery = DiscoveryVisit(ref, 'readings');
+  bool _discoveryScrolling = false;
+
+  Future<void> _discoveryNewVisit() async {
+    await _discovery.begin();
+    if (mounted) _scheduleDiscovery();
+  }
+
+  void _scheduleDiscovery() => _discovery.schedule(_discoverySnapshot);
+
+  /// The shared checks of every hint on this screen. Null = say nothing.
+  DiscoveryContext? _discoverySnapshot(int visitId) {
+    if (!mounted || widget.dateStr == null || widget.liturgicalKey != null) {
+      return null;
+    }
+    final navigation = AppNavigationScope.maybeOf(context);
+    final routeActive =
+        (ModalRoute.of(context)?.isCurrent ?? true) &&
+        (navigation == null ||
+            (navigation.shellState.activeBranch == AppBranch.readings &&
+                navigation.shellState.activeController.activeEntryId ==
+                    _routeScope?.entry.id));
+    final presentation = ref.read(liturgicalDayPresentationProvider);
+    final sameDay = DateUtils.isSameDay(presentation.date, _currentDate);
+    final ready =
+        !_loading && _error == null && _readings.isNotEmpty && sameDay;
+    final ui = DiscoveryUiState(
+      scrolling: _discoveryScrolling,
+      activeReading: _selectedSentenceId != null,
+      keyboardVisible: MediaQuery.viewInsetsOf(context).bottom > 0,
+      modalOpen: _optionsOpen || !routeActive,
+    );
+    if (!ready) {
+      return DiscoveryContext.loading(
+        screenId: 'readings',
+        visitId: visitId,
+        ui: ui,
+      );
+    }
+    // The anchors are in the header: only reachable at the top of the text.
+    final atTop =
+        !_scrollController.hasClients || _scrollController.offset <= 24;
+    final signals = ref.read(discoverySessionSignalsProvider);
+    final celebrations = ref
+        .read(hoursLiturgicalSelectionProvider)
+        .sortedOptions
+        .where(
+          (o) =>
+              o.ordo != null &&
+              !o.disabled &&
+              o.source != LiturgicalOptionSource.officeForDead,
+        )
+        .length;
+    return DiscoveryContext(
+      screenId: 'readings',
+      visitId: visitId,
+      status: DiscoveryDataStatus.ready,
+      anchors: atTop
+          ? _discovery.mounted(const {
+              'readings.day_variants.button',
+              'readings.cycle.button',
+              'calendar.date.button',
+            })
+          : const {},
+      facts: {
+        kFactDayVariantCount: celebrations,
+        kFactOtherCycleLoaded:
+            _selection.cycles.length > 1 && _manualCycle == null,
+        kFactCalendarAnchorReady:
+            signals.dayArrowTaps >= kDateNavigationArrowTaps &&
+            !signals.dateControlUsed,
+      },
+      ui: ui,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -204,6 +289,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   Future<void> _load() async {
     if (!mounted) return;
     final generation = ++_loadGeneration;
+    unawaited(_discoveryNewVisit());
     final requestedDateStr = widget.dateStr;
     final requestedLiturgicalKey = widget.liturgicalKey;
     final requestedDayId = widget.dayId;
@@ -236,6 +322,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       setState(() {
         _applyResult(result, requestedDayId, requestedDateStr != null);
       });
+      _scheduleDiscovery();
     } catch (e) {
       if (!mounted || generation != _loadGeneration) return;
       setState(() {
@@ -253,6 +340,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   @override
   void dispose() {
+    _discovery.end();
     _routeScope?.showContextualBottomBar(false);
     _scrollController.dispose();
     _optionsRevision.dispose();
@@ -510,6 +598,18 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   bool _onScroll(ScrollNotification notification) {
+    if (notification.metrics.axis == Axis.vertical) {
+      if (notification is ScrollEndNotification) {
+        if (_discoveryScrolling) {
+          _discoveryScrolling = false;
+          _scheduleDiscovery();
+        }
+      } else if (notification is ScrollStartNotification ||
+          notification is ScrollUpdateNotification) {
+        _discoveryScrolling = true;
+        _discovery.interrupt();
+      }
+    }
     if (!_didRequestCompact &&
         notification.metrics.axis == Axis.vertical &&
         notification.metrics.pixels >= _compactThreshold &&
@@ -531,6 +631,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       DateTime.tryParse(widget.dateStr ?? '') ?? DateTime.now();
 
   void _openRelativeDate(int direction) {
+    ref.read(discoverySessionSignalsProvider).dayArrowTaps++;
     AppNavigationScope.maybeOf(context)?.shellState.clearOraReturn();
     ref.read(liturgicalNavigationControllerProvider).moveBy(direction);
   }
@@ -560,6 +661,11 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   Future<void> _showOptions({bool calendarExpanded = false}) async {
     if (_optionsOpen) return;
     _optionsOpen = true;
+    _discovery.interrupt();
+    unawaited(_discovery.actedOnPresented());
+    if (calendarExpanded) {
+      ref.read(discoverySessionSignalsProvider).dateControlUsed = true;
+    }
     if (calendarExpanded) analyticsFeature('picker_open');
     final advanced = await showModalBottomSheet<bool>(
       context: context,
@@ -650,6 +756,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       ),
     );
     _optionsOpen = false;
+    // A date picked inside the sheet loaded while it was open: ask again now.
+    if (mounted) _scheduleDiscovery();
     if (advanced == true && mounted) {
       await context.push('/readings/picker?mode=readings');
     }
@@ -800,6 +908,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                   onVariants: _showOptions,
                   onPrevious: () => _openRelativeDate(-1),
                   onNext: () => _openRelativeDate(1),
+                  dateHint: DiscoveryHintSlot(
+                    anchorIds: const ['calendar.date.button'],
+                    onShow: _showDateActions,
+                  ),
+                  variantsHint: DiscoveryHintSlot(
+                    anchorIds: const [
+                      'readings.day_variants.button',
+                      'readings.cycle.button',
+                    ],
+                    onShow: _showOptions,
+                  ),
                 )
               else ...[
                 Text(
@@ -1162,6 +1281,7 @@ class _ReadingsOptionsSheetState extends State<_ReadingsOptionsSheet> {
           padding: EdgeInsets.symmetric(vertical: 16),
           child: Text('Для гэтай даты іншых набораў чытанняў няма'),
         ),
+      if (widget.date != null) const CalendarSearchHint(),
       if (widget.date != null)
         ListTile(
           key: const Key('readings-calendar-picker'),

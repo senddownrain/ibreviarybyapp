@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/discovery/ui/discovery_sheet_hint.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -192,6 +193,7 @@ class _CalendarSheetState extends ConsumerState<LiturgicalCalendarSheet> {
         else
           const Center(child: CircularProgressIndicator.adaptive()),
         const Divider(),
+        const CalendarSearchHint(),
         ListTile(
           key: const Key('liturgical-calendar-picker'),
           leading: const Icon(Icons.search),

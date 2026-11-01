@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/discovery/p2_navigation.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
@@ -38,6 +40,11 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
   );
   late final ProviderSubscription<DateTime> _liturgicalDateSubscription;
 
+  late _ShellTourBridge _tourShell = _ShellTourBridge(
+    widget.shellState,
+    widget.navigationShell,
+  );
+
   @override
   String? get restorationId => 'production-app-shell';
 
@@ -47,6 +54,7 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     ref.read(liturgicalNavigationSyncProvider);
     widget.shellState.setActiveBranch(widget.activeBranch);
     _rememberActiveBranch();
+    _countBranchVisit();
     _liturgicalDateSubscription = ref.listenManual<DateTime>(
       selectedDateProvider,
       (previous, next) {
@@ -80,9 +88,28 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeBranch != widget.activeBranch ||
         oldWidget.shellState != widget.shellState) {
+      _tourShell = _ShellTourBridge(widget.shellState, widget.navigationShell);
       widget.shellState.setActiveBranch(widget.activeBranch);
       _rememberActiveBranch();
+      if (oldWidget.activeBranch != widget.activeBranch) _countBranchSwitch();
     }
+  }
+
+  /// A dock switch is the "safe navigation activity" P2 hints wait for.
+  void _countBranchSwitch() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(navigationSwitchCountProvider.notifier).increment();
+    });
+    _countBranchVisit();
+  }
+
+  /// Local discovery counter only: which sections the person has entered.
+  void _countBranchVisit() {
+    final key = branchVisitKey(widget.activeBranch);
+    if (key == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) recordDiscoveryVisit(ref, key);
+    });
   }
 
   void _rememberActiveBranch() {
@@ -140,84 +167,120 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
     return AppNavigationScope(
       shell: widget.navigationShell,
       shellState: widget.shellState,
-      child: AnimatedBuilder(
-        animation: widget.shellState,
-        builder: (context, _) {
-          final controller = widget.shellState.activeController;
-          final descriptor = controller.activeDescriptor;
-          final mode = controller.value;
-          final shellOwnsTop =
-              descriptor.topChromeOwner == TopChromeOwner.shell;
-          final topPadding = MediaQuery.paddingOf(context).top;
-          return ContentUpdateScheduler(
-            child: AmbientBackdrop(
-              child: Scaffold(
-                key: const Key('production-app-shell'),
-                backgroundColor: Colors.transparent,
-                extendBody: true,
-                body: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: descriptor.reserveShellTopInset
-                          ? Column(
-                              children: [
-                                SizedBox(height: topPadding + 78),
-                                Expanded(child: widget.navigationShell),
-                              ],
-                            )
-                          : widget.navigationShell,
-                    ),
-                    if (shellOwnsTop && mode != ReaderChromeMode.hidden)
-                      Positioned(
-                        top: topPadding + 8,
-                        right: 12,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (descriptor.isBranchRoot &&
-                                widget.activeBranch == AppBranch.hours) ...[
-                              _FloatingDayButton(
-                                onTap: () {
-                                  final selection = ref.read(
-                                    hoursLiturgicalSelectionProvider,
-                                  );
-                                  context.push(
-                                    Uri(
-                                      path: '/hours/ordo',
-                                      queryParameters: {
-                                        'date': liturgicalDateKey(
-                                          ref.read(selectedDateProvider),
-                                        ),
-                                        'dayId': ?selection.dayId,
-                                        'diocese': ?selection.diocese,
-                                      },
-                                    ).toString(),
-                                  );
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                            const AppOverflowMenu(),
-                          ],
-                        ),
+      child: TourHost(
+        shell: _tourShell,
+        child: AnimatedBuilder(
+          animation: widget.shellState,
+          builder: (context, _) {
+            final controller = widget.shellState.activeController;
+            final descriptor = controller.activeDescriptor;
+            final mode = controller.value;
+            final shellOwnsTop =
+                descriptor.topChromeOwner == TopChromeOwner.shell;
+            final topPadding = MediaQuery.paddingOf(context).top;
+            return ContentUpdateScheduler(
+              child: AmbientBackdrop(
+                child: Scaffold(
+                  key: const Key('production-app-shell'),
+                  backgroundColor: Colors.transparent,
+                  extendBody: true,
+                  body: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: descriptor.reserveShellTopInset
+                            ? Column(
+                                children: [
+                                  SizedBox(height: topPadding + 78),
+                                  Expanded(child: widget.navigationShell),
+                                ],
+                              )
+                            : widget.navigationShell,
                       ),
-                  ],
-                ),
-                bottomNavigationBar: AppNavigationDock(
-                  activeBranch: widget.activeBranch,
-                  mode: controller.navigationDockSuppressed
-                      ? ReaderChromeMode.hidden
-                      : mode,
-                  seasonColor: Theme.of(context).colorScheme.primary,
-                  onSelect: (branch) => _selectBranch(context, branch),
-                  onExpand: () => _requestActiveMode(ReaderChromeMode.full),
+                      if (shellOwnsTop && mode != ReaderChromeMode.hidden)
+                        Positioned(
+                          top: topPadding + 8,
+                          right: 12,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (descriptor.isBranchRoot &&
+                                  widget.activeBranch == AppBranch.hours) ...[
+                                _FloatingDayButton(
+                                  onTap: () {
+                                    final selection = ref.read(
+                                      hoursLiturgicalSelectionProvider,
+                                    );
+                                    context.push(
+                                      Uri(
+                                        path: '/hours/ordo',
+                                        queryParameters: {
+                                          'date': liturgicalDateKey(
+                                            ref.read(selectedDateProvider),
+                                          ),
+                                          'dayId': ?selection.dayId,
+                                          'diocese': ?selection.diocese,
+                                        },
+                                      ).toString(),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                              const AppOverflowMenu(),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  bottomNavigationBar: AppNavigationDock(
+                    activeBranch: widget.activeBranch,
+                    mode: controller.navigationDockSuppressed
+                        ? ReaderChromeMode.hidden
+                        : mode,
+                    seasonColor: Theme.of(context).colorScheme.primary,
+                    onSelect: (branch) => _selectBranch(context, branch),
+                    onExpand: () => _requestActiveMode(ReaderChromeMode.full),
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
+  }
+}
+
+/// Lets the tour read and switch the section without knowing the shell.
+class _ShellTourBridge implements TourShell {
+  _ShellTourBridge(this._state, this._shell);
+
+  final AppShellState _state;
+  final StatefulNavigationShell _shell;
+
+  @override
+  Listenable get changes => _state;
+
+  @override
+  AppBranch get branch => _state.activeBranch;
+
+  @override
+  bool get atBranchRoot =>
+      _state.activeController.activeDescriptor.isBranchRoot;
+
+  @override
+  bool get dockVisible {
+    final controller = _state.activeController;
+    return controller.activeDescriptor.showsNavigationDock &&
+        !controller.navigationDockSuppressed &&
+        controller.value != ReaderChromeMode.hidden;
+  }
+
+  @override
+  void selectBranch(AppBranch branch) {
+    if (branch == _state.activeBranch) return;
+    _state.clearOraReturn();
+    _shell.goBranch(branch.index);
   }
 }
 

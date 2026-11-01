@@ -428,7 +428,9 @@ void main() {
           builder: (_, state) => AppRouteEntryScope(
             entry: entry,
             controller: controller,
-            child: PrayerCategoryScreen(categoryId: state.pathParameters['id']!),
+            child: PrayerCategoryScreen(
+              categoryId: state.pathParameters['id']!,
+            ),
           ),
         ),
         GoRoute(

@@ -7,9 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart';
+import 'package:mybrev_flutter/discovery/discovery.dart';
+import 'package:mybrev_flutter/discovery/discovery_qa_mode.dart';
+import 'package:mybrev_flutter/dev/discovery_qa_flags.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/discovery/p2_navigation.dart';
+import 'package:mybrev_flutter/router/discovery_navigation.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/firebase_bootstrap.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -70,7 +76,32 @@ void main() async {
     );
   }
 
-  runApp(const ProviderScope(child: MyBrevApp()));
+  // The hint hosts stay silent until the active storage box is open.
+  String? discoveryBoxPath;
+  final discoveryStorage = discoveryQaActive
+      ? qaDiscoveryStorage()
+      : HiveDiscoveryStorage();
+  try {
+    discoveryBoxPath = (await Hive.openBox<String>(
+      discoveryQaActive ? kDiscoveryQaBox : HiveDiscoveryStorage.defaultBoxName,
+    )).path;
+  } catch (error) {
+    debugPrint('[Discovery] hint box unavailable: $error');
+  }
+  // Test profile only: forget the hint history (the discovery box alone).
+  if (discoveryQaResetRequested(discoveryBoxPath)) {
+    await discoveryStorage.clear();
+  }
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        ...discoveryAppOverrides(),
+        discoveryRouteOpenerProvider.overrideWithValue(openDiscoveryRoute),
+      ],
+      child: const MyBrevApp(),
+    ),
+  );
   // Test builds only (--dart-define=ANALYTICS_LOCAL=true); decision D-10 = B.
   if (kAnalyticsLocal) unawaited(LocalAnalytics.start(router));
   unawaited(

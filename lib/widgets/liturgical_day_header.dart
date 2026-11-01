@@ -18,6 +18,8 @@ class LiturgicalDayHeader extends StatelessWidget {
     this.onToday,
     this.metadata,
     this.showVariants = true,
+    this.dateHint,
+    this.variantsHint,
   });
 
   final String sectionTitle;
@@ -30,6 +32,11 @@ class LiturgicalDayHeader extends StatelessWidget {
   final VoidCallback? onToday;
   final String? metadata;
   final bool showVariants;
+
+  /// Contextual-discovery slots right below the date row and below the
+  /// «Іншыя варыянты» control; empty when no hint is shown.
+  final Widget? dateHint;
+  final Widget? variantsHint;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +59,7 @@ class LiturgicalDayHeader extends StatelessWidget {
             onPrevious: onPrevious,
             onNext: onNext,
           ),
+          ?dateHint,
           const SizedBox(height: 12),
           IntrinsicHeight(
             child: Row(
@@ -162,6 +170,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                 ],
               ),
             ),
+            ?variantsHint,
           ],
         ],
       ),

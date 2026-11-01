@@ -1,0 +1,11 @@
+Building by.mybrev.testflight2026 for simulator (ios)...
+An error occurred when adding LLDB Init File:
+Running Flutter in debug mode on new iOS versions requires a LLDB Init File, but the Test action in the Runner scheme does not have it set. To ensure debug mode works, please complete the following:
+  * Open Xcode > Product > Scheme > Edit Scheme and for the Test action, set LLDB Init File to:
+
+  $(SRCROOT)/Flutter/ephemeral/flutter_lldbinit
+
+Running Xcode build...                                          
+Xcode build done.                                           74,2s
+✓ Built build/ios/iphonesimulator/Runner.app
+exit 0

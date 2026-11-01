@@ -158,7 +158,9 @@ class _AboutContent extends StatelessWidget {
     );
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не ўдалося адкрыць палітыку прыватнасці')),
+        const SnackBar(
+          content: Text('Не ўдалося адкрыць палітыку прыватнасці'),
+        ),
       );
     }
   }

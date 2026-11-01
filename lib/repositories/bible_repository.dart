@@ -1,6 +1,5 @@
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
 
-
 // Display labels follow Catholic.by (2017 official Belarusian New Testament).
 // The four Gospel labels omit «святога» for compact navigation.
 // IDs and bundled Bible text are intentionally unchanged.
@@ -154,7 +153,9 @@ class BibleRepository {
       return BibleBookInfo(
         id: b['id']?.toString() ?? '',
         name: versionId == 'bel'
-            ? (_belarusianNewTestamentNames[b['id']?.toString()] ?? b['name']?.toString() ?? '')
+            ? (_belarusianNewTestamentNames[b['id']?.toString()] ??
+                  b['name']?.toString() ??
+                  '')
             : (b['name']?.toString() ?? ''),
         chapterCount: _chapterCount(b),
         versionId: versionId,
