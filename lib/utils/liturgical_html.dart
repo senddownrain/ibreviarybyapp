@@ -358,6 +358,26 @@ String formatReadingPsalmHtml(String html) {
   return fragment.outerHtml;
 }
 
+/// The spoken text of a psalm body, one strophe per line.
+///
+/// The visible strophes are links (see [preparePsalmChoirHtml]); a link is its
+/// own accessibility node, and the reader drops such nodes while they are off
+/// screen, so TalkBack skipped the psalms inside the long hour. The same text
+/// as a plain label is part of the hour's text node instead.
+String psalmPlainText(String html) {
+  final fragment = parseFragment(html);
+  final strophes = fragment.querySelectorAll('p');
+  final blocks = strophes.isEmpty
+      ? [fragment.text ?? '']
+      : [for (final strophe in strophes) strophe.text];
+  return [
+    for (final block in blocks)
+      if (block.replaceAll(RegExp(r'\s+'), ' ').trim() case final line
+          when line.isNotEmpty)
+        line,
+  ].join('\n');
+}
+
 /// Adds tap targets to the already formatted strophes of a psalm.
 ///
 /// Odd and even strophes represent the two choirs. When [selectedChoir] is

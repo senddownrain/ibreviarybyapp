@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -103,6 +104,31 @@ void main() {
   tearDown(() async {
     await Hive.close();
     await directory.delete(recursive: true);
+  });
+
+  group('background preload', () {
+    test('a load that meets closed storage ends quietly', () async {
+      final bundle = _SlowBundle(const Duration(milliseconds: 80));
+      await HiveService.init(
+        path: directory.path,
+        bundle: bundle,
+        loadBundle: true,
+      );
+      // An overlay entry older than the bundle is stale: the load deletes it.
+      // Storage is closed while the bundle is still being read.
+      await Hive.box('content_songs').put('stale-song', {'v': 1, 'h': 'x'});
+      final load = ContentStore.instance.ensureLoaded(['songs']);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      await Hive.close();
+      await load;
+      await ContentStore.instance.idle();
+    });
+
+    test('idle() completes only after every started load', () async {
+      await HiveService.init(path: directory.path, loadBundle: true);
+      await ContentStore.instance.idle();
+      expect(ContentStore.instance.areLoaded(kContentCollections), isTrue);
+    });
   });
 
   group('distribution', () {
@@ -1042,4 +1068,18 @@ class _FixedUpdates extends ContentUpdatesNotifier {
   final ContentUpdateState _state;
   @override
   ContentUpdateState build() => _state;
+}
+
+/// The real bundle, each read late: a load is still in flight when a test
+/// closes storage.
+class _SlowBundle extends CachingAssetBundle {
+  _SlowBundle(this.delay);
+
+  final Duration delay;
+
+  @override
+  Future<ByteData> load(String key) async {
+    await Future<void>.delayed(delay);
+    return rootBundle.load(key);
+  }
 }
