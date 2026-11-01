@@ -16,6 +16,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+
 import 'package:mybrev_flutter/analytics/transport.dart';
 
 const bool kAnalyticsStaging = bool.fromEnvironment('ANALYTICS_STAGING');
@@ -133,10 +135,14 @@ class StagingSender {
             s++;
           } else {
             l++;
+            if (kDebugMode) {
+              debugPrint('[analytics-staging] status ${response.status}');
+            }
             if (kHaltStatuses.contains(response.status)) halted = true;
           }
-        } catch (_) {
+        } catch (e) {
           l++; // no retry: accepted under-count
+          if (kDebugMode) debugPrint('[analytics-staging] send failed: $e');
         }
       }
     } finally {
