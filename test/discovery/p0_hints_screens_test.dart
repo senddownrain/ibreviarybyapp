@@ -263,8 +263,13 @@ void main() {
     testWidgets('date_navigation: three day arrows, once', (tester) async {
       // 11-10..11-12 are ordinary weekdays (cycles I/II): the person has
       // already met «other year», so only the date hint is left to show.
+      // An invitation is tested separately: if it appears during the day
+      // transitions, it correctly blocks this hint and makes the test race.
       final learned = MemoryDiscoveryStorage()
-        ..value = DiscoveryState.empty.completedHint(_yearId).encode();
+        ..value = DiscoveryState.empty
+            .copyWith(tourStatus: TourStatus.declined)
+            .completedHint(_yearId)
+            .encode();
       await start(
         tester,
         location: '/readings?date=2026-11-09',
