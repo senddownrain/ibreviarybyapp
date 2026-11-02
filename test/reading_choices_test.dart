@@ -71,6 +71,15 @@ void main() {
   }
 
   group('choices equal the volumes', () {
+    test('religious R1 keeps the responsory variant with its reading', () {
+      for (final season in [null, ..._seasons]) {
+        final html = field('religious', 'officeOfReadingsR1', season);
+        final choices = getReadingChoices(html);
+        expect(choices.options, hasLength(1), reason: '$season');
+        expect(_words(choices.options.single.html), _words(html));
+      }
+    });
+
     test(
       'holy-women R2 in Advent, Christmas, Lent, Easter: note + two readings of holy men',
       () {

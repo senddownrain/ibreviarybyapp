@@ -1,0 +1,2 @@
+# This fixture is compared byte-for-byte with the Web SHA-256.
+test/fixtures/analytics/analytics-contract-v2.json text eol=lf

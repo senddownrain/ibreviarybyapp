@@ -61,9 +61,13 @@ void main() {
       final featureCalls = <String>[];
       for (final entity in Directory('lib').listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
-        if (entity.path.startsWith('lib/analytics/')) continue;
+        if (entity.path.replaceAll('\\', '/').startsWith('lib/analytics/')) {
+          continue;
+        }
         final text = entity.readAsStringSync();
-        if (text.contains('analytics/')) importers.add(entity.path);
+        if (text.contains('analytics/')) {
+          importers.add(entity.path.replaceAll('\\', '/'));
+        }
         for (final m in RegExp(
           r'analyticsFeature\(([^)]*)\)',
         ).allMatches(text)) {
@@ -116,7 +120,10 @@ void main() {
       for (final entity in Directory('lib/analytics').listSync()) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         // R04: the single, flag-gated network file (see staging_http_test.dart).
-        if (entity.path == 'lib/analytics/staging_http.dart') continue;
+        if (entity.path.replaceAll('\\', '/') ==
+            'lib/analytics/staging_http.dart') {
+          continue;
+        }
         final code = entity
             .readAsStringSync()
             .replaceAll(RegExp(r'/\*[\s\S]*?\*/'), '')

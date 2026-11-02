@@ -325,7 +325,9 @@ void main() {
       }
       for (final entity in Directory('lib').listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
-        if (entity.path.startsWith('lib/analytics/')) continue;
+        if (entity.path.replaceAll('\\', '/').startsWith('lib/analytics/')) {
+          continue;
+        }
         expect(
           entity.readAsStringSync().contains('consent_mock'),
           isFalse,

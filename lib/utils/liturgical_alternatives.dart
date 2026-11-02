@@ -94,7 +94,24 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
   final structured = kind == 'gospel-antiphon'
       ? (_gospelCycleAlternatives(root) ?? _structuredAlternatives(root))
       : _structuredAlternatives(root);
-  final raw = structured ?? _splitAtRules(root, kind);
+  final split = structured ?? _splitAtRules(root, kind);
+  final raw = <_RawAlternative>[];
+  for (final option in split) {
+    // Web #176: a responsory variant belongs to the preceding reading.
+    if (kind == 'office-reading' &&
+        raw.isNotEmpty &&
+        _isResponsoryVariant(option.html)) {
+      final previous = raw.removeLast();
+      raw.add(
+        _RawAlternative(
+          '${previous.html}\n<hr />\n${option.html}',
+          previous.explicitTitle,
+        ),
+      );
+    } else {
+      raw.add(option);
+    }
+  }
   final unique = <_RawAlternative>[];
   final seen = <String>{};
   for (final option in raw) {
@@ -384,6 +401,19 @@ List<String> _paragraphTexts(String html) {
       .map((node) => _textOf(_nodeHtml(node)))
       .where((text) => text.isNotEmpty)
       .toList();
+}
+
+bool _isResponsoryVariant(String html) {
+  final paragraphs = _paragraphTexts(html);
+  if (paragraphs.isEmpty || paragraphs.length > 6) return false;
+  final text = paragraphs.join(' ');
+  return RegExp(
+        r'^Пра\s+[^:]{1,60}:\s*\p{L}{1,6}\s*\d',
+        unicode: true,
+      ).hasMatch(paragraphs.first) &&
+      RegExp(r'(?:^|\s)Н\.\s').hasMatch(text) &&
+      RegExp(r'(?:^|\s)К\.\s').hasMatch(text) &&
+      text.length < 700;
 }
 
 String _categoryTitle(List<String> paragraphs) {

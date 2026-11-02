@@ -25,9 +25,13 @@ Map<String, Set<String>> _hooks() {
   final pattern = RegExp(r"analyticsFeature\(\s*'([a-z_]+)'\s*\)");
   for (final entity in Directory('lib').listSync(recursive: true)) {
     if (entity is! File || !entity.path.endsWith('.dart')) continue;
-    if (entity.path.startsWith('lib/analytics/')) continue;
+    if (entity.path.replaceAll('\\', '/').startsWith('lib/analytics/')) {
+      continue;
+    }
     for (final m in pattern.allMatches(entity.readAsStringSync())) {
-      found.putIfAbsent(m.group(1)!, () => {}).add(entity.path);
+      found
+          .putIfAbsent(m.group(1)!, () => {})
+          .add(entity.path.replaceAll('\\', '/'));
     }
   }
   return found;

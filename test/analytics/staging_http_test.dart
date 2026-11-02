@@ -263,7 +263,7 @@ void main() {
             .join('\n');
         if (code.contains('HttpClient(') ||
             code.contains('staging_http.dart')) {
-          offenders.add(e.path);
+          offenders.add(e.path.replaceAll('\\', '/'));
         }
       }
       expect(offenders.toSet(), {
