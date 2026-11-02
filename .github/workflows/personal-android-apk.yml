@@ -1,0 +1,66 @@
+name: Personal Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/android-personal-test-20261102]
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4g'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter --version
+      - run: flutter pub get --enforce-lockfile
+      - name: Build ordinary release APK without QA flags
+        run: flutter build apk --release
+      - name: Verify installable package
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p personal-apk
+          apk="personal-apk/MyBrev-Android-Latest-${GITHUB_SHA:0:7}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "$apk"
+          tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          "$tools_dir/apksigner" verify --verbose --print-certs "$apk" | tee personal-apk/signature.txt
+          "$tools_dir/aapt" dump badging "$apk" | tee personal-apk/package.txt
+          grep -q "package: name='by.mybrev.playtest2026'" personal-apk/package.txt
+          sha256sum "$apk" | tee personal-apk/SHA256SUMS.txt
+          git rev-parse HEAD > personal-apk/source-sha.txt
+          stat -c '%s bytes' "$apk" > personal-apk/size.txt
+          printf '%s\n' 'Release APK for manual installation. Debug-signed unless an upload key is supplied; no signing secrets are used in this workflow.' 'Native smoke: NOT TESTED — OWNER WILL TEST ON PHYSICAL ANDROID DEVICE.' 'Update requires matching applicationId, signing certificate and a compatible versionCode. Do not uninstall without backing up local data.' > personal-apk/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MyBrev-Android-${{ github.sha }}
+          path: personal-apk/
+          retention-days: 30
+          if-no-files-found: error
+  tests:
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test --concurrency=2
