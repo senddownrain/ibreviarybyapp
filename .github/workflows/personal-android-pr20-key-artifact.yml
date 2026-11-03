@@ -1,0 +1,48 @@
+name: Verified Android v17 with PR20 signing key
+on:
+  push:
+    branches: [codex/android-v17-pr20-key-artifact]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verified-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Fetch the prepared APK; no signing keys are transferred
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_ARCHIVE_SHA256: 13c3161ef2660f899264b8653a45b83a4b1c8d1eabe527bd7a9893062549e8c1
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/octet-stream' repos/senddownrain/ibreviarybyapp/releases/assets/704517094 > prepared-apk.zip
+          echo "$EXPECTED_ARCHIVE_SHA256  prepared-apk.zip" | sha256sum --check -
+          mkdir personal-apk
+          unzip -q prepared-apk.zip -d personal-apk
+      - name: Verify APK v17 and the original PR20 certificate
+        shell: bash
+        env:
+          EXPECTED_APK_SHA256: 901126202895c1ee29ed6d56421a2fba86a571ea557baabd88f6ab5eaa802721
+        run: |
+          set -euo pipefail
+          apk="personal-apk/MyBrev-Android-v17-87bf086-PR20-key.apk"
+          echo "$EXPECTED_APK_SHA256  $apk" | sha256sum --check -
+          tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          "$tools_dir/apksigner" verify --verbose --print-certs "$apk" | tee personal-apk/signature-verified-by-actions.txt
+          grep -q 'certificate SHA-256 digest: 21b8f556979f25f321a3f6f21d8fe347ef1ac7d5ddd5b9738cae1e95ee408c3f' personal-apk/signature-verified-by-actions.txt
+          "$tools_dir/aapt" dump badging "$apk" | tee personal-apk/package-verified-by-actions.txt
+          grep -q "package: name='by.mybrev.playtest2026'" personal-apk/package-verified-by-actions.txt
+          grep -q "versionCode='17'" personal-apk/package-verified-by-actions.txt
+          "$tools_dir/zipalign" -c -P 16 -v 4 "$apk" > personal-apk/alignment-verified-by-actions.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MyBrev-Android-v17-PR20-key
+          path: personal-apk/
+          retention-days: 30
+          if-no-files-found: error
