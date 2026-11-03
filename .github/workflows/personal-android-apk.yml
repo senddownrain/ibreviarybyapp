@@ -1,9 +1,9 @@
-name: Personal Android APK
+name: Personal Android APK v17
 
 on:
   workflow_dispatch:
   push:
-    branches: [codex/android-personal-test-20261102]
+    branches: [codex/android-apk-v17-20261103]
 
 permissions:
   contents: read
@@ -27,40 +27,45 @@ jobs:
           cache: true
       - run: flutter --version
       - run: flutter pub get --enforce-lockfile
-      - name: Build ordinary release APK without QA flags
-        run: flutter build apk --release
+      - name: Build v17 using the existing repository signing key
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+          keystore_path="$(mktemp "$RUNNER_TEMP/mybrev-upload-XXXXXX.jks")"
+          trap 'rm -f "$keystore_path"' EXIT
+          chmod 600 "$keystore_path"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"
+          keytool -list -keystore "$keystore_path" -storepass:env ANDROID_KEYSTORE_PASSWORD -alias "$ANDROID_KEY_ALIAS" > /dev/null 2>&1
+          export ANDROID_KEYSTORE_PATH="$keystore_path"
+          flutter build apk --release --build-number=17
       - name: Verify installable package
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p personal-apk
-          apk="personal-apk/MyBrev-Android-Latest-${GITHUB_SHA:0:7}.apk"
+          apk="personal-apk/MyBrev-Android-v17-${GITHUB_SHA:0:7}.apk"
           cp build/app/outputs/flutter-apk/app-release.apk "$apk"
           tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
           "$tools_dir/apksigner" verify --verbose --print-certs "$apk" | tee personal-apk/signature.txt
           "$tools_dir/aapt" dump badging "$apk" | tee personal-apk/package.txt
           grep -q "package: name='by.mybrev.playtest2026'" personal-apk/package.txt
+          grep -q "versionCode='17'" personal-apk/package.txt
           sha256sum "$apk" | tee personal-apk/SHA256SUMS.txt
           git rev-parse HEAD > personal-apk/source-sha.txt
           stat -c '%s bytes' "$apk" > personal-apk/size.txt
-          printf '%s\n' 'Release APK for manual installation. Debug-signed unless an upload key is supplied; no signing secrets are used in this workflow.' 'Native smoke: NOT TESTED — OWNER WILL TEST ON PHYSICAL ANDROID DEVICE.' 'Update requires matching applicationId, signing certificate and a compatible versionCode. Do not uninstall without backing up local data.' > personal-apk/README.txt
+          printf '%s\n' 'Release APK v17 for manual installation, signed with the existing repository Android upload key. No keys or passwords are included in this artifact. Signing compatibility with the former v16 on the phone is not yet confirmed.' 'Native smoke: NOT TESTED — OWNER WILL TEST ON PHYSICAL ANDROID DEVICE.' 'Update requires matching applicationId, signing certificate and a compatible versionCode. Do not uninstall without backing up local data.' > personal-apk/README.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: MyBrev-Android-${{ github.sha }}
+          name: MyBrev-Android-v17-${{ github.sha }}
           path: personal-apk/
           retention-days: 30
           if-no-files-found: error
-  tests:
-    needs: apk
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.41.4'
-          channel: stable
-          cache: true
-      - run: flutter pub get --enforce-lockfile
-      - run: flutter analyze --no-fatal-infos
-      - run: flutter test --concurrency=2
