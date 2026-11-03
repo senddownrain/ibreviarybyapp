@@ -62,8 +62,7 @@ jobs:
           "$tools_dir/zipalign" -c -P 16 -v 4 "$apk" > personal-intermediate/alignment.txt
           sha256sum "$apk" > personal-intermediate/SHA256SUMS.txt
           git rev-parse HEAD > personal-intermediate/source-sha.txt
-          printf '%s
-' 'Intermediate CI APK only. The final downloadable personal APK must be signed by the permanent local certificate 21b8f556979f25f321a3f6f21d8fe347ef1ac7d5ddd5b9738cae1e95ee408c3f.' 'No private signing keys are included.' 'Native smoke: NOT TESTED - OWNER WILL TEST ON PHYSICAL ANDROID DEVICE.' > personal-intermediate/README.txt
+          printf '%s\n' 'Intermediate CI APK only. The final downloadable personal APK must be signed by the permanent local certificate 21b8f556979f25f321a3f6f21d8fe347ef1ac7d5ddd5b9738cae1e95ee408c3f.' 'No private signing keys are included.' 'Native smoke: NOT TESTED - OWNER WILL TEST ON PHYSICAL ANDROID DEVICE.' > personal-intermediate/README.txt
       - uses: actions/upload-artifact@v4
         with:
           name: MyBrev-Personal-intermediate-${{ github.sha }}
