@@ -1,0 +1,72 @@
+name: Independent personal Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/android-personal-independent-20261103]
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4g'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: dart format --output=none --set-exit-if-changed lib/firebase_options.dart test/services/firebase_options_test.dart
+      - run: flutter analyze --no-fatal-infos
+      - name: Ordinary Firebase configuration and retained feature regressions
+        run: >-
+          flutter test --concurrency=2
+          test/services/firebase_options_test.dart test/services/firebase_bootstrap_test.dart
+          test/reading_choices_test.dart test/pastors_hymn_web_parity_test.dart
+          test/common_office_test.dart test/discovery/p0_hints_screens_test.dart
+          test/discovery/tour_test.dart
+      - name: Personal Firebase configuration
+        run: >-
+          flutter test --concurrency=2 --dart-define=MYBREV_PERSONAL_ANDROID=true
+          test/services/firebase_options_test.dart test/services/firebase_bootstrap_test.dart
+      - name: Build independent personal release (no analytics or emulator flags)
+        run: flutter build apk --release --build-number=18 --dart-define=MYBREV_PERSONAL_ANDROID=true
+      - name: Verify package separation and existing Firebase client
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir personal-intermediate
+          apk="personal-intermediate/MyBrev-Personal-v18-${GITHUB_SHA:0:7}-intermediate.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "$apk"
+          tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          "$tools_dir/apksigner" verify --verbose --print-certs "$apk" > personal-intermediate/signature.txt
+          "$tools_dir/aapt" dump badging "$apk" | tee personal-intermediate/package.txt
+          grep -q "package: name='com.example.ibrevapp'" personal-intermediate/package.txt
+          grep -q "versionCode='18'" personal-intermediate/package.txt
+          grep -q "sdkVersion:'24'" personal-intermediate/package.txt
+          grep -q "application-label:'MyBrev Personal'" personal-intermediate/package.txt
+          grep -q "launchable-activity: name='com.example.mybrev_flutter.MainActivity'" personal-intermediate/package.txt
+          grep -q "native-code:.*'arm64-v8a'" personal-intermediate/package.txt
+          "$tools_dir/aapt" dump xmltree "$apk" AndroidManifest.xml > personal-intermediate/manifest.txt
+          if grep -q 'by.mybrev.playtest2026\|sharedUserId' personal-intermediate/manifest.txt; then
+            echo 'Unexpected old package identity or shared user in personal manifest'; exit 1
+          fi
+          "$tools_dir/aapt" dump --values resources "$apk" | grep -F '1:344097781816:android:87ccd0e0b2d2ce93fd8ecd' > personal-intermediate/firebase-app-id.txt
+          "$tools_dir/zipalign" -c -P 16 -v 4 "$apk" > personal-intermediate/alignment.txt
+          sha256sum "$apk" > personal-intermediate/SHA256SUMS.txt
+          git rev-parse HEAD > personal-intermediate/source-sha.txt
+          printf '%s
+' 'Intermediate CI APK only. The final downloadable personal APK must be signed by the permanent local certificate 21b8f556979f25f321a3f6f21d8fe347ef1ac7d5ddd5b9738cae1e95ee408c3f.' 'No private signing keys are included.' 'Native smoke: NOT TESTED - OWNER WILL TEST ON PHYSICAL ANDROID DEVICE.' > personal-intermediate/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MyBrev-Personal-intermediate-${{ github.sha }}
+          path: personal-intermediate/
+          retention-days: 14
+          if-no-files-found: error

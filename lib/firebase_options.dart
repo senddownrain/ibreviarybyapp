@@ -19,7 +19,10 @@ class DefaultFirebaseOptions {
     }
     if (kIsWeb) return web;
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android => android,
+      TargetPlatform.android =>
+        const bool.fromEnvironment('MYBREV_PERSONAL_ANDROID')
+            ? androidPersonal
+            : android,
       TargetPlatform.iOS => ios,
       _ => throw UnsupportedError('Use Chrome, Android or iOS for Mybrev.'),
     };
@@ -38,6 +41,16 @@ class DefaultFirebaseOptions {
   static const android = FirebaseOptions(
     apiKey: 'AIzaSyBqZtw0FW1n9TELjTUHQ5Z-VGx3Sb98alg',
     appId: '1:344097781816:android:92f6c24311cce114fd8ecd',
+    messagingSenderId: '344097781816',
+    projectId: 'ibreviaryby',
+    storageBucket: 'ibreviaryby.firebasestorage.app',
+  );
+
+  /// Existing com.example.ibrevapp client, selected only for the personal APK.
+  /// Keep in sync with the matching client in android/app/google-services.json.
+  static const androidPersonal = FirebaseOptions(
+    apiKey: 'AIzaSyBqZtw0FW1n9TELjTUHQ5Z-VGx3Sb98alg',
+    appId: '1:344097781816:android:87ccd0e0b2d2ce93fd8ecd',
     messagingSenderId: '344097781816',
     projectId: 'ibreviaryby',
     storageBucket: 'ibreviaryby.firebasestorage.app',

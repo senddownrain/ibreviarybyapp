@@ -39,11 +39,14 @@ val uploadKey: Map<String, String>? = run {
 
 // Select a synthetic native configuration before FirebaseInitProvider runs.
 // Selecting task inputs also invalidates Gradle's cache on the next normal build.
-val useFirebaseEmulators = (project.findProperty("dart-defines") as? String)
-    .orEmpty().split(",").any {
-        runCatching { String(Base64.getDecoder().decode(it)) }
-            .getOrNull() == "PRIEST_USE_EMULATORS=true"
-    }
+val dartDefines = (project.findProperty("dart-defines") as? String)
+    .orEmpty().split(",").mapNotNull {
+        runCatching { String(Base64.getDecoder().decode(it)) }.getOrNull()
+    }.toSet()
+val useFirebaseEmulators = "PRIEST_USE_EMULATORS=true" in dartDefines
+// Opt-in personal installation uses an already registered Firebase client.
+// The store identity remains the default for all ordinary builds.
+val personalAndroid = "MYBREV_PERSONAL_ANDROID=true" in dartDefines
 afterEvaluate {
     if (useFirebaseEmulators) {
         tasks.named<GoogleServicesTask>("processDebugGoogleServices") {
@@ -74,7 +77,8 @@ android {
     defaultConfig {
         // Temporary Google Play test identity «MyBrev Test». Bound to the
         // Play Console app after the first upload: never rename it.
-        applicationId = "by.mybrev.playtest2026"
+        applicationId = if (personalAndroid) "com.example.ibrevapp" else "by.mybrev.playtest2026"
+        manifestPlaceholders["mybrevAppLabel"] = if (personalAndroid) "MyBrev Personal" else "MyBrev Test"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = maxOf(flutter.minSdkVersion, 23)
