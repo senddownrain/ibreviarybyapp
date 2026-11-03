@@ -1,0 +1,38 @@
+name: Inspect existing Android signing certificate
+on:
+  push:
+    branches: [codex/android-v17-signer-check]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Export public certificate only
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          keystore_path="$(mktemp "$RUNNER_TEMP/mybrev-cert-check-XXXXXX.jks")"
+          trap 'rm -f "$keystore_path"' EXIT
+          chmod 600 "$keystore_path"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"
+          mkdir public-certificate
+          keytool -exportcert -keystore "$keystore_path" -storepass:env ANDROID_KEYSTORE_PASSWORD -alias "$ANDROID_KEY_ALIAS" -file public-certificate/certificate.der > /dev/null 2>&1
+          keytool -printcert -file public-certificate/certificate.der > public-certificate/certificate.txt
+          sha256sum public-certificate/certificate.der | tee public-certificate/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Android-upload-public-certificate
+          path: public-certificate/
+          retention-days: 7
+          if-no-files-found: error
