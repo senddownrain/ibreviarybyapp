@@ -7,6 +7,10 @@ permissions:
   contents: read
 jobs:
   verified-apk:
+    # GitHub requires push access to read unpublished draft release assets.
+    # The job only downloads the prepared asset and uploads an Actions artifact.
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
