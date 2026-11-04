@@ -220,15 +220,15 @@ void main() {
         isFalse,
         reason: 'the weekday is not a third option',
       );
-      // The Immaculate Heart card has no «З дня» assembly; St Anthony keeps
-      // the rubrical memorial choice of the day's psalmody, as on the web.
-      expect(
-        content.options.first.templates.map((t) => t.choice),
-        isNot(contains(kCurrentDayChoice)),
-      );
+      // The Immaculate Heart memorial offers a genuine choice between
+      // «З дня» and the Marian Common, not a separate weekday Office card.
+      final heartChoices = content.options.first.templates.map((t) => t.choice);
+      expect(heartChoices, contains(kCurrentDayChoice), reason: diocese);
+      expect(heartChoices, contains('blessed-virgin-mary'), reason: diocese);
       expect(
         content.options.first.templates.map((t) => t.label),
-        isNot(contains(kCurrentDayLabel)),
+        contains(kCurrentDayLabel),
+        reason: diocese,
       );
     }
   });
