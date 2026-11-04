@@ -98,7 +98,7 @@ class PrayersScreen extends ConsumerWidget {
                     PrayerbookSectionTile(
                       key: const Key('songbook-destination'),
                       title: 'Спеўнік',
-                      subtitle: 'Спевы і акорды',
+                      subtitle: 'Пілігрымковы',
                       icon: PhosphorIconsRegular.playlist,
                       onTap: () => context.push('/prayers/songs'),
                     ),
