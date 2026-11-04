@@ -33,6 +33,8 @@ jobs:
         run: flutter analyze --no-fatal-infos
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
+      - name: Immaculate Heart and Sunday I Vespers regression
+        run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Check devotional reader formatting
         run: >-
           dart format --output=none --set-exit-if-changed
