@@ -440,7 +440,7 @@ class LiturgicalContentService {
     final dynamicDays = <String, List<LiturgicalDay>>{
       for (final entry in rawDynamicDays.entries)
         entry.key: [
-            for (final item in entry.value
+            for (final item in entry.value)
               withContext(resolveDayAgainstPeriod(item, resolvedPeriodDay))!,
           ],
     };
