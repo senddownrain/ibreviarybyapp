@@ -23,6 +23,7 @@ import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
+import 'package:mybrev_flutter/utils/liturgical_vespers.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
@@ -244,71 +245,37 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
     if (selected == null || widget.oraType != 'vespers') return selected;
     if (usesOwnVespers(selected)) return selected;
-    // I Vespers may belong to tomorrow's celebration.
+    // The Ordo, not non-empty `vesper1*`, decides which Office owns tonight.
+    final today = content.contentForDate(widget.date, diocese: diocese);
     final tomorrow = DateUtils.addDaysToDate(widget.date, 1);
     return _vespersFrom(
       selected,
-      tomorrow,
-      content.getContentForDate(
-        tomorrow,
-        calendar.getYearOptionsCached(tomorrow.year),
-        calendar.getYearOptionsCached(tomorrow.year + 1),
-        calendar.getDynamicDatesCached(tomorrow.year),
-        diocese: diocese,
-      ),
+      today,
+      content.contentForDate(tomorrow, diocese: diocese),
     );
   }
 
-  /// Vespers of [selected] given tomorrow's options (already on the device).
+  /// Resolves tonight's Office from the Ordo precedence and the on-device
+  /// text sources. I Vespers of an ordinary Sunday borrow Saturday's psalter,
+  /// never the Sunday document's II Vespers.
   LiturgicalDay _vespersFrom(
     LiturgicalDay selected,
-    DateTime tomorrow,
-    List<DayOption> options,
-  ) => _firstVespersOf(tomorrow, options) ?? _secondVespers(selected);
-
-  LiturgicalDay _secondVespers(LiturgicalDay selected) {
-    if (widget.date.weekday == DateTime.sunday || isSolemnity(selected)) {
+    LiturgicalDayContent today,
+    LiturgicalDayContent tomorrow,
+  ) {
+    final evening = resolveEveningOffice(
+      date: widget.date,
+      selected: selected,
+      today: today,
+      tomorrow: tomorrow,
+    );
+    if (evening.isFirst) {
+      final title = (evening.firstVespersTitle ?? '').trim();
+      _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+    } else if (evening.isSecond) {
       _vespersRubric = 'II Нешпары';
     }
-    return selected;
-  }
-
-  /// I Vespers of tomorrow's celebration, when tomorrow has them.
-  LiturgicalDay? _firstVespersOf(DateTime tomorrow, List<DayOption> options) {
-    final candidates = options
-        .map((option) => option.day)
-        .whereType<LiturgicalDay>();
-
-    bool isUniversal(LiturgicalDay day) {
-      final place = day.data['_place'];
-      return place == null ||
-          (place is String && place.trim().isEmpty) ||
-          (place is List && place.isEmpty);
-    }
-
-    final first = candidates
-        .where(
-          (day) =>
-              isUniversal(day) &&
-              hasFirstVespersRank(day) &&
-              hasFirstVespers(day),
-        )
-        .firstOrNull;
-    if (first != null) {
-      final title = liturgicalDayDisplayTitle(first, tomorrow);
-      _vespersRubric =
-          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
-      return normalizeFirstVespers(first)!;
-    }
-    if (widget.date.weekday == DateTime.saturday) {
-      final tomorrowDay = candidates.where(isUniversal).firstOrNull;
-      if (tomorrowDay != null) {
-        final title = liturgicalDayDisplayTitle(tomorrowDay, tomorrow);
-        _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'нядзелі' : title}';
-        return tomorrowDay;
-      }
-    }
-    return null;
+    return evening.day;
   }
 
   @override
@@ -920,6 +887,23 @@ class _OraScreenState extends ConsumerState<OraScreen> {
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: liturgicalColorForDay(day),
                 fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    final missingFirst = day.data['_missingFirstVespersFields'];
+    if (missingFirst is List && missingFirst.isNotEmpty) {
+      items.add(
+        _OraItem.custom(
+          (context, _) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Не ўсе тэксты I Нешпараў знойдзены ў псалтыры. '
+              'Тэксты II Нешпараў не падстаўляюцца.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
           ),
