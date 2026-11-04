@@ -149,6 +149,7 @@ void main() {
 
       expect(find.text('Раздзелы'), findsOneWidget);
       expect(find.byKey(const Key('prayerbook-sections-grid')), findsOneWidget);
+      expect(find.text('Пілігрымковы'), findsOneWidget);
       final keys = [
         'holy-mass-destination',
         'songbook-destination',
@@ -227,6 +228,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(_location(router), '/prayers/songs');
       expect(find.byKey(const Key('songbook-title')), findsOneWidget);
+      expect(find.byKey(const Key('songbook-subtitle')), findsOneWidget);
     });
 
     testWidgets('missing Mass says so on the tile', (tester) async {
@@ -487,7 +489,7 @@ void main() {
       expect(find.byType(ReaderScaffold), findsOneWidget);
       expect(find.byType(ReaderContextHeader), findsOneWidget);
       expect(find.byType(ReaderContentSurface), findsOneWidget);
-      expect(find.text('СПЕЎНІК'), findsOneWidget);
+      expect(find.text('СПЕЎНІК ПІЛІГРЫМКОВЫ'), findsOneWidget);
       expect(find.text('Бог наш'), findsOneWidget);
       expect(find.text('Марыйныя'), findsOneWidget);
       expect(find.text('Бог наш вялікі'), findsOneWidget);
