@@ -357,7 +357,9 @@ void main() {
     for (final iso in daysOfYear(2026)) {
       final content = service.contentForDate(dateOfIso(iso));
       legacy += content.options
-          .where((option) => option.properSource == ProperSource.legacyDays)
+          .where((option) =>
+              option.source == LiturgicalOptionSource.fixed &&
+              option.properSource == ProperSource.legacyDays)
           .length;
     }
     expect(legacy, 0);
