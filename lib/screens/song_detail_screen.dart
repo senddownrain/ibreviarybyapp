@@ -104,7 +104,7 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
         showScrollToTop: true,
         actions: [_SongFavoriteControl(songId: song.id, favorite: favorite)],
         contextHeader: ReaderContextHeader(
-          eyebrow: 'СПЕЎНІК',
+          eyebrow: 'СПЕЎНІК ПІЛІГРЫМКОВЫ',
           title: song.title,
           metadata: tags.isEmpty ? null : tags.join(' · '),
           accentColor: cs.tertiary,

@@ -88,7 +88,13 @@ class _SongbookScreenState extends ConsumerState<SongbookScreen> {
       ),
       const SizedBox(height: 6),
       Text(
-        songs.hasValue ? 'Спеваў: ${visible.length}' : 'Пілігрымкавы спеўнік',
+        'Пілігрымковы',
+        key: const Key('songbook-subtitle'),
+        style: TextStyle(color: cs.onSurfaceVariant),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        songs.hasValue ? 'Спеваў: ${visible.length}' : 'Загрузка спеваў…',
         key: const Key('songbook-count'),
         style: TextStyle(color: cs.onSurfaceVariant),
       ),
