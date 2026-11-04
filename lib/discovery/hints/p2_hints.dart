@@ -52,7 +52,7 @@ final List<HintDefinition> p2Hints = [
     priority: HintPriority.p2,
     screenId: 'prayers',
     anchorId: 'discover.songbook.link',
-    copyBe: 'Шукаеце спеў? Зазірніце ў «Спеўнік»',
+    copyBe: 'Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»',
     actionLabelBe: 'Паказаць',
     maxShows: kP2MaxShows,
     requirements: [
