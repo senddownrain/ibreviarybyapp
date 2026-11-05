@@ -28,17 +28,28 @@ async function scrollTo(text) {
   await pause(100);
 }
 async function click(label) {
-  if (label !== 'Закрыць') await scrollTo(label);
-  await page.getByRole('button', { name: label, exact: true }).last().click();
+  await page.bringToFront();
+  if (label === 'Закрыць') {
+    // A hovered Tooltip can repeat its label in Chrome's accessible name.
+    await page.getByRole('button', { name: /^Закрыць(?:\s|$)/ }).first().click();
+    await page.mouse.move(1, 1);
+  } else {
+    await scrollTo(label);
+    await page.getByRole('button', { name: label, exact: true }).last().click();
+  }
   await pause(450);
 }
 async function capture(name) {
+  await page.bringToFront();
   await snapshot();
-  await page.screenshot({ path: path.join(out, name + '.png') });
+  await page.evaluate(() => document.fonts.ready);
+  console.log('capture ' + name);
+  await page.screenshot({ path: path.join(out, name + '.png'), timeout: 90000 });
 }
 async function load(width, theme, scale, route = '/about') {
   await page.setViewportSize({ width, height: 844 });
   await page.goto(base + '?' + new URLSearchParams({ theme, scale, path: route }), { waitUntil: 'domcontentloaded' });
+  await page.bringToFront();
   await page.waitForFunction(() => typeof sourceSmokeSnapshot === 'function', null, { timeout: 120000 });
   const placeholder = page.locator('flt-semantics-placeholder');
   await placeholder.waitFor({ state: 'attached', timeout: 120000 });
@@ -159,6 +170,11 @@ async function load(width, theme, scale, route = '/about') {
     }
     // Real offline PDF download through share_plus's web fallback.
     await load(390, 'light', 1, '/documents/proper-calendar');
+    await waitText('СТУДЗЕНЬ');
+    await capture('calendar-intro-390-light');
+    await click('ЛІСТАПАД');
+    await scrollTo('Найсв. Панны Марыі, Маці Міласэрнасці (Маці Божай Вастрабрамскай)*');
+    await capture('calendar-11-390-light');
     await scrollTo('Арыгінал PDF');
     const pendingDownload = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Арыгінал PDF', exact: true }).click();

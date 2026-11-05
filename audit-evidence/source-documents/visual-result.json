@@ -1,0 +1,89 @@
+{
+  "url": "http://localhost:5241/",
+  "states": [
+    {
+      "width": 390,
+      "theme": "light",
+      "textScale": 1,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "textScale": 2,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "textScale": 1,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "textScale": 2,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "textScale": 1,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "textScale": 2,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "textScale": 1,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "textScale": 2,
+      "decrees": 4,
+      "pages": 13,
+      "dates": 365,
+      "months": 12,
+      "back": "pass"
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "pdf": "Offline downloaded bytes match original SHA-256",
+  "native": "Android/iOS not available; share sheet not verified on device"
+}

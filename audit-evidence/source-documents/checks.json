@@ -1,0 +1,49 @@
+{
+  "webCommit": "f185657e88436eb8c6adb0f666b6e50bed416b40",
+  "flutterBase": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+  "format": "16 changed/new Dart files: no formatting changes needed",
+  "analyze": {
+    "errors": 0,
+    "warnings": 0,
+    "infos": 12,
+    "matchesBaselineExactly": true
+  },
+  "targetedTests": {
+    "passed": 59,
+    "failed": 0
+  },
+  "fullFlutterTest": {
+    "passed": 1727,
+    "skipped": 9,
+    "failed": 8,
+    "baselineFailures": [
+      "discovery/p0_hints_screens_test.dart: Readings date_navigation: three day arrows, once",
+      "hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor",
+      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0",
+      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5",
+      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.0",
+      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.5"
+    ],
+    "additionalFailure": {
+      "case": "content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left",
+      "reason": "30 second timeout; not reproduced on isolated rerun",
+      "isolatedRerun": "1 passed, 0 failed (19 seconds)"
+    },
+    "all18NewFeatureTests": "passed"
+  },
+  "importParity": "Four assets byte-identical to Web; all book metadata and verse values in both corpora equal Web; pinned SHA-256 verified",
+  "finalWidgetRerun": {
+    "passed": 13,
+    "failed": 0,
+    "includesShortCalendarAppBar": true
+  },
+  "chromeVisualSmoke": {
+    "scenarios": 8,
+    "passed": 8,
+    "errors": 0,
+    "externalRequests": 0,
+    "pdf": "Offline downloaded bytes match original SHA-256",
+    "screenshots": 9
+  }
+}

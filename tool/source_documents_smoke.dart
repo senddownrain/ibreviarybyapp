@@ -12,8 +12,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
+import 'package:mybrev_flutter/screens/about_screen.dart';
+import 'package:mybrev_flutter/screens/source_documents_screen.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/theme/ib_colors.dart';
+import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 
 class _Settings extends SettingsNotifier {
   @override
@@ -48,11 +51,37 @@ String _text(Widget widget) => switch (widget) {
   _ => '',
 };
 
+String _route() {
+  final config = router.routerDelegate.currentConfiguration;
+  final last = config.last;
+  return last is ImperativeRouteMatch ? last.matches.uri.path : config.uri.path;
+}
+
+// Inspect widgets without registering inherited-widget dependencies on arbitrary
+// Elements. Navigator retains previous pages while another route is displayed.
+bool _inactive(Widget widget, String route) {
+  if (widget case SecondaryPageScaffold(child: final child)) {
+    final path = switch (child) {
+      AboutScreen() => '/about',
+      SourcesScreen() => '/sources',
+      LiturgyHoursDecreesScreen() => '/documents/liturgy-hours-decrees',
+      ProperCalendarScreen() => '/documents/proper-calendar',
+      _ => null,
+    };
+    return path != null && path != route;
+  }
+  return false;
+}
+
 Future<JSBoolean> _scrollToText(String needle) async {
   Element? target;
   var shortest = 1 << 30;
+  final route = _route();
   void visit(Element e) {
     if (e.widget case Offstage(offstage: true)) {
+      return;
+    }
+    if (_inactive(e.widget, route)) {
       return;
     }
     final text = _text(e.widget);
@@ -72,18 +101,25 @@ Future<JSBoolean> _scrollToText(String needle) async {
 String _snapshot() {
   final text = <String>[];
   final overflow = <String>[];
+  final route = _route();
+  final view = WidgetsBinding.instance.platformDispatcher.views.first;
+  final screen = view.physicalSize.width / view.devicePixelRatio;
   void visit(Element e) {
     if (e.widget case Offstage(offstage: true)) {
+      return;
+    }
+    if (_inactive(e.widget, route)) {
       return;
     }
     final s = _text(e.widget);
     if (s.isNotEmpty) text.add(s);
     final render = e.renderObject;
     if (render is RenderParagraph && render.attached && render.hasSize) {
+      if (render.didExceedMaxLines) {
+        overflow.add('Truncated: ${render.text.toPlainText()}');
+      }
       final left = render.localToGlobal(Offset.zero).dx;
-      final screen = MediaQuery.maybeSizeOf(e)?.width;
-      if (screen != null &&
-          (left < -1 || left + render.size.width > screen + 1)) {
+      if (left < -1 || left + render.size.width > screen + 1) {
         overflow.add(render.text.toPlainText());
       }
     }
@@ -91,15 +127,7 @@ String _snapshot() {
   }
 
   WidgetsBinding.instance.rootElement?.visitChildElements(visit);
-  final config = router.routerDelegate.currentConfiguration;
-  final last = config.last;
-  return jsonEncode({
-    'text': text,
-    'overflow': overflow,
-    'route': last is ImperativeRouteMatch
-        ? last.matches.uri.path
-        : config.uri.path,
-  });
+  return jsonEncode({'text': text, 'overflow': overflow, 'route': route});
 }
 
 class _SmokeApp extends StatelessWidget {

@@ -790,7 +790,7 @@ final router = GoRouter(
         key: state.pageKey,
         restorationId: 'proper-calendar',
         child: const SecondaryPageScaffold(
-          title: 'Уласны каляндар',
+          title: 'Каляндар',
           fallbackLocation: sourcesRoute,
           child: ProperCalendarScreen(),
         ),
