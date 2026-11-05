@@ -5,6 +5,8 @@ import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
 import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/models/mass_ritual.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
+import 'package:mybrev_flutter/screens/source_documents_screen.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -749,6 +751,48 @@ final router = GoRouter(
         child: const SecondaryPageScaffold(
           title: 'Інфармацыя',
           child: AboutScreen(),
+        ),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: sourcesRoute,
+      name: 'Sources',
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        restorationId: 'sources',
+        child: const SecondaryPageScaffold(
+          title: 'Крыніцы',
+          fallbackLocation: '/about',
+          child: SourcesScreen(),
+        ),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: hoursDecreesRoute,
+      name: 'LiturgyHoursDecrees',
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        restorationId: 'liturgy-hours-decrees',
+        child: const SecondaryPageScaffold(
+          title: 'Дэкрэты',
+          fallbackLocation: sourcesRoute,
+          child: LiturgyHoursDecreesScreen(),
+        ),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: properCalendarRoute,
+      name: 'ProperCalendar',
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        restorationId: 'proper-calendar',
+        child: const SecondaryPageScaffold(
+          title: 'Уласны каляндар',
+          fallbackLocation: sourcesRoute,
+          child: ProperCalendarScreen(),
         ),
       ),
     ),

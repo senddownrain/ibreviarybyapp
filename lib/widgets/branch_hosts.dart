@@ -340,10 +340,12 @@ class SecondaryPageScaffold extends StatelessWidget {
     super.key,
     required this.title,
     required this.child,
+    this.fallbackLocation = '/hours',
   });
 
   final String title;
   final Widget child;
+  final String fallbackLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +354,7 @@ class SecondaryPageScaffold extends StatelessWidget {
       if (canPop) {
         Navigator.pop(context);
       } else {
-        context.go('/hours');
+        context.go(fallbackLocation);
       }
     }
 

@@ -1,4 +1,5 @@
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
 
 // Display labels follow Catholic.by (2017 official Belarusian New Testament).
 // The four Gospel labels omit «святога» for compact navigation.
@@ -70,7 +71,8 @@ class BibleVersionMeta {
   final String shortName;
   final String langLabel;
   final String shortLabel;
-  final String attribution;
+  String get attribution =>
+      bibleAttribution(versionId: id, isNewTestament: false);
 
   const BibleVersionMeta({
     required this.id,
@@ -78,7 +80,6 @@ class BibleVersionMeta {
     required this.shortName,
     required this.langLabel,
     required this.shortLabel,
-    required this.attribution,
   });
 }
 
@@ -92,7 +93,6 @@ const kBibleVersionMeta = {
     shortName: 'ББ',
     langLabel: 'Беларуская',
     shortLabel: 'БЕЛ',
-    attribution: 'Стары Запавет · пераклад кс. Уладзіслава Чарняўскага MIC',
   ),
   'ru': BibleVersionMeta(
     id: 'ru',
@@ -100,7 +100,6 @@ const kBibleVersionMeta = {
     shortName: 'СП',
     langLabel: 'Руская',
     shortLabel: 'РУС',
-    attribution: 'Синодальный перевод',
   ),
 };
 
@@ -108,14 +107,7 @@ String bibleAttribution({
   required String versionId,
   required bool isNewTestament,
 }) {
-  // The Belarusian corpus combines two translations: Chernyavski (OT) and
-  // Catholic.by (NT).
-  if (versionId == 'bel') {
-    return isNewTestament
-        ? 'Новы Запавет · Catholic.by'
-        : 'Стары Запавет · пераклад кс. Уладзіслава Чарняўскага MIC';
-  }
-  return kBibleVersionMeta[versionId]?.attribution ?? '';
+  return SourceRegistry.current?.bibleLabel(versionId, isNewTestament) ?? '';
 }
 
 class BibleRepository {

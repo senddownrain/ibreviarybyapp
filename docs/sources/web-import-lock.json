@@ -1,0 +1,45 @@
+{
+  "repository": "senddownrain/mybrev",
+  "pullRequest": 189,
+  "commit": "f185657e88436eb8c6adb0f666b6e50bed416b40",
+  "files": [
+    {
+      "web": "src/data/sources.json",
+      "flutter": "assets/legal/sources.json",
+      "sha256": "fcd9d56e4e02e1afe330f31ca97bc52735e694b42c50749ba6a7e9edf6f62190"
+    },
+    {
+      "web": "src/data/documents/liturgy-hours-decrees.json",
+      "flutter": "assets/legal/liturgy-hours-decrees.json",
+      "sha256": "21b8270b78ad3b09aff45fbe9aaabf67e5750f961a82f5540c6dde5aeb3888c5"
+    },
+    {
+      "web": "src/data/documents/proper-calendar.json",
+      "flutter": "assets/legal/proper-calendar.json",
+      "sha256": "bb3aa796875e8c16011f3fa16077e8dd507f0a523cbfb0a9fccbbd8b0ce4b58d"
+    },
+    {
+      "web": "public/documents/proper-calendar.pdf",
+      "flutter": "assets/legal/proper-calendar.pdf",
+      "sha256": "681a59f92395a299510da4b4afc68d79cf0017518c0abb1351828560796017f3"
+    }
+  ],
+  "bibleCorpora": [
+    {
+      "flutter": "assets/bible_seed_bel.json.gz",
+      "web": "scripts/bible/bible_seed_bel_mixed.json.gz",
+      "sha256": "881fa3099031322b0083113446959c5b10680ef856bb7d481c7015c87ffa0b4b",
+      "books": 73,
+      "verses": 35532,
+      "comparison": "All decoded book metadata, chapter arrays and verse values equal Web; gzip bytes need not match."
+    },
+    {
+      "flutter": "assets/bible_seed_ru.json.gz",
+      "web": "scripts/bible/bible_seed_ru.json.gz",
+      "sha256": "2d22792001d78b06a6c5794e035def93faae940b8447be96d8c4e2c05ed8f956",
+      "books": 73,
+      "verses": 35590,
+      "comparison": "All decoded book metadata, chapter arrays and verse values equal Web; gzip bytes need not match."
+    }
+  ]
+}

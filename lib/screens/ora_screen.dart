@@ -522,7 +522,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             ),
           ),
         ),
-        const SourceFooter(key: Key('ora-source-footer')),
+        const SourceFooter(
+          key: Key('ora-source-footer'),
+          sourceId: 'liturgy-hours-2012-2020',
+        ),
         if (next != null) ...[
           const SizedBox(height: 28),
           Center(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
 
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -16,7 +17,8 @@ class SourceFooter extends ConsumerWidget {
     super.key,
     this.sourceName = 'Catholic.by',
     this.sourceUrl = 'https://catholic.by/',
-    this.copyright = '© Канферэнцыя Каталіцкіх Біскупаў у Беларусі.',
+    this.copyright = '',
+    this.sourceId,
     this.textStyle,
     this.linkColor,
     this.topSpacing = 32,
@@ -29,6 +31,7 @@ class SourceFooter extends ConsumerWidget {
   final String sourceName;
   final String sourceUrl;
   final String copyright;
+  final String? sourceId;
   final TextStyle? textStyle;
   final Color? linkColor;
   final double topSpacing;
@@ -39,6 +42,19 @@ class SourceFooter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final entry = sourceId == null
+        ? null
+        : ref.watch(sourceRegistryProvider).valueOrNull?.entry(sourceId!);
+    if (sourceId != null && entry == null) {
+      return const SizedBox.shrink();
+    }
+    final sourceName = this.sourceName == 'Catholic.by'
+        ? entry?.digitalLabel ?? this.sourceName
+        : this.sourceName;
+    final sourceUrl = entry?.digitalUrl ?? this.sourceUrl;
+    final copyright = sourceId == null
+        ? this.copyright
+        : entry?.notices.join('. ') ?? '';
     final reader = ReaderTheme.of(context);
     final settings = ref.watch(settingsProvider);
     final style =
@@ -69,12 +85,14 @@ class SourceFooter extends ConsumerWidget {
     );
     Widget result = Semantics(
       link: true,
-      label: semanticLabel ?? 'Крыніца: $sourceName. $copyright',
+      label:
+          semanticLabel ??
+          'Крыніца: $sourceName${copyright.isEmpty ? '' : '. $copyright'}',
       excludeSemantics: true,
       child: InkWell(
         key: linkKey,
         borderRadius: BorderRadius.circular(8),
-        onTap: () => _open(context, ref),
+        onTap: () => _open(context, ref, sourceUrl),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: verticalPadding),
           child: text,
@@ -95,7 +113,11 @@ class SourceFooter extends ConsumerWidget {
     );
   }
 
-  Future<void> _open(BuildContext context, WidgetRef ref) async {
+  Future<void> _open(
+    BuildContext context,
+    WidgetRef ref,
+    String sourceUrl,
+  ) async {
     final messenger = ScaffoldMessenger.maybeOf(context);
     var opened = false;
     try {

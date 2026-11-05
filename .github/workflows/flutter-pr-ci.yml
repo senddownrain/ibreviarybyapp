@@ -8,6 +8,10 @@ on:
       - 'test/**'
       - 'pubspec.yaml'
       - 'pubspec.lock'
+      - 'assets/legal/**'
+      - 'docs/sources/web-import-lock.json'
+      - 'scripts/check_web_source_import.py'
+      - 'tool/source_documents_smoke.dart'
       - '.github/workflows/flutter-pr-ci.yml'
 
 permissions:
@@ -31,6 +35,11 @@ jobs:
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
+      - name: Pinned Web sources and offline documents
+        run: |
+          python3 scripts/check_web_source_import.py
+          dart format --output=none --set-exit-if-changed lib/models/source_documents.dart lib/screens/source_documents_screen.dart test/source_documents_test.dart test/source_documents_widget_test.dart tool/source_documents_smoke.dart
+          flutter test test/source_documents_test.dart test/source_documents_widget_test.dart test/bible_repository_test.dart test/source_footer_test.dart test/compendium_screens_test.dart test/router_architecture_test.dart test/stateful_shell_navigation_test.dart test/secondary_menu_test.dart test/privacy_policy_link_test.dart
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
       - name: Movable feast daytime prayer and delivery regression

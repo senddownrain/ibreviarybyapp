@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/constants/legal_links.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -120,6 +122,11 @@ class _AboutContent extends StatelessWidget {
           style: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: 18),
+        TextButton(
+          key: const Key('about-sources-link'),
+          onPressed: () => context.push(sourcesRoute),
+          child: const Text('Крыніцы і аўтарскія правы'),
+        ),
         TextButton.icon(
           key: const Key('about-privacy-policy-link'),
           onPressed: () => _openPrivacyPolicy(context),
