@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -41,15 +42,19 @@ void main() {
         'selectedDiocese': 'pinsk',
       });
       final before = box.toMap();
+      // An installed old version is fully closed before the updated app opens.
+      await box.close();
+      await HiveService.init(path: directory.path, loadBundle: false);
+      final migrated = Hive.box('settings');
+      expect(migrated.toMap(), {...before, 'psalmodyMode': expected.name});
       final container = ProviderContainer();
       expect(container.read(settingsProvider).psalmodyMode, expected);
-      await box.flush();
-      expect(box.get('psalmodyMode'), expected.name);
+      expect(migrated.get('psalmodyMode'), expected.name);
       // Migration adds exactly one key, without rewriting any other preference.
-      expect(box.toMap(), {...before, 'psalmodyMode': expected.name});
+      expect(migrated.toMap(), {...before, 'psalmodyMode': expected.name});
       container.dispose();
-      await box.close();
-      await Hive.openBox('settings');
+      await Hive.close();
+      await HiveService.init(path: directory.path, loadBundle: false);
       final reloaded = ProviderContainer();
       addTearDown(reloaded.dispose);
       final state = reloaded.read(settingsProvider);
@@ -70,6 +75,7 @@ void main() {
           'psalmVerseLayout': 'alternatingIndent',
           'psalmMarkerBreakMode': 'breakAfterMarker',
         });
+        await HiveService.init(path: directory.path, loadBundle: false);
         final container = ProviderContainer();
         expect(container.read(settingsProvider).psalmodyMode, mode);
         for (final next in PsalmodyMode.values) {
@@ -92,6 +98,109 @@ void main() {
       },
     );
   }
+  test('provider reads never write or leave migration work at close', () async {
+    final box = Hive.box('settings');
+    await box.putAll({
+      'psalmVerseLayout': 'alignedLeft',
+      'psalmMarkerBreakMode': 'breakAfterMarker',
+      'favoriteIds': '["keep"]',
+    });
+    final before = box.toMap();
+    final changes = <BoxEvent>[];
+    final subscription = box.watch().listen(changes.add);
+    for (var i = 0; i < 5; i++) {
+      final container = ProviderContainer();
+      expect(
+        container.read(settingsProvider).psalmodyMode,
+        PsalmodyMode.leftBreakIndent,
+      );
+      container.dispose();
+    }
+    await box.close();
+    await subscription.cancel();
+    expect(changes, isEmpty);
+    final reopened = await Hive.openBox('settings');
+    expect(reopened.toMap(), before);
+  });
+
+  test(
+    'startup completes migration before an immediate close and restart',
+    () async {
+      final old = Hive.box('settings');
+      await old.putAll({
+        'psalmVerseLayout': 'alignedLeft',
+        'psalmMarkerBreakMode': 'breakAfterMarker',
+        'favoriteIds': '["keep"]',
+        'prayerCategoryMap': '{"keep":["personal"]}',
+        'hiddenGlobalPrayerCategoryIds': '["hidden"]',
+        'fontFamily': 'system',
+        'fontSize': 22.0,
+        'themeMode': 'dark',
+        'bibleVersionId': 'ru',
+        'dioceseSelection': {'primary': 'pinsk'},
+      });
+      final before = old.toMap();
+      await Hive.close();
+      await HiveService.init(path: directory.path, loadBundle: false);
+      // No ProviderContainer, extra pump, flush or delay before closing.
+      await Hive.close();
+      final reopened = await Hive.openBox('settings');
+      expect(reopened.toMap(), {...before, 'psalmodyMode': 'leftBreakIndent'});
+    },
+  );
+
+  test(
+    'unrelated saves from an older container cannot overwrite a new mode',
+    () async {
+      await HiveService.init(path: directory.path, loadBundle: false);
+      final first = ProviderContainer();
+      final second = ProviderContainer();
+      addTearDown(first.dispose);
+      addTearDown(second.dispose);
+      first.read(settingsProvider);
+      second.read(settingsProvider);
+      final notifier = first.read(settingsProvider.notifier);
+      // Run the old container's full settings save and the explicit mode write
+      // concurrently; only the mode setter owns this key after initialization.
+      await Future.wait([
+        second.read(settingsProvider.notifier).toggleFavorite('keep'),
+        notifier.setPsalmodyMode(PsalmodyMode.alternatingStanzas),
+      ]);
+      await Hive.close();
+      final reopened = await Hive.openBox('settings');
+      expect(reopened.get('psalmodyMode'), 'alternatingStanzas');
+      expect(reopened.get('favoriteIds'), '["keep"]');
+    },
+  );
+
+  test(
+    'reinitialization is idempotent and never resets a selected mode',
+    () async {
+      await HiveService.init(path: directory.path, loadBundle: false);
+      final container = ProviderContainer();
+      await container
+          .read(settingsProvider.notifier)
+          .setPsalmodyMode(PsalmodyMode.leftBreakIndent);
+      container.dispose();
+      final box = Hive.box('settings');
+      final before = box.toMap();
+      final changes = <BoxEvent>[];
+      final subscription = box.watch().listen(changes.add);
+      await HiveService.init(path: directory.path, loadBundle: false);
+      for (var i = 0; i < 5; i++) {
+        final next = ProviderContainer();
+        expect(
+          next.read(settingsProvider).psalmodyMode,
+          PsalmodyMode.leftBreakIndent,
+        );
+        next.dispose();
+      }
+      await subscription.cancel();
+      expect(changes, isEmpty);
+      expect(box.toMap(), before);
+    },
+  );
+
   test('unknown new value still migrates valid legacy preferences', () {
     expect(
       resolvePsalmodyMode(

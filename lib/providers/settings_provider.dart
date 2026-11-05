@@ -191,11 +191,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
       legacyLayout: _box.get('psalmVerseLayout'),
       legacyBreakMode: _box.get('psalmMarkerBreakMode'),
     );
-    // Persist migration immediately, even when the reader never opens settings.
-    // Legacy keys remain untouched for older installed versions.
-    if (_box.get('psalmodyMode') != psalmodyMode.name) {
-      _box.put('psalmodyMode', psalmodyMode.name);
-    }
     final mode = _box.get('themeMode', defaultValue: 'system') as String;
     final cats = (_box.get('userCategories', defaultValue: '[]') as String);
     final favs = (_box.get('favoriteIds', defaultValue: '[]') as String);
@@ -242,7 +237,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('themeMode', _themeName(state.themeMode));
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
-    await _box.put('psalmodyMode', state.psalmodyMode.name);
     await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
@@ -306,12 +300,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
-  Future<void> setPsalmodyMode(PsalmodyMode value) {
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
     if (state.psalmodyMode != value) {
       analyticsFeature('psalmody_layout_change');
     }
     state = state.copyWith(psalmodyMode: value);
-    return _box.put('psalmodyMode', value.name);
+    await _box.put('psalmodyMode', value.name);
+    await _box.flush();
   }
 
   Future<void> toggleFavorite(String id) {

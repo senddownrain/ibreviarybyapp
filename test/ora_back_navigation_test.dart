@@ -33,12 +33,6 @@ void main() {
     directory = await Directory.systemTemp.createTemp('ora-back-');
     await HiveService.init(path: directory.path, loadBundle: true);
     await HiveService.content.ensureLoaded(kLiturgicalCollections);
-    // Complete startup migration on the real async clock. A Hive write begun
-    // inside testWidgets' FakeAsync cannot finish during real-I/O teardown.
-    final settings = ProviderContainer();
-    settings.read(settingsProvider);
-    await Hive.box('settings').flush();
-    settings.dispose();
   });
   tearDownAll(() async {
     await Hive.close();
