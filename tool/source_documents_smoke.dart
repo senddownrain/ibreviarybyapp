@@ -52,7 +52,9 @@ Future<JSBoolean> _scrollToText(String needle) async {
   Element? target;
   var shortest = 1 << 30;
   void visit(Element e) {
-    if (e.widget case Offstage(offstage: true)) return;
+    if (e.widget case Offstage(offstage: true)) {
+      return;
+    }
     final text = _text(e.widget);
     if (text.contains(needle) && text.length < shortest) {
       target = e;
@@ -71,7 +73,9 @@ String _snapshot() {
   final text = <String>[];
   final overflow = <String>[];
   void visit(Element e) {
-    if (e.widget case Offstage(offstage: true)) return;
+    if (e.widget case Offstage(offstage: true)) {
+      return;
+    }
     final s = _text(e.widget);
     if (s.isNotEmpty) text.add(s);
     final render = e.renderObject;
