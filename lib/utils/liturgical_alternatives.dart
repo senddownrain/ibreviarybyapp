@@ -94,7 +94,24 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
   final structured = kind == 'gospel-antiphon'
       ? (_gospelCycleAlternatives(root) ?? _structuredAlternatives(root))
       : _structuredAlternatives(root);
-  final raw = structured ?? _splitAtRules(root, kind);
+  final split = structured ?? _splitAtRules(root, kind);
+  final raw = <_RawAlternative>[];
+  for (final option in split) {
+    // Web D-1: a responsory-only variant belongs to the preceding reading.
+    if (kind == 'office-reading' &&
+        raw.isNotEmpty &&
+        _isResponsoryVariant(option.html)) {
+      final previous = raw.removeLast();
+      raw.add(
+        _RawAlternative(
+          '${previous.html}\n<hr />\n${option.html}',
+          previous.explicitTitle,
+        ),
+      );
+    } else {
+      raw.add(option);
+    }
+  }
   final unique = <_RawAlternative>[];
   final seen = <String>{};
   for (final option in raw) {
@@ -175,6 +192,13 @@ String _firstLineText(Element element) {
   return '';
 }
 
+bool _isReadingCategoryHeading(String text) {
+  // Scripture and homilies can start with «Пра …: …» too. A category
+  // occupies the whole heading line, as in the Web office-reading parser.
+  final match = _categoryMarker.firstMatch(text);
+  return match != null && match.end == text.length;
+}
+
 bool _isAlternativeBoundary(Element element, String kind) {
   if (element.localName != 'p') return false;
   final text = _textOf(element.outerHtml);
@@ -187,10 +211,12 @@ bool _isAlternativeBoundary(Element element, String kind) {
   // psalm alternative. Preserve explicit "Або:" and <hr> alternatives.
   return _alternativeMarker.hasMatch(text) ||
       _instructionMarker.hasMatch(text) ||
-      (kind != 'psalm' &&
-          _categoryMarker.hasMatch(
-            kind == 'hymn' ? _firstLineText(element) : text,
-          ));
+      (kind == 'office-reading'
+          ? _isReadingCategoryHeading(_firstLineText(element))
+          : kind != 'psalm' &&
+                _categoryMarker.hasMatch(
+                  kind == 'hymn' ? _firstLineText(element) : text,
+                ));
 }
 
 List<_RawAlternative> _splitAtRules(DocumentFragment root, String kind) {
@@ -386,8 +412,11 @@ List<String> _paragraphTexts(String html) {
       .toList();
 }
 
-String _categoryTitle(List<String> paragraphs) {
+String _categoryTitle(List<String> paragraphs, String kind) {
   for (final paragraph in paragraphs.take(3)) {
+    if (kind == 'office-reading' && !_isReadingCategoryHeading(paragraph)) {
+      continue;
+    }
     final match = _categoryMarker.firstMatch(paragraph);
     if (match != null) {
       return _shorten(match.group(0)!.replaceFirst(RegExp(r'\s*:\s*$'), ''));
@@ -436,6 +465,21 @@ String _spaceBookAndNumber(String text) => text.replaceAllMapped(
   RegExp(r'([а-яёіўА-ЯЁІЎ.])(\d)'),
   (match) => '${match.group(1)} ${match.group(2)}',
 );
+
+// The printed «Пра законніцу: Пс … / Н. … / К. …» block is a
+// responsory variant, not another reading. Keep the Web predicate's limits.
+bool _isResponsoryVariant(String html) {
+  final paragraphs = _paragraphTexts(html);
+  if (paragraphs.isEmpty || paragraphs.length > 6) return false;
+  final text = paragraphs.join(' ');
+  return RegExp(
+        r'^Пра\s+[^:]{1,60}:\s*\p{L}{1,6}\s*\d',
+        unicode: true,
+      ).hasMatch(paragraphs.first) &&
+      RegExp(r'(?:^|\s)Н\.\s').hasMatch(text) &&
+      RegExp(r'(?:^|\s)К\.\s').hasMatch(text) &&
+      text.length < 700;
+}
 
 bool _isReadingReference(String html) {
   final paragraphs = _paragraphTexts(html);
@@ -504,7 +548,7 @@ String _readingTitle(List<String> paragraphs, {bool office = false}) {
 String _optionTitle(_RawAlternative option, int index, String kind) {
   if (option.explicitTitle.isNotEmpty) return _shorten(option.explicitTitle);
   final paragraphs = _paragraphTexts(option.html);
-  final category = _categoryTitle(paragraphs);
+  final category = _categoryTitle(paragraphs, kind);
   if (kind == 'office-reading') {
     // The reading itself names the choice; the category («Пра святога, які жыў у сужэнстве») only qualifies it.
     final reading = _readingTitle(paragraphs, office: true);
