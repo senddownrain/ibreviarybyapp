@@ -1,0 +1,7 @@
+{
+  "browser": "Google Chrome 157.0.8103.38",
+  "headless": true,
+  "sandboxDisablingFlags": [],
+  "debugPort": 9222,
+  "appUrl": "http://localhost:5240/"
+}
