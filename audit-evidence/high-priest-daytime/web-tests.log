@@ -1,0 +1,14 @@
+✔ 28 May 2026 is the feast of Christ the Eternal High Priest in Pinsk (42.602313ms)
+✔ Belarusian supplied source contains three distinct daytime readings, antiphons and responses (0.533136ms)
+✔ High Priest feast uses supplied Proper, with weekday psalms and hymn for each hour (4.1324ms)
+✔ the canonical Proper is only overlaid on the High Priest feast, not other feasts (2.097106ms)
+✔ missing daytime collect of another movable feast inherits its own Lauds, not the weekday (0.524796ms)
+✔ dynamic solemnities keep their own missing-field semantics (no weekday psalter fallback) (0.383284ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 905.606042
