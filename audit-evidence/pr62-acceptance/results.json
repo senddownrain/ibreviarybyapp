@@ -1,0 +1,79 @@
+{
+  "tested_head": "d4aba29b7ab9b17a1034c48a5d2a3988d4baa05b",
+  "baseline_head": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+  "verdict": "BLOCKED",
+  "blocking_issue": "https://github.com/senddownrain/ibreviarybyapp/issues/66",
+  "full_suite": {
+    "passed": 1806,
+    "skipped": 9,
+    "failed": 8,
+    "exit_code": 1
+  },
+  "analysis": {
+    "errors": 0,
+    "warnings": 0,
+    "pre_existing_infos": 12,
+    "exit_code": 0
+  },
+  "migration_tests": {
+    "passed": 16
+  },
+  "failures": [
+    {
+      "file": "test/content_offline_test.dart",
+      "test": "corrections and app releases a new app bundle absorbs the patches it contains",
+      "reproduced_on_main": false,
+      "blocks_acceptance": true,
+      "pr_linkage": "unresolved"
+    },
+    {
+      "file": "test/discovery/p0_hints_screens_test.dart",
+      "test": "Readings date_navigation: three day arrows, once",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    },
+    {
+      "file": "test/hours_parity_test.dart",
+      "test": "Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    },
+    {
+      "file": "test/ordo_day_flow_test.dart",
+      "test": "Day → ORDO → Month → Day → back preserves month cursor",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    },
+    {
+      "file": "test/ordo_ux_test.dart",
+      "test": "day and month utility layout Brightness.dark 1.0",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    },
+    {
+      "file": "test/ordo_ux_test.dart",
+      "test": "day and month utility layout Brightness.dark 1.5",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    },
+    {
+      "file": "test/ordo_ux_test.dart",
+      "test": "day and month utility layout Brightness.light 1.0",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    },
+    {
+      "file": "test/ordo_ux_test.dart",
+      "test": "day and month utility layout Brightness.light 1.5",
+      "reproduced_on_main": true,
+      "blocks_acceptance": false,
+      "pr_linkage": "reproduced on clean baseline"
+    }
+  ]
+}
