@@ -12,7 +12,7 @@ import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test('Web ↔ Flutter: all 27 daytime fields, 2025–2035 × four dioceses, '
-      'original bundle and canonical content patch', () async {
+      'original bundle and minimal reference-only patch', () async {
     final directory = await Directory.systemTemp.createTemp('daytime-parity-');
     try {
       await HiveService.init(path: directory.path, loadBundle: true);

@@ -408,21 +408,18 @@ void main() {
         expect(remote.fetched.toSet(), {_id});
         expect((await updater.check()).kind, ContentCheckKind.current);
         for (final entry in _canonical.entries) {
-          expect(feast().data[entry.key], entry.value);
+          expect(feast().data[entry.key], before[entry.key] ?? '');
         }
         // Explicit markers also fix older resolvers (before this Dart change).
         final oldResolver = resolveDayAgainstPeriod(_day(after), _period())!;
         for (final h in [1, 2, 3]) {
           expect(daytimeHourField(oldResolver, h, 'Ps1'), 'weekday:$h:Ps1');
-          expect(
-            daytimeHourField(oldResolver, h, 'R'),
-            _canonical['sext${h}R'],
-          );
+          expect(daytimeHourField(oldResolver, h, 'R'), before['sext${h}R']);
         }
         await Hive.close();
         await open();
         for (final entry in _canonical.entries) {
-          expect(feast().data[entry.key], entry.value);
+          expect(feast().data[entry.key], before[entry.key] ?? '');
         }
         // A subsequent reviewed patch is the only content authority. No runtime
         // JSON overlay can mask it. Reuse a real supplied reading as the marker.
@@ -432,7 +429,7 @@ void main() {
         );
         await next.apply((await next.check()).plan!);
         expect(feast().field('sext2R'), _canonical['sext3R']);
-        expect(feast().field('sext1R'), _canonical['sext1R']);
+        expect(feast().field('sext1R'), before['sext1R']);
       },
     );
   });
