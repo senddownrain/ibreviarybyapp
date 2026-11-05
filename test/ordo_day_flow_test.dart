@@ -204,8 +204,12 @@ void main() {
       navigatorKey: production.rootNavigatorKey,
       routes: production.router.configuration.routes,
     );
-    addTearDown(router.dispose);
-    addTearDown(container.dispose);
+    addTearDown(() async {
+      // Remove metric observers and consumers before releasing their scope.
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+      container.dispose();
+    });
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -424,7 +428,7 @@ void main() {
   testWidgets('Day → ORDO → Month → Day → back preserves month cursor', (
     tester,
   ) async {
-    final (router, _) = await start(tester);
+    final (router, container) = await start(tester);
     await openOrdo(tester);
     expect(find.byType(LiturgicalMonthCalendar), findsNothing);
     expect(find.byKey(const Key('app-dock-full')), findsNothing);
@@ -450,6 +454,10 @@ void main() {
         )
         .position
         .pixels;
+    expect(
+      find.byKey(const Key('ordo-day-2026-11-02')).hitTestable(),
+      findsOneWidget,
+    );
     await tester.tap(find.byKey(const Key('ordo-day-2026-11-02')));
     await tester.pumpAndSettle();
     expect(
@@ -460,7 +468,8 @@ void main() {
           .substring(0, 10),
       '2026-11-02',
     );
-    router.pop();
+    expect(container.read(selectedDateProvider), DateTime(2026, 11, 2));
+    await tester.tap(find.byTooltip('Назад').last);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('ordo-day-2026-11-02')), findsOneWidget);
     expect(
@@ -478,7 +487,65 @@ void main() {
     router.pop();
     await tester.pumpAndSettle();
     expect(find.byType(LiturgicalMonthCalendar), findsNothing);
+    expect(find.byType(OrdoScreen), findsOneWidget);
+    await tester.tap(find.byTooltip('Назад').last);
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(container.read(selectedDateProvider), DateTime(2026, 11, 2));
+    expect(tester.takeException(), isNull);
   });
+
+  for (final brightness in Brightness.values) {
+    for (final scale in [1.0, 1.5]) {
+      testWidgets('month taps and Back $brightness $scale', (tester) async {
+        final (_, container) = await start(
+          tester,
+          selectedDate: DateTime(2026, 10, 31),
+          width: scale == 1.5 ? 320 : 390,
+          brightness: brightness,
+          scale: scale,
+        );
+        await openOrdo(tester);
+        await tapVisible(tester, find.byKey(const Key('ordo-open-month')));
+        await tester.tap(find.byKey(const Key('ordo-next-month')));
+        await tester.pumpAndSettle();
+        final first = find.byKey(const Key('ordo-day-2026-11-01'));
+        expect(first.hitTestable(), findsOneWidget);
+        await tester.tap(first);
+        await tester.pumpAndSettle();
+        expect(container.read(selectedDateProvider), DateTime(2026, 11, 1));
+        await tapVisible(tester, find.byKey(const Key('ordo-next-day')));
+        expect(container.read(selectedDateProvider), DateTime(2026, 11, 2));
+        await tapVisible(tester, find.byKey(const Key('ordo-previous-day')));
+        expect(container.read(selectedDateProvider), DateTime(2026, 11, 1));
+        await tester.tap(find.byTooltip('Назад').last);
+        await tester.pumpAndSettle();
+        expect(first.hitTestable(), findsOneWidget);
+
+        // Scroll and return from a later day to check a nonzero month cursor.
+        final later = find.byKey(const Key('ordo-day-2026-11-15'));
+        await Scrollable.ensureVisible(tester.element(later), alignment: .25);
+        await tester.pumpAndSettle();
+        final scroll = tester.state<ScrollableState>(
+          find.descendant(
+            of: find.byKey(const Key('ordo-month-list')),
+            matching: find.byType(Scrollable),
+          ),
+        );
+        final offset = scroll.position.pixels;
+        expect(offset, greaterThan(0));
+        expect(later.hitTestable(), findsOneWidget);
+        await tester.tap(later);
+        await tester.pumpAndSettle();
+        expect(container.read(selectedDateProvider), DateTime(2026, 11, 15));
+        await tester.binding.handlePopRoute();
+        await tester.pumpAndSettle();
+        expect(scroll.position.pixels, offset);
+        expect(later.hitTestable(), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
 
   testWidgets('ORDO actions preserve date, option and temporary diocese', (
     tester,

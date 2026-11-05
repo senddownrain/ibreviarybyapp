@@ -80,7 +80,10 @@ void main() {
         ...overrides,
       ],
     );
-    addTearDown(container.dispose);
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      container.dispose();
+    });
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -940,6 +943,25 @@ void main() {
     },
   );
 
+  testWidgets('browsing the current month starts at day 1', (tester) async {
+    // Follow the system month so this regression is exercised year-round.
+    final today = DateTime.now();
+    final date = DateTime(today.year, today.month - 1, 9);
+    await frame(tester, date, OrdoMonthScreen(initialDate: date));
+    await tester.tap(find.byKey(const Key('ordo-next-month')));
+    await tester.pumpAndSettle();
+    final iso = '${today.year}-${today.month.toString().padLeft(2, '0')}-01';
+    expect(find.byKey(Key('ordo-day-$iso')).hitTestable(), findsOneWidget);
+    final scroll = tester.state<ScrollableState>(
+      find.descendant(
+        of: find.byKey(const Key('ordo-month-list')),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    expect(scroll.position.pixels, 0);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final brightness in Brightness.values) {
     for (final scale in [1.0, 1.5]) {
       testWidgets('day and month utility layout $brightness $scale', (
@@ -987,6 +1009,40 @@ void main() {
         );
         await capture(tester, 'month-${brightness.name}-$scale');
         await tester.tap(find.byKey(const Key('ordo-next-month')));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('ordo-day-2026-11-01')).hitTestable(),
+          findsOneWidget,
+        );
+        await tester.tap(find.byKey(const Key('ordo-next-month')));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('ordo-day-2026-12-01')).hitTestable(),
+          findsOneWidget,
+        );
+        await tester.drag(
+          find.byKey(const Key('ordo-month-list')),
+          const Offset(0, -500),
+        );
+        await tester.pumpAndSettle();
+        final scroll = tester.state<ScrollableState>(
+          find.descendant(
+            of: find.byKey(const Key('ordo-month-list')),
+            matching: find.byType(Scrollable),
+          ),
+        );
+        expect(scroll.position.pixels, greaterThan(0));
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('ordo-day-2026-12-31')).hitTestable(),
+          400,
+          scrollable: find.byType(Scrollable),
+          maxScrolls: 30,
+        );
+        expect(
+          find.byKey(const Key('ordo-day-2026-12-31')).hitTestable(),
+          findsOneWidget,
+        );
+        await tester.tap(find.byKey(const Key('ordo-previous-month')));
         await tester.pumpAndSettle();
         expect(
           find.byKey(const Key('ordo-day-2026-11-01')).hitTestable(),

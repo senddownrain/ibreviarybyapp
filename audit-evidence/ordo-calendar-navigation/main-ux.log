@@ -1,0 +1,161 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/ordo_ux_test.dart
+00:00 +0: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 190 ms
+[ContentStore] prayers: 115 docs in 312 ms
+[ContentStore] invitatoriums: 4 docs in 699 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 715 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 694 ms
+[ContentStore] compendiumMeta: 1 docs in 625 ms
+[ContentStore] completoriums: 35 docs in 717 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 706 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 755 ms
+[ContentStore] compendium: 27 docs in 686 ms
+[ContentStore] songs: 447 docs in 741 ms
+[ContentStore] liturgicalTemplates: 16 docs in 880 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 887 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 976 ms
+[ContentStore] readings: 822 docs in 1198 ms
+[ContentStore] days: 736 docs in 1629 ms
+00:02 +0: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 1.0
+00:11 +1: calendar sheet keeps radio geometry, real colours and nested Office Brightness.dark 2.0
+00:12 +2: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 1.0
+00:14 +3: calendar sheet keeps radio geometry, real colours and nested Office Brightness.light 2.0
+00:16 +4: month/year jump browses independently, supports keyboard and calendar bounds
+00:20 +5: year list centres the browsed year after reopening
+00:22 +6: All Souls 2025 displays three Mass sets and Sunday Office once
+00:23 +7: All Souls 2031 displays three Mass sets and Sunday Office once
+00:24 +8: month/year dialog stays usable at 320px, text x2, Brightness.dark
+00:24 +9: month/year dialog stays usable at 320px, text x2, Brightness.light
+00:25 +10: selected alternative and competing memorials keep one heading and collapsed details
+00:27 +11: diocesan differences remain visible and identical readings appear once
+00:27 +12: selector Oct 7, 360.0, Brightness.dark, scale 1.0
+00:28 +13: selector Oct 7, 360.0, Brightness.dark, scale 1.5
+00:28 +14: selector Oct 7, 360.0, Brightness.light, scale 1.0
+00:28 +15: selector Oct 7, 360.0, Brightness.light, scale 1.5
+00:29 +16: selector Oct 7, 430.0, Brightness.dark, scale 1.0
+00:29 +17: selector Oct 7, 430.0, Brightness.dark, scale 1.5
+00:29 +18: selector Oct 7, 430.0, Brightness.light, scale 1.0
+00:29 +19: selector Oct 7, 430.0, Brightness.light, scale 1.5
+00:29 +20: selector Oct 9, 360.0, Brightness.dark, scale 1.0
+00:30 +21: selector Oct 9, 360.0, Brightness.dark, scale 1.5
+00:31 +22: selector Oct 9, 360.0, Brightness.light, scale 1.0
+00:32 +23: selector Oct 9, 360.0, Brightness.light, scale 1.5
+00:34 +24: selector Oct 9, 430.0, Brightness.dark, scale 1.0
+00:35 +25: selector Oct 9, 430.0, Brightness.dark, scale 1.5
+00:36 +26: selector Oct 9, 430.0, Brightness.light, scale 1.0
+00:37 +27: selector Oct 9, 430.0, Brightness.light, scale 1.5
+00:38 +28: selector keeps distinct diocesan rows of the same celebration
+00:39 +29: polish October 16 Hedwig keeps separated weekday and shared readings
+00:39 +30: polish calendar heading is 19sp and retains picker targets
+00:39 +31: ORDO October 7 keeps memorial data and both Office variants
+00:39 +32: month lists all days, crosses year and respects calendar bounds
+00:41 +33: day and month utility layout Brightness.dark 1.0
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _HitTestableWidgetFinder:<Found 0 widgets with key [<'ordo-day-2026-11-01'>] (considering
+only hit-testable widgets with a RenderBox): []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart:991:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart line 991
+The test description was:
+  day and month utility layout Brightness.dark 1.0
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:44 +33 -1: day and month utility layout Brightness.dark 1.0 [E]
+  Test failed. See exception logs above.
+  The test description was: day and month utility layout Brightness.dark 1.0
+  
+00:44 +33 -1: day and month utility layout Brightness.dark 1.5
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _HitTestableWidgetFinder:<Found 0 widgets with key [<'ordo-day-2026-11-01'>] (considering
+only hit-testable widgets with a RenderBox): []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart:991:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart line 991
+The test description was:
+  day and month utility layout Brightness.dark 1.5
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:47 +33 -2: day and month utility layout Brightness.dark 1.5 [E]
+  Test failed. See exception logs above.
+  The test description was: day and month utility layout Brightness.dark 1.5
+  
+00:47 +33 -2: day and month utility layout Brightness.light 1.0
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _HitTestableWidgetFinder:<Found 0 widgets with key [<'ordo-day-2026-11-01'>] (considering
+only hit-testable widgets with a RenderBox): []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart:991:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart line 991
+The test description was:
+  day and month utility layout Brightness.light 1.0
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:50 +33 -3: day and month utility layout Brightness.light 1.0 [E]
+  Test failed. See exception logs above.
+  The test description was: day and month utility layout Brightness.light 1.0
+  
+00:50 +33 -3: day and month utility layout Brightness.light 1.5
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _HitTestableWidgetFinder:<Found 0 widgets with key [<'ordo-day-2026-11-01'>] (considering
+only hit-testable widgets with a RenderBox): []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart:991:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///workspace/ibreviarybyapp/test/ordo_ux_test.dart line 991
+The test description was:
+  day and month utility layout Brightness.light 1.5
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:52 +33 -4: day and month utility layout Brightness.light 1.5 [E]
+  Test failed. See exception logs above.
+  The test description was: day and month utility layout Brightness.light 1.5
+  
+00:52 +33 -4: (tearDownAll)
+00:52 +33 -4: Some tests failed.
