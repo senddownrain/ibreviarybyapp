@@ -1,0 +1,48 @@
+{
+  "base_sha": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+  "tested_pr_sha": "14b19a74c23d8ffbba6e4250731d3f9777d613ec",
+  "pr_full_command": "flutter test --no-pub",
+  "pr_full_result": {
+    "passed": 1721,
+    "skipped": 9,
+    "failed": 1,
+    "exit_code": 1
+  },
+  "main_command": "flutter test --no-pub test/hours_parity_test.dart",
+  "main_result": {
+    "passed": 0,
+    "failed": 1,
+    "exit_code": 1
+  },
+  "failure": "hours_parity_test.dart:159, feast-christthehighpriest Office text hashes",
+  "failure_diagnostics_identical": true,
+  "failure_diagnostic_sha256": "29bb76aa06f8ff411b5ff0011449a79e27bf18b6f801ce1673116800ab400313",
+  "baseline_tracked_files_unchanged": true,
+  "matching_git_blobs": {
+    "test/hours_parity_test.dart": {
+      "pr": "eee814dda0b41cd29b032619341d27ba51c8af36",
+      "main": "eee814dda0b41cd29b032619341d27ba51c8af36"
+    },
+    "test/support/ordo_fixture.dart": {
+      "pr": "cacd0ed86e6e15be4778a91907728f03849c0766",
+      "main": "cacd0ed86e6e15be4778a91907728f03849c0766"
+    },
+    "test/fixtures/ordo_parity.json.gz": {
+      "pr": "0b35ed797dc0b677275e6c92ca6580d94f53fdea",
+      "main": "0b35ed797dc0b677275e6c92ca6580d94f53fdea"
+    },
+    "lib/services/liturgical_content_service.dart": {
+      "pr": "9af470401cb3e2034b063e8df26c04eecdf8b2ab",
+      "main": "9af470401cb3e2034b063e8df26c04eecdf8b2ab"
+    },
+    "lib/utils/liturgical_day_resolution.dart": {
+      "pr": "174c4b6ef2879aeac86c35b9eb5aca21480e97a6",
+      "main": "174c4b6ef2879aeac86c35b9eb5aca21480e97a6"
+    }
+  },
+  "pr_changed_lib_and_test_paths": [
+    "lib/screens/ordo_month_screen.dart",
+    "test/ordo_day_flow_test.dart",
+    "test/ordo_ux_test.dart"
+  ]
+}

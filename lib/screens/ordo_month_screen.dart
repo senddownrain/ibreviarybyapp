@@ -55,11 +55,9 @@ class _OrdoMonthScreenState extends ConsumerState<OrdoMonthScreen> {
     final today = DateUtils.dateOnly(DateTime.now());
     bool inMonth(DateTime date) =>
         date.year == _month.year && date.month == _month.month;
-    final target = inMonth(widget.initialDate)
-        ? widget.initialDate
-        : inMonth(today)
-        ? today
-        : null;
+    // Browsing another month starts at day 1, even in the current month.
+    // Only the date that opened this overview owns its scroll anchor.
+    final target = inMonth(widget.initialDate) ? widget.initialDate : null;
     final monthKey = '${_month.year}-${_month.month}';
     if (ready.hasValue && _scrolledMonth != monthKey) {
       _scrolledMonth = monthKey;

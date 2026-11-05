@@ -1,0 +1,148 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/ordo_day_flow_test.dart
+00:00 +0: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 59 ms
+[ContentStore] prayers: 115 docs in 134 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 303 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 316 ms
+[ContentStore] completoriums: 35 docs in 324 ms
+[ContentStore] invitatoriums: 4 docs in 325 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 318 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 319 ms
+[ContentStore] compendium: 27 docs in 271 ms
+[ContentStore] compendiumMeta: 1 docs in 274 ms
+[ContentStore] liturgicalTemplates: 16 docs in 489 ms
+[ContentStore] songs: 447 docs in 406 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 414 ms
+[ContentStore] readings: 822 docs in 627 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 622 ms
+[ContentStore] days: 736 docs in 923 ms
+00:01 +0: Rosary memorial has default weekday and assembled Marian Office
+00:01 +1: Office assemblies share memorial readings in ORDO order
+00:01 +2: Hours exposes both Office choices even with one celebration
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary--blessed-virgin-mary
+[data] CACHE HIT  hour laudes 07-10-our-lady-rosary
+00:14 +3: October 9 selector and ORDO keep the chosen memorial Office
+00:19 +4: Day → ORDO → Month → Day → back preserves month cursor
+
+Warning: A call to tap() with finder "Found 1 widget with key [<'ordo-day-2026-11-02'>]: [
+  InkWell-[<'ordo-day-2026-11-02'>],
+]" derived an Offset (Offset(180.0, -145.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+Indeed, Offset(180.0, -145.0) is outside the bounds of the root of the render tree, Size(360.0, 800.0).
+The finder corresponds to this RenderBox: RenderSemanticsAnnotations#8c8c1 relayoutBoundary=up21
+The hit test result at that offset is: HitTestResult(HitTestEntry<HitTestTarget>#35bcc(_ReusableRenderView#1b6a3), HitTestEntry<HitTestTarget>#e2dde(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2158:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1942:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1075:7)
+#3      main.<anonymous closure> (file:///workspace/ibreviarybyapp/test/ordo_day_flow_test.dart:453:18)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      Iterable.single (dart:core/iterable.dart:694:25)
+#1      WidgetController.widget (package:flutter_test/src/controller.dart:823:30)
+#2      main.<anonymous closure> (file:///workspace/ibreviarybyapp/test/ordo_day_flow_test.dart:457:12)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  Day → ORDO → Month → Day → back preserves month cursor
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:28 +4 -1: Day → ORDO → Month → Day → back preserves month cursor [E]
+  Test failed. See exception logs above.
+  The test description was: Day → ORDO → Month → Day → back preserves month cursor
+  
+  Bad state: Tried to read a provider from a ProviderContainer that was already disposed
+  package:riverpod/src/framework/container.dart 423:7          ProviderContainer.readProviderElement
+  package:riverpod/src/framework/provider_base.dart 105:26     ProviderBase.read
+  package:riverpod/src/framework/container.dart 241:21         ProviderContainer.read
+  package:flutter_riverpod/src/consumer.dart 620:59            ConsumerStatefulElement.read
+  package:mybrev_flutter/discovery/tour/tour_host.dart 182:39  _TourHostState._scheduleInvitation
+  package:mybrev_flutter/discovery/tour/tour_host.dart 161:7   _TourHostState.didChangeMetrics
+  package:flutter/src/widgets/binding.dart 860:16              WidgetsBinding.handleMetricsChanged
+  package:flutter_test/src/window.dart 194:24                  TestPlatformDispatcher._handleMetricsChanged
+  package:flutter_test/src/window.dart 1334:43                 TestDisplay.resetDevicePixelRatio
+  package:flutter_test/src/window.dart 1035:14                 TestFlutterView.resetDevicePixelRatio
+  package:flutter_test/src/window.dart 1271:5                  TestFlutterView.reset
+  
+00:29 +4 -1: ORDO actions preserve date, option and temporary diocese
+[data] CACHE HIT  readings 2026-10-07
+00:36 +5 -1: Readings keep the selected assembly identity and celebration plan
+[data] CACHE HIT  readings 2026-10-07
+00:38 +6 -1: An alternative celebration keeps its reading route context
+[data] CACHE HIT  readings 2026-10-06
+00:40 +7 -1: Hours date action updates the visible selected day
+00:42 +8 -1: ORDO reused route adopts its new date and source
+00:44 +9 -1: Hours calendar icon opens the day; arrows keep one route
+00:47 +10 -1: ORDO date-only calendar applies without closing and preserves shared dioceses
+00:49 +11 -1: ORDO dioceses persist through the shared settings and Month context
+[data] CACHE HIT  readings 2026-08-26
+00:52 +12 -1: ORDO last action clears Android bottom obstruction 24.0 at 200 percent text
+00:53 +13 -1: ORDO last action clears Android bottom obstruction 48.0 at 200 percent text
+00:54 +14 -1: Hours calendar search reaches the existing period and feast picker
+00:55 +15 -1: hours search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  hour laudes 06-12-sv-nicholas--pastors
+01:01 +16 -1: hours periods keep Ordinary II Tuesday navigation
+01:03 +17 -1: hours Christmas opens 2027-01-01 on its canonical day
+01:04 +18 -1: hours Christmas opens 2027-01-02 on its canonical day
+01:05 +19 -1: readings search opens impeded Nicholas texts and keeps search on Back
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2026-12-06
+[data] CACHE HIT  readings 2027-12-06
+[data] CACHE HIT  readings 2027-12-06
+01:08 +20 -1: readings periods keep Ordinary II Tuesday navigation
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-01-20
+01:12 +21 -1: readings Christmas opens 2027-01-01 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-01
+01:13 +22 -1: readings Christmas opens 2027-01-02 on its canonical day
+[data] CACHE HIT  readings 2026-12-26
+[data] CACHE HIT  readings 2027-01-02
+01:15 +23 -1: movable feast search opens its proper readings in the existing reader
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-04-05
+[data] CACHE HIT  readings 2026-04-05
+01:18 +24 -1: Grodno impeded in 2027 opens Grodno in 2028, preserving Settings
+01:19 +25 -1: Hours search confirms day readings before changing tabs
+[data] CACHE HIT  readings 2027-12-06
+01:20 +26 -1: /hora preserves encoded id and rejects an unavailable Office
+01:20 +27 -1: /hours/hora preserves encoded id and rejects an unavailable Office
+01:21 +28 -1: production route tree hides dock and hit-tests readings palette
+[data] CACHE HIT  readings 2026-10-07
+[data] CACHE HIT  readings 2026-10-08
+[data] CACHE HIT  readings 2026-10-07
+01:24 +29 -1: All Souls Sunday 2025 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2025-11-02
+01:25 +30 -1: All Souls Sunday 2031 keeps Mass and Office sources in day routes
+[data] CACHE HIT  readings 2031-11-02
+01:26 +31 -1: Period notes are collapsed and can be opened
+01:27 +32 -1: colour date picker returns date on TargetPlatform.android
+01:27 +33 -1: colour date picker returns date on TargetPlatform.iOS
+01:27 +34 -1: day and month fit 320px at text scale 1.0
+01:28 +35 -1: day and month fit 320px at text scale 1.3
+01:29 +36 -1: day and month fit 320px at text scale 1.5
+01:30 +37 -1: day and month fit 320px at text scale 2.0
+01:30 +38 -1: shared month: multiple dioceses, 320px, Brightness.dark, scale 1.5
+01:31 +39 -1: shared month: multiple dioceses, 320px, Brightness.dark, scale 2.0
+01:31 +40 -1: shared month: multiple dioceses, 320px, Brightness.light, scale 1.5
+01:31 +41 -1: shared month: multiple dioceses, 320px, Brightness.light, scale 2.0
+01:31 +42 -1: (tearDownAll)
+01:31 +42 -1: Some tests failed.
