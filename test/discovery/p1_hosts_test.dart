@@ -22,12 +22,9 @@ class _Settings extends SettingsNotifier {
   SettingsState build() => const SettingsState();
 
   @override
-  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) async =>
-      state = state.copyWith(psalmMarkerBreakMode: value);
-
-  @override
-  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) async =>
-      state = state.copyWith(psalmVerseLayout: value);
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
+    state = state.copyWith(psalmodyMode: value);
+  }
 }
 
 Widget _app(
@@ -236,48 +233,35 @@ void main() {
       ),
     );
 
-    testWidgets('appears in the panel; both chips stay independent', (
-      tester,
-    ) async {
-      final storage = MemoryDiscoveryStorage();
-      await tester.pumpWidget(_app(storage, panelHome()));
-      await tester.tap(find.byKey(const Key('open-hours-panel')));
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('discovery-hint-hours.psalm_layout')),
-        findsNothing,
-      );
-      await _wait(tester, 3);
-      expect(
-        find.text('Можна наладзіць перанос радкоў і размяшчэнне вершаў'),
-        findsOneWidget,
-      );
-      expect(find.text('Зразумела'), findsOneWidget);
-      expect(find.text('Не паказваць'), findsOneWidget);
+    testWidgets(
+      'appears at the shared mode control without changing selection',
+      (tester) async {
+        final storage = MemoryDiscoveryStorage();
+        await tester.pumpWidget(_app(storage, panelHome()));
+        await tester.tap(find.byKey(const Key('open-hours-panel')));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('discovery-hint-hours.psalm_layout')),
+          findsNothing,
+        );
+        await _wait(tester, 3);
+        expect(
+          find.text('Выберыце адзін з трох рэжымаў псальмодыі'),
+          findsOneWidget,
+        );
+        expect(find.text('Зразумела'), findsOneWidget);
+        expect(find.text('Не паказваць'), findsOneWidget);
 
-      bool selected(String key) =>
-          tester.widget<FilterChip>(find.byKey(Key(key))).selected;
-      // The hint changed neither chip.
-      expect(selected('text-scale-psalm-marker-break'), isFalse);
-      expect(selected('text-scale-psalm-aligned-left'), isFalse);
-
-      await tester.ensureVisible(
-        find.byKey(const Key('text-scale-psalm-marker-break')),
-      );
-      await tester.tap(find.byKey(const Key('text-scale-psalm-marker-break')));
-      await tester.pump();
-      expect(selected('text-scale-psalm-marker-break'), isTrue);
-      expect(selected('text-scale-psalm-aligned-left'), isFalse);
-      await tester.tap(find.byKey(const Key('text-scale-psalm-aligned-left')));
-      await tester.pump();
-      expect(selected('text-scale-psalm-marker-break'), isTrue);
-      expect(selected('text-scale-psalm-aligned-left'), isTrue);
-      await tester.tap(find.byKey(const Key('text-scale-psalm-marker-break')));
-      await tester.pump();
-      expect(selected('text-scale-psalm-marker-break'), isFalse);
-      expect(selected('text-scale-psalm-aligned-left'), isTrue);
-      await tester.pumpWidget(const SizedBox());
-    });
+        final mode = find.byKey(const Key('psalmody-mode-leftBreakIndent'));
+        final semantics = tester.widget<Semantics>(mode);
+        expect(semantics.properties.selected, isFalse);
+        await tester.ensureVisible(mode);
+        await tester.tap(mode);
+        await tester.pump();
+        expect(tester.widget<Semantics>(mode).properties.selected, isTrue);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
 
     testWidgets('«Зразумела» closes it and it does not return', (tester) async {
       final storage = MemoryDiscoveryStorage();

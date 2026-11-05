@@ -781,7 +781,7 @@ class LiturgicalContentService {
           key: 'office-for-dead',
           source: LiturgicalOptionSource.officeForDead,
           title: dead.feastName ?? dead.title ?? 'Афіцый за памерлых',
-          subtitle: 'Памінальны афіцый',
+          subtitle: 'Афіцый за памерлых',
           day: dead,
           templates: [
             DayTemplate(id: dead.id, label: 'Афіцый за памерлых', day: dead),

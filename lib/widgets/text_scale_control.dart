@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_hint_host.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
-import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -231,55 +231,10 @@ class _TextScalePanel extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          FilterChip(
-                            key: const Key('text-scale-psalm-marker-break'),
-                            label: const Text('Перанос * †'),
-                            tooltip: 'Перанос пасля * і †',
-                            showCheckmark: false,
-                            selected:
-                                settings.psalmMarkerBreakMode ==
-                                PsalmMarkerBreakMode.breakAfterMarker,
-                            selectedColor: accent.withValues(alpha: 0.18),
-                            side: BorderSide(
-                              color:
-                                  settings.psalmMarkerBreakMode ==
-                                      PsalmMarkerBreakMode.breakAfterMarker
-                                  ? accent
-                                  : cs.outlineVariant,
-                            ),
-                            onSelected: (value) =>
-                                notifier.setPsalmMarkerBreakMode(
-                                  value
-                                      ? PsalmMarkerBreakMode.breakAfterMarker
-                                      : PsalmMarkerBreakMode.inline,
-                                ),
-                          ),
-                          FilterChip(
-                            key: const Key('text-scale-psalm-aligned-left'),
-                            label: const Text('Па левым краі'),
-                            showCheckmark: false,
-                            selected:
-                                settings.psalmVerseLayout ==
-                                PsalmVerseLayout.alignedLeft,
-                            selectedColor: accent.withValues(alpha: 0.18),
-                            side: BorderSide(
-                              color:
-                                  settings.psalmVerseLayout ==
-                                      PsalmVerseLayout.alignedLeft
-                                  ? accent
-                                  : cs.outlineVariant,
-                            ),
-                            onSelected: (value) => notifier.setPsalmVerseLayout(
-                              value
-                                  ? PsalmVerseLayout.alignedLeft
-                                  : PsalmVerseLayout.alternatingIndent,
-                            ),
-                          ),
-                        ],
+                      PsalmodyModeSelector(
+                        key: const Key('text-scale-psalmody-modes'),
+                        value: settings.psalmodyMode,
+                        onChanged: notifier.setPsalmodyMode,
                       ),
                       const HintInlineSlot(),
                     ],

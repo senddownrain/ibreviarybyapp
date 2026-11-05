@@ -935,7 +935,7 @@ class _DayDetail extends ConsumerWidget {
               ),
             if ((officeSelection.selected?.templates.length ?? 0) > 1)
               _NoteGroup(
-                label: 'Даступныя варыянты',
+                label: 'Тэксты Літургіі гадзінаў апрача ўласных',
                 children: [
                   for (final template in officeSelection.selected!.templates)
                     Padding(
@@ -1469,7 +1469,7 @@ Future<void> _openHours(
   if (option != null && option.templates.length > 1) {
     selectedDayId = await showReaderChoiceSheet<String>(
       context: context,
-      title: 'Варыянт літургіі гадзінаў',
+      title: 'Тэксты Літургіі гадзінаў апрача ўласных',
       selectedValue: selectedDayId ?? option.dayId,
       choices: [
         for (final template in option.templates)

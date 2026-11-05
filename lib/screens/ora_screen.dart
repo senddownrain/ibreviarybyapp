@@ -383,8 +383,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final settings = ref.watch(settingsProvider);
     return PsalmodyScope(
       controller: _psalmodyController,
-      verseLayout: settings.psalmVerseLayout,
-      markerBreakMode: settings.psalmMarkerBreakMode,
+      mode: settings.psalmodyMode,
       child: ReadingScaffold(
         builder: (context, textStyle) => ReaderScaffold(
           seasonColor: seasonColor,

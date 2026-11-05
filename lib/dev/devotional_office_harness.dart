@@ -25,11 +25,8 @@ class DevotionalSmokeSettings extends SettingsNotifier {
   void setFontFamily(String family) =>
       state = state.copyWith(fontFamily: normalizeReaderFontFamily(family));
   @override
-  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) async =>
-      state = state.copyWith(psalmVerseLayout: value);
-  @override
-  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) async =>
-      state = state.copyWith(psalmMarkerBreakMode: value);
+  Future<void> setPsalmodyMode(PsalmodyMode value) async =>
+      state = state.copyWith(psalmodyMode: value);
   @override
   Future<void> toggleFavorite(String id) async => state = state.copyWith(
     favoriteIds: state.favoriteIds.contains(id)

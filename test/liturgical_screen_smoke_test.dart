@@ -29,10 +29,12 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
 
 double _fontSize = 16;
+PsalmodyMode _mode = PsalmodyMode.leftBreak;
 
 class _SmokeSettings extends SettingsNotifier {
   @override
-  SettingsState build() => SettingsState(fontSize: _fontSize);
+  SettingsState build() =>
+      SettingsState(fontSize: _fontSize, psalmodyMode: _mode);
 
   // This UI fixture does not open SettingsNotifier's private Hive box. Keep
   // slider changes in memory; persistence has its own real-I/O tests.
@@ -42,13 +44,8 @@ class _SmokeSettings extends SettingsNotifier {
   }
 
   @override
-  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) async {
-    state = state.copyWith(psalmVerseLayout: value);
-  }
-
-  @override
-  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) async {
-    state = state.copyWith(psalmMarkerBreakMode: value);
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
+    state = state.copyWith(psalmodyMode: value);
   }
 }
 
@@ -202,6 +199,72 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  for (final hour in ['laudes', 'vespers', 'lectionis', 'completorium']) {
+    for (final mode in PsalmodyMode.values) {
+      testWidgets(
+        '$hour renders ${mode.name} and keeps it when changing modes',
+        (tester) async {
+          _fontSize = 16;
+          _mode = mode;
+          final container = ProviderContainer(
+            overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+          );
+          await tester.pumpWidget(
+            UncontrolledProviderScope(
+              container: container,
+              child: MaterialApp(
+                home: OraScreen(dayId: 'smoke', oraType: hour, date: date),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(find.byType(PsalmChoirHtml), findsWidgets);
+          void verify(PsalmodyMode expected) {
+            for (final element in find.byType(PsalmChoirHtml).evaluate()) {
+              expect(PsalmodyScope.maybeOf(element)!.mode, expected);
+              final html = tester.widget<Html>(
+                find.descendant(
+                  of: find.byWidget(element.widget),
+                  matching: find.byType(Html),
+                ),
+              );
+              final strophes = parseFragment(
+                html.data!,
+              ).querySelectorAll('.psalm-strophe');
+              expect(strophes, isNotEmpty);
+              for (final strophe in strophes) {
+                if (expected == PsalmodyMode.alternatingStanzas) {
+                  expect(strophe.querySelector('br, .psalm-line'), isNull);
+                } else {
+                  expect(strophe.querySelector('.psalm-line'), isNotNull);
+                }
+              }
+            }
+          }
+
+          verify(mode);
+          final before = tester.state(find.byType(OraScreen));
+          for (final next in PsalmodyMode.values) {
+            await container
+                .read(settingsProvider.notifier)
+                .setPsalmodyMode(next);
+            await tester.pumpAndSettle();
+            verify(next);
+            expect(tester.state(find.byType(OraScreen)), same(before));
+            expect(
+              tester.widget<OraScreen>(find.byType(OraScreen)).oraType,
+              hour,
+            );
+          }
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox());
+          container.dispose();
+          _mode = PsalmodyMode.leftBreak;
+        },
+      );
+    }
+  }
+
   testWidgets(
     'Office navigation preserves date and option and resets choir selection',
     (tester) async {
@@ -254,10 +317,7 @@ void main() {
         expect(html.data, contains('psalm-choir-muted'));
       }
       final settings = container.read(settingsProvider.notifier);
-      await settings.setPsalmVerseLayout(PsalmVerseLayout.alignedLeft);
-      await settings.setPsalmMarkerBreakMode(
-        PsalmMarkerBreakMode.breakAfterMarker,
-      );
+      await settings.setPsalmodyMode(PsalmodyMode.leftBreakIndent);
       await tester.pumpAndSettle();
       expect(firstPsalm().data, contains('psalm-continuation'));
       expect(firstPsalm().data, contains('psalm-choir-muted'));

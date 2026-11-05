@@ -1,0 +1,60 @@
+Format
+Formatted 395 files (0 changed) in 2.93 seconds.
+
+Final targeted (8 files)
+01:46 +132: All tests passed!
+
+OraScreen and HTML (2 files)
+02:10 +71: All tests passed!
+
+Full flutter test --no-pub
+74:33 +1784 ~9 -9: Some tests failed.
+07:00 +329 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text [E]
+07:45 +330 ~9 -2: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays [E]
+54:50 +907 ~9 -3: /workspace/ibreviarybyapp/test/ora_back_navigation_test.dart: (tearDownAll) [E]
+55:19 +915 ~9 -4: /workspace/ibreviarybyapp/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor [E]
+57:39 +1063 ~9 -5: /workspace/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0 [E]
+57:40 +1063 ~9 -6: /workspace/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5 [E]
+57:42 +1063 ~9 -7: /workspace/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.0 [E]
+57:43 +1063 ~9 -8: /workspace/ibreviarybyapp/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.5 [E]
+72:07 +1539 ~9 -9: /workspace/ibreviarybyapp/test/psalm_semantics_test.dart: (tearDownAll) [E]
+
+Clean main calendar baseline
+05:49 +75 -5: Some tests failed.
+01:28 +4 -1: /workspace/ibreviarybyapp-baseline/test/ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor [E]
+05:35 +75 -2: /workspace/ibreviarybyapp-baseline/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0 [E]
+05:42 +75 -3: /workspace/ibreviarybyapp-baseline/test/ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5 [E]
+05:46 +75 -4: /workspace/ibreviarybyapp-baseline/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.0 [E]
+05:49 +75 -5: /workspace/ibreviarybyapp-baseline/test/ordo_ux_test.dart: day and month utility layout Brightness.light 1.5 [E]
+
+Final flutter analyze --no-pub
+Analyzing ibreviarybyapp...
+
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:17:5 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:25:5 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:46:5 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:62:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:67:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:124:5 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:149:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:151:13 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:153:13 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:160:10 • prefer_interpolation_to_compose_strings
+   info • Use an initializing formal to assign a parameter to a field • test/analytics/consent_mock_test.dart:45:8 • prefer_initializing_formals
+   info • Unnecessary use of string interpolation • test/reading_choices_test.dart:57:11 • unnecessary_string_interpolations
+
+12 issues found. (ran in 20.9s)
+
+Platform availability
+    • Flutter version 3.41.4 on channel stable at /workspace/toolchains/flutter
+    • Dart version 3.11.1
+    ✗ Unable to locate Android SDK.
+      On first launch it will assist you in installing the Android SDK components.
+      If the Android SDK has been installed to a custom location, please use
+[✓] Chrome - develop for the web [278ms]
+    • Chrome (web)    • chrome • web-javascript • Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)
+
+Follow-up I/O regression run
+08:07 +49 -2: Some tests failed.
+04:16 +23 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: versions a removed document disappears; a new one appears [E]
+07:16 +44 -2: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left [E]

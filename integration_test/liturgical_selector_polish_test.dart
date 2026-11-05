@@ -85,12 +85,12 @@ void main() {
             .contentForDate(date)
             .options
             .firstWhere((option) => option.title.contains('Ядвіг'));
-      final dayId = hedwig.dayId!;
+        final dayId = hedwig.dayId!;
         container
             .read(liturgicalNavigationControllerProvider)
             .openDate(date, dayId: hedwig.dayId);
         router.go(
-        '/hours/ordo?date=2026-10-16&dayId=${Uri.encodeQueryComponent(dayId)}',
+          '/hours/ordo?date=2026-10-16&dayId=${Uri.encodeQueryComponent(dayId)}',
         );
         await waitFor(find.byKey(const Key('ordo-selected-celebration')));
         expect(

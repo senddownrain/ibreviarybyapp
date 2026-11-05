@@ -422,7 +422,10 @@ void main() {
       await tester.pumpWidget(app(storage));
       await wait(tester);
       expect(find.byKey(_hint), findsOneWidget);
-      expect(find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'), findsOneWidget);
+      expect(
+        find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'),
+        findsOneWidget,
+      );
       // One suggestion, not a carousel.
       expect(find.byKey(const Key('discovery-hint-card')), findsOneWidget);
       await tester.tap(find.byKey(const Key('discovery-hint-show')));
@@ -467,7 +470,10 @@ void main() {
       expect(state.record('discover.songbook').dismissed, isTrue);
       await tester.pumpWidget(app(storage));
       await wait(tester, 6);
-      expect(find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'), findsNothing);
+      expect(
+        find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'),
+        findsNothing,
+      );
       await tester.pumpWidget(const SizedBox());
     });
 
@@ -480,7 +486,10 @@ void main() {
         ),
       );
       await wait(tester);
-      expect(find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'), findsNothing);
+      expect(
+        find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'),
+        findsNothing,
+      );
       await tester.pumpWidget(const SizedBox());
     });
 
@@ -491,7 +500,10 @@ void main() {
       ]) {
         await tester.pumpWidget(app(MemoryDiscoveryStorage(), songs: songs));
         await wait(tester);
-        expect(find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'), findsNothing);
+        expect(
+          find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'),
+          findsNothing,
+        );
         await tester.pumpWidget(const SizedBox());
       }
     });

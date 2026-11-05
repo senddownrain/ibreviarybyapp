@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parseFragment;
 
@@ -385,8 +387,9 @@ String psalmPlainText(String html) {
 String preparePsalmChoirHtml(
   String html, {
   int? selectedChoir,
-  bool breakAfterMarker = false,
+  PsalmodyMode mode = PsalmodyMode.leftBreak,
 }) {
+  final breakAfterMarker = mode != PsalmodyMode.alternatingStanzas;
   return html.replaceAllMapped(_paragraphPattern, (match) {
     final attributes = match.group(1) ?? '';
     final content = match.group(2) ?? '';
@@ -411,7 +414,15 @@ String preparePsalmChoirHtml(
             : 1);
     final mutedClass = selectedChoir == choir ? ' psalm-choir-muted' : '';
 
-    final pieces = parseFragment(content).nodes.expand(_choirPieces);
+    final fragment = parseFragment(content);
+    if (mode == PsalmodyMode.alternatingStanzas) {
+      // Preserve strophes, words and inline ancestors, but remove every source
+      // line break inside this strophe (including nested formatting).
+      for (final br in fragment.querySelectorAll('br')) {
+        br.replaceWith(dom.Text(' '));
+      }
+    }
+    final pieces = fragment.nodes.expand(_choirPieces);
     final rendered = StringBuffer();
     final segments = <String>[];
     final linked = StringBuffer();
@@ -486,9 +497,7 @@ Iterable<({String html, bool isMarker})> _choirPieces(dom.Node node) sync* {
   final closing = outer.substring(closeStart);
   for (final child in node.nodes) {
     for (final piece in _choirPieces(child)) {
-      yield piece.isMarker
-          ? piece
-          : (html: '$opening${piece.html}$closing', isMarker: false);
+      yield (html: '$opening${piece.html}$closing', isMarker: piece.isMarker);
     }
   }
 }

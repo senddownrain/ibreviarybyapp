@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/providers/connectivity_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -29,6 +30,12 @@ void main() {
     directory = await Directory.systemTemp.createTemp('psalm-a11y-');
     await HiveService.init(path: directory.path, loadBundle: true);
     await HiveService.content.ensureLoaded(kLiturgicalCollections);
+    // Complete startup migration on the real async clock. A Hive write begun
+    // inside testWidgets' FakeAsync cannot finish during real-I/O teardown.
+    final settings = ProviderContainer();
+    settings.read(settingsProvider);
+    await Hive.box('settings').flush();
+    settings.dispose();
   });
   tearDownAll(() async {
     await HiveService.content.idle();
