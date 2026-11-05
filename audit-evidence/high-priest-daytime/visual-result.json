@@ -1,0 +1,107 @@
+{
+  "browser": "157.0.8103.38",
+  "url": "http://localhost:5240/",
+  "source": "unchanged offline bundle; production router and OraScreen; no Firebase initialization",
+  "engineResources": "same local Flutter SDK; Roboto fallback supplied locally",
+  "states": [
+    {
+      "hour": "terz",
+      "reference": "Гбр 7, 26-27",
+      "theme": "light",
+      "font": "default",
+      "width": 390,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "terz",
+      "reference": "Гбр 7, 26-27",
+      "theme": "light",
+      "font": "maximum reader size",
+      "width": 320,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "terz",
+      "reference": "Гбр 7, 26-27",
+      "theme": "dark",
+      "font": "default",
+      "width": 390,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "terz",
+      "reference": "Гбр 7, 26-27",
+      "theme": "dark",
+      "font": "maximum reader size",
+      "width": 320,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "sext",
+      "reference": "1 П 2, 4-5",
+      "theme": "light",
+      "font": "default",
+      "width": 390,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "sext",
+      "reference": "1 П 2, 4-5",
+      "theme": "light",
+      "font": "maximum reader size",
+      "width": 320,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "sext",
+      "reference": "1 П 2, 4-5",
+      "theme": "dark",
+      "font": "default",
+      "width": 390,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "sext",
+      "reference": "1 П 2, 4-5",
+      "theme": "dark",
+      "font": "maximum reader size",
+      "width": 320,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "none",
+      "reference": "1 П 2, 9-10",
+      "theme": "light",
+      "font": "default",
+      "width": 390,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "none",
+      "reference": "1 П 2, 9-10",
+      "theme": "light",
+      "font": "maximum reader size",
+      "width": 320,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "none",
+      "reference": "1 П 2, 9-10",
+      "theme": "dark",
+      "font": "default",
+      "width": 390,
+      "scroll": "reading reached"
+    },
+    {
+      "hour": "none",
+      "reference": "1 П 2, 9-10",
+      "theme": "dark",
+      "font": "maximum reader size",
+      "width": 320,
+      "scroll": "reading reached"
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "nativeSmoke": "required before mobile release"
+}

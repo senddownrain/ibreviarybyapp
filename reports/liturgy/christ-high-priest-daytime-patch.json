@@ -1,0 +1,63 @@
+{
+  "mode": "OFFLINE REVIEW ONLY — NOT PUBLISHED",
+  "input": "shipped-bundle; live IDs and hashes must be verified before writing",
+  "webCommit": "ee369ef2402da99148de88b92e2c48496b709c9e",
+  "sourcePath": "src/data/liturgical/christ-high-priest-daytime-by.json",
+  "sourceSha256": "a210e791f69642e1f4b9d8291f8e11cb69f2c0313f55215f2ab8e286c0dbb8fc",
+  "strategy": "Only missing daytime hymn/psalm references. Preserve all Proper fields and full Lauds conclusions byte-for-byte; refuse unexpected source data.",
+  "collection": "days",
+  "updates": [
+    {
+      "id": "feast-christthehighpriest",
+      "preconditionHash": "c62263e79af628b2",
+      "resultHash": "82cc1163da5f1e12",
+      "set": {
+        "sext1Hymn": "from-day",
+        "sext1Ps1": "from-day",
+        "sext1Ps2": "from-day",
+        "sext1Ps3": "from-day",
+        "sext2Hymn": "from-day",
+        "sext2Ps1": "from-day",
+        "sext2Ps2": "from-day",
+        "sext2Ps3": "from-day",
+        "sext3Hymn": "from-day",
+        "sext3Ps1": "from-day",
+        "sext3Ps2": "from-day",
+        "sext3Ps3": "from-day"
+      },
+      "preservedFields": [
+        "sext1Ant1",
+        "sext1Ant2",
+        "sext1Ant3",
+        "sext1R",
+        "sext1Pr",
+        "sext2Ant1",
+        "sext2Ant2",
+        "sext2Ant3",
+        "sext2R",
+        "sext2Pr",
+        "sext3Ant1",
+        "sext3Ant2",
+        "sext3Ant3",
+        "sext3R",
+        "sext3Pr"
+      ],
+      "changedFields": [
+        "sext1Hymn",
+        "sext1Ps1",
+        "sext1Ps2",
+        "sext1Ps3",
+        "sext2Hymn",
+        "sext2Ps1",
+        "sext2Ps2",
+        "sext2Ps3",
+        "sext3Hymn",
+        "sext3Ps1",
+        "sext3Ps2",
+        "sext3Ps3"
+      ],
+      "storedBytes": 53042
+    }
+  ],
+  "publication": "After explicit approval: compare live IDs/preconditions, field-only transaction update; content:manifest dry-run must say SAFE CONTENT PATCH before separate publication approval."
+}

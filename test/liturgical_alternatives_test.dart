@@ -22,6 +22,33 @@ void main() {
       expect(headings, hasLength(2));
     });
 
+    test('office category is a whole heading line, never quoted prose', () {
+      for (final prose in [
+        'Пра гэта сведчыць нам і Дух Святы, бо сказана: «Вось запавет».',
+        'Пра гэты келіх казалі мучанікі: «Келіх збаўлення ўзніму».',
+        'Пра такія ганенні кажа Апостал: «Усе пераследаваныя будуць».',
+      ]) {
+        final options = getLiturgicalAlternatives(
+          '<p>Казанне св. Аўгустына</p><p>$prose</p><p>Заканчэнне і рэспансорый.</p>',
+          kind: 'office-reading',
+        );
+        expect(options, hasLength(1));
+        expect(options.single.title, 'Казанне св. Аўгустына');
+        expect(options.single.html, contains(prose));
+      }
+      for (final boundary in [
+        '<p><span style="color:red">Пра прэзбітэра:</span></p>',
+        '<p>Пра прэзбітэра:<br>Кніга Рут 1, 1-5</p>',
+      ]) {
+        final options = getLiturgicalAlternatives(
+          '<p>Кніга Зыходу 1, 1-5</p><p>Тэкст адзін.</p>$boundary<p>Тэкст два.</p>',
+          kind: 'office-reading',
+        );
+        expect(options, hasLength(2), reason: boundary);
+        expect(options.last.html, contains('Тэкст два.'));
+      }
+    });
+
     test('splits legacy hr-delimited alternatives and derives titles', () {
       final options = getLiturgicalAlternatives(
         '<p><span style="color:red">Пра біскупа:</span></p>'

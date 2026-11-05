@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:hive/hive.dart';
 import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/content/content_bundle.dart';
@@ -69,6 +70,140 @@ void main() {
         : (doc['_seasonalVariants'] as Map)[season] as Map;
     return source[name] as String;
   }
+
+  final palmSunday = File(
+    'test/fixtures/office-readings/palm-sunday-r1.html',
+  ).readAsStringSync();
+
+  test(
+    'Web #187 Palm Sunday: raw and reader HTML preserve the complete R1',
+    () {
+      expect(
+        palmSunday,
+        isNot(matches(RegExp(r'<hr\b', caseSensitive: false))),
+      );
+      final stripped = stripLeadingReadingHeading(palmSunday, 'Першае чытанне');
+      for (final html in [
+        palmSunday,
+        stripped,
+        formatLiturgicalHtml(stripped),
+      ]) {
+        final choices = getReadingChoices(html);
+        expect(choices.notes, isEmpty);
+        expect(choices.options, hasLength(1));
+        expect(choices.options.single.title, 'Пасланне да Габрэяў 10, 1-18');
+        expect(_words(choices.options.single.html), _words(html));
+        expect(
+          choices.options.single.html,
+          contains('Нашае асвячэнне праз ахвяру Хрыста'),
+        );
+        expect(
+          choices.options.single.html,
+          contains('Пра гэта сведчыць нам і Дух Святы'),
+        );
+        expect(
+          choices.options.single.html,
+          contains('РЭСПАНСОРЫЙ пар. Гбр 10, 5-7. 4'),
+        );
+        expect(
+          _plain(choices.options.single.html),
+          endsWith('Вось іду, каб выканаць волю Тваю, Божа.'),
+        );
+      }
+    },
+  );
+
+  test('martyr-one (all seasons) and St Sebastian keep their entire R2', () {
+    final sebastian = propers.entries.singleWhere(
+      (e) => e.key.contains('sebastian'),
+    );
+    final readings = {
+      'martyr-one': field('martyr-one', 'officeOfReadingsR2'),
+      for (final season in _seasons)
+        'martyr-one:$season': field('martyr-one', 'officeOfReadingsR2', season),
+      sebastian.key: sebastian.value['officeOfReadingsR2'] as String,
+    };
+    for (final entry in readings.entries) {
+      expect(
+        entry.value,
+        contains(
+          entry.key.contains('sebastian')
+              ? 'Пра такія ганенні кажа Апостал:'
+              : 'Пра гэты келіх казалі мучанікі:',
+        ),
+      );
+      final choices = getReadingChoices(entry.value);
+      expect(choices.notes, isEmpty, reason: entry.key);
+      expect(choices.options, hasLength(1), reason: entry.key);
+      expect(
+        _words(choices.options.single.html),
+        _words(entry.value),
+        reason: entry.key,
+      );
+    }
+  });
+
+  test(
+    'Office for the Dead retains three full readings with shared content',
+    () {
+      final html = field('office-for-dead', 'officeOfReadingsR1');
+      final choices = getReadingChoices(html);
+      expect(choices.notes, isEmpty);
+      expect(choices.options.map((o) => o.title), [
+        '1 Кар 15, 12–34',
+        '1 Кар 15, 35–57',
+        '2 Кар 4, 16 — 5, 10',
+      ]);
+      final root = parseFragment(html);
+      final blocks = root.querySelectorAll('[data-alternative-title]');
+      final suffixes = root.querySelectorAll('[data-alternative-suffix]');
+      final bodies = blocks.map((b) => b.innerHtml).toList();
+      final suffix = suffixes.map((b) => b.innerHtml).join(' ');
+      for (final block in [...blocks, ...suffixes]) {
+        block.remove();
+      }
+      expect(choices.options, hasLength(blocks.length));
+      for (var i = 0; i < blocks.length; i++) {
+        expect(
+          _words(choices.options[i].html),
+          _words('${root.outerHtml} ${bodies[i]} $suffix'),
+        );
+      }
+    },
+  );
+
+  test(
+    'religious R1: a responsory variant is kept with its reading in all seasons',
+    () {
+      for (final season in [null, ..._seasons]) {
+        final html = field('religious', 'officeOfReadingsR1', season);
+        final choices = getReadingChoices(html);
+        expect(choices.notes, isEmpty);
+        expect(choices.options, hasLength(1), reason: '$season');
+        expect(
+          _words(choices.options.single.html),
+          _words(html),
+          reason: '$season',
+        );
+        expect(
+          choices.options.single.title,
+          contains(
+            season == null ? 'Філіпянаў 3, 7 – 4, 1. 4-9' : 'Эфесцаў 4, 1-24',
+          ),
+        );
+        expect(choices.options.single.html, contains('Пра закон'));
+      }
+      const realReadings =
+          '<p>Пасланне да Рымлянаў 12, 1-21</p><p>Тэкст адзін</p>'
+          '<hr><p>Пасланне да Эфесцаў 5, 21-32</p><p>Тэкст два</p>';
+      expect(getReadingChoices(realReadings).options, hasLength(2));
+      // This rule is specific to Office readings.
+      expect(
+        getLiturgicalAlternatives(field('religious', 'officeOfReadingsR1')),
+        hasLength(2),
+      );
+    },
+  );
 
   group('choices equal the volumes', () {
     test(
@@ -466,6 +601,73 @@ void main() {
       ordinary = field('holy-women', 'officeOfReadingsR2');
       store = ReadingChoiceStore();
     });
+
+    testWidgets('Palm Sunday renders all R1 without a false picker', (
+      tester,
+    ) async {
+      final html = stripLeadingReadingHeading(palmSunday, 'Першае чытанне');
+      await pump(
+        tester,
+        html,
+        slot('2026-03-29|feast-palmsunday|pinsk', 'officeOfReadingsR1'),
+      );
+      expect(find.byKey(const Key('alternative-picker-trigger')), findsNothing);
+      expect(find.byKey(const Key('reading-reference-note-0')), findsNothing);
+      final rendered = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((t) => t.data ?? '')
+          .join(' ');
+      expect(_words(rendered), _words(_plain(html)));
+      expect(rendered, contains('Пра гэта сведчыць нам і Дух Святы'));
+      expect(rendered, contains('РЭСПАНСОРЫЙ'));
+      expect(rendered, endsWith('Вось іду, каб выканаць волю Тваю, Божа.'));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'Palm Sunday: HTML renderer preserves all words and reaches the ending',
+      (tester) async {
+        final html = stripLeadingReadingHeading(palmSunday, 'Першае чытанне');
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: AlternativeText(
+                  text: html,
+                  kind: 'office-reading',
+                  contentBuilder: (_, value) =>
+                      Html(data: formatLiturgicalHtml(value)),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('alternative-picker-trigger')),
+          findsNothing,
+        );
+        final rendered = tester
+            .widgetList<RichText>(find.byType(RichText))
+            .map((t) => t.text.toPlainText(includePlaceholders: false))
+            .join(' ');
+        expect(_words(rendered), _words(html));
+        final ending = find
+            .textContaining(
+              'Вось іду, каб выканаць волю Тваю, Божа.',
+              findRichText: true,
+            )
+            .last;
+        await tester.ensureVisible(ending);
+        await tester.pumpAndSettle();
+        expect(ending.hitTestable(), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets(
       'D1-F1: pick B and see one complete B with its title; no other readings',

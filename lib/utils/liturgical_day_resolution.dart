@@ -124,6 +124,7 @@ LiturgicalDay? resolveDayAgainstPeriod(
   LiturgicalDay? day,
   LiturgicalDay? periodDay, {
   bool fillMissing = false,
+  bool fillMissingDaytime = false,
 }) {
   if (day == null && periodDay == null) return null;
   final dayData = day?.toMap() ?? <String, dynamic>{};
@@ -135,8 +136,20 @@ LiturgicalDay? resolveDayAgainstPeriod(
   for (final entry in dayData.entries) {
     if (isFromDayReference(entry.value)) fromFields.add(entry.key);
   }
-  final exclusions = fillMissing
-      ? _singleAntiphonExclusions(dayData)
+  // A stale inheritance list must not erase a supplied feast Proper. Remove
+  // it here as well as from the assembled result, which may be resolved again.
+  if (fillMissingDaytime) {
+    fromFields.removeWhere(
+      (field) =>
+          _isDaytimeField(field) &&
+          !_missing(dayData[field]) &&
+          !isFromDayReference(dayData[field]),
+    );
+  }
+  final exclusions = fillMissing || fillMissingDaytime
+      ? _singleAntiphonExclusions(
+          dayData,
+        ).where((field) => fillMissing || _isDaytimeField(field)).toSet()
       : const <String>{};
   final keys = <String>{...periodData.keys, ...dayData.keys, ...fromFields};
   for (final field in keys) {
@@ -148,9 +161,35 @@ LiturgicalDay? resolveDayAgainstPeriod(
       final fallback = _identityFields.contains(field) ? '' : periodData[field];
       resolved[field] = isFromDayReference(fallback) ? '' : fallback ?? '';
     } else if (!_identityFields.contains(field) &&
-        fillMissing &&
+        (fillMissing || (fillMissingDaytime && _isDaytimeField(field))) &&
         _missing(value)) {
-      final fallback = periodData[field];
+      // Sext/None can share a supplied Terce field. Leave that fallback to
+      // daytimeHourField instead of masking it with weekday content.
+      final shared = fillMissingDaytime && !fillMissing
+          ? RegExp(r'^sext[23](.+)$').firstMatch(field)
+          : null;
+      final fromTerce = shared == null
+          ? null
+          : dayData['sext1${shared.group(1)}'];
+      final useProperTerce =
+          !_missing(fromTerce) && !isFromDayReference(fromTerce);
+      final suffix = RegExp(r'^sext[123](.+)$').firstMatch(field)?.group(1);
+      if (fillMissingDaytime && !fillMissing && suffix == 'R') {
+        // Feast readings are proper; missing source content needs correction.
+        resolved[field] = '';
+        continue;
+      }
+      if (fillMissingDaytime && !fillMissing && suffix == 'Pr') {
+        final collect = dayData['laudesPr'];
+        resolved[field] =
+            !useProperTerce &&
+                !_missing(collect) &&
+                !isFromDayReference(collect)
+            ? collect
+            : '';
+        continue;
+      }
+      final fallback = useProperTerce ? '' : periodData[field];
       resolved[field] = isFromDayReference(fallback) ? '' : fallback ?? '';
     }
   }
@@ -163,6 +202,31 @@ LiturgicalDay? resolveDayAgainstPeriod(
     resolved['_fromDayFields'] = fromFields.toList();
   }
   return LiturgicalDay.fromMap(resolved);
+}
+
+bool _isDaytimeField(String field) {
+  final match = RegExp(r'^sext[123](.+)$').firstMatch(field);
+  return match != null && _daytimeSuffixes.contains(match.group(1));
+}
+
+/// Movable feasts use the current day's daytime psalter. Solemnities retain
+/// their existing resolution; this mode never fills gaps in the other Hours.
+LiturgicalDay resolveMovableFeastAgainstPeriod(
+  LiturgicalDay day,
+  LiturgicalDay? periodDay,
+  String feastCode,
+) {
+  final declaredRank = (day.rank ?? '').trim();
+  final rank =
+      (declaredRank.isEmpty ? day.field('_feastType') ?? '' : declaredRank)
+          .trim()
+          .toLowerCase();
+  final isFeast =
+      const {'festum', 'feast'}.contains(rank) ||
+      (rank.isEmpty &&
+          feastCode.replaceFirst(RegExp(r'^feast-'), '') ==
+              'christthehighpriest');
+  return resolveDayAgainstPeriod(day, periodDay, fillMissingDaytime: isFeast)!;
 }
 
 LiturgicalDay? resolveChristmasDateAgainstPeriod(
@@ -207,6 +271,11 @@ bool hasMissingDaytimeFields(LiturgicalDay day) {
 }
 
 String daytimeHourField(LiturgicalDay day, int hour, String suffix) {
+  // An hour with one own antiphon must not borrow Ant2/Ant3 from Terce.
+  if ((suffix == 'Ant2' || suffix == 'Ant3') &&
+      _singleAntiphonExclusions(day.data).contains('sext$hour$suffix')) {
+    return '';
+  }
   final value = day.data['sext$hour$suffix'];
   if (!_missing(value) && !isFromDayReference(value)) {
     return value.toString().trim();

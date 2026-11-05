@@ -437,7 +437,9 @@ class LiturgicalContentService {
         if (exclusive == null || _normalizeFeast(code) == exclusive)
           code: [
             for (final item in _daysByFeast(code))
-              withContext(resolveDayAgainstPeriod(item, resolvedPeriodDay))!,
+              withContext(
+                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, code),
+              )!,
           ],
     };
     return _DaysResult(
