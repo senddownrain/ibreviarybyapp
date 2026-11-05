@@ -1,11 +1,13 @@
 # ORDO: прокрутка месяца и возврат назад
 
-База: актуальный `origin/main`, `f8a260ace2da371b871caef30e9a3656c1730d25`
-(PR #61). Проверено 05.11.2026 UTC, Flutter 3.41.4 / Dart 3.11.1.
+Начальная база: `f8a260ace2da371b871caef30e9a3656c1730d25` (PR #61).
+За время проверки в main вошёл PR #63. Исправление перенесено без конфликтов
+на актуальный `origin/main`, `7abba85bebe184e2314b6df1593bab0720fb1c77`.
+Проверено 05.11.2026 UTC, Flutter 3.41.4 / Dart 3.11.1.
 
 ## Причины
 
-Все пять исходных падений воспроизведены на неизменённом main:
+Все пять исходных падений воспроизведены на неизменённом main `f8a260a`:
 
 | Сценарий | Причина |
 | --- | --- |
@@ -48,7 +50,7 @@ production-провайдеров и навигационная архитект
 
 ## Проверки
 
-Исходный main:
+Исходный main `f8a260a`:
 
 - `flutter test --no-pub test/ordo_day_flow_test.dart`: 42 passed, 1 failed;
   [полный лог](main-day-flow.log), включая промах тапа и вторичную ошибку scope.
@@ -56,7 +58,7 @@ production-провайдеров и навигационная архитект
   [полный лог](main-ux.log).
 - `flutter analyze --no-pub --no-fatal-infos`: exit 0, 12 infos.
 
-После исправления:
+После исправления на базе `f8a260a`:
 
 - `flutter test --no-pub test/ordo_day_flow_test.dart`: 47 passed,
   без missed-tap warnings и ошибок Riverpod; [полный лог](fixed-day-flow.log).
@@ -65,13 +67,29 @@ production-провайдеров и навигационная архитект
 - `flutter analyze --no-pub --no-fatal-infos`: exit 0, те же 12 infos,
   без errors/warnings; [полный лог](analyze.log).
 - `flutter test --no-pub`: **1710 passed, 9 skipped, 0 failed** за 43:39;
-  [полный лог](full-suite.log). Все пять исходных сценариев прошли также
+  [полный лог](full-suite-f8a260a.log). Все пять исходных сценариев прошли также
   внутри полного набора. Пропуски заданы существующими условиями analytics
   тестов; новые пропуски не добавлялись. Ошибок Riverpod и missed-tap warnings нет.
 
-Других падений полного набора нет, поэтому сравнение дополнительных падений
-с main не требуется. По автоматическим проверкам блокеров для merge нет;
-перед слиянием рекомендуется ручная проверка Android ниже, поскольку
+Повторное воспроизведение на **неизменённом актуальном main `7abba85`**:
+
+- Исходный сценарий навигации (фильтр `--plain-name`): 1 failed,
+  тот же промах нажатия, `No element` и ошибка teardown Riverpod;
+  [лог](main-7abba85-day.log).
+- Четыре `day and month utility layout` (фильтр `--plain-name`): 4 failed,
+  те же hit-test ошибки; [лог](main-7abba85-ux.log).
+
+После переноса исправления на `7abba85`:
+
+- `flutter test --no-pub test/ordo_day_flow_test.dart`: 47 passed,
+  без missed-tap warnings и ошибок Riverpod; [лог](fixed-7abba85-day.log).
+- `flutter test --no-pub test/ordo_ux_test.dart`: 38 passed;
+  [лог](fixed-7abba85-ux.log).
+- `flutter analyze --no-pub --no-fatal-infos`: exit 0, те же 12 infos,
+  без errors/warnings; [лог](analyze-7abba85.log).
+- Полный набор после переноса проверяется повторно; результат будет добавлен.
+
+Перед слиянием рекомендуется ручная проверка Android ниже, поскольку
 визуальное взаимодействие на устройстве в этой среде не проверено.
 
 ## Визуальная и нативная проверка
