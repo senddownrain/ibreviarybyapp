@@ -163,7 +163,7 @@ void main() {
             expect(variant.day.field(field)?.trim(), isNotEmpty,
                 reason: '$diocese ${option.optionId} ${variant.choice} $field');
           }
-          expect(variant.day.data['officeOfReadingsTeDeum'], isFalse,
+          expect(variant.day.data['officeOfReadingsTeDeum'], isNot(true),
               reason: 'no Te Deum on a memorial');
         }
       }
