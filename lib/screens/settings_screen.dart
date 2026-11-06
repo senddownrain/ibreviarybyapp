@@ -284,6 +284,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   builder: (context, snapshot) =>
                       Text('Версія ${snapshot.data?.version ?? '—'}'),
                 ),
+                ListTile(
+                  key: const Key('settings-feedback'),
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Зваротная сувязь'),
+                  subtitle: const Text(
+                    'Паведаміць пра памылку ў тэксце або даслаць прапанову',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/settings/feedback'),
+                ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(

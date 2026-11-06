@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -308,6 +309,14 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
               icon: Icons.edit_outlined,
               onSelected: () => context.push('/prayers/prayer/${p.id}/edit'),
             ),
+          // Calm, optional entry (overflow menu, never a pop-up while praying).
+          ReaderSecondaryAction(
+            label: 'Паведаміць пра памылку',
+            icon: Icons.flag_outlined,
+            onSelected: () => context.push(
+              feedbackLocation(kind: 'prayer', id: p.id, title: title),
+            ),
+          ),
         ],
         contextHeader: ReaderContextHeader(
           eyebrow: _isMass ? 'ЛІТУРГІЯ' : 'МАЛІТВА',
