@@ -144,7 +144,7 @@ void main() {
         ),
       );
       expect(find.text('ЧЫТАННІ ІМШЫ'), findsOneWidget);
-      expect(find.text('3 варыянты аднаго святкавання'), findsOneWidget);
+      expect(find.text('Магчымасці цэлебрацыі'), findsOneWidget);
       for (final label in [
         'Св. Імша ўначы',
         'Св. Імша на світанні',

@@ -1,0 +1,140 @@
+{
+  "roots": {
+    "pr": "/workspace/ibreviarybyapp",
+    "main": "/workspace/ibreviarybyapp-baseline"
+  },
+  "heads": {
+    "pr": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+    "main": "6b74fbe07f949ad5ecc9027cc284471c26e43578"
+  },
+  "cpuMax": "200000 100000",
+  "flutter": "3.41.4",
+  "dart": "3.11.1",
+  "hive": "2.2.3",
+  "defaultConcurrency": 1,
+  "processors": 3,
+  "hashes": {
+    "lib/content/content_store.dart": {
+      "pr": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad",
+      "main": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad"
+    },
+    "lib/content/content_updater.dart": {
+      "pr": "1d5a7712950adc8b5dab24d4af2e9147ea871a2b6ef7eaceff13a7b1565f21b1",
+      "main": "1d5a7712950adc8b5dab24d4af2e9147ea871a2b6ef7eaceff13a7b1565f21b1"
+    },
+    "lib/services/hive_service.dart": {
+      "pr": "33b74d6f1500d23787c223ee084af3d4e5dc91644fcd4a40ce0a4ba58709fa2e",
+      "main": "368781a563186b04331ecbb5a785aa5b65ab7ec6400ad9186d567820c54a0528"
+    },
+    "pubspec.lock": {
+      "pr": "24e265d65075c2b69b47db4744913901f0fb201a4a40c26b28d8ab076c55fdcd",
+      "main": "24e265d65075c2b69b47db4744913901f0fb201a4a40c26b28d8ab076c55fdcd"
+    },
+    "test/content_offline_test.dart": {
+      "pr": "f1152e3f0ce16350e32a4f180dd0159443139f2724384933d585b11359462b7c",
+      "main": "f1152e3f0ce16350e32a4f180dd0159443139f2724384933d585b11359462b7c"
+    },
+    "assets/content/compendium.json.gz": {
+      "pr": "632735c5e171542ba67206e8874d710d9683b9c08dd6558b22585d0a8eedab1c",
+      "main": "632735c5e171542ba67206e8874d710d9683b9c08dd6558b22585d0a8eedab1c"
+    },
+    "assets/content/compendiumMeta.json.gz": {
+      "pr": "1df323a19eec0772e68929245ac25f2b7ade6de1f98c4e9b9b69886e4242e3f8",
+      "main": "1df323a19eec0772e68929245ac25f2b7ade6de1f98c4e9b9b69886e4242e3f8"
+    },
+    "assets/content/completoriums.json.gz": {
+      "pr": "56e0c118d6bfc9651a847ee1cf29d2d56e449ea7046312b237e9c92b5b436b5d",
+      "main": "56e0c118d6bfc9651a847ee1cf29d2d56e449ea7046312b237e9c92b5b436b5d"
+    },
+    "assets/content/days.json.gz": {
+      "pr": "f0ed291c345162d423564655db5139a2c168312fb7cad3311f325024ca79ea76",
+      "main": "f0ed291c345162d423564655db5139a2c168312fb7cad3311f325024ca79ea76"
+    },
+    "assets/content/invitatoriums.json.gz": {
+      "pr": "835b2b332b17e8cb3675601a935ee0416627a6b9288d6a3c96e08be70bb28d79",
+      "main": "835b2b332b17e8cb3675601a935ee0416627a6b9288d6a3c96e08be70bb28d79"
+    },
+    "assets/content/liturgicalCalendarMeta.json.gz": {
+      "pr": "08cd0b20f8050cf4fb9fcc522234678d426d0709c7e3622a5ba2933677221532",
+      "main": "08cd0b20f8050cf4fb9fcc522234678d426d0709c7e3622a5ba2933677221532"
+    },
+    "assets/content/liturgicalCelebrations.json.gz": {
+      "pr": "aa0a6347f71461ac7ea57aa914b1d4cf26be1193c1aab80c1816fd005facb351",
+      "main": "aa0a6347f71461ac7ea57aa914b1d4cf26be1193c1aab80c1816fd005facb351"
+    },
+    "assets/content/liturgicalDioceseOverrides.json.gz": {
+      "pr": "04aa246da69c4b1f3e1efc171f185e1c14c7163d1abbc9c28cabe640cdc96a30",
+      "main": "04aa246da69c4b1f3e1efc171f185e1c14c7163d1abbc9c28cabe640cdc96a30"
+    },
+    "assets/content/liturgicalOrdoNotes.json.gz": {
+      "pr": "a69a6ab7c22093db2b9b49d12dc532f0091a83fa2e08180cb485a8532aee61c1",
+      "main": "a69a6ab7c22093db2b9b49d12dc532f0091a83fa2e08180cb485a8532aee61c1"
+    },
+    "assets/content/liturgicalProperTexts.json.gz": {
+      "pr": "a2f84a2693f910243cc640b6465e418384c72bd0ee5ef7ce552e706211ebdba7",
+      "main": "a2f84a2693f910243cc640b6465e418384c72bd0ee5ef7ce552e706211ebdba7"
+    },
+    "assets/content/liturgicalTemplates.json.gz": {
+      "pr": "5b1886d8e3c0314bec7dac202bde637f5f7d82bf7eaa8d63170170e6dec07916",
+      "main": "5b1886d8e3c0314bec7dac202bde637f5f7d82bf7eaa8d63170170e6dec07916"
+    },
+    "assets/content/liturgicalYearOverrides.json.gz": {
+      "pr": "cc3d4ed3add9c6b5f7b770353a95ec38299a1fa43b38d4f597e43fa6d0e15f13",
+      "main": "cc3d4ed3add9c6b5f7b770353a95ec38299a1fa43b38d4f597e43fa6d0e15f13"
+    },
+    "assets/content/manifest.json": {
+      "pr": "8248188e0b2863331faa28a4815ceb386e03c1b2f783c7275b159b46a3381c1a",
+      "main": "8248188e0b2863331faa28a4815ceb386e03c1b2f783c7275b159b46a3381c1a"
+    },
+    "assets/content/prayerCategories.json.gz": {
+      "pr": "8f5b1f32979c9a8cd4c9e1e23f4f5cdf0b40d1cb68de7b9c4d7b2534611ec491",
+      "main": "8f5b1f32979c9a8cd4c9e1e23f4f5cdf0b40d1cb68de7b9c4d7b2534611ec491"
+    },
+    "assets/content/prayers.json.gz": {
+      "pr": "6edd638b13e76820367771357161d14bd51273ede2c4e551b15925e9c5e9e3ee",
+      "main": "6edd638b13e76820367771357161d14bd51273ede2c4e551b15925e9c5e9e3ee"
+    },
+    "assets/content/readings.json.gz": {
+      "pr": "a01371c4692026df9e3e2597be9b93e56b4b0093eef8028e5612b4144865288b",
+      "main": "a01371c4692026df9e3e2597be9b93e56b4b0093eef8028e5612b4144865288b"
+    },
+    "assets/content/songs.json.gz": {
+      "pr": "79e41914bd4cb23bf5df01f5943ae77651149415d804a0d6000537cd8f4a93c5",
+      "main": "79e41914bd4cb23bf5df01f5943ae77651149415d804a0d6000537cd8f4a93c5"
+    }
+  },
+  "execution": "Serial commands in separate worktrees; controlled load is five bounded Python workers in same two-core cgroup; no timeout changes. Fixed main means only the identical PR test-fixture patch applied to main, not clean main. Original raw main/PR had no instrumentation or tracked modifications. First normal profiled resource sampler failed (missing cgroup cpu.pressure); timing events complete; later runs sample /proc/pressure/cpu.",
+  "fixtureCommit": "c7682771985e6bbf28e7169be1af6bda31a7edd8",
+  "originalInstrumentedInputHashes": [
+    {
+      "path": "/workspace/ibreviarybyapp/test/content_offline_test.dart",
+      "backup": "/workspace/issue66-diagnostics/original-0-content_offline_test.dart",
+      "sha256": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082"
+    },
+    {
+      "path": "/workspace/ibreviarybyapp/lib/content/content_store.dart",
+      "backup": "/workspace/issue66-diagnostics/original-0-content_store.dart",
+      "sha256": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad"
+    },
+    {
+      "path": "/workspace/ibreviarybyapp/lib/services/hive_service.dart",
+      "backup": "/workspace/issue66-diagnostics/original-0-hive_service.dart",
+      "sha256": "33b74d6f1500d23787c223ee084af3d4e5dc91644fcd4a40ce0a4ba58709fa2e"
+    },
+    {
+      "path": "/workspace/ibreviarybyapp-baseline/test/content_offline_test.dart",
+      "backup": "/workspace/issue66-diagnostics/original-1-content_offline_test.dart",
+      "sha256": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082"
+    },
+    {
+      "path": "/workspace/ibreviarybyapp-baseline/lib/content/content_store.dart",
+      "backup": "/workspace/issue66-diagnostics/original-1-content_store.dart",
+      "sha256": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad"
+    },
+    {
+      "path": "/workspace/ibreviarybyapp-baseline/lib/services/hive_service.dart",
+      "backup": "/workspace/issue66-diagnostics/original-1-hive_service.dart",
+      "sha256": "368781a563186b04331ecbb5a785aa5b65ab7ec6400ad9186d567820c54a0528"
+    }
+  ]
+}

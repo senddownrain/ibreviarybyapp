@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
+import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 void main() {
@@ -13,76 +14,58 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets(
-    'Ora popup is compact and psalmody chips toggle independently in font sheet',
-    (tester) async {
-      final container = ProviderContainer(
-        overrides: [settingsProvider.overrideWith(_Settings.new)],
-      );
-      addTearDown(container.dispose);
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(
-            home: Scaffold(
-              body: Align(
-                alignment: Alignment.topRight,
-                child: AppOverflowMenu(showTextScale: true, showPsalmody: true),
-              ),
+  testWidgets('Ora popup is compact and one psalmody mode survives reopening', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [settingsProvider.overrideWith(_Settings.new)],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.topRight,
+              child: AppOverflowMenu(showTextScale: true, showPsalmody: true),
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      await openMenu(tester);
-      expect(find.text('Шрыфт'), findsOneWidget);
-      expect(find.byType(FilterChip), findsNothing);
-      expect(find.byType(SwitchListTile), findsNothing);
-      expect(
-        tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
-        lessThanOrEqualTo(288),
-      );
+    await openMenu(tester);
+    expect(find.text('Шрыфт'), findsOneWidget);
+    expect(find.byType(FilterChip), findsNothing);
+    expect(find.byType(SwitchListTile), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
+      lessThanOrEqualTo(288),
+    );
 
-      await tester.tap(find.text('Шрыфт'));
+    await tester.tap(find.text('Шрыфт'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('app-overflow-content')), findsNothing);
+    expect(find.text('Псальмодыя'), findsOneWidget);
+    expect(find.byType(FilterChip), findsNothing);
+    final selector = find.byType(PsalmodyModeSelector);
+    for (final mode in PsalmodyMode.values) {
+      await tester.tap(find.byKey(ValueKey('psalmody-mode-${mode.name}')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('app-overflow-content')), findsNothing);
-      expect(find.text('Псальмодыя'), findsOneWidget);
-      expect(find.byType(FilterChip), findsNWidgets(2));
-      final marker = find.byKey(const Key('text-scale-psalm-marker-break'));
-      final layout = find.byKey(const Key('text-scale-psalm-aligned-left'));
-      expect(tester.widget<FilterChip>(marker).selected, isFalse);
-      expect(tester.widget<FilterChip>(layout).selected, isFalse);
-
-      await tester.tap(marker);
-      await tester.pumpAndSettle();
-      expect(
-        container.read(settingsProvider).psalmMarkerBreakMode,
-        PsalmMarkerBreakMode.breakAfterMarker,
-      );
-      expect(
-        container.read(settingsProvider).psalmVerseLayout,
-        PsalmVerseLayout.alternatingIndent,
-      );
-
-      await tester.tap(layout);
-      await tester.pumpAndSettle();
-      expect(tester.widget<FilterChip>(marker).selected, isTrue);
-      expect(tester.widget<FilterChip>(layout).selected, isTrue);
-
-      await tester.tap(marker);
-      await tester.pumpAndSettle();
-      expect(tester.widget<FilterChip>(marker).selected, isFalse);
-      expect(tester.widget<FilterChip>(layout).selected, isTrue);
-
-      await tester.tap(find.byTooltip('Закрыць'));
-      await tester.pumpAndSettle();
-      await openMenu(tester);
-      await tester.tap(find.text('Шрыфт'));
-      await tester.pumpAndSettle();
-      expect(tester.widget<FilterChip>(marker).selected, isFalse);
-      expect(tester.widget<FilterChip>(layout).selected, isTrue);
-    },
-  );
+      expect(container.read(settingsProvider).psalmodyMode, mode);
+      expect(tester.widget<PsalmodyModeSelector>(selector).value, mode);
+    }
+    await tester.tap(find.byTooltip('Закрыць'));
+    await tester.pumpAndSettle();
+    await openMenu(tester);
+    await tester.tap(find.text('Шрыфт'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<PsalmodyModeSelector>(selector).value,
+      PsalmodyMode.alternatingStanzas,
+    );
+  });
 
   testWidgets('font sheet keeps its size slider and separate Ora options', (
     tester,
@@ -106,7 +89,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('app-overflow-content')), findsNothing);
     expect(find.byType(SwitchListTile), findsNothing);
-    expect(find.byType(FilterChip), findsNWidgets(2));
+    expect(find.byType(PsalmodyModeSelector), findsOneWidget);
     expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
     await tester.tap(find.byKey(const Key('text-scale-increase')));
     await tester.pumpAndSettle();
@@ -299,7 +282,7 @@ void main() {
       await openMenu(tester);
       await tester.tap(find.text('Шрыфт'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('text-scale-psalm-marker-break')));
+      await tester.tap(find.byKey(const Key('psalmody-mode-leftBreakIndent')));
       await tester.pumpAndSettle();
       expect(scroll.offset, 400);
       await tester.tap(find.byTooltip('Закрыць'));
@@ -324,12 +307,7 @@ class _Settings extends SettingsNotifier {
   }
 
   @override
-  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) async {
-    state = state.copyWith(psalmMarkerBreakMode: value);
-  }
-
-  @override
-  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) async {
-    state = state.copyWith(psalmVerseLayout: value);
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
+    state = state.copyWith(psalmodyMode: value);
   }
 }

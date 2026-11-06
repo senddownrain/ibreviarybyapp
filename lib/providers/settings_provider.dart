@@ -116,8 +116,7 @@ class SettingsState {
   final String bibleVersionId;
   final String startSection;
   final String lastSection;
-  final PsalmVerseLayout psalmVerseLayout;
-  final PsalmMarkerBreakMode psalmMarkerBreakMode;
+  final PsalmodyMode psalmodyMode;
 
   /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
@@ -133,8 +132,7 @@ class SettingsState {
     this.bibleVersionId = 'bel',
     this.startSection = 'hours',
     this.lastSection = 'hours',
-    this.psalmVerseLayout = PsalmVerseLayout.alternatingIndent,
-    this.psalmMarkerBreakMode = PsalmMarkerBreakMode.inline,
+    this.psalmodyMode = PsalmodyMode.leftBreak,
     this.prayerCategoryMap = const {},
   });
 
@@ -156,8 +154,7 @@ class SettingsState {
     String? bibleVersionId,
     String? startSection,
     String? lastSection,
-    PsalmVerseLayout? psalmVerseLayout,
-    PsalmMarkerBreakMode? psalmMarkerBreakMode,
+    PsalmodyMode? psalmodyMode,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
     themeMode: themeMode ?? this.themeMode,
@@ -171,8 +168,7 @@ class SettingsState {
     bibleVersionId: bibleVersionId ?? this.bibleVersionId,
     startSection: startSection ?? this.startSection,
     lastSection: lastSection ?? this.lastSection,
-    psalmVerseLayout: psalmVerseLayout ?? this.psalmVerseLayout,
-    psalmMarkerBreakMode: psalmMarkerBreakMode ?? this.psalmMarkerBreakMode,
+    psalmodyMode: psalmodyMode ?? this.psalmodyMode,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
   );
 }
@@ -190,6 +186,11 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   SettingsState _load() {
+    final psalmodyMode = resolvePsalmodyMode(
+      storedMode: _box.get('psalmodyMode'),
+      legacyLayout: _box.get('psalmVerseLayout'),
+      legacyBreakMode: _box.get('psalmMarkerBreakMode'),
+    );
     final mode = _box.get('themeMode', defaultValue: 'system') as String;
     final cats = (_box.get('userCategories', defaultValue: '[]') as String);
     final favs = (_box.get('favoriteIds', defaultValue: '[]') as String);
@@ -204,13 +205,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     };
     return SettingsState(
       themeMode: _parseTheme(mode),
-      psalmVerseLayout: _box.get('psalmVerseLayout') == 'alignedLeft'
-          ? PsalmVerseLayout.alignedLeft
-          : PsalmVerseLayout.alternatingIndent,
-      psalmMarkerBreakMode:
-          _box.get('psalmMarkerBreakMode') == 'breakAfterMarker'
-          ? PsalmMarkerBreakMode.breakAfterMarker
-          : PsalmMarkerBreakMode.inline,
+      psalmodyMode: psalmodyMode,
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -242,8 +237,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('themeMode', _themeName(state.themeMode));
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
-    await _box.put('psalmVerseLayout', state.psalmVerseLayout.name);
-    await _box.put('psalmMarkerBreakMode', state.psalmMarkerBreakMode.name);
     await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
@@ -307,20 +300,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
-  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) {
-    if (state.psalmVerseLayout != value) {
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
+    if (state.psalmodyMode != value) {
       analyticsFeature('psalmody_layout_change');
     }
-    state = state.copyWith(psalmVerseLayout: value);
-    return _save();
-  }
-
-  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) {
-    if (state.psalmMarkerBreakMode != value) {
-      analyticsFeature('psalmody_layout_change');
-    }
-    state = state.copyWith(psalmMarkerBreakMode: value);
-    return _save();
+    state = state.copyWith(psalmodyMode: value);
+    await _box.put('psalmodyMode', value.name);
+    await _box.flush();
   }
 
   Future<void> toggleFavorite(String id) {

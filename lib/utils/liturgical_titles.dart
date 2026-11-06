@@ -140,7 +140,7 @@ String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {
 
 String liturgicalDayPeriodLabel(LiturgicalDay day) {
   if (day.field('_kind') == 'office-for-dead' || day.id == 'office-for-dead') {
-    return 'Памінальны афіцый';
+    return 'Афіцый за памерлых';
   }
   return periodLabelMap[day.periodType ?? day.field('_periodType')] ??
       'Літургічны дзень';

@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/workspace/ibreviarybyapp/test/content_offline_test.dart",
+    "backup": "/workspace/issue66-diagnostics/original-0-content_offline_test.dart",
+    "sha256": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082"
+  },
+  {
+    "path": "/workspace/ibreviarybyapp/lib/content/content_store.dart",
+    "backup": "/workspace/issue66-diagnostics/original-0-content_store.dart",
+    "sha256": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad"
+  },
+  {
+    "path": "/workspace/ibreviarybyapp/lib/services/hive_service.dart",
+    "backup": "/workspace/issue66-diagnostics/original-0-hive_service.dart",
+    "sha256": "33b74d6f1500d23787c223ee084af3d4e5dc91644fcd4a40ce0a4ba58709fa2e"
+  },
+  {
+    "path": "/workspace/ibreviarybyapp-baseline/test/content_offline_test.dart",
+    "backup": "/workspace/issue66-diagnostics/original-1-content_offline_test.dart",
+    "sha256": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082"
+  },
+  {
+    "path": "/workspace/ibreviarybyapp-baseline/lib/content/content_store.dart",
+    "backup": "/workspace/issue66-diagnostics/original-1-content_store.dart",
+    "sha256": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad"
+  },
+  {
+    "path": "/workspace/ibreviarybyapp-baseline/lib/services/hive_service.dart",
+    "backup": "/workspace/issue66-diagnostics/original-1-hive_service.dart",
+    "sha256": "368781a563186b04331ecbb5a785aa5b65ab7ec6400ad9186d567820c54a0528"
+  }
+]

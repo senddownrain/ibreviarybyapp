@@ -1,0 +1,77 @@
+[
+  {
+    "name": "main-offline",
+    "sha": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+    "cwd": "/workspace/ibreviarybyapp-baseline",
+    "command": [
+      "/workspace/toolchains/flutter/bin/flutter",
+      "test",
+      "--no-pub",
+      "test/content_offline_test.dart"
+    ],
+    "started_utc": "2026-11-05T12:22:44.738335+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 192.083,
+    "ended_utc": "2026-11-05T12:25:56.818457+00:00"
+  },
+  {
+    "name": "pr-offline",
+    "sha": "d4aba29b7ab9b17a1034c48a5d2a3988d4baa05b",
+    "cwd": "/workspace/ibreviarybyapp",
+    "command": [
+      "/workspace/toolchains/flutter/bin/flutter",
+      "test",
+      "--no-pub",
+      "test/content_offline_test.dart"
+    ],
+    "started_utc": "2026-11-05T12:25:56.833521+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 199.695,
+    "ended_utc": "2026-11-05T12:29:16.520044+00:00"
+  },
+  {
+    "name": "pr-analyze",
+    "sha": "d4aba29b7ab9b17a1034c48a5d2a3988d4baa05b",
+    "cwd": "/workspace/ibreviarybyapp",
+    "command": [
+      "/workspace/toolchains/flutter/bin/flutter",
+      "analyze",
+      "--no-pub",
+      "--no-fatal-infos"
+    ],
+    "started_utc": "2026-11-05T12:29:16.528055+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 10.079,
+    "ended_utc": "2026-11-05T12:29:26.600373+00:00"
+  },
+  {
+    "name": "pr-full",
+    "sha": "d4aba29b7ab9b17a1034c48a5d2a3988d4baa05b",
+    "cwd": "/workspace/ibreviarybyapp",
+    "command": [
+      "/workspace/toolchains/flutter/bin/flutter",
+      "test",
+      "--no-pub"
+    ],
+    "started_utc": "2026-11-05T12:29:26.604619+00:00",
+    "exit_code": 1,
+    "elapsed_seconds": 3746.457,
+    "ended_utc": "2026-11-05T13:31:53.058726+00:00"
+  },
+  {
+    "name": "main-calendar",
+    "sha": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+    "cwd": "/workspace/ibreviarybyapp-baseline",
+    "command": [
+      "/workspace/toolchains/flutter/bin/flutter",
+      "test",
+      "--no-pub",
+      "test/ordo_day_flow_test.dart",
+      "test/ordo_ux_test.dart"
+    ],
+    "started_utc": "2026-11-05T13:31:53.082045+00:00",
+    "exit_code": 1,
+    "elapsed_seconds": 182.278,
+    "ended_utc": "2026-11-05T13:34:55.343301+00:00"
+  }
+]

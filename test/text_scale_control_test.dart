@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 
 void main() {
   test('reader font preferences are compact and legacy-safe', () {
@@ -51,7 +52,7 @@ void main() {
     expect(find.byKey(const Key('text-scale-value')), findsOneWidget);
     expect(find.text('100%'), findsOneWidget);
     expect(find.byKey(const Key('reader-font-literata')), findsNothing);
-    expect(find.byKey(const Key('psalm-marker-break')), findsNothing);
+    expect(find.byType(PsalmodyModeSelector), findsNothing);
     expect(find.byType(FilterChip), findsNothing);
 
     await tester.tap(find.byKey(const Key('text-scale-increase')));

@@ -1,0 +1,21 @@
+{
+  "name": "pr-original-load5",
+  "branch": "pr",
+  "head": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+  "command": [
+    "/workspace/toolchains/flutter/bin/flutter",
+    "test",
+    "--no-pub",
+    "test/content_offline_test.dart",
+    "--plain-name",
+    "corrections and app releases a new app bundle absorbs the patches it contains"
+  ],
+  "workers": 5,
+  "startedUtc": "2026-11-06T05:17:16.779337+00:00",
+  "cpuMax": "200000 100000",
+  "clockTicks": 100,
+  "loadStartedElapsed": 3.847,
+  "exitCode": 1,
+  "elapsedSeconds": 41.873,
+  "endedUtc": "2026-11-06T05:17:58.652712+00:00"
+}

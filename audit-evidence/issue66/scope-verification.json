@@ -1,0 +1,23 @@
+{
+  "lib/content/content_store.dart": {
+    "originalSha256": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad",
+    "currentSha256": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad",
+    "same": true
+  },
+  "lib/content/content_updater.dart": {
+    "originalSha256": "1d5a7712950adc8b5dab24d4af2e9147ea871a2b6ef7eaceff13a7b1565f21b1",
+    "currentSha256": "1d5a7712950adc8b5dab24d4af2e9147ea871a2b6ef7eaceff13a7b1565f21b1",
+    "same": true
+  },
+  "lib/services/hive_service.dart": {
+    "originalSha256": "33b74d6f1500d23787c223ee084af3d4e5dc91644fcd4a40ce0a4ba58709fa2e",
+    "currentSha256": "33b74d6f1500d23787c223ee084af3d4e5dc91644fcd4a40ce0a4ba58709fa2e",
+    "same": true
+  },
+  "codeChangesSinceC78": [
+    "test/content_offline_test.dart"
+  ],
+  "noTrackedBaselineChangesAfterVerification": true,
+  "baselineTestSha256": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082",
+  "fixtureCommit": "c7682771985e6bbf28e7169be1af6bda31a7edd8"
+}

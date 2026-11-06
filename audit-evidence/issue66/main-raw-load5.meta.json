@@ -1,0 +1,22 @@
+{
+  "name": "main-raw-load5",
+  "branch": "main",
+  "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+  "command": [
+    "/workspace/toolchains/flutter/bin/flutter",
+    "test",
+    "--no-pub",
+    "test/content_offline_test.dart",
+    "--plain-name",
+    "corrections and app releases a new app bundle absorbs the patches it contains"
+  ],
+  "instrumented": false,
+  "workers": 5,
+  "startedUtc": "2026-11-06T05:19:08.504824+00:00",
+  "cpuMax": "200000 100000",
+  "clockTicks": 100,
+  "loadStartedElapsed": 4.335,
+  "exitCode": 1,
+  "elapsedSeconds": 47.923,
+  "endedUtc": "2026-11-06T05:19:56.428286+00:00"
+}

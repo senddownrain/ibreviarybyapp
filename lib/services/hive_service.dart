@@ -6,6 +6,7 @@ import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_migration.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/services/priest_access_policy.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 
 const kTemplatesBoxName = 'liturgicalTemplates';
 
@@ -79,6 +80,19 @@ class HiveService {
     _meta = await Hive.openBox(_metaBox);
     _localPrayers = await Hive.openBox(_localPrayersBoxName);
     _settings = await Hive.openBox(_settingsBoxName);
+    // main awaits init before constructing ProviderScope. Complete the one-key
+    // migration here, where write/flush failures propagate to the initializer;
+    // synchronous settings reads must never start unobserved disk writes.
+    final settings = _settings!;
+    final psalmodyMode = resolvePsalmodyMode(
+      storedMode: settings.get('psalmodyMode'),
+      legacyLayout: settings.get('psalmVerseLayout'),
+      legacyBreakMode: settings.get('psalmMarkerBreakMode'),
+    );
+    if (settings.get('psalmodyMode') != psalmodyMode.name) {
+      await settings.put('psalmodyMode', psalmodyMode.name);
+      await settings.flush();
+    }
     final withBundle = loadBundle ?? path == null;
     await content.open(bundle: bundle, loadBundle: withBundle);
     if (withBundle) {

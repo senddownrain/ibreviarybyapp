@@ -11,8 +11,7 @@ import 'package:mybrev_flutter/providers/prayers_provider.dart';
 const _readerOverflow = Key('reader-chrome-overflow');
 const _overflowButton = Key('app-overflow-open');
 const _nextHour = Key('ora-next-hour');
-const _psalmBreakChip = Key('text-scale-psalm-marker-break');
-const _psalmAlignChip = Key('text-scale-psalm-aligned-left');
+const _psalmModes = Key('text-scale-psalmody-modes');
 const _biblePicker = Key('bible-book-chapter-picker');
 const _bibleSelection = Key('bible-highlight-palette');
 const _prayerSearch = Key('prayerbook-search-action');
@@ -69,13 +68,9 @@ class _PsalmLayoutHintHostState extends State<PsalmLayoutHintHost> {
     dwell: const Duration(milliseconds: 900),
     child: widget.child,
     probe: (context, ref, metrics) => DiscoveryProbe(
-      facts: {
-        kFactPsalmChipsReady:
-            _mounted(context, _psalmBreakChip) &&
-            _mounted(context, _psalmAlignChip),
-      },
+      facts: {kFactPsalmChipsReady: _mounted(context, _psalmModes)},
       anchors: {
-        'hours.psalm_chips': [_psalmBreakChip, _psalmAlignChip],
+        'hours.psalm_chips': [_psalmModes],
       },
     ),
   );

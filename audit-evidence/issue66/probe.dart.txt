@@ -1,0 +1,71 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:test_api/src/backend/invoker.dart' show Invoker;
+
+class Issue66Probe {
+  static final enabled = Platform.environment['ISSUE66_PROFILE'] == '1';
+  static final clock = Stopwatch()..start();
+  static int serial = 0;
+  static int epoch = 0;
+  static String name = '';
+  static Timer? deadline;
+  static final pending = <int, Map<String, Object?>>{};
+  static final totals = <String, Map<String, int>>{};
+  static final finished = <int>{};
+
+  static void event(String event, Map<String, Object?> fields) {
+    if (!enabled) return;
+    print('ISSUE66 ${jsonEncode({'event': event, 'test': name, 'epoch': epoch,
+      'pid': pid, 'utc': DateTime.now().toUtc().toIso8601String(),
+      'us': clock.elapsedMicroseconds, ...fields})}');
+  }
+  static void begin() {
+    if (!enabled) return;
+    epoch++;
+    name = Invoker.current?.liveTest.test.name ?? 'unknown';
+    totals.clear();
+    event('test.begin', {'previousPending': pending.values.toList()});
+    deadline?.cancel();
+    deadline = Timer(const Duration(seconds: 29), () => snapshot('deadline29'));
+  }
+  static void snapshot(String reason) => event(reason, {
+    'pending': pending.values.toList(), 'totals': totals,
+  });
+  static void finish() {
+    if (!enabled) return;
+    deadline?.cancel();
+    finished.add(epoch);
+    snapshot('test.end');
+  }
+  static void record(String label, int us, {int units = 0}) {
+    final item = totals.putIfAbsent(label, () => {'calls': 0, 'us': 0, 'units': 0});
+    item['calls'] = item['calls']! + 1;
+    item['us'] = item['us']! + us;
+    item['units'] = item['units']! + units;
+  }
+  static T sync<T>(String label, T Function() body, {int units = 0}) {
+    if (!enabled) return body();
+    final watch = Stopwatch()..start();
+    try { return body(); }
+    finally {
+      record(label, watch.elapsedMicroseconds, units: units);
+      event('sync.end', {'phase': label, 'elapsedUs': watch.elapsedMicroseconds, 'units': units});
+    }
+  }
+  static Future<T> future<T>(String label, Future<T> Function() body) async {
+    if (!enabled) return body();
+    final token = ++serial;
+    final owner = epoch;
+    final watch = Stopwatch()..start();
+    pending[token] = {'id': token, 'phase': label, 'epoch': owner};
+    event('async.begin', pending[token]!);
+    try { return await body(); }
+    finally {
+      pending.remove(token);
+      record(label, watch.elapsedMicroseconds);
+      event('async.end', {'id': token, 'phase': label, 'elapsedUs': watch.elapsedMicroseconds,
+        'ownerEpoch': owner, 'afterTeardown': finished.contains(owner)});
+    }
+  }
+}

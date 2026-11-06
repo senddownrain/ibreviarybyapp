@@ -29,7 +29,7 @@ final List<HintDefinition> p1Hints = [
     priority: HintPriority.p1,
     screenId: 'hours',
     anchorId: 'hours.psalm_chips',
-    copyBe: 'Можна наладзіць перанос радкоў і размяшчэнне вершаў',
+    copyBe: 'Выберыце адзін з трох рэжымаў псальмодыі',
     requirements: [FactRequirement.isTrue(kFactPsalmChipsReady)],
   ),
   HintDefinition(

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,7 +97,7 @@ void main() {
         await capture('open');
         await tester.tap(find.text('Шрыфт'));
         await tester.pumpAndSettle();
-        expect(find.byType(FilterChip), findsNWidgets(2));
+        expect(find.byType(PsalmodyModeSelector), findsOneWidget);
         expect(tester.takeException(), isNull);
         await capture('font-sheet');
       });

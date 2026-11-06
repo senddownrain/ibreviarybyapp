@@ -5,7 +5,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
@@ -22,53 +21,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
-    'psalmody defaults and independent preferences survive a new container',
-    () async {
-      final directory = await Directory.systemTemp.createTemp(
-        'psalmody-settings-',
-      );
-      Hive.init(directory.path);
-      final box = await Hive.openBox('settings');
-      final container = ProviderContainer();
-      expect(
-        container.read(settingsProvider).psalmVerseLayout,
-        PsalmVerseLayout.alternatingIndent,
-      );
-      expect(
-        container.read(settingsProvider).psalmMarkerBreakMode,
-        PsalmMarkerBreakMode.inline,
-      );
-      final notifier = container.read(settingsProvider.notifier);
-      await notifier.setPsalmVerseLayout(PsalmVerseLayout.alignedLeft);
-      expect(
-        container.read(settingsProvider).psalmMarkerBreakMode,
-        PsalmMarkerBreakMode.inline,
-      );
-      await notifier.setPsalmMarkerBreakMode(
-        PsalmMarkerBreakMode.breakAfterMarker,
-      );
-      await box.flush();
-      expect(box.get('psalmVerseLayout'), 'alignedLeft');
-      expect(box.get('psalmMarkerBreakMode'), 'breakAfterMarker');
-      container.dispose();
-      await box.close();
-      await Hive.openBox('settings');
-      final reloaded = ProviderContainer();
-      expect(
-        reloaded.read(settingsProvider).psalmVerseLayout,
-        PsalmVerseLayout.alignedLeft,
-      );
-      expect(
-        reloaded.read(settingsProvider).psalmMarkerBreakMode,
-        PsalmMarkerBreakMode.breakAfterMarker,
-      );
-      reloaded.dispose();
-      await Hive.close();
-      await directory.delete(recursive: true);
-    },
-  );
-
-  test(
     'cadence segments preserve marks, emphasis, source breaks and non-psalm text',
     () {
       final formatted = formatPsalmHtml(
@@ -77,7 +29,7 @@ void main() {
       final output = preparePsalmChoirHtml(
         '$formatted<p class="ora-ant">Ант. *</p>',
         selectedChoir: 1,
-        breakAfterMarker: true,
+        mode: PsalmodyMode.leftBreakIndent,
       );
       final root = parseFragment(output);
       final lines = root.querySelectorAll('.psalm-line');
@@ -125,68 +77,65 @@ void main() {
     (tester) async {
       final controller = ValueNotifier<int?>(null);
       addTearDown(controller.dispose);
-      for (final layout in PsalmVerseLayout.values) {
-        for (final breaks in PsalmMarkerBreakMode.values) {
-          await tester.pumpWidget(
-            MaterialApp(
-              home: PsalmodyScope(
-                controller: controller,
-                verseLayout: layout,
-                markerBreakMode: breaks,
-                child: Scaffold(
-                  body: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        for (final name in [
-                          'Псальм',
-                          'Benedictus',
-                          'Magnificat',
-                          'Nunc dimittis',
-                        ])
-                          PsalmChoirHtml(
-                            html: formatPsalmHtml(
-                              '<p>$name A * працяг</p><p>$name B * працяг</p>',
-                            ),
-                            style: {'body': Style(fontSize: FontSize(20))},
-                            textColor: Colors.black,
-                            rubricColor: Colors.red,
+      for (final mode in PsalmodyMode.values) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: PsalmodyScope(
+              controller: controller,
+              mode: mode,
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (final name in [
+                        'Псальм',
+                        'Benedictus',
+                        'Magnificat',
+                        'Nunc dimittis',
+                      ])
+                        PsalmChoirHtml(
+                          html: formatPsalmHtml(
+                            '<p>$name A * працяг</p><p>$name B * працяг</p>',
                           ),
-                      ],
-                    ),
+                          style: {'body': Style(fontSize: FontSize(20))},
+                          textColor: Colors.black,
+                          rubricColor: Colors.red,
+                        ),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
+        );
+        void select(int side) => tester
+            .widgetList<Html>(find.byType(Html))
+            .first
+            .onLinkTap!('psalm-choir:$side', {}, null);
+        select(1);
+        await tester.pump();
+        expect(controller.value, 1);
+        for (final html in tester.widgetList<Html>(find.byType(Html))) {
+          final root = parseFragment(html.data!);
+          expect(
+            root
+                .querySelectorAll('a.psalm-choir-muted')
+                .every((a) => a.attributes['href'] == 'psalm-choir:1'),
+            isTrue,
           );
-          void select(int side) => tester
-              .widgetList<Html>(find.byType(Html))
-              .first
-              .onLinkTap!('psalm-choir:$side', {}, null);
-          select(1);
-          await tester.pump();
-          expect(controller.value, 1);
-          for (final html in tester.widgetList<Html>(find.byType(Html))) {
-            final root = parseFragment(html.data!);
-            expect(
-              root
-                  .querySelectorAll('a.psalm-choir-muted')
-                  .every((a) => a.attributes['href'] == 'psalm-choir:1'),
-              isTrue,
-            );
-            expect(root.querySelectorAll('a.psalm-choir-muted'), isNotEmpty);
-            expect(
-              root.querySelectorAll('.psalm-continuation').isNotEmpty,
-              breaks == PsalmMarkerBreakMode.breakAfterMarker,
-            );
-          }
-          select(2);
-          await tester.pump();
-          expect(controller.value, 2);
-          select(2);
-          await tester.pump();
-          expect(controller.value, isNull);
-          expect(tester.takeException(), isNull);
+          expect(root.querySelectorAll('a.psalm-choir-muted'), isNotEmpty);
+          expect(
+            root.querySelectorAll('.psalm-continuation').isNotEmpty,
+            mode != PsalmodyMode.alternatingStanzas,
+          );
         }
+        select(2);
+        await tester.pump();
+        expect(controller.value, 2);
+        select(2);
+        await tester.pump();
+        expect(controller.value, isNull);
+        expect(tester.takeException(), isNull);
       }
     },
   );
@@ -209,8 +158,7 @@ void main() {
                 theme: ThemeData(brightness: brightness),
                 home: PsalmodyScope(
                   controller: selection,
-                  verseLayout: PsalmVerseLayout.alignedLeft,
-                  markerBreakMode: PsalmMarkerBreakMode.breakAfterMarker,
+                  mode: PsalmodyMode.leftBreakIndent,
                   child: Scaffold(
                     body: Builder(
                       builder: (context) {
@@ -278,7 +226,7 @@ void main() {
           expect(
             tester.getTopLeft(line('працяг *')).dx -
                 tester.getTopLeft(line('Божа, †')).dx,
-            closeTo(size * .8, .01),
+            closeTo(size * .75, .01),
           );
           expect(tester.takeException(), isNull);
           if (Platform.environment['LITURGY_PSALMODY_IMAGES'] == '1') {

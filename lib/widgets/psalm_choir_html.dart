@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
@@ -8,22 +9,18 @@ class PsalmodyScope extends InheritedNotifier<ValueNotifier<int?>> {
   const PsalmodyScope({
     super.key,
     required ValueNotifier<int?> controller,
-    required this.verseLayout,
-    required this.markerBreakMode,
+    required this.mode,
     required super.child,
   }) : super(notifier: controller);
 
-  final PsalmVerseLayout verseLayout;
-  final PsalmMarkerBreakMode markerBreakMode;
+  final PsalmodyMode mode;
 
   static PsalmodyScope? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<PsalmodyScope>();
 
   @override
   bool updateShouldNotify(PsalmodyScope oldWidget) =>
-      verseLayout != oldWidget.verseLayout ||
-      markerBreakMode != oldWidget.markerBreakMode ||
-      super.updateShouldNotify(oldWidget);
+      mode != oldWidget.mode || super.updateShouldNotify(oldWidget);
 }
 
 /// Renders psalm strophes as two alternating choirs.
@@ -61,11 +58,17 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
   Widget build(BuildContext context) {
     final scope = PsalmodyScope.maybeOf(context);
     final selected = scope == null ? _selectedChoir : scope.notifier!.value;
-    final aligned = scope?.verseLayout == PsalmVerseLayout.alignedLeft;
-    final breakAfter =
-        scope?.markerBreakMode == PsalmMarkerBreakMode.breakAfterMarker;
-    // The alternating inset already identifies the choirs, so the selection
-    // state only needs a restrained contrast change.
+    final mode = scope?.mode ?? PsalmodyMode.leftBreak;
+    final fontSize = MediaQuery.textScalerOf(context).scale(
+      widget.style['p']?.fontSize?.value ??
+          widget.style['body']?.fontSize?.value ??
+          16,
+    );
+    final stropheInset = math.min(
+      fontSize,
+      MediaQuery.sizeOf(context).width * .08,
+    );
+    // Choir selection is independent of the visual presentation.
     final dimmedText = widget.textColor.withValues(alpha: 0.60);
     // The strophes below are links, and links are not merged into the hour's
     // text node for screen readers; the body is spoken as one plain label.
@@ -73,11 +76,11 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
       label: psalmPlainText(widget.html),
       excludeSemantics: true,
       child: Html(
-        key: ValueKey((selected, aligned, breakAfter)),
+        key: ValueKey((selected, mode)),
         data: preparePsalmChoirHtml(
           widget.html,
           selectedChoir: selected,
-          breakAfterMarker: breakAfter,
+          mode: mode,
         ),
         onLinkTap: (url, attributes, element) {
           final choir = switch (url) {
@@ -96,31 +99,27 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
         },
         style: {
           ...widget.style,
-          if (aligned) ...{
-            '.psalm-strophe-even': Style(
-              margin: Margins.only(
-                left: 0,
-                bottom:
-                    widget.style['.psalm-strophe']?.margin?.bottom?.value ?? 8,
-              ),
+          'p': (widget.style['p'] ?? Style()).merge(
+            Style(textAlign: TextAlign.left),
+          ),
+          '.psalm-strophe-even': Style(
+            textAlign: TextAlign.left,
+            margin: Margins.only(
+              left: mode == PsalmodyMode.alternatingStanzas ? stropheInset : 0,
+              bottom:
+                  widget.style['.psalm-strophe']?.margin?.bottom?.value ?? 8,
             ),
-            '.psalm-strophe-even.semantic-last': Style(margin: Margins.zero),
-          },
+          ),
+          '.psalm-strophe-even.semantic-last': Style(
+            margin: Margins.only(
+              left: mode == PsalmodyMode.alternatingStanzas ? stropheInset : 0,
+            ),
+          ),
           '.psalm-line': Style(display: Display.block, margin: Margins.zero),
           '.psalm-continuation': Style(
-            // With alternating strophes, every line uses its paragraph's inset,
-            // including lines that wrap to fit the screen.
-            padding: !aligned && breakAfter
-                ? HtmlPaddings.zero
-                : HtmlPaddings.only(
-                    left:
-                        MediaQuery.textScalerOf(context).scale(
-                          widget.style['p']?.fontSize?.value ??
-                              widget.style['body']?.fontSize?.value ??
-                              16,
-                        ) *
-                        .8,
-                  ),
+            padding: HtmlPaddings.only(
+              left: mode == PsalmodyMode.leftBreakIndent ? fontSize * .75 : 0,
+            ),
           ),
           '.psalm-choir-strophe': Style(
             color: widget.textColor,
