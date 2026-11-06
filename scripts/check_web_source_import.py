@@ -16,7 +16,8 @@ parser.add_argument('--web-root', type=Path)
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 lock = json.loads((root / 'docs/sources/web-import-lock.json').read_text())
-assert lock['commit'] == 'f185657e88436eb8c6adb0f666b6e50bed416b40'
+assert lock['commit'] == '33577e1fb265b02160a5e6d94cfc83a8df15b9a3'
+assert [e['flutter'] for e in lock['files']] == ['assets/legal/sources.json']
 if args.web_root:
     head = subprocess.check_output(
         ['git', '-C', str(args.web_root), 'rev-parse', 'HEAD'], text=True).strip()
@@ -31,4 +32,4 @@ for entry in lock['files'] + lock['bibleCorpora']:
                 gzip.decompress(upstream)), entry['flutter']
         else:
             assert data == upstream, entry['flutter']
-print('PASS: four byte-identical document assets and two unchanged Bible corpora')
+print('PASS: local rights registry matches Web PR #192; two Bible corpora unchanged')

@@ -1,49 +1,33 @@
 {
-  "webCommit": "f185657e88436eb8c6adb0f666b6e50bed416b40",
-  "flutterBase": "7abba85bebe184e2314b6df1593bab0720fb1c77",
-  "format": "16 changed/new Dart files: no formatting changes needed",
+  "webReference": {
+    "pullRequest": 192,
+    "commit": "33577e1fb265b02160a5e6d94cfc83a8df15b9a3"
+  },
+  "previousFlutterPRHead": "d25cb2930eeda61636077717758f0c11acbd4391",
+  "registry": "Six stable IDs; exact Web JSON retained, including provenance and internal LEV audit notice",
+  "legalBundleAssets": [
+    "assets/legal/sources.json"
+  ],
+  "targetedTests": {
+    "passed": 60,
+    "failed": 0
+  },
   "analyze": {
     "errors": 0,
     "warnings": 0,
     "infos": 12,
-    "matchesBaselineExactly": true
+    "matchesHistoricalBaselineExactly": true
   },
-  "targetedTests": {
-    "passed": 59,
-    "failed": 0
+  "chrome": {
+    "layoutScenariosPassed": 4,
+    "browserFailurePassed": true,
+    "realExternalTabs": 3,
+    "screenshots": 3,
+    "remoteDocumentContentVerified": false
   },
   "fullFlutterTest": {
-    "passed": 1727,
-    "skipped": 9,
-    "failed": 8,
-    "baselineFailures": [
-      "discovery/p0_hints_screens_test.dart: Readings date_navigation: three day arrows, once",
-      "hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
-      "ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor",
-      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0",
-      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5",
-      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.0",
-      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.5"
-    ],
-    "additionalFailure": {
-      "case": "content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left",
-      "reason": "30 second timeout; not reproduced on isolated rerun",
-      "isolatedRerun": "1 passed, 0 failed (19 seconds)"
-    },
-    "all18NewFeatureTests": "passed"
+    "status": "in_progress",
+    "command": "flutter test --no-pub --concurrency=2"
   },
-  "importParity": "Four assets byte-identical to Web; all book metadata and verse values in both corpora equal Web; pinned SHA-256 verified",
-  "finalWidgetRerun": {
-    "passed": 13,
-    "failed": 0,
-    "includesShortCalendarAppBar": true
-  },
-  "chromeVisualSmoke": {
-    "scenarios": 8,
-    "passed": 8,
-    "errors": 0,
-    "externalRequests": 0,
-    "pdf": "Offline downloaded bytes match original SHA-256",
-    "screenshots": 9
-  }
+  "publicationGate": "Blocked / unverified: managed proxy rejects Web host. Keep PR draft and do not merge or release."
 }

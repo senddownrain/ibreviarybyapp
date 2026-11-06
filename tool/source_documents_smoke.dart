@@ -1,6 +1,7 @@
 // Offline visual harness using production pages and routes, without Firebase.
 // flutter run -d chrome -t tool/source_documents_smoke.dart --web-port 5241
-// ?theme=dark&scale=2&path=/documents/proper-calendar
+// ?theme=dark&scale=2&path=/sources
+// ?launchError=true exercises browser failure without opening an external page.
 import 'dart:convert';
 import 'dart:js_interop';
 
@@ -11,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/constants/legal_links.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
 import 'package:mybrev_flutter/screens/source_documents_screen.dart';
@@ -35,7 +37,13 @@ void main() {
   router.go(params['path'] ?? '/about');
   runApp(
     ProviderScope(
-      overrides: [settingsProvider.overrideWith(_Settings.new)],
+      overrides: [
+        settingsProvider.overrideWith(_Settings.new),
+        if (params['launchError'] == 'true')
+          sourceDocumentLauncherProvider.overrideWithValue(
+            (uri, mode) async => false,
+          ),
+      ],
       child: _SmokeApp(
         dark: params['theme'] == 'dark',
         scale: double.tryParse(params['scale'] ?? '') ?? 1,
@@ -64,8 +72,6 @@ bool _inactive(Widget widget, String route) {
     final path = switch (child) {
       AboutScreen() => '/about',
       SourcesScreen() => '/sources',
-      LiturgyHoursDecreesScreen() => '/documents/liturgy-hours-decrees',
-      ProperCalendarScreen() => '/documents/proper-calendar',
       _ => null,
     };
     return path != null && path != route;
@@ -127,7 +133,14 @@ String _snapshot() {
   }
 
   WidgetsBinding.instance.rootElement?.visitChildElements(visit);
-  return jsonEncode({'text': text, 'overflow': overflow, 'route': route});
+  return jsonEncode({
+    'text': text,
+    'overflow': overflow,
+    'route': route,
+    'links': [
+      for (final d in kSourceDocumentLinks) {'label': d.label, 'url': d.url},
+    ],
+  });
 }
 
 class _SmokeApp extends StatelessWidget {
@@ -138,7 +151,7 @@ class _SmokeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = dark ? Brightness.dark : Brightness.light;
     return MaterialApp.router(
-      title: 'Source documents offline smoke',
+      title: 'Local rights and external documents smoke',
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

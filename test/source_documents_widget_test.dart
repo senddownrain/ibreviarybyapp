@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mybrev_flutter/constants/legal_links.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,14 +30,7 @@ GoRouter _router(String initialLocation) => GoRouter(
   initialLocation: initialLocation,
   routes: production.router.configuration.routes
       .whereType<GoRoute>()
-      .where(
-        (r) => [
-          '/about',
-          sourcesRoute,
-          hoursDecreesRoute,
-          properCalendarRoute,
-        ].contains(r.path),
-      )
+      .where((r) => ['/about', sourcesRoute].contains(r.path))
       .toList(),
 );
 
@@ -44,8 +39,13 @@ Widget _app(
   TargetPlatform platform = TargetPlatform.android,
   Brightness brightness = Brightness.light,
   double scale = 1,
+  Future<bool> Function(Uri, LaunchMode)? launcher,
 }) => ProviderScope(
-  overrides: [settingsProvider.overrideWith(_Settings.new)],
+  overrides: [
+    settingsProvider.overrideWith(_Settings.new),
+    if (launcher != null)
+      sourceDocumentLauncherProvider.overrideWithValue(launcher),
+  ],
   child: ReaderTypographyScope(
     useSystemFonts: true,
     child: MaterialApp.router(
@@ -142,13 +142,19 @@ void main() {
         )
         .textSpan!
         .toPlainText();
-    expect(text('hours'), 'Крыніца: lh.catholic.by');
-    expect(text('hours'), isNot(contains('©')));
+    expect(
+      text('hours'),
+      'Крыніца: lh.catholic.by. © Канферэнцыя Каталіцкіх Біскупаў Беларусі',
+    );
     expect(
       text('readings'),
       contains('© Канферэнцыя Каталіцкіх Біскупаў Беларусі, 2002-2005'),
     );
-    expect(text('compendium'), contains('© Libreria Editrice Vaticana, 2005'));
+    expect(
+      text('compendium'),
+      contains('© Канферэнцыя Каталіцкіх Біскупаў Беларусі, 2010'),
+    );
+    expect(text('compendium'), isNot(contains('Libreria')));
     await tester.tap(
       find.descendant(
         of: find.byKey(const Key('hours')),
@@ -159,79 +165,104 @@ void main() {
     expect(opened.single.toString(), 'https://lh.catholic.by/');
   });
 
-  testWidgets('About → Sources → both documents; jumps do not add Back steps', (
-    tester,
-  ) async {
-    final router = _router('/about');
+  testWidgets(
+    'About → Sources; all documents launch externally without changing the stack',
+    (tester) async {
+      final router = _router('/about');
+      addTearDown(router.dispose);
+      final opened = <(Uri, LaunchMode)>[];
+      await tester.pumpWidget(
+        _app(
+          router,
+          launcher: (uri, mode) async {
+            opened.add((uri, mode));
+            return true;
+          },
+        ),
+      );
+      await _load(tester);
+      final link = find.byKey(const Key('about-sources-link'));
+      await tester.ensureVisible(link);
+      await tester.tap(link);
+      await _load(tester);
+      expect(_path(router), sourcesRoute);
+      expect(find.textContaining('Libreria'), findsNothing);
+      for (final document in kSourceDocumentLinks) {
+        final button = find.widgetWithText(TextButton, document.label);
+        expect(button, findsOneWidget);
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(_path(router), sourcesRoute);
+      }
+      expect(opened, [
+        for (final d in kSourceDocumentLinks)
+          (Uri.parse(d.url), LaunchMode.externalApplication),
+      ]);
+      await tester.binding.handlePopRoute();
+      await _load(tester);
+      expect(_path(router), '/about');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('direct Sources has a safe Back destination', (tester) async {
+    final router = _router(sourcesRoute);
     addTearDown(router.dispose);
     await tester.pumpWidget(_app(router));
     await _load(tester);
-    final link = find.byKey(const Key('about-sources-link'));
-    await tester.ensureVisible(link);
-    await tester.tap(link);
-    await _load(tester);
-    expect(_path(router), sourcesRoute);
-    expect(find.text('Дэкрэты Літургіі гадзінаў'), findsOneWidget);
-    expect(find.textContaining('pending'), findsNothing);
-    expect(find.textContaining('пераклад ККББ'), findsNothing);
-
-    final decreeLink = find.text('Дэкрэты Літургіі гадзінаў');
-    await tester.ensureVisible(decreeLink);
-    await tester.tap(decreeLink);
-    await _load(tester);
-    expect(_path(router), hoursDecreesRoute);
-    for (final roman in ['I', 'II', 'III', 'IV']) {
-      final jump = find.widgetWithText(TextButton, 'Том $roman');
-      await tester.ensureVisible(jump);
-      await tester.tap(jump);
-      await tester.pumpAndSettle();
-    }
-    await tester.binding.handlePopRoute();
-    await _load(tester);
-    expect(_path(router), sourcesRoute);
-    final calendarLink = find.widgetWithText(
-      TextButton,
-      'Уласны каляндар дыяцэзій на Беларусі',
-    );
-    await tester.ensureVisible(calendarLink);
-    await tester.tap(calendarLink);
-    await _load(tester);
-    expect(_path(router), properCalendarRoute);
-    expect(find.byKey(const Key('calendar-intro')), findsOneWidget);
-    expect(find.byType(CalendarDocumentLine), findsNWidgets(477));
-    for (final month in [1, 7, 11, 12]) {
-      final jump = find.byKey(ValueKey('calendar-jump-$month'));
-      await tester.ensureVisible(jump);
-      await tester.tap(jump);
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-    }
-    await tester.binding.handlePopRoute();
-    await _load(tester);
-    expect(_path(router), sourcesRoute);
     await tester.tap(find.byTooltip('Закрыць'));
     await _load(tester);
     expect(_path(router), '/about');
-    expect(tester.takeException(), isNull);
   });
 
-  for (final path in [hoursDecreesRoute, properCalendarRoute, sourcesRoute]) {
-    testWidgets('direct $path has a safe Back destination', (tester) async {
-      final router = _router(path);
-      addTearDown(router.dispose);
-      await tester.pumpWidget(_app(router));
-      await _load(tester);
-      await tester.binding.handlePopRoute();
-      await _load(tester);
-      expect(_path(router), path == sourcesRoute ? '/about' : sourcesRoute);
-    });
+  for (final throws in [false, true]) {
+    testWidgets(
+      'external launch ${throws ? 'exception' : 'false'} shows a Belarusian error without fallback',
+      (tester) async {
+        final router = _router(sourcesRoute);
+        addTearDown(router.dispose);
+        await tester.pumpWidget(
+          _app(
+            router,
+            launcher: (uri, mode) async {
+              if (throws) throw StateError('browser unavailable');
+              return false;
+            },
+          ),
+        );
+        await _load(tester);
+        final button = find.widgetWithText(
+          TextButton,
+          kSourceDocumentLinks[1].label,
+        );
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(
+          find.text('Не ўдалося адкрыць старонку. Праверце інтэрнэт-злучэнне'),
+          findsOneWidget,
+        );
+        expect(_path(router), sourcesRoute);
+        expect(find.text('Арыгінал PDF'), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
+
+  test('document paths have no native Flutter routes', () {
+    final routes = production.router.configuration.routes.whereType<GoRoute>();
+    for (final doc in kSourceDocumentLinks) {
+      expect(routes.where((r) => r.path == Uri.parse(doc.url).path), isEmpty);
+    }
+  });
 
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
     for (final brightness in Brightness.values) {
       for (final size in [(320.0, 2.0), (390.0, 1.0)]) {
         testWidgets(
-          'offline articles fit $platform $brightness ${size.$1} ${size.$2}',
+          'local rights fit $platform $brightness ${size.$1} ${size.$2}',
           (tester) async {
             tester.view.physicalSize = Size(size.$1, 844);
             tester.view.devicePixelRatio = 1;
@@ -248,25 +279,18 @@ void main() {
               ),
             );
             await _load(tester);
-            expect(tester.takeException(), isNull);
-            for (final route in [hoursDecreesRoute, properCalendarRoute]) {
-              router.go(route);
-              await _load(tester);
-              expect(tester.takeException(), isNull);
-              final scrollable = find.byType(Scrollable).first;
-              await tester.drag(scrollable, const Offset(0, -1500));
+            expect(find.textContaining('Libreria'), findsNothing);
+            expect(
+              find.text('© Канферэнцыя Каталіцкіх Біскупаў Беларусі'),
+              findsOneWidget,
+            );
+            for (final doc in kSourceDocumentLinks) {
+              await tester.ensureVisible(
+                find.widgetWithText(TextButton, doc.label),
+              );
               await tester.pumpAndSettle();
               expect(tester.takeException(), isNull);
             }
-            final runs = tester.widgetList<DocumentRuns>(
-              find.byType(DocumentRuns),
-            );
-            expect(runs.expand((r) => r.runs).any((r) => r.small), isTrue);
-            expect(runs.expand((r) => r.runs).any((r) => r.italic), isTrue);
-            expect(
-              runs.expand((r) => r.runs).any((r) => r.tone == 'red'),
-              isTrue,
-            );
           },
         );
       }

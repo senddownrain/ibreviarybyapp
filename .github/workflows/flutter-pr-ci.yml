@@ -35,7 +35,7 @@ jobs:
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
-      - name: Pinned Web sources and offline documents
+      - name: Local rights and external Web documents
         run: |
           python3 scripts/check_web_source_import.py
           dart format --output=none --set-exit-if-changed lib/models/source_documents.dart lib/screens/source_documents_screen.dart test/source_documents_test.dart test/source_documents_widget_test.dart tool/source_documents_smoke.dart

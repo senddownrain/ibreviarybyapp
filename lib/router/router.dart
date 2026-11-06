@@ -768,34 +768,6 @@ final router = GoRouter(
         ),
       ),
     ),
-    GoRoute(
-      parentNavigatorKey: rootNavigatorKey,
-      path: hoursDecreesRoute,
-      name: 'LiturgyHoursDecrees',
-      pageBuilder: (context, state) => MaterialPage<void>(
-        key: state.pageKey,
-        restorationId: 'liturgy-hours-decrees',
-        child: const SecondaryPageScaffold(
-          title: 'Дэкрэты',
-          fallbackLocation: sourcesRoute,
-          child: LiturgyHoursDecreesScreen(),
-        ),
-      ),
-    ),
-    GoRoute(
-      parentNavigatorKey: rootNavigatorKey,
-      path: properCalendarRoute,
-      name: 'ProperCalendar',
-      pageBuilder: (context, state) => MaterialPage<void>(
-        key: state.pageKey,
-        restorationId: 'proper-calendar',
-        child: const SecondaryPageScaffold(
-          title: 'Каляндар',
-          fallbackLocation: sourcesRoute,
-          child: ProperCalendarScreen(),
-        ),
-      ),
-    ),
   ],
 );
 

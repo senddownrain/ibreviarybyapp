@@ -4,9 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const sourcesRoute = '/sources';
-const hoursDecreesRoute = '/documents/liturgy-hours-decrees';
-const properCalendarRoute = '/documents/proper-calendar';
-const properCalendarPdfAsset = 'assets/legal/proper-calendar.pdf';
 
 Future<Map<String, dynamic>> _read(String name) async =>
     jsonDecode(await rootBundle.loadString('assets/legal/$name.json'))
@@ -97,13 +94,15 @@ class SourceEntry {
 
   String get edition {
     if (id == 'bible-ru-synodal') return '';
-    final title =
-        ['liturgy-hours-2012-2020', 'compendium-kkbb-2010'].contains(id)
+    final title = id == 'compendium-kkbb-2010'
         ? raw['officialEdition'] as String
         : '«${raw['officialEdition']}»';
+    final years = id == 'liturgy-hours-2012-2020'
+        ? (raw['years'] as String).replaceFirst('-', '–')
+        : raw['years'];
     final details = [
       raw['publicationPlace'],
-      raw['years'],
+      years,
     ].whereType<String>().where((s) => s.isNotEmpty).join(', ');
     return '$title${details.isEmpty ? '' : ' ($details)'}';
   }
@@ -122,109 +121,4 @@ class SourceEntry {
         )
         .toList(growable: false);
   }
-}
-
-class HoursDecrees {
-  HoursDecrees.fromJson(Map<String, dynamic> json)
-    : title = json['title'] as String,
-      documents = (json['documents'] as List)
-          .map((d) => HoursDecree(d as Map<String, dynamic>))
-          .toList(growable: false);
-  final String title;
-  final List<HoursDecree> documents;
-  static Future<HoursDecrees> load() async =>
-      HoursDecrees.fromJson(await _read('liturgy-hours-decrees'));
-}
-
-class HoursDecree {
-  const HoursDecree(this.raw);
-  final Map<String, dynamic> raw;
-  String get id => raw['id'] as String;
-  String get roman => raw['roman'] as String;
-  String get number => raw['number'] as String;
-  String get heading => raw['heading'] as String;
-  List<String> lines(String field) => (raw[field] as List).cast<String>();
-}
-
-class DocumentRun {
-  const DocumentRun({
-    required this.text,
-    this.tone = 'black',
-    this.italic = false,
-    this.small = false,
-    this.bold = false,
-  });
-  factory DocumentRun.fromJson(Map<String, dynamic> json) => DocumentRun(
-    text: json['text'] as String,
-    tone: json['tone'] as String,
-    italic: json['italic'] as bool,
-    small: json['small'] as bool,
-    bold: json['bold'] as bool,
-  );
-  final String text;
-  final String tone;
-  final bool italic, small, bold;
-}
-
-class CalendarRow {
-  CalendarRow.fromJson(Map<String, dynamic> json)
-    : kind = json['kind'] as String,
-      month = json['month'] as int?,
-      date = json['date'] as int?,
-      dateTone = json['dateTone'] as String?,
-      indent = json['indent'] as bool? ?? false,
-      text = json['text'] as String?,
-      runs = _runs(json['runs']),
-      rank = _runs(json['rank']);
-  final String kind;
-  final int? month, date;
-  final String? text, dateTone;
-  final bool indent;
-  final List<DocumentRun> runs, rank;
-  static List<DocumentRun> _runs(dynamic value) => (value as List? ?? [])
-      .map((r) => DocumentRun.fromJson(r as Map<String, dynamic>))
-      .toList(growable: false);
-}
-
-class CalendarPage {
-  CalendarPage.fromJson(Map<String, dynamic> json)
-    : number = json['number'] as int,
-      rows = (json['rows'] as List)
-          .map((r) => CalendarRow.fromJson(r as Map<String, dynamic>))
-          .toList(growable: false);
-  final int number;
-  final List<CalendarRow> rows;
-}
-
-class ProperCalendarDocument {
-  ProperCalendarDocument.fromJson(Map<String, dynamic> json)
-    : title = json['title'] as String,
-      months = (json['months'] as List)
-          .map((m) => (number: m['number'] as int, title: m['title'] as String))
-          .toList(growable: false),
-      pages = (json['pages'] as List)
-          .map((p) => CalendarPage.fromJson(p as Map<String, dynamic>))
-          .toList(growable: false);
-  final String title;
-  final List<({int number, String title})> months;
-  final List<CalendarPage> pages;
-  Iterable<CalendarRow> get rows => pages.expand((p) => p.rows);
-
-  /// Five PDF lines, one logical paragraph, exactly as corrected in Web.
-  List<DocumentRun> get introRuns => [
-    for (final row in rows.where((r) => r.kind == 'intro').indexed) ...[
-      if (row.$1 > 0)
-        DocumentRun(
-          text: ' ',
-          tone: row.$2.runs.first.tone,
-          italic: row.$2.runs.first.italic,
-          small: row.$2.runs.first.small,
-          bold: row.$2.runs.first.bold,
-        ),
-      ...row.$2.runs,
-    ],
-  ];
-
-  static Future<ProperCalendarDocument> load() async =>
-      ProperCalendarDocument.fromJson(await _read('proper-calendar'));
 }

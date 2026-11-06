@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-11-06",
+  "status": "blocked_unverified",
+  "urls": [
+    {
+      "url": "https://ibreviaryby.web.app/documents/liturgy-hours-decrees",
+      "originHttpStatus": null,
+      "mobileBrowserContentVerified": false
+    },
+    {
+      "url": "https://ibreviaryby.web.app/documents/liturgy-hours-introduction",
+      "originHttpStatus": null,
+      "mobileBrowserContentVerified": false
+    },
+    {
+      "url": "https://ibreviaryby.web.app/documents/proper-calendar",
+      "originHttpStatus": null,
+      "mobileBrowserContentVerified": false
+    }
+  ],
+  "proxyConnectStatus": 403,
+  "curlExitCode": 56,
+  "reason": "Managed HTTP proxy denies CONNECT to ibreviaryby.web.app; host is absent from the allowed-host policy. This is not a response from the Web site.",
+  "webReference": {
+    "pullRequest": 192,
+    "commit": "33577e1fb265b02160a5e6d94cfc83a8df15b9a3"
+  },
+  "browserOpening": "Chrome real popups observed for all three canonical URLs; content requests intentionally aborted by visual smoke. External launch mode also checked in widget tests.",
+  "acceptanceGate": "Keep Flutter PR #65 draft and do not merge or release until all three public URLs, especially the introduction, are opened successfully in a mobile browser."
+}
