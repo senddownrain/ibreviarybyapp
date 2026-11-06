@@ -441,7 +441,9 @@ class LiturgicalContentService {
       for (final entry in rawDynamicDays.entries)
         entry.key: [
             for (final item in entry.value)
-              withContext(resolveDayAgainstPeriod(item, resolvedPeriodDay))!,
+              withContext(
+                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, entry.key),
+              )!,
           ],
     };
     return _DaysResult(

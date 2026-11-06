@@ -1,0 +1,16 @@
+Analyzing ibreviarybyapp...
+
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:17:5 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:25:5 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:46:5 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:62:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:67:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:124:5 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:149:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:151:13 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:153:13 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:160:10 • prefer_interpolation_to_compose_strings
+   info • Use an initializing formal to assign a parameter to a field • test/analytics/consent_mock_test.dart:45:8 • prefer_initializing_formals
+   info • Unnecessary use of string interpolation • test/reading_choices_test.dart:57:11 • unnecessary_string_interpolations
+
+12 issues found. (ran in 6.0s)

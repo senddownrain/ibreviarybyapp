@@ -1,0 +1,35 @@
+00:00 +0: loading /workspace/ibreviarybyapp-before63/test/high_priest_minimal_patch_test.dart
+00:00 +0: minimal 12-field patch: real service/updater, complete Proper, 44-date parity and offline restart (also runs on pre-PR Flutter)
+[ContentStore] prayerCategories: 5 docs in 49 ms
+[ContentStore] prayers: 115 docs in 547 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 172 ms
+[ContentStore] invitatoriums: 4 docs in 181 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 168 ms
+[ContentStore] completoriums: 35 docs in 263 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 259 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 360 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 658 ms
+[ContentStore] liturgicalTemplates: 16 docs in 705 ms
+[ContentStore] readings: 822 docs in 1307 ms
+[ContentStore] days: 736 docs in 2512 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 105 ms
+[ContentStore] songs: 447 docs in 125 ms
+[ContentStore] compendium: 27 docs in 177 ms
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 90 ms
+[ContentStore] invitatoriums: 4 docs in 55 ms
+[ContentStore] completoriums: 35 docs in 55 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 17 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 14 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 63 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 64 ms
+[ContentStore] liturgicalTemplates: 16 docs in 416 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 445 ms
+[ContentStore] readings: 822 docs in 684 ms
+[ContentStore] days: 736 docs in 1295 ms
+[ContentStore] compendiumMeta: 1 docs in 2 ms
+[ContentStore] songs: 447 docs in 19 ms
+[ContentStore] compendium: 27 docs in 31 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 42 ms
+00:21 +1: All tests passed!

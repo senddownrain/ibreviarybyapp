@@ -1,0 +1,12 @@
+{
+  "legacyCommit": "2420c45cc19ea87b843765d5f658cbc975dc69ed",
+  "legacyPackageRoot": "/workspace/ibreviarybyapp-before63",
+  "sameTestAndInputs": {
+    "test/high_priest_minimal_patch_test.dart": "49dcbb41d8d17fef355c8d4828803750d7549c98c95b267478c2e429b934f26f",
+    "test/fixtures/high_priest_daytime_parity.json.gz": "04e9cf0898d91ae4879dfe6450141e0922c874ed1d8479d1ba7ddcf3585c3972",
+    "reports/liturgy/christ-high-priest-daytime-patch.json": "3dc40790aa8316226793ee31b38399b4beef2f6ee4960878620ee950354fb659"
+  },
+  "legacyResult": "1 passed; real original ContentService/ContentStore/ContentUpdater",
+  "runtimeChangesSinceOriginalPR": false,
+  "originalAlgorithmTestsUnchanged": true
+}

@@ -1,0 +1,15 @@
+✔ exactly 12 references, every other stored field unchanged (334.496463ms)
+✔ already resolved references need no new writes (idempotent) (276.822076ms)
+✔ correct full collect with different HTML is preserved (186.450483ms)
+✔ refuse a shortened collect; never automatically repair it (186.817486ms)
+✔ refuse unexpected Proper text (212.330954ms)
+✔ refuse stale Proper inheritance metadata instead of broadening the patch (224.542369ms)
+✔ refuse unexpected populated psalm instead of overwriting it (203.836711ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2106.606663

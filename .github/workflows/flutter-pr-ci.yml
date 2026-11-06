@@ -35,6 +35,11 @@ jobs:
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
+      - name: Movable feast daytime prayer and delivery regression
+        run: >-
+          flutter test test/high_priest_daytime_test.dart
+          test/high_priest_daytime_parity_test.dart test/high_priest_minimal_patch_test.dart
+          test/liturgical_resolution_test.dart
       - name: Check devotional reader formatting
         run: >-
           dart format --output=none --set-exit-if-changed
