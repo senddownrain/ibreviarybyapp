@@ -1,0 +1,47 @@
+{
+  "url": "http://localhost:5241/",
+  "states": [
+    {
+      "width": 390,
+      "theme": "light",
+      "textScale": 1,
+      "rights": 6,
+      "externalLinks": 3,
+      "back": "pass"
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "textScale": 1,
+      "rights": 6,
+      "externalLinks": 3,
+      "back": "pass"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "textScale": 2,
+      "rights": 6,
+      "externalLinks": 3,
+      "back": "pass"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "textScale": 2,
+      "rights": 6,
+      "externalLinks": 3,
+      "back": "pass"
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "documentRequests": [
+    "https://ibreviaryby.web.app/documents/liturgy-hours-decrees",
+    "https://ibreviaryby.web.app/documents/liturgy-hours-introduction",
+    "https://ibreviaryby.web.app/documents/proper-calendar"
+  ],
+  "browserFailure": "Belarusian message displayed, no native document fallback",
+  "publication": "UNVERIFIED: managed proxy denies the Web host; this smoke intentionally aborts document content requests",
+  "native": "Android/iOS devices unavailable; externalApplication mode covered by widget tests, Chrome opens separate real tabs"
+}

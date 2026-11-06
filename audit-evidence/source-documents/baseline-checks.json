@@ -1,0 +1,36 @@
+{
+  "commit": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+  "analyze": {
+    "issues": [
+      "info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:17:5 • prefer_interpolation_to_compose_strings",
+      "info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:25:5 • curly_braces_in_flow_control_structures",
+      "info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:46:5 • prefer_interpolation_to_compose_strings",
+      "info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:62:5 • curly_braces_in_flow_control_structures",
+      "info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:67:5 • curly_braces_in_flow_control_structures",
+      "info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:124:5 • curly_braces_in_flow_control_structures",
+      "info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:149:16 • prefer_interpolation_to_compose_strings",
+      "info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:151:13 • prefer_interpolation_to_compose_strings",
+      "info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:153:13 • prefer_interpolation_to_compose_strings",
+      "info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:160:10 • prefer_interpolation_to_compose_strings",
+      "info • Use an initializing formal to assign a parameter to a field • test/analytics/consent_mock_test.dart:45:8 • prefer_initializing_formals",
+      "info • Unnecessary use of string interpolation • test/reading_choices_test.dart:58:11 • unnecessary_string_interpolations"
+    ],
+    "errors": 0,
+    "warnings": 0,
+    "infos": 12
+  },
+  "flutterTest": {
+    "passed": 1710,
+    "skipped": 9,
+    "failed": 7,
+    "failureCases": [
+      "discovery/p0_hints_screens_test.dart: Readings date_navigation: three day arrows, once",
+      "hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor",
+      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0",
+      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5",
+      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.0",
+      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.5"
+    ]
+  }
+}

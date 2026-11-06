@@ -71,7 +71,7 @@ void main() {
       );
       expect(
         find.textContaining('Libreria Editrice Vaticana', findRichText: true),
-        findsOneWidget,
+        findsNothing,
       );
       final sourceText = tester.widget<Text>(
         find.descendant(

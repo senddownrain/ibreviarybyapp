@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/navigation/bible_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -314,10 +315,12 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                   titleActionLabel:
                       'Выбраць кнігу або раздзел. Зараз ${book.name} ${widget.chapter}',
                   subtitle: 'Раздзел ${widget.chapter}',
-                  metadata: bibleAttribution(
-                    versionId: widget.versionId,
-                    isNewTestament: book.isNewTestament,
-                  ),
+                  metadata:
+                      ref
+                          .watch(sourceRegistryProvider)
+                          .valueOrNull
+                          ?.bibleLabel(widget.versionId, book.isNewTestament) ??
+                      '',
                   onTitleTap: () => _openPicker(book),
                   actions: [_translationControl(book)],
                 ),

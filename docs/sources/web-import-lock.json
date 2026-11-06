@@ -1,0 +1,31 @@
+{
+  "repository": "senddownrain/mybrev",
+  "pullRequest": 192,
+  "commit": "33577e1fb265b02160a5e6d94cfc83a8df15b9a3",
+  "files": [
+    {
+      "web": "src/data/sources.json",
+      "flutter": "assets/legal/sources.json",
+      "sha256": "dbd8d9fb60535923d98ae7e17071aac78fa621bb8827023229151c855cdbb030"
+    }
+  ],
+  "bibleCorpora": [
+    {
+      "flutter": "assets/bible_seed_bel.json.gz",
+      "web": "scripts/bible/bible_seed_bel_mixed.json.gz",
+      "sha256": "881fa3099031322b0083113446959c5b10680ef856bb7d481c7015c87ffa0b4b",
+      "books": 73,
+      "verses": 35532,
+      "comparison": "All decoded book metadata, chapter arrays and verse values equal Web; gzip bytes need not match."
+    },
+    {
+      "flutter": "assets/bible_seed_ru.json.gz",
+      "web": "scripts/bible/bible_seed_ru.json.gz",
+      "sha256": "2d22792001d78b06a6c5794e035def93faae940b8447be96d8c4e2c05ed8f956",
+      "books": 73,
+      "verses": 35590,
+      "comparison": "All decoded book metadata, chapter arrays and verse values equal Web; gzip bytes need not match."
+    }
+  ],
+  "bibleReferenceCommit": "f185657e88436eb8c6adb0f666b6e50bed416b40"
+}
