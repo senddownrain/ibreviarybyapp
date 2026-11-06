@@ -27,6 +27,8 @@ import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
+import 'package:mybrev_flutter/screens/feedback_screen.dart';
+import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
@@ -736,6 +738,20 @@ final router = GoRouter(
               'data',
               'sync',
             }.contains(state.uri.queryParameters['section']),
+          ),
+        ),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: '/settings/feedback',
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        restorationId: 'settings-feedback',
+        child: SecondaryPageScaffold(
+          title: 'Зваротная сувязь',
+          child: FeedbackScreen(
+            context: FeedbackContext.fromQuery(state.uri.queryParameters),
           ),
         ),
       ),
