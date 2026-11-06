@@ -44,6 +44,8 @@ jobs:
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
+      - name: Offline content, atomic updates and calendar refresh regression
+        run: flutter test test/content_offline_test.dart test/ordo_content_update_test.dart
       - name: Movable feast daytime prayer and delivery regression
         run: >-
           flutter test test/high_priest_daytime_test.dart
