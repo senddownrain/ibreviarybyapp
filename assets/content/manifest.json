@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1793343827000,
-  "contentDate": "2026-10-30T07:03:47.000Z",
+  "contentVersion": 1793950365664,
+  "contentDate": "2026-11-06T07:32:45.664Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -68,12 +68,12 @@
     },
     "liturgicalDioceseOverrides": {
       "file": "liturgicalDioceseOverrides.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
+      "contentVersion": 1793950365664,
+      "contentDate": "2026-11-06T07:32:45.664Z",
       "count": 75,
-      "digest": "1df4e38742254f17",
-      "storedBytes": 53313,
-      "bundleBytes": 7767
+      "digest": "d5f7d42724c985cb",
+      "storedBytes": 53185,
+      "bundleBytes": 7750
     },
     "liturgicalYearOverrides": {
       "file": "liturgicalYearOverrides.json.gz",
@@ -86,12 +86,12 @@
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",
-      "contentVersion": 1793343827000,
-      "contentDate": "2026-10-30T07:03:47.000Z",
+      "contentVersion": 1793950365664,
+      "contentDate": "2026-11-06T07:32:45.664Z",
       "count": 291,
-      "digest": "e38afe1c97a7ba34",
-      "storedBytes": 3200281,
-      "bundleBytes": 590594
+      "digest": "8d79a1efaafd1062",
+      "storedBytes": 3200447,
+      "bundleBytes": 590699
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",

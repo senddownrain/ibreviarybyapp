@@ -152,10 +152,9 @@ void main() {
       expect(option.day!.data['laudesHymn'], 'day:laudesHymn');
       final pastors = option.templates[1].day.data;
       expect(pastors['laudesHymn'], templates['pastors']!['laudesHymn']);
-      expect(
-        pastors['laudesPs1'],
-        templates[kSundayWeek1Template]!['laudesPs1'],
-      );
+      // GILH 235-238: a memorial keeps the psalmody of the weekday (not Sunday week I).
+      expect(pastors['laudesPs1'], option.day!.data['laudesPs1']);
+      expect(pastors['officeOfReadingsTeDeum'], isNot(true));
       expect(
         pastors['officeOfReadingsR2'],
         option.day!.data['officeOfReadingsR2'],
