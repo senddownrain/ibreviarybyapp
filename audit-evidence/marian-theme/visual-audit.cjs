@@ -22,6 +22,8 @@ async function connect(port) {
  });
  const pages=context.pages().filter(p=>p.url().startsWith(base));
  const page=pages.find(p=>p.url().includes('?theme='))||pages[0];
+ // Restored audit tabs can hold IndexedDB locks across preview runs.
+ for(const other of context.pages()) if(other!==page) await other.close();
  await page.bringToFront();
  return {browser,context,page};
 }
@@ -32,13 +34,26 @@ async function boot(page,width=390,theme='marian',scale=1,platform='android') {
  const session=await page.context().newCDPSession(page);
  await session.send('HeapProfiler.collectGarbage');await session.detach();
  await page.setViewportSize({width,height:900});
- await page.goto(`${base}/?theme=${theme}&scale=${scale}&platform=${platform}`);
+ await page.goto(`${base}/?theme=${theme}&scale=${scale}&platform=${platform}`,{waitUntil:'domcontentloaded',timeout:90000});
+ // A manually reloaded Flutter debug tab can wait for the DWDS debugger.
+ // Start its registered entrypoint once when no debugger has started it.
+ await page.waitForFunction(()=>(typeof window.$dartRunMain==='function'&&window.$dartMainTearOffs?.length>0)||typeof window.marianAuditCommand==='function',null,{timeout:90000});
+ await page.waitForTimeout(1000);
+ await page.evaluate(()=>{if(!window.$dartMainExecuted&&window.$dartRunMain)window.$dartRunMain();});
  await page.waitForFunction(()=>typeof window.marianAuditCommand==='function',null,{timeout:90000});
  await page.bringToFront();
+ await command(page,'psalmody','leftBreak');
  await command(page,'font','16');
  await page.waitForTimeout(1200);
 }
-module.exports={connect,command,boot};
+async function psalmMiddle(page) {
+ const state=JSON.parse(await command(page,'inspect'));
+ const verse=state.texts.find(t=>t.includes('Душа мая насычаецца'));
+ if(!verse) throw Error('Missing verse from the first long psalm');
+ const result=await command(page,'text',verse);
+ if(result!=='ok') throw Error(result);
+}
+module.exports={connect,command,boot,psalmMiddle};
 if(require.main===module) (async()=>{
  const {browser,page}=await connect(Number(process.argv[2]||32769));
  const errors=[];page.on('pageerror',e=>errors.push(e.message));

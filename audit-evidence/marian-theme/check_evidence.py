@@ -32,7 +32,10 @@ def contrast(a, b):
     return (y+.05)/(x+.05)
 checks['reader_contrast'] = {name: round(contrast(color, 'FBFDFF'), 3) for name, color in {'ink':'202D39','muted':'52687A','primary':'244D78','rubric':'9B302A'}.items()}
 checks['secondary_contrast'] = round(contrast('477DAA','000000'), 3)
-checks['source'] = {'flutter_base': '6b74fbe07f949ad5ecc9027cc284471c26e43578', 'web_reference': '3aa7ba0f5cd186922d67e4e5e18a980e287a030c'}
+checks['psalmody_mode_images'] = [{'name': r['name'], 'mode': r.get('psalmodyMode'), 'pass': r.get('psalmodyMode') == r['name'].split('-psalmody-')[1]} for r in visual['records'] if '-psalmody-' in r['name']]
+checks['psalmody_default'] = all(r.get('psalmodyMode') == 'leftBreak' for r in visual['records'] if '-psalmody-' not in r['name'])
+checks['console'] = {'widget_messages': visual['errors'], 'debug_transport_message_count': len(visual.get('transportErrors', []))}
+checks['source'] = {'flutter_base': '9bf2925f537d648fd29fb87cec2235b98ea80412', 'web_reference': '3aa7ba0f5cd186922d67e4e5e18a980e287a030c'}
 (root / 'audit-checks.json').write_text(json.dumps(checks, indent=2) + '\n')
 print(json.dumps({
     'screenshots': checks['screenshots'],
@@ -43,3 +46,9 @@ print(json.dumps({
     'legacy_total': len(checks['legacy_png_comparison']),
     'contrast': checks['reader_contrast'],
 }, indent=2))
+assert checks['screenshots'] == 129
+assert len({r['name'] for r in visual['records']}) == 129
+assert all(r['pass'] for key in ['viewports', 'reader_surfaces', 'paper_pixels', 'psalmody_mode_images'] for r in checks[key])
+assert len(checks['psalmody_mode_images']) == 8 and checks['psalmody_default']
+assert all(value >= 4.5 for value in checks['reader_contrast'].values())
+assert checks['secondary_contrast'] >= 4.5

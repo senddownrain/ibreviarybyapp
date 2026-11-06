@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
@@ -113,6 +114,10 @@ Future<JSString> _handle(String action, String value) async {
         .setThemePreference(AppThemePreference.fromStorage(value));
   } else if (action == 'route') {
     router.go(value);
+  } else if (action == 'psalmody') {
+    await _container
+        .read(settingsProvider.notifier)
+        .setPsalmodyMode(resolvePsalmodyMode(storedMode: value));
   } else if (action == 'font') {
     _container.read(settingsProvider.notifier).setFontSize(double.parse(value));
   } else if (action == 'back') {
@@ -207,6 +212,7 @@ Future<JSString> _handle(String action, String value) async {
       View.of(context).physicalSize.height,
     ],
     'preference': _container.read(settingsProvider).themePreference.name,
+    'psalmodyMode': _container.read(settingsProvider).psalmodyMode.name,
     'brightness': Theme.of(context).brightness.name,
     'page': colors.page.toARGB32().toRadixString(16),
     'reader': colors.reader.toARGB32().toRadixString(16),

@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/providers/connectivity_provider.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
@@ -87,14 +88,16 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(
       container: _container,
-      child: Builder(builder: (context) => MediaQuery(
-        data: MediaQueryData.fromView(View.of(context)).copyWith(
-          textScaler: TextScaler.linear(
-            double.tryParse(Uri.base.queryParameters['scale'] ?? '') ?? 1,
+      child: Builder(
+        builder: (context) => MediaQuery(
+          data: MediaQueryData.fromView(View.of(context)).copyWith(
+            textScaler: TextScaler.linear(
+              double.tryParse(Uri.base.queryParameters['scale'] ?? '') ?? 1,
+            ),
           ),
+          child: const MyBrevApp(),
         ),
-        child: const MyBrevApp(),
-      )),
+      ),
     ),
   );
   _command = ((JSString action, JSString value) => _handle(
@@ -110,6 +113,9 @@ Future<JSString> _handle(String action, String value) async {
         .setThemeMode(legacyThemeMode(value));
   } else if (action == 'route') {
     router.go(value);
+  } else if (action == 'psalmody') {
+    await _container.read(settingsProvider.notifier)
+        .setPsalmodyMode(resolvePsalmodyMode(storedMode: value));
   } else if (action == 'font') {
     _container.read(settingsProvider.notifier).setFontSize(double.parse(value));
   } else if (action == 'back') {
@@ -195,9 +201,16 @@ Future<JSString> _handle(String action, String value) async {
   final colors = IbColors.of(context);
   return jsonEncode({
     'route': actualRoute,
-    'mediaSize': [MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height],
-    'viewSize': [View.of(context).physicalSize.width, View.of(context).physicalSize.height],
+    'mediaSize': [
+      MediaQuery.sizeOf(context).width,
+      MediaQuery.sizeOf(context).height,
+    ],
+    'viewSize': [
+      View.of(context).physicalSize.width,
+      View.of(context).physicalSize.height,
+    ],
     'preference': _container.read(settingsProvider).themeMode.name,
+    'psalmodyMode': _container.read(settingsProvider).psalmodyMode.name,
     'brightness': Theme.of(context).brightness.name,
     'page': colors.page.toARGB32().toRadixString(16),
     'reader': colors.reader.toARGB32().toRadixString(16),

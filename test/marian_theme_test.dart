@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/main.dart' show buildAppTheme;
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
@@ -123,6 +124,22 @@ void main() {
         await stale.toggleFavorite('one');
         expect(box.get('themeMode'), 'marian');
         expect(container().read(settingsProvider).favoriteIds, ['one']);
+      },
+    );
+    test(
+      'all three accepted psalmody modes survive every theme choice',
+      () async {
+        for (final mode in PsalmodyMode.values) {
+          await box.put('psalmodyMode', mode.name);
+          final settings = container().read(settingsProvider.notifier);
+          for (final preference in AppThemePreference.values) {
+            final before = box.toMap();
+            await settings.setThemePreference(preference);
+            expect(settings.state.psalmodyMode, mode);
+            expect(box.toMap(), {...before, 'themeMode': preference.name});
+            expect(container().read(settingsProvider).psalmodyMode, mode);
+          }
+        }
       },
     );
   });

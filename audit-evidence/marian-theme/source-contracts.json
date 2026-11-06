@@ -1,6 +1,6 @@
 {
-  "base": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
-  "implementation": "f766beddb99d716962f08505678e8f304a4fd4d8",
+  "base": "9bf2925f537d648fd29fb87cec2235b98ea80412",
+  "implementation": "3d63fdcbd4778d5dfc0dcfbec2cfbbba6c40c54c",
   "all_assets_unchanged": true,
   "domain_and_reader_contracts": [
     {
@@ -35,20 +35,20 @@
     },
     {
       "path": "lib/services/liturgical_content_service.dart",
-      "main_blob": "9af470401cb3e2034b063e8df26c04eecdf8b2ab",
-      "branch_blob": "9af470401cb3e2034b063e8df26c04eecdf8b2ab",
+      "main_blob": "c1aa578f9542ede5e779384bc122da90eeda3b03",
+      "branch_blob": "c1aa578f9542ede5e779384bc122da90eeda3b03",
       "identical": true
     },
     {
       "path": "lib/models/psalmody_preferences.dart",
-      "main_blob": "bcc3a848b5d7d355d7ed9772e9dc1c0c5621ca14",
-      "branch_blob": "bcc3a848b5d7d355d7ed9772e9dc1c0c5621ca14",
+      "main_blob": "d5b78b30b232901e436faa30ce0fc29e9e22d4cc",
+      "branch_blob": "d5b78b30b232901e436faa30ce0fc29e9e22d4cc",
       "identical": true
     },
     {
       "path": "lib/widgets/psalmody_settings_section.dart",
-      "main_blob": "717fb4cf67d2662974238fb2f2b0d241f986407c",
-      "branch_blob": "717fb4cf67d2662974238fb2f2b0d241f986407c",
+      "main_blob": "fe19dbf7c5400768b2efc3061c5e8cf0eae3b53c",
+      "branch_blob": "fe19dbf7c5400768b2efc3061c5e8cf0eae3b53c",
       "identical": true
     },
     {
@@ -103,6 +103,36 @@
       "path": "assets/content/manifest.json",
       "main_blob": "f1463c1457d58a3ce7f8aecdfde907750c613481",
       "branch_blob": "f1463c1457d58a3ce7f8aecdfde907750c613481",
+      "identical": true
+    },
+    {
+      "path": "lib/services/hive_service.dart",
+      "main_blob": "c9a7ed21ec34ec3a3d91b63876e2e4a444cefc3d",
+      "branch_blob": "c9a7ed21ec34ec3a3d91b63876e2e4a444cefc3d",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/psalm_choir_html.dart",
+      "main_blob": "4370c45a8fcfdbcf885122d6c07abb548f5091cf",
+      "branch_blob": "4370c45a8fcfdbcf885122d6c07abb548f5091cf",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/psalmody_mode_selector.dart",
+      "main_blob": "149ff9b16367b64c93e9f72026f8c474455fd930",
+      "branch_blob": "149ff9b16367b64c93e9f72026f8c474455fd930",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/text_scale_control.dart",
+      "main_blob": "84678066d95fc18951db5a97c8922f2693e88123",
+      "branch_blob": "84678066d95fc18951db5a97c8922f2693e88123",
+      "identical": true
+    },
+    {
+      "path": "lib/utils/liturgical_html.dart",
+      "main_blob": "b2ee3e4da6b12e7a134bb5e32a4231784b2086d9",
+      "branch_blob": "b2ee3e4da6b12e7a134bb5e32a4231784b2086d9",
       "identical": true
     },
     {

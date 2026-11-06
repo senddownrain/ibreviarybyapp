@@ -1,4 +1,4 @@
-const {connect,boot,command}=require('./visual-audit.cjs');
+const {connect,boot,command,psalmMiddle}=require('./visual-audit.cjs');
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 (async()=>{
  const {browser,page}=await connect(Number(process.argv[2]));
@@ -20,10 +20,7 @@ const fs=require('fs'),path=require('path'),crypto=require('crypto');
   const prefix=`${platform}-${width}-${theme}`;
   await snap(prefix+'-home');
   await command(page,'tap','Ютрань');await page.waitForTimeout(900);
-  const state=JSON.parse(await command(page,'inspect'));
-  const idx=state.texts.findIndex(t=>/^Псальм /.test(t));
-  const verses=state.texts.slice(idx+1).filter(t=>t.includes('*')&&t.length>45&&!/ант\.|^Хвала|^Як была/.test(t));
-  if(verses.length>3)await command(page,'text',verses[3]);else await command(page,'scroll','.35');
+  await psalmMiddle(page);
   await snap(prefix+'-laudes-middle');
   await command(page,'route','/settings');await snap(prefix+'-settings');
  }

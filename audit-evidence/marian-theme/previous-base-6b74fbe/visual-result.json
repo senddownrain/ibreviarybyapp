@@ -1,0 +1,3088 @@
+{
+  "records": [
+    {
+      "name": "android-390-marian-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "android-390-marian-laudes-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 181,
+      "textHash": "a6ac440ebd3c7e90b7042d0972da05b821742b29d8d775e03c4ce2e548d69a88"
+    },
+    {
+      "name": "android-390-marian-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-390-marian-laudes-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-390-marian-vespers-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 165,
+      "textHash": "f1ab1edd77c1043e2c4666287bdea05469a5e7812f081fd02572ba07738f2c18"
+    },
+    {
+      "name": "android-390-marian-vespers-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "android-390-marian-vespers-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "android-390-marian-lectionis-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 174,
+      "textHash": "abaf494b48ce2b7acd8d3ba4e2a08fe06c60349fda5bf94ece7aaf5ef8ada5c6"
+    },
+    {
+      "name": "android-390-marian-lectionis-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "android-390-marian-lectionis-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "android-390-marian-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "26e2ea785ce1e8c96af9d4e77b9538dced8a4027c0104be1101c1af61336714d"
+    },
+    {
+      "name": "android-390-marian-settings-options",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 52,
+      "textHash": "07c945dadd6276c73f61c6d66e1457921df9040b19747a97f2b2653cbd3c8437"
+    },
+    {
+      "name": "android-390-marian-calendar",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ordo/month?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 108,
+      "textHash": "c74002c814f30ebe580cc70ec8ef99c6526f80e9598116fe3fa22b0ce608c6ca"
+    },
+    {
+      "name": "android-390-marian-calendar-dialog",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 74,
+      "textHash": "5b00951dfeb8bcf26d0a65bf292272d4a035e37c1a46fa564def5afd74642f97"
+    },
+    {
+      "name": "android-390-marian-bible",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/bible?version=bel&book=gn&chapter=1",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 42,
+      "textHash": "db9c5a05da271baa894e28f29f5c8fbb9858a5e1f0bda63806c4c8f95860e442"
+    },
+    {
+      "name": "android-390-marian-readings-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 41,
+      "textHash": "271d9a865542e490437c4406ea3d10daf18514baa7b7247f93c500b74bf4ad97"
+    },
+    {
+      "name": "android-390-marian-readings-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "android-390-marian-readings-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "android-390-marian-prayer-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 16,
+      "textHash": "3adfbd2341aba6867eb9f50c996c996d832998df36debfa681041727a51ab100"
+    },
+    {
+      "name": "android-390-marian-prayer-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "android-390-marian-prayer-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "android-390-marian-mass-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 405,
+      "textHash": "d92fddeb2df4c662d6df3ce7f72625a450144cf82593175652956ebf021311ad"
+    },
+    {
+      "name": "android-390-marian-mass-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "4645f826a9afccfd804231b4cb5d7a6565284fd96a3ffa26f82d7d12bea61fbd"
+    },
+    {
+      "name": "android-390-marian-mass-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "39abcdd0183d2f7e6791ce24e834a84f0414d78d3e97de339e8d716078f6f347"
+    },
+    {
+      "name": "android-390-light-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "android-390-light-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [
+        "fffdfcf9"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-390-light-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "cd597880c0d06260478e6380ccbe2dbd1a576b9d2adb85aa9b7a40364a3b2564"
+    },
+    {
+      "name": "android-390-dark-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "android-390-dark-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [
+        "ff171917"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-390-dark-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "e2102e56963404185c6be707e0224888290350e33230156adf9f3134c9d27067"
+    },
+    {
+      "name": "android-1440-marian-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "android-1440-marian-laudes-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 181,
+      "textHash": "a6ac440ebd3c7e90b7042d0972da05b821742b29d8d775e03c4ce2e548d69a88"
+    },
+    {
+      "name": "android-1440-marian-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-1440-marian-laudes-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-1440-marian-vespers-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 165,
+      "textHash": "f1ab1edd77c1043e2c4666287bdea05469a5e7812f081fd02572ba07738f2c18"
+    },
+    {
+      "name": "android-1440-marian-vespers-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "android-1440-marian-vespers-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "android-1440-marian-lectionis-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 174,
+      "textHash": "abaf494b48ce2b7acd8d3ba4e2a08fe06c60349fda5bf94ece7aaf5ef8ada5c6"
+    },
+    {
+      "name": "android-1440-marian-lectionis-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "android-1440-marian-lectionis-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "android-1440-marian-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 51,
+      "textHash": "23d6b8f7e2b060989187e459de420273e3456106c8e667db73b5daa8e2bd3741"
+    },
+    {
+      "name": "android-1440-marian-calendar",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ordo/month?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 108,
+      "textHash": "c74002c814f30ebe580cc70ec8ef99c6526f80e9598116fe3fa22b0ce608c6ca"
+    },
+    {
+      "name": "android-1440-marian-calendar-dialog",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 74,
+      "textHash": "5b00951dfeb8bcf26d0a65bf292272d4a035e37c1a46fa564def5afd74642f97"
+    },
+    {
+      "name": "android-1440-marian-bible",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/bible?version=bel&book=gn&chapter=1",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 42,
+      "textHash": "db9c5a05da271baa894e28f29f5c8fbb9858a5e1f0bda63806c4c8f95860e442"
+    },
+    {
+      "name": "android-1440-marian-readings-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 41,
+      "textHash": "271d9a865542e490437c4406ea3d10daf18514baa7b7247f93c500b74bf4ad97"
+    },
+    {
+      "name": "android-1440-marian-readings-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "android-1440-marian-readings-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "android-1440-marian-prayer-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 16,
+      "textHash": "3adfbd2341aba6867eb9f50c996c996d832998df36debfa681041727a51ab100"
+    },
+    {
+      "name": "android-1440-marian-prayer-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "android-1440-marian-prayer-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "android-1440-marian-mass-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 405,
+      "textHash": "d92fddeb2df4c662d6df3ce7f72625a450144cf82593175652956ebf021311ad"
+    },
+    {
+      "name": "android-1440-marian-mass-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "4645f826a9afccfd804231b4cb5d7a6565284fd96a3ffa26f82d7d12bea61fbd"
+    },
+    {
+      "name": "android-1440-marian-mass-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "39abcdd0183d2f7e6791ce24e834a84f0414d78d3e97de339e8d716078f6f347"
+    },
+    {
+      "name": "android-1440-light-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "android-1440-light-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [
+        "fffdfcf9"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-1440-light-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 51,
+      "textHash": "23d6b8f7e2b060989187e459de420273e3456106c8e667db73b5daa8e2bd3741"
+    },
+    {
+      "name": "android-1440-dark-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "android-1440-dark-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [
+        "ff171917"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "android-1440-dark-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 51,
+      "textHash": "23d6b8f7e2b060989187e459de420273e3456106c8e667db73b5daa8e2bd3741"
+    },
+    {
+      "name": "android-320-marian-settings-200",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        320,
+        900
+      ],
+      "viewSize": [
+        320,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "26e2ea785ce1e8c96af9d4e77b9538dced8a4027c0104be1101c1af61336714d"
+    },
+    {
+      "name": "android-320-marian-options-200",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        320,
+        900
+      ],
+      "viewSize": [
+        320,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 52,
+      "textHash": "07c945dadd6276c73f61c6d66e1457921df9040b19747a97f2b2653cbd3c8437"
+    },
+    {
+      "name": "android-320-marian-reader-200",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        320,
+        900
+      ],
+      "viewSize": [
+        320,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-390-marian-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "ios-390-marian-laudes-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 181,
+      "textHash": "a6ac440ebd3c7e90b7042d0972da05b821742b29d8d775e03c4ce2e548d69a88"
+    },
+    {
+      "name": "ios-390-marian-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-390-marian-laudes-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-390-marian-vespers-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 165,
+      "textHash": "f1ab1edd77c1043e2c4666287bdea05469a5e7812f081fd02572ba07738f2c18"
+    },
+    {
+      "name": "ios-390-marian-vespers-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "ios-390-marian-vespers-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "ios-390-marian-lectionis-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 174,
+      "textHash": "abaf494b48ce2b7acd8d3ba4e2a08fe06c60349fda5bf94ece7aaf5ef8ada5c6"
+    },
+    {
+      "name": "ios-390-marian-lectionis-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "ios-390-marian-lectionis-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "ios-390-marian-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "26e2ea785ce1e8c96af9d4e77b9538dced8a4027c0104be1101c1af61336714d"
+    },
+    {
+      "name": "ios-390-marian-settings-options",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 52,
+      "textHash": "07c945dadd6276c73f61c6d66e1457921df9040b19747a97f2b2653cbd3c8437"
+    },
+    {
+      "name": "ios-390-marian-calendar",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ordo/month?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 108,
+      "textHash": "c74002c814f30ebe580cc70ec8ef99c6526f80e9598116fe3fa22b0ce608c6ca"
+    },
+    {
+      "name": "ios-390-marian-calendar-dialog",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 74,
+      "textHash": "5b00951dfeb8bcf26d0a65bf292272d4a035e37c1a46fa564def5afd74642f97"
+    },
+    {
+      "name": "ios-390-marian-bible",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/bible?version=bel&book=gn&chapter=1",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 42,
+      "textHash": "db9c5a05da271baa894e28f29f5c8fbb9858a5e1f0bda63806c4c8f95860e442"
+    },
+    {
+      "name": "ios-390-marian-readings-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 41,
+      "textHash": "271d9a865542e490437c4406ea3d10daf18514baa7b7247f93c500b74bf4ad97"
+    },
+    {
+      "name": "ios-390-marian-readings-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "ios-390-marian-readings-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "ios-390-marian-prayer-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 16,
+      "textHash": "3adfbd2341aba6867eb9f50c996c996d832998df36debfa681041727a51ab100"
+    },
+    {
+      "name": "ios-390-marian-prayer-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "ios-390-marian-prayer-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "ios-390-marian-mass-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 405,
+      "textHash": "d92fddeb2df4c662d6df3ce7f72625a450144cf82593175652956ebf021311ad"
+    },
+    {
+      "name": "ios-390-marian-mass-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "4645f826a9afccfd804231b4cb5d7a6565284fd96a3ffa26f82d7d12bea61fbd"
+    },
+    {
+      "name": "ios-390-marian-mass-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "39abcdd0183d2f7e6791ce24e834a84f0414d78d3e97de339e8d716078f6f347"
+    },
+    {
+      "name": "ios-390-light-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "ios-390-light-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [
+        "fffdfcf9"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-390-light-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "cd597880c0d06260478e6380ccbe2dbd1a576b9d2adb85aa9b7a40364a3b2564"
+    },
+    {
+      "name": "ios-390-dark-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "ios-390-dark-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [
+        "ff171917"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-390-dark-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        390,
+        900
+      ],
+      "viewSize": [
+        390,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 48,
+      "textHash": "e2102e56963404185c6be707e0224888290350e33230156adf9f3134c9d27067"
+    },
+    {
+      "name": "ios-1440-marian-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "ios-1440-marian-laudes-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 181,
+      "textHash": "a6ac440ebd3c7e90b7042d0972da05b821742b29d8d775e03c4ce2e548d69a88"
+    },
+    {
+      "name": "ios-1440-marian-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-1440-marian-laudes-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-1440-marian-vespers-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 165,
+      "textHash": "f1ab1edd77c1043e2c4666287bdea05469a5e7812f081fd02572ba07738f2c18"
+    },
+    {
+      "name": "ios-1440-marian-vespers-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "ios-1440-marian-vespers-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/vespers?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 160,
+      "textHash": "00ec0846ace9301b6fa28817475d5b4cc65ea62f396c9682459afe8f44c200cc"
+    },
+    {
+      "name": "ios-1440-marian-lectionis-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 174,
+      "textHash": "abaf494b48ce2b7acd8d3ba4e2a08fe06c60349fda5bf94ece7aaf5ef8ada5c6"
+    },
+    {
+      "name": "ios-1440-marian-lectionis-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "ios-1440-marian-lectionis-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/lectionis?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 169,
+      "textHash": "f0b0c59bb761bc6c5a8812d608dab117fc50b25d3b30cfe6aa14bbba758b56c1"
+    },
+    {
+      "name": "ios-1440-marian-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 51,
+      "textHash": "23d6b8f7e2b060989187e459de420273e3456106c8e667db73b5daa8e2bd3741"
+    },
+    {
+      "name": "ios-1440-marian-calendar",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ordo/month?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 108,
+      "textHash": "c74002c814f30ebe580cc70ec8ef99c6526f80e9598116fe3fa22b0ce608c6ca"
+    },
+    {
+      "name": "ios-1440-marian-calendar-dialog",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [],
+      "textCount": 74,
+      "textHash": "5b00951dfeb8bcf26d0a65bf292272d4a035e37c1a46fa564def5afd74642f97"
+    },
+    {
+      "name": "ios-1440-marian-bible",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/bible?version=bel&book=gn&chapter=1",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 42,
+      "textHash": "db9c5a05da271baa894e28f29f5c8fbb9858a5e1f0bda63806c4c8f95860e442"
+    },
+    {
+      "name": "ios-1440-marian-readings-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 41,
+      "textHash": "271d9a865542e490437c4406ea3d10daf18514baa7b7247f93c500b74bf4ad97"
+    },
+    {
+      "name": "ios-1440-marian-readings-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "ios-1440-marian-readings-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/readings?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 35,
+      "textHash": "ec5195c663d0cf4868b12045b925df73485f4598bd68a2403bf672c6f3ab15fd"
+    },
+    {
+      "name": "ios-1440-marian-prayer-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 16,
+      "textHash": "3adfbd2341aba6867eb9f50c996c996d832998df36debfa681041727a51ab100"
+    },
+    {
+      "name": "ios-1440-marian-prayer-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "ios-1440-marian-prayer-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/AAazUF2ItrRRdPXI5XKU",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 13,
+      "textHash": "d254b7c36df72e5dfd8afdd7d04de769dfcf1c621b365ac7e8bb9e34f20d9ad8"
+    },
+    {
+      "name": "ios-1440-marian-mass-start",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 405,
+      "textHash": "d92fddeb2df4c662d6df3ce7f72625a450144cf82593175652956ebf021311ad"
+    },
+    {
+      "name": "ios-1440-marian-mass-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "4645f826a9afccfd804231b4cb5d7a6565284fd96a3ffa26f82d7d12bea61fbd"
+    },
+    {
+      "name": "ios-1440-marian-mass-end",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/prayers/prayer/eMmCtxwyJ75ogmL5rwye",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "marian",
+      "brightness": "light",
+      "page": "fff4f8fc",
+      "reader": "fffbfdff",
+      "readerSurfaces": [
+        "fffbfdff"
+      ],
+      "textCount": 402,
+      "textHash": "39abcdd0183d2f7e6791ce24e834a84f0414d78d3e97de339e8d716078f6f347"
+    },
+    {
+      "name": "ios-1440-light-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "ios-1440-light-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [
+        "fffdfcf9"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-1440-light-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "light",
+      "brightness": "light",
+      "page": "fff2f1ee",
+      "reader": "fffdfcf9",
+      "readerSurfaces": [],
+      "textCount": 51,
+      "textHash": "23d6b8f7e2b060989187e459de420273e3456106c8e667db73b5daa8e2bd3741"
+    },
+    {
+      "name": "ios-1440-dark-home",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 28,
+      "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+    },
+    {
+      "name": "ios-1440-dark-laudes-middle",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [
+        "ff171917"
+      ],
+      "textCount": 176,
+      "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    },
+    {
+      "name": "ios-1440-dark-settings",
+      "sandbox": "namespace+seccomp-bpf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "route": "/settings",
+      "mediaSize": [
+        1440,
+        900
+      ],
+      "viewSize": [
+        1440,
+        900
+      ],
+      "preference": "dark",
+      "brightness": "dark",
+      "page": "ff0f110f",
+      "reader": "ff171917",
+      "readerSurfaces": [],
+      "textCount": 51,
+      "textHash": "23d6b8f7e2b060989187e459de420273e3456106c8e667db73b5daa8e2bd3741"
+    }
+  ],
+  "errors": [
+    {
+      "scene": "android-320-marian-settings-200",
+      "message": "══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════"
+    },
+    {
+      "scene": "android-320-marian-settings-200",
+      "message": "A RenderFlex overflowed by 92 pixels on the right."
+    }
+  ]
+}

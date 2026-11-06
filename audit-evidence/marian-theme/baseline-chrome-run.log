@@ -1,5 +1,5 @@
 Launching tool/marian_theme_smoke.dart on Chrome in debug mode...
-Waiting for connection from debug service on Chrome...             35.2s
+Waiting for connection from debug service on Chrome...             28.6s
 
 Flutter run key commands.
 r Hot reload. 🔥🔥🔥
@@ -9,9 +9,9 @@ d Detach (terminate "flutter run" but leave application running).
 c Clear the screen
 q Quit (terminate the application on the device).
 
-Debug service listening on [local debugger URL omitted]
-A Dart VM Service on Chrome is available at: [local debugger URL omitted]
-The Flutter DevTools debugger and profiler on Chrome is available at: [local debugger URL omitted]
+Debug service listening on ws://127.0.0.1:35625/cZDYjlp1dUc=/ws
+A Dart VM Service on Chrome is available at: [local debug endpoint omitted]
+The Flutter DevTools debugger and profiler on Chrome is available at: [local debug endpoint omitted]
 Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
 Failed to load font Roboto at https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Me4GZLCzYlKw.woff2
 Flutter Web engine failed to complete HTTP request to fetch "https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Me4GZLCzYlKw.woff2": TypeError: Failed to fetch

@@ -12,6 +12,9 @@ paths = [
     'lib/screens/home_screen.dart', 'lib/screens/ordo_month_screen.dart',
     'lib/content/content_store.dart', 'lib/content/content_updater.dart',
     'assets/content/manifest.json',
+    'lib/services/hive_service.dart', 'lib/widgets/psalm_choir_html.dart',
+    'lib/widgets/psalmody_mode_selector.dart', 'lib/widgets/text_scale_control.dart',
+    'lib/utils/liturgical_html.dart',
     'test/hours_parity_test.dart', 'test/support/ordo_fixture.dart',
     'test/fixtures/ordo_parity.json.gz',
 ]

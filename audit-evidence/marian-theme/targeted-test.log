@@ -6,62 +6,152 @@
 00:00 +4: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Hive preference compatibility all choices update immediately and survive a real close/reopen
 00:00 +5: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Hive preference compatibility unknown, corrupt and missing values safely follow the OS
 00:00 +6: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Hive preference compatibility saving another setting in a stale container cannot undo Marian
-00:00 +7: /workspace/ibreviarybyapp/test/marian_theme_test.dart: every legacy ColorScheme and IbColors value matches main 7abba85
-00:00 +8: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Marian maps approved Web roles into Material and Cupertino
-00:00 +9: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Marian foreground/background pairs pass WCAG AA
-00:00 +10: /workspace/ibreviarybyapp/test/marian_theme_test.dart: OS brightness controls system but never explicit choices
-00:00 +11: /workspace/ibreviarybyapp/test/marian_theme_test.dart: opaque paper and edge protection across scroll, TargetPlatform.android
-00:00 +12: /workspace/ibreviarybyapp/test/marian_theme_test.dart: opaque paper and edge protection across scroll, TargetPlatform.iOS
-00:01 +13: /workspace/ibreviarybyapp/test/marian_theme_test.dart: light/dark decorative intensities remain unchanged
-00:01 +14: loading /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart
-00:01 +14: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (setUpAll)
-[ContentStore] prayerCategories: 5 docs in 24 ms
-[ContentStore] prayers: 115 docs in 74 ms
-[ContentStore] liturgicalCalendarMeta: 1 docs in 64 ms
-[ContentStore] liturgicalYearOverrides: 15 docs in 64 ms
-[ContentStore] completoriums: 35 docs in 72 ms
-[ContentStore] invitatoriums: 4 docs in 75 ms
-[ContentStore] liturgicalDioceseOverrides: 75 docs in 170 ms
-[ContentStore] liturgicalCelebrations: 241 docs in 223 ms
-[ContentStore] liturgicalProperTexts: 291 docs in 270 ms
-[ContentStore] liturgicalTemplates: 16 docs in 290 ms
-[ContentStore] readings: 822 docs in 384 ms
-[ContentStore] days: 736 docs in 425 ms
-00:02 +14: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: production app retains route, reader state, scroll and open sheet across all themes
-00:02 +14: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (setUpAll)
-[ContentStore] compendiumMeta: 1 docs in 14 ms
-[ContentStore] compendium: 27 docs in 16 ms
-00:03 +14: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: production app retains route, reader state, scroll and open sheet across all themes
+00:00 +7: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Hive preference compatibility all three accepted psalmody modes survive every theme choice
+00:00 +8: /workspace/ibreviarybyapp/test/marian_theme_test.dart: every legacy ColorScheme and IbColors value matches main 7abba85
+00:00 +9: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Marian maps approved Web roles into Material and Cupertino
+00:00 +10: /workspace/ibreviarybyapp/test/marian_theme_test.dart: Marian foreground/background pairs pass WCAG AA
+00:00 +11: /workspace/ibreviarybyapp/test/marian_theme_test.dart: OS brightness controls system but never explicit choices
+00:01 +12: /workspace/ibreviarybyapp/test/marian_theme_test.dart: opaque paper and edge protection across scroll, TargetPlatform.android
+00:02 +13: /workspace/ibreviarybyapp/test/marian_theme_test.dart: opaque paper and edge protection across scroll, TargetPlatform.iOS
+00:02 +14: /workspace/ibreviarybyapp/test/marian_theme_test.dart: light/dark decorative intensities remain unchanged
+00:02 +15: loading /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart
+00:03 +15: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 60 ms
+[ContentStore] prayers: 115 docs in 196 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 77 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 77 ms
+[ContentStore] invitatoriums: 4 docs in 78 ms
+[ContentStore] completoriums: 35 docs in 78 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 223 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 369 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 416 ms
+[ContentStore] liturgicalTemplates: 16 docs in 425 ms
+[ContentStore] readings: 822 docs in 489 ms
+[ContentStore] days: 736 docs in 896 ms
+00:05 +15: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: production app retains route, reader state, scroll and open sheet across all themes
+00:05 +15: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (setUpAll)
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] compendium: 27 docs in 87 ms
+[ContentStore] songs: 447 docs in 92 ms
+00:08 +15: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: production app retains route, reader state, scroll and open sheet across all themes
 [data] CACHE HIT  hour laudes ordinary-w5-d1
-00:05 +14: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (setUpAll)
-[ContentStore] songs: 447 docs in 3007 ms
-[ContentStore] liturgicalOrdoNotes: 1337 docs in 3008 ms
-00:08 +15: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (tearDownAll)
-00:08 +15: loading /workspace/ibreviarybyapp/test/app_theme_test.dart
-00:09 +15: /workspace/ibreviarybyapp/test/app_theme_test.dart: explicit theme mode is authoritative for both MaterialApp slots
-00:09 +16: /workspace/ibreviarybyapp/test/app_theme_test.dart: system theme keeps separate light and dark MaterialApp slots
-00:09 +17: /workspace/ibreviarybyapp/test/app_theme_test.dart: app theme controller updates the running MaterialApp
-00:10 +18: loading /workspace/ibreviarybyapp/test/platform_design_test.dart
-00:11 +18: /workspace/ibreviarybyapp/test/platform_design_test.dart: (setUpAll)
-00:11 +18: /workspace/ibreviarybyapp/test/platform_design_test.dart: chrome uses Liquid Glass only on Apple platforms
-00:11 +19: /workspace/ibreviarybyapp/test/platform_design_test.dart: date picker uses the shared liturgical calendar on iOS and Android
-00:12 +20: /workspace/ibreviarybyapp/test/platform_design_test.dart: segmented choices follow the target platform
-00:12 +21: /workspace/ibreviarybyapp/test/platform_design_test.dart: segmented labels stay on one line on narrow Android screens
-00:12 +22: /workspace/ibreviarybyapp/test/platform_design_test.dart: theme choices keep full labels at 320 dp and 200% text
-00:12 +23: /workspace/ibreviarybyapp/test/platform_design_test.dart: theme choice labels fit the width and text-scale matrix
-00:13 +24: /workspace/ibreviarybyapp/test/platform_design_test.dart: floating back icon follows the target platform
-00:13 +25: /workspace/ibreviarybyapp/test/platform_design_test.dart: a single floating top action stays perfectly round
-00:13 +26: /workspace/ibreviarybyapp/test/platform_design_test.dart: (tearDownAll)
-00:13 +26: loading /workspace/ibreviarybyapp/test/color_foundations_test.dart
-00:14 +26: /workspace/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
-00:15 +27: /workspace/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in light
-00:15 +28: /workspace/ibreviarybyapp/test/color_foundations_test.dart: non-liturgical screens do not subscribe to calendar color
-00:15 +29: /workspace/ibreviarybyapp/test/color_foundations_test.dart: android dark dock, top and reader chrome stay neutral
-00:15 +30: /workspace/ibreviarybyapp/test/color_foundations_test.dart: android light dock, top and reader chrome stay neutral
-00:15 +31: /workspace/ibreviarybyapp/test/color_foundations_test.dart: iOS dark dock, top and reader chrome stay neutral
-00:15 +32: /workspace/ibreviarybyapp/test/color_foundations_test.dart: iOS light dock, top and reader chrome stay neutral
-00:15 +33: loading /workspace/ibreviarybyapp/test/reader_theme_test.dart
-00:16 +33: /workspace/ibreviarybyapp/test/reader_theme_test.dart: book and system reader preferences resolve differently
-00:16 +34: /workspace/ibreviarybyapp/test/reader_theme_test.dart: liturgical block headings are larger than reader body text
-00:17 +35: /workspace/ibreviarybyapp/test/reader_theme_test.dart: document roles keep meaning in light and dark themes
-00:17 +36: All tests passed!
+00:14 +15: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (setUpAll)
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 9192 ms
+00:24 +16: /workspace/ibreviarybyapp/test/marian_theme_navigation_test.dart: (tearDownAll)
+00:24 +16: loading /workspace/ibreviarybyapp/test/app_theme_test.dart
+00:26 +16: /workspace/ibreviarybyapp/test/app_theme_test.dart: explicit theme mode is authoritative for both MaterialApp slots
+00:26 +17: /workspace/ibreviarybyapp/test/app_theme_test.dart: system theme keeps separate light and dark MaterialApp slots
+00:26 +18: /workspace/ibreviarybyapp/test/app_theme_test.dart: app theme controller updates the running MaterialApp
+00:28 +19: loading /workspace/ibreviarybyapp/test/platform_design_test.dart
+00:30 +19: /workspace/ibreviarybyapp/test/platform_design_test.dart: (setUpAll)
+00:30 +19: /workspace/ibreviarybyapp/test/platform_design_test.dart: chrome uses Liquid Glass only on Apple platforms
+00:32 +20: /workspace/ibreviarybyapp/test/platform_design_test.dart: date picker uses the shared liturgical calendar on iOS and Android
+00:34 +21: /workspace/ibreviarybyapp/test/platform_design_test.dart: segmented choices follow the target platform
+00:34 +22: /workspace/ibreviarybyapp/test/platform_design_test.dart: segmented labels stay on one line on narrow Android screens
+00:35 +23: /workspace/ibreviarybyapp/test/platform_design_test.dart: theme choices keep full labels at 320 dp and 200% text
+00:35 +24: /workspace/ibreviarybyapp/test/platform_design_test.dart: theme choice labels fit the width and text-scale matrix
+00:37 +25: /workspace/ibreviarybyapp/test/platform_design_test.dart: floating back icon follows the target platform
+00:37 +26: /workspace/ibreviarybyapp/test/platform_design_test.dart: a single floating top action stays perfectly round
+00:37 +27: /workspace/ibreviarybyapp/test/platform_design_test.dart: (tearDownAll)
+00:37 +27: loading /workspace/ibreviarybyapp/test/color_foundations_test.dart
+00:39 +27: /workspace/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+00:41 +28: /workspace/ibreviarybyapp/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in light
+00:41 +29: /workspace/ibreviarybyapp/test/color_foundations_test.dart: non-liturgical screens do not subscribe to calendar color
+00:41 +30: /workspace/ibreviarybyapp/test/color_foundations_test.dart: android dark dock, top and reader chrome stay neutral
+00:42 +31: /workspace/ibreviarybyapp/test/color_foundations_test.dart: android light dock, top and reader chrome stay neutral
+00:42 +32: /workspace/ibreviarybyapp/test/color_foundations_test.dart: iOS dark dock, top and reader chrome stay neutral
+00:43 +33: /workspace/ibreviarybyapp/test/color_foundations_test.dart: iOS light dock, top and reader chrome stay neutral
+00:43 +34: loading /workspace/ibreviarybyapp/test/reader_theme_test.dart
+00:45 +34: /workspace/ibreviarybyapp/test/reader_theme_test.dart: book and system reader preferences resolve differently
+00:46 +35: /workspace/ibreviarybyapp/test/reader_theme_test.dart: liturgical block headings are larger than reader body text
+00:46 +36: /workspace/ibreviarybyapp/test/reader_theme_test.dart: document roles keep meaning in light and dark themes
+00:46 +37: loading /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart
+00:49 +37: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates null / null and persists on real Hive reopen
+00:49 +38: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates alignedLeft / inline and persists on real Hive reopen
+00:50 +39: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates alignedLeft / breakAfterMarker and persists on real Hive reopen
+00:50 +40: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates alternatingIndent / inline and persists on real Hive reopen
+00:50 +41: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates alternatingIndent / breakAfterMarker and persists on real Hive reopen
+00:50 +42: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates alignedLeft / null and persists on real Hive reopen
+00:51 +43: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates null / breakAfterMarker and persists on real Hive reopen
+00:51 +44: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: migrates unknown / unknown and persists on real Hive reopen
+00:51 +45: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: leftBreak wins over legacy values and survives selection/restart
+00:51 +46: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: leftBreakIndent wins over legacy values and survives selection/restart
+00:52 +47: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: alternatingStanzas wins over legacy values and survives selection/restart
+00:52 +48: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: provider reads never write or leave migration work at close
+00:52 +49: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: startup completes migration before an immediate close and restart
+00:52 +50: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: unrelated saves from an older container cannot overwrite a new mode
+00:53 +51: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: reinitialization is idempotent and never resets a selected mode
+00:53 +52: /workspace/ibreviarybyapp/test/psalmody_preferences_test.dart: unknown new value still migrates valid legacy preferences
+00:53 +53: loading /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart
+00:56 +53: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 320.0 dp 1.0x: shared value, safe panel and full labels
+00:59 +54: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 320.0 dp 1.5x: shared value, safe panel and full labels
+01:00 +55: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 320.0 dp 2.0x: shared value, safe panel and full labels
+01:01 +56: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 360.0 dp 1.0x: shared value, safe panel and full labels
+01:01 +57: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 360.0 dp 1.5x: shared value, safe panel and full labels
+01:02 +58: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 360.0 dp 2.0x: shared value, safe panel and full labels
+01:02 +59: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 390.0 dp 1.0x: shared value, safe panel and full labels
+01:02 +60: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 390.0 dp 1.5x: shared value, safe panel and full labels
+01:03 +61: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 390.0 dp 2.0x: shared value, safe panel and full labels
+01:03 +62: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 768.0 dp 1.0x: shared value, safe panel and full labels
+01:04 +63: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 768.0 dp 1.5x: shared value, safe panel and full labels
+01:04 +64: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.dark 768.0 dp 2.0x: shared value, safe panel and full labels
+01:05 +65: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 320.0 dp 1.0x: shared value, safe panel and full labels
+01:05 +66: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 320.0 dp 1.5x: shared value, safe panel and full labels
+01:06 +67: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 320.0 dp 2.0x: shared value, safe panel and full labels
+01:06 +68: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 360.0 dp 1.0x: shared value, safe panel and full labels
+01:07 +69: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 360.0 dp 1.5x: shared value, safe panel and full labels
+01:08 +70: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 360.0 dp 2.0x: shared value, safe panel and full labels
+01:08 +71: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 390.0 dp 1.0x: shared value, safe panel and full labels
+01:09 +72: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 390.0 dp 1.5x: shared value, safe panel and full labels
+01:09 +73: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 390.0 dp 2.0x: shared value, safe panel and full labels
+01:10 +74: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 768.0 dp 1.0x: shared value, safe panel and full labels
+01:11 +75: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 768.0 dp 1.5x: shared value, safe panel and full labels
+01:11 +76: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.android Brightness.light 768.0 dp 2.0x: shared value, safe panel and full labels
+01:12 +77: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 320.0 dp 1.0x: shared value, safe panel and full labels
+01:12 +78: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 320.0 dp 1.5x: shared value, safe panel and full labels
+01:12 +79: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 320.0 dp 2.0x: shared value, safe panel and full labels
+01:13 +80: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 360.0 dp 1.0x: shared value, safe panel and full labels
+01:13 +81: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 360.0 dp 1.5x: shared value, safe panel and full labels
+01:14 +82: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 360.0 dp 2.0x: shared value, safe panel and full labels
+01:15 +83: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 390.0 dp 1.0x: shared value, safe panel and full labels
+01:16 +84: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 390.0 dp 1.5x: shared value, safe panel and full labels
+01:16 +85: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 390.0 dp 2.0x: shared value, safe panel and full labels
+01:17 +86: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 768.0 dp 1.0x: shared value, safe panel and full labels
+01:18 +87: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 768.0 dp 1.5x: shared value, safe panel and full labels
+01:19 +88: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.dark 768.0 dp 2.0x: shared value, safe panel and full labels
+01:19 +89: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 320.0 dp 1.0x: shared value, safe panel and full labels
+01:20 +90: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 320.0 dp 1.5x: shared value, safe panel and full labels
+01:21 +91: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 320.0 dp 2.0x: shared value, safe panel and full labels
+01:22 +92: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 360.0 dp 1.0x: shared value, safe panel and full labels
+01:23 +93: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 360.0 dp 1.5x: shared value, safe panel and full labels
+01:23 +94: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 360.0 dp 2.0x: shared value, safe panel and full labels
+01:24 +95: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 390.0 dp 1.0x: shared value, safe panel and full labels
+01:24 +96: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 390.0 dp 1.5x: shared value, safe panel and full labels
+01:25 +97: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 390.0 dp 2.0x: shared value, safe panel and full labels
+01:26 +98: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 768.0 dp 1.0x: shared value, safe panel and full labels
+01:27 +99: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 768.0 dp 1.5x: shared value, safe panel and full labels
+01:28 +100: /workspace/ibreviarybyapp/test/psalmody_mode_selector_test.dart: TargetPlatform.iOS Brightness.light 768.0 dp 2.0x: shared value, safe panel and full labels
+01:28 +101: loading /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart
+01:31 +101: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: semantic choir overrides visual parity class
+01:31 +102: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Ютрань leftBreak: one continuous strophe or non-nested continuations
+01:31 +103: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Ютрань leftBreakIndent: one continuous strophe or non-nested continuations
+01:31 +104: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Ютрань alternatingStanzas: one continuous strophe or non-nested continuations
+01:31 +105: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Нешпары leftBreak: one continuous strophe or non-nested continuations
+01:31 +106: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Нешпары leftBreakIndent: one continuous strophe or non-nested continuations
+01:31 +107: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Нешпары alternatingStanzas: one continuous strophe or non-nested continuations
+01:31 +108: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Гадзіна чытанняў leftBreak: one continuous strophe or non-nested continuations
+01:31 +109: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Гадзіна чытанняў leftBreakIndent: one continuous strophe or non-nested continuations
+01:32 +110: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Гадзіна чытанняў alternatingStanzas: one continuous strophe or non-nested continuations
+01:32 +111: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Камплета leftBreak: one continuous strophe or non-nested continuations
+01:32 +112: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Камплета leftBreakIndent: one continuous strophe or non-nested continuations
+01:32 +113: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Камплета alternatingStanzas: one continuous strophe or non-nested continuations
+01:32 +114: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Benedictus leftBreak: one continuous strophe or non-nested continuations
+01:32 +115: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Benedictus leftBreakIndent: one continuous strophe or non-nested continuations
+01:32 +116: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Benedictus alternatingStanzas: one continuous strophe or non-nested continuations
+01:32 +117: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Magnificat leftBreak: one continuous strophe or non-nested continuations
+01:32 +118: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Magnificat leftBreakIndent: one continuous strophe or non-nested continuations
+01:32 +119: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Magnificat alternatingStanzas: one continuous strophe or non-nested continuations
+01:32 +120: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Nunc dimittis leftBreak: one continuous strophe or non-nested continuations
+01:32 +121: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Nunc dimittis leftBreakIndent: one continuous strophe or non-nested continuations
+01:32 +122: /workspace/ibreviarybyapp/test/psalmody_html_modes_test.dart: Nunc dimittis alternatingStanzas: one continuous strophe or non-nested continuations
+01:32 +123: All tests passed!

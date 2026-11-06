@@ -11,6 +11,7 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
@@ -30,14 +31,15 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [
       "fffdfcf9"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "android-390-light-settings",
@@ -51,12 +53,13 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [],
-    "textCount": 48,
-    "textHash": "cd597880c0d06260478e6380ccbe2dbd1a576b9d2adb85aa9b7a40364a3b2564"
+    "textCount": 44,
+    "textHash": "523746556add5292cc12b62d3fbd305a576eb3223cd7a14a4dc4cad6f9b5dd50"
   },
   {
     "name": "android-390-dark-home",
@@ -70,6 +73,7 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
@@ -89,14 +93,15 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [
       "ff171917"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "android-390-dark-settings",
@@ -110,12 +115,13 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [],
-    "textCount": 48,
-    "textHash": "e2102e56963404185c6be707e0224888290350e33230156adf9f3134c9d27067"
+    "textCount": 44,
+    "textHash": "15ba97eb13ccdb3c85f738a9313fc4fb3215cff37d2df6ee2fc2db36047b577f"
   },
   {
     "name": "android-1440-light-home",
@@ -129,6 +135,7 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
@@ -148,14 +155,15 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [
       "fffdfcf9"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "android-1440-light-settings",
@@ -169,12 +177,13 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [],
-    "textCount": 50,
-    "textHash": "3e7867a24813695d62a2c9cc51dff6cac99f665c1a16d7e6369a02e94a665394"
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
   },
   {
     "name": "android-1440-dark-home",
@@ -188,6 +197,7 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
@@ -207,14 +217,15 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [
       "ff171917"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "android-1440-dark-settings",
@@ -228,12 +239,13 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [],
-    "textCount": 50,
-    "textHash": "3e7867a24813695d62a2c9cc51dff6cac99f665c1a16d7e6369a02e94a665394"
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
   },
   {
     "name": "ios-390-light-home",
@@ -247,6 +259,7 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
@@ -266,14 +279,15 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [
       "fffdfcf9"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "ios-390-light-settings",
@@ -287,12 +301,13 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [],
-    "textCount": 48,
-    "textHash": "cd597880c0d06260478e6380ccbe2dbd1a576b9d2adb85aa9b7a40364a3b2564"
+    "textCount": 44,
+    "textHash": "523746556add5292cc12b62d3fbd305a576eb3223cd7a14a4dc4cad6f9b5dd50"
   },
   {
     "name": "ios-390-dark-home",
@@ -306,6 +321,7 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
@@ -325,14 +341,15 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [
       "ff171917"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "ios-390-dark-settings",
@@ -346,12 +363,13 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [],
-    "textCount": 48,
-    "textHash": "e2102e56963404185c6be707e0224888290350e33230156adf9f3134c9d27067"
+    "textCount": 44,
+    "textHash": "15ba97eb13ccdb3c85f738a9313fc4fb3215cff37d2df6ee2fc2db36047b577f"
   },
   {
     "name": "ios-1440-light-home",
@@ -365,6 +383,7 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
@@ -384,14 +403,15 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [
       "fffdfcf9"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "ios-1440-light-settings",
@@ -405,12 +425,13 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [],
-    "textCount": 50,
-    "textHash": "3e7867a24813695d62a2c9cc51dff6cac99f665c1a16d7e6369a02e94a665394"
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
   },
   {
     "name": "ios-1440-dark-home",
@@ -424,6 +445,7 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
@@ -443,14 +465,15 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [
       "ff171917"
     ],
-    "textCount": 176,
-    "textHash": "25bc07e8334385ede134e835e1c39a9b3f50c167ebb678a76755a672f6c731f6"
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
   },
   {
     "name": "ios-1440-dark-settings",
@@ -464,12 +487,13 @@
       900
     ],
     "preference": "dark",
+    "psalmodyMode": "leftBreak",
     "brightness": "dark",
     "page": "ff0f110f",
     "reader": "ff171917",
     "readerSurfaces": [],
-    "textCount": 50,
-    "textHash": "3e7867a24813695d62a2c9cc51dff6cac99f665c1a16d7e6369a02e94a665394"
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
   },
   {
     "name": "android-320-light-settings-200",
@@ -483,11 +507,12 @@
       900
     ],
     "preference": "light",
+    "psalmodyMode": "leftBreak",
     "brightness": "light",
     "page": "fff2f1ee",
     "reader": "fffdfcf9",
     "readerSurfaces": [],
-    "textCount": 48,
-    "textHash": "cd597880c0d06260478e6380ccbe2dbd1a576b9d2adb85aa9b7a40364a3b2564"
+    "textCount": 44,
+    "textHash": "523746556add5292cc12b62d3fbd305a576eb3223cd7a14a4dc4cad6f9b5dd50"
   }
 ]

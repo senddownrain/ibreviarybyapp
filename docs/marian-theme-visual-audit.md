@@ -2,7 +2,7 @@
 
 Реализация: [описание архитектуры, палитры и пересечений PR](marian-theme-implementation.md).
 Референс — утверждённый Web merge `3aa7ba0f5cd186922d67e4e5e18a980e287a030c`.
-Финальная Flutter-база — `6b74fbe` (включая принятый #64).
+Финальная Flutter-база — `9bf2925` (включая принятые #64 и #62).
 Финальные кадры сняты с активными Namespace/PID/Network и Seccomp-BPF sandbox:
 [статус chrome://sandbox](../audit-evidence/marian-theme/chrome-sandbox.txt).
 В этом контейнере SUID helper Chromium имеет неверного владельца; используется
@@ -28,7 +28,7 @@ DejaVu Sans (fallback вместо скачиваемого Roboto/Noto). Кни
 
 Масштабирование в host сохраняет реальные размеры `FlutterView`; прежние
 диагностические снимки с неправильным MediaQuery не входят в итоговую матрицу.
-Два Chrome-preview одновременно превысили лимит памяти окружения; итоговые
+Ранние запуски двух Chrome-preview одновременно превысили лимит памяти окружения; итоговые
 проверки выполняются с одним preview за раз.
 
 ## Что оценивалось
@@ -81,6 +81,11 @@ Web-изображения скопированы без изменения из
 
 Нешпары и Гадзіна чытанняў сохранены в той же папке:
 `{android|ios}-{390|1440}-marian-{vespers|lectionis}-{start|middle|end}.png`.
+Все три режима псалмодии проверены на каждой платформе и ширине.
+Основные кадры Ютрани используют принятый в #62 `leftBreak`; дополнительные
+`{platform}-{width}-marian-psalmody-{leftBreakIndent|alternatingStanzas}.png`
+показывают второй отступ и чередование строф. Цвет бумаги и рубрик сохраняется.
+
 Сравнения обычной светлой и тёмной:
 `{platform}-{width}-{light|dark}-{home|laudes-middle|settings}.png`.
 
@@ -91,7 +96,7 @@ Web-изображения скопированы без изменения из
 [`targeted-test.log`](../audit-evidence/marian-theme/targeted-test.log),
 [`full-test.log`](../audit-evidence/marian-theme/full-test.log),
 [`analyze.log`](../audit-evidence/marian-theme/analyze.log).
-Матрица Flutter содержит **121 PNG**: 97 Marian и 24 Light/Dark. Все размеры MediaQuery соответствуют
+Матрица Flutter содержит **129 PNG**: 105 Marian и 24 Light/Dark. Все размеры MediaQuery соответствуют
 viewport; все проверенные ReaderContentSurface имеют `#FBFDFF`. В середине и
 конце трёх часов на обеих ширинах и платформах точки чистого поля страницы
 дают один и тот же RGB `(251,253,255)` без цветных пятен.
@@ -103,17 +108,23 @@ primary **8,55:1**, рубрики **7,23:1**. Новая палитра про�
 На 320 px / 200% четыре подписи темы целиком видимы в dropdown. Обнаруженное
 переполнение на 92 px относится к существующему
 `DropdownButtonFormField<String>` с ключом `settings-start-section`:
-это поле «Стартовы раздзел», ниже нового переключателя. На чистом `6b74fbe` воспроизвелось то же переполнение 92 px:
+это поле «Стартовы раздзел», ниже нового переключателя. На чистом `9bf2925` воспроизвелось то же переполнение 92 px:
 [baseline/errors.json](../audit-evidence/marian-theme/baseline/errors.json),
 [main PNG при 200%](../audit-evidence/marian-theme/baseline/android-320-light-settings-200.png).
 Это существующее ограничение старого поля; новый переключатель темы не переполняется.
+При одновременных 200% и максимальном Aa на 320 px заголовок «Ютрань»
+переносится на две строки и выходит за компактную область верхней навигации
+([PNG](../audit-evidence/marian-theme/android-320-marian-reader-200.png)).
+Это ограничение существующей фиксированной reader-chrome: её геометрия,
+типографика и размеры в ветке совпадают с main. Отдельный pixel baseline
+этого reader-состояния не снимался; для него подтверждена неизменность исходников.
+Оно требует отдельной проверки доступности перед мобильным релизом.
 
 Сравнение с неизменённым `main`: 24 пары PNG (home / середина Ютрани / settings,
-Light/Dark, обе ширины и платформы). **19 пар пиксельно идентичны**. Четыре
-широких settings отличаются четвёртым вариантом темы. У оставшейся пары
-Android / 1440 / Dark / Ютрань текст сдвинут по прокрутке примерно на 4 px;
-цвета, размеры и хэш полного видимого документа совпадают. Все восемь главных
-страниц Light/Dark пиксельно совпадают. [PNG main](../audit-evidence/marian-theme/baseline/),
+Light/Dark, обе ширины и платформы). **20 пар пиксельно идентичны**.
+Четыре широких settings отличаются только переключателем с четвёртым вариантом
+темы. Все восемь главных страниц и все восемь страниц чтения Light/Dark
+пиксельно совпадают. [PNG main](../audit-evidence/marian-theme/baseline/),
 [попарные результаты](../audit-evidence/marian-theme/audit-checks.json).
 Полный ColorScheme и IbColors также проверяются по снимку до изменения темы.
 
@@ -121,24 +132,23 @@ Android / 1440 / Dark / Ютрань текст сдвинут по прокру
 
 | Проверка | Результат |
 | --- | --- |
-| `dart format --output=none --set-exit-if-changed` по изменённым Dart-файлам | PASS, 23 файла, 0 изменений |
+| `dart format --output=none --set-exit-if-changed` по изменённым Dart-файлам | PASS, 19 файлов, 0 изменений |
 | `flutter analyze --no-pub` | 0 errors / warnings, те же 12 исходных info; exit 1 из-за info |
 | `flutter analyze --no-pub --no-fatal-infos` | PASS, exit 0 |
-| Целевые unit/widget, повтор на финальной базе | **36 passed**, exit 0 |
-| Полный `flutter test --no-pub --reporter expanded` | **1735 passed, 9 skipped, 2 failed**, 32:05, exit 1 |
-| Новые тесты Marian в полном наборе | **15 passed**, без новых пропусков |
+| Целевые unit/widget, повтор на финальной базе | **123 passed**, exit 0 |
+| Полный `flutter test --no-pub --concurrency=2 --reporter expanded` | **1835 passed, 9 skipped, 1 failed**, 23:57, exit 1 |
+| Новые тесты Marian в полном наборе | **16 passed**, без новых пропусков |
 | Native Android / iOS | NOT RUN, нет SDK / Xcode / устройств |
 
 [Структурированные результаты](../audit-evidence/marian-theme/test-results.json),
 [лог analyzer с исходными info](../audit-evidence/marian-theme/analyze-no-fatal-infos.log),
 [сохранность domain/reader-файлов и всех assets](../audit-evidence/marian-theme/source-contracts.json).
 
-Оба падения полного набора отдельно воспроизведены на неизменённом текущем
-`main` **6b74fbe**:
+Единственное падение полного набора отдельно проверено на неизменённом
+`main` **9bf2925**:
 
 | Тест | Ветка / main | Подтверждение |
 | --- | --- | --- |
-| `Readings date_navigation: three day arrows, once` | Отсутствует та же карточка подсказки; диагностические сообщения идентичны | [main](../audit-evidence/marian-theme/main-date-hint-test.log) |
 | `Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses` | То же расхождение `feast-christthehighpriest`; весь показанный список несовпадений идентичен | [main](../audit-evidence/marian-theme/main-hours-parity-test.log) |
 
 Тест паритета и fixture не менялись. Ошибки исправления ORDO из принятого #64
@@ -146,10 +156,18 @@ Android / 1440 / Dark / Ютрань текст сдвинут по прокру
 производственные календарные алгоритмы ради зелёного результата не менялись.
 Полный набор не объявляется зелёным.
 
+`Readings date_navigation: three day arrows, once` падал в предыдущем полном
+прогоне на базе 6b74fbe и отдельно воспроизвёлся на чистом 9bf2925
+([лог main](../audit-evidence/marian-theme/main-date-hint-test.log)). В финальном
+полном прогоне ветки этот нестабильный тест прошёл; он не входит в число её падений.
+
+Предыдущие завершённые результаты на базе 6b74fbe (1735 passed, 9 skipped,
+2 failed; 36 целевых passed) сохранены в
+[`previous-base-6b74fbe/`](../audit-evidence/marian-theme/previous-base-6b74fbe/).
 Первый baseline-прогон на 7abba85 остановился при выключении окружения;
 промежуточный прогон старой базы был прерван при включении принятого #64.
-Эти логи сохранены отдельно, но не используются как завершённый полный набор.
-Финальные числа относятся только к `full-test.log` на базе 6b74fbe.
+Эти прерванные логи не используются как завершённый полный набор.
+Финальные числа относятся к `full-test.log` на базе **9bf2925**.
 
 ## Ручная проверка Android
 
@@ -160,7 +178,8 @@ Android / 1440 / Dark / Ютрань текст сдвинут по прокру
 3. Открыть Ютрань, прокрутить псалмы и завершение, затем Нешпары и Гадзіну чытанняў:
    единая бумага без цветных пятен, красные рубрики, читаемые края под навигацией.
 4. Из чтения открыть настройки, сменить тему и вернуться: тот же час и место
-   прокрутки. Проверить Aa, привычный шрифт и текущие настройки псалмодии.
+   прокрутки. Проверить Aa, привычный шрифт и все три режима псалмодии: переключение темы
+   сохраняет выбранный режим и его форматирование.
 5. Проверить календарь, модальную панель, обычную молитву, чтения Мессы и Библию;
    повторить на малой ширине с системным текстом 200% и после холодного запуска.
 
@@ -181,11 +200,19 @@ SafeArea, реального blur, TalkBack/VoiceOver и производите�
 CDP-порт находится в строке запущенного Chromium `--remote-debugging-port`;
 это отдельный порт от Flutter VM Service. Сценарий подключается к уже
 запущенному браузеру и точному `http://localhost:5241/`.
-Для 8 GiB окружения использовались отдельные запуски с
-`AUDIT_PLATFORMS=android`, затем `AUDIT_PLATFORMS=ios AUDIT_RESUME=1`.
-Финальные 121 записи содержат отметку `namespace+seccomp-bpf`.
+Сценарий поддерживает разделение через `AUDIT_PLATFORMS=android`, затем
+`AUDIT_PLATFORMS=ios AUDIT_RESUME=1`. Итоговая матрица снята последовательно
+в одном Chrome. `capture-psalm-middle.cjs <Chrome-CDP-port>` уточняет
+одинаковое место первого длинного псалма во всех темах и трёх режимах.
+При ручной перезагрузке debug-вкладки сценарий однократно вызывает
+зарегистрированный `$dartRunMain`, если DWDS ещё не запустил приложение.
+Старые восстановленные audit-вкладки закрываются, чтобы не удерживать Hive.
+Сообщения DWDS «Not connected to an application» сохранены отдельно в
+`visual-result.json → transportErrors`: это debug-подключение, а не исключения
+Flutter-виджетов. Исходный console-сводный лог — `capture-final.log`.
+Финальные 129 записей содержат отметку `namespace+seccomp-bpf`.
 
-Для baseline нужен отдельный worktree `6b74fbe` с теми же зависимостями:
+Для baseline нужен отдельный worktree `9bf2925` с теми же зависимостями:
 [точный baseline host](../audit-evidence/marian-theme/baseline-host.dart.txt)
 копируется в его `tool/marian_theme_smoke.dart`. Production-файлы main не
 меняются. Он запускается на порту 5242, затем
