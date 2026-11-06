@@ -1,0 +1,279 @@
+diff --git a/lib/content/content_store.dart b/lib/content/content_store.dart
+index 3b2f1c2..02284ec 100644
+--- a/lib/content/content_store.dart
++++ b/lib/content/content_store.dart
+@@ -1,3 +1,4 @@
++import 'file:///workspace/issue66-diagnostics/probe.dart';
+ import 'dart:async';
+ import 'dart:convert';
+ 
+@@ -87,18 +88,19 @@ class ContentStore {
+   }
+ 
+   Future<void> _load(ContentCollection item) async {
++return Issue66Probe.future('bundle.load.${item.name}', () async {
+     if (!_bundleEnabled) return;
+     final bundle = _bundle ?? rootBundle;
+     bundleManifest ??=
+         jsonDecode(await bundle.loadString('$kContentAssetDir/manifest.json'))
+             as Map<String, dynamic>;
+     final watch = Stopwatch()..start();
+-    final data = await bundle.load('$kContentAssetDir/${item.name}.json.gz');
++    final data = await Issue66Probe.future('bundle.read.${item.name}', () => bundle.load('$kContentAssetDir/${item.name}.json.gz'));
+     final bytes = data.buffer.asUint8List(
+       data.offsetInBytes,
+       data.lengthInBytes,
+     );
+-    final decoded = await compute(decodeContentCollection, bytes);
++    final decoded = await Issue66Probe.future('bundle.decode.${item.name}', () => compute(decodeContentCollection, bytes));
+     item._setBaseline(decoded.docs, decoded.hashes, decoded.contentVersion);
+     await item._reconcileWithBaseline();
+     if (kDebugMode) {
+@@ -108,7 +110,9 @@ class ContentStore {
+       );
+     }
+     revision.value++;
+-  }
++  
++});
++}
+ 
+   /// Starts loading everything in the background, liturgy first.
+   void preloadAll() {
+@@ -155,7 +159,7 @@ class ContentStore {
+       (_) => _commit(ops, version, stopAfter: stopAfter),
+     );
+     _commitTail = run.catchError((Object _) {});
+-    return run;
++    return Issue66Probe.future('store.commit.$version', () => run);
+   }
+ 
+   Future<void>? _commitTail;
+@@ -167,16 +171,16 @@ class ContentStore {
+   }) async {
+     await _recover();
+     final staging = await _stagingBox();
+-    await staging.clear();
+-    await staging.putAll({
++    await Issue66Probe.future('hive.staging.clear', () => staging.clear());
++    await Issue66Probe.future('hive.staging.putAll', () => staging.putAll({
+       for (final MapEntry(key: name, value: entries) in ops.entries)
+         for (final MapEntry(key: id, value: entry) in entries.entries)
+           '$name\u0000$id': entry ?? const {'drop': true},
+-    });
+-    await staging.flush();
++    }));
++    await Issue66Probe.future('hive.staging.flush', () => staging.flush());
+     if (stopAfter == ContentCommitPhase.staged) return;
+-    await staging.put(_readyKey, {'v': version, 'n': staging.length});
+-    await staging.flush();
++    await Issue66Probe.future('hive.staging.put', () => staging.put(_readyKey, {'v': version, 'n': staging.length}));
++    await Issue66Probe.future('hive.staging.flush', () => staging.flush());
+     if (stopAfter == ContentCommitPhase.ready) return;
+     await _replay(
+       staging,
+@@ -198,7 +202,7 @@ class ContentStore {
+       await _replay(staging);
+     } else {
+       debugPrint('[ContentStore] dropping an unfinished update');
+-      await staging.clear();
++      await Issue66Probe.future('hive.staging.clear', () => staging.clear());
+     }
+   }
+ 
+@@ -223,7 +227,7 @@ class ContentStore {
+       collection(name)._reloadView();
+     }
+     revision.value++;
+-    await staging.clear();
++    await Issue66Probe.future('hive.staging.clear', () => staging.clear());
+   }
+ 
+   /// Bytes kept by the update overlay (documents newer than the bundle).
+@@ -298,7 +302,7 @@ class ContentCollection {
+     }
+     if (stale.isEmpty) return;
+     try {
+-      await overlay.deleteAll(stale);
++      await Issue66Probe.future('hive.overlay.deleteAll', () => overlay.deleteAll(stale));
+     } on HiveError {
+       // Storage was closed under a late load: nothing left to reconcile.
+       if (overlay.isOpen) rethrow;
+@@ -329,8 +333,8 @@ class ContentCollection {
+       for (final MapEntry(:key, :value) in ops.entries)
+         if (value == null) key,
+     ];
+-    if (puts.isNotEmpty) await overlay.putAll(puts);
+-    if (drops.isNotEmpty) await overlay.deleteAll(drops);
++    if (puts.isNotEmpty) await Issue66Probe.future('hive.overlay.putAll', () => overlay.putAll(puts));
++    if (drops.isNotEmpty) await Issue66Probe.future('hive.overlay.deleteAll', () => overlay.deleteAll(drops));
+   }
+ 
+   void _changed() {
+@@ -444,26 +448,26 @@ class ContentCollection {
+   /// A document written outside an update (former cache, tests): version
+   /// now, hash unknown unless given.
+   Future<void> put(String key, Map data, {String? hash, int? version}) async {
+-    await _overlay!.put(key, {
++    await Issue66Probe.future('hive._overlay.put', () => _overlay!.put(key, {
+       'd': data,
+       'h': hash,
+       'v': version ?? DateTime.now().millisecondsSinceEpoch,
+-    });
++    }));
+     _reloadView();
+   }
+ 
+   Future<void> putAll(Map<String, Map> docs) async {
+     final now = DateTime.now().millisecondsSinceEpoch;
+-    await _overlay!.putAll({
++    await Issue66Probe.future('hive._overlay.putAll', () => _overlay!.putAll({
+       for (final entry in docs.entries)
+         entry.key: {'d': entry.value, 'h': null, 'v': now},
+-    });
++    }));
+     _reloadView();
+   }
+ 
+   /// Drops every update (the bundle is read again).
+   Future<void> clearOverlay() async {
+-    await _overlay!.clear();
++    await Issue66Probe.future('hive._overlay.clear', () => _overlay!.clear());
+     _reloadView();
+   }
+ 
+diff --git a/lib/services/hive_service.dart b/lib/services/hive_service.dart
+index d6d57de..d3df6e3 100644
+--- a/lib/services/hive_service.dart
++++ b/lib/services/hive_service.dart
+@@ -1,3 +1,4 @@
++import 'file:///workspace/issue66-diagnostics/probe.dart';
+ import 'dart:async';
+ 
+ import 'package:flutter/widgets.dart';
+diff --git a/test/content_offline_test.dart b/test/content_offline_test.dart
+index 20e1cce..2d95786 100644
+--- a/test/content_offline_test.dart
++++ b/test/content_offline_test.dart
+@@ -1,3 +1,4 @@
++import 'file:///workspace/issue66-diagnostics/probe.dart';
+ // «Offline by installation»: the bundled content, the update overlay, the
+ // version check, the move from the former download cache, and the
+ // Settings section. No network in any of these tests.
+@@ -38,13 +39,14 @@ class FakeRemote implements ContentRemote {
+   final List<String> manifestReads = [];
+   final List<String> fetched = [];
+ 
+-  Map<String, String> _hashes(String name) => {
++  Map<String, String> _hashes(String name) => Issue66Probe.sync('fake.hashes.$name', () => {
+     for (final entry in collections[name]!.entries)
+       entry.key: documentHash(entry.value),
+-  };
++  }, units: collections[name]!.length);
+ 
+   @override
+   Future<Map<String, dynamic>?> fetchCurrent() async {
++return Issue66Probe.sync('fake.currentManifest', () {
+     currentReads++;
+     return {
+       'schemaVersion': kContentSchemaVersion,
+@@ -54,10 +56,13 @@ class FakeRemote implements ContentRemote {
+           name: {'digest': contentDigest(_hashes(name))},
+       },
+     };
+-  }
++  
++});
++}
+ 
+   @override
+   Future<Map<String, dynamic>?> fetchCollectionManifest(String name) async {
++return Issue66Probe.sync('fake.collectionManifest.$name', () {
+     manifestReads.add(name);
+     final hashes = _hashes(name);
+     return {
+@@ -65,7 +70,9 @@ class FakeRemote implements ContentRemote {
+       'hashes': hashes,
+       'sizes': {for (final id in hashes.keys) id: 1000},
+     };
+-  }
++  
++});
++}
+ 
+   @override
+   Future<Map<String, Map<String, dynamic>>> fetchDocuments(
+@@ -82,11 +89,14 @@ class FakeRemote implements ContentRemote {
+ 
+ /// A copy of the bundled collection [name], as Firestore would serve it.
+ Map<String, Map<String, dynamic>> bundled(String name) {
++return Issue66Probe.sync('test.copyCollection.$name', () {
+   final collection = ContentStore.instance.collection(name);
+   return {
+     for (final key in collection.keys)
+       key: Map<String, dynamic>.from(collection.get(key) as Map),
+   };
++
++});
+ }
+ 
+ void main() {
+@@ -94,16 +104,20 @@ void main() {
+   late Directory directory;
+ 
+   Future<void> openWithBundle() async {
+-    await HiveService.init(path: directory.path, loadBundle: true);
+-    await ContentStore.instance.ensureLoaded(kContentCollections);
++    await Issue66Probe.future('bundle.init', () => HiveService.init(path: directory.path, loadBundle: true));
++    await Issue66Probe.future('bundle.ensureAll', () => ContentStore.instance.ensureLoaded(kContentCollections));
+   }
+ 
+   setUp(() async {
++    Issue66Probe.begin();
+     directory = await Directory.systemTemp.createTemp('content-');
+   });
+   tearDown(() async {
+-    await Hive.close();
+-    await directory.delete(recursive: true);
++    Issue66Probe.snapshot('teardown.begin');
++    await Issue66Probe.future('teardown.hiveClose', Hive.close);
++    Issue66Probe.snapshot('teardown.hiveClosed');
++    await Issue66Probe.future('teardown.delete', () => directory.delete(recursive: true));
++    Issue66Probe.finish();
+   });
+ 
+   group('background preload', () {
+@@ -125,7 +139,7 @@ void main() {
+     });
+ 
+     test('idle() completes only after every started load', () async {
+-      await HiveService.init(path: directory.path, loadBundle: true);
++      await Issue66Probe.future('bundle.init', () => HiveService.init(path: directory.path, loadBundle: true));
+       await ContentStore.instance.idle();
+       expect(ContentStore.instance.areLoaded(kContentCollections), isTrue);
+     });
+@@ -863,7 +877,10 @@ void main() {
+           name: name == 'days' ? {...bundled('days'), ...docs} : bundled(name),
+       }, contentVersion: version);
+       final updater = ContentUpdater(remote: remote);
+-      return updater.check().then((result) => updater.apply(result.plan!));
++      return Issue66Probe.future('test.publish.$version', () async {
++        final result = await Issue66Probe.future('updater.check.$version', updater.check);
++        await Issue66Probe.future('updater.apply.$version', () => updater.apply(result.plan!));
++      });
+     }
+ 
+     test(
+@@ -966,9 +983,10 @@ void main() {
+         ids[0]: withText(ids[0], 'v101'),
+         ids[1]: withText(ids[1], 'v102'),
+       };
+-      await days.debugReplaceBaseline(docs, {
++      final replacementHashes = Issue66Probe.sync('test.replacementHashes', () => {
+         for (final e in docs.entries) e.key: documentHash(e.value),
+-      }, 102);
++      }, units: docs.length);
++      await Issue66Probe.future('store.replaceBaseline', () => days.debugReplaceBaseline(docs, replacementHashes, 102));
+       expect(
+         days.overlayLength,
+         1,

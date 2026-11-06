@@ -1,0 +1,1031 @@
+00:00 +0: loading /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart
+00:00 +0: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at centre
+00:01 +1: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at centre with finger drift
+00:01 +2: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at left edge
+00:01 +3: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at left edge with finger drift
+00:01 +4: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at right edge
+00:01 +5: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at right edge with finger drift
+00:01 +6: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at upper part
+00:02 +7: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at upper part with finger drift
+00:02 +8: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at lower part
+00:02 +9: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 1 takes a tap at lower part with finger drift
+00:02 +10: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at centre
+00:02 +11: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at centre with finger drift
+00:02 +12: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at left edge
+00:02 +13: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at left edge with finger drift
+00:02 +14: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at right edge
+00:02 +15: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at right edge with finger drift
+00:03 +16: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at upper part
+00:03 +17: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at upper part with finger drift
+00:03 +18: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at lower part
+00:03 +19: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 2 takes a tap at lower part with finger drift
+00:03 +20: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at centre
+00:03 +21: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at centre with finger drift
+00:03 +22: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at left edge
+00:03 +23: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at left edge with finger drift
+00:04 +24: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at right edge
+00:04 +25: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at right edge with finger drift
+00:04 +26: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at upper part
+00:04 +27: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at upper part with finger drift
+00:04 +28: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at lower part
+00:04 +29: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: iOS: option 3 takes a tap at lower part with finger drift
+00:04 +30: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at centre
+00:04 +31: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at centre with finger drift
+00:04 +32: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at left edge
+00:04 +33: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at left edge with finger drift
+00:04 +34: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at right edge
+00:05 +35: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at right edge with finger drift
+00:05 +36: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at upper part
+00:05 +37: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at upper part with finger drift
+00:05 +38: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at lower part
+00:05 +39: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 1 takes a tap at lower part with finger drift
+00:05 +40: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at centre
+00:05 +41: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at centre with finger drift
+00:05 +42: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at left edge
+00:05 +43: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at left edge with finger drift
+00:05 +44: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at right edge
+00:05 +45: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at right edge with finger drift
+00:06 +46: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at upper part
+00:06 +47: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at upper part with finger drift
+00:06 +48: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at lower part
+00:06 +49: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 2 takes a tap at lower part with finger drift
+00:06 +50: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at centre
+00:06 +51: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at centre with finger drift
+00:06 +52: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at left edge
+00:06 +53: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at left edge with finger drift
+00:06 +54: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at right edge
+00:06 +55: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at right edge with finger drift
+00:06 +56: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at upper part
+00:07 +57: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at upper part with finger drift
+00:07 +58: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at lower part
+00:07 +59: /workspace/ibreviarybyapp-baseline/test/alternative_sheet_hit_test.dart: android: option 3 takes a tap at lower part with finger drift
+00:07 +60: loading /workspace/ibreviarybyapp-baseline/test/alternative_text_test.dart
+00:08 +60: /workspace/ibreviarybyapp-baseline/test/alternative_text_test.dart: shared controller synchronizes repeated antiphons
+00:09 +61: /workspace/ibreviarybyapp-baseline/test/alternative_text_test.dart: seven long alternatives fit a narrow 200 percent sheet
+00:09 +62: loading /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart
+00:10 +62: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: disabled by default: nothing is collected
+00:10 +63: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: a read visit yields screen_view plus fv, sd and er in a valid packet
+00:10 +64: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: short opens give fv=lt5s only; under 1 s is discarded
+00:10 +65: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: closed or unknown material is never measured (fail closed)
+00:10 +66: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: background time is not visible time; 5+ minutes in background starts a new visit
+00:10 +67: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: same-material double trigger within 2 s and re-entry are one visit
+00:10 +68: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: back navigation to the same material after more than 2 s is a new visit
+00:10 +69: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: sections without content ids count views only; text that fits reports fit
+00:10 +70: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: unmeasurable scroll is counted as an error, not guessed
+00:10 +71: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: clock going backwards is a measurement error, not negative time
+00:10 +72: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: feature_use validates ids; unknown features and sections are dropped
+00:10 +73: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: local queue is bounded and overflow is counted
+00:10 +74: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: pruneOlderThan drops stale days; disabling clears everything
+00:10 +75: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: discardView drops the active visit without recording it
+00:10 +76: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: importPackets restores persisted counters and ignores invalid or foreign packets
+00:10 +77: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: app version is coarsened to major.minor
+00:10 +78: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: daily readings are one generic material with fv, sd and er; no date
+00:10 +79: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: catalog screens count catalog_open once per visit and never a material
+00:10 +80: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: catalog visit under one second is discarded
+00:10 +81: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: fits can change back when content grows after late loading
+00:10 +82: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_collector_test.dart: snapshot(includeOpen) counts the open visit without ending it
+00:10 +83: loading /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart
+00:11 +83: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: contract is v2 and matches the shared fixture version
+00:11 +84: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: visible-time buckets follow the golden vectors
+00:11 +85: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: scroll-depth buckets follow the golden vectors
+00:11 +86: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: reading estimates follow the golden vectors
+00:11 +87: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: the golden packet is valid and every invalid cell is rejected
+00:11 +88: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: packets reject identifiers, unknown fields and bad envelopes
+00:11 +89: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: closed material cannot pass: content_id must be in the inventory
+00:11 +90: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_contract_test.dart: whitelists contain no closed or personal sections
+00:11 +91: loading /workspace/ibreviarybyapp-baseline/test/analytics/analytics_feature_coverage_test.dart
+00:12 +91: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_feature_coverage_test.dart: every contract feature is hooked or declared, nothing unknown is reported
+00:12 +92: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_feature_coverage_test.dart: the P04 hooks are present where the action really happens
+00:13 +93: loading /workspace/ibreviarybyapp-baseline/test/analytics/analytics_parity_test.dart
+00:13 +93: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_parity_test.dart: golden and shared contract fixture are the WEB bytes it was built from
+00:13 +94: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_parity_test.dart: contract surface (ids, buckets, limits, constants) equals WEB
+00:13 +95: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_parity_test.dart: content id probes give the WEB verdict
+00:13 +96: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_parity_test.dart: routes: every Flutter location maps to the WEB-equivalent target
+00:13 +97: /workspace/ibreviarybyapp-baseline/test/analytics/analytics_parity_test.dart: synthetic visits replay to the WEB cells on android and ios
+00:14 +98: loading /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart
+00:15 +98: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: no consent: reading produces no queue and nothing is sent
+00:15 +99: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: consent: a closed day is sent once, today is held
+00:15 +100: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: min batch: a day with fewer than 3 cells is held, never sent
+00:15 +101: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: revoke wipes the queue; later events are dropped; no automatic re-grant
+00:15 +102: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: kill switch OFF: even with consent nothing is queued or sent, existing queue is wiped
+00:15 +103: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: at-most-once: a lost send is not retried (under-count), no duplicate on relaunch
+00:15 +104: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: crash before the queue is persisted again: the packet survives and is sent once after relaunch
+00:15 +105: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: server-side kill switch alone (client unaware): 503, counted lost, never retried
+00:15 +106: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: scenario: retention: a queued day older than 14 days expires and is never sent
+00:15 +107: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: gate matrix OFF/OFF, ON/OFF, OFF/ON, ON/ON: only ON/ON processes a packet
+00:15 +108: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: default is OFF: fresh install and non-literal consent values
+00:15 +109: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: consent=false never writes anything
+00:15 +110: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: invalid packets are refused even with consent
+00:15 +111: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: queue: same day merged, byte cap, 14 days
+00:15 +112: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: non-204 and exceptions are counted lost and never retried
+00:15 +113: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: Hive adapter: queue lives in a Box<String>, revoke removes the key
+00:15 +114: /workspace/ibreviarybyapp-baseline/test/analytics/consent_mock_test.dart: isolation: nothing outside lib/analytics imports the mock; it has no network API
+00:15 +115: loading /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart
+00:16 +115: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit a two-line text in a roomy viewport is fit
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~1: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit a text that ends within the screen is fit although the blank reserve below it makes the view scrollable by a few points
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~2: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit the same page on a small phone (320x720) stays fit
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~3: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit a text that overflows the viewport is not fit
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~4: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit a text hidden by just a few lines is not fit
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~5: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit a long text read to the end reaches p100
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~6: /workspace/ibreviarybyapp-baseline/test/analytics/fit_detection_test.dart: sd = fit a larger font turns a fitting text into a scrolling one
+  Skip: needs --dart-define=ANALYTICS_LOCAL=true
+00:16 +115 ~7: loading /workspace/ibreviarybyapp-baseline/test/analytics/local_analytics_test.dart
+00:16 +115 ~7: /workspace/ibreviarybyapp-baseline/test/analytics/local_analytics_test.dart: without ANALYTICS_LOCAL the glue does nothing
+00:17 +116 ~7: /workspace/ibreviarybyapp-baseline/test/analytics/local_analytics_test.dart: a scrolled read, a short fitting read, a loader, a closed id and a catalog
+00:17 +116 ~8: loading /workspace/ibreviarybyapp-baseline/test/analytics/public_inventory_test.dart
+00:17 +116 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/public_inventory_test.dart: the generated Dart set equals the web inventory copy
+00:17 +117 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/public_inventory_test.dart: the fixture checksum matches its own ids (copy is not edited)
+00:17 +118 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/public_inventory_test.dart: every id is well-formed for its section
+00:17 +119 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/public_inventory_test.dart: fixed sets are present: mass order, nine hours, both Bible languages
+00:17 +120 ~8: loading /workspace/ibreviarybyapp-baseline/test/analytics/route_mapper_test.dart
+00:19 +120 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/route_mapper_test.dart: public routes map to contract sections
+00:19 +121 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/route_mapper_test.dart: hour routes map to contract hour ids, vespers becomes vesper
+00:19 +122 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/route_mapper_test.dart: prayers, mass, songs, compendium and Bible map to content ids
+00:19 +123 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/route_mapper_test.dart: lists, search, personal prayers and incomplete routes are not measured
+00:19 +124 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/route_mapper_test.dart: every mapped id is shaped for its section; unknown ids fail the inventory
+00:19 +125 ~8: loading /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart
+00:19 +125 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: gate (compile-time flags + URL) both flags and a valid URL are required
+00:19 +126 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: gate (compile-time flags + URL) normal test run has the gate closed and no URL baked in
+00:19 +127 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: gate (compile-time flags + URL) URL parsing: https or loopback http only, path fixed
+00:19 +128 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: HttpStagingTransport one POST with the contract body and nothing identifying
+00:20 +129 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: HttpStagingTransport non-204 is returned as is and never retried
+00:20 +130 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: HttpStagingTransport oversized packet is not sent at all
+00:20 +131 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: HttpStagingTransport unreachable server: exception, no retry
+00:20 +132 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: HttpStagingTransport redirects are not followed
+00:20 +133 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: StagingSender (at-most-once, kill switch) 204 counts as sent; other statuses and errors as lost, no retry
+00:20 +134 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: StagingSender (at-most-once, kill switch) 503 halts: the rest of the batch and later batches are not sent
+00:20 +135 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: StagingSender (at-most-once, kill switch) 426 also halts
+00:20 +136 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: collector.drainPackets removes what it returns (so it can never be sent twice)
+00:20 +137 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: collector.drainPackets days older than 2 are dropped, not returned
+00:20 +138 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: no flags -> no network channel LocalAnalytics gate constant is closed without both flags
+00:20 +139 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: no flags -> no network channel lib: only staging_http.dart touches dart:io network; guarded
+00:20 +140 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: no flags -> no network channel pubspec: no new packages, manifests: no new permissions
+00:20 +141 ~8: /workspace/ibreviarybyapp-baseline/test/analytics/staging_http_test.dart: R02 server end-to-end 204 / 400 / kill-switch against the real Worker code
+  Skip: needs --dart-define=R02_URL=...
+00:20 +141 ~9: loading /workspace/ibreviarybyapp-baseline/test/analytics/transport_and_guard_test.dart
+00:21 +141 ~9: /workspace/ibreviarybyapp-baseline/test/analytics/transport_and_guard_test.dart: NoopTransport answers 204 without side effects
+00:21 +142 ~9: /workspace/ibreviarybyapp-baseline/test/analytics/transport_and_guard_test.dart: RecordingTransport keeps packets and answers programmed statuses
+00:21 +143 ~9: /workspace/ibreviarybyapp-baseline/test/analytics/transport_and_guard_test.dart: collecting never touches a transport: reading works with a failing one
+00:21 +144 ~9: /workspace/ibreviarybyapp-baseline/test/analytics/transport_and_guard_test.dart: stage guard: only known files reach the analytics; calls carry feature ids only
+00:21 +145 ~9: /workspace/ibreviarybyapp-baseline/test/analytics/transport_and_guard_test.dart: pubspec has no analytics, crash-reporting or advertising packages
+00:21 +146 ~9: loading /workspace/ibreviarybyapp-baseline/test/app_navigation_dock_test.dart
+00:23 +146 ~9: /workspace/ibreviarybyapp-baseline/test/app_navigation_dock_test.dart: Full dock renders four destinations on iOS and Android
+00:27 +147 ~9: /workspace/ibreviarybyapp-baseline/test/app_navigation_dock_test.dart: dock labels stay complete across widths and text scales
+00:30 +148 ~9: /workspace/ibreviarybyapp-baseline/test/app_navigation_dock_test.dart: Compact expands without acting as a repeated tab
+00:30 +149 ~9: /workspace/ibreviarybyapp-baseline/test/app_navigation_dock_test.dart: Hidden removes the primary dock
+00:30 +150 ~9: loading /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart
+00:36 +150 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: Ora popup is compact and psalmody chips toggle independently in font sheet
+00:38 +151 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: font sheet keeps its size slider and separate Ora options
+00:38 +152 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.dark 320.0 dp at 1.0 scale
+00:38 +153 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.dark 320.0 dp at 1.5 scale
+00:38 +154 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.dark 320.0 dp at 2.0 scale
+00:38 +155 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.dark 390.0 dp at 1.0 scale
+00:39 +156 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.dark 390.0 dp at 1.5 scale
+00:39 +157 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.dark 390.0 dp at 2.0 scale
+00:39 +158 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.light 320.0 dp at 1.0 scale
+00:39 +159 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.light 320.0 dp at 1.5 scale
+00:39 +160 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.light 320.0 dp at 2.0 scale
+00:39 +161 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.light 390.0 dp at 1.0 scale
+00:40 +162 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.light 390.0 dp at 1.5 scale
+00:40 +163 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.android Brightness.light 390.0 dp at 2.0 scale
+00:40 +164 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.dark 320.0 dp at 1.0 scale
+00:40 +165 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.dark 320.0 dp at 1.5 scale
+00:40 +166 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.dark 320.0 dp at 2.0 scale
+00:40 +167 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.dark 390.0 dp at 1.0 scale
+00:40 +168 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.dark 390.0 dp at 1.5 scale
+00:40 +169 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.dark 390.0 dp at 2.0 scale
+00:40 +170 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 1.0 scale
+00:40 +171 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 1.5 scale
+00:41 +172 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 320.0 dp at 2.0 scale
+00:41 +173 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 1.0 scale
+00:41 +174 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 1.5 scale
+00:41 +175 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup fits TargetPlatform.iOS Brightness.light 390.0 dp at 2.0 scale
+00:41 +176 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: popup stays above an open keyboard on a small viewport
+00:41 +177 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: root menu has no font and routes to settings and information
+00:41 +178 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: context action runs after popup closes
+00:41 +179 ~9: /workspace/ibreviarybyapp-baseline/test/app_overflow_menu_test.dart: switching preserves reader scroll and hidden chrome dismisses popup
+00:42 +180 ~9: loading /workspace/ibreviarybyapp-baseline/test/app_shell_restoration_test.dart
+00:45 +180 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_restoration_test.dart: (setUpAll)
+00:45 +180 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_restoration_test.dart: Bible selection temporarily owns the bottom slot
+00:45 +181 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_restoration_test.dart: shell starts and restores the shared date without build writes
+[ContentUpdates] check failed: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+00:47 +182 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_restoration_test.dart: opening Readings with an explicit date updates after route build
+00:48 +183 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_restoration_test.dart: (tearDownAll)
+00:48 +183 ~9: loading /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart
+00:49 +183 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: removing replaced inactive reader keeps new reader chrome active
+00:49 +184 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: route entry owns Full Compact Hidden and pop restores previous mode
+00:49 +185 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: each branch owns an independent chrome controller
+00:49 +186 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: Full to Full route change publishes descriptor ownership
+00:49 +187 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: contextual bottom slot does not change the reader chrome mode
+00:49 +188 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: live bottom slot survives URI reset and inactive owner can release it
+00:49 +189 ~9: /workspace/ibreviarybyapp-baseline/test/app_shell_state_test.dart: Ora return token is valid only while its route entry exists
+00:49 +190 ~9: loading /workspace/ibreviarybyapp-baseline/test/app_theme_test.dart
+00:50 +190 ~9: /workspace/ibreviarybyapp-baseline/test/app_theme_test.dart: explicit theme mode is authoritative for both MaterialApp slots
+00:50 +191 ~9: /workspace/ibreviarybyapp-baseline/test/app_theme_test.dart: system theme keeps separate light and dark MaterialApp slots
+00:50 +192 ~9: /workspace/ibreviarybyapp-baseline/test/app_theme_test.dart: app theme controller updates the running MaterialApp
+00:51 +193 ~9: loading /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart
+00:52 +193 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: (setUpAll)
+00:52 +193 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: testament boundary accounts for Russian additional books
+00:52 +194 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: Belarusian testaments: 46 OT books, 27 NT books from mt to rev
+00:52 +195 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: Belarusian attribution depends on the testament
+00:52 +196 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: Belarusian New Testament text is Catholic.by, not Chernyavski
+00:52 +197 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: Belarusian New Testament keeps canonical verse numbering
+00:52 +198 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: parallel translation keeps the canonical book
+00:52 +199 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: Belarusian version carries the full catholic canon
+00:52 +200 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: parallel mapping aligns both translations
+00:52 +201 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: book search returns matches with chapter and verse
+00:52 +202 ~9: /workspace/ibreviarybyapp-baseline/test/bible_repository_test.dart: (tearDownAll)
+00:52 +202 ~9: loading /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart
+00:53 +202 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: (setUpAll)
+00:54 +202 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation first run uses a sensible first-book default
+00:54 +203 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation root restores last location and clamps a corrupt chapter
+00:54 +204 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation translation switch preserves the canonical book and chapter
+00:54 +205 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation translation fallback uses the saved target location
+00:54 +206 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation previous and next cross book boundaries
+00:54 +207 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation first and last chapter boundaries disable navigation
+00:54 +208 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation canonical and search-result routes preserve a verse target
+00:54 +209 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible location and navigation missing and corrupt local data produce an empty graceful state
+00:54 +210 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions reader is neutral and exposes translation, picker, search, Aa
+00:55 +211 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions BEL and RUS switch keeps the reading location
+00:56 +212 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions book/chapter picker changes chapter
+00:58 +213 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions inline chapter center opens the existing full-name picker
+00:58 +214 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions manual downward scroll compacts the Bible dock and a new chapter resets it
+00:59 +215 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions next and previous chapter controls navigate
+00:59 +216 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions verse selection adds, removes, and persists a highlight
+01:00 +217 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions double tap enters fullscreen without selecting a verse
+01:00 +218 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions verse palette exposes names, state, and 48dp targets
+01:01 +219 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions verse announces its number, text, and selected state
+01:01 +220 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions verse palette uses reported zero system inset
+01:01 +221 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions system TextScaler increases rendered verse body
+01:02 +222 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions Aa changes shared text size without exposing font settings
+01:02 +223 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions search result opens the verse and Back restores query state
+01:03 +224 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions scroll offset survives recreation and branch-style return
+01:03 +225 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions Compact and Hidden chrome remain shell-controlled
+01:03 +226 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions iOS and Android use their native chrome interpretations
+01:04 +227 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: Bible reader interactions large text and narrow screens do not overflow
+01:04 +228 ~9: /workspace/ibreviarybyapp-baseline/test/bible_stage6_test.dart: (tearDownAll)
+01:04 +228 ~9: loading /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart
+01:05 +228 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: lab route exists only in flag builds
+01:05 +229 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: A has previous/current/next and outline selection
+01:07 +230 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: B is selector-first with steps inside outline
+01:08 +231 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: C changes to two rows when label does not fit
+01:08 +232 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: width/scale matrix and long labels have no overflow
+01:16 +233 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: targets are at least 48 and content clears measured bar
+01:16 +234 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: physical 320 px viewport and all scenarios stay interactive
+01:17 +235 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: lab uses semantic neutral chrome on android
+01:17 +236 ~9: /workspace/ibreviarybyapp-baseline/test/bottom_navigation_lab_test.dart: lab uses semantic neutral chrome on iOS
+01:17 +237 ~9: loading /workspace/ibreviarybyapp-baseline/test/bundled_fonts_test.dart
+01:18 +237 ~9: /workspace/ibreviarybyapp-baseline/test/bundled_fonts_test.dart: every reader face variant is bundled and declared
+01:18 +238 ~9: loading /workspace/ibreviarybyapp-baseline/test/civil_date_test.dart
+01:19 +238 ~9: /workspace/ibreviarybyapp-baseline/test/civil_date_test.dart: next and previous day across both changes
+01:19 +239 ~9: /workspace/ibreviarybyapp-baseline/test/civil_date_test.dart: a time of day is dropped: the date stays the date
+01:19 +240 ~9: /workspace/ibreviarybyapp-baseline/test/civil_date_test.dart: days between dates count calendar days
+01:19 +241 ~9: /workspace/ibreviarybyapp-baseline/test/civil_date_test.dart: a week of neighbouring days around a change has no gap or repeat
+01:19 +242 ~9: /workspace/ibreviarybyapp-baseline/test/civil_date_test.dart: liturgical weeks are right on both sides of a change
+01:19 +243 ~9: loading /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart
+01:20 +243 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in dark
+01:20 +244 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: semantic colors and ReaderTheme agree in light
+01:20 +245 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: non-liturgical screens do not subscribe to calendar color
+01:21 +246 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: android dark dock, top and reader chrome stay neutral
+01:21 +247 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: android light dock, top and reader chrome stay neutral
+01:21 +248 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: iOS dark dock, top and reader chrome stay neutral
+01:21 +249 ~9: /workspace/ibreviarybyapp-baseline/test/color_foundations_test.dart: iOS light dock, top and reader chrome stay neutral
+01:22 +250 ~9: loading /workspace/ibreviarybyapp-baseline/test/common_office_test.dart
+01:23 +250 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 15 ms
+[ContentStore] prayers: 115 docs in 89 ms
+[ContentStore] invitatoriums: 4 docs in 94 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 103 ms
+[ContentStore] completoriums: 35 docs in 104 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 92 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 95 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 136 ms
+[ContentStore] liturgicalTemplates: 16 docs in 199 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 334 ms
+[ContentStore] readings: 822 docs in 412 ms
+[ContentStore] days: 736 docs in 605 ms
+[ContentStore] compendiumMeta: 1 docs in 9 ms
+01:23 +250 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: real A–F inputs: every text value and source equals production Web
+01:24 +251 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: (setUpAll)
+[ContentStore] compendium: 27 docs in 182 ms
+[ContentStore] songs: 447 docs in 183 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 181 ms
+01:24 +251 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: explicit bases win; conflicting, invalid and inferred sources never guess
+01:24 +252 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: Proper precedes Common; absent base, ref and Common stay diagnosed gaps
+01:24 +253 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: seasonal base, omission, rule and Marian section do not mutate cache
+01:24 +254 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: choice survives hour navigation and date switching; cache rebuild keeps dioceses separate
+01:24 +255 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: offline bundle contains revision 4, 29 bases, rules and seasonal Commons
+01:24 +256 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 31 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 11 ms
+[ContentStore] completoriums: 35 docs in 12 ms
+[ContentStore] invitatoriums: 4 docs in 13 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 5 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 12 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 23 ms
+[ContentStore] liturgicalTemplates: 16 docs in 167 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 219 ms
+[ContentStore] readings: 822 docs in 241 ms
+[ContentStore] days: 736 docs in 431 ms
+01:25 +257 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] compendiumMeta: 1 docs in 18 ms
+[ContentStore] songs: 447 docs in 27 ms
+[ContentStore] compendium: 27 docs in 26 ms
+01:25 +257 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: (tearDownAll)
+01:25 +257 ~9: /workspace/ibreviarybyapp-baseline/test/common_office_test.dart: a new bundle replaces stale Proper and Common overlays without clearing settings
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 51 ms
+01:25 +257 ~9: loading /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart
+01:26 +257 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset bundled asset is the valid canonical export
+01:26 +258 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset index: flat order, lookup by number/id and reading groups
+01:26 +259 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset navigation: every question once, in canonical order
+01:26 +260 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset navigation: only real source headings are nodes
+01:26 +261 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset navigation: question 1 is a direct child of section p1-s1
+01:26 +262 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset navigation: lead-in questions precede named topics
+01:26 +263 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset ПАДРАЗДЗЕЛ labels use masculine ordinals from the number
+01:26 +264 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset audit: every node is addressable and owns its questions once
+01:26 +265 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset audit: direct questions of sections and subsections
+01:26 +266 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset untitled lead-ins are reading chunks, not headings
+01:26 +267 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset answer paragraphs keep source text and emphasis
+01:26 +268 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: canonical dataset context trails use visible Belarusian titles only
+01:26 +269 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: validation rejects incomplete or inconsistent datasets
+01:26 +270 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_data_test.dart: validation Firestore documents reassemble into the canonical dataset
+01:26 +271 ~9: loading /workspace/ibreviarybyapp-baseline/test/compendium_flat_outline_test.dart
+01:27 +271 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_flat_outline_test.dart: all four cached streams contain exactly the canonical 598 questions
+01:27 +272 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_flat_outline_test.dart: Part I starts with section, q1, subsection, citation, q2–5, topic
+01:27 +273 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_flat_outline_test.dart: edge placements and inline headings match source order
+01:27 +274 ~9: loading /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart
+01:28 +274 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: root shows the four parts and the attribution
+01:30 +275 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: root source attribution opens Catholic.by externally
+01:30 +276 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: root bundle failure without a synced copy shows a retry
+01:30 +277 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: search results open a question and the query survives Back
+01:31 +278 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: search an exact number jumps to the question on submit
+01:32 +279 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: search no match shows an empty state
+01:32 +280 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: flat Part navigation root → Part I shows section, q1, subsection and q2–5 inline
+01:32 +281 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: flat Part navigation reader has canonical neighbours and returns to its question in Part
+01:33 +282 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: flat Part navigation cold Part target and legacy links land on stable items
+01:36 +283 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: flat Part navigation search from a Part returns to results then restores its target
+01:37 +284 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: flat Part navigation Part and reader clear bottom dock at large text and safe insets
+01:39 +285 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_screens_test.dart: the Compendium stays independent from prayers
+01:39 +286 ~9: loading /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart
+01:40 +286 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: normalisation folds Belarusian orthographic variants
+01:40 +287 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: normalisation matches the MyBrev implementation character for character
+01:40 +288 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: ranking number search puts the exact question first
+01:40 +289 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: ranking Belarusian search is case-insensitive and prefers questions
+01:40 +290 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: ranking rankings, fields and scores equal the MyBrev results
+01:40 +291 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: hidden Russian aliases widen matching only
+01:40 +292 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: hidden Russian aliases every alias target exists in the Belarusian text
+01:40 +293 ~9: /workspace/ibreviarybyapp-baseline/test/compendium_search_test.dart: hidden Russian aliases a malformed alias file is ignored
+01:40 +294 ~9: loading /workspace/ibreviarybyapp-baseline/test/computed_year_options_test.dart
+01:41 +294 ~9: /workspace/ibreviarybyapp-baseline/test/computed_year_options_test.dart: computed year options equal the web Ordo engine
+01:41 +295 ~9: /workspace/ibreviarybyapp-baseline/test/computed_year_options_test.dart: the calendar is available synchronously for any year, no network
+01:41 +296 ~9: /workspace/ibreviarybyapp-baseline/test/computed_year_options_test.dart: daylight-saving changes never shift a computed date
+01:41 +297 ~9: loading /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart
+01:42 +297 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: fake remote hashes each document once per publication
+01:42 +298 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: background preload a load that meets closed storage ends quietly
+[ContentStore] prayerCategories: 5 docs in 104 ms
+[ContentStore] prayers: 115 docs in 151 ms
+[ContentStore] invitatoriums: 4 docs in 156 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 165 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 166 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 166 ms
+[ContentStore] completoriums: 35 docs in 168 ms
+[ContentStore] songs: 447 docs in 242 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 268 ms
+[ContentStore] liturgicalTemplates: 16 docs in 305 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 377 ms
+[ContentStore] readings: 822 docs in 421 ms
+[ContentStore] days: 736 docs in 562 ms
+[ContentStore] compendiumMeta: 1 docs in 86 ms
+[ContentStore] compendium: 27 docs in 105 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 123 ms
+01:43 +299 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: background preload idle() completes only after every started load
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 38 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 8 ms
+[ContentStore] invitatoriums: 4 docs in 9 ms
+[ContentStore] completoriums: 35 docs in 9 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 8 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 8 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 33 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 84 ms
+[ContentStore] liturgicalTemplates: 16 docs in 157 ms
+[ContentStore] readings: 822 docs in 199 ms
+[ContentStore] days: 736 docs in 402 ms
+[ContentStore] compendiumMeta: 1 docs in 7 ms
+[ContentStore] songs: 447 docs in 15 ms
+[ContentStore] compendium: 27 docs in 21 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 37 ms
+01:43 +300 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: distribution every collection ships with the app and matches its manifest
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 25 ms
+[ContentStore] invitatoriums: 4 docs in 40 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 45 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 43 ms
+[ContentStore] completoriums: 35 docs in 53 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 45 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] compendiumMeta: 1 docs in 37 ms
+[ContentStore] songs: 447 docs in 47 ms
+[ContentStore] compendium: 27 docs in 93 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 135 ms
+[ContentStore] liturgicalTemplates: 16 docs in 238 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 231 ms
+[ContentStore] readings: 822 docs in 286 ms
+[ContentStore] days: 736 docs in 431 ms
+01:44 +301 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: distribution a fresh install opens the Hours and the Readings offline, far outside the former ±7-day window
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 26 ms
+[ContentStore] invitatoriums: 4 docs in 23 ms
+[ContentStore] completoriums: 35 docs in 32 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 28 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 41 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] songs: 447 docs in 47 ms
+[ContentStore] compendium: 27 docs in 135 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 153 ms
+[ContentStore] liturgicalTemplates: 16 docs in 186 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 253 ms
+[ContentStore] readings: 822 docs in 290 ms
+[ContentStore] days: 736 docs in 398 ms
+01:45 +302 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: distribution the app and the bundle builder agree on collections and schema
+01:45 +303 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: distribution the Compendium is content: validated from the store, patched with the rest
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 47 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 16 ms
+[ContentStore] invitatoriums: 4 docs in 27 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 27 ms
+[ContentStore] completoriums: 35 docs in 28 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] compendiumMeta: 1 docs in 13 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 28 ms
+[ContentStore] songs: 447 docs in 96 ms
+[ContentStore] compendium: 27 docs in 109 ms
+[ContentStore] liturgicalTemplates: 16 docs in 140 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 119 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 219 ms
+[ContentStore] readings: 822 docs in 317 ms
+[ContentStore] days: 736 docs in 389 ms
+01:46 +304 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: distribution Hive holds no copy of the bundled corpus
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 27 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 55 ms
+[ContentStore] invitatoriums: 4 docs in 55 ms
+[ContentStore] completoriums: 35 docs in 55 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 55 ms
+[ContentStore] compendiumMeta: 1 docs in 47 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 57 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 58 ms
+[ContentStore] compendium: 27 docs in 57 ms
+[ContentStore] songs: 447 docs in 64 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 103 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 210 ms
+[ContentStore] liturgicalTemplates: 16 docs in 241 ms
+[ContentStore] readings: 822 docs in 313 ms
+[ContentStore] days: 736 docs in 465 ms
+01:46 +305 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions same digest: one small request, nothing downloaded
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 38 ms
+[ContentStore] invitatoriums: 4 docs in 7 ms
+[ContentStore] completoriums: 35 docs in 18 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 17 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 34 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 34 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 35 ms
+[ContentStore] compendiumMeta: 1 docs in 33 ms
+[ContentStore] songs: 447 docs in 46 ms
+[ContentStore] compendium: 27 docs in 54 ms
+[ContentStore] liturgicalTemplates: 16 docs in 141 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 197 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 207 ms
+[ContentStore] readings: 822 docs in 358 ms
+[ContentStore] days: 736 docs in 525 ms
+01:49 +306 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions one changed document: only that document is downloaded
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 31 ms
+[ContentStore] invitatoriums: 4 docs in 26 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 21 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 20 ms
+[ContentStore] completoriums: 35 docs in 21 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 21 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 21 ms
+[ContentStore] compendiumMeta: 1 docs in 9 ms
+[ContentStore] compendium: 27 docs in 36 ms
+[ContentStore] songs: 447 docs in 51 ms
+[ContentStore] liturgicalTemplates: 16 docs in 74 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 142 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 230 ms
+[ContentStore] readings: 822 docs in 281 ms
+[ContentStore] days: 736 docs in 447 ms
+01:51 +307 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions a removed document disappears; a new one appears
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 29 ms
+[ContentStore] invitatoriums: 4 docs in 13 ms
+[ContentStore] completoriums: 35 docs in 15 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 14 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 13 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 13 ms
+[ContentStore] compendiumMeta: 1 docs in 14 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 25 ms
+[ContentStore] compendium: 27 docs in 61 ms
+[ContentStore] liturgicalTemplates: 16 docs in 108 ms
+[ContentStore] songs: 447 docs in 96 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 120 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 154 ms
+[ContentStore] readings: 822 docs in 249 ms
+[ContentStore] days: 736 docs in 438 ms
+01:54 +308 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions a document that does not match the manifest is rejected; nothing changes
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 31 ms
+[ContentStore] invitatoriums: 4 docs in 11 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 11 ms
+[ContentStore] completoriums: 35 docs in 11 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 11 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 11 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 21 ms
+[ContentStore] compendiumMeta: 1 docs in 12 ms
+[ContentStore] compendium: 27 docs in 46 ms
+[ContentStore] songs: 447 docs in 98 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 140 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 148 ms
+[ContentStore] liturgicalTemplates: 16 docs in 214 ms
+[ContentStore] readings: 822 docs in 231 ms
+[ContentStore] days: 736 docs in 437 ms
+01:56 +309 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions a missing document rejects the update
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 35 ms
+[ContentStore] invitatoriums: 4 docs in 29 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 28 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 37 ms
+[ContentStore] completoriums: 35 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 38 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 66 ms
+[ContentStore] compendiumMeta: 1 docs in 41 ms
+[ContentStore] compendium: 27 docs in 108 ms
+[ContentStore] songs: 447 docs in 127 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 122 ms
+[ContentStore] liturgicalTemplates: 16 docs in 164 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 292 ms
+[ContentStore] readings: 822 docs in 328 ms
+[ContentStore] days: 736 docs in 500 ms
+01:59 +310 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions a newer local update survives a restart
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 35 ms
+[ContentStore] invitatoriums: 4 docs in 16 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 17 ms
+[ContentStore] completoriums: 35 docs in 18 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 18 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 18 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 19 ms
+[ContentStore] compendiumMeta: 1 docs in 12 ms
+[ContentStore] songs: 447 docs in 50 ms
+[ContentStore] compendium: 27 docs in 70 ms
+[ContentStore] liturgicalTemplates: 16 docs in 133 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 141 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 184 ms
+[ContentStore] readings: 822 docs in 236 ms
+[ContentStore] days: 736 docs in 436 ms
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 25 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 33 ms
+[ContentStore] invitatoriums: 4 docs in 34 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 34 ms
+[ContentStore] completoriums: 35 docs in 35 ms
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 35 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 35 ms
+[ContentStore] compendium: 27 docs in 50 ms
+[ContentStore] songs: 447 docs in 52 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 98 ms
+[ContentStore] liturgicalTemplates: 16 docs in 181 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 183 ms
+[ContentStore] readings: 822 docs in 233 ms
+[ContentStore] days: 736 docs in 399 ms
+02:00 +311 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: versions an app update with a newer bundle supersedes an older local update
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 29 ms
+[ContentStore] invitatoriums: 4 docs in 17 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 23 ms
+[ContentStore] completoriums: 35 docs in 25 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 23 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 24 ms
+[ContentStore] compendiumMeta: 1 docs in 16 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] compendium: 27 docs in 30 ms
+[ContentStore] songs: 447 docs in 40 ms
+[ContentStore] liturgicalTemplates: 16 docs in 148 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 131 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 202 ms
+[ContentStore] readings: 822 docs in 263 ms
+[ContentStore] days: 736 docs in 413 ms
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 34 ms
+[ContentStore] invitatoriums: 4 docs in 9 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 17 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 18 ms
+[ContentStore] completoriums: 35 docs in 18 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 18 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 18 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] compendium: 27 docs in 119 ms
+[ContentStore] songs: 447 docs in 124 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 151 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 195 ms
+[ContentStore] liturgicalTemplates: 16 docs in 210 ms
+[ContentStore] readings: 822 docs in 238 ms
+[ContentStore] days: 736 docs in 450 ms
+02:01 +312 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: former download cache newer documents are kept, older ones dropped, the cache removed, user data untouched — and running again changes nothing
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 33 ms
+[ContentStore] invitatoriums: 4 docs in 30 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 28 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 28 ms
+[ContentStore] completoriums: 35 docs in 29 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 29 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms
+[ContentStore] compendiumMeta: 1 docs in 27 ms
+[ContentStore] compendium: 27 docs in 44 ms
+[ContentStore] songs: 447 docs in 77 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 180 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 187 ms
+[ContentStore] liturgicalTemplates: 16 docs in 194 ms
+[ContentStore] readings: 822 docs in 217 ms
+[ContentStore] days: 736 docs in 463 ms
+[ContentMigration] done, 1 newer documents kept
+02:02 +313 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy 100 new prayers: only those are downloaded, by themselves
+[ContentStore] prayerCategories: 5 docs in 0 ms
+[ContentStore] prayers: 115 docs in 28 ms
+[ContentStore] invitatoriums: 4 docs in 11 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 10 ms
+[ContentStore] completoriums: 35 docs in 11 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 4 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 11 ms
+[ContentStore] compendiumMeta: 1 docs in 6 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 39 ms
+[ContentStore] songs: 447 docs in 71 ms
+[ContentStore] compendium: 27 docs in 181 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 202 ms
+[ContentStore] readings: 822 docs in 223 ms
+[ContentStore] liturgicalTemplates: 16 docs in 220 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 213 ms
+[ContentStore] days: 736 docs in 484 ms
+02:05 +314 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy a rebuild-sized diff is left to the next app release
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 40 ms
+[ContentStore] invitatoriums: 4 docs in 18 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 18 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 18 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 18 ms
+[ContentStore] completoriums: 35 docs in 19 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 18 ms
+[ContentStore] compendiumMeta: 1 docs in 9 ms
+[ContentStore] songs: 447 docs in 74 ms
+[ContentStore] compendium: 27 docs in 103 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 149 ms
+[ContentStore] liturgicalTemplates: 16 docs in 185 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 224 ms
+[ContentStore] readings: 822 docs in 294 ms
+[ContentStore] days: 736 docs in 557 ms
+[ContentUpdates] rebuild: content 1893456000000 needs the next app release
+02:08 +315 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy a newer schema is never installed as a patch
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 29 ms
+[ContentStore] invitatoriums: 4 docs in 16 ms
+[ContentStore] completoriums: 35 docs in 26 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 26 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 26 ms
+[ContentStore] compendiumMeta: 1 docs in 30 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 46 ms
+[ContentStore] songs: 447 docs in 32 ms
+[ContentStore] liturgicalTemplates: 16 docs in 48 ms
+[ContentStore] compendium: 27 docs in 87 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 122 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 180 ms
+[ContentStore] readings: 822 docs in 234 ms
+[ContentStore] days: 736 docs in 391 ms
+02:10 +316 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy new schema: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 25 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 15 ms
+[ContentStore] invitatoriums: 4 docs in 17 ms
+[ContentStore] completoriums: 35 docs in 40 ms
+[ContentStore] compendiumMeta: 1 docs in 27 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 43 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 43 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 43 ms
+[ContentStore] compendium: 27 docs in 46 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 82 ms
+[ContentStore] songs: 447 docs in 93 ms
+[ContentStore] liturgicalTemplates: 16 docs in 211 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 277 ms
+[ContentStore] readings: 822 docs in 319 ms
+[ContentStore] days: 736 docs in 411 ms
+[ContentUpdates] schema: content 1893456000000 needs the next app release
+02:13 +317 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy mass rebuild: app release required, nothing installed, survives a restart, never «Актуальныя»
+[ContentStore] prayerCategories: 5 docs in 6 ms
+[ContentStore] prayers: 115 docs in 39 ms
+[ContentStore] invitatoriums: 4 docs in 10 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 16 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 16 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 16 ms
+[ContentStore] completoriums: 35 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 23 ms
+[ContentStore] compendiumMeta: 1 docs in 14 ms
+[ContentStore] compendium: 27 docs in 20 ms
+[ContentStore] songs: 447 docs in 61 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 156 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 194 ms
+[ContentStore] liturgicalTemplates: 16 docs in 222 ms
+[ContentStore] readings: 822 docs in 271 ms
+[ContentStore] days: 736 docs in 491 ms
+[ContentUpdates] rebuild: content 1893456000000 needs the next app release
+02:15 +318 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy a compatible current check clears the status — at the next launch, even within the day
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 34 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 26 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 28 ms
+[ContentStore] invitatoriums: 4 docs in 33 ms
+[ContentStore] completoriums: 35 docs in 29 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] compendium: 27 docs in 38 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 51 ms
+[ContentStore] songs: 447 docs in 66 ms
+[ContentStore] liturgicalTemplates: 16 docs in 184 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 197 ms
+[ContentStore] readings: 822 docs in 219 ms
+[ContentStore] days: 736 docs in 463 ms
+[ContentUpdates] rebuild: content 1893456000000 needs the next app release
+02:20 +319 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: update policy the daily check runs once a day
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 64 ms
+[ContentStore] invitatoriums: 4 docs in 23 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 25 ms
+[ContentStore] completoriums: 35 docs in 26 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 25 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 29 ms
+[ContentStore] compendiumMeta: 1 docs in 20 ms
+[ContentStore] compendium: 27 docs in 43 ms
+[ContentStore] songs: 447 docs in 110 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 172 ms
+[ContentStore] liturgicalTemplates: 16 docs in 199 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 217 ms
+[ContentStore] readings: 822 docs in 259 ms
+[ContentStore] days: 736 docs in 404 ms
+02:23 +320 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: settings only the reader's questions: offline, current, check
+02:24 +321 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: settings a failed check is calm
+02:24 +322 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: settings a rebuild waits for the app; nothing about Wi-Fi or sizes
+02:24 +323 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: settings offline: the texts work, the check waits
+02:24 +324 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: activation a completed update is new in every collection
+[ContentStore] prayerCategories: 5 docs in 9 ms
+[ContentStore] prayers: 115 docs in 62 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 17 ms
+[ContentStore] invitatoriums: 4 docs in 18 ms
+[ContentStore] completoriums: 35 docs in 18 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 17 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 42 ms
+[ContentStore] compendiumMeta: 1 docs in 28 ms
+[ContentStore] compendium: 27 docs in 29 ms
+[ContentStore] songs: 447 docs in 50 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 85 ms
+[ContentStore] liturgicalTemplates: 16 docs in 147 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 314 ms
+[ContentStore] readings: 822 docs in 348 ms
+[ContentStore] days: 736 docs in 550 ms
+02:25 +325 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: activation crash while staging: old content, before and after a restart
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 29 ms
+[ContentStore] invitatoriums: 4 docs in 11 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 18 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 18 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 19 ms
+[ContentStore] completoriums: 35 docs in 20 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 20 ms
+[ContentStore] compendiumMeta: 1 docs in 15 ms
+[ContentStore] songs: 447 docs in 28 ms
+[ContentStore] compendium: 27 docs in 53 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 94 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 208 ms
+[ContentStore] liturgicalTemplates: 16 docs in 257 ms
+[ContentStore] readings: 822 docs in 288 ms
+[ContentStore] days: 736 docs in 604 ms
+[ContentStore] dropping an unfinished update
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 32 ms
+[ContentStore] invitatoriums: 4 docs in 19 ms
+[ContentStore] completoriums: 35 docs in 27 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 31 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 36 ms
+[ContentStore] compendiumMeta: 1 docs in 19 ms
+[ContentStore] songs: 447 docs in 32 ms
+[ContentStore] compendium: 27 docs in 42 ms
+[ContentStore] liturgicalTemplates: 16 docs in 164 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 166 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 232 ms
+[ContentStore] readings: 822 docs in 262 ms
+[ContentStore] days: 736 docs in 428 ms
+02:26 +326 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: activation crash after READY: old until restart, then new everywhere
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 32 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 23 ms
+[ContentStore] invitatoriums: 4 docs in 24 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 24 ms
+[ContentStore] compendiumMeta: 1 docs in 22 ms
+[ContentStore] completoriums: 35 docs in 24 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 24 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 25 ms
+[ContentStore] compendium: 27 docs in 73 ms
+[ContentStore] songs: 447 docs in 93 ms
+[ContentStore] liturgicalTemplates: 16 docs in 127 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 172 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 218 ms
+[ContentStore] readings: 822 docs in 290 ms
+[ContentStore] days: 736 docs in 414 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 32 ms
+[ContentStore] invitatoriums: 4 docs in 20 ms
+[ContentStore] completoriums: 35 docs in 20 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 20 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 20 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 20 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 47 ms
+[ContentStore] compendiumMeta: 1 docs in 41 ms
+[ContentStore] songs: 447 docs in 83 ms
+[ContentStore] compendium: 27 docs in 114 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 133 ms
+[ContentStore] liturgicalTemplates: 16 docs in 178 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 226 ms
+[ContentStore] readings: 822 docs in 263 ms
+[ContentStore] days: 736 docs in 423 ms
+02:27 +327 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: activation a READY generation left by a failed commit is finished before the next one starts
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 29 ms
+[ContentStore] invitatoriums: 4 docs in 57 ms
+[ContentStore] completoriums: 35 docs in 58 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 58 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 58 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 107 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 111 ms
+[ContentStore] compendiumMeta: 1 docs in 109 ms
+[ContentStore] compendium: 27 docs in 109 ms
+[ContentStore] songs: 447 docs in 111 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 164 ms
+[ContentStore] liturgicalTemplates: 16 docs in 217 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 219 ms
+[ContentStore] readings: 822 docs in 314 ms
+[ContentStore] days: 736 docs in 475 ms
+[ContentStore] finishing an interrupted update
+02:27 +328 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: activation crash while writing overlays: readers never see a mix; the restart finishes it
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 32 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 11 ms
+[ContentStore] completoriums: 35 docs in 44 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 44 ms
+[ContentStore] invitatoriums: 4 docs in 45 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 45 ms
+[ContentStore] compendiumMeta: 1 docs in 43 ms
+[ContentStore] songs: 447 docs in 46 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 98 ms
+[ContentStore] compendium: 27 docs in 172 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 173 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 197 ms
+[ContentStore] liturgicalTemplates: 16 docs in 237 ms
+[ContentStore] readings: 822 docs in 241 ms
+[ContentStore] days: 736 docs in 512 ms
+[ContentStore] finishing an interrupted update
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 30 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 24 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 25 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] compendiumMeta: 1 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 26 ms
+[ContentStore] invitatoriums: 4 docs in 27 ms
+[ContentStore] completoriums: 35 docs in 27 ms
+[ContentStore] compendium: 27 docs in 45 ms
+[ContentStore] songs: 447 docs in 49 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 118 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 129 ms
+[ContentStore] liturgicalTemplates: 16 docs in 138 ms
+[ContentStore] readings: 822 docs in 195 ms
+[ContentStore] days: 736 docs in 409 ms
+02:29 +329 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left
+[ContentStore] prayerCategories: 5 docs in 0 ms
+[ContentStore] prayers: 115 docs in 37 ms
+[ContentStore] invitatoriums: 4 docs in 24 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 24 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 24 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 24 ms
+[ContentStore] completoriums: 35 docs in 25 ms
+[ContentStore] compendiumMeta: 1 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 25 ms
+[ContentStore] songs: 447 docs in 62 ms
+[ContentStore] compendium: 27 docs in 97 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 105 ms
+[ContentStore] liturgicalTemplates: 16 docs in 114 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 162 ms
+[ContentStore] readings: 822 docs in 237 ms
+[ContentStore] days: 736 docs in 438 ms
+02:33 +330 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 45 ms
+[ContentStore] invitatoriums: 4 docs in 39 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 39 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] completoriums: 35 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 39 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 52 ms
+[ContentStore] compendiumMeta: 1 docs in 32 ms
+[ContentStore] songs: 447 docs in 79 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 76 ms
+[ContentStore] compendium: 27 docs in 131 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 169 ms
+[ContentStore] liturgicalTemplates: 16 docs in 204 ms
+[ContentStore] readings: 822 docs in 330 ms
+[ContentStore] days: 736 docs in 647 ms
+02:40 +331 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: corrections and app releases every collection keeps the version of its own snapshot
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 43 ms
+[ContentStore] invitatoriums: 4 docs in 21 ms
+[ContentStore] completoriums: 35 docs in 27 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 26 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 26 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 26 ms
+[ContentStore] compendiumMeta: 1 docs in 17 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 27 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 46 ms
+[ContentStore] songs: 447 docs in 52 ms
+[ContentStore] compendium: 27 docs in 56 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 118 ms
+[ContentStore] liturgicalTemplates: 16 docs in 143 ms
+[ContentStore] readings: 822 docs in 320 ms
+[ContentStore] days: 736 docs in 471 ms
+02:41 +332 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 26 ms
+[ContentStore] invitatoriums: 4 docs in 15 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 15 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 15 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 15 ms
+[ContentStore] compendiumMeta: 1 docs in 18 ms
+[ContentStore] completoriums: 35 docs in 33 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 33 ms
+[ContentStore] songs: 447 docs in 32 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 63 ms
+[ContentStore] compendium: 27 docs in 99 ms
+[ContentStore] liturgicalTemplates: 16 docs in 110 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 219 ms
+[ContentStore] readings: 822 docs in 303 ms
+[ContentStore] days: 736 docs in 447 ms
+02:48 +333 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: corrections and app releases a new app bundle absorbs the patches it contains
+[ContentStore] prayerCategories: 5 docs in 0 ms
+[ContentStore] prayers: 115 docs in 35 ms
+[ContentStore] invitatoriums: 4 docs in 14 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 16 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 16 ms
+[ContentStore] completoriums: 35 docs in 17 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 16 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 17 ms
+[ContentStore] compendiumMeta: 1 docs in 6 ms
+[ContentStore] songs: 447 docs in 76 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 75 ms
+[ContentStore] compendium: 27 docs in 77 ms
+[ContentStore] liturgicalTemplates: 16 docs in 96 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 121 ms
+[ContentStore] readings: 822 docs in 330 ms
+[ContentStore] days: 736 docs in 459 ms
+02:57 +334 ~9: /workspace/ibreviarybyapp-baseline/test/content_offline_test.dart: former download cache at full size an almost complete old database: newer kept, the rest freed, user data intact
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 42 ms
+[ContentStore] invitatoriums: 4 docs in 30 ms
+[ContentStore] completoriums: 35 docs in 30 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 41 ms
+[ContentStore] compendiumMeta: 1 docs in 24 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 37 ms
+[ContentStore] songs: 447 docs in 73 ms
+[ContentStore] compendium: 27 docs in 70 ms
+[ContentStore] liturgicalTemplates: 16 docs in 90 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 99 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 103 ms
+[ContentStore] readings: 822 docs in 298 ms
+[ContentStore] days: 736 docs in 504 ms
+[ContentMigration] done, 1 newer documents kept
+MIGRATION 2120 documents, 58.3 MB → 0.1 MB in 39 ms
+02:59 +335 ~9: All tests passed!

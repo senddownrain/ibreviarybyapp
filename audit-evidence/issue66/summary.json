@@ -1,0 +1,4194 @@
+{
+  "main-fixed-load5": {
+    "run": {
+      "name": "main-fixed-load5",
+      "branch": "main",
+      "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "instrumented": false,
+      "workers": 5,
+      "startedUtc": "2026-11-06T05:23:55.613927+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "loadStartedElapsed": 4.36,
+      "exitCode": 1,
+      "elapsedSeconds": 38.023,
+      "endedUtc": "2026-11-06T05:24:33.637391+00:00"
+    },
+    "resources": {
+      "samples": 41,
+      "cgroupDelta": {
+        "usage_usec": 63884119,
+        "user_usec": 59452285,
+        "system_usec": 4431833,
+        "nice_usec": 0,
+        "nr_periods": 372,
+        "nr_throttled": 297,
+        "throttled_usec": 39385773,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 281.140625,
+      "perTargetPid": [
+        {
+          "pid": 1396,
+          "sampleCount": 33,
+          "cpuSeconds": 10.51,
+          "sampleWallSeconds": 33.211
+        }
+      ],
+      "targetCpuSeconds": 10.51,
+      "targetSampleWallSeconds": 33.211
+    }
+  },
+  "main-fixed-prefix": {
+    "run": {
+      "name": "main-fixed-prefix",
+      "branch": "main",
+      "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+      "testSha256": "f1152e3f0ce16350e32a4f180dd0159443139f2724384933d585b11359462b7c",
+      "workingTreeDiff": [
+        "test/content_offline_test.dart"
+      ],
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/alternative_sheet_hit_test.dart",
+        "test/alternative_text_test.dart",
+        "test/analytics/analytics_collector_test.dart",
+        "test/analytics/analytics_contract_test.dart",
+        "test/analytics/analytics_feature_coverage_test.dart",
+        "test/analytics/analytics_parity_test.dart",
+        "test/analytics/consent_mock_test.dart",
+        "test/analytics/fit_detection_test.dart",
+        "test/analytics/local_analytics_test.dart",
+        "test/analytics/public_inventory_test.dart",
+        "test/analytics/route_mapper_test.dart",
+        "test/analytics/staging_http_test.dart",
+        "test/analytics/transport_and_guard_test.dart",
+        "test/app_navigation_dock_test.dart",
+        "test/app_overflow_menu_test.dart",
+        "test/app_shell_restoration_test.dart",
+        "test/app_shell_state_test.dart",
+        "test/app_theme_test.dart",
+        "test/bible_repository_test.dart",
+        "test/bible_stage6_test.dart",
+        "test/bottom_navigation_lab_test.dart",
+        "test/bundled_fonts_test.dart",
+        "test/civil_date_test.dart",
+        "test/color_foundations_test.dart",
+        "test/common_office_test.dart",
+        "test/compendium_data_test.dart",
+        "test/compendium_flat_outline_test.dart",
+        "test/compendium_screens_test.dart",
+        "test/compendium_search_test.dart",
+        "test/computed_year_options_test.dart",
+        "test/content_offline_test.dart"
+      ],
+      "instrumented": false,
+      "workers": 0,
+      "startedUtc": "2026-11-06T05:29:59.897268+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "exitCode": 0,
+      "elapsedSeconds": 191.521,
+      "endedUtc": "2026-11-06T05:33:11.418979+00:00"
+    },
+    "resources": {
+      "samples": 377,
+      "cgroupDelta": {
+        "usage_usec": 245988500,
+        "user_usec": 208228653,
+        "system_usec": 37759848,
+        "nice_usec": 0,
+        "nr_periods": 1907,
+        "nr_throttled": 198,
+        "throttled_usec": 9871468,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 619.25,
+      "perTargetPid": [
+        {
+          "pid": 2273,
+          "sampleCount": 16,
+          "cpuSeconds": 9.36,
+          "sampleWallSeconds": 7.5329999999999995
+        },
+        {
+          "pid": 2300,
+          "sampleCount": 3,
+          "cpuSeconds": 1.19,
+          "sampleWallSeconds": 1.001999999999999
+        },
+        {
+          "pid": 2310,
+          "sampleCount": 2,
+          "cpuSeconds": 0.72,
+          "sampleWallSeconds": 0.5019999999999989
+        },
+        {
+          "pid": 2319,
+          "sampleCount": 2,
+          "cpuSeconds": 0.52,
+          "sampleWallSeconds": 0.5030000000000001
+        },
+        {
+          "pid": 2329,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2340,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2348,
+          "sampleCount": 2,
+          "cpuSeconds": 0.53,
+          "sampleWallSeconds": 0.5010000000000012
+        },
+        {
+          "pid": 2358,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2366,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2375,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2386,
+          "sampleCount": 2,
+          "cpuSeconds": 0.48,
+          "sampleWallSeconds": 0.5009999999999977
+        },
+        {
+          "pid": 2398,
+          "sampleCount": 2,
+          "cpuSeconds": 0.51,
+          "sampleWallSeconds": 0.5019999999999953
+        },
+        {
+          "pid": 2407,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2416,
+          "sampleCount": 14,
+          "cpuSeconds": 9.14,
+          "sampleWallSeconds": 7.725000000000001
+        },
+        {
+          "pid": 2431,
+          "sampleCount": 18,
+          "cpuSeconds": 10.92,
+          "sampleWallSeconds": 8.676000000000002
+        },
+        {
+          "pid": 2458,
+          "sampleCount": 8,
+          "cpuSeconds": 4.52,
+          "sampleWallSeconds": 3.512999999999998
+        },
+        {
+          "pid": 2488,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2497,
+          "sampleCount": 3,
+          "cpuSeconds": 1.11,
+          "sampleWallSeconds": 1.0060000000000002
+        },
+        {
+          "pid": 2506,
+          "sampleCount": 3,
+          "cpuSeconds": 1.14,
+          "sampleWallSeconds": 1.0020000000000024
+        },
+        {
+          "pid": 2519,
+          "sampleCount": 23,
+          "cpuSeconds": 14.98,
+          "sampleWallSeconds": 11.045000000000002
+        },
+        {
+          "pid": 2541,
+          "sampleCount": 25,
+          "cpuSeconds": 16.14,
+          "sampleWallSeconds": 12.066000000000003
+        },
+        {
+          "pid": 2558,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2568,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2576,
+          "sampleCount": 4,
+          "cpuSeconds": 1.67,
+          "sampleWallSeconds": 1.5030000000000001
+        },
+        {
+          "pid": 2584,
+          "sampleCount": 6,
+          "cpuSeconds": 3.86,
+          "sampleWallSeconds": 2.51100000000001
+        },
+        {
+          "pid": 2632,
+          "sampleCount": 2,
+          "cpuSeconds": 0.59,
+          "sampleWallSeconds": 0.5010000000000048
+        },
+        {
+          "pid": 2642,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2652,
+          "sampleCount": 22,
+          "cpuSeconds": 13.69,
+          "sampleWallSeconds": 10.536999999999992
+        },
+        {
+          "pid": 2667,
+          "sampleCount": 3,
+          "cpuSeconds": 1.32,
+          "sampleWallSeconds": 1.0019999999999953
+        },
+        {
+          "pid": 2679,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 2688,
+          "sampleCount": 154,
+          "cpuSeconds": 93.28,
+          "sampleWallSeconds": 76.91699999999999
+        }
+      ]
+    }
+  },
+  "main-fixed-whole": {
+    "run": {
+      "name": "main-fixed-whole",
+      "branch": "main",
+      "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+      "testSha256": "f1152e3f0ce16350e32a4f180dd0159443139f2724384933d585b11359462b7c",
+      "workingTreeDiff": [
+        "test/content_offline_test.dart"
+      ],
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart"
+      ],
+      "instrumented": false,
+      "workers": 0,
+      "startedUtc": "2026-11-06T05:25:37.675474+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "exitCode": 0,
+      "elapsedSeconds": 107.819,
+      "endedUtc": "2026-11-06T05:27:25.494765+00:00"
+    },
+    "resources": {
+      "samples": 184,
+      "cgroupDelta": {
+        "usage_usec": 140261298,
+        "user_usec": 123691530,
+        "system_usec": 16569768,
+        "nice_usec": 0,
+        "nr_periods": 1071,
+        "nr_throttled": 247,
+        "throttled_usec": 22607401,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 638.03125,
+      "perTargetPid": [
+        {
+          "pid": 1689,
+          "sampleCount": 148,
+          "cpuSeconds": 89.49,
+          "sampleWallSeconds": 73.862
+        }
+      ],
+      "targetCpuSeconds": 89.49,
+      "targetSampleWallSeconds": 73.862
+    }
+  },
+  "main-original-load5": {
+    "run": {
+      "name": "main-original-load5",
+      "branch": "main",
+      "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "workers": 5,
+      "startedUtc": "2026-11-06T05:16:37.714423+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "loadStartedElapsed": 6.267,
+      "exitCode": 1,
+      "elapsedSeconds": 39.05,
+      "endedUtc": "2026-11-06T05:17:16.764997+00:00"
+    },
+    "testMs": 32470.61,
+    "totals": {
+      "bundle.read.prayers": {
+        "calls": 1,
+        "us": 2212,
+        "units": 0
+      },
+      "bundle.read.prayerCategories": {
+        "calls": 1,
+        "us": 500,
+        "units": 0
+      },
+      "bundle.decode.prayerCategories": {
+        "calls": 1,
+        "us": 89985,
+        "units": 0
+      },
+      "bundle.load.prayerCategories": {
+        "calls": 1,
+        "us": 149278,
+        "units": 0
+      },
+      "bundle.decode.prayers": {
+        "calls": 1,
+        "us": 201697,
+        "units": 0
+      },
+      "bundle.load.prayers": {
+        "calls": 1,
+        "us": 261440,
+        "units": 0
+      },
+      "bundle.read.days": {
+        "calls": 1,
+        "us": 57603,
+        "units": 0
+      },
+      "bundle.read.readings": {
+        "calls": 1,
+        "us": 9079,
+        "units": 0
+      },
+      "bundle.read.liturgicalTemplates": {
+        "calls": 1,
+        "us": 7924,
+        "units": 0
+      },
+      "bundle.read.invitatoriums": {
+        "calls": 1,
+        "us": 463,
+        "units": 0
+      },
+      "bundle.read.completoriums": {
+        "calls": 1,
+        "us": 319,
+        "units": 0
+      },
+      "bundle.read.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 588,
+        "units": 0
+      },
+      "bundle.read.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 302,
+        "units": 0
+      },
+      "bundle.read.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 234,
+        "units": 0
+      },
+      "bundle.read.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 259,
+        "units": 0
+      },
+      "bundle.read.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 6670,
+        "units": 0
+      },
+      "bundle.init": {
+        "calls": 1,
+        "us": 691119,
+        "units": 0
+      },
+      "bundle.read.songs": {
+        "calls": 1,
+        "us": 555,
+        "units": 0
+      },
+      "bundle.read.compendium": {
+        "calls": 1,
+        "us": 6402,
+        "units": 0
+      },
+      "bundle.read.compendiumMeta": {
+        "calls": 1,
+        "us": 298,
+        "units": 0
+      },
+      "bundle.read.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 912,
+        "units": 0
+      },
+      "bundle.decode.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 200467,
+        "units": 0
+      },
+      "bundle.load.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 319170,
+        "units": 0
+      },
+      "bundle.decode.completoriums": {
+        "calls": 1,
+        "us": 246587,
+        "units": 0
+      },
+      "bundle.load.completoriums": {
+        "calls": 1,
+        "us": 322550,
+        "units": 0
+      },
+      "bundle.decode.invitatoriums": {
+        "calls": 1,
+        "us": 254417,
+        "units": 0
+      },
+      "bundle.load.invitatoriums": {
+        "calls": 1,
+        "us": 326987,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 222383,
+        "units": 0
+      },
+      "bundle.load.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 326097,
+        "units": 0
+      },
+      "bundle.decode.compendiumMeta": {
+        "calls": 1,
+        "us": 202212,
+        "units": 0
+      },
+      "bundle.load.compendiumMeta": {
+        "calls": 1,
+        "us": 302383,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 359346,
+        "units": 0
+      },
+      "bundle.load.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 467136,
+        "units": 0
+      },
+      "bundle.decode.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 364514,
+        "units": 0
+      },
+      "bundle.load.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 467288,
+        "units": 0
+      },
+      "bundle.decode.compendium": {
+        "calls": 1,
+        "us": 499031,
+        "units": 0
+      },
+      "bundle.load.compendium": {
+        "calls": 1,
+        "us": 644986,
+        "units": 0
+      },
+      "bundle.decode.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 538188,
+        "units": 0
+      },
+      "bundle.load.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 638028,
+        "units": 0
+      },
+      "bundle.decode.songs": {
+        "calls": 1,
+        "us": 597162,
+        "units": 0
+      },
+      "bundle.load.songs": {
+        "calls": 1,
+        "us": 704992,
+        "units": 0
+      },
+      "bundle.decode.liturgicalTemplates": {
+        "calls": 1,
+        "us": 737617,
+        "units": 0
+      },
+      "bundle.load.liturgicalTemplates": {
+        "calls": 1,
+        "us": 818656,
+        "units": 0
+      },
+      "bundle.decode.readings": {
+        "calls": 1,
+        "us": 1004184,
+        "units": 0
+      },
+      "bundle.load.readings": {
+        "calls": 1,
+        "us": 1099581,
+        "units": 0
+      },
+      "bundle.decode.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 974318,
+        "units": 0
+      },
+      "bundle.load.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 1094894,
+        "units": 0
+      },
+      "bundle.decode.days": {
+        "calls": 1,
+        "us": 1473220,
+        "units": 0
+      },
+      "bundle.load.days": {
+        "calls": 1,
+        "us": 1579284,
+        "units": 0
+      },
+      "bundle.ensureAll": {
+        "calls": 1,
+        "us": 1487535,
+        "units": 0
+      },
+      "test.copyCollection.days": {
+        "calls": 3,
+        "us": 77894,
+        "units": 0
+      },
+      "test.copyCollection.readings": {
+        "calls": 3,
+        "us": 47587,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalTemplates": {
+        "calls": 3,
+        "us": 392,
+        "units": 0
+      },
+      "test.copyCollection.invitatoriums": {
+        "calls": 3,
+        "us": 41,
+        "units": 0
+      },
+      "test.copyCollection.completoriums": {
+        "calls": 3,
+        "us": 187,
+        "units": 0
+      },
+      "test.copyCollection.prayers": {
+        "calls": 3,
+        "us": 643,
+        "units": 0
+      },
+      "test.copyCollection.prayerCategories": {
+        "calls": 3,
+        "us": 61,
+        "units": 0
+      },
+      "test.copyCollection.songs": {
+        "calls": 3,
+        "us": 2213,
+        "units": 0
+      },
+      "test.copyCollection.compendium": {
+        "calls": 3,
+        "us": 349,
+        "units": 0
+      },
+      "test.copyCollection.compendiumMeta": {
+        "calls": 3,
+        "us": 36,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 12,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 1153,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 434,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 159,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 4547,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 20959,
+        "units": 0
+      },
+      "fake.hashes.days": {
+        "calls": 6,
+        "us": 25459133,
+        "units": 4416
+      },
+      "fake.hashes.readings": {
+        "calls": 3,
+        "us": 1180314,
+        "units": 2466
+      },
+      "fake.hashes.liturgicalTemplates": {
+        "calls": 3,
+        "us": 709303,
+        "units": 48
+      },
+      "fake.hashes.invitatoriums": {
+        "calls": 3,
+        "us": 1590,
+        "units": 12
+      },
+      "fake.hashes.completoriums": {
+        "calls": 3,
+        "us": 49568,
+        "units": 105
+      },
+      "fake.hashes.prayers": {
+        "calls": 3,
+        "us": 546723,
+        "units": 345
+      },
+      "fake.hashes.prayerCategories": {
+        "calls": 3,
+        "us": 783,
+        "units": 15
+      },
+      "fake.hashes.songs": {
+        "calls": 3,
+        "us": 99179,
+        "units": 1341
+      },
+      "fake.hashes.compendium": {
+        "calls": 3,
+        "us": 161063,
+        "units": 81
+      },
+      "fake.hashes.compendiumMeta": {
+        "calls": 3,
+        "us": 857,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 49,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 43784,
+        "units": 723
+      },
+      "fake.hashes.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 16816,
+        "units": 225
+      },
+      "fake.hashes.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 1166,
+        "units": 45
+      },
+      "fake.hashes.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 762386,
+        "units": 873
+      },
+      "fake.hashes.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 246069,
+        "units": 4011
+      },
+      "fake.currentManifest": {
+        "calls": 3,
+        "us": 17044742,
+        "units": 0
+      },
+      "fake.collectionManifest.days": {
+        "calls": 3,
+        "us": 12516749,
+        "units": 0
+      },
+      "updater.check.101": {
+        "calls": 1,
+        "us": 10220367,
+        "units": 0
+      },
+      "hive.staging.clear": {
+        "calls": 5,
+        "us": 189871,
+        "units": 0
+      },
+      "hive.staging.putAll": {
+        "calls": 3,
+        "us": 25266,
+        "units": 0
+      },
+      "hive.staging.flush": {
+        "calls": 4,
+        "us": 4027,
+        "units": 0
+      },
+      "hive.staging.put": {
+        "calls": 2,
+        "us": 5376,
+        "units": 0
+      },
+      "hive.overlay.putAll": {
+        "calls": 2,
+        "us": 6447,
+        "units": 0
+      },
+      "store.commit.101": {
+        "calls": 1,
+        "us": 43470,
+        "units": 0
+      },
+      "updater.apply.101": {
+        "calls": 1,
+        "us": 92422,
+        "units": 0
+      },
+      "test.publish.101": {
+        "calls": 1,
+        "us": 10319326,
+        "units": 0
+      },
+      "updater.check.102": {
+        "calls": 1,
+        "us": 9822801,
+        "units": 0
+      },
+      "store.commit.102": {
+        "calls": 1,
+        "us": 26410,
+        "units": 0
+      },
+      "updater.apply.102": {
+        "calls": 1,
+        "us": 29248,
+        "units": 0
+      },
+      "test.publish.102": {
+        "calls": 1,
+        "us": 9890366,
+        "units": 0
+      },
+      "updater.check.103": {
+        "calls": 1,
+        "us": 9568975,
+        "units": 0
+      },
+      "store.commit.103": {
+        "calls": 1,
+        "us": 179767,
+        "units": 0
+      },
+      "updater.apply.103": {
+        "calls": 1,
+        "us": 182378,
+        "units": 0
+      },
+      "test.publish.103": {
+        "calls": 1,
+        "us": 9757783,
+        "units": 0
+      },
+      "teardown.hiveClose": {
+        "calls": 1,
+        "us": 155036,
+        "units": 0
+      },
+      "teardown.delete": {
+        "calls": 1,
+        "us": 1711,
+        "units": 0
+      }
+    },
+    "pendingAtEnd": [],
+    "pendingAtTeardown": [
+      [
+        {
+          "id": 73,
+          "phase": "test.publish.103",
+          "epoch": 1
+        },
+        {
+          "id": 75,
+          "phase": "updater.apply.103",
+          "epoch": 1
+        },
+        {
+          "id": 76,
+          "phase": "store.commit.103",
+          "epoch": 1
+        },
+        {
+          "id": 77,
+          "phase": "hive.staging.clear",
+          "epoch": 1
+        }
+      ]
+    ],
+    "deadlineSnapshots": [
+      {
+        "event": "deadline29",
+        "test": "corrections and app releases a new app bundle absorbs the patches it contains",
+        "epoch": 1,
+        "pid": 852,
+        "utc": "2026-11-06T05:17:16.159282Z",
+        "us": 32190105,
+        "pending": [
+          {
+            "id": 73,
+            "phase": "test.publish.103",
+            "epoch": 1
+          },
+          {
+            "id": 75,
+            "phase": "updater.apply.103",
+            "epoch": 1
+          },
+          {
+            "id": 76,
+            "phase": "store.commit.103",
+            "epoch": 1
+          },
+          {
+            "id": 77,
+            "phase": "hive.staging.clear",
+            "epoch": 1
+          }
+        ],
+        "totals": {
+          "bundle.read.prayers": {
+            "calls": 1,
+            "us": 2212,
+            "units": 0
+          },
+          "bundle.read.prayerCategories": {
+            "calls": 1,
+            "us": 500,
+            "units": 0
+          },
+          "bundle.decode.prayerCategories": {
+            "calls": 1,
+            "us": 89985,
+            "units": 0
+          },
+          "bundle.load.prayerCategories": {
+            "calls": 1,
+            "us": 149278,
+            "units": 0
+          },
+          "bundle.decode.prayers": {
+            "calls": 1,
+            "us": 201697,
+            "units": 0
+          },
+          "bundle.load.prayers": {
+            "calls": 1,
+            "us": 261440,
+            "units": 0
+          },
+          "bundle.read.days": {
+            "calls": 1,
+            "us": 57603,
+            "units": 0
+          },
+          "bundle.read.readings": {
+            "calls": 1,
+            "us": 9079,
+            "units": 0
+          },
+          "bundle.read.liturgicalTemplates": {
+            "calls": 1,
+            "us": 7924,
+            "units": 0
+          },
+          "bundle.read.invitatoriums": {
+            "calls": 1,
+            "us": 463,
+            "units": 0
+          },
+          "bundle.read.completoriums": {
+            "calls": 1,
+            "us": 319,
+            "units": 0
+          },
+          "bundle.read.liturgicalCalendarMeta": {
+            "calls": 1,
+            "us": 588,
+            "units": 0
+          },
+          "bundle.read.liturgicalCelebrations": {
+            "calls": 1,
+            "us": 302,
+            "units": 0
+          },
+          "bundle.read.liturgicalDioceseOverrides": {
+            "calls": 1,
+            "us": 234,
+            "units": 0
+          },
+          "bundle.read.liturgicalYearOverrides": {
+            "calls": 1,
+            "us": 259,
+            "units": 0
+          },
+          "bundle.read.liturgicalProperTexts": {
+            "calls": 1,
+            "us": 6670,
+            "units": 0
+          },
+          "bundle.init": {
+            "calls": 1,
+            "us": 691119,
+            "units": 0
+          },
+          "bundle.read.songs": {
+            "calls": 1,
+            "us": 555,
+            "units": 0
+          },
+          "bundle.read.compendium": {
+            "calls": 1,
+            "us": 6402,
+            "units": 0
+          },
+          "bundle.read.compendiumMeta": {
+            "calls": 1,
+            "us": 298,
+            "units": 0
+          },
+          "bundle.read.liturgicalOrdoNotes": {
+            "calls": 1,
+            "us": 912,
+            "units": 0
+          },
+          "bundle.decode.liturgicalYearOverrides": {
+            "calls": 1,
+            "us": 200467,
+            "units": 0
+          },
+          "bundle.load.liturgicalYearOverrides": {
+            "calls": 1,
+            "us": 319170,
+            "units": 0
+          },
+          "bundle.decode.completoriums": {
+            "calls": 1,
+            "us": 246587,
+            "units": 0
+          },
+          "bundle.load.completoriums": {
+            "calls": 1,
+            "us": 322550,
+            "units": 0
+          },
+          "bundle.decode.invitatoriums": {
+            "calls": 1,
+            "us": 254417,
+            "units": 0
+          },
+          "bundle.load.invitatoriums": {
+            "calls": 1,
+            "us": 326987,
+            "units": 0
+          },
+          "bundle.decode.liturgicalCalendarMeta": {
+            "calls": 1,
+            "us": 222383,
+            "units": 0
+          },
+          "bundle.load.liturgicalCalendarMeta": {
+            "calls": 1,
+            "us": 326097,
+            "units": 0
+          },
+          "bundle.decode.compendiumMeta": {
+            "calls": 1,
+            "us": 202212,
+            "units": 0
+          },
+          "bundle.load.compendiumMeta": {
+            "calls": 1,
+            "us": 302383,
+            "units": 0
+          },
+          "bundle.decode.liturgicalCelebrations": {
+            "calls": 1,
+            "us": 359346,
+            "units": 0
+          },
+          "bundle.load.liturgicalCelebrations": {
+            "calls": 1,
+            "us": 467136,
+            "units": 0
+          },
+          "bundle.decode.liturgicalDioceseOverrides": {
+            "calls": 1,
+            "us": 364514,
+            "units": 0
+          },
+          "bundle.load.liturgicalDioceseOverrides": {
+            "calls": 1,
+            "us": 467288,
+            "units": 0
+          },
+          "bundle.decode.compendium": {
+            "calls": 1,
+            "us": 499031,
+            "units": 0
+          },
+          "bundle.load.compendium": {
+            "calls": 1,
+            "us": 644986,
+            "units": 0
+          },
+          "bundle.decode.liturgicalOrdoNotes": {
+            "calls": 1,
+            "us": 538188,
+            "units": 0
+          },
+          "bundle.load.liturgicalOrdoNotes": {
+            "calls": 1,
+            "us": 638028,
+            "units": 0
+          },
+          "bundle.decode.songs": {
+            "calls": 1,
+            "us": 597162,
+            "units": 0
+          },
+          "bundle.load.songs": {
+            "calls": 1,
+            "us": 704992,
+            "units": 0
+          },
+          "bundle.decode.liturgicalTemplates": {
+            "calls": 1,
+            "us": 737617,
+            "units": 0
+          },
+          "bundle.load.liturgicalTemplates": {
+            "calls": 1,
+            "us": 818656,
+            "units": 0
+          },
+          "bundle.decode.readings": {
+            "calls": 1,
+            "us": 1004184,
+            "units": 0
+          },
+          "bundle.load.readings": {
+            "calls": 1,
+            "us": 1099581,
+            "units": 0
+          },
+          "bundle.decode.liturgicalProperTexts": {
+            "calls": 1,
+            "us": 974318,
+            "units": 0
+          },
+          "bundle.load.liturgicalProperTexts": {
+            "calls": 1,
+            "us": 1094894,
+            "units": 0
+          },
+          "bundle.decode.days": {
+            "calls": 1,
+            "us": 1473220,
+            "units": 0
+          },
+          "bundle.load.days": {
+            "calls": 1,
+            "us": 1579284,
+            "units": 0
+          },
+          "bundle.ensureAll": {
+            "calls": 1,
+            "us": 1487535,
+            "units": 0
+          },
+          "test.copyCollection.days": {
+            "calls": 3,
+            "us": 77894,
+            "units": 0
+          },
+          "test.copyCollection.readings": {
+            "calls": 3,
+            "us": 47587,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalTemplates": {
+            "calls": 3,
+            "us": 392,
+            "units": 0
+          },
+          "test.copyCollection.invitatoriums": {
+            "calls": 3,
+            "us": 41,
+            "units": 0
+          },
+          "test.copyCollection.completoriums": {
+            "calls": 3,
+            "us": 187,
+            "units": 0
+          },
+          "test.copyCollection.prayers": {
+            "calls": 3,
+            "us": 643,
+            "units": 0
+          },
+          "test.copyCollection.prayerCategories": {
+            "calls": 3,
+            "us": 61,
+            "units": 0
+          },
+          "test.copyCollection.songs": {
+            "calls": 3,
+            "us": 2213,
+            "units": 0
+          },
+          "test.copyCollection.compendium": {
+            "calls": 3,
+            "us": 349,
+            "units": 0
+          },
+          "test.copyCollection.compendiumMeta": {
+            "calls": 3,
+            "us": 36,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalCalendarMeta": {
+            "calls": 3,
+            "us": 12,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalCelebrations": {
+            "calls": 3,
+            "us": 1153,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalDioceseOverrides": {
+            "calls": 3,
+            "us": 434,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalYearOverrides": {
+            "calls": 3,
+            "us": 159,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalProperTexts": {
+            "calls": 3,
+            "us": 4547,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalOrdoNotes": {
+            "calls": 3,
+            "us": 20959,
+            "units": 0
+          },
+          "fake.hashes.days": {
+            "calls": 6,
+            "us": 25459133,
+            "units": 4416
+          },
+          "fake.hashes.readings": {
+            "calls": 3,
+            "us": 1180314,
+            "units": 2466
+          },
+          "fake.hashes.liturgicalTemplates": {
+            "calls": 3,
+            "us": 709303,
+            "units": 48
+          },
+          "fake.hashes.invitatoriums": {
+            "calls": 3,
+            "us": 1590,
+            "units": 12
+          },
+          "fake.hashes.completoriums": {
+            "calls": 3,
+            "us": 49568,
+            "units": 105
+          },
+          "fake.hashes.prayers": {
+            "calls": 3,
+            "us": 546723,
+            "units": 345
+          },
+          "fake.hashes.prayerCategories": {
+            "calls": 3,
+            "us": 783,
+            "units": 15
+          },
+          "fake.hashes.songs": {
+            "calls": 3,
+            "us": 99179,
+            "units": 1341
+          },
+          "fake.hashes.compendium": {
+            "calls": 3,
+            "us": 161063,
+            "units": 81
+          },
+          "fake.hashes.compendiumMeta": {
+            "calls": 3,
+            "us": 857,
+            "units": 3
+          },
+          "fake.hashes.liturgicalCalendarMeta": {
+            "calls": 3,
+            "us": 49,
+            "units": 3
+          },
+          "fake.hashes.liturgicalCelebrations": {
+            "calls": 3,
+            "us": 43784,
+            "units": 723
+          },
+          "fake.hashes.liturgicalDioceseOverrides": {
+            "calls": 3,
+            "us": 16816,
+            "units": 225
+          },
+          "fake.hashes.liturgicalYearOverrides": {
+            "calls": 3,
+            "us": 1166,
+            "units": 45
+          },
+          "fake.hashes.liturgicalProperTexts": {
+            "calls": 3,
+            "us": 762386,
+            "units": 873
+          },
+          "fake.hashes.liturgicalOrdoNotes": {
+            "calls": 3,
+            "us": 246069,
+            "units": 4011
+          },
+          "fake.currentManifest": {
+            "calls": 3,
+            "us": 17044742,
+            "units": 0
+          },
+          "fake.collectionManifest.days": {
+            "calls": 3,
+            "us": 12516749,
+            "units": 0
+          },
+          "updater.check.101": {
+            "calls": 1,
+            "us": 10220367,
+            "units": 0
+          },
+          "hive.staging.clear": {
+            "calls": 4,
+            "us": 25559,
+            "units": 0
+          },
+          "hive.staging.putAll": {
+            "calls": 2,
+            "us": 15928,
+            "units": 0
+          },
+          "hive.staging.flush": {
+            "calls": 4,
+            "us": 4027,
+            "units": 0
+          },
+          "hive.staging.put": {
+            "calls": 2,
+            "us": 5376,
+            "units": 0
+          },
+          "hive.overlay.putAll": {
+            "calls": 2,
+            "us": 6447,
+            "units": 0
+          },
+          "store.commit.101": {
+            "calls": 1,
+            "us": 43470,
+            "units": 0
+          },
+          "updater.apply.101": {
+            "calls": 1,
+            "us": 92422,
+            "units": 0
+          },
+          "test.publish.101": {
+            "calls": 1,
+            "us": 10319326,
+            "units": 0
+          },
+          "updater.check.102": {
+            "calls": 1,
+            "us": 9822801,
+            "units": 0
+          },
+          "store.commit.102": {
+            "calls": 1,
+            "us": 26410,
+            "units": 0
+          },
+          "updater.apply.102": {
+            "calls": 1,
+            "us": 29248,
+            "units": 0
+          },
+          "test.publish.102": {
+            "calls": 1,
+            "us": 9890366,
+            "units": 0
+          },
+          "updater.check.103": {
+            "calls": 1,
+            "us": 9568975,
+            "units": 0
+          }
+        }
+      }
+    ],
+    "resources": {
+      "samples": 77,
+      "cgroupDelta": {
+        "usage_usec": 73261255,
+        "user_usec": 70764725,
+        "system_usec": 2496530,
+        "nice_usec": 0,
+        "nr_periods": 384,
+        "nr_throttled": 338,
+        "throttled_usec": 32872426,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 310.59375,
+      "perTargetPid": [
+        {
+          "pid": 852,
+          "sampleCount": 64,
+          "cpuSeconds": 11.88,
+          "sampleWallSeconds": 31.806
+        }
+      ],
+      "targetCpuSeconds": 11.88,
+      "targetSampleWallSeconds": 31.806
+    }
+  },
+  "main-original-single": {
+    "run": {
+      "name": "main-original-single",
+      "branch": "main",
+      "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "workers": 0,
+      "startedUtc": "2026-11-06T05:13:37.539436+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "exitCode": 0,
+      "elapsedSeconds": 17.621,
+      "endedUtc": "2026-11-06T05:13:55.161198+00:00"
+    },
+    "testMs": 12323.253,
+    "totals": {
+      "bundle.read.prayers": {
+        "calls": 1,
+        "us": 2185,
+        "units": 0
+      },
+      "bundle.read.prayerCategories": {
+        "calls": 1,
+        "us": 1510,
+        "units": 0
+      },
+      "bundle.decode.prayerCategories": {
+        "calls": 1,
+        "us": 42560,
+        "units": 0
+      },
+      "bundle.load.prayerCategories": {
+        "calls": 1,
+        "us": 59162,
+        "units": 0
+      },
+      "bundle.decode.prayers": {
+        "calls": 1,
+        "us": 108770,
+        "units": 0
+      },
+      "bundle.load.prayers": {
+        "calls": 1,
+        "us": 128417,
+        "units": 0
+      },
+      "bundle.read.days": {
+        "calls": 1,
+        "us": 12126,
+        "units": 0
+      },
+      "bundle.read.readings": {
+        "calls": 1,
+        "us": 5240,
+        "units": 0
+      },
+      "bundle.read.liturgicalTemplates": {
+        "calls": 1,
+        "us": 1532,
+        "units": 0
+      },
+      "bundle.read.invitatoriums": {
+        "calls": 1,
+        "us": 1210,
+        "units": 0
+      },
+      "bundle.read.completoriums": {
+        "calls": 1,
+        "us": 1078,
+        "units": 0
+      },
+      "bundle.read.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 858,
+        "units": 0
+      },
+      "bundle.read.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 752,
+        "units": 0
+      },
+      "bundle.read.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 745,
+        "units": 0
+      },
+      "bundle.read.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 1086,
+        "units": 0
+      },
+      "bundle.read.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 6638,
+        "units": 0
+      },
+      "bundle.init": {
+        "calls": 1,
+        "us": 326379,
+        "units": 0
+      },
+      "bundle.read.songs": {
+        "calls": 1,
+        "us": 1300,
+        "units": 0
+      },
+      "bundle.read.compendium": {
+        "calls": 1,
+        "us": 1967,
+        "units": 0
+      },
+      "bundle.read.compendiumMeta": {
+        "calls": 1,
+        "us": 1465,
+        "units": 0
+      },
+      "bundle.read.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 1713,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 211609,
+        "units": 0
+      },
+      "bundle.load.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 314271,
+        "units": 0
+      },
+      "bundle.decode.completoriums": {
+        "calls": 1,
+        "us": 247250,
+        "units": 0
+      },
+      "bundle.load.completoriums": {
+        "calls": 1,
+        "us": 329692,
+        "units": 0
+      },
+      "bundle.decode.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 240596,
+        "units": 0
+      },
+      "bundle.load.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 331806,
+        "units": 0
+      },
+      "bundle.decode.invitatoriums": {
+        "calls": 1,
+        "us": 262054,
+        "units": 0
+      },
+      "bundle.load.invitatoriums": {
+        "calls": 1,
+        "us": 369710,
+        "units": 0
+      },
+      "bundle.decode.compendiumMeta": {
+        "calls": 1,
+        "us": 269752,
+        "units": 0
+      },
+      "bundle.load.compendiumMeta": {
+        "calls": 1,
+        "us": 306554,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 288955,
+        "units": 0
+      },
+      "bundle.load.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 364294,
+        "units": 0
+      },
+      "bundle.decode.compendium": {
+        "calls": 1,
+        "us": 271660,
+        "units": 0
+      },
+      "bundle.load.compendium": {
+        "calls": 1,
+        "us": 311472,
+        "units": 0
+      },
+      "bundle.decode.songs": {
+        "calls": 1,
+        "us": 274997,
+        "units": 0
+      },
+      "bundle.load.songs": {
+        "calls": 1,
+        "us": 337008,
+        "units": 0
+      },
+      "bundle.decode.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 301259,
+        "units": 0
+      },
+      "bundle.load.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 394013,
+        "units": 0
+      },
+      "bundle.decode.liturgicalTemplates": {
+        "calls": 1,
+        "us": 323718,
+        "units": 0
+      },
+      "bundle.load.liturgicalTemplates": {
+        "calls": 1,
+        "us": 406144,
+        "units": 0
+      },
+      "bundle.decode.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 300376,
+        "units": 0
+      },
+      "bundle.load.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 341366,
+        "units": 0
+      },
+      "bundle.decode.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 436967,
+        "units": 0
+      },
+      "bundle.load.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 525175,
+        "units": 0
+      },
+      "bundle.decode.readings": {
+        "calls": 1,
+        "us": 504083,
+        "units": 0
+      },
+      "bundle.load.readings": {
+        "calls": 1,
+        "us": 589862,
+        "units": 0
+      },
+      "bundle.decode.days": {
+        "calls": 1,
+        "us": 624220,
+        "units": 0
+      },
+      "bundle.load.days": {
+        "calls": 1,
+        "us": 717404,
+        "units": 0
+      },
+      "bundle.ensureAll": {
+        "calls": 1,
+        "us": 641157,
+        "units": 0
+      },
+      "test.copyCollection.days": {
+        "calls": 3,
+        "us": 30174,
+        "units": 0
+      },
+      "test.copyCollection.readings": {
+        "calls": 3,
+        "us": 6926,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalTemplates": {
+        "calls": 3,
+        "us": 476,
+        "units": 0
+      },
+      "test.copyCollection.invitatoriums": {
+        "calls": 3,
+        "us": 44,
+        "units": 0
+      },
+      "test.copyCollection.completoriums": {
+        "calls": 3,
+        "us": 243,
+        "units": 0
+      },
+      "test.copyCollection.prayers": {
+        "calls": 3,
+        "us": 734,
+        "units": 0
+      },
+      "test.copyCollection.prayerCategories": {
+        "calls": 3,
+        "us": 56,
+        "units": 0
+      },
+      "test.copyCollection.songs": {
+        "calls": 3,
+        "us": 1783,
+        "units": 0
+      },
+      "test.copyCollection.compendium": {
+        "calls": 3,
+        "us": 467,
+        "units": 0
+      },
+      "test.copyCollection.compendiumMeta": {
+        "calls": 3,
+        "us": 30,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 22,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 1730,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 546,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 194,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 2485,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 20021,
+        "units": 0
+      },
+      "fake.hashes.days": {
+        "calls": 6,
+        "us": 8372740,
+        "units": 4416
+      },
+      "fake.hashes.readings": {
+        "calls": 3,
+        "us": 417287,
+        "units": 2466
+      },
+      "fake.hashes.liturgicalTemplates": {
+        "calls": 3,
+        "us": 263823,
+        "units": 48
+      },
+      "fake.hashes.invitatoriums": {
+        "calls": 3,
+        "us": 810,
+        "units": 12
+      },
+      "fake.hashes.completoriums": {
+        "calls": 3,
+        "us": 33047,
+        "units": 105
+      },
+      "fake.hashes.prayers": {
+        "calls": 3,
+        "us": 168595,
+        "units": 345
+      },
+      "fake.hashes.prayerCategories": {
+        "calls": 3,
+        "us": 324,
+        "units": 15
+      },
+      "fake.hashes.songs": {
+        "calls": 3,
+        "us": 41236,
+        "units": 1341
+      },
+      "fake.hashes.compendium": {
+        "calls": 3,
+        "us": 46003,
+        "units": 81
+      },
+      "fake.hashes.compendiumMeta": {
+        "calls": 3,
+        "us": 858,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 123,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 23443,
+        "units": 723
+      },
+      "fake.hashes.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 8366,
+        "units": 225
+      },
+      "fake.hashes.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 1290,
+        "units": 45
+      },
+      "fake.hashes.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 246095,
+        "units": 873
+      },
+      "fake.hashes.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 105469,
+        "units": 4011
+      },
+      "fake.currentManifest": {
+        "calls": 3,
+        "us": 5664181,
+        "units": 0
+      },
+      "fake.collectionManifest.days": {
+        "calls": 3,
+        "us": 4101946,
+        "units": 0
+      },
+      "updater.check.101": {
+        "calls": 1,
+        "us": 3333561,
+        "units": 0
+      },
+      "hive.staging.clear": {
+        "calls": 6,
+        "us": 6995,
+        "units": 0
+      },
+      "hive.staging.putAll": {
+        "calls": 3,
+        "us": 7639,
+        "units": 0
+      },
+      "hive.staging.flush": {
+        "calls": 6,
+        "us": 2948,
+        "units": 0
+      },
+      "hive.staging.put": {
+        "calls": 3,
+        "us": 1747,
+        "units": 0
+      },
+      "hive.overlay.putAll": {
+        "calls": 3,
+        "us": 6894,
+        "units": 0
+      },
+      "store.commit.101": {
+        "calls": 1,
+        "us": 18114,
+        "units": 0
+      },
+      "updater.apply.101": {
+        "calls": 1,
+        "us": 22198,
+        "units": 0
+      },
+      "test.publish.101": {
+        "calls": 1,
+        "us": 3356615,
+        "units": 0
+      },
+      "updater.check.102": {
+        "calls": 1,
+        "us": 3258546,
+        "units": 0
+      },
+      "store.commit.102": {
+        "calls": 1,
+        "us": 8197,
+        "units": 0
+      },
+      "updater.apply.102": {
+        "calls": 1,
+        "us": 11446,
+        "units": 0
+      },
+      "test.publish.102": {
+        "calls": 1,
+        "us": 3270745,
+        "units": 0
+      },
+      "updater.check.103": {
+        "calls": 1,
+        "us": 3198547,
+        "units": 0
+      },
+      "store.commit.103": {
+        "calls": 1,
+        "us": 7572,
+        "units": 0
+      },
+      "updater.apply.103": {
+        "calls": 1,
+        "us": 9705,
+        "units": 0
+      },
+      "test.publish.103": {
+        "calls": 1,
+        "us": 3208765,
+        "units": 0
+      },
+      "test.replacementHashes": {
+        "calls": 1,
+        "us": 1393903,
+        "units": 736
+      },
+      "hive.overlay.deleteAll": {
+        "calls": 1,
+        "us": 2532,
+        "units": 0
+      },
+      "store.replaceBaseline": {
+        "calls": 1,
+        "us": 3534,
+        "units": 0
+      },
+      "teardown.hiveClose": {
+        "calls": 1,
+        "us": 16765,
+        "units": 0
+      },
+      "teardown.delete": {
+        "calls": 1,
+        "us": 1144,
+        "units": 0
+      }
+    },
+    "pendingAtEnd": [],
+    "pendingAtTeardown": [
+      []
+    ],
+    "deadlineSnapshots": []
+  },
+  "main-raw-load5": {
+    "run": {
+      "name": "main-raw-load5",
+      "branch": "main",
+      "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "instrumented": false,
+      "workers": 5,
+      "startedUtc": "2026-11-06T05:19:08.504824+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "loadStartedElapsed": 4.335,
+      "exitCode": 1,
+      "elapsedSeconds": 47.923,
+      "endedUtc": "2026-11-06T05:19:56.428286+00:00"
+    },
+    "resources": {
+      "samples": 94,
+      "cgroupDelta": {
+        "usage_usec": 91939409,
+        "user_usec": 89263699,
+        "system_usec": 2675710,
+        "nice_usec": 0,
+        "nr_periods": 472,
+        "nr_throttled": 438,
+        "throttled_usec": 43778920,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 255.65625,
+      "perTargetPid": [
+        {
+          "pid": 1096,
+          "sampleCount": 86,
+          "cpuSeconds": 15.82,
+          "sampleWallSeconds": 43.15
+        }
+      ],
+      "targetCpuSeconds": 15.82,
+      "targetSampleWallSeconds": 43.15
+    }
+  },
+  "pr-fixed-load5": {
+    "run": {
+      "name": "pr-fixed-load5",
+      "branch": "pr",
+      "head": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "instrumented": false,
+      "workers": 5,
+      "startedUtc": "2026-11-06T05:24:33.643316+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "loadStartedElapsed": 3.234,
+      "exitCode": 1,
+      "elapsedSeconds": 35.683,
+      "endedUtc": "2026-11-06T05:25:09.327577+00:00"
+    },
+    "resources": {
+      "samples": 69,
+      "cgroupDelta": {
+        "usage_usec": 67914196,
+        "user_usec": 65751733,
+        "system_usec": 2162463,
+        "nice_usec": 0,
+        "nr_periods": 348,
+        "nr_throttled": 321,
+        "throttled_usec": 32449732,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 277.82421875,
+      "perTargetPid": [
+        {
+          "pid": 1528,
+          "sampleCount": 63,
+          "cpuSeconds": 11.83,
+          "sampleWallSeconds": 31.806
+        }
+      ],
+      "targetCpuSeconds": 11.83,
+      "targetSampleWallSeconds": 31.806
+    }
+  },
+  "pr-fixed-prefix": {
+    "run": {
+      "name": "pr-fixed-prefix",
+      "branch": "pr",
+      "head": "c7682771985e6bbf28e7169be1af6bda31a7edd8",
+      "testSha256": "f1152e3f0ce16350e32a4f180dd0159443139f2724384933d585b11359462b7c",
+      "workingTreeDiff": [
+        "docs/pr62-final-acceptance.md"
+      ],
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/alternative_sheet_hit_test.dart",
+        "test/alternative_text_test.dart",
+        "test/analytics/analytics_collector_test.dart",
+        "test/analytics/analytics_contract_test.dart",
+        "test/analytics/analytics_feature_coverage_test.dart",
+        "test/analytics/analytics_parity_test.dart",
+        "test/analytics/consent_mock_test.dart",
+        "test/analytics/fit_detection_test.dart",
+        "test/analytics/local_analytics_test.dart",
+        "test/analytics/public_inventory_test.dart",
+        "test/analytics/route_mapper_test.dart",
+        "test/analytics/staging_http_test.dart",
+        "test/analytics/transport_and_guard_test.dart",
+        "test/app_navigation_dock_test.dart",
+        "test/app_overflow_menu_test.dart",
+        "test/app_shell_restoration_test.dart",
+        "test/app_shell_state_test.dart",
+        "test/app_theme_test.dart",
+        "test/bible_repository_test.dart",
+        "test/bible_stage6_test.dart",
+        "test/bottom_navigation_lab_test.dart",
+        "test/bundled_fonts_test.dart",
+        "test/civil_date_test.dart",
+        "test/color_foundations_test.dart",
+        "test/common_office_test.dart",
+        "test/compendium_data_test.dart",
+        "test/compendium_flat_outline_test.dart",
+        "test/compendium_screens_test.dart",
+        "test/compendium_search_test.dart",
+        "test/computed_year_options_test.dart",
+        "test/content_offline_test.dart"
+      ],
+      "instrumented": false,
+      "workers": 0,
+      "startedUtc": "2026-11-06T05:33:11.439961+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "exitCode": 0,
+      "elapsedSeconds": 236.086,
+      "endedUtc": "2026-11-06T05:37:07.526693+00:00"
+    },
+    "resources": {
+      "samples": 433,
+      "cgroupDelta": {
+        "usage_usec": 317209227,
+        "user_usec": 267644148,
+        "system_usec": 49565078,
+        "nice_usec": 0,
+        "nr_periods": 2352,
+        "nr_throttled": 426,
+        "throttled_usec": 35308688,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 649.4453125,
+      "perTargetPid": [
+        {
+          "pid": 2932,
+          "sampleCount": 19,
+          "cpuSeconds": 11.64,
+          "sampleWallSeconds": 9.152000000000001
+        },
+        {
+          "pid": 2950,
+          "sampleCount": 5,
+          "cpuSeconds": 2.23,
+          "sampleWallSeconds": 2.0090000000000003
+        },
+        {
+          "pid": 2959,
+          "sampleCount": 2,
+          "cpuSeconds": 0.72,
+          "sampleWallSeconds": 0.5019999999999989
+        },
+        {
+          "pid": 2967,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3005,
+          "sampleCount": 2,
+          "cpuSeconds": 0.54,
+          "sampleWallSeconds": 0.5030000000000001
+        },
+        {
+          "pid": 3014,
+          "sampleCount": 2,
+          "cpuSeconds": 0.43,
+          "sampleWallSeconds": 0.5010000000000012
+        },
+        {
+          "pid": 3022,
+          "sampleCount": 2,
+          "cpuSeconds": 0.62,
+          "sampleWallSeconds": 0.5010000000000012
+        },
+        {
+          "pid": 3031,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3042,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3051,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3059,
+          "sampleCount": 2,
+          "cpuSeconds": 0.51,
+          "sampleWallSeconds": 0.5019999999999953
+        },
+        {
+          "pid": 3068,
+          "sampleCount": 3,
+          "cpuSeconds": 1.1,
+          "sampleWallSeconds": 1.0019999999999953
+        },
+        {
+          "pid": 3079,
+          "sampleCount": 2,
+          "cpuSeconds": 0.54,
+          "sampleWallSeconds": 0.5019999999999953
+        },
+        {
+          "pid": 3087,
+          "sampleCount": 6,
+          "cpuSeconds": 2.95,
+          "sampleWallSeconds": 2.503999999999998
+        },
+        {
+          "pid": 3096,
+          "sampleCount": 11,
+          "cpuSeconds": 6.43,
+          "sampleWallSeconds": 5.0120000000000005
+        },
+        {
+          "pid": 3128,
+          "sampleCount": 8,
+          "cpuSeconds": 4.39,
+          "sampleWallSeconds": 3.509999999999998
+        },
+        {
+          "pid": 3140,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3150,
+          "sampleCount": 3,
+          "cpuSeconds": 1.14,
+          "sampleWallSeconds": 1.0060000000000002
+        },
+        {
+          "pid": 3160,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3174,
+          "sampleCount": 27,
+          "cpuSeconds": 17.66,
+          "sampleWallSeconds": 13.039999999999992
+        },
+        {
+          "pid": 3194,
+          "sampleCount": 25,
+          "cpuSeconds": 16.1,
+          "sampleWallSeconds": 12.034999999999997
+        },
+        {
+          "pid": 3226,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3237,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3245,
+          "sampleCount": 4,
+          "cpuSeconds": 1.74,
+          "sampleWallSeconds": 1.5100000000000051
+        },
+        {
+          "pid": 3255,
+          "sampleCount": 9,
+          "cpuSeconds": 5.49,
+          "sampleWallSeconds": 4.0249999999999915
+        },
+        {
+          "pid": 3284,
+          "sampleCount": 2,
+          "cpuSeconds": 0.55,
+          "sampleWallSeconds": 0.5019999999999953
+        },
+        {
+          "pid": 3295,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3304,
+          "sampleCount": 24,
+          "cpuSeconds": 14.87,
+          "sampleWallSeconds": 11.578999999999994
+        },
+        {
+          "pid": 3319,
+          "sampleCount": 2,
+          "cpuSeconds": 0.8,
+          "sampleWallSeconds": 0.5009999999999906
+        },
+        {
+          "pid": 3333,
+          "sampleCount": 1,
+          "cpuSeconds": 0.0,
+          "sampleWallSeconds": 0.0
+        },
+        {
+          "pid": 3342,
+          "sampleCount": 220,
+          "cpuSeconds": 155.45,
+          "sampleWallSeconds": 127.81299999999999
+        }
+      ]
+    }
+  },
+  "pr-fixed-whole": {
+    "run": {
+      "name": "pr-fixed-whole",
+      "branch": "pr",
+      "head": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+      "testSha256": "f1152e3f0ce16350e32a4f180dd0159443139f2724384933d585b11359462b7c",
+      "workingTreeDiff": [
+        "test/content_offline_test.dart"
+      ],
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart"
+      ],
+      "instrumented": false,
+      "workers": 0,
+      "startedUtc": "2026-11-06T05:27:25.506339+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "exitCode": 0,
+      "elapsedSeconds": 78.287,
+      "endedUtc": "2026-11-06T05:28:43.794018+00:00"
+    },
+    "resources": {
+      "samples": 155,
+      "cgroupDelta": {
+        "usage_usec": 96161584,
+        "user_usec": 84659219,
+        "system_usec": 11502366,
+        "nice_usec": 0,
+        "nr_periods": 774,
+        "nr_throttled": 101,
+        "throttled_usec": 4621603,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 629.99609375,
+      "perTargetPid": [
+        {
+          "pid": 1953,
+          "sampleCount": 149,
+          "cpuSeconds": 89.91,
+          "sampleWallSeconds": 74.341
+        }
+      ],
+      "targetCpuSeconds": 89.91,
+      "targetSampleWallSeconds": 74.341
+    }
+  },
+  "pr-original-load5": {
+    "run": {
+      "name": "pr-original-load5",
+      "branch": "pr",
+      "head": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "workers": 5,
+      "startedUtc": "2026-11-06T05:17:16.779337+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "loadStartedElapsed": 3.847,
+      "exitCode": 1,
+      "elapsedSeconds": 41.873,
+      "endedUtc": "2026-11-06T05:17:58.652712+00:00"
+    },
+    "testMs": 37517.321,
+    "totals": {
+      "hive.settings.put": {
+        "calls": 1,
+        "us": 56969,
+        "units": 0
+      },
+      "hive.settings.flush": {
+        "calls": 1,
+        "us": 1107,
+        "units": 0
+      },
+      "bundle.read.prayers": {
+        "calls": 1,
+        "us": 6687,
+        "units": 0
+      },
+      "bundle.read.prayerCategories": {
+        "calls": 1,
+        "us": 494,
+        "units": 0
+      },
+      "bundle.decode.prayerCategories": {
+        "calls": 1,
+        "us": 20139,
+        "units": 0
+      },
+      "bundle.load.prayerCategories": {
+        "calls": 1,
+        "us": 48680,
+        "units": 0
+      },
+      "bundle.decode.prayers": {
+        "calls": 1,
+        "us": 240590,
+        "units": 0
+      },
+      "bundle.load.prayers": {
+        "calls": 1,
+        "us": 304391,
+        "units": 0
+      },
+      "bundle.read.days": {
+        "calls": 1,
+        "us": 23192,
+        "units": 0
+      },
+      "bundle.read.readings": {
+        "calls": 1,
+        "us": 7939,
+        "units": 0
+      },
+      "bundle.read.liturgicalTemplates": {
+        "calls": 1,
+        "us": 2004,
+        "units": 0
+      },
+      "bundle.read.invitatoriums": {
+        "calls": 1,
+        "us": 531,
+        "units": 0
+      },
+      "bundle.read.completoriums": {
+        "calls": 1,
+        "us": 983,
+        "units": 0
+      },
+      "bundle.read.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 385,
+        "units": 0
+      },
+      "bundle.read.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 548,
+        "units": 0
+      },
+      "bundle.read.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 369,
+        "units": 0
+      },
+      "bundle.read.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 4012,
+        "units": 0
+      },
+      "bundle.read.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 3319,
+        "units": 0
+      },
+      "bundle.init": {
+        "calls": 1,
+        "us": 721359,
+        "units": 0
+      },
+      "bundle.read.songs": {
+        "calls": 1,
+        "us": 1014,
+        "units": 0
+      },
+      "bundle.read.compendium": {
+        "calls": 1,
+        "us": 1222,
+        "units": 0
+      },
+      "bundle.read.compendiumMeta": {
+        "calls": 1,
+        "us": 340,
+        "units": 0
+      },
+      "bundle.read.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 4363,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 99549,
+        "units": 0
+      },
+      "bundle.load.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 219034,
+        "units": 0
+      },
+      "bundle.decode.completoriums": {
+        "calls": 1,
+        "us": 111402,
+        "units": 0
+      },
+      "bundle.load.completoriums": {
+        "calls": 1,
+        "us": 221432,
+        "units": 0
+      },
+      "bundle.decode.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 80526,
+        "units": 0
+      },
+      "bundle.load.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 216758,
+        "units": 0
+      },
+      "bundle.decode.invitatoriums": {
+        "calls": 1,
+        "us": 159712,
+        "units": 0
+      },
+      "bundle.load.invitatoriums": {
+        "calls": 1,
+        "us": 262185,
+        "units": 0
+      },
+      "bundle.decode.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 284104,
+        "units": 0
+      },
+      "bundle.load.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 409436,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 301722,
+        "units": 0
+      },
+      "bundle.load.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 411036,
+        "units": 0
+      },
+      "bundle.decode.compendiumMeta": {
+        "calls": 1,
+        "us": 205599,
+        "units": 0
+      },
+      "bundle.load.compendiumMeta": {
+        "calls": 1,
+        "us": 373200,
+        "units": 0
+      },
+      "bundle.decode.songs": {
+        "calls": 1,
+        "us": 298179,
+        "units": 0
+      },
+      "bundle.load.songs": {
+        "calls": 1,
+        "us": 477520,
+        "units": 0
+      },
+      "bundle.decode.liturgicalTemplates": {
+        "calls": 1,
+        "us": 466443,
+        "units": 0
+      },
+      "bundle.load.liturgicalTemplates": {
+        "calls": 1,
+        "us": 571429,
+        "units": 0
+      },
+      "bundle.decode.compendium": {
+        "calls": 1,
+        "us": 321156,
+        "units": 0
+      },
+      "bundle.load.compendium": {
+        "calls": 1,
+        "us": 503569,
+        "units": 0
+      },
+      "bundle.decode.readings": {
+        "calls": 1,
+        "us": 739706,
+        "units": 0
+      },
+      "bundle.load.readings": {
+        "calls": 1,
+        "us": 852499,
+        "units": 0
+      },
+      "bundle.decode.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 713343,
+        "units": 0
+      },
+      "bundle.load.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 881774,
+        "units": 0
+      },
+      "bundle.decode.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 903532,
+        "units": 0
+      },
+      "bundle.load.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 1037763,
+        "units": 0
+      },
+      "bundle.decode.days": {
+        "calls": 1,
+        "us": 1850955,
+        "units": 0
+      },
+      "bundle.load.days": {
+        "calls": 1,
+        "us": 1982977,
+        "units": 0
+      },
+      "bundle.ensureAll": {
+        "calls": 1,
+        "us": 1888735,
+        "units": 0
+      },
+      "test.copyCollection.days": {
+        "calls": 3,
+        "us": 36825,
+        "units": 0
+      },
+      "test.copyCollection.readings": {
+        "calls": 3,
+        "us": 58530,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalTemplates": {
+        "calls": 3,
+        "us": 472,
+        "units": 0
+      },
+      "test.copyCollection.invitatoriums": {
+        "calls": 3,
+        "us": 107,
+        "units": 0
+      },
+      "test.copyCollection.completoriums": {
+        "calls": 3,
+        "us": 241,
+        "units": 0
+      },
+      "test.copyCollection.prayers": {
+        "calls": 3,
+        "us": 1322,
+        "units": 0
+      },
+      "test.copyCollection.prayerCategories": {
+        "calls": 3,
+        "us": 40,
+        "units": 0
+      },
+      "test.copyCollection.songs": {
+        "calls": 3,
+        "us": 2550,
+        "units": 0
+      },
+      "test.copyCollection.compendium": {
+        "calls": 3,
+        "us": 200,
+        "units": 0
+      },
+      "test.copyCollection.compendiumMeta": {
+        "calls": 3,
+        "us": 72,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 81,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 1965,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 530,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 147,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 19981,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 47590,
+        "units": 0
+      },
+      "fake.hashes.days": {
+        "calls": 6,
+        "us": 28638025,
+        "units": 4416
+      },
+      "fake.hashes.readings": {
+        "calls": 3,
+        "us": 1229263,
+        "units": 2466
+      },
+      "fake.hashes.liturgicalTemplates": {
+        "calls": 3,
+        "us": 808940,
+        "units": 48
+      },
+      "fake.hashes.invitatoriums": {
+        "calls": 3,
+        "us": 1616,
+        "units": 12
+      },
+      "fake.hashes.completoriums": {
+        "calls": 3,
+        "us": 60099,
+        "units": 105
+      },
+      "fake.hashes.prayers": {
+        "calls": 3,
+        "us": 825069,
+        "units": 345
+      },
+      "fake.hashes.prayerCategories": {
+        "calls": 3,
+        "us": 342,
+        "units": 15
+      },
+      "fake.hashes.songs": {
+        "calls": 3,
+        "us": 254250,
+        "units": 1341
+      },
+      "fake.hashes.compendium": {
+        "calls": 3,
+        "us": 156490,
+        "units": 81
+      },
+      "fake.hashes.compendiumMeta": {
+        "calls": 3,
+        "us": 852,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 48,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 99202,
+        "units": 723
+      },
+      "fake.hashes.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 16252,
+        "units": 225
+      },
+      "fake.hashes.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 1387,
+        "units": 45
+      },
+      "fake.hashes.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 924540,
+        "units": 873
+      },
+      "fake.hashes.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 339729,
+        "units": 4011
+      },
+      "fake.currentManifest": {
+        "calls": 3,
+        "us": 17840894,
+        "units": 0
+      },
+      "fake.collectionManifest.days": {
+        "calls": 3,
+        "us": 15864437,
+        "units": 0
+      },
+      "updater.check.101": {
+        "calls": 1,
+        "us": 10017789,
+        "units": 0
+      },
+      "hive.staging.clear": {
+        "calls": 5,
+        "us": 411355,
+        "units": 0
+      },
+      "hive.staging.putAll": {
+        "calls": 3,
+        "us": 59321,
+        "units": 0
+      },
+      "hive.staging.flush": {
+        "calls": 4,
+        "us": 5430,
+        "units": 0
+      },
+      "hive.staging.put": {
+        "calls": 2,
+        "us": 3414,
+        "units": 0
+      },
+      "hive.overlay.putAll": {
+        "calls": 2,
+        "us": 20909,
+        "units": 0
+      },
+      "store.commit.101": {
+        "calls": 1,
+        "us": 111679,
+        "units": 0
+      },
+      "updater.apply.101": {
+        "calls": 1,
+        "us": 126157,
+        "units": 0
+      },
+      "test.publish.101": {
+        "calls": 1,
+        "us": 10151027,
+        "units": 0
+      },
+      "updater.check.102": {
+        "calls": 1,
+        "us": 9789420,
+        "units": 0
+      },
+      "store.commit.102": {
+        "calls": 1,
+        "us": 24768,
+        "units": 0
+      },
+      "updater.apply.102": {
+        "calls": 1,
+        "us": 28415,
+        "units": 0
+      },
+      "test.publish.102": {
+        "calls": 1,
+        "us": 9822357,
+        "units": 0
+      },
+      "updater.check.103": {
+        "calls": 1,
+        "us": 14073008,
+        "units": 0
+      },
+      "store.commit.103": {
+        "calls": 1,
+        "us": 390348,
+        "units": 0
+      },
+      "updater.apply.103": {
+        "calls": 1,
+        "us": 400971,
+        "units": 0
+      },
+      "test.publish.103": {
+        "calls": 1,
+        "us": 14477733,
+        "units": 0
+      },
+      "teardown.hiveClose": {
+        "calls": 1,
+        "us": 289747,
+        "units": 0
+      },
+      "teardown.delete": {
+        "calls": 1,
+        "us": 48933,
+        "units": 0
+      }
+    },
+    "pendingAtEnd": [],
+    "pendingAtTeardown": [
+      [
+        {
+          "id": 75,
+          "phase": "test.publish.103",
+          "epoch": 1
+        },
+        {
+          "id": 77,
+          "phase": "updater.apply.103",
+          "epoch": 1
+        },
+        {
+          "id": 78,
+          "phase": "store.commit.103",
+          "epoch": 1
+        },
+        {
+          "id": 79,
+          "phase": "hive.staging.clear",
+          "epoch": 1
+        }
+      ]
+    ],
+    "deadlineSnapshots": [
+      {
+        "event": "deadline29",
+        "test": "corrections and app releases a new app bundle absorbs the patches it contains",
+        "epoch": 1,
+        "pid": 943,
+        "utc": "2026-11-06T05:17:57.539312Z",
+        "us": 36932264,
+        "pending": [
+          {
+            "id": 75,
+            "phase": "test.publish.103",
+            "epoch": 1
+          },
+          {
+            "id": 77,
+            "phase": "updater.apply.103",
+            "epoch": 1
+          },
+          {
+            "id": 78,
+            "phase": "store.commit.103",
+            "epoch": 1
+          },
+          {
+            "id": 79,
+            "phase": "hive.staging.clear",
+            "epoch": 1
+          }
+        ],
+        "totals": {
+          "hive.settings.put": {
+            "calls": 1,
+            "us": 56969,
+            "units": 0
+          },
+          "hive.settings.flush": {
+            "calls": 1,
+            "us": 1107,
+            "units": 0
+          },
+          "bundle.read.prayers": {
+            "calls": 1,
+            "us": 6687,
+            "units": 0
+          },
+          "bundle.read.prayerCategories": {
+            "calls": 1,
+            "us": 494,
+            "units": 0
+          },
+          "bundle.decode.prayerCategories": {
+            "calls": 1,
+            "us": 20139,
+            "units": 0
+          },
+          "bundle.load.prayerCategories": {
+            "calls": 1,
+            "us": 48680,
+            "units": 0
+          },
+          "bundle.decode.prayers": {
+            "calls": 1,
+            "us": 240590,
+            "units": 0
+          },
+          "bundle.load.prayers": {
+            "calls": 1,
+            "us": 304391,
+            "units": 0
+          },
+          "bundle.read.days": {
+            "calls": 1,
+            "us": 23192,
+            "units": 0
+          },
+          "bundle.read.readings": {
+            "calls": 1,
+            "us": 7939,
+            "units": 0
+          },
+          "bundle.read.liturgicalTemplates": {
+            "calls": 1,
+            "us": 2004,
+            "units": 0
+          },
+          "bundle.read.invitatoriums": {
+            "calls": 1,
+            "us": 531,
+            "units": 0
+          },
+          "bundle.read.completoriums": {
+            "calls": 1,
+            "us": 983,
+            "units": 0
+          },
+          "bundle.read.liturgicalCalendarMeta": {
+            "calls": 1,
+            "us": 385,
+            "units": 0
+          },
+          "bundle.read.liturgicalCelebrations": {
+            "calls": 1,
+            "us": 548,
+            "units": 0
+          },
+          "bundle.read.liturgicalDioceseOverrides": {
+            "calls": 1,
+            "us": 369,
+            "units": 0
+          },
+          "bundle.read.liturgicalYearOverrides": {
+            "calls": 1,
+            "us": 4012,
+            "units": 0
+          },
+          "bundle.read.liturgicalProperTexts": {
+            "calls": 1,
+            "us": 3319,
+            "units": 0
+          },
+          "bundle.init": {
+            "calls": 1,
+            "us": 721359,
+            "units": 0
+          },
+          "bundle.read.songs": {
+            "calls": 1,
+            "us": 1014,
+            "units": 0
+          },
+          "bundle.read.compendium": {
+            "calls": 1,
+            "us": 1222,
+            "units": 0
+          },
+          "bundle.read.compendiumMeta": {
+            "calls": 1,
+            "us": 340,
+            "units": 0
+          },
+          "bundle.read.liturgicalOrdoNotes": {
+            "calls": 1,
+            "us": 4363,
+            "units": 0
+          },
+          "bundle.decode.liturgicalCalendarMeta": {
+            "calls": 1,
+            "us": 99549,
+            "units": 0
+          },
+          "bundle.load.liturgicalCalendarMeta": {
+            "calls": 1,
+            "us": 219034,
+            "units": 0
+          },
+          "bundle.decode.completoriums": {
+            "calls": 1,
+            "us": 111402,
+            "units": 0
+          },
+          "bundle.load.completoriums": {
+            "calls": 1,
+            "us": 221432,
+            "units": 0
+          },
+          "bundle.decode.liturgicalYearOverrides": {
+            "calls": 1,
+            "us": 80526,
+            "units": 0
+          },
+          "bundle.load.liturgicalYearOverrides": {
+            "calls": 1,
+            "us": 216758,
+            "units": 0
+          },
+          "bundle.decode.invitatoriums": {
+            "calls": 1,
+            "us": 159712,
+            "units": 0
+          },
+          "bundle.load.invitatoriums": {
+            "calls": 1,
+            "us": 262185,
+            "units": 0
+          },
+          "bundle.decode.liturgicalDioceseOverrides": {
+            "calls": 1,
+            "us": 284104,
+            "units": 0
+          },
+          "bundle.load.liturgicalDioceseOverrides": {
+            "calls": 1,
+            "us": 409436,
+            "units": 0
+          },
+          "bundle.decode.liturgicalCelebrations": {
+            "calls": 1,
+            "us": 301722,
+            "units": 0
+          },
+          "bundle.load.liturgicalCelebrations": {
+            "calls": 1,
+            "us": 411036,
+            "units": 0
+          },
+          "bundle.decode.compendiumMeta": {
+            "calls": 1,
+            "us": 205599,
+            "units": 0
+          },
+          "bundle.load.compendiumMeta": {
+            "calls": 1,
+            "us": 373200,
+            "units": 0
+          },
+          "bundle.decode.songs": {
+            "calls": 1,
+            "us": 298179,
+            "units": 0
+          },
+          "bundle.load.songs": {
+            "calls": 1,
+            "us": 477520,
+            "units": 0
+          },
+          "bundle.decode.liturgicalTemplates": {
+            "calls": 1,
+            "us": 466443,
+            "units": 0
+          },
+          "bundle.load.liturgicalTemplates": {
+            "calls": 1,
+            "us": 571429,
+            "units": 0
+          },
+          "bundle.decode.compendium": {
+            "calls": 1,
+            "us": 321156,
+            "units": 0
+          },
+          "bundle.load.compendium": {
+            "calls": 1,
+            "us": 503569,
+            "units": 0
+          },
+          "bundle.decode.readings": {
+            "calls": 1,
+            "us": 739706,
+            "units": 0
+          },
+          "bundle.load.readings": {
+            "calls": 1,
+            "us": 852499,
+            "units": 0
+          },
+          "bundle.decode.liturgicalOrdoNotes": {
+            "calls": 1,
+            "us": 713343,
+            "units": 0
+          },
+          "bundle.load.liturgicalOrdoNotes": {
+            "calls": 1,
+            "us": 881774,
+            "units": 0
+          },
+          "bundle.decode.liturgicalProperTexts": {
+            "calls": 1,
+            "us": 903532,
+            "units": 0
+          },
+          "bundle.load.liturgicalProperTexts": {
+            "calls": 1,
+            "us": 1037763,
+            "units": 0
+          },
+          "bundle.decode.days": {
+            "calls": 1,
+            "us": 1850955,
+            "units": 0
+          },
+          "bundle.load.days": {
+            "calls": 1,
+            "us": 1982977,
+            "units": 0
+          },
+          "bundle.ensureAll": {
+            "calls": 1,
+            "us": 1888735,
+            "units": 0
+          },
+          "test.copyCollection.days": {
+            "calls": 3,
+            "us": 36825,
+            "units": 0
+          },
+          "test.copyCollection.readings": {
+            "calls": 3,
+            "us": 58530,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalTemplates": {
+            "calls": 3,
+            "us": 472,
+            "units": 0
+          },
+          "test.copyCollection.invitatoriums": {
+            "calls": 3,
+            "us": 107,
+            "units": 0
+          },
+          "test.copyCollection.completoriums": {
+            "calls": 3,
+            "us": 241,
+            "units": 0
+          },
+          "test.copyCollection.prayers": {
+            "calls": 3,
+            "us": 1322,
+            "units": 0
+          },
+          "test.copyCollection.prayerCategories": {
+            "calls": 3,
+            "us": 40,
+            "units": 0
+          },
+          "test.copyCollection.songs": {
+            "calls": 3,
+            "us": 2550,
+            "units": 0
+          },
+          "test.copyCollection.compendium": {
+            "calls": 3,
+            "us": 200,
+            "units": 0
+          },
+          "test.copyCollection.compendiumMeta": {
+            "calls": 3,
+            "us": 72,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalCalendarMeta": {
+            "calls": 3,
+            "us": 81,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalCelebrations": {
+            "calls": 3,
+            "us": 1965,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalDioceseOverrides": {
+            "calls": 3,
+            "us": 530,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalYearOverrides": {
+            "calls": 3,
+            "us": 147,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalProperTexts": {
+            "calls": 3,
+            "us": 19981,
+            "units": 0
+          },
+          "test.copyCollection.liturgicalOrdoNotes": {
+            "calls": 3,
+            "us": 47590,
+            "units": 0
+          },
+          "fake.hashes.days": {
+            "calls": 6,
+            "us": 28638025,
+            "units": 4416
+          },
+          "fake.hashes.readings": {
+            "calls": 3,
+            "us": 1229263,
+            "units": 2466
+          },
+          "fake.hashes.liturgicalTemplates": {
+            "calls": 3,
+            "us": 808940,
+            "units": 48
+          },
+          "fake.hashes.invitatoriums": {
+            "calls": 3,
+            "us": 1616,
+            "units": 12
+          },
+          "fake.hashes.completoriums": {
+            "calls": 3,
+            "us": 60099,
+            "units": 105
+          },
+          "fake.hashes.prayers": {
+            "calls": 3,
+            "us": 825069,
+            "units": 345
+          },
+          "fake.hashes.prayerCategories": {
+            "calls": 3,
+            "us": 342,
+            "units": 15
+          },
+          "fake.hashes.songs": {
+            "calls": 3,
+            "us": 254250,
+            "units": 1341
+          },
+          "fake.hashes.compendium": {
+            "calls": 3,
+            "us": 156490,
+            "units": 81
+          },
+          "fake.hashes.compendiumMeta": {
+            "calls": 3,
+            "us": 852,
+            "units": 3
+          },
+          "fake.hashes.liturgicalCalendarMeta": {
+            "calls": 3,
+            "us": 48,
+            "units": 3
+          },
+          "fake.hashes.liturgicalCelebrations": {
+            "calls": 3,
+            "us": 99202,
+            "units": 723
+          },
+          "fake.hashes.liturgicalDioceseOverrides": {
+            "calls": 3,
+            "us": 16252,
+            "units": 225
+          },
+          "fake.hashes.liturgicalYearOverrides": {
+            "calls": 3,
+            "us": 1387,
+            "units": 45
+          },
+          "fake.hashes.liturgicalProperTexts": {
+            "calls": 3,
+            "us": 924540,
+            "units": 873
+          },
+          "fake.hashes.liturgicalOrdoNotes": {
+            "calls": 3,
+            "us": 339729,
+            "units": 4011
+          },
+          "fake.currentManifest": {
+            "calls": 3,
+            "us": 17840894,
+            "units": 0
+          },
+          "fake.collectionManifest.days": {
+            "calls": 3,
+            "us": 15864437,
+            "units": 0
+          },
+          "updater.check.101": {
+            "calls": 1,
+            "us": 10017789,
+            "units": 0
+          },
+          "hive.staging.clear": {
+            "calls": 4,
+            "us": 77095,
+            "units": 0
+          },
+          "hive.staging.putAll": {
+            "calls": 2,
+            "us": 12070,
+            "units": 0
+          },
+          "hive.staging.flush": {
+            "calls": 4,
+            "us": 5430,
+            "units": 0
+          },
+          "hive.staging.put": {
+            "calls": 2,
+            "us": 3414,
+            "units": 0
+          },
+          "hive.overlay.putAll": {
+            "calls": 2,
+            "us": 20909,
+            "units": 0
+          },
+          "store.commit.101": {
+            "calls": 1,
+            "us": 111679,
+            "units": 0
+          },
+          "updater.apply.101": {
+            "calls": 1,
+            "us": 126157,
+            "units": 0
+          },
+          "test.publish.101": {
+            "calls": 1,
+            "us": 10151027,
+            "units": 0
+          },
+          "updater.check.102": {
+            "calls": 1,
+            "us": 9789420,
+            "units": 0
+          },
+          "store.commit.102": {
+            "calls": 1,
+            "us": 24768,
+            "units": 0
+          },
+          "updater.apply.102": {
+            "calls": 1,
+            "us": 28415,
+            "units": 0
+          },
+          "test.publish.102": {
+            "calls": 1,
+            "us": 9822357,
+            "units": 0
+          },
+          "updater.check.103": {
+            "calls": 1,
+            "us": 14073008,
+            "units": 0
+          }
+        }
+      }
+    ],
+    "resources": {
+      "samples": 83,
+      "cgroupDelta": {
+        "usage_usec": 80529124,
+        "user_usec": 77978383,
+        "system_usec": 2550741,
+        "nice_usec": 0,
+        "nr_periods": 413,
+        "nr_throttled": 384,
+        "throttled_usec": 37975506,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 245.0078125,
+      "perTargetPid": [
+        {
+          "pid": 943,
+          "sampleCount": 75,
+          "cpuSeconds": 13.75,
+          "sampleWallSeconds": 37.246
+        }
+      ],
+      "targetCpuSeconds": 13.75,
+      "targetSampleWallSeconds": 37.246
+    }
+  },
+  "pr-original-single": {
+    "run": {
+      "name": "pr-original-single",
+      "branch": "pr",
+      "head": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "workers": 0,
+      "startedUtc": "2026-11-06T05:13:55.170612+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "exitCode": 0,
+      "elapsedSeconds": 17.573,
+      "endedUtc": "2026-11-06T05:14:12.745040+00:00"
+    },
+    "testMs": 12550.386,
+    "totals": {
+      "hive.settings.put": {
+        "calls": 1,
+        "us": 14194,
+        "units": 0
+      },
+      "hive.settings.flush": {
+        "calls": 1,
+        "us": 1179,
+        "units": 0
+      },
+      "bundle.read.prayers": {
+        "calls": 1,
+        "us": 2974,
+        "units": 0
+      },
+      "bundle.read.prayerCategories": {
+        "calls": 1,
+        "us": 1862,
+        "units": 0
+      },
+      "bundle.decode.prayerCategories": {
+        "calls": 1,
+        "us": 25326,
+        "units": 0
+      },
+      "bundle.load.prayerCategories": {
+        "calls": 1,
+        "us": 45897,
+        "units": 0
+      },
+      "bundle.decode.prayers": {
+        "calls": 1,
+        "us": 72117,
+        "units": 0
+      },
+      "bundle.load.prayers": {
+        "calls": 1,
+        "us": 94393,
+        "units": 0
+      },
+      "bundle.read.days": {
+        "calls": 1,
+        "us": 10878,
+        "units": 0
+      },
+      "bundle.read.readings": {
+        "calls": 1,
+        "us": 4541,
+        "units": 0
+      },
+      "bundle.read.liturgicalTemplates": {
+        "calls": 1,
+        "us": 1643,
+        "units": 0
+      },
+      "bundle.read.invitatoriums": {
+        "calls": 1,
+        "us": 962,
+        "units": 0
+      },
+      "bundle.read.completoriums": {
+        "calls": 1,
+        "us": 1024,
+        "units": 0
+      },
+      "bundle.read.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 1269,
+        "units": 0
+      },
+      "bundle.read.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 1232,
+        "units": 0
+      },
+      "bundle.read.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 941,
+        "units": 0
+      },
+      "bundle.read.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 4005,
+        "units": 0
+      },
+      "bundle.read.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 3100,
+        "units": 0
+      },
+      "bundle.init": {
+        "calls": 1,
+        "us": 266649,
+        "units": 0
+      },
+      "bundle.read.songs": {
+        "calls": 1,
+        "us": 3856,
+        "units": 0
+      },
+      "bundle.read.compendium": {
+        "calls": 1,
+        "us": 5856,
+        "units": 0
+      },
+      "bundle.read.compendiumMeta": {
+        "calls": 1,
+        "us": 946,
+        "units": 0
+      },
+      "bundle.read.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 6502,
+        "units": 0
+      },
+      "bundle.decode.invitatoriums": {
+        "calls": 1,
+        "us": 211468,
+        "units": 0
+      },
+      "bundle.load.invitatoriums": {
+        "calls": 1,
+        "us": 298217,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 240974,
+        "units": 0
+      },
+      "bundle.load.liturgicalCalendarMeta": {
+        "calls": 1,
+        "us": 296339,
+        "units": 0
+      },
+      "bundle.decode.completoriums": {
+        "calls": 1,
+        "us": 242998,
+        "units": 0
+      },
+      "bundle.load.completoriums": {
+        "calls": 1,
+        "us": 308151,
+        "units": 0
+      },
+      "bundle.decode.compendiumMeta": {
+        "calls": 1,
+        "us": 239926,
+        "units": 0
+      },
+      "bundle.load.compendiumMeta": {
+        "calls": 1,
+        "us": 275991,
+        "units": 0
+      },
+      "bundle.decode.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 247589,
+        "units": 0
+      },
+      "bundle.load.liturgicalYearOverrides": {
+        "calls": 1,
+        "us": 302460,
+        "units": 0
+      },
+      "bundle.decode.songs": {
+        "calls": 1,
+        "us": 243190,
+        "units": 0
+      },
+      "bundle.load.songs": {
+        "calls": 1,
+        "us": 294599,
+        "units": 0
+      },
+      "bundle.decode.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 271903,
+        "units": 0
+      },
+      "bundle.load.liturgicalDioceseOverrides": {
+        "calls": 1,
+        "us": 328408,
+        "units": 0
+      },
+      "bundle.decode.compendium": {
+        "calls": 1,
+        "us": 266938,
+        "units": 0
+      },
+      "bundle.load.compendium": {
+        "calls": 1,
+        "us": 312978,
+        "units": 0
+      },
+      "bundle.decode.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 283807,
+        "units": 0
+      },
+      "bundle.load.liturgicalCelebrations": {
+        "calls": 1,
+        "us": 340492,
+        "units": 0
+      },
+      "bundle.decode.liturgicalTemplates": {
+        "calls": 1,
+        "us": 366182,
+        "units": 0
+      },
+      "bundle.load.liturgicalTemplates": {
+        "calls": 1,
+        "us": 425432,
+        "units": 0
+      },
+      "bundle.decode.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 359931,
+        "units": 0
+      },
+      "bundle.load.liturgicalOrdoNotes": {
+        "calls": 1,
+        "us": 395223,
+        "units": 0
+      },
+      "bundle.decode.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 365894,
+        "units": 0
+      },
+      "bundle.load.liturgicalProperTexts": {
+        "calls": 1,
+        "us": 445486,
+        "units": 0
+      },
+      "bundle.decode.readings": {
+        "calls": 1,
+        "us": 471849,
+        "units": 0
+      },
+      "bundle.load.readings": {
+        "calls": 1,
+        "us": 537176,
+        "units": 0
+      },
+      "bundle.decode.days": {
+        "calls": 1,
+        "us": 690474,
+        "units": 0
+      },
+      "bundle.load.days": {
+        "calls": 1,
+        "us": 757035,
+        "units": 0
+      },
+      "bundle.ensureAll": {
+        "calls": 1,
+        "us": 717393,
+        "units": 0
+      },
+      "test.copyCollection.days": {
+        "calls": 3,
+        "us": 25107,
+        "units": 0
+      },
+      "test.copyCollection.readings": {
+        "calls": 3,
+        "us": 6539,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalTemplates": {
+        "calls": 3,
+        "us": 370,
+        "units": 0
+      },
+      "test.copyCollection.invitatoriums": {
+        "calls": 3,
+        "us": 45,
+        "units": 0
+      },
+      "test.copyCollection.completoriums": {
+        "calls": 3,
+        "us": 186,
+        "units": 0
+      },
+      "test.copyCollection.prayers": {
+        "calls": 3,
+        "us": 749,
+        "units": 0
+      },
+      "test.copyCollection.prayerCategories": {
+        "calls": 3,
+        "us": 33,
+        "units": 0
+      },
+      "test.copyCollection.songs": {
+        "calls": 3,
+        "us": 9014,
+        "units": 0
+      },
+      "test.copyCollection.compendium": {
+        "calls": 3,
+        "us": 605,
+        "units": 0
+      },
+      "test.copyCollection.compendiumMeta": {
+        "calls": 3,
+        "us": 23,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 14,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 1780,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 592,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 204,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 2225,
+        "units": 0
+      },
+      "test.copyCollection.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 6573,
+        "units": 0
+      },
+      "fake.hashes.days": {
+        "calls": 6,
+        "us": 8581354,
+        "units": 4416
+      },
+      "fake.hashes.readings": {
+        "calls": 3,
+        "us": 412428,
+        "units": 2466
+      },
+      "fake.hashes.liturgicalTemplates": {
+        "calls": 3,
+        "us": 245084,
+        "units": 48
+      },
+      "fake.hashes.invitatoriums": {
+        "calls": 3,
+        "us": 904,
+        "units": 12
+      },
+      "fake.hashes.completoriums": {
+        "calls": 3,
+        "us": 23344,
+        "units": 105
+      },
+      "fake.hashes.prayers": {
+        "calls": 3,
+        "us": 174954,
+        "units": 345
+      },
+      "fake.hashes.prayerCategories": {
+        "calls": 3,
+        "us": 328,
+        "units": 15
+      },
+      "fake.hashes.songs": {
+        "calls": 3,
+        "us": 46414,
+        "units": 1341
+      },
+      "fake.hashes.compendium": {
+        "calls": 3,
+        "us": 48709,
+        "units": 81
+      },
+      "fake.hashes.compendiumMeta": {
+        "calls": 3,
+        "us": 825,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCalendarMeta": {
+        "calls": 3,
+        "us": 46,
+        "units": 3
+      },
+      "fake.hashes.liturgicalCelebrations": {
+        "calls": 3,
+        "us": 23045,
+        "units": 723
+      },
+      "fake.hashes.liturgicalDioceseOverrides": {
+        "calls": 3,
+        "us": 7592,
+        "units": 225
+      },
+      "fake.hashes.liturgicalYearOverrides": {
+        "calls": 3,
+        "us": 1375,
+        "units": 45
+      },
+      "fake.hashes.liturgicalProperTexts": {
+        "calls": 3,
+        "us": 256207,
+        "units": 873
+      },
+      "fake.hashes.liturgicalOrdoNotes": {
+        "calls": 3,
+        "us": 105099,
+        "units": 4011
+      },
+      "fake.currentManifest": {
+        "calls": 3,
+        "us": 5719210,
+        "units": 0
+      },
+      "fake.collectionManifest.days": {
+        "calls": 3,
+        "us": 4246959,
+        "units": 0
+      },
+      "updater.check.101": {
+        "calls": 1,
+        "us": 3402675,
+        "units": 0
+      },
+      "hive.staging.clear": {
+        "calls": 6,
+        "us": 9071,
+        "units": 0
+      },
+      "hive.staging.putAll": {
+        "calls": 3,
+        "us": 8234,
+        "units": 0
+      },
+      "hive.staging.flush": {
+        "calls": 6,
+        "us": 2977,
+        "units": 0
+      },
+      "hive.staging.put": {
+        "calls": 3,
+        "us": 1927,
+        "units": 0
+      },
+      "hive.overlay.putAll": {
+        "calls": 3,
+        "us": 7824,
+        "units": 0
+      },
+      "store.commit.101": {
+        "calls": 1,
+        "us": 20902,
+        "units": 0
+      },
+      "updater.apply.101": {
+        "calls": 1,
+        "us": 25592,
+        "units": 0
+      },
+      "test.publish.101": {
+        "calls": 1,
+        "us": 3429238,
+        "units": 0
+      },
+      "updater.check.102": {
+        "calls": 1,
+        "us": 3303779,
+        "units": 0
+      },
+      "store.commit.102": {
+        "calls": 1,
+        "us": 9145,
+        "units": 0
+      },
+      "updater.apply.102": {
+        "calls": 1,
+        "us": 12093,
+        "units": 0
+      },
+      "test.publish.102": {
+        "calls": 1,
+        "us": 3316731,
+        "units": 0
+      },
+      "updater.check.103": {
+        "calls": 1,
+        "us": 3285370,
+        "units": 0
+      },
+      "store.commit.103": {
+        "calls": 1,
+        "us": 8816,
+        "units": 0
+      },
+      "updater.apply.103": {
+        "calls": 1,
+        "us": 11384,
+        "units": 0
+      },
+      "test.publish.103": {
+        "calls": 1,
+        "us": 3297482,
+        "units": 0
+      },
+      "test.replacementHashes": {
+        "calls": 1,
+        "us": 1403353,
+        "units": 736
+      },
+      "hive.overlay.deleteAll": {
+        "calls": 1,
+        "us": 1909,
+        "units": 0
+      },
+      "store.replaceBaseline": {
+        "calls": 1,
+        "us": 2889,
+        "units": 0
+      },
+      "teardown.hiveClose": {
+        "calls": 1,
+        "us": 15394,
+        "units": 0
+      },
+      "teardown.delete": {
+        "calls": 1,
+        "us": 2067,
+        "units": 0
+      }
+    },
+    "pendingAtEnd": [],
+    "pendingAtTeardown": [
+      []
+    ],
+    "deadlineSnapshots": []
+  },
+  "pr-raw-load5": {
+    "run": {
+      "name": "pr-raw-load5",
+      "branch": "pr",
+      "head": "c78eaf7b903cd048b6e55c8526be96a37e6d1096",
+      "command": [
+        "/workspace/toolchains/flutter/bin/flutter",
+        "test",
+        "--no-pub",
+        "test/content_offline_test.dart",
+        "--plain-name",
+        "corrections and app releases a new app bundle absorbs the patches it contains"
+      ],
+      "instrumented": false,
+      "workers": 5,
+      "startedUtc": "2026-11-06T05:19:56.444152+00:00",
+      "cpuMax": "200000 100000",
+      "clockTicks": 100,
+      "loadStartedElapsed": 4.283,
+      "exitCode": 1,
+      "elapsedSeconds": 47.979,
+      "endedUtc": "2026-11-06T05:20:44.423766+00:00"
+    },
+    "resources": {
+      "samples": 93,
+      "cgroupDelta": {
+        "usage_usec": 92069086,
+        "user_usec": 89009347,
+        "system_usec": 3059740,
+        "nice_usec": 0,
+        "nr_periods": 473,
+        "nr_throttled": 438,
+        "throttled_usec": 44144948,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "maxTargetRssMiB": 303.359375,
+      "perTargetPid": [
+        {
+          "pid": 1196,
+          "sampleCount": 85,
+          "cpuSeconds": 15.24,
+          "sampleWallSeconds": 43.266999999999996
+        }
+      ],
+      "targetCpuSeconds": 15.24,
+      "targetSampleWallSeconds": 43.266999999999996
+    }
+  }
+}
