@@ -44,8 +44,7 @@ void main() {
         scale: scale,
         systemFonts: true,
         settings: const SettingsState(
-          psalmVerseLayout: PsalmVerseLayout.alignedLeft,
-          psalmMarkerBreakMode: PsalmMarkerBreakMode.breakAfterMarker,
+          psalmodyMode: PsalmodyMode.leftBreakIndent,
         ),
       ),
     );
@@ -122,8 +121,7 @@ void main() {
           final scope = PsalmodyScope.maybeOf(
             tester.element(find.byType(PsalmChoirHtml).first),
           )!;
-          expect(scope.verseLayout, PsalmVerseLayout.alignedLeft);
-          expect(scope.markerBreakMode, PsalmMarkerBreakMode.breakAfterMarker);
+          expect(scope.mode, PsalmodyMode.leftBreakIndent);
           expect(html(tester), contains('psalm-continuation'));
         }
         // Traverse to the original ending as well as the changed controls.

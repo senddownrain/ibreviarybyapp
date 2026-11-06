@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/theme/ib_colors.dart';
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 
 /// Application chrome palette shared with the MyBrev PWA.
 ///
-/// Liturgical colours remain contextual accents and must not replace these
-/// achromatic surfaces. Rubrics keep their traditional red.
+/// Liturgical colours remain contextual accents and must not replace the application
+/// surfaces. Rubrics keep their traditional red.
 abstract final class AppPalette {
   static final lightPrimary = IbColors.light.accent;
   static final lightOnPrimary = IbColors.light.onAccent;
@@ -38,32 +39,67 @@ abstract final class AppPalette {
   /// brightness. This makes the in-app preference authoritative even when an
   /// Android device reports a stale platform brightness during an activity.
   static ({ColorScheme theme, ColorScheme darkTheme}) schemesFor(
-    ThemeMode mode,
+    AppThemePreference preference,
   ) {
     final light = scheme(Brightness.light);
     final dark = scheme(Brightness.dark);
-    return switch (mode) {
-      ThemeMode.light => (theme: light, darkTheme: light),
-      ThemeMode.dark => (theme: dark, darkTheme: dark),
-      ThemeMode.system => (theme: light, darkTheme: dark),
+    return switch (preference) {
+      AppThemePreference.light => (theme: light, darkTheme: light),
+      AppThemePreference.dark => (theme: dark, darkTheme: dark),
+      AppThemePreference.system => (theme: light, darkTheme: dark),
+      AppThemePreference.marian => (
+        theme: marianScheme,
+        darkTheme: marianScheme,
+      ),
     };
   }
 
   static ColorScheme scheme(Brightness brightness) {
     final dark = brightness == Brightness.dark;
     final colors = IbColors.forBrightness(brightness);
-    final primary = dark ? darkPrimary : lightPrimary;
-    final onPrimary = dark ? darkOnPrimary : lightOnPrimary;
-    final secondary = dark ? darkSecondary : lightSecondary;
-    final background = dark ? darkBackground : lightBackground;
-    final surface = dark ? darkSurface : lightSurface;
-    final surfaceBright = dark ? darkSurfaceBright : lightSurfaceBright;
-    final surfaceVariant = dark ? darkSurfaceVariant : lightSurfaceVariant;
-    final onSurface = dark ? darkOnSurface : lightOnSurface;
-    final onSurfaceVariant = dark
-        ? darkOnSurfaceVariant
-        : lightOnSurfaceVariant;
-    final devotional = dark ? darkDevotional : lightDevotional;
+    return _scheme(
+      brightness,
+      colors,
+      dark ? darkSecondary : lightSecondary,
+      dark ? darkDevotional : lightDevotional,
+      colors.onAccent,
+    );
+  }
+
+  static ColorScheme get marianScheme => _scheme(
+    Brightness.light,
+    IbColors.marian,
+    const Color(0xFF477DAA),
+    IbColors.marian.accent,
+    // White on #477DAA is 4.39:1; black keeps small secondary labels AA.
+    Colors.black,
+    outlineAlpha: 1,
+  );
+
+  static IbColors colorsFor(
+    AppThemePreference preference,
+    Brightness brightness,
+  ) => preference == AppThemePreference.marian
+      ? IbColors.marian
+      : IbColors.forBrightness(brightness);
+
+  static ColorScheme _scheme(
+    Brightness brightness,
+    IbColors colors,
+    Color secondary,
+    Color devotional,
+    Color onSecondary, {
+    double outlineAlpha = 0.55,
+  }) {
+    final dark = brightness == Brightness.dark;
+    final primary = colors.accent;
+    final onPrimary = colors.onAccent;
+    final background = colors.page;
+    final surface = colors.surface;
+    final surfaceBright = colors.surfaceRaised;
+    final surfaceVariant = colors.floating;
+    final onSurface = colors.ink;
+    final onSurfaceVariant = colors.inkMuted;
 
     return ColorScheme(
       brightness: brightness,
@@ -72,7 +108,7 @@ abstract final class AppPalette {
       primaryContainer: primary.withValues(alpha: dark ? 0.22 : 0.13),
       onPrimaryContainer: primary,
       secondary: secondary,
-      onSecondary: onPrimary,
+      onSecondary: onSecondary,
       secondaryContainer: surfaceVariant,
       onSecondaryContainer: onSurface,
       tertiary: devotional,
@@ -95,7 +131,7 @@ abstract final class AppPalette {
       surfaceContainerHigh: surfaceVariant,
       surfaceContainerHighest: surfaceVariant,
       onSurfaceVariant: onSurfaceVariant,
-      outline: colors.outline.withValues(alpha: 0.55),
+      outline: colors.outline.withValues(alpha: outlineAlpha),
       outlineVariant: colors.outline.withValues(alpha: 0.22),
       shadow: Colors.black,
       scrim: Colors.black,

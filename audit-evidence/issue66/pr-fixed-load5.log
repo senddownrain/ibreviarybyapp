@@ -1,0 +1,29 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/content_offline_test.dart
+00:00 +0: corrections and app releases a new app bundle absorbs the patches it contains
+[ContentStore] prayerCategories: 5 docs in 73 ms
+[ContentStore] prayers: 115 docs in 329 ms
+[ContentStore] invitatoriums: 4 docs in 373 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 402 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 351 ms
+[ContentStore] completoriums: 35 docs in 438 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 406 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 426 ms
+[ContentStore] compendiumMeta: 1 docs in 301 ms
+[ContentStore] songs: 447 docs in 307 ms
+[ContentStore] liturgicalTemplates: 16 docs in 654 ms
+[ContentStore] compendium: 27 docs in 532 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 674 ms
+[ContentStore] readings: 822 docs in 892 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 636 ms
+[ContentStore] days: 736 docs in 1803 ms
+00:31 +0 -1: corrections and app releases a new app bundle absorbs the patches it contains [E]
+  TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts
+  dart:isolate  _RawReceivePort._handleMessage
+  
+  HiveError: Box has already been closed.
+  package:hive/src/box/box_base_impl.dart 76:7              BoxBaseImpl.checkOpen
+  package:hive/src/box/box_base_impl.dart 56:5              BoxBaseImpl.keys
+  package:mybrev_flutter/content/content_store.dart 315:39  ContentCollection._reloadView
+  package:mybrev_flutter/content/content_store.dart 307:5   ContentCollection._reconcileWithBaseline
+  
+00:32 +0 -1: Some tests failed.

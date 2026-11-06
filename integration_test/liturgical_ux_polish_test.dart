@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 // Runs the production app on Android. POLISH_SCREEN frames are captured by
 // adb screencap on the host, including the real status/navigation bars.
 import 'package:flutter/material.dart';
@@ -134,7 +135,9 @@ void main() {
       }
 
       for (final dark in [false, true]) {
-        appThemeModeController.value = dark ? ThemeMode.dark : ThemeMode.light;
+        appThemePreferenceController.value = dark
+            ? AppThemePreference.dark
+            : AppThemePreference.light;
         final theme = dark ? 'dark' : 'light';
         await go('/hours');
         await date(DateTime(2026, 10, 9));
@@ -313,7 +316,7 @@ void main() {
           notifier.toggle(id);
         }
       }
-      appThemeModeController.value = ThemeMode.light;
+      appThemePreferenceController.value = AppThemePreference.light;
       await go('/hours');
       await shot('finished-hours');
       debugPrint('POLISH_DONE');

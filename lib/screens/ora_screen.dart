@@ -350,8 +350,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     final settings = ref.watch(settingsProvider);
     return PsalmodyScope(
       controller: _psalmodyController,
-      verseLayout: settings.psalmVerseLayout,
-      markerBreakMode: settings.psalmMarkerBreakMode,
+      mode: settings.psalmodyMode,
       child: ReadingScaffold(
         builder: (context, textStyle) => ReaderScaffold(
           seasonColor: seasonColor,
@@ -489,7 +488,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
             ),
           ),
         ),
-        const SourceFooter(key: Key('ora-source-footer')),
+        const SourceFooter(
+          key: Key('ora-source-footer'),
+          sourceId: 'liturgy-hours-2012-2020',
+        ),
         if (next != null) ...[
           const SizedBox(height: 28),
           Center(

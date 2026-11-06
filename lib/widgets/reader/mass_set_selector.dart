@@ -49,8 +49,7 @@ class MassSetSelector extends StatelessWidget {
             const LiturgicalSelectorHeading('ЧЫТАННІ ІМШЫ'),
             const SizedBox(height: 2),
             Text(
-              '${sets.length} ${massSetVariantWord(sets.length)} '
-              'аднаго святкавання',
+              'Магчымасці цэлебрацыі',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: cs.onSurfaceVariant,
               ),

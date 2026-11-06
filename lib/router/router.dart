@@ -5,6 +5,8 @@ import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
 import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/models/mass_ritual.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
+import 'package:mybrev_flutter/screens/source_documents_screen.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -27,6 +29,8 @@ import 'package:mybrev_flutter/screens/prayerbook_placeholder_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/screens/reading_detail_screen.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
+import 'package:mybrev_flutter/screens/feedback_screen.dart';
+import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
@@ -742,6 +746,20 @@ final router = GoRouter(
     ),
     GoRoute(
       parentNavigatorKey: rootNavigatorKey,
+      path: '/settings/feedback',
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        restorationId: 'settings-feedback',
+        child: SecondaryPageScaffold(
+          title: 'Зваротная сувязь',
+          child: FeedbackScreen(
+            context: FeedbackContext.fromQuery(state.uri.queryParameters),
+          ),
+        ),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
       path: '/about',
       pageBuilder: (context, state) => MaterialPage<void>(
         key: state.pageKey,
@@ -749,6 +767,20 @@ final router = GoRouter(
         child: const SecondaryPageScaffold(
           title: 'Інфармацыя',
           child: AboutScreen(),
+        ),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: sourcesRoute,
+      name: 'Sources',
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        restorationId: 'sources',
+        child: const SecondaryPageScaffold(
+          title: 'Крыніцы',
+          fallbackLocation: '/about',
+          child: SourcesScreen(),
         ),
       ),
     ),

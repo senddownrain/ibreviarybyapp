@@ -63,7 +63,9 @@ class HoursOptionsSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const LiturgicalSelectorHeading('Варыянт літургіі гадзінаў'),
+          const LiturgicalSelectorHeading(
+            'Тэксты Літургіі гадзінаў апрача ўласных',
+          ),
           RadioGroup<String>(
             groupValue: selection.template?.id ?? selection.dayId,
             onChanged: (id) {

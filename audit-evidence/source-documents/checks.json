@@ -1,0 +1,81 @@
+{
+  "webReference": {
+    "pullRequest": 192,
+    "commit": "33577e1fb265b02160a5e6d94cfc83a8df15b9a3"
+  },
+  "previousFlutterPRHead": "d25cb2930eeda61636077717758f0c11acbd4391",
+  "registry": "Six stable IDs; exact Web JSON retained, including provenance and internal LEV audit notice",
+  "legalBundleAssets": [
+    "assets/legal/sources.json"
+  ],
+  "targetedTests": {
+    "passed": 60,
+    "failed": 0
+  },
+  "analyze": {
+    "errors": 0,
+    "warnings": 0,
+    "infos": 12,
+    "matchesHistoricalBaselineExactly": true
+  },
+  "chrome": {
+    "layoutScenariosPassed": 4,
+    "browserFailurePassed": true,
+    "realExternalTabs": 3,
+    "screenshots": 3,
+    "remoteDocumentContentVerified": false
+  },
+  "fullFlutterTest": {
+    "status": "completed_with_failures",
+    "command": "flutter test --no-pub --concurrency=2",
+    "duration": "35:55",
+    "passed": 1725,
+    "skipped": 9,
+    "failed": 11,
+    "exitCode": 1,
+    "historicalBaselineCommit": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+    "historicalBaselineFailures": [
+      "discovery/p0_hints_screens_test.dart: Readings date_navigation: three day arrows, once",
+      "hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "ordo_day_flow_test.dart: Day → ORDO → Month → Day → back preserves month cursor",
+      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.0",
+      "ordo_ux_test.dart: day and month utility layout Brightness.dark 1.5",
+      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.0",
+      "ordo_ux_test.dart: day and month utility layout Brightness.light 1.5"
+    ],
+    "additionalTimeoutCases": [
+      "content_offline_test.dart: corrections and app releases v101 wrong text, v102 back to the bundled text: no overlay left",
+      "content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text",
+      "content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays",
+      "content_offline_test.dart: corrections and app releases a new app bundle absorbs the patches it contains"
+    ],
+    "additionalFailureDetail": "All four additional cases exceeded the existing 30-second timeout under concurrent CPU load; Hive closed-box errors followed teardown. All 37 tests in the isolated file rerun passed, including these four cases."
+  },
+  "publicationGate": "Blocked / unverified: managed proxy rejects Web host. Keep PR draft and do not merge or release.",
+  "githubActions": {
+    "runId": 42224271046,
+    "commit": "de1bede32b02d6b6876eb543d13e406077e2421f",
+    "jobs": {
+      "Analytics tests": "success",
+      "Flutter analyze and alternatives regression": "success"
+    }
+  },
+  "isolatedOfflineRerun": {
+    "command": "flutter test --no-pub test/content_offline_test.dart",
+    "passed": 37,
+    "failed": 0,
+    "duration": "02:31",
+    "exitCode": 0,
+    "fourAdditionalFailuresReproduced": false
+  },
+  "format": {
+    "changedDartFiles": 8,
+    "status": "pass"
+  },
+  "importIntegrity": {
+    "status": "pass",
+    "registryByteIdenticalToPinnedWeb": true,
+    "bothBibleCorporaStructurallyEqualToWeb": true,
+    "bibleCorporaUnchanged": true
+  }
+}

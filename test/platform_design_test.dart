@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
@@ -178,7 +179,7 @@ void main() {
             body: SizedBox(
               width: 260,
               child: SettingsThemeControl(
-                value: ThemeMode.system,
+                value: AppThemePreference.marian,
                 onChanged: (_) {},
               ),
             ),
@@ -186,15 +187,18 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(DropdownButtonFormField<ThemeMode>), findsOneWidget);
+    expect(
+      find.byType(DropdownButtonFormField<AppThemePreference>),
+      findsOneWidget,
+    );
     final selected = tester.renderObject<RenderParagraph>(
       find.descendant(
-        of: find.text('Сістэма').first,
+        of: find.text('Марыйная').first,
         matching: find.byType(RichText),
       ),
     );
     expect(selected.didExceedMaxLines, isFalse);
-    await tester.tap(find.byType(DropdownButtonFormField<ThemeMode>));
+    await tester.tap(find.byType(DropdownButtonFormField<AppThemePreference>));
     await tester.pumpAndSettle();
     expect(find.text('Светлая').last, findsOneWidget);
     expect(find.text('Цёмная').last, findsOneWidget);
@@ -208,7 +212,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
-      for (final width in [320.0, 360.0, 390.0, 430.0, 700.0]) {
+      for (final width in [320.0, 360.0, 390.0, 430.0, 700.0, 1000.0]) {
         for (final scale in [1.0, 1.5, 2.0]) {
           tester.view.physicalSize = Size(width, 800);
           await tester.pumpWidget(
@@ -224,7 +228,7 @@ void main() {
                   body: SizedBox(
                     width: width - 60,
                     child: SettingsThemeControl(
-                      value: ThemeMode.system,
+                      value: AppThemePreference.system,
                       onChanged: (_) {},
                     ),
                   ),
@@ -233,10 +237,10 @@ void main() {
             ),
           );
           if (find
-              .byType(DropdownButtonFormField<ThemeMode>)
+              .byType(DropdownButtonFormField<AppThemePreference>)
               .evaluate()
               .isEmpty) {
-            for (final label in ['Сістэма', 'Светлая', 'Цёмная']) {
+            for (final label in ['Сістэма', 'Светлая', 'Цёмная', 'Марыйная']) {
               final paragraph = tester.renderObject<RenderParagraph>(
                 find.descendant(
                   of: find.text(label),
@@ -251,7 +255,7 @@ void main() {
             }
           } else {
             expect(
-              find.byType(DropdownButtonFormField<ThemeMode>),
+              find.byType(DropdownButtonFormField<AppThemePreference>),
               findsOneWidget,
             );
           }

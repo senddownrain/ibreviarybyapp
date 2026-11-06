@@ -50,12 +50,11 @@ Future<void> main() async {
       dark: q['theme'] == 'dark',
       scale: q['scale'] == '2' ? 2 : 1,
       settings: SettingsState(
-        psalmVerseLayout: q['layout'] == 'aligned'
-            ? PsalmVerseLayout.alignedLeft
-            : PsalmVerseLayout.alternatingIndent,
-        psalmMarkerBreakMode: q['breaks'] == '1'
-            ? PsalmMarkerBreakMode.breakAfterMarker
-            : PsalmMarkerBreakMode.inline,
+        psalmodyMode: resolvePsalmodyMode(
+          storedMode: q['mode'],
+          legacyLayout: q['layout'] == 'aligned' ? 'alignedLeft' : null,
+          legacyBreakMode: q['breaks'] == '1' ? 'breakAfterMarker' : null,
+        ),
       ),
     ),
   );

@@ -7,7 +7,6 @@ import 'package:mybrev_flutter/widgets/source_footer.dart';
 
 import 'package:mybrev_flutter/constants/compendium.dart';
 import 'package:mybrev_flutter/models/compendium.dart';
-import 'package:mybrev_flutter/providers/compendium_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -39,18 +38,9 @@ class CompendiumSourceAttribution extends ConsumerWidget {
     final link = onReader
         ? reader.rubric
         : GlassTokens.of(context).accentOnSurface(cs.tertiary);
-    final copyright =
-        ref
-            .watch(compendiumDatasetProvider)
-            .valueOrNull
-            ?.meta
-            .copyright
-            .join('. ') ??
-        '';
     return SourceFooter(
+      sourceId: 'compendium-kkbb-2010',
       sourceName: '$kCompendiumFullTitle, $kCompendiumSourceHost',
-      sourceUrl: kCompendiumSourceUrl,
-      copyright: copyright,
       textStyle: onReader && readerTextStyle != null
           ? reader
                 .sourceStyle(readerTextStyle!.fontSize ?? 16)

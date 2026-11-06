@@ -1,0 +1,97 @@
+{
+  "pr_head": "d4aba29b7ab9b17a1034c48a5d2a3988d4baa05b",
+  "main_head": "7abba85bebe184e2314b6df1593bab0720fb1c77",
+  "flutter": "Flutter 3.41.4 \u2022 channel stable \u2022 https://github.com/flutter/flutter.git\nFramework \u2022 revision ff37bef603 (8 months ago) \u2022 2026-03-03 16:03:22 -0800\nEngine \u2022 hash 99578ad0355da00edb26301c874a3c250a5716f5 (revision e4b8dca3f1) (7 months ago) \u2022 2026-03-03 18:24:54.000Z\nTools \u2022 Dart 3.11.1 \u2022 DevTools 2.54.1\n",
+  "identical_inputs": {
+    "test/content_offline_test.dart": {
+      "pr": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082",
+      "main": "96bcbf0971b4fca2347591e7dba06fc6eb20500e8371e333829f1b996ca27082"
+    },
+    "pubspec.lock": {
+      "pr": "24e265d65075c2b69b47db4744913901f0fb201a4a40c26b28d8ab076c55fdcd",
+      "main": "24e265d65075c2b69b47db4744913901f0fb201a4a40c26b28d8ab076c55fdcd"
+    },
+    "lib/content/content_store.dart": {
+      "pr": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad",
+      "main": "dfeaaf03460ce66013d18a09433588fdca582433ede06e627008b283a62878ad"
+    },
+    "lib/content/content_updater.dart": {
+      "pr": "1d5a7712950adc8b5dab24d4af2e9147ea871a2b6ef7eaceff13a7b1565f21b1",
+      "main": "1d5a7712950adc8b5dab24d4af2e9147ea871a2b6ef7eaceff13a7b1565f21b1"
+    },
+    "assets/content/manifest.json": {
+      "pr": "8248188e0b2863331faa28a4815ceb386e03c1b2f783c7275b159b46a3381c1a",
+      "main": "8248188e0b2863331faa28a4815ceb386e03c1b2f783c7275b159b46a3381c1a"
+    }
+  },
+  "cpu_max": "200000 100000",
+  "execution": "Sequential processes, identical inherited environment, no browser or parallel test command; default timeouts unchanged.",
+  "dart_processors": 3,
+  "package_test_default_concurrency": 1,
+  "asset_sha256": {
+    "compendium.json.gz": {
+      "pr": "632735c5e171542ba67206e8874d710d9683b9c08dd6558b22585d0a8eedab1c",
+      "main": "632735c5e171542ba67206e8874d710d9683b9c08dd6558b22585d0a8eedab1c"
+    },
+    "compendiumMeta.json.gz": {
+      "pr": "1df323a19eec0772e68929245ac25f2b7ade6de1f98c4e9b9b69886e4242e3f8",
+      "main": "1df323a19eec0772e68929245ac25f2b7ade6de1f98c4e9b9b69886e4242e3f8"
+    },
+    "completoriums.json.gz": {
+      "pr": "56e0c118d6bfc9651a847ee1cf29d2d56e449ea7046312b237e9c92b5b436b5d",
+      "main": "56e0c118d6bfc9651a847ee1cf29d2d56e449ea7046312b237e9c92b5b436b5d"
+    },
+    "days.json.gz": {
+      "pr": "f0ed291c345162d423564655db5139a2c168312fb7cad3311f325024ca79ea76",
+      "main": "f0ed291c345162d423564655db5139a2c168312fb7cad3311f325024ca79ea76"
+    },
+    "invitatoriums.json.gz": {
+      "pr": "835b2b332b17e8cb3675601a935ee0416627a6b9288d6a3c96e08be70bb28d79",
+      "main": "835b2b332b17e8cb3675601a935ee0416627a6b9288d6a3c96e08be70bb28d79"
+    },
+    "liturgicalCalendarMeta.json.gz": {
+      "pr": "08cd0b20f8050cf4fb9fcc522234678d426d0709c7e3622a5ba2933677221532",
+      "main": "08cd0b20f8050cf4fb9fcc522234678d426d0709c7e3622a5ba2933677221532"
+    },
+    "liturgicalCelebrations.json.gz": {
+      "pr": "aa0a6347f71461ac7ea57aa914b1d4cf26be1193c1aab80c1816fd005facb351",
+      "main": "aa0a6347f71461ac7ea57aa914b1d4cf26be1193c1aab80c1816fd005facb351"
+    },
+    "liturgicalDioceseOverrides.json.gz": {
+      "pr": "04aa246da69c4b1f3e1efc171f185e1c14c7163d1abbc9c28cabe640cdc96a30",
+      "main": "04aa246da69c4b1f3e1efc171f185e1c14c7163d1abbc9c28cabe640cdc96a30"
+    },
+    "liturgicalOrdoNotes.json.gz": {
+      "pr": "a69a6ab7c22093db2b9b49d12dc532f0091a83fa2e08180cb485a8532aee61c1",
+      "main": "a69a6ab7c22093db2b9b49d12dc532f0091a83fa2e08180cb485a8532aee61c1"
+    },
+    "liturgicalProperTexts.json.gz": {
+      "pr": "a2f84a2693f910243cc640b6465e418384c72bd0ee5ef7ce552e706211ebdba7",
+      "main": "a2f84a2693f910243cc640b6465e418384c72bd0ee5ef7ce552e706211ebdba7"
+    },
+    "liturgicalTemplates.json.gz": {
+      "pr": "5b1886d8e3c0314bec7dac202bde637f5f7d82bf7eaa8d63170170e6dec07916",
+      "main": "5b1886d8e3c0314bec7dac202bde637f5f7d82bf7eaa8d63170170e6dec07916"
+    },
+    "liturgicalYearOverrides.json.gz": {
+      "pr": "cc3d4ed3add9c6b5f7b770353a95ec38299a1fa43b38d4f597e43fa6d0e15f13",
+      "main": "cc3d4ed3add9c6b5f7b770353a95ec38299a1fa43b38d4f597e43fa6d0e15f13"
+    },
+    "prayerCategories.json.gz": {
+      "pr": "8f5b1f32979c9a8cd4c9e1e23f4f5cdf0b40d1cb68de7b9c4d7b2534611ec491",
+      "main": "8f5b1f32979c9a8cd4c9e1e23f4f5cdf0b40d1cb68de7b9c4d7b2534611ec491"
+    },
+    "prayers.json.gz": {
+      "pr": "6edd638b13e76820367771357161d14bd51273ede2c4e551b15925e9c5e9e3ee",
+      "main": "6edd638b13e76820367771357161d14bd51273ede2c4e551b15925e9c5e9e3ee"
+    },
+    "readings.json.gz": {
+      "pr": "a01371c4692026df9e3e2597be9b93e56b4b0093eef8028e5612b4144865288b",
+      "main": "a01371c4692026df9e3e2597be9b93e56b4b0093eef8028e5612b4144865288b"
+    },
+    "songs.json.gz": {
+      "pr": "79e41914bd4cb23bf5df01f5943ae77651149415d804a0d6000537cd8f4a93c5",
+      "main": "79e41914bd4cb23bf5df01f5943ae77651149415d804a0d6000537cd8f4a93c5"
+    }
+  }
+}

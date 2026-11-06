@@ -56,8 +56,7 @@ class _DevotionalOfficeReaderState
     final doc = widget.document;
     return PsalmodyScope(
       controller: _choir,
-      verseLayout: settings.psalmVerseLayout,
-      markerBreakMode: settings.psalmMarkerBreakMode,
+      mode: settings.psalmodyMode,
       child: SelectionArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

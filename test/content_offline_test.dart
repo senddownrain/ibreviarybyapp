@@ -23,7 +23,10 @@ import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/services/parsed_readings_service.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 
-/// Version manifest and documents of a pretend Firestore.
+/// One immutable publication of a pretend Firestore.
+///
+/// Construct a new remote for each publication; use [served] to simulate a
+/// corrupt download without changing its published manifest.
 class FakeRemote implements ContentRemote {
   FakeRemote(this.collections, {this.contentVersion = 0});
 
@@ -35,13 +38,22 @@ class FakeRemote implements ContentRemote {
   final Map<String, Map<String, dynamic>> served = {};
 
   int currentReads = 0;
+  int hashComputations = 0;
   final List<String> manifestReads = [];
   final List<String> fetched = [];
+  final Map<String, Map<String, String>> _publicationHashes = {};
 
-  Map<String, String> _hashes(String name) => {
-    for (final entry in collections[name]!.entries)
-      entry.key: documentHash(entry.value),
-  };
+  // The version pointer and collection manifest describe the same snapshot.
+  // Hash its documents once, independently of ContentStore's cached hashes.
+  Map<String, String> _hashes(String name) =>
+      _publicationHashes.putIfAbsent(name, () {
+        final documents = collections[name]!;
+        hashComputations += documents.length;
+        return Map<String, String>.unmodifiable({
+          for (final entry in documents.entries)
+            entry.key: documentHash(entry.value),
+        });
+      });
 
   @override
   Future<Map<String, dynamic>?> fetchCurrent() async {
@@ -104,6 +116,54 @@ void main() {
   tearDown(() async {
     await Hive.close();
     await directory.delete(recursive: true);
+  });
+
+  test('fake remote hashes each document once per publication', () async {
+    final original = <String, dynamic>{
+      'text': 'Original',
+      'nested': [1, 2],
+    };
+    final other = <String, dynamic>{'text': 'Other'};
+    final remote = FakeRemote({
+      'days': {'first': original, 'second': other},
+    });
+    final expected = {
+      'first': documentHash(original),
+      'second': documentHash(other),
+    };
+    final current = (await remote.fetchCurrent())!;
+    expect((current['collections'] as Map)['days'], {
+      'digest': contentDigest(expected),
+    });
+    expect(remote.hashComputations, 2);
+    for (var read = 0; read < 2; read++) {
+      expect(
+        (await remote.fetchCollectionManifest('days'))!['hashes'],
+        expected,
+      );
+      await remote.fetchCurrent();
+    }
+    expect(remote.hashComputations, 2);
+
+    // Corruption must still disagree with the independently published hashes.
+    final corrupt = <String, dynamic>{'text': 'Corrupt'};
+    remote.served['days/first'] = corrupt;
+    expect((await remote.fetchDocuments('days', ['first']))['first'], corrupt);
+    expect((await remote.fetchCollectionManifest('days'))!['hashes'], expected);
+    expect(documentHash(corrupt), isNot(expected['first']));
+    expect(remote.hashComputations, 2);
+
+    // A new publication computes its own hashes, including changed documents.
+    final next = FakeRemote({
+      'days': {'first': corrupt, 'second': other},
+    }, contentVersion: 1);
+    final nextManifest = (await next.fetchCollectionManifest('days'))!;
+    expect(nextManifest['hashes'], {
+      'first': documentHash(corrupt),
+      'second': expected['second'],
+    });
+    expect(nextManifest['digest'], isNot(contentDigest(expected)));
+    expect(next.hashComputations, 2);
   });
 
   group('background preload', () {

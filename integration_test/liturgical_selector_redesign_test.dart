@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -156,13 +157,13 @@ void main() {
             '-system-text-${MediaQuery.textScalerOf(tester.element(find.byType(HomeScreen))).scale(1)}-nav-$nativeNavigation';
         if (focusOnly) nativeScale += '-focused';
       }
-      final originalTheme = appThemeModeController.value;
+      final originalTheme = appThemePreferenceController.value;
       final originalDioceses = container.read(dioceseSelectionProvider);
       try {
         for (final dark in [false, true]) {
-          appThemeModeController.value = dark
-              ? ThemeMode.dark
-              : ThemeMode.light;
+          appThemePreferenceController.value = dark
+              ? AppThemePreference.dark
+              : AppThemePreference.light;
           final theme = dark ? 'dark' : 'light';
           router.go('/hours');
           navigation.openDate(DateTime(2026, 10, 9));
@@ -364,7 +365,7 @@ void main() {
         }
       } finally {
         tester.platformDispatcher.clearTextScaleFactorTestValue();
-        appThemeModeController.value = originalTheme;
+        appThemePreferenceController.value = originalTheme;
         final notifier = container.read(dioceseSelectionProvider.notifier);
         for (final id in originalDioceses.selected) {
           if (!container.read(dioceseSelectionProvider).contains(id)) {
@@ -386,7 +387,7 @@ void main() {
           container.read(dioceseSelectionProvider).primary,
           originalDioceses.primary,
         );
-        expect(appThemeModeController.value, originalTheme);
+        expect(appThemePreferenceController.value, originalTheme);
         binding.reportData?['preferences_restored'] = true;
       }
     },

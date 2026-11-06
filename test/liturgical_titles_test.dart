@@ -4,6 +4,15 @@ import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 
 void main() {
+  test('office for the dead uses the agreed full period label', () {
+    final day = LiturgicalDay.fromMap({'id': 'office-for-dead'});
+    expect(liturgicalDayPeriodLabel(day), 'Афіцый за памерлых');
+    expect(
+      liturgicalDayDisplayTitle(day, DateTime(2026, 11, 2)),
+      'Афіцый за памерлых',
+    );
+  });
+
   test('formats period Sundays and weekdays like mybrev', () {
     final sunday = LiturgicalDay.fromMap({
       'id': 'ordinary-w12-d1',

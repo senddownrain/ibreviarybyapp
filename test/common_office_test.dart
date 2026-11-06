@@ -91,9 +91,11 @@ void main() {
         );
         expect(result.data['_assembly'], item['assembly'], reason: context);
         expect(result.data['_rank'], doc['_rank']);
+        // GILH 235-238: a memorial never has the Te Deum, whatever the Common.
         expect(
           shouldShowTeDeum(LiturgicalDay.fromMap(result.data)),
-          item['choice'] != kCurrentDayChoice,
+          isFalse,
+          reason: context,
         );
       }
     },
@@ -155,10 +157,11 @@ void main() {
             '_rank': 'memoria',
             ...metadata,
           }, choice: choice);
-          expect(result.data['vesperPs1'], '');
+          // A memorial may use the weekday's text where its Common has a gap.
+          expect(result.data['vesperR'], 'day:vesperR');
           expect(
             result.integrity.any(
-              (e) => e.field == 'vesperPs1' && e.reason == reason,
+              (e) => e.field == 'vesperR' && e.reason == reason,
             ),
             isTrue,
           );
@@ -179,7 +182,7 @@ void main() {
       final doc = proper('19-10-sv-paul-of-cross');
       final templates = HiveService.templates()..remove('holy-men');
       final missing = assemble(doc, templates: templates);
-      expect(missing.data['vesperPs1'], '');
+      expect(missing.data['vesperR'], 'day:vesperR');
       expect(
         missing.integrity.any(
           (e) =>
@@ -200,16 +203,17 @@ void main() {
         ...doc,
         '_fieldRules': {
           ...Map<String, dynamic>.from(doc['_fieldRules'] as Map? ?? {}),
-          'vesperPs1': {'ref': 'absent'},
+          'vesperR': {'ref': 'absent'},
         },
       });
-      expect(broken.data['vesperPs1'], '');
+      expect(broken.data['vesperR'], '');
       expect(broken.integrity.any((e) => e.source == 'ref:absent'), isTrue);
       final withoutCommon = assemble(doc, templates: {});
-      expect(withoutCommon.data['laudesPs1'], '');
+      // Sunday week I plays no part in a memorial: the weekday psalmody stays.
+      expect(withoutCommon.data['laudesPs1'], 'day:laudesPs1');
       expect(
         withoutCommon.integrity.any((e) => e.source == kSundayWeek1Template),
-        isTrue,
+        isFalse,
       );
       expect(
         assemble({...doc, '_omitTeDeum': true}).data['officeOfReadingsTeDeum'],
@@ -227,7 +231,7 @@ void main() {
         '_seasonalVariants': {
           'easter': {
             'laudesR': 'seasonal base reading',
-            'vesperAnt2': null,
+            'vesperInter': null,
             'vesperHymn': {
               'rule': {'ref': 'laudesHymn'},
             },
@@ -239,7 +243,7 @@ void main() {
       final easter = assemble(doc, templates: templates, date: '2026-04-20');
       expect(easter.data['laudesR'], 'seasonal base reading');
       expect(easter.provenance['laudesR'], 'common:holy-men');
-      expect(easter.data['vesperAnt2'], '');
+      expect(easter.data['vesperInter'], '');
       expect(
         assemble(doc, templates: templates).data['laudesR'],
         isNot('seasonal base reading'),
@@ -327,7 +331,7 @@ void main() {
       );
       expect(
         store.collection('liturgicalProperTexts').digest(),
-        'e38afe1c97a7ba34',
+        '8d79a1efaafd1062',
       );
       expect(HiveService.templatesBox.digest(), '316b5f1487846faf');
       expect(
@@ -382,7 +386,7 @@ void main() {
         'kept',
       );
       final offline = assemble(proper('04-10-sv-francis-assisi'));
-      expect(offline.provenance['vesperPs1'], 'common:holy-men');
+      expect(offline.provenance['vesperR'], 'common:holy-men');
     },
   );
 }

@@ -38,6 +38,7 @@ dependencies:
   url_launcher: ^6.3.2
   scrollable_positioned_list: ^0.3.8
   markdown: 7.3.1
+  http: ^1.6.0
 
 dependency_overrides:
   # objective_c >=6.0.0 uses Dart native assets which fail to bundle on this
@@ -46,7 +47,6 @@ dependency_overrides:
   path_provider_foundation: 2.4.0
 
 dev_dependencies:
-  http: ^1.6.0
   flutter_test:
     sdk: flutter
   integration_test:
@@ -65,6 +65,7 @@ flutter:
     # Canonical content shipped with the app (MyBrev `npm run content:app-bundle`).
     - assets/content/
     - assets/compendium/compendium_search_aliases.json
+    - assets/legal/sources.json
     # Book faces used by ReaderTheme, bundled so the first launch without a
     # network has the right typography (google_fonts reads these first).
     - assets/google_fonts/

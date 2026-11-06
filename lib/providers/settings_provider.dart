@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
@@ -106,7 +107,9 @@ class UserCategory {
 }
 
 class SettingsState {
-  final ThemeMode themeMode;
+  final AppThemePreference themePreference;
+
+  ThemeMode get themeMode => themePreference.themeMode;
   final double fontSize;
   final String fontFamily;
   final bool keepScreenOn;
@@ -116,14 +119,13 @@ class SettingsState {
   final String bibleVersionId;
   final String startSection;
   final String lastSection;
-  final PsalmVerseLayout psalmVerseLayout;
-  final PsalmMarkerBreakMode psalmMarkerBreakMode;
+  final PsalmodyMode psalmodyMode;
 
   /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
 
   const SettingsState({
-    this.themeMode = ThemeMode.system,
+    this.themePreference = AppThemePreference.system,
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
     this.keepScreenOn = false,
@@ -133,8 +135,7 @@ class SettingsState {
     this.bibleVersionId = 'bel',
     this.startSection = 'hours',
     this.lastSection = 'hours',
-    this.psalmVerseLayout = PsalmVerseLayout.alternatingIndent,
-    this.psalmMarkerBreakMode = PsalmMarkerBreakMode.inline,
+    this.psalmodyMode = PsalmodyMode.leftBreak,
     this.prayerCategoryMap = const {},
   });
 
@@ -146,7 +147,7 @@ class SettingsState {
   };
 
   SettingsState copyWith({
-    ThemeMode? themeMode,
+    AppThemePreference? themePreference,
     double? fontSize,
     String? fontFamily,
     bool? keepScreenOn,
@@ -156,11 +157,10 @@ class SettingsState {
     String? bibleVersionId,
     String? startSection,
     String? lastSection,
-    PsalmVerseLayout? psalmVerseLayout,
-    PsalmMarkerBreakMode? psalmMarkerBreakMode,
+    PsalmodyMode? psalmodyMode,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
-    themeMode: themeMode ?? this.themeMode,
+    themePreference: themePreference ?? this.themePreference,
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
@@ -171,8 +171,7 @@ class SettingsState {
     bibleVersionId: bibleVersionId ?? this.bibleVersionId,
     startSection: startSection ?? this.startSection,
     lastSection: lastSection ?? this.lastSection,
-    psalmVerseLayout: psalmVerseLayout ?? this.psalmVerseLayout,
-    psalmMarkerBreakMode: psalmMarkerBreakMode ?? this.psalmMarkerBreakMode,
+    psalmodyMode: psalmodyMode ?? this.psalmodyMode,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
   );
 }
@@ -185,12 +184,17 @@ class SettingsNotifier extends Notifier<SettingsState> {
   SettingsState build() {
     _box = Hive.box(_boxName);
     final loaded = _load();
-    setActiveThemeMode(loaded.themeMode);
+    setActiveThemePreference(loaded.themePreference);
     return loaded;
   }
 
   SettingsState _load() {
-    final mode = _box.get('themeMode', defaultValue: 'system') as String;
+    final psalmodyMode = resolvePsalmodyMode(
+      storedMode: _box.get('psalmodyMode'),
+      legacyLayout: _box.get('psalmVerseLayout'),
+      legacyBreakMode: _box.get('psalmMarkerBreakMode'),
+    );
+    final preference = AppThemePreference.fromStorage(_box.get('themeMode'));
     final cats = (_box.get('userCategories', defaultValue: '[]') as String);
     final favs = (_box.get('favoriteIds', defaultValue: '[]') as String);
     final hiddenCategories =
@@ -203,14 +207,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
         e.key as String: Set<String>.from(e.value as List),
     };
     return SettingsState(
-      themeMode: _parseTheme(mode),
-      psalmVerseLayout: _box.get('psalmVerseLayout') == 'alignedLeft'
-          ? PsalmVerseLayout.alignedLeft
-          : PsalmVerseLayout.alternatingIndent,
-      psalmMarkerBreakMode:
-          _box.get('psalmMarkerBreakMode') == 'breakAfterMarker'
-          ? PsalmMarkerBreakMode.breakAfterMarker
-          : PsalmMarkerBreakMode.inline,
+      themePreference: preference,
+      psalmodyMode: psalmodyMode,
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -239,11 +237,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   Future<void> _save() async {
-    await _box.put('themeMode', _themeName(state.themeMode));
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
-    await _box.put('psalmVerseLayout', state.psalmVerseLayout.name);
-    await _box.put('psalmMarkerBreakMode', state.psalmMarkerBreakMode.name);
     await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
@@ -266,11 +261,18 @@ class SettingsNotifier extends Notifier<SettingsState> {
     );
   }
 
-  void setThemeMode(ThemeMode mode) {
-    if (state.themeMode != mode) analyticsFeature('theme_change');
-    state = state.copyWith(themeMode: mode);
-    setActiveThemeMode(mode);
-    _save();
+  /// Compatibility for callers that only select Flutter's light/dark modes.
+  Future<void> setThemeMode(ThemeMode mode) =>
+      setThemePreference(AppThemePreference.fromThemeMode(mode));
+
+  Future<void> setThemePreference(AppThemePreference preference) async {
+    if (state.themePreference != preference) analyticsFeature('theme_change');
+    state = state.copyWith(themePreference: preference);
+    setActiveThemePreference(preference);
+    // Only an explicit theme change writes this key. Other settings, including
+    // stale provider containers, cannot overwrite the selected palette.
+    await _box.put('themeMode', preference.name);
+    await _box.flush();
   }
 
   void setFontSize(double size) {
@@ -307,20 +309,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _save();
   }
 
-  Future<void> setPsalmVerseLayout(PsalmVerseLayout value) {
-    if (state.psalmVerseLayout != value) {
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
+    if (state.psalmodyMode != value) {
       analyticsFeature('psalmody_layout_change');
     }
-    state = state.copyWith(psalmVerseLayout: value);
-    return _save();
-  }
-
-  Future<void> setPsalmMarkerBreakMode(PsalmMarkerBreakMode value) {
-    if (state.psalmMarkerBreakMode != value) {
-      analyticsFeature('psalmody_layout_change');
-    }
-    state = state.copyWith(psalmMarkerBreakMode: value);
-    return _save();
+    state = state.copyWith(psalmodyMode: value);
+    await _box.put('psalmodyMode', value.name);
+    await _box.flush();
   }
 
   Future<void> toggleFavorite(String id) {
@@ -443,18 +438,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
     state = state.copyWith(hiddenGlobalPrayerCategoryIds: const []);
     _save();
   }
-
-  ThemeMode _parseTheme(String s) => switch (s) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
-
-  String _themeName(ThemeMode m) => switch (m) {
-    ThemeMode.light => 'light',
-    ThemeMode.dark => 'dark',
-    _ => 'system',
-  };
 
   String _validStartSection(String value) =>
       kStartSections.contains(value) ? value : 'hours';

@@ -1,0 +1,34 @@
+[
+  {
+    "file": "test/content_offline_test.dart",
+    "test": "corrections and app releases a new app bundle absorbs the patches it contains"
+  },
+  {
+    "file": "test/discovery/p0_hints_screens_test.dart",
+    "test": "Readings date_navigation: three day arrows, once"
+  },
+  {
+    "file": "test/hours_parity_test.dart",
+    "test": "Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses"
+  },
+  {
+    "file": "test/ordo_day_flow_test.dart",
+    "test": "Day → ORDO → Month → Day → back preserves month cursor"
+  },
+  {
+    "file": "test/ordo_ux_test.dart",
+    "test": "day and month utility layout Brightness.dark 1.0"
+  },
+  {
+    "file": "test/ordo_ux_test.dart",
+    "test": "day and month utility layout Brightness.dark 1.5"
+  },
+  {
+    "file": "test/ordo_ux_test.dart",
+    "test": "day and month utility layout Brightness.light 1.0"
+  },
+  {
+    "file": "test/ordo_ux_test.dart",
+    "test": "day and month utility layout Brightness.light 1.5"
+  }
+]

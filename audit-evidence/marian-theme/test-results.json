@@ -1,0 +1,100 @@
+{
+  "base": "9bf2925f537d648fd29fb87cec2235b98ea80412",
+  "full": {
+    "command": "flutter test --no-pub --concurrency=2 --reporter expanded",
+    "passed": 1835,
+    "skipped": 9,
+    "failed": 1,
+    "exit_code": 1,
+    "duration": "23:57",
+    "new_tests_passed": 16
+  },
+  "targeted": {
+    "passed": 123,
+    "failed": 0,
+    "exit_code": 0,
+    "files": [
+      "marian_theme_test.dart",
+      "marian_theme_navigation_test.dart",
+      "app_theme_test.dart",
+      "platform_design_test.dart",
+      "color_foundations_test.dart",
+      "reader_theme_test.dart",
+      "psalmody_preferences_test.dart",
+      "psalmody_mode_selector_test.dart",
+      "psalmody_html_modes_test.dart"
+    ]
+  },
+  "analyze": {
+    "errors": 0,
+    "warnings": 0,
+    "existing_infos": 12,
+    "bare_exit_code": 1,
+    "no_fatal_infos_exit_code": 0
+  },
+  "format": {
+    "exit_code": 0,
+    "files": 19
+  },
+  "main_comparison": [
+    {
+      "test": "Readings date_navigation: three day arrows, once",
+      "file": "test/discovery/p0_hints_screens_test.dart",
+      "main_failed": 1,
+      "branch_final_full_passed": true,
+      "main_base": "9bf2925f537d648fd29fb87cec2235b98ea80412",
+      "note": "Existing intermittent hint test failed in isolation on main; passed in final full branch suite. Historical 6b74fbe branch failure has identical diagnostic.",
+      "historical_branch_diagnostic_identical": true,
+      "historical_branch_diagnostic_sha256": "d82222daf2a3287fc3016fb7d2d8d0835e3a29808ebda55ff96fdbe769f213bc"
+    },
+    {
+      "test": "Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "file": "test/hours_parity_test.dart",
+      "main_failed": 1,
+      "main_base": "9bf2925f537d648fd29fb87cec2235b98ea80412",
+      "main_duration": "04:04",
+      "shown_mismatch_count": 24,
+      "shown_mismatches": [
+        "2025-06-12 minsk-mohilev feast-christthehighpriest",
+        "2026-05-28 minsk-mohilev feast-christthehighpriest",
+        "2027-05-20 minsk-mohilev feast-christthehighpriest",
+        "2028-06-08 minsk-mohilev feast-christthehighpriest",
+        "2029-05-24 minsk-mohilev feast-christthehighpriest",
+        "2030-06-13 minsk-mohilev feast-christthehighpriest",
+        "2031-06-05 minsk-mohilev feast-christthehighpriest",
+        "2032-05-20 minsk-mohilev feast-christthehighpriest",
+        "2033-06-09 minsk-mohilev feast-christthehighpriest",
+        "2034-06-01 minsk-mohilev feast-christthehighpriest",
+        "2035-05-17 minsk-mohilev feast-christthehighpriest",
+        "2025-06-12 grodno feast-christthehighpriest",
+        "2026-05-28 grodno feast-christthehighpriest",
+        "2027-05-20 grodno feast-christthehighpriest",
+        "2028-06-08 grodno feast-christthehighpriest",
+        "2029-05-24 grodno feast-christthehighpriest",
+        "2030-06-13 grodno feast-christthehighpriest",
+        "2031-06-05 grodno feast-christthehighpriest",
+        "2032-05-20 grodno feast-christthehighpriest",
+        "2033-06-09 grodno feast-christthehighpriest",
+        "2034-06-01 grodno feast-christthehighpriest",
+        "2035-05-17 grodno feast-christthehighpriest",
+        "2025-06-12 pinsk feast-christthehighpriest",
+        "2026-05-28 pinsk feast-christthehighpriest"
+      ],
+      "shown_mismatches_identical": true
+    }
+  ],
+  "native": {
+    "android": "not run: Android SDK/device unavailable",
+    "ios": "not run: Xcode/simulator unavailable on Linux"
+  },
+  "interrupted_runs": "baseline-test.log stopped during environment shutdown; initial-base-test-interrupted.log superseded after main #64 was included. Neither is a completed final suite.",
+  "log_normalization": "Trailing whitespace trimmed; local browser debugger endpoint tokens omitted. Test messages, counts and diagnostics retained.",
+  "previous_completed_base": {
+    "base": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+    "directory": "previous-base-6b74fbe",
+    "full_passed": 1735,
+    "full_skipped": 9,
+    "full_failed": 2,
+    "targeted_passed": 36
+  }
+}

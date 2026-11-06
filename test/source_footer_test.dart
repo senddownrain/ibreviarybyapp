@@ -84,10 +84,7 @@ void main() {
         final text = tester.widget<Text>(
           find.descendant(of: link, matching: find.byType(Text)),
         );
-        expect(
-          text.textSpan!.toPlainText(),
-          'Крыніца: Catholic.by. © Канферэнцыя Каталіцкіх Біскупаў у Беларусі.',
-        );
+        expect(text.textSpan!.toPlainText(), 'Крыніца: Catholic.by');
         await tester.tap(link);
         await tester.pump();
         expect(opened.single.toString(), 'https://catholic.by/');

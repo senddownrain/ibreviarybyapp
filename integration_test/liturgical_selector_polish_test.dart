@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,21 +77,21 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(HomeScreen)),
       );
-      final originalTheme = appThemeModeController.value;
+      final originalTheme = appThemePreferenceController.value;
       try {
-        appThemeModeController.value = ThemeMode.light;
+        appThemePreferenceController.value = AppThemePreference.light;
         if (narrow) tester.platformDispatcher.textScaleFactorTestValue = 2;
         final date = DateTime(2026, 10, 16);
         final hedwig = LiturgicalContentService()
             .contentForDate(date)
             .options
             .firstWhere((option) => option.title.contains('Ядвіг'));
-      final dayId = hedwig.dayId!;
+        final dayId = hedwig.dayId!;
         container
             .read(liturgicalNavigationControllerProvider)
             .openDate(date, dayId: hedwig.dayId);
         router.go(
-        '/hours/ordo?date=2026-10-16&dayId=${Uri.encodeQueryComponent(dayId)}',
+          '/hours/ordo?date=2026-10-16&dayId=${Uri.encodeQueryComponent(dayId)}',
         );
         await waitFor(find.byKey(const Key('ordo-selected-celebration')));
         expect(
@@ -134,7 +135,7 @@ void main() {
         expect(tester.takeException(), isNull);
       } finally {
         tester.platformDispatcher.clearTextScaleFactorTestValue();
-        appThemeModeController.value = originalTheme;
+        appThemePreferenceController.value = originalTheme;
         binding.reportData?['preferences_restored'] = true;
       }
     },

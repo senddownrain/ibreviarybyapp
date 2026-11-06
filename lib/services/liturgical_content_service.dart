@@ -858,7 +858,7 @@ class LiturgicalContentService {
           key: 'office-for-dead',
           source: LiturgicalOptionSource.officeForDead,
           title: dead.feastName ?? dead.title ?? 'Афіцый за памерлых',
-          subtitle: 'Памінальны афіцый',
+          subtitle: 'Афіцый за памерлых',
           day: dead,
           templates: [
             DayTemplate(id: dead.id, label: 'Афіцый за памерлых', day: dead),
@@ -991,14 +991,23 @@ class LiturgicalContentService {
     Set<String> claimed,
   ) {
     final docs = all.where((doc) => doc.data['_obsolete'] != true).toList();
-    List<LiturgicalDay> preferSparse(List<LiturgicalDay> list) =>
-        list.any(isSparseDay) ? [list.firstWhere(isSparseDay)] : list;
+    // Several sparse documents of one celebration. A rank variant (`memoria`
+    // next to a retired `memoria-ad-libitum`) is decided by the calendar rank of
+    // the option; documents of the same rank are equivalent copies (one per
+    // diocese) and keep the stable id order, never the order of the bundle.
+    List<LiturgicalDay> canonicalSparse(List<LiturgicalDay> sparse) {
+      final sameRank = sparse.where((doc) => doc.rank == option.rank).toList();
+      final pool = sameRank.isNotEmpty ? sameRank : sparse;
+      final ordered = [...pool]..sort((a, b) => a.id.compareTo(b.id));
+      return [ordered.first];
+    }
+
     List<LiturgicalDay> byIds(Object? ids) {
       if (ids is! List) return const [];
       final wanted = ids.map((id) => '$id').toSet();
-      return preferSparse(
-        docs.where((doc) => wanted.contains(doc.id)).toList(),
-      );
+      final found = docs.where((doc) => wanted.contains(doc.id)).toList();
+      final sparse = found.where(isSparseDay).toList();
+      return sparse.isEmpty ? found : canonicalSparse(sparse);
     }
 
     final ref = option.daysRef ?? const <String, dynamic>{};

@@ -79,10 +79,6 @@ LiturgicalDay? normalizeFirstVespers(LiturgicalDay day) {
 
 bool shouldShowTeDeum(LiturgicalDay? day) {
   if (day == null || day.field('_kind') == 'office-for-dead') return false;
-  final assembly = day.data['_assembly'];
-  if (assembly is Map && assembly['festiveCommon'] == true) {
-    return day.data['officeOfReadingsTeDeum'] == true;
-  }
   final period = (day.periodType ?? '').toLowerCase();
   final week = day.periodWeekNumber ?? -1;
   final dow = day.dayOfWeek ?? -1;

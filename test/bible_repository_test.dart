@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mybrev_flutter/models/source_documents.dart';
 import 'package:mybrev_flutter/repositories/bible_repository.dart';
 import 'package:mybrev_flutter/services/bible_seed_loader.dart';
 
@@ -6,6 +7,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
+    await SourceRegistry.load();
     BibleRepository.setData('bel', await BibleSeedLoader.load(lang: 'bel'));
     BibleRepository.setData('ru', await BibleSeedLoader.load(lang: 'ru'));
   });
@@ -45,7 +47,7 @@ void main() {
     );
     expect(
       bibleAttribution(versionId: 'bel', isNewTestament: true),
-      'Новы Запавет · Catholic.by',
+      'Новы Запавет · ККББ, 2017',
     );
     expect(
       bibleAttribution(versionId: 'ru', isNewTestament: true),

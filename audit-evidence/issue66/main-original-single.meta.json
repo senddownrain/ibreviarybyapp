@@ -1,0 +1,20 @@
+{
+  "name": "main-original-single",
+  "branch": "main",
+  "head": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+  "command": [
+    "/workspace/toolchains/flutter/bin/flutter",
+    "test",
+    "--no-pub",
+    "test/content_offline_test.dart",
+    "--plain-name",
+    "corrections and app releases a new app bundle absorbs the patches it contains"
+  ],
+  "workers": 0,
+  "startedUtc": "2026-11-06T05:13:37.539436+00:00",
+  "cpuMax": "200000 100000",
+  "clockTicks": 100,
+  "exitCode": 0,
+  "elapsedSeconds": 17.621,
+  "endedUtc": "2026-11-06T05:13:55.161198+00:00"
+}
