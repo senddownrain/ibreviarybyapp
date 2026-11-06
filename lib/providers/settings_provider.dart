@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
@@ -106,7 +107,9 @@ class UserCategory {
 }
 
 class SettingsState {
-  final ThemeMode themeMode;
+  final AppThemePreference themePreference;
+
+  ThemeMode get themeMode => themePreference.themeMode;
   final double fontSize;
   final String fontFamily;
   final bool keepScreenOn;
@@ -122,7 +125,7 @@ class SettingsState {
   final Map<String, Set<String>> prayerCategoryMap;
 
   const SettingsState({
-    this.themeMode = ThemeMode.system,
+    this.themePreference = AppThemePreference.system,
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
     this.keepScreenOn = false,
@@ -144,7 +147,7 @@ class SettingsState {
   };
 
   SettingsState copyWith({
-    ThemeMode? themeMode,
+    AppThemePreference? themePreference,
     double? fontSize,
     String? fontFamily,
     bool? keepScreenOn,
@@ -157,7 +160,7 @@ class SettingsState {
     PsalmodyMode? psalmodyMode,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
-    themeMode: themeMode ?? this.themeMode,
+    themePreference: themePreference ?? this.themePreference,
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
@@ -181,7 +184,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
   SettingsState build() {
     _box = Hive.box(_boxName);
     final loaded = _load();
-    setActiveThemeMode(loaded.themeMode);
+    setActiveThemePreference(loaded.themePreference);
     return loaded;
   }
 
@@ -191,7 +194,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
       legacyLayout: _box.get('psalmVerseLayout'),
       legacyBreakMode: _box.get('psalmMarkerBreakMode'),
     );
-    final mode = _box.get('themeMode', defaultValue: 'system') as String;
+    final preference = AppThemePreference.fromStorage(_box.get('themeMode'));
     final cats = (_box.get('userCategories', defaultValue: '[]') as String);
     final favs = (_box.get('favoriteIds', defaultValue: '[]') as String);
     final hiddenCategories =
@@ -204,7 +207,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
         e.key as String: Set<String>.from(e.value as List),
     };
     return SettingsState(
-      themeMode: _parseTheme(mode),
+      themePreference: preference,
       psalmodyMode: psalmodyMode,
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
@@ -234,7 +237,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   Future<void> _save() async {
-    await _box.put('themeMode', _themeName(state.themeMode));
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
     await _box.put('keepScreenOn', state.keepScreenOn);
@@ -259,11 +261,18 @@ class SettingsNotifier extends Notifier<SettingsState> {
     );
   }
 
-  void setThemeMode(ThemeMode mode) {
-    if (state.themeMode != mode) analyticsFeature('theme_change');
-    state = state.copyWith(themeMode: mode);
-    setActiveThemeMode(mode);
-    _save();
+  /// Compatibility for callers that only select Flutter's light/dark modes.
+  Future<void> setThemeMode(ThemeMode mode) =>
+      setThemePreference(AppThemePreference.fromThemeMode(mode));
+
+  Future<void> setThemePreference(AppThemePreference preference) async {
+    if (state.themePreference != preference) analyticsFeature('theme_change');
+    state = state.copyWith(themePreference: preference);
+    setActiveThemePreference(preference);
+    // Only an explicit theme change writes this key. Other settings, including
+    // stale provider containers, cannot overwrite the selected palette.
+    await _box.put('themeMode', preference.name);
+    await _box.flush();
   }
 
   void setFontSize(double size) {
@@ -429,18 +438,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
     state = state.copyWith(hiddenGlobalPrayerCategoryIds: const []);
     _save();
   }
-
-  ThemeMode _parseTheme(String s) => switch (s) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
-
-  String _themeName(ThemeMode m) => switch (m) {
-    ThemeMode.light => 'light',
-    ThemeMode.dark => 'dark',
-    _ => 'system',
-  };
 
   String _validStartSection(String value) =>
       kStartSections.contains(value) ? value : 'hours';

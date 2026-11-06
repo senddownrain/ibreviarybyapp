@@ -1,0 +1,518 @@
+[
+  {
+    "name": "android-390-light-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "android-390-light-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [
+      "fffdfcf9"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "android-390-light-settings",
+    "route": "/settings",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 44,
+    "textHash": "523746556add5292cc12b62d3fbd305a576eb3223cd7a14a4dc4cad6f9b5dd50"
+  },
+  {
+    "name": "android-390-dark-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "android-390-dark-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [
+      "ff171917"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "android-390-dark-settings",
+    "route": "/settings",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 44,
+    "textHash": "15ba97eb13ccdb3c85f738a9313fc4fb3215cff37d2df6ee2fc2db36047b577f"
+  },
+  {
+    "name": "android-1440-light-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "android-1440-light-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [
+      "fffdfcf9"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "android-1440-light-settings",
+    "route": "/settings",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
+  },
+  {
+    "name": "android-1440-dark-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "android-1440-dark-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [
+      "ff171917"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "android-1440-dark-settings",
+    "route": "/settings",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
+  },
+  {
+    "name": "ios-390-light-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "ios-390-light-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [
+      "fffdfcf9"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "ios-390-light-settings",
+    "route": "/settings",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 44,
+    "textHash": "523746556add5292cc12b62d3fbd305a576eb3223cd7a14a4dc4cad6f9b5dd50"
+  },
+  {
+    "name": "ios-390-dark-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "ios-390-dark-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [
+      "ff171917"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "ios-390-dark-settings",
+    "route": "/settings",
+    "mediaSize": [
+      390,
+      900
+    ],
+    "viewSize": [
+      390,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 44,
+    "textHash": "15ba97eb13ccdb3c85f738a9313fc4fb3215cff37d2df6ee2fc2db36047b577f"
+  },
+  {
+    "name": "ios-1440-light-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "ios-1440-light-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [
+      "fffdfcf9"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "ios-1440-light-settings",
+    "route": "/settings",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
+  },
+  {
+    "name": "ios-1440-dark-home",
+    "route": "/hours?date=2026-02-08&diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 28,
+    "textHash": "548871cba871970055dd604ce2ecc3432f10024f3517a0e61c72bca475ca97d0"
+  },
+  {
+    "name": "ios-1440-dark-laudes-middle",
+    "route": "/hours/ora/2026-02-08/ordinary-w5-d1/laudes?diocese=minsk-mohilev",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [
+      "ff171917"
+    ],
+    "textCount": 290,
+    "textHash": "0009f2ca2cb2399fe0a748fc08189597fb9f92622ea857e715198527eed0efdc"
+  },
+  {
+    "name": "ios-1440-dark-settings",
+    "route": "/settings",
+    "mediaSize": [
+      1440,
+      900
+    ],
+    "viewSize": [
+      1440,
+      900
+    ],
+    "preference": "dark",
+    "psalmodyMode": "leftBreak",
+    "brightness": "dark",
+    "page": "ff0f110f",
+    "reader": "ff171917",
+    "readerSurfaces": [],
+    "textCount": 46,
+    "textHash": "d047bb3396830f7c07987ae5e8a76007470b42a3beaaf5f953c1612528ac195f"
+  },
+  {
+    "name": "android-320-light-settings-200",
+    "route": "/settings",
+    "mediaSize": [
+      320,
+      900
+    ],
+    "viewSize": [
+      320,
+      900
+    ],
+    "preference": "light",
+    "psalmodyMode": "leftBreak",
+    "brightness": "light",
+    "page": "fff2f1ee",
+    "reader": "fffdfcf9",
+    "readerSurfaces": [],
+    "textCount": 44,
+    "textHash": "523746556add5292cc12b62d3fbd305a576eb3223cd7a14a4dc4cad6f9b5dd50"
+  }
+]

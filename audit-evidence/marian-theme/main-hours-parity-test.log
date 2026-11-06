@@ -1,0 +1,75 @@
+00:00 +0: loading /workspace/ibreviary-main-audit/test/hours_parity_test.dart
+00:00 +0: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 30 ms
+[ContentStore] prayers: 115 docs in 75 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 71 ms
+[ContentStore] invitatoriums: 4 docs in 119 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 122 ms
+[ContentStore] completoriums: 35 docs in 123 ms
+[ContentStore] compendiumMeta: 1 docs in 89 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 129 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 129 ms
+[ContentStore] liturgicalTemplates: 16 docs in 140 ms
+[ContentStore] songs: 447 docs in 144 ms
+[ContentStore] compendium: 27 docs in 188 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 282 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 255 ms
+[ContentStore] readings: 822 docs in 304 ms
+[ContentStore] days: 736 docs in 392 ms
+00:00 +0: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+04:04 +0 -1: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses [E]
+  Expected: empty
+    Actual: [
+              '2025-06-12 minsk-mohilev feast-christthehighpriest',
+              '2026-05-28 minsk-mohilev feast-christthehighpriest',
+              '2027-05-20 minsk-mohilev feast-christthehighpriest',
+              '2028-06-08 minsk-mohilev feast-christthehighpriest',
+              '2029-05-24 minsk-mohilev feast-christthehighpriest',
+              '2030-06-13 minsk-mohilev feast-christthehighpriest',
+              '2031-06-05 minsk-mohilev feast-christthehighpriest',
+              '2032-05-20 minsk-mohilev feast-christthehighpriest',
+              '2033-06-09 minsk-mohilev feast-christthehighpriest',
+              '2034-06-01 minsk-mohilev feast-christthehighpriest',
+              '2035-05-17 minsk-mohilev feast-christthehighpriest',
+              '2025-06-12 grodno feast-christthehighpriest',
+              '2026-05-28 grodno feast-christthehighpriest',
+              '2027-05-20 grodno feast-christthehighpriest',
+              '2028-06-08 grodno feast-christthehighpriest',
+              '2029-05-24 grodno feast-christthehighpriest',
+              '2030-06-13 grodno feast-christthehighpriest',
+              '2031-06-05 grodno feast-christthehighpriest',
+              '2032-05-20 grodno feast-christthehighpriest',
+              '2033-06-09 grodno feast-christthehighpriest',
+              '2034-06-01 grodno feast-christthehighpriest',
+              '2035-05-17 grodno feast-christthehighpriest',
+              '2025-06-12 pinsk feast-christthehighpriest',
+              '2026-05-28 pinsk feast-christthehighpriest',
+              ...
+            ]
+  2025-06-12 minsk-mohilev feast-christthehighpriest
+  2026-05-28 minsk-mohilev feast-christthehighpriest
+  2027-05-20 minsk-mohilev feast-christthehighpriest
+  2028-06-08 minsk-mohilev feast-christthehighpriest
+  2029-05-24 minsk-mohilev feast-christthehighpriest
+  2030-06-13 minsk-mohilev feast-christthehighpriest
+  2031-06-05 minsk-mohilev feast-christthehighpriest
+  2032-05-20 minsk-mohilev feast-christthehighpriest
+  2033-06-09 minsk-mohilev feast-christthehighpriest
+  2034-06-01 minsk-mohilev feast-christthehighpriest
+  2035-05-17 minsk-mohilev feast-christthehighpriest
+  2025-06-12 grodno feast-christthehighpriest
+  2026-05-28 grodno feast-christthehighpriest
+  2027-05-20 grodno feast-christthehighpriest
+  2028-06-08 grodno feast-christthehighpriest
+  2029-05-24 grodno feast-christthehighpriest
+  2030-06-13 grodno feast-christthehighpriest
+  2031-06-05 grodno feast-christthehighpriest
+  2032-05-20 grodno feast-christthehighpriest
+  2033-06-09 grodno feast-christthehighpriest
+
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test/hours_parity_test.dart 159:7                   main.<fn>
+
+04:04 +0 -1: (tearDownAll)
+04:04 +0 -1: Some tests failed.

@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -86,7 +87,9 @@ void main() {
       final navigation = container.read(liturgicalNavigationControllerProvider);
       for (final dark in [false, true]) {
         final theme = dark ? 'dark' : 'light';
-        appThemeModeController.value = dark ? ThemeMode.dark : ThemeMode.light;
+        appThemePreferenceController.value = dark
+            ? AppThemePreference.dark
+            : AppThemePreference.light;
         router.go('/hours');
         navigation.openDate(DateTime(2026, 10, 9));
         await settle();
@@ -207,7 +210,7 @@ void main() {
       }
       debugPrint('QUIET_BOOK_FONT_SCALE::2');
       await Future<void>.delayed(const Duration(seconds: 3));
-      appThemeModeController.value = ThemeMode.light;
+      appThemePreferenceController.value = AppThemePreference.light;
       router.go('/hours');
       navigation.openDate(DateTime(2026, 4, 4));
       await settle();

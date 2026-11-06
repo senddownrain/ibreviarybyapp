@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,7 +68,9 @@ void main() {
           : auditDate;
       for (final dark in [false, true]) {
         final theme = dark ? 'dark' : 'light';
-        appThemeModeController.value = dark ? ThemeMode.dark : ThemeMode.light;
+        appThemePreferenceController.value = dark
+            ? AppThemePreference.dark
+            : AppThemePreference.light;
         router.go('/hours');
         await settle();
         container
@@ -179,7 +182,7 @@ void main() {
       }
       debugPrint('QUIET_BOOK_FONT_SCALE::2');
       await Future<void>.delayed(const Duration(seconds: 3));
-      appThemeModeController.value = ThemeMode.light;
+      appThemePreferenceController.value = AppThemePreference.light;
       router.go('/hours');
       container
           .read(liturgicalNavigationControllerProvider)
@@ -221,7 +224,7 @@ void main() {
       await shot('large-long-hour-title');
       debugPrint('QUIET_BOOK_FONT_SCALE::restore');
       await Future<void>.delayed(const Duration(seconds: 3));
-      appThemeModeController.value = ThemeMode.light;
+      appThemePreferenceController.value = AppThemePreference.light;
       router.go('/hours');
       await settle();
       debugPrint('QUIET_BOOK_CAPTURE_DONE');

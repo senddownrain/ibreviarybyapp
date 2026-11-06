@@ -20,7 +20,8 @@ import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/firebase_bootstrap.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
-import 'package:mybrev_flutter/theme/ib_colors.dart';
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
+import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_controller.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -142,220 +143,35 @@ class MyBrevApp extends ConsumerWidget {
 
     // Content stays consistent with the PWA. Navigation and system controls
     // adapt inside the shared theme and the platform-chrome widgets.
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: appThemeModeController,
-      builder: (context, themeMode, _) {
-        final schemes = AppPalette.schemesFor(themeMode);
-        return _buildApp(settings, themeMode, schemes.theme, schemes.darkTheme);
+    return ValueListenableBuilder<AppThemePreference>(
+      valueListenable: appThemePreferenceController,
+      builder: (context, preference, _) {
+        final schemes = AppPalette.schemesFor(preference);
+        return _buildApp(preference, schemes.theme, schemes.darkTheme);
       },
     );
   }
 
   Widget _buildApp(
-    SettingsState settings,
-    ThemeMode themeMode,
+    AppThemePreference preference,
     ColorScheme light,
     ColorScheme dark,
   ) {
-    final targetPlatform = appTargetPlatform();
-    final isIOS = targetPlatform == TargetPlatform.iOS;
-
-    ThemeData makeTheme(ColorScheme cs) {
-      // Build from brightness first so textTheme colors match light/dark.
-      // GoogleFonts.getTextTheme without a base returns light-mode (dark) ink
-      // and makes body/title text unreadable on dark surfaces.
-      final base = ThemeData(
-        useMaterial3: true,
-        colorScheme: cs,
-        brightness: cs.brightness,
-        platform: targetPlatform,
-        extensions: [IbColors.forBrightness(cs.brightness)],
-      );
-      return base.copyWith(
-        platform: targetPlatform,
-        splashFactory: isIOS
-            ? NoSplash.splashFactory
-            : InkSparkle.splashFactory,
-        highlightColor: isIOS ? Colors.transparent : null,
-        cupertinoOverrideTheme: CupertinoThemeData(
-          primaryColor: cs.primary,
-          brightness: cs.brightness,
-          scaffoldBackgroundColor: cs.surfaceContainerLowest,
-        ),
-        // Application chrome follows the real platform typography. Book faces
-        // are applied only inside ReadingScaffold/ReaderTheme.
-        textTheme: base.textTheme,
-        scaffoldBackgroundColor: cs.surfaceContainerLowest,
-        dividerTheme: DividerThemeData(
-          color: cs.outlineVariant,
-          thickness: 0.7,
-          space: 1,
-        ),
-        cardTheme: CardThemeData(
-          color: cs.surface.withValues(alpha: 0.92),
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: cs.outlineVariant, width: 0.7),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: cs.surface.withValues(alpha: 0.88),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(color: cs.outlineVariant),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(color: cs.outlineVariant),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(color: cs.primary, width: 1.4),
-          ),
-        ),
-        chipTheme: base.chipTheme.copyWith(
-          backgroundColor: Colors.transparent,
-          selectedColor: cs.tertiaryContainer,
-          side: BorderSide(color: cs.outlineVariant),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999),
-          ),
-          labelStyle: TextStyle(color: cs.onSurfaceVariant),
-        ),
-        drawerTheme: DrawerThemeData(
-          backgroundColor: cs.surface.withValues(alpha: 0.97),
-          surfaceTintColor: Colors.transparent,
-          width: 320,
-          shape: const RoundedRectangleBorder(),
-        ),
-        listTileTheme: ListTileThemeData(
-          iconColor: cs.onSurfaceVariant,
-          textColor: cs.onSurface,
-          selectedColor: cs.primary,
-          selectedTileColor: cs.primary.withValues(alpha: 0.11),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(48, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(isIOS ? 24 : 18),
-            ),
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(48, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(isIOS ? 24 : 18),
-            ),
-            side: BorderSide(color: cs.outlineVariant),
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(shape: const StadiumBorder()),
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          elevation: 8,
-          highlightElevation: 4,
-          backgroundColor: cs.surface,
-          foregroundColor: cs.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(isIOS ? 24 : 20),
-            side: BorderSide(color: cs.outlineVariant),
-          ),
-        ),
-        bottomSheetTheme: BottomSheetThemeData(
-          backgroundColor: cs.surface.withValues(alpha: 0.98),
-          surfaceTintColor: Colors.transparent,
-          modalBackgroundColor: cs.surface.withValues(alpha: 0.98),
-          modalElevation: 16,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-        ),
-        dialogTheme: DialogThemeData(
-          backgroundColor: cs.surface.withValues(alpha: 0.98),
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: BorderSide(color: cs.outlineVariant),
-          ),
-        ),
-        snackBarTheme: SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: cs.inverseSurface,
-          contentTextStyle: TextStyle(color: cs.onInverseSurface),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-        appBarTheme: AppBarTheme(
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: isIOS,
-          // Transparent so BlurAppBar can paint its own background
-          backgroundColor: Colors.transparent,
-          foregroundColor: cs.onSurface,
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            systemNavigationBarColor: Colors.transparent,
-            systemNavigationBarDividerColor: Colors.transparent,
-            statusBarIconBrightness: cs.brightness == Brightness.dark
-                ? Brightness.light
-                : Brightness.dark,
-            statusBarBrightness: cs.brightness == Brightness.dark
-                ? Brightness.dark
-                : Brightness.light,
-            systemNavigationBarIconBrightness: cs.brightness == Brightness.dark
-                ? Brightness.light
-                : Brightness.dark,
-            systemStatusBarContrastEnforced: false,
-            systemNavigationBarContrastEnforced: false,
-          ),
-        ),
-        pageTransitionsTheme: PageTransitionsTheme(
-          builders: {
-            TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: isIOS
-                ? const FadeUpwardsPageTransitionsBuilder()
-                : const PredictiveBackPageTransitionsBuilder(),
-          },
-        ),
-        // Android: tonal surface elevation (Material You)
-        navigationBarTheme: NavigationBarThemeData(
-          indicatorColor: cs.secondaryContainer,
-          labelTextStyle: WidgetStateProperty.all(
-            const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-          ),
-        ),
-      );
-    }
-
     return MaterialApp.router(
-      // Recreate MaterialApp's inherited theme boundary when the user switches
-      // modes. The router configuration is stable, so navigation is preserved.
-      key: ValueKey(themeMode),
+      // Keep this boundary stable: rebuilding colors must not dispose readers,
+      // branch navigators, open sheets or their scroll/chrome controllers.
       title: 'Mybrev',
       restorationScopeId: 'ibreviary-app',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      builder: (context, child) =>
-          PriestAccessLifecycle(child: child ?? const SizedBox.shrink()),
-      themeMode: themeMode,
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: Theme.of(context).appBarTheme.systemOverlayStyle!,
+        child: PriestAccessLifecycle(child: child ?? const SizedBox.shrink()),
+      ),
+      themeMode: preference.themeMode,
       themeAnimationDuration: Duration.zero,
-      theme: makeTheme(light),
-      darkTheme: makeTheme(dark),
+      theme: buildAppTheme(light, preference: preference),
+      darkTheme: buildAppTheme(dark, preference: preference),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -370,4 +186,188 @@ class MyBrevApp extends ConsumerWidget {
       locale: const Locale('be'),
     );
   }
+}
+
+/// Shared production theme assembly, also used by isolated visual/test hosts.
+ThemeData buildAppTheme(
+  ColorScheme cs, {
+  required AppThemePreference preference,
+  TargetPlatform? platform,
+}) {
+  final targetPlatform = platform ?? appTargetPlatform();
+  final isIOS = targetPlatform == TargetPlatform.iOS;
+
+  // Build from brightness first so textTheme colors match light/dark.
+  // GoogleFonts.getTextTheme without a base returns light-mode (dark) ink
+  // and makes body/title text unreadable on dark surfaces.
+  final base = ThemeData(
+    useMaterial3: true,
+    colorScheme: cs,
+    brightness: cs.brightness,
+    platform: targetPlatform,
+    extensions: [
+      AppPalette.colorsFor(preference, cs.brightness),
+      preference == AppThemePreference.marian
+          ? GlassDecoration.marian
+          : GlassDecoration.forBrightness(cs.brightness),
+    ],
+  );
+  return base.copyWith(
+    platform: targetPlatform,
+    splashFactory: isIOS ? NoSplash.splashFactory : InkSparkle.splashFactory,
+    highlightColor: isIOS ? Colors.transparent : null,
+    cupertinoOverrideTheme: CupertinoThemeData(
+      primaryColor: cs.primary,
+      brightness: cs.brightness,
+      scaffoldBackgroundColor: cs.surfaceContainerLowest,
+    ),
+    // Application chrome follows the real platform typography. Book faces
+    // are applied only inside ReadingScaffold/ReaderTheme.
+    textTheme: base.textTheme,
+    scaffoldBackgroundColor: cs.surfaceContainerLowest,
+    dividerTheme: DividerThemeData(
+      color: cs.outlineVariant,
+      thickness: 0.7,
+      space: 1,
+    ),
+    cardTheme: CardThemeData(
+      color: cs.surface.withValues(alpha: 0.92),
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: cs.outlineVariant, width: 0.7),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: cs.surface.withValues(alpha: 0.88),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: cs.outlineVariant),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: cs.outlineVariant),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: cs.primary, width: 1.4),
+      ),
+    ),
+    chipTheme: base.chipTheme.copyWith(
+      backgroundColor: Colors.transparent,
+      selectedColor: cs.tertiaryContainer,
+      side: BorderSide(color: cs.outlineVariant),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      labelStyle: TextStyle(color: cs.onSurfaceVariant),
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: cs.surface.withValues(alpha: 0.97),
+      surfaceTintColor: Colors.transparent,
+      width: 320,
+      shape: const RoundedRectangleBorder(),
+    ),
+    listTileTheme: ListTileThemeData(
+      iconColor: cs.onSurfaceVariant,
+      textColor: cs.onSurface,
+      selectedColor: cs.primary,
+      selectedTileColor: cs.primary.withValues(alpha: 0.11),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(isIOS ? 24 : 18),
+        ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(isIOS ? 24 : 18),
+        ),
+        side: BorderSide(color: cs.outlineVariant),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(shape: const StadiumBorder()),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      elevation: 8,
+      highlightElevation: 4,
+      backgroundColor: cs.surface,
+      foregroundColor: cs.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(isIOS ? 24 : 20),
+        side: BorderSide(color: cs.outlineVariant),
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: cs.surface.withValues(alpha: 0.98),
+      surfaceTintColor: Colors.transparent,
+      modalBackgroundColor: cs.surface.withValues(alpha: 0.98),
+      modalElevation: 16,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: cs.surface.withValues(alpha: 0.98),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(28),
+        side: BorderSide(color: cs.outlineVariant),
+      ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: cs.inverseSurface,
+      contentTextStyle: TextStyle(color: cs.onInverseSurface),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    ),
+    appBarTheme: AppBarTheme(
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: isIOS,
+      // Transparent so BlurAppBar can paint its own background
+      backgroundColor: Colors.transparent,
+      foregroundColor: cs.onSurface,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        statusBarIconBrightness: cs.brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: cs.brightness == Brightness.dark
+            ? Brightness.dark
+            : Brightness.light,
+        systemNavigationBarIconBrightness: cs.brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        systemStatusBarContrastEnforced: false,
+        systemNavigationBarContrastEnforced: false,
+      ),
+    ),
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
+        TargetPlatform.android: isIOS
+            ? const FadeUpwardsPageTransitionsBuilder()
+            : const PredictiveBackPageTransitionsBuilder(),
+      },
+    ),
+    // Android: tonal surface elevation (Material You)
+    navigationBarTheme: NavigationBarThemeData(
+      indicatorColor: cs.secondaryContainer,
+      labelTextStyle: WidgetStateProperty.all(
+        const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+      ),
+    ),
+  );
 }

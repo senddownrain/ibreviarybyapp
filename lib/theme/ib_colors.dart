@@ -74,6 +74,26 @@ class IbColors extends ThemeExtension<IbColors> {
     neutralAmbient: Color(0xFF343A34),
   );
 
+  static const marian = IbColors(
+    page: Color(0xFFF4F8FC),
+    reader: Color(0xFFFBFDFF),
+    surface: Color(0xFFFFFFFF),
+    surfaceRaised: Color(0xFFFFFFFF),
+    floating: Color(0xFFE2EFF9),
+    ink: Color(0xFF202D39),
+    inkMuted: Color(0xFF52687A),
+    readerMuted: Color(0xFF52687A),
+    accent: Color(0xFF244D78),
+    onAccent: Color(0xFFFFFFFF),
+    rubric: Color(0xFF9B302A),
+    error: Color(0xFFA62D32),
+    separator: Color(0x1F244D78),
+    outline: Color(0xFF52687A),
+    neutralAmbient: Color(0xFFA8CBE6),
+  );
+
+  /// Fallback for themes without the application extension. App assembly must
+  /// install the selected palette explicitly: Marian is also light in Flutter.
   static IbColors forBrightness(Brightness brightness) =>
       brightness == Brightness.dark ? dark : light;
 

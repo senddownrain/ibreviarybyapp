@@ -2,17 +2,53 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/theme/ib_colors.dart';
 
+/// Decorative intensity is independent of brightness. Keep light/dark as-is;
+/// Marian uses the same composition with quieter neutral and seasonal washes.
+@immutable
+class GlassDecoration extends ThemeExtension<GlassDecoration> {
+  const GlassDecoration({required this.ambientScale, required this.backdrop});
+
+  final double ambientScale;
+  final double backdrop;
+
+  static const light = GlassDecoration(ambientScale: 1, backdrop: 0.09);
+  static const dark = GlassDecoration(ambientScale: 1, backdrop: 0.11);
+  static const marian = GlassDecoration(ambientScale: 0.45, backdrop: 0.06);
+
+  static GlassDecoration forBrightness(Brightness brightness) =>
+      brightness == Brightness.dark ? dark : light;
+
+  @override
+  GlassDecoration copyWith({double? ambientScale, double? backdrop}) =>
+      GlassDecoration(
+        ambientScale: ambientScale ?? this.ambientScale,
+        backdrop: backdrop ?? this.backdrop,
+      );
+
+  @override
+  GlassDecoration lerp(ThemeExtension<GlassDecoration>? other, double t) =>
+      other is GlassDecoration
+      ? GlassDecoration(
+          ambientScale: lerpDouble(ambientScale, other.ambientScale, t)!,
+          backdrop: lerpDouble(backdrop, other.backdrop, t)!,
+        )
+      : this;
+}
+
 /// Shared liquid-glass / ambient tokens for the liturgical UI.
 class GlassTokens {
-  const GlassTokens._(this.isDark, this.colors);
+  const GlassTokens._(this.isDark, this.colors, this.decoration);
 
   factory GlassTokens.of(BuildContext context) => GlassTokens._(
     Theme.of(context).brightness == Brightness.dark,
     IbColors.of(context),
+    Theme.of(context).extension<GlassDecoration>() ??
+        GlassDecoration.forBrightness(Theme.of(context).brightness),
   );
 
   final bool isDark;
   final IbColors colors;
+  final GlassDecoration decoration;
 
   // Blur strengths
   double get pillBlur => 20;
@@ -20,11 +56,11 @@ class GlassTokens {
   double get softBlur => 10;
 
   // Ambient wash (full / soft page tints)
-  double get ambientStrong => isDark ? 0.15 : 0.11;
-  double get ambientMid => isDark ? 0.06 : 0.045;
-  double get ambientSoft => isDark ? 0.07 : 0.055;
-  double get ambientPill => isDark ? 0.08 : 0.065;
-  double get ambientCard => isDark ? 0.06 : 0.045;
+  double get ambientStrong => (isDark ? 0.15 : 0.11) * decoration.ambientScale;
+  double get ambientMid => (isDark ? 0.06 : 0.045) * decoration.ambientScale;
+  double get ambientSoft => (isDark ? 0.07 : 0.055) * decoration.ambientScale;
+  double get ambientPill => (isDark ? 0.08 : 0.065) * decoration.ambientScale;
+  double get ambientCard => (isDark ? 0.06 : 0.045) * decoration.ambientScale;
 
   // Glass fills
   Color get cardFill => colors.surface.withValues(alpha: 0xF0 / 255);
@@ -87,7 +123,7 @@ class AmbientBackdrop extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = GlassTokens.of(context);
     final background = Theme.of(context).colorScheme.surfaceContainerLowest;
-    final strength = tokens.isDark ? 0.11 : 0.09;
+    final strength = tokens.decoration.backdrop;
 
     return DecoratedBox(
       decoration: BoxDecoration(

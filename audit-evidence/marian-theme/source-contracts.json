@@ -1,0 +1,158 @@
+{
+  "base": "9bf2925f537d648fd29fb87cec2235b98ea80412",
+  "implementation": "3d63fdcbd4778d5dfc0dcfbec2cfbbba6c40c54c",
+  "all_assets_unchanged": true,
+  "domain_and_reader_contracts": [
+    {
+      "path": "pubspec.yaml",
+      "main_blob": "ee71f96842cc3fb7f1cfe54f67fe76eb0098d66f",
+      "branch_blob": "ee71f96842cc3fb7f1cfe54f67fe76eb0098d66f",
+      "identical": true
+    },
+    {
+      "path": "pubspec.lock",
+      "main_blob": "d98fec7bbbdba881f30628354841fc623e37adb9",
+      "branch_blob": "d98fec7bbbdba881f30628354841fc623e37adb9",
+      "identical": true
+    },
+    {
+      "path": "lib/router/router.dart",
+      "main_blob": "3d195e7b7f7259e46248dfa171af3e2800437455",
+      "branch_blob": "3d195e7b7f7259e46248dfa171af3e2800437455",
+      "identical": true
+    },
+    {
+      "path": "lib/utils/liturgical_theme.dart",
+      "main_blob": "ef699e9677e0a1f7c7791c3b5241414881ed42ab",
+      "branch_blob": "ef699e9677e0a1f7c7791c3b5241414881ed42ab",
+      "identical": true
+    },
+    {
+      "path": "lib/utils/liturgical_visual.dart",
+      "main_blob": "4c1cb81dce62842a71b1656b12c35e4f3baf9ccb",
+      "branch_blob": "4c1cb81dce62842a71b1656b12c35e4f3baf9ccb",
+      "identical": true
+    },
+    {
+      "path": "lib/services/liturgical_content_service.dart",
+      "main_blob": "c1aa578f9542ede5e779384bc122da90eeda3b03",
+      "branch_blob": "c1aa578f9542ede5e779384bc122da90eeda3b03",
+      "identical": true
+    },
+    {
+      "path": "lib/models/psalmody_preferences.dart",
+      "main_blob": "d5b78b30b232901e436faa30ce0fc29e9e22d4cc",
+      "branch_blob": "d5b78b30b232901e436faa30ce0fc29e9e22d4cc",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/psalmody_settings_section.dart",
+      "main_blob": "fe19dbf7c5400768b2efc3061c5e8cf0eae3b53c",
+      "branch_blob": "fe19dbf7c5400768b2efc3061c5e8cf0eae3b53c",
+      "identical": true
+    },
+    {
+      "path": "lib/theme/reader.dart",
+      "main_blob": "37cae4742aac6aec5fcf03c117c708a088350f7e",
+      "branch_blob": "37cae4742aac6aec5fcf03c117c708a088350f7e",
+      "identical": true
+    },
+    {
+      "path": "lib/theme/platform_design.dart",
+      "main_blob": "16f1e592593b58294083fa3f6bcf6518d1cbd0b3",
+      "branch_blob": "16f1e592593b58294083fa3f6bcf6518d1cbd0b3",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/reader/reader_scaffold.dart",
+      "main_blob": "fbc0d85ce7d33f70c02fb8ea740de9ec381f31b6",
+      "branch_blob": "fbc0d85ce7d33f70c02fb8ea740de9ec381f31b6",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/liturgical_day_header.dart",
+      "main_blob": "6ce4277557d848ea26a5d3499d004ebfe3748735",
+      "branch_blob": "6ce4277557d848ea26a5d3499d004ebfe3748735",
+      "identical": true
+    },
+    {
+      "path": "lib/screens/home_screen.dart",
+      "main_blob": "c15331e5d461bfecfc5e1bc5482c8d6c263bdc91",
+      "branch_blob": "c15331e5d461bfecfc5e1bc5482c8d6c263bdc91",
+      "identical": true
+    },
+    {
+      "path": "lib/screens/ordo_month_screen.dart",
+      "main_blob": "d1d5b6b5bdebd3160605078923bd98cb9dbac863",
+      "branch_blob": "d1d5b6b5bdebd3160605078923bd98cb9dbac863",
+      "identical": true
+    },
+    {
+      "path": "lib/content/content_store.dart",
+      "main_blob": "3b2f1c2d11ca6925005926d90a75ddc559f601b1",
+      "branch_blob": "3b2f1c2d11ca6925005926d90a75ddc559f601b1",
+      "identical": true
+    },
+    {
+      "path": "lib/content/content_updater.dart",
+      "main_blob": "41b9cb1a9c00390d70330d2c50fba356c65cfde2",
+      "branch_blob": "41b9cb1a9c00390d70330d2c50fba356c65cfde2",
+      "identical": true
+    },
+    {
+      "path": "assets/content/manifest.json",
+      "main_blob": "f1463c1457d58a3ce7f8aecdfde907750c613481",
+      "branch_blob": "f1463c1457d58a3ce7f8aecdfde907750c613481",
+      "identical": true
+    },
+    {
+      "path": "lib/services/hive_service.dart",
+      "main_blob": "c9a7ed21ec34ec3a3d91b63876e2e4a444cefc3d",
+      "branch_blob": "c9a7ed21ec34ec3a3d91b63876e2e4a444cefc3d",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/psalm_choir_html.dart",
+      "main_blob": "4370c45a8fcfdbcf885122d6c07abb548f5091cf",
+      "branch_blob": "4370c45a8fcfdbcf885122d6c07abb548f5091cf",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/psalmody_mode_selector.dart",
+      "main_blob": "149ff9b16367b64c93e9f72026f8c474455fd930",
+      "branch_blob": "149ff9b16367b64c93e9f72026f8c474455fd930",
+      "identical": true
+    },
+    {
+      "path": "lib/widgets/text_scale_control.dart",
+      "main_blob": "84678066d95fc18951db5a97c8922f2693e88123",
+      "branch_blob": "84678066d95fc18951db5a97c8922f2693e88123",
+      "identical": true
+    },
+    {
+      "path": "lib/utils/liturgical_html.dart",
+      "main_blob": "b2ee3e4da6b12e7a134bb5e32a4231784b2086d9",
+      "branch_blob": "b2ee3e4da6b12e7a134bb5e32a4231784b2086d9",
+      "identical": true
+    },
+    {
+      "path": "test/hours_parity_test.dart",
+      "main_blob": "eee814dda0b41cd29b032619341d27ba51c8af36",
+      "branch_blob": "eee814dda0b41cd29b032619341d27ba51c8af36",
+      "identical": true
+    },
+    {
+      "path": "test/support/ordo_fixture.dart",
+      "main_blob": "cacd0ed86e6e15be4778a91907728f03849c0766",
+      "branch_blob": "cacd0ed86e6e15be4778a91907728f03849c0766",
+      "identical": true
+    },
+    {
+      "path": "test/fixtures/ordo_parity.json.gz",
+      "main_blob": "0b35ed797dc0b677275e6c92ca6580d94f53fdea",
+      "branch_blob": "0b35ed797dc0b677275e6c92ca6580d94f53fdea",
+      "identical": true
+    }
+  ],
+  "palette_fixture_sha256": "d1c514b39118c28aa4e67bd4bbebb3d4867d48b2b32d38a0e4c073cbe35349ac"
+}
