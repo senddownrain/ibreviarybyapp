@@ -33,7 +33,6 @@ void main() {
         builder: (context, mode, _) {
           final schemes = AppPalette.schemesFor(mode);
           return MaterialApp(
-            key: ValueKey(mode),
             theme: ThemeData(colorScheme: schemes.theme),
             darkTheme: ThemeData(colorScheme: schemes.darkTheme),
             themeMode: mode.themeMode,

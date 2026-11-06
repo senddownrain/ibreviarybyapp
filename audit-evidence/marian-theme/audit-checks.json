@@ -1,0 +1,1942 @@
+{
+  "screenshots": 121,
+  "viewports": [
+    {
+      "name": "android-390-marian-home",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-settings",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-settings-options",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-calendar",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-calendar-dialog",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-light-home",
+      "pass": true
+    },
+    {
+      "name": "android-390-light-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-light-settings",
+      "pass": true
+    },
+    {
+      "name": "android-390-dark-home",
+      "pass": true
+    },
+    {
+      "name": "android-390-dark-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-dark-settings",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-home",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-settings",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-calendar",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-calendar-dialog",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-light-home",
+      "pass": true
+    },
+    {
+      "name": "android-1440-light-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-light-settings",
+      "pass": true
+    },
+    {
+      "name": "android-1440-dark-home",
+      "pass": true
+    },
+    {
+      "name": "android-1440-dark-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-dark-settings",
+      "pass": true
+    },
+    {
+      "name": "android-320-marian-settings-200",
+      "pass": true
+    },
+    {
+      "name": "android-320-marian-options-200",
+      "pass": true
+    },
+    {
+      "name": "android-320-marian-reader-200",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-home",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-settings",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-settings-options",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-calendar",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-calendar-dialog",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-light-home",
+      "pass": true
+    },
+    {
+      "name": "ios-390-light-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-light-settings",
+      "pass": true
+    },
+    {
+      "name": "ios-390-dark-home",
+      "pass": true
+    },
+    {
+      "name": "ios-390-dark-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-dark-settings",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-home",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-settings",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-calendar",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-calendar-dialog",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-light-home",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-light-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-light-settings",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-dark-home",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-dark-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-dark-settings",
+      "pass": true
+    }
+  ],
+  "reader_surfaces": [
+    {
+      "name": "android-390-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "android-320-marian-reader-200",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-bible",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-end",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-start",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-middle",
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-end",
+      "pass": true
+    }
+  ],
+  "paper_pixels": [
+    {
+      "name": "android-390-marian-laudes-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-laudes-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-vespers-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-lectionis-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-readings-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-prayer-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-390-marian-mass-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-laudes-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-vespers-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-lectionis-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-readings-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-prayer-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "android-1440-marian-mass-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-laudes-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-vespers-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-lectionis-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-readings-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-prayer-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-390-marian-mass-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-laudes-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-vespers-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-lectionis-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-readings-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-prayer-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-middle",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    },
+    {
+      "name": "ios-1440-marian-mass-end",
+      "colors": [
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ],
+        [
+          251,
+          253,
+          255
+        ]
+      ],
+      "pass": true
+    }
+  ],
+  "legacy_png_comparison": [
+    {
+      "name": "android-1440-dark-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-1440-dark-laudes-middle",
+      "pixel_identical": false,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-1440-dark-settings",
+      "pixel_identical": false,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "android-1440-light-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-1440-light-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-1440-light-settings",
+      "pixel_identical": false,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "android-390-dark-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-390-dark-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-390-dark-settings",
+      "pixel_identical": true,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "android-390-light-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-390-light-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "android-390-light-settings",
+      "pixel_identical": true,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "ios-1440-dark-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-1440-dark-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-1440-dark-settings",
+      "pixel_identical": false,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "ios-1440-light-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-1440-light-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-1440-light-settings",
+      "pixel_identical": false,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "ios-390-dark-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-390-dark-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-390-dark-settings",
+      "pixel_identical": true,
+      "expected_theme_choice_change": true
+    },
+    {
+      "name": "ios-390-light-home",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-390-light-laudes-middle",
+      "pixel_identical": true,
+      "expected_theme_choice_change": false
+    },
+    {
+      "name": "ios-390-light-settings",
+      "pixel_identical": true,
+      "expected_theme_choice_change": true
+    }
+  ],
+  "reader_contrast": {
+    "ink": 13.769,
+    "muted": 5.69,
+    "primary": 8.554,
+    "rubric": 7.227
+  },
+  "secondary_contrast": 4.782,
+  "source": {
+    "flutter_base": "6b74fbe07f949ad5ecc9027cc284471c26e43578",
+    "web_reference": "3aa7ba0f5cd186922d67e4e5e18a980e287a030c"
+  }
+}
