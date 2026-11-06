@@ -26,5 +26,3 @@ Other live documents checked: `days/feast-heartofmary`, three `days/13-06-sv-ant
 Before merge: obtain the independent dated source, resolve the incorrect I Vespers content through a separately authorized publication (or a fully sourced reviewed bundled fix), rerun cross-platform text checks and targeted UI smoke. This task explicitly forbids Firestore writes, so no publication was attempted.
 
 Additional Web verification: a service-worker-controlled production page was reloaded with browser networking disabled and rendered the saved Sunday Vespers (6817 visible characters). This checks a previously cached page, not first-install offline access. Modern Anthony Proper lookup was included: both apps offer the weekday default and three Common choices.
-
-Additional Web verification: a service-worker-controlled production page was reloaded with browser networking disabled and rendered the saved Sunday Vespers (6817 visible characters). This checks a previously cached page, not first-install offline access. Modern Anthony Proper lookup was included: both apps offer the weekday default and three Common choices.
