@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/widgets/priest_access_settings_section.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
@@ -36,55 +37,51 @@ class SettingsThemeControl extends StatelessWidget {
     required this.onChanged,
   });
 
-  final ThemeMode value;
-  final ValueChanged<ThemeMode> onChanged;
+  final AppThemePreference value;
+  final ValueChanged<AppThemePreference> onChanged;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final textScale = MediaQuery.textScalerOf(context).scale(1);
-      final widthPerChoice = constraints.maxWidth / 3;
+      final widthPerChoice =
+          constraints.maxWidth / AppThemePreference.values.length;
       final needsFullWidthLabels =
-          constraints.hasBoundedWidth && widthPerChoice < 120 * textScale;
+          constraints.hasBoundedWidth && widthPerChoice < 145 * textScale;
       if (needsFullWidthLabels) {
-        return DropdownButtonFormField<ThemeMode>(
+        return DropdownButtonFormField<AppThemePreference>(
           key: ValueKey(value),
           initialValue: value,
           isExpanded: true,
-          items: const [
-            DropdownMenuItem(value: ThemeMode.system, child: Text('Сістэма')),
-            DropdownMenuItem(value: ThemeMode.light, child: Text('Светлая')),
-            DropdownMenuItem(value: ThemeMode.dark, child: Text('Цёмная')),
+          items: [
+            for (final preference in AppThemePreference.values)
+              DropdownMenuItem(
+                value: preference,
+                child: Text(preference.label),
+              ),
           ],
           onChanged: (mode) {
             if (mode != null) onChanged(mode);
           },
         );
       }
-      final showIcons = widthPerChoice >= 135 * textScale;
-      return AdaptiveSegmentedControl<ThemeMode>(
+      final showIcons = widthPerChoice >= 180 * textScale;
+      return AdaptiveSegmentedControl<AppThemePreference>(
         segments: [
-          AdaptiveSegment(
-            value: ThemeMode.system,
-            icon: showIcons
-                ? const PhosphorIcon(PhosphorIconsRegular.circleHalf, size: 18)
-                : null,
-            label: const Text('Сістэма'),
-          ),
-          AdaptiveSegment(
-            value: ThemeMode.light,
-            icon: showIcons
-                ? const PhosphorIcon(PhosphorIconsRegular.sun, size: 18)
-                : null,
-            label: const Text('Светлая'),
-          ),
-          AdaptiveSegment(
-            value: ThemeMode.dark,
-            icon: showIcons
-                ? const PhosphorIcon(PhosphorIconsRegular.moon, size: 18)
-                : null,
-            label: const Text('Цёмная'),
-          ),
+          for (final preference in AppThemePreference.values)
+            AdaptiveSegment(
+              value: preference,
+              icon: showIcons
+                  ? Icon(switch (preference) {
+                      AppThemePreference.system =>
+                        PhosphorIconsRegular.circleHalf,
+                      AppThemePreference.light => PhosphorIconsRegular.sun,
+                      AppThemePreference.dark => PhosphorIconsRegular.moon,
+                      AppThemePreference.marian => Icons.star_outline_rounded,
+                    }, size: 18)
+                  : null,
+              label: Text(preference.label),
+            ),
         ],
         value: value,
         showSelectedIcon: false,
@@ -133,9 +130,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text('Тэма', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
                 SettingsThemeControl(
-                  value: settings.themeMode,
-                  onChanged: (mode) =>
-                      ref.read(settingsProvider.notifier).setThemeMode(mode),
+                  value: settings.themePreference,
+                  onChanged: (mode) => ref
+                      .read(settingsProvider.notifier)
+                      .setThemePreference(mode),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),

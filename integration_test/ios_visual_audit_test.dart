@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 // iOS visual audit harness (Codemagic + iOS Simulator).
 //
 // Runs the real app (Firebase, Hive, sync, shell and dock) and walks key
@@ -48,7 +49,7 @@ void main() {
 
     switch (_pass) {
       case 'dark':
-        appThemeModeController.value = ThemeMode.dark;
+        appThemePreferenceController.value = AppThemePreference.dark;
         await audit.settle();
         await audit.darkPass();
       case 'compact':
@@ -56,7 +57,7 @@ void main() {
       case 'large-text':
         await audit.largeTextPass();
       default:
-        appThemeModeController.value = ThemeMode.light;
+        appThemePreferenceController.value = AppThemePreference.light;
         await audit.settle();
         await audit.mainPass();
     }
