@@ -160,8 +160,10 @@ void main() {
         expect(ownByOption[id], isNotNull, reason: id);
       }
       // web `memorials.json`: 56 celebrations are weekday-default with own
-      // readings kept as an alternative.
-      expect(ownByOption, hasLength(56));
+      // readings kept as an alternative, plus Our Lady of Trakai (Grodno), which
+      // the owner decided is an obligatory memorial on 05.07 (Nov 2026).
+      expect(ownByOption, hasLength(57));
+      expect(ownByOption['our-lady-trakai'], isNotNull);
       expect(prescribedOpen, greaterThan(0));
       final total = ownByOption.values.fold(0, (a, b) => a + b);
       expect(total, greaterThanOrEqualTo(140));

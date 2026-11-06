@@ -372,10 +372,12 @@ OfficeAssembly assembleOffice({
       : _descriptorSlots(office);
   final choices = assemblyChoices(proper, officeKind, office: office);
   final selected = choices.contains(choice) ? choice! : choices.first;
-  final festiveCommon =
-      (office?.hasDayChoice ?? officeKind == 'memorial') &&
-      selected != kCurrentDayChoice &&
-      const {'memorial', 'optional-memorial'}.contains(officeKind);
+  // GILH 235-239: a memorial keeps the structure of its weekday whatever Common
+  // the user picks; the Common only supplies the elements the slots allow.
+  final isMemorial = const {
+    'memorial',
+    'optional-memorial',
+  }.contains(officeKind);
   bool isMainHourField(String field) => const {
     'lauds',
     'vespers',
@@ -400,7 +402,7 @@ OfficeAssembly assembleOffice({
       ? null
       : commonBaseRule(proper, templateId);
   bool isStrictCommonField(String field) =>
-      isMainHourField(field) && (festiveCommon || base != null);
+      isMainHourField(field) && base != null;
   final rules = proper['_fieldRules'] is Map
       ? Map<String, dynamic>.from(proper['_fieldRules'] as Map)
       : const <String, dynamic>{};
@@ -580,23 +582,6 @@ OfficeAssembly assembleOffice({
       refs.add((field, ['laudesPr']));
       return (null, 'pending');
     }
-    if (festiveCommon && isMainHourField(field)) {
-      final slot = kOfficeFieldSlots[field]!;
-      final source = slot.$1 == 'lauds' && slot.$2 == 'psalmody'
-          ? kSundayWeek1Template
-          : 'common';
-      final found = fromSource(source, field);
-      if (found != null) return found;
-      final template = source == 'common' ? common : sunday;
-      integrity.add(
-        AssemblyIntegrityError(
-          field,
-          source == 'common' ? 'common:$templateId' : source,
-          template == null ? 'template-missing' : 'field-missing',
-        ),
-      );
-      return null;
-    }
     final (hour, component) = kOfficeFieldSlots[field]!;
     final slot = slots['$hour.$component'];
     if (slot == null) return firstOf(['common', kCurrentDayChoice], field);
@@ -651,7 +636,7 @@ OfficeAssembly assembleOffice({
       ..remove('${hour}Ant3');
   }
 
-  if (proper['_omitFirstVespers'] != true && !festiveCommon) {
+  if (proper['_omitFirstVespers'] != true && !isMemorial) {
     for (final field in kFirstVesperFields) {
       if (!_blank(proper[field])) {
         day[field] = proper[field];
@@ -713,10 +698,9 @@ OfficeAssembly assembleOffice({
   } else if (proper[_teDeum] != null && proper[_teDeum] != '') {
     day[_teDeum] = proper[_teDeum] == true;
   } else if (office != null) {
-    day[_teDeum] = festiveCommon || office.teDeum ? true : '';
+    day[_teDeum] = office.teDeum ? true : '';
   } else {
-    day[_teDeum] =
-        festiveCommon || officeKind == 'solemnity' || officeKind == 'feast'
+    day[_teDeum] = officeKind == 'solemnity' || officeKind == 'feast'
         ? true
         : '';
   }
@@ -740,7 +724,6 @@ OfficeAssembly assembleOffice({
     'choice': selected,
     'template': selected == kCurrentDayChoice ? '' : templateId,
     'sparse': true,
-    if (festiveCommon) 'festiveCommon': true,
     if (commonSeasonVariant(season) case final String variant)
       'season': variant,
   };
