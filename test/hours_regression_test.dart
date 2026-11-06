@@ -144,7 +144,7 @@ void main() {
     expect(service.contentForDate(DateTime(2025, 11, 3)).ordo.isSplit, false);
   });
 
-  test('13.06.2026: movable Marian Office and XI Sunday I Vespers have correct sources in four dioceses', () {
+  test('13-14.06.2026: memorial assembly and I/II Vespers field routing in four dioceses', () {
     final date = DateTime(2026, 6, 13);
     for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
       final today = service.contentForDate(date, diocese: diocese);
@@ -156,6 +156,17 @@ void main() {
         (option) => option.ordo?.optionId == 'sv-anthony-padua',
       );
       expect(antony.day, isNotNull, reason: diocese);
+      for (final option in [heart, antony]) {
+        for (final variant in option.templates) {
+          for (final field in kOfficeFieldSlots.keys) {
+            if (field.startsWith('vesper')) continue;
+            expect(variant.day.field(field)?.trim(), isNotEmpty,
+                reason: '$diocese ${option.optionId} ${variant.choice} $field');
+          }
+          expect(variant.day.data['officeOfReadingsTeDeum'], isFalse,
+              reason: 'no Te Deum on a memorial');
+        }
+      }
       expect(heart.day, isNotNull, reason: diocese);
       expect(heart.templates.map((choice) => choice.choice),
           contains('blessed-virgin-mary'), reason: diocese);
@@ -193,6 +204,18 @@ void main() {
       }
       expect(first.day.data['_missingFirstVespersFields'], isEmpty,
           reason: diocese);
+      final second = resolveEveningOffice(
+        date: DateTime(2026, 6, 14),
+        selected: sunday.day!,
+        today: tomorrow,
+        tomorrow: service.contentForDate(DateTime(2026, 6, 15), diocese: diocese),
+      );
+      expect(second.isFirst, isFalse, reason: diocese);
+      expect(second.isSecond, isTrue, reason: diocese);
+      for (final suffix in firstVespersSuffixes) {
+        expect(second.day.field('vesper$suffix'), sunday.day!.field('vesper$suffix'),
+            reason: '$diocese Sunday II Vespers: $suffix');
+      }
       final anthonyVespers = resolveEveningOffice(
         date: date, selected: antony.day!, today: today, tomorrow: tomorrow,
       );
