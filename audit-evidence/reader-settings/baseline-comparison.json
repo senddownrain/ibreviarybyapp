@@ -1,0 +1,33 @@
+{
+  "test": "hours_parity_test.dart",
+  "baselineCommit": "19125bb",
+  "codeCommit": "f174dd8",
+  "sameFailures": true,
+  "cases": [
+    "2025-06-12 minsk-mohilev feast-christthehighpriest",
+    "2026-05-28 minsk-mohilev feast-christthehighpriest",
+    "2027-05-20 minsk-mohilev feast-christthehighpriest",
+    "2028-06-08 minsk-mohilev feast-christthehighpriest",
+    "2029-05-24 minsk-mohilev feast-christthehighpriest",
+    "2030-06-13 minsk-mohilev feast-christthehighpriest",
+    "2031-06-05 minsk-mohilev feast-christthehighpriest",
+    "2032-05-20 minsk-mohilev feast-christthehighpriest",
+    "2033-06-09 minsk-mohilev feast-christthehighpriest",
+    "2034-06-01 minsk-mohilev feast-christthehighpriest",
+    "2035-05-17 minsk-mohilev feast-christthehighpriest",
+    "2025-06-12 grodno feast-christthehighpriest",
+    "2026-05-28 grodno feast-christthehighpriest",
+    "2027-05-20 grodno feast-christthehighpriest",
+    "2028-06-08 grodno feast-christthehighpriest",
+    "2029-05-24 grodno feast-christthehighpriest",
+    "2030-06-13 grodno feast-christthehighpriest",
+    "2031-06-05 grodno feast-christthehighpriest",
+    "2032-05-20 grodno feast-christthehighpriest",
+    "2033-06-09 grodno feast-christthehighpriest",
+    "2034-06-01 grodno feast-christthehighpriest",
+    "2035-05-17 grodno feast-christthehighpriest",
+    "2025-06-12 pinsk feast-christthehighpriest",
+    "2026-05-28 pinsk feast-christthehighpriest"
+  ],
+  "verifiedFromMachineLog": true
+}

@@ -1,0 +1,43 @@
+{
+  "codeCommit": "f174dd8077a450fd5a19c730e241465275578026",
+  "complete": true,
+  "counts": {
+    "passed": 1892,
+    "failed": 2,
+    "skipped": 9
+  },
+  "suitesLoaded": 139,
+  "elapsedSeconds": 1242.86,
+  "failures": [
+    {
+      "file": "test/discovery/p0_hints_screens_test.dart",
+      "test": "Readings date_navigation: three day arrows, once",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: date_navigation: three day arrows, once"
+      ],
+      "diagnostics": [
+        "══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════\nThe following TestFailure was thrown running a test:\nExpected: exactly one matching candidate\n  Actual: _KeyWidgetFinder:<Found 0 widgets with key [<'discovery-card-calendar.date_navigation'>]:\n[]>\n   Which: means none were found but one was expected\n\nWhen the exception was thrown, this was the stack:\n#4      main.<anonymous closure>.<anonymous closure> (file:///workspace/ibreviary-reader-qa/test/discovery/p0_hints_screens_test.dart:281:7)\n<asynchronous suspension>\n#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)\n<asynchronous suspension>\n#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)\n<asynchronous suspension>\n<asynchronous suspension>\n(elided one frame from package:stack_trace)\n\nThis was caught by the test expectation on the following line:\n  file:///workspace/ibreviary-reader-qa/test/discovery/p0_hints_screens_test.dart line 281\nThe test description was:\n  date_navigation: three day arrows, once\n════════════════════════════════════════════════════════════════════════════════════════════════════"
+      ],
+      "baselineFailure": true
+    },
+    {
+      "file": "test/hours_parity_test.dart",
+      "test": "Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "errors": [
+        "Expected: empty\n  Actual: [\n            '2025-06-12 minsk-mohilev feast-christthehighpriest',\n            '2026-05-28 minsk-mohilev feast-christthehighpriest',\n            '2027-05-20 minsk-mohilev feast-christthehighpriest',\n            '2028-06-08 minsk-mohilev feast-christthehighpriest',\n            '2029-05-24 minsk-mohilev feast-christthehighpriest',\n            '2030-06-13 minsk-mohilev feast-christthehighpriest',\n            '2031-06-05 minsk-mohilev feast-christthehighpriest',\n            '2032-05-20 minsk-mohilev feast-christthehighpriest',\n            '2033-06-09 minsk-mohilev feast-christthehighpriest',\n            '2034-06-01 minsk-mohilev feast-christthehighpriest',\n            '2035-05-17 minsk-mohilev feast-christthehighpriest',\n            '2025-06-12 grodno feast-christthehighpriest',\n            '2026-05-28 grodno feast-christthehighpriest',\n            '2027-05-20 grodno feast-christthehighpriest',\n            '2028-06-08 grodno feast-christthehighpriest',\n            '2029-05-24 grodno feast-christthehighpriest',\n            '2030-06-13 grodno feast-christthehighpriest',\n            '2031-06-05 grodno feast-christthehighpriest',\n            '2032-05-20 grodno feast-christthehighpriest',\n            '2033-06-09 grodno feast-christthehighpriest',\n            '2034-06-01 grodno feast-christthehighpriest',\n            '2035-05-17 grodno feast-christthehighpriest',\n            '2025-06-12 pinsk feast-christthehighpriest',\n            '2026-05-28 pinsk feast-christthehighpriest',\n            ...\n          ]\n2025-06-12 minsk-mohilev feast-christthehighpriest\n2026-05-28 minsk-mohilev feast-christthehighpriest\n2027-05-20 minsk-mohilev feast-christthehighpriest\n2028-06-08 minsk-mohilev feast-christthehighpriest\n2029-05-24 minsk-mohilev feast-christthehighpriest\n2030-06-13 minsk-mohilev feast-christthehighpriest\n2031-06-05 minsk-mohilev feast-christthehighpriest\n2032-05-20 minsk-mohilev feast-christthehighpriest\n2033-06-09 minsk-mohilev feast-christthehighpriest\n2034-06-01 minsk-mohilev feast-christthehighpriest\n2035-05-17 minsk-mohilev feast-christthehighpriest\n2025-06-12 grodno feast-christthehighpriest\n2026-05-28 grodno feast-christthehighpriest\n2027-05-20 grodno feast-christthehighpriest\n2028-06-08 grodno feast-christthehighpriest\n2029-05-24 grodno feast-christthehighpriest\n2030-06-13 grodno feast-christthehighpriest\n2031-06-05 grodno feast-christthehighpriest\n2032-05-20 grodno feast-christthehighpriest\n2033-06-09 grodno feast-christthehighpriest\n"
+      ],
+      "diagnostics": [],
+      "sameDisplayedMismatchesAsMain": true,
+      "baselineFailure": true
+    }
+  ],
+  "runnerDone": {
+    "success": false,
+    "type": "done",
+    "time": 1242863
+  },
+  "exitCode": 1,
+  "command": "flutter test --no-pub --concurrency=4 --timeout=2m --machine",
+  "logSha256": "17ceae6149b5142ffb07995a9a827f5998731a9245ac47685f8fd749593bfb36",
+  "newFailures": []
+}

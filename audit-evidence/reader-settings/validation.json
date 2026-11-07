@@ -1,11 +1,19 @@
 {
-  "codeCommit": "f174dd8",
+  "codeCommit": "f174dd8077a450fd5a19c730e241465275578026",
   "baseCommit": "19125bb",
   "webReferenceCommit": "38e94e65b2d944eb34b6c86ef761b1d5b28284cd",
   "fullSuite": {
-    "status": "running in immutable checkout",
-    "command": "flutter test --no-pub --concurrency=2 --timeout=2m",
-    "sourceLog": "reader-frozen-tests.log"
+    "status": "completed",
+    "command": "flutter test --no-pub --concurrency=4 --timeout=2m --machine",
+    "counts": {
+      "passed": 1892,
+      "failed": 2,
+      "skipped": 9
+    },
+    "exitCode": 1,
+    "elapsedSeconds": 1242.86,
+    "newFailures": 0,
+    "details": "test-results.json"
   },
   "baseline": {
     "passed": 1867,

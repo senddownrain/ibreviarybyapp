@@ -23,18 +23,18 @@ commit `38e94e65b2d944eb34b6c86ef761b1d5b28284cd`.
   controls/menu matrix (87), Bible/keyboard/prayer-style regression group (38),
   exact Web example (3), final narrow header/keyboard checks (5), final prose
   guards (4): passed. These groups overlap and are not an aggregate count.
-- **Full suite:** final verification runs from a separate immutable checkout of
-  `f174dd8`; final counts are recorded below when the run completes.
-  Clean `main`: **1867 passed, 9 skipped, 2 failed**. Its existing failures are
-  `hours_parity_test.dart` (Christ the High Priest fixture mismatches) and
-  `discovery/p0_hints_screens_test.dart` (Readings date-navigation hint missing).
-  The latter is intermittent; it did not fail in one subsequent run.
+- **Full suite:** immutable checkout `f174dd8`: **1892 passed,
+  9 skipped, 2 failed**. No new failures.
+  Remaining baseline failures: `test/discovery/p0_hints_screens_test.dart`, `test/hours_parity_test.dart`.
+  [Machine-derived result and error messages](test-results.json).
+  Clean `main`: **1867 passed, 9 skipped, 2 failed** (`hours_parity` and the
+  intermittent Readings date-navigation hint). The current run's failures are
+  from that same baseline set. [Recorded mismatch comparison](baseline-comparison.json).
 
-The earlier exploratory full runs overlapped changing sources and heavy browser
-compilation. They are not used as final evidence: Flutter reused older imported
-libraries, and CPU/memory pressure caused timeouts. The final checkout isolates
-code from documentation/artifact updates. The unchanged offline content tests
-also passed separately on `main` (38 tests).
+The final run used four workers and a two-minute default timeout for large local
+bundle tests. Its code was isolated from documentation/artifact changes.
+The unchanged offline content tests also passed separately on `main` (38 tests).
+The analyzer retains the same 27 existing info diagnostics; [full output](analyze.txt).
 
 ## Screenshots
 
@@ -75,7 +75,7 @@ content, with offline gateways and update checks disabled only in this test host
 
 ```sh
 flutter analyze --no-pub
-flutter test --no-pub --concurrency=2 --timeout=2m
+flutter test --no-pub --concurrency=4 --timeout=2m --machine
 python tool/audit_reader_fonts.py
 flutter run -d chrome --no-pub --no-web-resources-cdn \
   -t tool/reader_settings_smoke.dart --web-port 5241
