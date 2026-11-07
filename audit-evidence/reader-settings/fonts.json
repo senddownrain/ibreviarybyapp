@@ -1,0 +1,51 @@
+[
+  {
+    "file": "assets/google_fonts/CormorantGaramond-Bold.ttf",
+    "family": "Cormorant Garamond",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "cb27b88ee3515a285352fc908713e51cdc3fe2d93239cead98ef5728b13f7a77"
+  },
+  {
+    "file": "assets/google_fonts/Kurale-Regular.ttf",
+    "family": "Kurale",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "6055aaca6870ca64210dd81fa47f8bb71595a9c8fbe570351ed45a15f1a0820d"
+  },
+  {
+    "file": "assets/google_fonts/Literata-Regular.ttf",
+    "family": "Literata 12pt",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "1e94ecb1a3d7d0639d3ea83e70b991af32087707cd53fde96c6e6d09351f9025"
+  },
+  {
+    "file": "assets/google_fonts/OldStandardTT-Bold.ttf",
+    "family": "Old Standard TT",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "7d831e9d799ad23ee98e889381a9db2a283b2dac7f228dd5c06071decb9c54db"
+  },
+  {
+    "file": "assets/google_fonts/OldStandardTT-Italic.ttf",
+    "family": "Old Standard TT",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "4b9522f4711317fc06e2413a58b4662c249cb707df193d682b9d640e365ef564"
+  },
+  {
+    "file": "assets/google_fonts/OldStandardTT-Regular.ttf",
+    "family": "Old Standard TT",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "42717a1280b523a506ca2b0285cca380e77fe214b1f6e3d75a8b925005f19eac"
+  },
+  {
+    "file": "assets/google_fonts/SourceSerif4-Regular.ttf",
+    "family": "Source Serif 4",
+    "glyphs_checked": "ўЎіІёЁ†*",
+    "glyphs_present": true,
+    "sha256": "c146c639a6d78366b47a15ab7d2f6d3a161906eda0d559fb3a3d438c69ede917"
+  }
+]

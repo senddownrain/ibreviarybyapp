@@ -1,0 +1,33 @@
+{
+  "codeCommit": "f174dd8",
+  "baseCommit": "19125bb",
+  "webReferenceCommit": "38e94e65b2d944eb34b6c86ef761b1d5b28284cd",
+  "fullSuite": {
+    "status": "running in immutable checkout",
+    "command": "flutter test --no-pub --concurrency=2 --timeout=2m",
+    "sourceLog": "reader-frozen-tests.log"
+  },
+  "baseline": {
+    "passed": 1867,
+    "skipped": 9,
+    "failed": 2,
+    "failures": [
+      "hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses",
+      "discovery/p0_hints_screens_test.dart: Readings date_navigation: three day arrows, once"
+    ]
+  },
+  "analyzer": {
+    "errors": 0,
+    "warnings": 0,
+    "existingInfos": 27,
+    "sameAsMain": true
+  },
+  "visual": {
+    "frames": 43,
+    "additionalLiveFrames": 2,
+    "assertionsPassed": 15,
+    "browserPageErrors": 0
+  },
+  "nativeAndroid": "Unavailable: no SDK/AVD/device",
+  "nativeIOS": "Unavailable: Linux, no Xcode/simulator"
+}

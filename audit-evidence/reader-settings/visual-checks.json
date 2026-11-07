@@ -1,0 +1,103 @@
+[
+  {
+    "check": "all captures have matching View and MediaQuery dimensions",
+    "passed": true,
+    "details": 43
+  },
+  {
+    "check": "browser page errors",
+    "passed": true,
+    "details": []
+  },
+  {
+    "check": "actual preview face literata",
+    "passed": true,
+    "details": "Literata_regular"
+  },
+  {
+    "check": "actual preview face sourceSerif4",
+    "passed": true,
+    "details": "SourceSerif4_regular"
+  },
+  {
+    "check": "actual preview face oldStandardTT",
+    "passed": true,
+    "details": "OldStandardTT_regular"
+  },
+  {
+    "check": "actual preview face kurale",
+    "passed": true,
+    "details": "Kurale_regular"
+  },
+  {
+    "check": "actual preview face system",
+    "passed": true,
+    "details": "Roboto"
+  },
+  {
+    "check": "Catechism prose start",
+    "passed": true,
+    "details": "start"
+  },
+  {
+    "check": "Catechism prose justify",
+    "passed": true,
+    "details": "justify"
+  },
+  {
+    "check": "Ora excludes justify",
+    "passed": true,
+    "details": {
+      "paragraphs": 190
+    }
+  },
+  {
+    "check": "after-overflow-home-393 right edge",
+    "passed": true,
+    "details": {
+      "width": 224,
+      "right_delta": 0.8000000000000114,
+      "top": 60.8
+    }
+  },
+  {
+    "check": "after-overflow-reader-393 right edge",
+    "passed": true,
+    "details": {
+      "width": 224,
+      "right_delta": 0.8000000000000114,
+      "top": 60
+    }
+  },
+  {
+    "check": "long real context action remains visible",
+    "passed": true,
+    "details": 269.59375
+  },
+  {
+    "check": "real prayer retains scroll with live font/size/alignment changes",
+    "passed": true,
+    "details": {
+      "before": [
+        158.89999999999998,
+        454
+      ],
+      "during": [
+        158.89999999999998,
+        773
+      ],
+      "after": [
+        158.89999999999998,
+        773
+      ]
+    }
+  },
+  {
+    "check": "Settings reads the live sheet values",
+    "passed": true,
+    "details": {
+      "font": "oldStandardTT",
+      "size": 20
+    }
+  }
+]
