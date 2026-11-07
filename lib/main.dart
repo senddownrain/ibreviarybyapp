@@ -119,6 +119,8 @@ void _registerFontLicenses() {
     'cormorantgaramond': 'Cormorant Garamond',
     'literata': 'Literata',
     'sourceserif4': 'Source Serif 4',
+    'oldstandardtt': 'Old Standard TT',
+    'kurale': 'Kurale',
   };
   LicenseRegistry.addLicense(() async* {
     for (final entry in families.entries) {

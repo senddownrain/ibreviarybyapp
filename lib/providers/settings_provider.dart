@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mybrev_flutter/models/reader_preferences.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,24 +25,37 @@ class ReaderFontOption {
 const kAvailableReaderFonts = <ReaderFontOption>[
   ReaderFontOption(
     id: ReaderFontFamily.literata,
-    label: 'Кніжны',
-    description: 'Literata · рэкамендаваны',
+    label: 'Literata',
+    description: 'рэкамендаваны',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.sourceSerif4,
+    label: 'Source Serif 4',
+    description: 'Source Serif 4',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.oldStandardTT,
+    label: 'Old Standard TT',
+    description: 'Old Standard TT',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.kurale,
+    label: 'Kurale',
+    description: 'Kurale',
   ),
   ReaderFontOption(
     id: ReaderFontFamily.system,
     label: 'Сістэмны',
     description: 'Шрыфт вашай прылады',
   ),
-  ReaderFontOption(
-    id: ReaderFontFamily.sourceSerif4,
-    label: 'Класічны',
-    description: 'Source Serif 4',
-  ),
 ];
 
 String normalizeReaderFontFamily(String? stored) => switch (stored) {
   ReaderFontFamily.literata || 'Literata' => ReaderFontFamily.literata,
   ReaderFontFamily.system => ReaderFontFamily.system,
+  ReaderFontFamily.oldStandardTT ||
+  'Old Standard TT' => ReaderFontFamily.oldStandardTT,
+  ReaderFontFamily.kurale || 'Kurale' => ReaderFontFamily.kurale,
   ReaderFontFamily.sourceSerif4 ||
   'Source Serif 4' => ReaderFontFamily.sourceSerif4,
   // Before VNext this label rendered Literata, not the system face. Preserve
@@ -112,6 +126,7 @@ class SettingsState {
   ThemeMode get themeMode => themePreference.themeMode;
   final double fontSize;
   final String fontFamily;
+  final ReaderTextAlignment textAlignment;
   final bool keepScreenOn;
   final List<UserCategory> userCategories;
   final List<String> hiddenGlobalPrayerCategoryIds;
@@ -128,6 +143,7 @@ class SettingsState {
     this.themePreference = AppThemePreference.system,
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
+    this.textAlignment = ReaderTextAlignment.start,
     this.keepScreenOn = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
@@ -143,6 +159,8 @@ class SettingsState {
   String? get resolvedFontFamily => switch (fontFamily) {
     ReaderFontFamily.system => null,
     ReaderFontFamily.sourceSerif4 => 'Source Serif 4',
+    ReaderFontFamily.oldStandardTT => 'Old Standard TT',
+    ReaderFontFamily.kurale => 'Kurale',
     _ => 'Literata',
   };
 
@@ -150,6 +168,7 @@ class SettingsState {
     AppThemePreference? themePreference,
     double? fontSize,
     String? fontFamily,
+    ReaderTextAlignment? textAlignment,
     bool? keepScreenOn,
     List<UserCategory>? userCategories,
     List<String>? hiddenGlobalPrayerCategoryIds,
@@ -163,6 +182,7 @@ class SettingsState {
     themePreference: themePreference ?? this.themePreference,
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
+    textAlignment: textAlignment ?? this.textAlignment,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
@@ -209,6 +229,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     return SettingsState(
       themePreference: preference,
       psalmodyMode: psalmodyMode,
+      textAlignment: ReaderTextAlignment.fromStorage(_box.get('textAlignment')),
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -307,6 +328,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     if (state.keepScreenOn != value) analyticsFeature('keep_screen_on_toggle');
     state = state.copyWith(keepScreenOn: value);
     _save();
+  }
+
+  Future<void> setTextAlignment(ReaderTextAlignment value) async {
+    state = state.copyWith(textAlignment: value);
+    // Only the explicit setter owns this key, like psalmodyMode.
+    await _box.put('textAlignment', value.name);
+    await _box.flush();
   }
 
   Future<void> setPsalmodyMode(PsalmodyMode value) async {

@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/reader_prose.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
@@ -15,7 +16,11 @@ class PrayerContent extends StatelessWidget {
     required this.textStyle,
     this.onLinkTap,
     this.wrapInSelectionArea = true,
+    this.applyTextAlignment = true,
+    this.textAlignment = TextAlign.start,
   });
+  final bool applyTextAlignment;
+  final TextAlign textAlignment;
   final Prayer prayer;
   final TextStyle textStyle;
   final OnTap? onLinkTap;
@@ -29,8 +34,12 @@ class PrayerContent extends StatelessWidget {
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
     final content = Html(
-      data: html,
-      style: prayerDocumentStyles(context, textStyle),
+      data: applyTextAlignment ? prepareReaderProseHtml(html) : html,
+      style: {
+        ...prayerDocumentStyles(context, textStyle),
+        if (applyTextAlignment)
+          '.reader-prose': Style(textAlign: textAlignment),
+      },
       onLinkTap: onLinkTap,
     );
     return wrapInSelectionArea ? SelectionArea(child: content) : content;

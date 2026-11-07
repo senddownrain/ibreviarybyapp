@@ -80,6 +80,48 @@ class PsalmodyModeSelector extends StatelessWidget {
   }
 }
 
+/// Equal full-width touch targets on phones; a compact group on wider surfaces.
+class PsalmodyControlRow extends StatelessWidget {
+  const PsalmodyControlRow({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    this.selectorKey,
+  });
+  final PsalmodyMode value;
+  final ValueChanged<PsalmodyMode> onChanged;
+  final Key? selectorKey;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final title = Text(
+        'Псальмодыя',
+        style: Theme.of(context).textTheme.titleMedium,
+      );
+      final selector = PsalmodyModeSelector(
+        key: selectorKey,
+        value: value,
+        onChanged: onChanged,
+      );
+      if (constraints.maxWidth >= 560 &&
+          MediaQuery.textScalerOf(context).scale(1) <= 1.5) {
+        return Row(
+          children: [
+            Expanded(child: title),
+            const SizedBox(width: 16),
+            SizedBox(width: 240, child: selector),
+          ],
+        );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [title, const SizedBox(height: 8), selector],
+      );
+    },
+  );
+}
+
 class _PsalmodyIcon extends CustomPainter {
   const _PsalmodyIcon(this.mode, this.color);
   final PsalmodyMode mode;

@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/reader_text_settings.dart';
 import 'package:mybrev_flutter/widgets/psalmody_settings_section.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -139,71 +140,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Font size
-                Text(
-                  'Памер шрыфту',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Slider.adaptive(
-                  value: settings.fontSize,
-                  min: kMinReaderFontSize,
-                  max: kMaxReaderFontSize,
-                  divisions: 11,
-                  label: '${readerFontScalePercent(settings.fontSize)}%',
-                  onChanged: (val) =>
-                      ref.read(settingsProvider.notifier).setFontSize(val),
-                ),
-                Text(
-                  'Пан — маё святло і маё збаўленне.',
-                  style: ReaderTheme.of(
-                    context,
-                  ).body(settings.fontSize, family: settings.fontFamily),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Шрыфт чытання',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  key: const Key('settings-reader-font'),
-                  initialValue: settings.fontFamily,
-                  isExpanded: true,
-                  selectedItemBuilder: (context) => [
-                    for (final option in kAvailableReaderFonts)
-                      Text(option.label),
-                  ],
-                  items: [
-                    for (final option in kAvailableReaderFonts)
-                      DropdownMenuItem(
-                        value: option.id,
-                        child: Text(
-                          '${option.label}: Пан — маё святло і маё збаўленне.',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: ReaderTheme.of(
-                            context,
-                          ).body(16, family: option.id),
-                        ),
+                ExpansionTile(
+                  key: const PageStorageKey('settings-text-group'),
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: const EdgeInsets.only(top: 12, bottom: 16),
+                  title: const Text('Тэкст'),
+                  subtitle: const Text('Шрыфт, памер і выраўноўванне'),
+                  children: [
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        'Памер шрыфту · ${readerFontScalePercent(settings.fontSize)}%',
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
+                    ),
+                    Slider.adaptive(
+                      value: settings.fontSize,
+                      min: kMinReaderFontSize,
+                      max: kMaxReaderFontSize,
+                      divisions: 11,
+                      label: '${readerFontScalePercent(settings.fontSize)}%',
+                      onChanged: ref
+                          .read(settingsProvider.notifier)
+                          .setFontSize,
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        'Пан — маё святло і маё збаўленне.',
+                        style: ReaderTheme.of(
+                          context,
+                        ).body(settings.fontSize, family: settings.fontFamily),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const ReaderFontPicker(key: Key('settings-reader-font')),
+                    const SizedBox(height: 6),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        readerFontOption(settings.fontFamily).description,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const ReaderAlignmentControl(),
                   ],
-                  onChanged: (family) {
-                    if (family != null) {
-                      ref.read(settingsProvider.notifier).setFontFamily(family);
-                    }
-                  },
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  readerFontOption(settings.fontFamily).description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Divider(),
                 const SizedBox(height: 16),
-
                 const PsalmodySettingsSection(),
                 const SizedBox(height: 24),
                 Text(
@@ -213,6 +197,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   key: const Key('settings-start-section'),
+                  isExpanded: true,
+                  itemHeight: null,
                   initialValue: settings.startSection,
                   items: const [
                     DropdownMenuItem(

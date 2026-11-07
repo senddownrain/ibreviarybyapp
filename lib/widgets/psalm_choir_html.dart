@@ -32,6 +32,7 @@ class PsalmChoirHtml extends StatefulWidget {
   final Map<String, Style> style;
   final Color textColor;
   final Color rubricColor;
+  final bool interactive;
 
   const PsalmChoirHtml({
     super.key,
@@ -39,6 +40,7 @@ class PsalmChoirHtml extends StatefulWidget {
     required this.style,
     required this.textColor,
     required this.rubricColor,
+    this.interactive = true,
   });
 
   @override
@@ -80,9 +82,11 @@ class _PsalmChoirHtmlState extends State<PsalmChoirHtml> {
         data: preparePsalmChoirHtml(
           widget.html,
           selectedChoir: selected,
+          interactive: widget.interactive,
           mode: mode,
         ),
         onLinkTap: (url, attributes, element) {
+          if (!widget.interactive) return;
           final choir = switch (url) {
             'psalm-choir:1' => 1,
             'psalm-choir:2' => 2,

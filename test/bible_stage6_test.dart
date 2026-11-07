@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -171,6 +173,45 @@ void main() {
         expect(find.byKey(const Key('app-overflow-open')), findsOneWidget);
       },
     );
+
+    testWidgets('Bible prose follows alignment and all five families live', (
+      tester,
+    ) async {
+      await _pumpBible(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(BibleChapterScreen)),
+      );
+      final notifier = container.read(settingsProvider.notifier);
+      for (final alignment in ReaderTextAlignment.values) {
+        notifier.setTextAlignment(alignment);
+        await tester.pump();
+        expect(
+          tester
+              .widget<RichText>(find.byKey(const Key('bible-verse-body-1')))
+              .textAlign,
+          alignment.textAlign,
+        );
+      }
+      for (final family in kAvailableReaderFonts) {
+        notifier.setFontFamily(family.id);
+        await tester.pump();
+        final body = tester.widget<RichText>(
+          find.byKey(const Key('bible-verse-body-1')),
+        );
+        final style = (body.text as TextSpan).style!;
+        if (family.id == 'system') {
+          expect(style.fontFamily, isNull);
+        } else {
+          expect(
+            style.fontFamily!.toLowerCase().replaceAll(' ', ''),
+            startsWith(family.label.toLowerCase().replaceAll(' ', '')),
+          );
+        }
+      }
+      notifier.setFontFamily('literata');
+      notifier.setTextAlignment(ReaderTextAlignment.start);
+      await tester.pump();
+    });
 
     testWidgets('BEL and RUS switch keeps the reading location', (
       tester,

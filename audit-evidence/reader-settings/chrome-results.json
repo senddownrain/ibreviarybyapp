@@ -1,0 +1,252 @@
+{
+  "url": "http://localhost:5241/",
+  "rows": [
+    {
+      "platform": "android",
+      "theme": "light",
+      "width": 393,
+      "fonts": 5,
+      "psalmody": 3,
+      "alignments": 2
+    },
+    {
+      "platform": "android",
+      "theme": "dark",
+      "width": 393,
+      "fonts": 5,
+      "psalmody": 3,
+      "alignments": 2
+    },
+    {
+      "platform": "android",
+      "theme": "marian",
+      "width": 393,
+      "fonts": 5,
+      "psalmody": 3,
+      "alignments": 2
+    },
+    {
+      "platform": "ios",
+      "theme": "light",
+      "width": 393,
+      "fonts": 5,
+      "psalmody": 3,
+      "alignments": 2
+    },
+    {
+      "platform": "ios",
+      "theme": "dark",
+      "width": 393,
+      "fonts": 5,
+      "psalmody": 3,
+      "alignments": 2
+    },
+    {
+      "platform": "ios",
+      "theme": "marian",
+      "width": 393,
+      "fonts": 5,
+      "psalmody": 3,
+      "alignments": 2
+    },
+    {
+      "width": 320,
+      "theme": "marian",
+      "scale": 2
+    },
+    {
+      "width": 360,
+      "theme": "marian",
+      "scale": 1
+    },
+    {
+      "width": 1440,
+      "theme": "marian",
+      "scale": 1
+    }
+  ],
+  "errors": [],
+  "fontAssets": [
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/CormorantGaramond-Bold.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Literata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/SourceSerif4-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/OldStandardTT-Regular.ttf",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5241/assets/assets/google_fonts/Kurale-Regular.ttf",
+      "status": 200
+    }
+  ],
+  "nativeSmoke": "unavailable; Android/iOS appearance in Flutter Web only"
+}

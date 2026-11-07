@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -287,7 +288,7 @@ class CompendiumQuestionRow extends StatelessWidget {
 
 /// Answer paragraphs with source emphasis, Catechism references and
 /// quotation boxes, in the reader typography.
-class CompendiumAnswer extends StatelessWidget {
+class CompendiumAnswer extends ConsumerWidget {
   const CompendiumAnswer({
     super.key,
     required this.question,
@@ -298,7 +299,7 @@ class CompendiumAnswer extends StatelessWidget {
   final TextStyle textStyle;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final reader = ReaderTheme.of(context);
     final size = textStyle.fontSize ?? 18;
     final paragraphs = answerParagraphs(question);
@@ -330,6 +331,10 @@ class CompendiumAnswer extends StatelessWidget {
                 ],
               ),
               style: textStyle,
+              textAlign: readerProseAlignment(
+                ref.watch(settingsProvider.select((s) => s.textAlignment)),
+                paragraph.map((run) => run.text).join(),
+              ),
             ),
           ),
         if (question.cccRefs.isNotEmpty)

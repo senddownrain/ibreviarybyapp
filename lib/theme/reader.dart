@@ -8,6 +8,8 @@ abstract final class ReaderFontFamily {
   static const literata = 'literata';
   static const system = 'system';
   static const sourceSerif4 = 'sourceSerif4';
+  static const oldStandardTT = 'oldStandardTT';
+  static const kurale = 'kurale';
 }
 
 /// Allows deterministic widget harnesses to use Flutter's bundled test font.
@@ -84,11 +86,18 @@ class ReaderTheme {
     final base = TextStyle(fontSize: size, height: bodyHeight, color: ink);
     if (useSystemFonts) return base;
     try {
-      return switch (family) {
+      // Semantic roles may reuse the resolved Google Fonts style family.
+      final face = family?.split('_').first;
+      return switch (face) {
         ReaderFontFamily.system => base,
-        ReaderFontFamily.sourceSerif4 => GoogleFonts.sourceSerif4(
-          textStyle: base,
-        ),
+        ReaderFontFamily.sourceSerif4 ||
+        'SourceSerif4' ||
+        'Source Serif 4' => GoogleFonts.sourceSerif4(textStyle: base),
+        ReaderFontFamily.oldStandardTT ||
+        'OldStandardTT' ||
+        'Old Standard TT' => GoogleFonts.oldStandardTt(textStyle: base),
+        ReaderFontFamily.kurale ||
+        'Kurale' => GoogleFonts.kurale(textStyle: base),
         _ => GoogleFonts.literata(textStyle: base),
       };
     } catch (_) {
