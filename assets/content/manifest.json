@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1793950365664,
-  "contentDate": "2026-11-06T07:32:45.664Z",
+  "contentVersion": 1794092262000,
+  "contentDate": "2026-11-07T22:57:42.000Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
       "count": 736,
-      "digest": "b5f4b077f42f6664",
-      "storedBytes": 53966736,
-      "bundleBytes": 2318503
+      "digest": "4d71131ab6bf2f4a",
+      "storedBytes": 54608675,
+      "bundleBytes": 2319360
     },
     "readings": {
       "file": "readings.json.gz",
@@ -23,12 +23,12 @@
     },
     "liturgicalTemplates": {
       "file": "liturgicalTemplates.json.gz",
-      "contentVersion": 1793343827000,
-      "contentDate": "2026-10-30T07:03:47.000Z",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
       "count": 16,
-      "digest": "316b5f1487846faf",
-      "storedBytes": 2961227,
-      "bundleBytes": 339127
+      "digest": "eb5361386d552f49",
+      "storedBytes": 3022599,
+      "bundleBytes": 344031
     },
     "invitatoriums": {
       "file": "invitatoriums.json.gz",
@@ -50,12 +50,12 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1793343827000,
-      "contentDate": "2026-10-30T07:03:47.000Z",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
       "count": 1,
-      "digest": "67191e93d2d4eec8",
+      "digest": "71ad58d830bd0d77",
       "storedBytes": 139,
-      "bundleBytes": 201
+      "bundleBytes": 205
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
@@ -86,12 +86,12 @@
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",
-      "contentVersion": 1793950365664,
-      "contentDate": "2026-11-06T07:32:45.664Z",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
       "count": 291,
-      "digest": "8d79a1efaafd1062",
-      "storedBytes": 3200447,
-      "bundleBytes": 590699
+      "digest": "60081a442fa9c4ed",
+      "storedBytes": 3211295,
+      "bundleBytes": 590720
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",

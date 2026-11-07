@@ -58,13 +58,13 @@ void main() {
   );
 
   test(
-    'real A–F inputs: every text value and source equals production Web',
+    'real inputs: every text value and source equals the Web oracle',
     () {
       for (final item in (fixture['cases'] as List).cast<Map>()) {
         final doc = proper(item['id'] as String);
         final date = item['date'] as String;
         final office = OrdoRuntime.engine
-            .resolve(date)
+            .resolve(date, diocese: item['diocese'] as String? ?? 'minsk-mohilev')
             .office(doc['_celebrationId'] as String)!;
         final result = assembleOffice(
           proper: doc,
@@ -91,10 +91,10 @@ void main() {
         );
         expect(result.data['_assembly'], item['assembly'], reason: context);
         expect(result.data['_rank'], doc['_rank']);
-        // GILH 235-238: a memorial never has the Te Deum, whatever the Common.
+        // The Web descriptor decides: memorials omit it; solemnities keep it.
         expect(
           shouldShowTeDeum(LiturgicalDay.fromMap(result.data)),
-          isFalse,
+          item['teDeum'] ?? false,
           reason: context,
         );
       }

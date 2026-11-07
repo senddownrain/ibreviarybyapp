@@ -31,17 +31,20 @@ for (const [id, date] of [
   ['19-10-sv-paul-of-cross', '2026-10-19'], ['04-10-sv-francis-assisi', '2027-10-04'],
   ['11-08-sv-clare', '2026-08-11'], ['17-02-seven-servite-founders', '2026-02-17'],
   ['04-07-sv-elizabeth-portugal', '2026-07-04'], ['27-01-sv-angela-merici', '2026-01-27'],
+  ['12-11-sv-josaphat-minsk-mohilev-pinsk--pinsk', '2026-11-12'],
+  ['02-11-all-faithful-departed', '2026-11-02'],
+  ['01-11-all-saints', '2026-11-01'],
 ]) {
   const proper = all.liturgicalProperTexts[id];
   if (!proper) throw new Error(`Unknown Proper ${id}`);
-  const resolved = resolveRuntimeDay(date, { diocese: 'minsk-mohilev' });
+  const resolved = resolveRuntimeDay(date, { diocese: id.includes('josaphat') ? 'pinsk' : 'minsk-mohilev' });
   const office = [resolved.officeResolution.primary, ...resolved.officeResolution.alternatives]
     .find(o => o.optionId === proper._celebrationId);
   if (!office) throw new Error(`No legal Office ${id} ${date}`);
   for (const choice of assemblyChoices(proper, office)) {
     const assembled = assembleOffice({ proper, office, templates: all.liturgicalTemplates, currentDay,
       choice, season: computeSeason(date) });
-    cases.push({ id, date, choice,
+    cases.push({ id, date, choice, diocese: id.includes('josaphat') ? 'pinsk' : 'minsk-mohilev', teDeum: office.teDeum,
       fields: Object.fromEntries(OFFICE_CONTENT_FIELDS.map(f => [f, createHash('sha256')
         .update(api.canonicalJson(assembled.day[f] ?? null)).digest('hex')])),
       provenance: assembled.provenance, missing: assembled.missing, integrity: assembled.integrity,
