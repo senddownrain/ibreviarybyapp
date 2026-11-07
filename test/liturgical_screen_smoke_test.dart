@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/reader_alignment.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -33,8 +34,11 @@ PsalmodyMode _mode = PsalmodyMode.leftBreak;
 
 class _SmokeSettings extends SettingsNotifier {
   @override
-  SettingsState build() =>
-      SettingsState(fontSize: _fontSize, psalmodyMode: _mode);
+  SettingsState build() => SettingsState(
+    fontSize: _fontSize,
+    psalmodyMode: _mode,
+    textAlignment: ReaderAlignment.justify,
+  );
 
   // This UI fixture does not open SettingsNotifier's private Hive box. Keep
   // slider changes in memory; persistence has its own real-I/O tests.
@@ -50,6 +54,32 @@ class _SmokeSettings extends SettingsNotifier {
 }
 
 void main() {
+  testWidgets('justify preference does not align any Ora content', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+        child: ReaderTypographyScope(
+          useSystemFonts: true,
+          child: MaterialApp(
+            home: OraScreen(
+              dayId: 'smoke',
+              oraType: 'laudes',
+              date: DateTime(2028, 8, 1),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final rich = tester.widgetList<RichText>(find.byType(RichText));
+    expect(rich, isNotEmpty);
+    expect(rich.any((w) => w.textAlign == TextAlign.justify), isFalse);
+    for (final html in tester.widgetList<Html>(find.byType(Html))) {
+      expect(html.data, isNot(contains('reader-prose')));
+    }
+  });
   late Directory directory;
   final date = DateTime(2028, 8, 1);
   setUpAll(() async {

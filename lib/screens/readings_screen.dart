@@ -1,3 +1,6 @@
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/utils/reader_prose.dart';
+import 'package:mybrev_flutter/widgets/reader_prose.dart';
 import 'dart:async';
 
 import 'package:mybrev_flutter/discovery/discovery_context.dart';
@@ -1839,7 +1842,11 @@ class _SequenceSection extends StatelessWidget {
         for (final strophe in strophes)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _ReadingText(text: strophe, textStyle: textStyle),
+            child: _ReadingText(
+              text: strophe,
+              textStyle: textStyle,
+              prose: false,
+            ),
           ),
       ],
     );
@@ -2037,10 +2044,11 @@ class _BibleRef extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 
-class _ReadingText extends StatefulWidget {
+class _ReadingText extends ConsumerStatefulWidget {
   final String text;
   final TextStyle textStyle;
   final bool isPsalm;
+  final bool prose;
   final String? highlightNamespace;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
@@ -2050,6 +2058,7 @@ class _ReadingText extends StatefulWidget {
     required this.text,
     required this.textStyle,
     this.isPsalm = false,
+    this.prose = true,
     this.highlightNamespace,
     this.highlights = const {},
     this.selectedSentenceId,
@@ -2057,10 +2066,10 @@ class _ReadingText extends StatefulWidget {
   });
 
   @override
-  State<_ReadingText> createState() => _ReadingTextState();
+  ConsumerState<_ReadingText> createState() => _ReadingTextState();
 }
 
-class _ReadingTextState extends State<_ReadingText> {
+class _ReadingTextState extends ConsumerState<_ReadingText> {
   final Map<String, TapGestureRecognizer> _recognizers = {};
 
   TapGestureRecognizer _recognizerFor(String sentenceId) =>
@@ -2083,14 +2092,21 @@ class _ReadingTextState extends State<_ReadingText> {
   Widget build(BuildContext context) {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
-      return Html(
-        data: widget.isPsalm
-            ? formatReadingPsalmHtml(widget.text)
-            : formatLiturgicalHtml(widget.text),
-        style: {
-          ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
-          '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
-        },
+      final styles = {
+        ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
+        '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
+      };
+      if (widget.isPsalm || !widget.prose) {
+        return Html(
+          data: widget.isPsalm
+              ? formatReadingPsalmHtml(widget.text)
+              : formatLiturgicalHtml(widget.text),
+          style: styles,
+        );
+      }
+      return ReaderProseHtml(
+        data: formatLiturgicalHtml(widget.text),
+        style: styles,
       );
     }
     final reader = ReaderTheme.of(context);
@@ -2101,33 +2117,47 @@ class _ReadingTextState extends State<_ReadingText> {
     final sentences = namespace == null
         ? <_SentencePart>[_SentencePart(plainText, 0)]
         : _splitReadingSentences(plainText);
-    return Text.rich(
-      TextSpan(
-        children: [
-          for (final sentence in sentences)
-            TextSpan(
-              style: _sentenceStyle(context, '$namespace:${sentence.index}'),
-              children: [
-                for (final piece in sentence.text.split(
-                  RegExp(r'(?=[*†])|(?<=[*†])'),
-                ))
-                  TextSpan(
-                    text: piece,
-                    recognizer: namespace == null
-                        ? null
-                        : _recognizerFor('$namespace:${sentence.index}'),
-                    style: piece == '*' || piece == '†'
-                        ? widget.textStyle.copyWith(
-                            height: ReaderTheme.bodyHeight,
-                            color: reader.rubric,
-                            fontWeight: FontWeight.w600,
-                          )
-                        : null,
-                  ),
-              ],
+    final paragraphs = <List<InlineSpan>>[[]];
+    for (final sentence in sentences) {
+      final parts = sentence.text.split('\n');
+      for (var i = 0; i < parts.length; i++) {
+        if (i > 0) paragraphs.add([]);
+        paragraphs.last.add(
+          TextSpan(
+            style: _sentenceStyle(context, '$namespace:${sentence.index}'),
+            children: [
+              for (final piece in parts[i].split(RegExp(r'(?=[*†])|(?<=[*†])')))
+                TextSpan(
+                  text: piece,
+                  recognizer: namespace == null
+                      ? null
+                      : _recognizerFor('$namespace:${sentence.index}'),
+                  style: piece == '*' || piece == '†'
+                      ? widget.textStyle.copyWith(
+                          height: ReaderTheme.bodyHeight,
+                          color: reader.rubric,
+                          fontWeight: FontWeight.w600,
+                        )
+                      : null,
+                ),
+            ],
+          ),
+        );
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final spans in paragraphs)
+          Text.rich(
+            TextSpan(children: spans),
+            textAlign: proseTextAlign(
+              ref.watch(settingsProvider).textAlignment,
+              widget.text.replaceAll(RegExp(r'\r?\n[ \t]*\r?\n+'), ' '),
+              enabled: widget.prose && !widget.isPsalm,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
@@ -2664,7 +2694,7 @@ class _AlleluiaSection extends StatelessWidget {
         _acclamationLine(context),
         if (verse.isNotEmpty) ...[
           const SizedBox(height: 4),
-          _ReadingText(text: verse, textStyle: textStyle),
+          _ReadingText(text: verse, textStyle: textStyle, prose: false),
         ],
         _acclamationLine(context),
       ],

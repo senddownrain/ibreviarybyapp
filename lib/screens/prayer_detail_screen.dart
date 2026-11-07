@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/utils/reader_prose.dart';
+import 'package:mybrev_flutter/widgets/reader_prose.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:flutter/rendering.dart';
@@ -520,9 +522,17 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
               .copyWith(fontFamily: textStyle.fontFamily),
         );
       }
-      return Html(onLinkTap: _onLinkTap, data: formattedHtml, style: styles);
+      return ReaderProseHtml(
+        onLinkTap: _onLinkTap,
+        data: formattedHtml,
+        style: styles,
+      );
     }
-    return SelectableText(raw, style: textStyle);
+    return SelectableText(
+      raw,
+      style: textStyle,
+      textAlign: proseTextAlign(ref.watch(settingsProvider).textAlignment, raw),
+    );
   }
 }
 
@@ -835,7 +845,7 @@ class _MassDocumentState extends State<_MassDocument> {
               child: Semantics(
                 container: true,
                 explicitChildNodes: true,
-                child: Html(
+                child: ReaderProseHtml(
                   onLinkTap: widget.onLinkTap,
                   data: chunk.html,
                   style: index == 0 ? firstMajorStyle : widget.styles,
@@ -843,7 +853,7 @@ class _MassDocumentState extends State<_MassDocument> {
               ),
             )
           else
-            Html(
+            ReaderProseHtml(
               onLinkTap: widget.onLinkTap,
               data: chunk.html,
               style: index == 0 ? firstMajorStyle : widget.styles,

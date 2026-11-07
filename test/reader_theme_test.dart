@@ -1,8 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
 void main() {
+  testWidgets('all five real font families load offline, including new faces', (
+    tester,
+  ) async {
+    GoogleFonts.config.allowRuntimeFetching = false;
+    late List<TextStyle> styles;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            final reader = ReaderTheme.of(context);
+            styles = [
+              for (final family in [
+                ReaderFontFamily.literata,
+                ReaderFontFamily.sourceSerif4,
+                ReaderFontFamily.oldStandardTT,
+                ReaderFontFamily.kurale,
+                ReaderFontFamily.system,
+              ])
+                reader.body(24, family: family),
+            ];
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+    await tester.runAsync(() => GoogleFonts.pendingFonts());
+    expect(styles.map((s) => s.fontFamily), [
+      'Literata_regular',
+      'SourceSerif4_regular',
+      'OldStandardTT_regular',
+      'Kurale_regular',
+      null,
+    ]);
+    for (final s in styles) {
+      expect(s.fontSize, 24);
+      expect(s.height, ReaderTheme.bodyHeight);
+    }
+    for (final family in ['oldstandardtt', 'kurale']) {
+      final license = await rootBundle.loadString(
+        'assets/google_fonts/OFL-$family.txt',
+      );
+      expect(license, contains('SIL OPEN FONT LICENSE'));
+    }
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('book and system reader preferences resolve differently', (
     tester,
   ) async {

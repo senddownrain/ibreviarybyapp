@@ -65,18 +65,14 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
-    final width = math.min(
-      widget.showPsalmody ? 288.0 : 360.0,
-      media.size.width - 32,
-    );
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
     final bottom =
         media.size.height -
         math.max(media.viewInsets.bottom, media.viewPadding.bottom);
-    final menuTop = origin.dy + button.size.height + 8;
+    final menuTop = origin.dy + button.size.height + 4;
     final availableHeight = math.max(48.0, bottom - menuTop - 8);
     var position = RelativeRect.fromRect(
-      Rect.fromLTWH(origin.dx, menuTop, button.size.width, 0),
+      Rect.fromLTWH(origin.dx + button.size.width, menuTop, 0, 0),
       Offset.zero & overlay.size,
     );
     // The prayerbook shares this menu across its root, category/catalogue
@@ -97,6 +93,30 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
           onSelected: () => context.push('/prayers/categories'),
         ),
     ];
+    final labels = [
+      if (widget.showTextScale) 'Шрыфт',
+      ...actions.map((a) => a.label),
+      'Налады',
+      'Інфармацыя',
+    ];
+    final textStyle = Theme.of(context).textTheme.bodyLarge!;
+    var contentWidth = 0.0;
+    for (final label in labels) {
+      final painter = TextPainter(
+        text: TextSpan(text: label, style: textStyle),
+        textDirection: Directionality.of(context),
+        textScaler: media.textScaler,
+      )..layout();
+      contentWidth = math.max(contentWidth, painter.width + 16 + 22 + 12 + 16);
+      painter.dispose();
+    }
+    final maxWidth = math.min(
+      360.0,
+      media.size.width - media.viewPadding.horizontal - 16,
+    );
+    final width = contentWidth
+        .clamp(math.min(224, maxWidth), maxWidth)
+        .toDouble();
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -115,9 +135,9 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
           final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
           position = RelativeRect.fromRect(
             Rect.fromLTWH(
-              origin.dx,
-              origin.dy + button.size.height + 8,
-              button.size.width,
+              origin.dx + button.size.width,
+              origin.dy + button.size.height + 4,
+              0,
               0,
             ),
             Offset.zero & overlay.size,
@@ -229,7 +249,9 @@ class _OverflowContent extends StatelessWidget {
     minTileHeight: 48,
     leading: Icon(icon, size: 22),
     title: Text(label),
-    trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+    horizontalTitleGap: 12,
+    minLeadingWidth: 22,
     onTap: () => onSelected(value),
   );
 }

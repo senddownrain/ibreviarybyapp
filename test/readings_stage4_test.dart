@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/reader_alignment.dart';
 import 'dart:async';
 
 import 'dart:io';
@@ -119,6 +120,40 @@ void main() {
         isEmpty,
       );
     });
+  });
+
+  testWidgets('Readings prose reacts to start and justify', (tester) async {
+    final container = ProviderContainer(
+      overrides: [
+        _presentationOverride,
+        liturgicalContentReadyProvider.overrideWith((ref) async {}),
+        dayOptionsProvider.overrideWithValue(const []),
+        settingsProvider.overrideWith(_TestSettingsNotifier.new),
+        liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+        readingsLoaderProvider.overrideWithValue(
+          _loader([
+            _reading('only', title: 'Свята дня', text: 'Абзац чытання.'),
+          ]),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    for (final mode in ReaderAlignment.values) {
+      await container.read(settingsProvider.notifier).setTextAlignment(mode);
+      await tester.pumpAndSettle();
+      final prose = tester
+          .widgetList<RichText>(find.byType(RichText))
+          .where((w) => w.text.toPlainText().contains('Абзац чытання.'));
+      expect(prose, isNotEmpty);
+      expect(prose.every((w) => w.textAlign == mode.textAlign), isTrue);
+    }
   });
 
   testWidgets('root is the shared reader and immediately shows content', (
@@ -629,6 +664,9 @@ void main() {
 class _TestSettingsNotifier extends SettingsNotifier {
   @override
   SettingsState build() => const SettingsState();
+  @override
+  Future<void> setTextAlignment(ReaderAlignment value) async =>
+      state = state.copyWith(textAlignment: value);
 }
 
 final _presentationOverride = liturgicalDayPresentationProvider

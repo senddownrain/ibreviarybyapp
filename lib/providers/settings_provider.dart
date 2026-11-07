@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mybrev_flutter/models/reader_alignment.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,24 +25,37 @@ class ReaderFontOption {
 const kAvailableReaderFonts = <ReaderFontOption>[
   ReaderFontOption(
     id: ReaderFontFamily.literata,
-    label: 'Кніжны',
-    description: 'Literata · рэкамендаваны',
+    label: 'Literata',
+    description: 'рэкамендаваны',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.sourceSerif4,
+    label: 'Source Serif 4',
+    description: 'Source Serif 4',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.oldStandardTT,
+    label: 'Old Standard TT',
+    description: 'Old Standard TT',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.kurale,
+    label: 'Kurale',
+    description: 'Kurale',
   ),
   ReaderFontOption(
     id: ReaderFontFamily.system,
     label: 'Сістэмны',
     description: 'Шрыфт вашай прылады',
   ),
-  ReaderFontOption(
-    id: ReaderFontFamily.sourceSerif4,
-    label: 'Класічны',
-    description: 'Source Serif 4',
-  ),
 ];
 
 String normalizeReaderFontFamily(String? stored) => switch (stored) {
   ReaderFontFamily.literata || 'Literata' => ReaderFontFamily.literata,
   ReaderFontFamily.system => ReaderFontFamily.system,
+  ReaderFontFamily.oldStandardTT ||
+  'Old Standard TT' => ReaderFontFamily.oldStandardTT,
+  ReaderFontFamily.kurale || 'Kurale' => ReaderFontFamily.kurale,
   ReaderFontFamily.sourceSerif4 ||
   'Source Serif 4' => ReaderFontFamily.sourceSerif4,
   // Before VNext this label rendered Literata, not the system face. Preserve
@@ -120,6 +134,7 @@ class SettingsState {
   final String startSection;
   final String lastSection;
   final PsalmodyMode psalmodyMode;
+  final ReaderAlignment textAlignment;
 
   /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
@@ -136,6 +151,7 @@ class SettingsState {
     this.startSection = 'hours',
     this.lastSection = 'hours',
     this.psalmodyMode = PsalmodyMode.leftBreak,
+    this.textAlignment = ReaderAlignment.start,
     this.prayerCategoryMap = const {},
   });
 
@@ -143,6 +159,8 @@ class SettingsState {
   String? get resolvedFontFamily => switch (fontFamily) {
     ReaderFontFamily.system => null,
     ReaderFontFamily.sourceSerif4 => 'Source Serif 4',
+    ReaderFontFamily.oldStandardTT => 'Old Standard TT',
+    ReaderFontFamily.kurale => 'Kurale',
     _ => 'Literata',
   };
 
@@ -158,6 +176,7 @@ class SettingsState {
     String? startSection,
     String? lastSection,
     PsalmodyMode? psalmodyMode,
+    ReaderAlignment? textAlignment,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
     themePreference: themePreference ?? this.themePreference,
@@ -172,6 +191,7 @@ class SettingsState {
     startSection: startSection ?? this.startSection,
     lastSection: lastSection ?? this.lastSection,
     psalmodyMode: psalmodyMode ?? this.psalmodyMode,
+    textAlignment: textAlignment ?? this.textAlignment,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
   );
 }
@@ -209,6 +229,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     return SettingsState(
       themePreference: preference,
       psalmodyMode: psalmodyMode,
+      textAlignment: ReaderAlignment.fromStorage(_box.get('textAlignment')),
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -279,7 +300,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     final next = normalizeReaderFontSize(size);
     if (state.fontSize != next) analyticsFeature('text_scale_change');
     state = state.copyWith(fontSize: next);
-    _save();
+    _box.put('fontSize', next);
   }
 
   void increaseFontSize() => _stepFontSize(1);
@@ -300,7 +321,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     final next = normalizeReaderFontFamily(family);
     if (state.fontFamily != next) analyticsFeature('font_family_change');
     state = state.copyWith(fontFamily: next);
-    _save();
+    _box.put('fontFamily', next);
+  }
+
+  Future<void> setTextAlignment(ReaderAlignment value) async {
+    state = state.copyWith(textAlignment: value);
+    await _box.put('textAlignment', value.name);
+    await _box.flush();
   }
 
   void setKeepScreenOn(bool value) {

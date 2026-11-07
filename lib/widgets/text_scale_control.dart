@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_hint_host.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
-import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
+import 'package:mybrev_flutter/widgets/psalmody_settings_section.dart';
+import 'package:mybrev_flutter/widgets/reader_text_settings.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -57,11 +58,16 @@ Future<void> showTextScalePanel(
     return showCupertinoModalPopup<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.28),
-      builder: (_) => Material(
+      builder: (panelContext) => Material(
         color: Colors.transparent,
         child: SafeArea(
           top: false,
-          child: _TextScalePanel(showPsalmody: showPsalmody),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.viewInsetsOf(panelContext).bottom,
+            ),
+            child: _TextScalePanel(showPsalmody: showPsalmody),
+          ),
         ),
       ),
     );
@@ -74,10 +80,15 @@ Future<void> showTextScalePanel(
     enableDrag: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.28),
-    builder: (_) => SafeArea(
+    builder: (panelContext) => SafeArea(
       top: false,
       minimum: EdgeInsets.only(bottom: 6),
-      child: _TextScalePanel(showPsalmody: showPsalmody),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(panelContext).bottom,
+        ),
+        child: _TextScalePanel(showPsalmody: showPsalmody),
+      ),
     ),
   );
 }
@@ -106,7 +117,10 @@ class _TextScalePanel extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * .85,
+              maxHeight:
+                  (MediaQuery.sizeOf(context).height -
+                      MediaQuery.viewInsetsOf(context).bottom) *
+                  .85,
             ),
             child: SingleChildScrollView(
               child: AdaptiveChromeSurface(
@@ -126,56 +140,7 @@ class _TextScalePanel extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        PhosphorIcon(
-                          PhosphorIconsRegular.textAa,
-                          size: 23,
-                          color: accent,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Шрыфт',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        AnimatedContainer(
-                          key: const Key('text-scale-value'),
-                          duration: const Duration(milliseconds: 160),
-                          curve: Curves.easeOut,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: cs.tertiary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: Text(
-                            '$percent%',
-                            style: Theme.of(context).textTheme.labelLarge
-                                ?.copyWith(
-                                  color: accent,
-                                  fontWeight: FontWeight.w700,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures(),
-                                  ],
-                                ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        IconButton(
-                          tooltip: 'Закрыць',
-                          onPressed: () => Navigator.pop(context),
-                          icon: const PhosphorIcon(
-                            PhosphorIconsRegular.x,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
+                    _TextScalePanelHeader(percent: percent, accent: accent),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -220,24 +185,14 @@ class _TextScalePanel extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    const ReaderFontSelector(key: Key('sheet-reader-font')),
+                    const Divider(height: 28),
                     if (showPsalmody) ...[
-                      const Divider(height: 28),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Псальмодыя',
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      PsalmodyModeSelector(
-                        key: const Key('text-scale-psalmody-modes'),
-                        value: settings.psalmodyMode,
-                        onChanged: notifier.setPsalmodyMode,
-                      ),
+                      const PsalmodySettingsSection(showExample: false),
                       const HintInlineSlot(),
-                    ],
+                    ] else
+                      const ReaderAlignmentSelector(),
                   ],
                 ),
               ),
@@ -247,6 +202,91 @@ class _TextScalePanel extends ConsumerWidget {
       ),
     );
     return showPsalmody ? PsalmLayoutHintHost(child: panel) : panel;
+  }
+}
+
+class _TextScalePanelHeader extends StatelessWidget {
+  const _TextScalePanelHeader({required this.percent, required this.accent});
+  final int percent;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleStyle = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.w700,
+    );
+    final valueStyle = theme.textTheme.labelLarge?.copyWith(
+      color: accent,
+      fontWeight: FontWeight.w700,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    double widthOf(String text, TextStyle? style) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      final width = painter.width;
+      painter.dispose();
+      return width;
+    }
+
+    final badge = AnimatedContainer(
+      key: const Key('text-scale-value'),
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOut,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.tertiary.withValues(alpha: .12),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Text('$percent%', style: valueStyle),
+    );
+    // Measure the real labels at the system scale before sharing a row.
+    final requiredWidth =
+        23 +
+        10 +
+        widthOf('Шрыфт', titleStyle) +
+        widthOf('$percent%', valueStyle) +
+        20 +
+        4 +
+        48;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final inline = constraints.maxWidth >= requiredWidth;
+        final row = Row(
+          children: [
+            PhosphorIcon(PhosphorIconsRegular.textAa, size: 23, color: accent),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Шрыфт',
+                style: titleStyle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (inline) ...[badge, const SizedBox(width: 4)],
+            IconButton(
+              tooltip: 'Закрыць',
+              onPressed: () => Navigator.pop(context),
+              icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 20),
+            ),
+          ],
+        );
+        return inline
+            ? row
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  row,
+                  const SizedBox(height: 4),
+                  Align(alignment: Alignment.centerRight, child: badge),
+                ],
+              );
+      },
+    );
   }
 }
 

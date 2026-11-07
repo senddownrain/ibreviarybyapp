@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/models/reader_alignment.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -35,6 +37,26 @@ void main() {
   // Hive stays open for the lifetime of the test isolate. Closing it while the
   // final widget tree is being disposed can race the reader's debounced scroll
   // save on Windows.
+
+  testWidgets('Bible prose follows the shared alignment preference', (
+    tester,
+  ) async {
+    await _pumpBible(tester);
+    final verse = find.byKey(const Key('bible-verse-body-1'));
+    final container = ProviderScope.containerOf(tester.element(verse));
+    for (final mode in ReaderAlignment.values) {
+      // State changes synchronously. Real disk close/reopen belongs to the
+      // preferences tests; awaiting disk flush inside fake time stalls it.
+      container.read(settingsProvider.notifier).setTextAlignment(mode);
+      await tester.pumpAndSettle();
+      expect(tester.widget<RichText>(verse).textAlign, mode.textAlign);
+      expect(tester.widget<RichText>(verse).text.toPlainText(), isNotEmpty);
+    }
+    container
+        .read(settingsProvider.notifier)
+        .setTextAlignment(ReaderAlignment.start);
+    await tester.pumpAndSettle();
+  });
 
   group('Bible location and navigation', () {
     test('first run uses a sensible first-book default', () {

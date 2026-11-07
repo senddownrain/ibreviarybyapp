@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
@@ -37,52 +38,58 @@ void main() {
               await tester.pumpWidget(
                 UncontrolledProviderScope(
                   container: container,
-                  child: MaterialApp(
-                    theme: ThemeData(
-                      platform: platform,
-                      brightness: brightness,
-                    ),
-                    builder: (context, child) => MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        textScaler: TextScaler.linear(scale),
-                        padding: const EdgeInsets.only(top: 44, bottom: 34),
-                        viewPadding: const EdgeInsets.only(top: 44, bottom: 34),
+                  child: ReaderTypographyScope(
+                    useSystemFonts: true,
+                    child: MaterialApp(
+                      theme: ThemeData(
+                        platform: platform,
+                        brightness: brightness,
                       ),
-                      child: child!,
-                    ),
-                    home: Scaffold(
-                      body: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const PsalmodySettingsSection(),
-                              Builder(
-                                builder: (context) => TextButton(
-                                  onPressed: () => showTextScalePanel(
-                                    context,
-                                    showPsalmody: true,
+                      builder: (context, child) => MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          textScaler: TextScaler.linear(scale),
+                          padding: const EdgeInsets.only(top: 44, bottom: 34),
+                          viewPadding: const EdgeInsets.only(
+                            top: 44,
+                            bottom: 34,
+                          ),
+                        ),
+                        child: child!,
+                      ),
+                      home: Scaffold(
+                        body: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const PsalmodySettingsSection(),
+                                Builder(
+                                  builder: (context) => TextButton(
+                                    onPressed: () => showTextScalePanel(
+                                      context,
+                                      showPsalmody: true,
+                                    ),
+                                    child: const Text('Aa'),
                                   ),
-                                  child: const Text('Aa'),
                                 ),
-                              ),
-                              const LiturgicalSelectorHeading(
-                                'Тэксты Літургіі гадзінаў апрача ўласных',
-                              ),
-                              RadioGroup<String>(
-                                groupValue: 'dead',
-                                onChanged: (_) {},
-                                child: const LiturgicalCelebrationChoice(
-                                  value: 'dead',
-                                  title: 'Афіцый за памерлых',
-                                  subtitle:
-                                      'Літургічная ступень · Магчымасці цэлебрацыі',
-                                  selected: true,
-                                  colors: [],
+                                const LiturgicalSelectorHeading(
+                                  'Тэксты Літургіі гадзінаў апрача ўласных',
                                 ),
-                              ),
-                            ],
+                                RadioGroup<String>(
+                                  groupValue: 'dead',
+                                  onChanged: (_) {},
+                                  child: const LiturgicalCelebrationChoice(
+                                    value: 'dead',
+                                    title: 'Афіцый за памерлых',
+                                    subtitle:
+                                        'Літургічная ступень · Магчымасці цэлебрацыі',
+                                    selected: true,
+                                    colors: [],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -101,6 +108,8 @@ void main() {
                 tester.widget<PsalmodyModeSelector>(global).value,
                 PsalmodyMode.alternatingStanzas,
               );
+              await tester.ensureVisible(find.text('Aa'));
+              await tester.pumpAndSettle();
               await tester.tap(find.text('Aa'));
               await tester.pumpAndSettle();
               final panel = find.byKey(const Key('text-scale-psalmody-modes'));

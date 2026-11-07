@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -63,15 +65,18 @@ void main() {
             textFormat: legacy ? 'html' : 'mybrev-markdown',
           );
           await tester.pumpWidget(
-            ReaderTypographyScope(
-              useSystemFonts: true,
-              child: MaterialApp(
-                theme: ThemeData(brightness: brightness),
-                home: Scaffold(
-                  body: SingleChildScrollView(
-                    child: PrayerContent(
-                      prayer: prayer,
-                      textStyle: const TextStyle(fontSize: 28.8),
+            ProviderScope(
+              overrides: [settingsProvider.overrideWith(_Settings.new)],
+              child: ReaderTypographyScope(
+                useSystemFonts: true,
+                child: MaterialApp(
+                  theme: ThemeData(brightness: brightness),
+                  home: Scaffold(
+                    body: SingleChildScrollView(
+                      child: PrayerContent(
+                        prayer: prayer,
+                        textStyle: const TextStyle(fontSize: 28.8),
+                      ),
                     ),
                   ),
                 ),
@@ -119,4 +124,9 @@ void main() {
       );
     }
   }
+}
+
+class _Settings extends SettingsNotifier {
+  @override
+  SettingsState build() => const SettingsState();
 }

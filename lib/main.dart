@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,6 +30,7 @@ import 'package:mybrev_flutter/widgets/priest_access_lifecycle.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
   await ensureFirebaseInitialized(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -119,6 +121,8 @@ void _registerFontLicenses() {
     'cormorantgaramond': 'Cormorant Garamond',
     'literata': 'Literata',
     'sourceserif4': 'Source Serif 4',
+    'oldstandardtt': 'Old Standard TT',
+    'kurale': 'Kurale',
   };
   LicenseRegistry.addLicense(() async* {
     for (final entry in families.entries) {

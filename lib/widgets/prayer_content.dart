@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/reader_prose.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
@@ -28,7 +29,7 @@ class PrayerContent extends StatelessWidget {
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
-    final content = Html(
+    final content = ReaderProseHtml(
       data: html,
       style: prayerDocumentStyles(context, textStyle),
       onLinkTap: onLinkTap,

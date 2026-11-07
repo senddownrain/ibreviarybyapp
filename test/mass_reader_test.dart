@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/reader_alignment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -131,6 +132,36 @@ bool _onScreen(WidgetTester tester, Finder finder) {
 }
 
 void main() {
+  testWidgets(
+    'Mass prose aligns while headings and role labels keep their roles',
+    (tester) async {
+      await tester.pumpWidget(
+        _app(const PrayerDetailScreen(prayerId: _massId)),
+      );
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PrayerDetailScreen)),
+      );
+      for (final mode in ReaderAlignment.values) {
+        await container.read(settingsProvider.notifier).setTextAlignment(mode);
+        await tester.pumpAndSettle();
+        final documents = tester.widgetList<Html>(find.byType(Html));
+        expect(documents, isNotEmpty);
+        expect(
+          documents.any((html) => html.data!.contains('reader-prose')),
+          isTrue,
+        );
+        for (final html in documents) {
+          expect(html.style['.reader-prose']!.textAlign, mode.textAlign);
+          expect(
+            html.style['.${MassBlockClass.major}']!.textAlign,
+            isNot(TextAlign.justify),
+          );
+        }
+      }
+    },
+  );
+
   testWidgets('Holy Mass opens in Belarusian with the section bar', (
     tester,
   ) async {
@@ -661,6 +692,9 @@ class _TestSettingsNotifier extends SettingsNotifier {
   @override
   SettingsState build() => const SettingsState();
 
+  @override
+  Future<void> setTextAlignment(ReaderAlignment value) async =>
+      state = state.copyWith(textAlignment: value);
   @override
   Future<void> toggleFavorite(String id) async {}
 

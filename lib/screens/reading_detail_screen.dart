@@ -1,6 +1,8 @@
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/utils/reader_prose.dart';
+import 'package:mybrev_flutter/widgets/reader_prose.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/reading.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -117,7 +119,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   Widget _buildRendered(String text, TextStyle textStyle) {
     if (text.contains('<') && text.contains('>')) {
       final reader = ReaderTheme.of(context);
-      return Html(
+      return ReaderProseHtml(
         data: formatLiturgicalHtml(text),
         style: liturgicalDocumentStyles(reader: reader, body: textStyle),
       );
@@ -137,6 +139,10 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
                   : textStyle,
             ),
         ],
+      ),
+      textAlign: proseTextAlign(
+        ref.watch(settingsProvider).textAlignment,
+        text,
       ),
     );
   }

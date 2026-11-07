@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/widgets/reader_text_settings.dart';
+import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +10,7 @@ import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 
 void main() {
   test('reader font preferences are compact and legacy-safe', () {
-    expect(kAvailableReaderFonts, hasLength(3));
+    expect(kAvailableReaderFonts, hasLength(5));
     expect(normalizeReaderFontFamily('Сістэмны'), ReaderFontFamily.literata);
     expect(
       normalizeReaderFontFamily(ReaderFontFamily.system),
@@ -19,6 +21,65 @@ void main() {
       isNot(contains('Playfair Display')),
     );
   });
+
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    testWidgets(
+      'sheet follows keyboard height changes at 320 dp and 200% on $platform',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final keyboard = ValueNotifier<double>(0);
+        addTearDown(keyboard.dispose);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              settingsProvider.overrideWith(_TestSettingsNotifier.new),
+            ],
+            child: MaterialApp(
+              theme: ThemeData(platform: platform),
+              builder: (context, child) => ValueListenableBuilder<double>(
+                valueListenable: keyboard,
+                builder: (context, inset, _) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: const TextScaler.linear(2),
+                    viewInsets: EdgeInsets.only(bottom: inset),
+                    viewPadding: const EdgeInsets.only(bottom: 34),
+                    padding: EdgeInsets.only(bottom: inset == 0 ? 34 : 0),
+                  ),
+                  child: child!,
+                ),
+              ),
+              home: const Scaffold(body: TextScaleControl()),
+            ),
+          ),
+        );
+        await tester.tap(find.byKey(const Key('text-scale-open')));
+        await tester.pumpAndSettle();
+        final heading = tester.renderObject<RenderParagraph>(
+          find.descendant(
+            of: find.text('Шрыфт'),
+            matching: find.byType(RichText),
+          ),
+        );
+        expect(heading.didExceedMaxLines, isFalse);
+        keyboard.value = 240;
+        await tester.pumpAndSettle();
+        final alignment = find.byKey(const Key('reader-alignment-justify'));
+        await tester.ensureVisible(alignment);
+        await tester.pumpAndSettle();
+        expect(tester.getRect(alignment).bottom, lessThanOrEqualTo(400));
+        expect(find.byType(ReaderAlignmentSelector), findsOneWidget);
+        expect(find.byType(PsalmodyModeSelector), findsNothing);
+        expect(tester.takeException(), isNull);
+        keyboard.value = 0;
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.byTooltip('Закрыць'));
+        await tester.tap(find.byTooltip('Закрыць'));
+        await tester.pumpAndSettle();
+      },
+    );
+  }
 
   testWidgets('opens the slider panel and respects reader-size limits', (
     tester,

@@ -14,6 +14,86 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  for (final scale in [1.0, 2.0]) {
+    for (final longAction in [false, true]) {
+      testWidgets(
+        'right anchor and content width, scale $scale long $longAction',
+        (tester) async {
+          tester.view.physicalSize = const Size(393, 852);
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.reset);
+          var selected = 0;
+          await tester.pumpWidget(
+            MaterialApp(
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(scale),
+                  padding: const EdgeInsets.only(
+                    top: 32,
+                    right: 12,
+                    bottom: 34,
+                  ),
+                  viewPadding: const EdgeInsets.only(
+                    top: 32,
+                    right: 12,
+                    bottom: 34,
+                  ),
+                ),
+                child: child!,
+              ),
+              home: Scaffold(
+                body: SafeArea(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: AppOverflowMenu(
+                        showTextScale: true,
+                        actions: [
+                          if (longAction)
+                            ReaderSecondaryAction(
+                              label: 'Дадаць да асабістай катэгорыі',
+                              icon: Icons.add,
+                              onSelected: () => selected++,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          final button = tester.getRect(
+            find.byKey(const Key('app-overflow-open')),
+          );
+          await openMenu(tester);
+          final menu = tester.getRect(
+            find.byKey(const Key('app-overflow-content')),
+          );
+          expect(menu.right, closeTo(button.right, 1));
+          expect(menu.top, closeTo(button.bottom + 4, 1));
+          expect(menu.left, greaterThanOrEqualTo(8));
+          expect(menu.width, lessThanOrEqualTo(360));
+          if (scale == 1 && !longAction) {
+            expect(menu.width, inInclusiveRange(224, 280));
+          }
+          expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+          if (longAction) {
+            await tester.tap(find.text('Дадаць да асабістай катэгорыі'));
+            await tester.pumpAndSettle();
+            expect(selected, 1);
+          } else {
+            await tester.binding.handlePopRoute();
+            await tester.pumpAndSettle();
+          }
+          expect(find.byKey(const Key('app-overflow-content')), findsNothing);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
   testWidgets('Ora popup is compact and one psalmody mode survives reopening', (
     tester,
   ) async {

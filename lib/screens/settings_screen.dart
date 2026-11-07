@@ -15,7 +15,7 @@ import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
-import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/widgets/reader_text_settings.dart';
 import 'package:mybrev_flutter/widgets/adaptive_segmented_control.dart';
 
 // ignore_for_file: use_build_context_synchronously
@@ -139,68 +139,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Font size
-                Text(
-                  'Памер шрыфту',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Slider.adaptive(
-                  value: settings.fontSize,
-                  min: kMinReaderFontSize,
-                  max: kMaxReaderFontSize,
-                  divisions: 11,
-                  label: '${readerFontScalePercent(settings.fontSize)}%',
-                  onChanged: (val) =>
-                      ref.read(settingsProvider.notifier).setFontSize(val),
-                ),
-                Text(
-                  'Пан — маё святло і маё збаўленне.',
-                  style: ReaderTheme.of(
-                    context,
-                  ).body(settings.fontSize, family: settings.fontFamily),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Шрыфт чытання',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  key: const Key('settings-reader-font'),
-                  initialValue: settings.fontFamily,
-                  isExpanded: true,
-                  selectedItemBuilder: (context) => [
-                    for (final option in kAvailableReaderFonts)
-                      Text(option.label),
-                  ],
-                  items: [
-                    for (final option in kAvailableReaderFonts)
-                      DropdownMenuItem(
-                        value: option.id,
-                        child: Text(
-                          '${option.label}: Пан — маё святло і маё збаўленне.',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: ReaderTheme.of(
-                            context,
-                          ).body(16, family: option.id),
-                        ),
-                      ),
-                  ],
-                  onChanged: (family) {
-                    if (family != null) {
-                      ref.read(settingsProvider.notifier).setFontFamily(family);
-                    }
-                  },
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  readerFontOption(settings.fontFamily).description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 24),
+                const ReaderTextSettings(),
+                const SizedBox(height: 16),
                 const Divider(),
                 const SizedBox(height: 16),
 
@@ -213,6 +153,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   key: const Key('settings-start-section'),
+                  isExpanded: true,
+                  itemHeight: null,
                   initialValue: settings.startSection,
                   items: const [
                     DropdownMenuItem(
