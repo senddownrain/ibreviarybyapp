@@ -141,7 +141,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 16),
 
                 ExpansionTile(
-                  key: const PageStorageKey('settings-text-group'),
+                  key: const ValueKey('settings-text-group'),
+                  initiallyExpanded: settings.textSettingsExpanded,
+                  onExpansionChanged: (expanded) => ref
+                      .read(settingsProvider.notifier)
+                      .setTextSettingsExpanded(expanded),
                   tilePadding: EdgeInsets.zero,
                   childrenPadding: const EdgeInsets.only(top: 12, bottom: 16),
                   title: const Text('Тэкст'),
@@ -167,7 +171,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: Text(
-                        'Пан — маё святло і маё збаўленне.',
+                        'Божа, прыйдзі мне на дапамогу. Пане, паспяшы да мяне на паратунак.',
                         style: ReaderTheme.of(
                           context,
                         ).body(settings.fontSize, family: settings.fontFamily),

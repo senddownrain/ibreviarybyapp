@@ -127,6 +127,7 @@ class SettingsState {
   final double fontSize;
   final String fontFamily;
   final ReaderTextAlignment textAlignment;
+  final bool textSettingsExpanded;
   final bool keepScreenOn;
   final List<UserCategory> userCategories;
   final List<String> hiddenGlobalPrayerCategoryIds;
@@ -144,6 +145,7 @@ class SettingsState {
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
     this.textAlignment = ReaderTextAlignment.start,
+    this.textSettingsExpanded = false,
     this.keepScreenOn = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
@@ -169,6 +171,7 @@ class SettingsState {
     double? fontSize,
     String? fontFamily,
     ReaderTextAlignment? textAlignment,
+    bool? textSettingsExpanded,
     bool? keepScreenOn,
     List<UserCategory>? userCategories,
     List<String>? hiddenGlobalPrayerCategoryIds,
@@ -183,6 +186,7 @@ class SettingsState {
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
     textAlignment: textAlignment ?? this.textAlignment,
+    textSettingsExpanded: textSettingsExpanded ?? this.textSettingsExpanded,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
@@ -230,6 +234,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
       themePreference: preference,
       psalmodyMode: psalmodyMode,
       textAlignment: ReaderTextAlignment.fromStorage(_box.get('textAlignment')),
+      textSettingsExpanded: _box.get('textSettingsExpanded') == true,
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -294,6 +299,14 @@ class SettingsNotifier extends Notifier<SettingsState> {
     // stale provider containers, cannot overwrite the selected palette.
     await _box.put('themeMode', preference.name);
     await _box.flush();
+  }
+
+  /// Keep the reader appearance group consistent with Web across app restarts.
+  /// Only this setting is written, so unrelated stale providers stay harmless.
+  Future<void> setTextSettingsExpanded(bool expanded) async {
+    if (state.textSettingsExpanded == expanded) return;
+    state = state.copyWith(textSettingsExpanded: expanded);
+    await _box.put('textSettingsExpanded', expanded);
   }
 
   void setFontSize(double size) {

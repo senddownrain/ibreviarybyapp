@@ -12,6 +12,8 @@ void main() {
       'Literata-Regular', // ReaderTheme.body, default family
       'SourceSerif4-Regular', // ReaderTheme.body, Source Serif 4
       'OldStandardTT-Regular',
+      'OldStandardTT-Bold',
+      'OldStandardTT-Italic',
       'Kurale-Regular',
     ];
     for (final name in variants) {

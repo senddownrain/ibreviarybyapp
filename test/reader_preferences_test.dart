@@ -48,6 +48,21 @@ void main() {
     },
   );
 
+  test('text group expansion defaults to collapsed and survives restart', () async {
+    final first = ProviderContainer();
+    expect(first.read(settingsProvider).textSettingsExpanded, isFalse);
+    await first.read(settingsProvider.notifier).setTextSettingsExpanded(true);
+    expect(Hive.box('settings').get('textSettingsExpanded'), isTrue);
+    first.dispose();
+    await Hive.close();
+    await Hive.openBox('settings');
+    final restarted = ProviderContainer();
+    expect(restarted.read(settingsProvider).textSettingsExpanded, isTrue);
+    await restarted.read(settingsProvider.notifier).setTextSettingsExpanded(false);
+    expect(Hive.box('settings').get('textSettingsExpanded'), isFalse);
+    restarted.dispose();
+  });
+
   test('loading old preferences performs no writes or resets', () async {
     final box = Hive.box('settings');
     for (final family in [
@@ -66,6 +81,7 @@ void main() {
       final settings = container.read(settingsProvider);
       expect(settings.fontFamily, family);
       expect(settings.textAlignment, ReaderTextAlignment.start);
+      expect(settings.textSettingsExpanded, isFalse);
       expect(settings.psalmodyMode, PsalmodyMode.leftBreakIndent);
       expect(settings.fontSize, 22.4);
       expect(settings.favoriteIds, ['keep']);
