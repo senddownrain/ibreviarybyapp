@@ -338,7 +338,12 @@ DevotionalOfficeDocument? parseDevotionalOffice(Prayer prayer) {
       ).hasMatch(headings[i].text)) {
         return null;
       }
-    } else if (headings[i].text != expected[i]) {
+    } else if (headings[i].text != expected[i] &&
+        !(profile == 'gadzinki' &&
+            expected[i] == 'Напрыканцы дня' &&
+            headings[i].text == 'Камплета')) {
+      // Current canonical Gadzinki call the final hour «Камплета»;
+      // previous offline bundles use «Напрыканцы дня». Both are valid.
       return null;
     }
   }
