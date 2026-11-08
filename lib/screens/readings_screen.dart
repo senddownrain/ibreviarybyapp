@@ -2133,9 +2133,10 @@ class _ReadingTextState extends State<_ReadingText> {
                 ))
                   TextSpan(
                     text: piece,
-                    recognizer: namespace == null || widget.onSentenceTap == null
-                        ? null
-                        : _recognizerFor('$namespace:${sentence.index}'),
+                    recognizer:
+                        namespace == null || widget.onSentenceTap == null
+                            ? null
+                            : _recognizerFor('$namespace:${sentence.index}'),
                     style: piece == '*' || piece == '†'
                         ? widget.textStyle.copyWith(
                             height: ReaderTheme.bodyHeight,
