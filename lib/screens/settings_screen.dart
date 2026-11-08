@@ -206,6 +206,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                 const PsalmodySettingsSection(),
                 const SizedBox(height: 24),
+                SwitchListTile.adaptive(
+                  key: const Key('settings-readings-highlights'),
+                  title: const Text('Каляровае вылучэнне ў чытаннях'),
+                  subtitle: const Text(
+                    'Каб вылучаць сказы колерам у чытаннях дня. У Бібліі вылучэнне працуе асобна.',
+                  ),
+                  value: settings.readingsHighlightEnabled,
+                  onChanged: (value) => ref
+                      .read(settingsProvider.notifier)
+                      .setReadingsHighlightEnabled(value),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 24),
                 Text(
                   'Стартовы раздзел',
                   style: Theme.of(context).textTheme.titleMedium,
