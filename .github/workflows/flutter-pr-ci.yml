@@ -10,7 +10,8 @@ on:
       - 'pubspec.lock'
       - 'assets/legal/**'
       - 'assets/content/**'
-      - 'docs/june-13-14-2026-acceptance.md'
+      - 'scripts/refresh_common_bundle.mjs'
+      - 'scripts/lib/psalmody_bundle.mjs'
       - 'docs/sources/web-import-lock.json'
       - 'scripts/check_web_source_import.py'
       - 'tool/source_documents_smoke.dart'
@@ -64,6 +65,11 @@ jobs:
         run: >-
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
           test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
+
+      - name: Psalmody bundle, alternatives and existing local data
+        run: |
+          dart format --output=show --set-exit-if-changed test/doxology_bundle_test.dart test/common_office_test.dart
+          flutter test test/doxology_bundle_test.dart test/common_office_test.dart test/content_offline_test.dart test/ordo_content_update_test.dart test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart
 
   analytics-tests:
     name: Analytics tests

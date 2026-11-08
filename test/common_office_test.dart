@@ -57,49 +57,46 @@ void main() {
     season: computeSeason(date),
   );
 
-  test(
-    'real A–F inputs: every text value and source equals production Web',
-    () {
-      for (final item in (fixture['cases'] as List).cast<Map>()) {
-        final doc = proper(item['id'] as String);
-        final date = item['date'] as String;
-        final office = OrdoRuntime.engine
-            .resolve(date)
-            .office(doc['_celebrationId'] as String)!;
-        final result = assembleOffice(
-          proper: doc,
-          currentDay: Map<String, dynamic>.from(fixture['currentDay'] as Map),
-          templates: HiveService.templates(),
-          isSunday: computeSeason(date).isSunday,
-          choice: item['choice'] as String,
-          office: office,
-          season: computeSeason(date),
-        );
-        final context = '${item['id']} ${item['choice']}';
-        for (final entry in (item['fields'] as Map).entries) {
-          final hash = sha256
-              .convert(utf8.encode(canonicalJson(result.data[entry.key])))
-              .toString();
-          expect(hash, entry.value, reason: '$context ${entry.key}');
-        }
-        expect(result.provenance, item['provenance'], reason: context);
-        expect(result.missing, item['missing'], reason: context);
-        expect(
-          result.integrity.map((e) => e.toJson()).toList(),
-          item['integrity'],
-          reason: context,
-        );
-        expect(result.data['_assembly'], item['assembly'], reason: context);
-        expect(result.data['_rank'], doc['_rank']);
-        // GILH 235-238: a memorial never has the Te Deum, whatever the Common.
-        expect(
-          shouldShowTeDeum(LiturgicalDay.fromMap(result.data)),
-          isFalse,
-          reason: context,
-        );
+  test('real inputs: every text value and source equals the Web oracle', () {
+    for (final item in (fixture['cases'] as List).cast<Map>()) {
+      final doc = proper(item['id'] as String);
+      final date = item['date'] as String;
+      final office = OrdoRuntime.engine
+          .resolve(date, diocese: item['diocese'] as String? ?? 'minsk-mohilev')
+          .office(doc['_celebrationId'] as String)!;
+      final result = assembleOffice(
+        proper: doc,
+        currentDay: Map<String, dynamic>.from(fixture['currentDay'] as Map),
+        templates: HiveService.templates(),
+        isSunday: computeSeason(date).isSunday,
+        choice: item['choice'] as String,
+        office: office,
+        season: computeSeason(date),
+      );
+      final context = '${item['id']} ${item['choice']}';
+      for (final entry in (item['fields'] as Map).entries) {
+        final hash = sha256
+            .convert(utf8.encode(canonicalJson(result.data[entry.key])))
+            .toString();
+        expect(hash, entry.value, reason: '$context ${entry.key}');
       }
-    },
-  );
+      expect(result.provenance, item['provenance'], reason: context);
+      expect(result.missing, item['missing'], reason: context);
+      expect(
+        result.integrity.map((e) => e.toJson()).toList(),
+        item['integrity'],
+        reason: context,
+      );
+      expect(result.data['_assembly'], item['assembly'], reason: context);
+      expect(result.data['_rank'], doc['_rank']);
+      // The Web descriptor decides: memorials omit it; solemnities keep it.
+      expect(
+        shouldShowTeDeum(LiturgicalDay.fromMap(result.data)),
+        item['teDeum'] ?? false,
+        reason: context,
+      );
+    }
+  });
 
   test(
     'explicit bases win; conflicting, invalid and inferred sources never guess',
@@ -316,13 +313,13 @@ void main() {
   );
 
   test(
-    'offline bundle contains revision 4, 29 bases, rules and seasonal Commons',
+    'offline bundle contains published revisions, 29 bases and seasonal Commons',
     () {
       final store = ContentStore.instance;
       final meta =
           store.collection('liturgicalCalendarMeta').get('current') as Map;
-      expect(meta['properTextsRevision'], 4);
-      expect(meta['templatesRevision'], 3);
+      expect(meta['properTextsRevision'], 6);
+      expect(meta['templatesRevision'], 4);
       final docs = store.collection('liturgicalProperTexts').values.cast<Map>();
       expect(docs.where((d) => d['_commonBase'] != null), hasLength(27));
       expect(
@@ -331,9 +328,9 @@ void main() {
       );
       expect(
         store.collection('liturgicalProperTexts').digest(),
-        '8d79a1efaafd1062',
+        '60081a442fa9c4ed',
       );
-      expect(HiveService.templatesBox.digest(), '316b5f1487846faf');
+      expect(HiveService.templatesBox.digest(), 'eb5361386d552f49');
       expect(
         HiveService.templates()['holy-women']!['_seasonalVariants'],
         isNotNull,
