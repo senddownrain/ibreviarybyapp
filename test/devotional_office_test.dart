@@ -154,6 +154,32 @@ void main() {
       },
     );
   }
+  test('Gadzinki: current Камплета and legacy Напрыканцы дня both open', () {
+    const id = 'catholicby-yearcycle-100116';
+    final current = prayers[id]!;
+    expect(current.displayText, contains('## Камплета'));
+    expect(parseDevotionalOffice(current), isNotNull);
+    expect(
+      parseDevotionalOffice(
+        current.copyWith(
+          body: current.displayText.replaceFirst(
+            '## Камплета', '## Напрыканцы дня',
+          ),
+        ),
+      ),
+      isNotNull,
+    );
+    expect(
+      parseDevotionalOffice(
+        current.copyWith(
+          body: current.displayText.replaceFirst(
+            '## Камплета', '## Невядомая гадзіна',
+          ),
+        ),
+      ),
+      isNull,
+    );
+  });
   for (final id in devotionalOfficeProfiles.keys.where(
     (id) => id.contains('for-dead'),
   )) {
