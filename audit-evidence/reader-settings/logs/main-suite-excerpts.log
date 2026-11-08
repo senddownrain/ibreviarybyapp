@@ -1,0 +1,126 @@
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.3.79 available)
+  archive 4.2.0 (4.6.0 available)
+  async 2.13.0 (2.13.1 available)
+07:36 +359: /workspace/ibreviarybyapp/work/baseline/test/prayer_markdown_test.dart: only relative prayer reader links resolve internally
+07:36 +360: /workspace/ibreviarybyapp/work/baseline/test/prayer_markdown_test.dart: prayer Markdown renders the formatting offered by the editor
+07:36 +361: loading /workspace/ibreviarybyapp/work/baseline/test/reader_navigation_test.dart
+07:37 +361: /workspace/ibreviarybyapp/work/baseline/test/reader_navigation_test.dart: readings route preserves the Ora date and selected day context
+07:38 +362: /workspace/ibreviarybyapp/work/baseline/test/reader_navigation_test.dart: readings route omits an empty optional day context
+07:38 +363: /workspace/ibreviarybyapp/work/baseline/test/reader_navigation_test.dart: Ora route safely carries the selected day and hour
+07:38 +364: loading /workspace/ibreviarybyapp/work/baseline/test/hours_parity_test.dart
+07:39 +364: /workspace/ibreviarybyapp/work/baseline/test/hours_parity_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 17 ms
+[ContentStore] prayers: 115 docs in 160 ms
+[ContentStore] invitatoriums: 4 docs in 171 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 137 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 172 ms
+[ContentStore] completoriums: 35 docs in 173 ms
+[ContentStore] songs: 447 docs in 130 ms
+[ContentStore] compendiumMeta: 1 docs in 111 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 143 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 143 ms
+[ContentStore] compendium: 27 docs in 183 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 307 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 279 ms
+[ContentStore] liturgicalTemplates: 16 docs in 351 ms
+[ContentStore] readings: 822 docs in 591 ms
+[ContentStore] days: 736 docs in 741 ms
+07:40 +364: /workspace/ibreviarybyapp/work/baseline/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+12:02 +364 -1: /workspace/ibreviarybyapp/work/baseline/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses [E]
+  Expected: empty
+    Actual: [
+              '2025-06-12 minsk-mohilev feast-christthehighpriest',
+              '2026-05-28 minsk-mohilev feast-christthehighpriest',
+              '2027-05-20 minsk-mohilev feast-christthehighpriest',
+              '2028-06-08 minsk-mohilev feast-christthehighpriest',
+              '2029-05-24 minsk-mohilev feast-christthehighpriest',
+              '2030-06-13 minsk-mohilev feast-christthehighpriest',
+              '2031-06-05 minsk-mohilev feast-christthehighpriest',
+              '2032-05-20 minsk-mohilev feast-christthehighpriest',
+              '2033-06-09 minsk-mohilev feast-christthehighpriest',
+              '2034-06-01 minsk-mohilev feast-christthehighpriest',
+              '2035-05-17 minsk-mohilev feast-christthehighpriest',
+              '2025-06-12 grodno feast-christthehighpriest',
+              '2026-05-28 grodno feast-christthehighpriest',
+              '2027-05-20 grodno feast-christthehighpriest',
+              '2028-06-08 grodno feast-christthehighpriest',
+              '2029-05-24 grodno feast-christthehighpriest',
+              '2030-06-13 grodno feast-christthehighpriest',
+              '2031-06-05 grodno feast-christthehighpriest',
+              '2032-05-20 grodno feast-christthehighpriest',
+              '2033-06-09 grodno feast-christthehighpriest',
+              '2034-06-01 grodno feast-christthehighpriest',
+              '2035-05-17 grodno feast-christthehighpriest',
+              '2025-06-12 pinsk feast-christthehighpriest',
+              '2026-05-28 pinsk feast-christthehighpriest',
+              ...
+            ]
+  2025-06-12 minsk-mohilev feast-christthehighpriest
+  2026-05-28 minsk-mohilev feast-christthehighpriest
+  2027-05-20 minsk-mohilev feast-christthehighpriest
+  2028-06-08 minsk-mohilev feast-christthehighpriest
+  2029-05-24 minsk-mohilev feast-christthehighpriest
+  2030-06-13 minsk-mohilev feast-christthehighpriest
+  2031-06-05 minsk-mohilev feast-christthehighpriest
+  2032-05-20 minsk-mohilev feast-christthehighpriest
+  2033-06-09 minsk-mohilev feast-christthehighpriest
+  2034-06-01 minsk-mohilev feast-christthehighpriest
+  2035-05-17 minsk-mohilev feast-christthehighpriest
+  2025-06-12 grodno feast-christthehighpriest
+  2026-05-28 grodno feast-christthehighpriest
+  2027-05-20 grodno feast-christthehighpriest
+  2028-06-08 grodno feast-christthehighpriest
+  2029-05-24 grodno feast-christthehighpriest
+  2030-06-13 grodno feast-christthehighpriest
+  2031-06-05 grodno feast-christthehighpriest
+  2032-05-20 grodno feast-christthehighpriest
+  2033-06-09 grodno feast-christthehighpriest
+
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test/hours_parity_test.dart 159:7                   main.<fn>
+
+12:02 +364 -1: /workspace/ibreviarybyapp/work/baseline/test/hours_parity_test.dart: (tearDownAll)
+12:02 +364 -1: loading /workspace/ibreviarybyapp/work/baseline/test/alternative_text_test.dart
+12:03 +364 -1: /workspace/ibreviarybyapp/work/baseline/test/alternative_text_test.dart: shared controller synchronizes repeated antiphons
+12:05 +365 -1: /workspace/ibreviarybyapp/work/baseline/test/alternative_text_test.dart: seven long alternatives fit a narrow 200 percent sheet
+12:05 +366 -1: loading /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart
+12:06 +366 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: office for the dead uses the agreed full period label
+12:06 +367 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: formats period Sundays and weekdays like mybrev
+12:06 +368 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: uses Christmas octave and celebration titles
+12:06 +369 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: formats a readings title like the Liturgy of the Hours
+12:06 +370 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: formats one or several liturgical places without duplicates
+12:06 +371 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: formats a scalar liturgical place
+12:06 +372 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: combines places from grouped celebrations of the same rank
+12:06 +373 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_titles_test.dart: uses Belarusian names for every place code stored in days
+12:06 +374 -1: loading /workspace/ibreviarybyapp/work/baseline/test/feedback/feedback_test.dart
+12:08 +374 -1: /workspace/ibreviarybyapp/work/baseline/test/feedback/feedback_test.dart: context keeps only whitelisted safe values
+12:08 +375 -1: /workspace/ibreviarybyapp/work/baseline/test/feedback/feedback_test.dart: context location round-trips through the query parser
+52:40 +1848 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_visual_contract_test.dart: psalm subtitle has a distinct metadata role
+52:40 +1849 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_visual_contract_test.dart: leading psalm subtitles recognize nested and styled italics only
+52:40 +1850 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_visual_contract_test.dart: structured psalm package keeps antiphons outside psalm metadata
+52:40 +1851 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_visual_contract_test.dart: responsory turns keep nested emphasis across lost spaces
+52:40 +1852 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_visual_contract_test.dart: Hours use one psalm shell and fixed block gap
+52:40 +1853 ~9 -1: loading /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart
+52:41 +1853 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: scrolled hour title shares readable chrome and leaves scrolling reachable
+52:43 +1854 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: shell controller drives full compact and hidden chrome
+52:43 +1855 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: reader document uses opaque neutral light and dark surfaces
+52:43 +1856 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: reader masks scrolling text throughout the status bar
+52:43 +1857 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: reader reserves space for floating bottom navigation
+52:43 +1858 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: reader reserves the safe area above floating chrome
+52:43 +1859 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: scroll position survives a pushed route and back navigation
+52:43 +1860 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: context actions stay outside the document surface
+52:43 +1861 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: long reader content has no overflow at 180% on iOS and Android
+52:44 +1862 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/reader_foundation_test.dart: document title and body fit the 200% system text matrix
+52:44 +1863 ~9 -1: loading /workspace/ibreviarybyapp/work/baseline/test/compendium_flat_outline_test.dart
+52:45 +1863 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/compendium_flat_outline_test.dart: all four cached streams contain exactly the canonical 598 questions
+52:45 +1864 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/compendium_flat_outline_test.dart: Part I starts with section, q1, subsection, citation, q2–5, topic
+52:45 +1865 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/compendium_flat_outline_test.dart: edge placements and inline headings match source order
+52:45 +1866 ~9 -1: loading /workspace/ibreviarybyapp/work/baseline/test/liturgical_heading_text_test.dart
+52:46 +1866 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_heading_text_test.dart: (setUpAll)
+52:46 +1866 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_heading_text_test.dart: celebration heading keeps words intact inside an intrinsic band row
+52:46 +1867 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_heading_text_test.dart: 320 dp at 200 percent keeps whole Belarusian heading words
+52:46 +1868 ~9 -1: /workspace/ibreviarybyapp/work/baseline/test/liturgical_heading_text_test.dart: (tearDownAll)
+52:46 +1868 ~9 -1: Some tests failed.

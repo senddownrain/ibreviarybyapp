@@ -1,0 +1,57 @@
+{
+  "base": "19125bb",
+  "webReference": {
+    "url": "https://github.com/senddownrain/mybrev/pull/202",
+    "sha": "38e94e65b2d944eb34b6c86ef761b1d5b28284cd"
+  },
+  "fullSuite": {
+    "command": "flutter test --concurrency=2 --timeout=2m",
+    "passed": 1888,
+    "skipped": 9,
+    "failed": 2,
+    "knownMainFailures": [
+      "hours_parity_test: feast-christthehighpriest",
+      "p0_hints_screens_test: Readings date_navigation (isolated repro; order-sensitive)"
+    ]
+  },
+  "mainFullSuite": {
+    "passed": 1868,
+    "skipped": 9,
+    "failed": 1,
+    "additionalIsolatedDiscoveryFailure": true
+  },
+  "targeted": {
+    "passed": 155,
+    "failed": 0
+  },
+  "finalResponsiveRerun": {
+    "passed": 100,
+    "failed": 0
+  },
+  "analyze": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 27,
+    "sameAsMain": true,
+    "exitCode": 1
+  },
+  "format": {
+    "files": 34,
+    "changed": 0
+  },
+  "diffCheck": "passed",
+  "chrome": {
+    "configurations": 9,
+    "errors": 0,
+    "pngCount": 122,
+    "newFontAssetsStatus": 200,
+    "platformAppearanceOnly": [
+      "android",
+      "ios"
+    ]
+  },
+  "nativeSmoke": "unavailable: Linux; no Android AVD or iOS Simulator",
+  "productionFirebaseChanged": false,
+  "merged": false,
+  "released": false
+}

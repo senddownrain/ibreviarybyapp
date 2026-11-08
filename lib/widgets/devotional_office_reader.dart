@@ -298,6 +298,7 @@ class _DevotionalOfficeReaderState
           r'(?:\*\*|^|\n)(?:Кантар:|Мол[іi]мся:|[КНС][.:])',
         ).hasMatch(item.source)) {
           return PrayerContent(
+            applyTextAlignment: false,
             prayer: Prayer(
               id: '',
               title: '',

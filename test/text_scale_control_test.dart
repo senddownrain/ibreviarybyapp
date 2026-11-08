@@ -8,7 +8,7 @@ import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 
 void main() {
   test('reader font preferences are compact and legacy-safe', () {
-    expect(kAvailableReaderFonts, hasLength(3));
+    expect(kAvailableReaderFonts, hasLength(5));
     expect(normalizeReaderFontFamily('Сістэмны'), ReaderFontFamily.literata);
     expect(
       normalizeReaderFontFamily(ReaderFontFamily.system),
@@ -51,7 +51,7 @@ void main() {
     expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
     expect(find.byKey(const Key('text-scale-value')), findsOneWidget);
     expect(find.text('100%'), findsOneWidget);
-    expect(find.byKey(const Key('reader-font-literata')), findsNothing);
+    expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
     expect(find.byType(PsalmodyModeSelector), findsNothing);
     expect(find.byType(FilterChip), findsNothing);
 
@@ -83,6 +83,40 @@ void main() {
     );
     expect(decreaseButton.onPressed, isNull);
   });
+
+  testWidgets(
+    'sheet controls scroll above the keyboard and system navigation',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [settingsProvider.overrideWith(_TestSettingsNotifier.new)],
+          child: MaterialApp(
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: const TextScaler.linear(2),
+                viewInsets: const EdgeInsets.only(bottom: 300),
+                viewPadding: const EdgeInsets.only(top: 24, bottom: 34),
+                padding: const EdgeInsets.only(top: 24),
+              ),
+              child: child!,
+            ),
+            home: const Scaffold(body: TextScaleControl()),
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(const Key('text-scale-open')));
+      await tester.pumpAndSettle();
+      final alignment = find.byKey(const ValueKey('reader-alignment-justify'));
+      await tester.ensureVisible(alignment);
+      await tester.pumpAndSettle();
+      expect(tester.getRect(alignment).bottom, lessThanOrEqualTo(340));
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('appearance panel fits 320 px at 200 percent system text', (
     tester,
@@ -117,7 +151,7 @@ void main() {
       await tester.tap(find.byKey(const Key('text-scale-open')));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('reader-font-literata')), findsNothing);
+      expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
       expect(tester.takeException(), isNull, reason: platform.name);
       await tester.tap(find.byTooltip('Закрыць'));
       await tester.pumpAndSettle();

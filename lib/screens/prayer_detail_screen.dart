@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
+import 'package:mybrev_flutter/utils/reader_prose.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:flutter/rendering.dart';
@@ -415,6 +417,9 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         );
       }
       return PrayerContent(
+        textAlignment: ref
+            .watch(settingsProvider.select((s) => s.textAlignment))
+            .textAlign,
         prayer: prayer.copyWith(body: raw),
         textStyle: textStyle,
         onLinkTap: _onLinkTap,
@@ -506,6 +511,9 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
         ),
         '.liturgical-rubric-inline': Style(color: reader.rubric),
         if (isMass) ..._massStyles(reader, textStyle),
+        '.reader-prose': Style(
+          textAlign: ref.watch(settingsProvider).textAlignment.textAlign,
+        ),
       };
       if (isMass) {
         return _MassDocument(
@@ -520,9 +528,20 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
               .copyWith(fontFamily: textStyle.fontFamily),
         );
       }
-      return Html(onLinkTap: _onLinkTap, data: formattedHtml, style: styles);
+      return Html(
+        onLinkTap: _onLinkTap,
+        data: prepareReaderProseHtml(formattedHtml),
+        style: styles,
+      );
     }
-    return SelectableText(raw, style: textStyle);
+    return SelectableText(
+      raw,
+      style: textStyle,
+      textAlign: readerProseAlignment(
+        ref.watch(settingsProvider).textAlignment,
+        raw,
+      ),
+    );
   }
 }
 
@@ -837,7 +856,7 @@ class _MassDocumentState extends State<_MassDocument> {
                 explicitChildNodes: true,
                 child: Html(
                   onLinkTap: widget.onLinkTap,
-                  data: chunk.html,
+                  data: prepareReaderProseHtml(chunk.html),
                   style: index == 0 ? firstMajorStyle : widget.styles,
                 ),
               ),
@@ -845,7 +864,7 @@ class _MassDocumentState extends State<_MassDocument> {
           else
             Html(
               onLinkTap: widget.onLinkTap,
-              data: chunk.html,
+              data: prepareReaderProseHtml(chunk.html),
               style: index == 0 ? firstMajorStyle : widget.styles,
             ),
         if (source != null) ...[

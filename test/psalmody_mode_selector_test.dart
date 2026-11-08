@@ -101,6 +101,8 @@ void main() {
                 tester.widget<PsalmodyModeSelector>(global).value,
                 PsalmodyMode.alternatingStanzas,
               );
+              await tester.ensureVisible(find.text('Aa'));
+              await tester.pumpAndSettle();
               await tester.tap(find.text('Aa'));
               await tester.pumpAndSettle();
               final panel = find.byKey(const Key('text-scale-psalmody-modes'));

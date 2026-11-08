@@ -477,6 +477,9 @@ class _PrayerMarkdownPreview extends ConsumerWidget {
         border: Border.all(color: cs.outlineVariant),
       ),
       child: PrayerContent(
+        textAlignment: ref
+            .watch(settingsProvider.select((s) => s.textAlignment))
+            .textAlign,
         prayer: Prayer(
           id: 'preview',
           title: '',

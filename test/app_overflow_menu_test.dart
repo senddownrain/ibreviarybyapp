@@ -14,6 +14,142 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  for (final scale in [1.0, 2.0]) {
+    testWidgets(
+      'short menu is measured, has no chevrons and follows its right anchor at ${scale}x',
+      (tester) async {
+        tester.view.physicalSize = const Size(393, 852);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          MaterialApp(
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(scale)),
+              child: child!,
+            ),
+            home: const Scaffold(
+              body: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 12, top: 44),
+                  child: AppOverflowMenu(showTextScale: true),
+                ),
+              ),
+            ),
+          ),
+        );
+        final button = tester.getRect(
+          find.byKey(const Key('app-overflow-open')),
+        );
+        await openMenu(tester);
+        final menu = tester.getRect(
+          find.byKey(const Key('app-overflow-content')),
+        );
+        expect(menu.width, inInclusiveRange(224, 280));
+        expect(menu.right, closeTo(button.right, .01));
+        expect(menu.top, closeTo(button.bottom + 4, .01));
+        expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+        expect(find.text('Шрыфт'), findsOneWidget);
+        expect(find.text('Налады'), findsOneWidget);
+        expect(find.text('Інфармацыя'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets(
+    'long context action wraps within SafeArea at 320 dp and 200 percent',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var selected = false;
+      const label = 'Адкрыць поўны тэкст і дадатковую інфармацыю пра крыніцу';
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(2),
+              padding: const EdgeInsets.fromLTRB(12, 44, 12, 34),
+              viewPadding: const EdgeInsets.fromLTRB(12, 44, 12, 34),
+            ),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 12, top: 44),
+                child: AppOverflowMenu(
+                  actions: [
+                    ReaderSecondaryAction(
+                      label: label,
+                      icon: Icons.book,
+                      onSelected: () => selected = true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await openMenu(tester);
+      final menu = tester.getRect(
+        find.byKey(const Key('app-overflow-content')),
+      );
+      expect(menu.left, greaterThanOrEqualTo(20));
+      expect(menu.right, lessThanOrEqualTo(300));
+      expect(find.text(label), findsOneWidget);
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+      expect(selected, isTrue);
+      expect(find.byKey(const Key('app-overflow-content')), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('a repeated selection during dismissal never pops the reader', (
+    tester,
+  ) async {
+    var calls = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              const Text('Reader stays open'),
+              AppOverflowMenu(
+                actions: [
+                  ReaderSecondaryAction(
+                    label: 'Дзеянне',
+                    icon: Icons.book,
+                    onSelected: () => calls++,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await openMenu(tester);
+    final action = tester.widget<ListTile>(
+      find.ancestor(of: find.text('Дзеянне'), matching: find.byType(ListTile)),
+    );
+    action.onTap!();
+    action.onTap!();
+    await tester.pumpAndSettle();
+    expect(calls, 1);
+    expect(find.text('Reader stays open'), findsOneWidget);
+    expect(find.byKey(const Key('app-overflow-content')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Ora popup is compact and one psalmody mode survives reopening', (
     tester,
   ) async {

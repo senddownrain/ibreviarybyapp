@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
 void main() {
@@ -25,6 +27,43 @@ void main() {
     expect(book.fontFamily, startsWith('Literata'));
     expect(system.fontFamily, isNull);
     expect(book.height, ReaderTheme.bodyHeight);
+  });
+
+  testWidgets('all five reader families resolve offline in every theme', (
+    tester,
+  ) async {
+    GoogleFonts.config.allowRuntimeFetching = false;
+    for (final brightness in Brightness.values) {
+      final styles = <String, TextStyle>{};
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(brightness: brightness),
+          home: Builder(
+            builder: (context) {
+              for (final option in kAvailableReaderFonts) {
+                styles[option.id] = ReaderTheme.of(
+                  context,
+                ).body(28.8, family: option.id);
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(
+        styles[ReaderFontFamily.oldStandardTT]!.fontFamily,
+        startsWith('OldStandardTT'),
+      );
+      expect(styles[ReaderFontFamily.kurale]!.fontFamily, startsWith('Kurale'));
+      expect(styles[ReaderFontFamily.system]!.fontFamily, isNull);
+      expect(
+        styles.values.every(
+          (s) => s.fontSize == 28.8 && s.height == ReaderTheme.bodyHeight,
+        ),
+        isTrue,
+      );
+      await tester.runAsync(() => GoogleFonts.pendingFonts());
+    }
   });
 
   testWidgets('liturgical block headings are larger than reader body text', (

@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/reader_text_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -98,147 +99,201 @@ class _TextScalePanel extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final accent = GlassTokens.of(context).accentOnSurface(cs.tertiary);
 
-    final panel = Center(
-      heightFactor: 1,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * .85,
-            ),
-            child: SingleChildScrollView(
-              child: AdaptiveChromeSurface(
-                role: ChromeSurfaceRole.group,
-                seasonColor: cs.tertiary,
-                borderRadius: BorderRadius.circular(30),
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 38,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: cs.onSurfaceVariant.withValues(alpha: 0.32),
-                        borderRadius: BorderRadius.circular(2),
+    final media = MediaQuery.of(context);
+    final panel = Padding(
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+      child: Center(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight:
+                    (media.size.height -
+                            media.viewInsets.bottom -
+                            media.viewPadding.vertical -
+                            24)
+                        .clamp(0.0, media.size.height) *
+                    .9,
+              ),
+              child: SingleChildScrollView(
+                child: AdaptiveChromeSurface(
+                  role: ChromeSurfaceRole.group,
+                  seasonColor: cs.tertiary,
+                  borderRadius: BorderRadius.circular(30),
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: cs.onSurfaceVariant.withValues(alpha: 0.32),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        PhosphorIcon(
-                          PhosphorIconsRegular.textAa,
-                          size: 23,
-                          color: accent,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Шрыфт',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        AnimatedContainer(
-                          key: const Key('text-scale-value'),
-                          duration: const Duration(milliseconds: 160),
-                          curve: Curves.easeOut,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: cs.tertiary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: Text(
-                            '$percent%',
-                            style: Theme.of(context).textTheme.labelLarge
-                                ?.copyWith(
-                                  color: accent,
-                                  fontWeight: FontWeight.w700,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures(),
-                                  ],
+                      const SizedBox(height: 14),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final titleStyle = Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700);
+                          final percentStyle = Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w700);
+                          double textWidth(String text, TextStyle? style) {
+                            final painter = TextPainter(
+                              text: TextSpan(text: text, style: style),
+                              textDirection: Directionality.of(context),
+                              textScaler: media.textScaler,
+                            )..layout();
+                            final width = painter.width;
+                            painter.dispose();
+                            return width;
+                          }
+
+                          final stacked =
+                              constraints.maxWidth <
+                              23 +
+                                  10 +
+                                  textWidth('Шрыфт', titleStyle) +
+                                  textWidth('$percent%', percentStyle) +
+                                  20 +
+                                  4 +
+                                  48 +
+                                  8;
+                          final badge = AnimatedContainer(
+                            key: const Key('text-scale-value'),
+                            duration: const Duration(milliseconds: 160),
+                            curve: Curves.easeOut,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: cs.tertiary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                            child: Text(
+                              '$percent%',
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(
+                                    color: accent,
+                                    fontWeight: FontWeight.w700,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
+                                  ),
+                            ),
+                          );
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  PhosphorIcon(
+                                    PhosphorIconsRegular.textAa,
+                                    size: 23,
+                                    color: accent,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      'Шрыфт',
+                                      maxLines: 1,
+                                      style: titleStyle,
+                                    ),
+                                  ),
+                                  if (!stacked) badge,
+                                  if (!stacked) const SizedBox(width: 4),
+                                  IconButton(
+                                    key: const Key('text-scale-close'),
+                                    tooltip: 'Закрыць',
+                                    onPressed: () => Navigator.pop(context),
+                                    icon: const PhosphorIcon(
+                                      PhosphorIconsRegular.x,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (stacked)
+                                Align(
+                                  alignment: AlignmentDirectional.centerEnd,
+                                  child: badge,
                                 ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          _ScaleStepButton(
+                            key: const Key('text-scale-decrease'),
+                            tooltip: 'Паменшыць тэкст',
+                            icon: PhosphorIconsBold.minus,
+                            onPressed: canDecrease
+                                ? notifier.decreaseFontSize
+                                : null,
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        IconButton(
-                          tooltip: 'Закрыць',
-                          onPressed: () => Navigator.pop(context),
-                          icon: const PhosphorIcon(
-                            PhosphorIconsRegular.x,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        _ScaleStepButton(
-                          key: const Key('text-scale-decrease'),
-                          tooltip: 'Паменшыць тэкст',
-                          icon: PhosphorIconsBold.minus,
-                          onPressed: canDecrease
-                              ? notifier.decreaseFontSize
-                              : null,
-                        ),
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              trackHeight: 5,
-                              activeTrackColor: accent,
-                              inactiveTrackColor: cs.onSurfaceVariant
-                                  .withValues(alpha: 0.16),
-                              thumbColor: accent,
-                              overlayColor: cs.tertiary.withValues(alpha: 0.12),
-                            ),
-                            child: Slider.adaptive(
-                              key: const Key('text-scale-slider'),
-                              value: fontSize,
-                              min: kMinReaderFontSize,
-                              max: kMaxReaderFontSize,
-                              divisions: 11,
-                              label: '$percent%',
-                              onChanged: notifier.setFontSize,
-                              semanticFormatterCallback: (value) =>
-                                  '${readerFontScalePercent(value)} адсоткаў',
+                          Expanded(
+                            child: SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                trackHeight: 5,
+                                activeTrackColor: accent,
+                                inactiveTrackColor: cs.onSurfaceVariant
+                                    .withValues(alpha: 0.16),
+                                thumbColor: accent,
+                                overlayColor: cs.tertiary.withValues(
+                                  alpha: 0.12,
+                                ),
+                              ),
+                              child: Slider.adaptive(
+                                key: const Key('text-scale-slider'),
+                                value: fontSize,
+                                min: kMinReaderFontSize,
+                                max: kMaxReaderFontSize,
+                                divisions: 11,
+                                label: '$percent%',
+                                onChanged: notifier.setFontSize,
+                                semanticFormatterCallback: (value) =>
+                                    '${readerFontScalePercent(value)} адсоткаў',
+                              ),
                             ),
                           ),
+                          _ScaleStepButton(
+                            key: const Key('text-scale-increase'),
+                            tooltip: 'Павялічыць тэкст',
+                            icon: PhosphorIconsBold.plus,
+                            onPressed: canIncrease
+                                ? notifier.increaseFontSize
+                                : null,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      const ReaderFontPicker(
+                        key: Key('text-scale-font-family'),
+                      ),
+                      const SizedBox(height: 16),
+                      if (!showPsalmody) const ReaderAlignmentControl(),
+                      if (showPsalmody) ...[
+                        const Divider(height: 28),
+                        PsalmodyControlRow(
+                          selectorKey: const Key('text-scale-psalmody-modes'),
+                          value: settings.psalmodyMode,
+                          onChanged: notifier.setPsalmodyMode,
                         ),
-                        _ScaleStepButton(
-                          key: const Key('text-scale-increase'),
-                          tooltip: 'Павялічыць тэкст',
-                          icon: PhosphorIconsBold.plus,
-                          onPressed: canIncrease
-                              ? notifier.increaseFontSize
-                              : null,
-                        ),
+                        const HintInlineSlot(),
                       ],
-                    ),
-                    if (showPsalmody) ...[
-                      const Divider(height: 28),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Псальмодыя',
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      PsalmodyModeSelector(
-                        key: const Key('text-scale-psalmody-modes'),
-                        value: settings.psalmodyMode,
-                        onChanged: notifier.setPsalmodyMode,
-                      ),
-                      const HintInlineSlot(),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),

@@ -387,6 +387,7 @@ String psalmPlainText(String html) {
 String preparePsalmChoirHtml(
   String html, {
   int? selectedChoir,
+  bool interactive = true,
   PsalmodyMode mode = PsalmodyMode.leftBreak,
 }) {
   final breakAfterMarker = mode != PsalmodyMode.alternatingStanzas;
@@ -429,8 +430,9 @@ String preparePsalmChoirHtml(
     void flushLink() {
       if (linked.isEmpty) return;
       rendered.write(
-        '<a href="psalm-choir:$choir" '
-        'class="psalm-choir-strophe$mutedClass">$linked</a>',
+        interactive
+            ? '<a href="psalm-choir:$choir" class="psalm-choir-strophe$mutedClass">$linked</a>'
+            : '<span class="psalm-choir-strophe">$linked</span>',
       );
       linked.clear();
     }

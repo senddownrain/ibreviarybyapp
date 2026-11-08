@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
 import 'dart:async';
 
 import 'dart:io';
@@ -63,6 +64,54 @@ void main() {
     await Hive.close();
     await hiveDirectory.delete(recursive: true);
   });
+
+  testWidgets(
+    'Readings prose justifies without changing references or fixed psalm lines',
+    (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          _presentationOverride,
+          liturgicalContentReadyProvider.overrideWith((ref) async {}),
+          dayOptionsProvider.overrideWithValue(const []),
+          settingsProvider.overrideWith(_JustifiedSettings.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(
+            _loader([
+              _reading('only', title: 'Свята дня', text: 'Проза для чытання.'),
+            ]),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final body = tester.widget<RichText>(
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget is RichText &&
+                  widget.text.toPlainText().contains('Проза для чытання.'),
+            )
+            .first,
+      );
+      expect(body.textAlign, TextAlign.justify);
+      final references = tester.widgetList<RichText>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is RichText && widget.text.toPlainText().contains('Ян 1'),
+        ),
+      );
+      expect(
+        references.every((text) => text.textAlign != TextAlign.justify),
+        isTrue,
+      );
+    },
+  );
 
   group('current production default adapter', () {
     test('keeps first sorted group and calendar cycle fallback', () {
@@ -640,3 +689,9 @@ final _presentationOverride = liturgicalDayPresentationProvider
         accent: Colors.green,
       ),
     );
+
+class _JustifiedSettings extends _TestSettingsNotifier {
+  @override
+  SettingsState build() =>
+      const SettingsState(textAlignment: ReaderTextAlignment.justify);
+}

@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -764,7 +765,7 @@ class _ChromeAction extends StatelessWidget {
   );
 }
 
-class _VerseRow extends StatelessWidget {
+class _VerseRow extends ConsumerWidget {
   final int verseNum;
   final String text;
   final TextStyle textStyle;
@@ -783,7 +784,7 @@ class _VerseRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final chromeController = ReaderChromeModeScope.maybeControllerOf(context);
     return Padding(
@@ -811,6 +812,10 @@ class _VerseRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
               child: RichText(
                 key: Key('bible-verse-body-$verseNum'),
+                textAlign: readerProseAlignment(
+                  ref.watch(settingsProvider.select((s) => s.textAlignment)),
+                  text,
+                ),
                 textScaler: MediaQuery.textScalerOf(context),
                 text: TextSpan(
                   style: textStyle.copyWith(

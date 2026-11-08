@@ -330,7 +330,7 @@ void main() {
   }
 
   testWidgets(
-    'Office font panel is size-only and scrollable on a small screen at 200 percent',
+    'Office font panel includes families and fits a small screen at 200 percent',
     (tester) async {
       tester.view.physicalSize = const Size(320, 640);
       tester.view.devicePixelRatio = 1;
@@ -345,14 +345,31 @@ void main() {
                 size: Size(320, 640),
                 textScaler: TextScaler.linear(2),
               ),
-              child: const Scaffold(body: TextScaleControl()),
+              child: Scaffold(
+                body: Builder(
+                  builder: (context) => TextButton(
+                    key: const Key('text-scale-open'),
+                    onPressed: () =>
+                        showTextScalePanel(context, showPsalmody: true),
+                    child: const Text('Aa'),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
       );
       await tester.tap(find.byKey(const Key('text-scale-open')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('reader-font-literata')), findsNothing);
+      expect(find.byKey(const Key('reader-font-literata')), findsOneWidget);
+      expect(
+        find.byKey(const Key('text-scale-psalmody-modes')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('reader-alignment-justify')),
+        findsNothing,
+      );
       expect(find.byKey(const Key('psalm-marker-break')), findsNothing);
       expect(tester.takeException(), isNull);
     },

@@ -1,3 +1,6 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/utils/reader_prose.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -118,12 +121,21 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
     if (text.contains('<') && text.contains('>')) {
       final reader = ReaderTheme.of(context);
       return Html(
-        data: formatLiturgicalHtml(text),
-        style: liturgicalDocumentStyles(reader: reader, body: textStyle),
+        data: prepareReaderProseHtml(formatLiturgicalHtml(text)),
+        style: {
+          ...liturgicalDocumentStyles(reader: reader, body: textStyle),
+          '.reader-prose': Style(
+            textAlign: ref.watch(settingsProvider).textAlignment.textAlign,
+          ),
+        },
       );
     }
     final rubric = ReaderTheme.of(context).rubric;
     return SelectableText.rich(
+      textAlign: readerProseAlignment(
+        ref.watch(settingsProvider).textAlignment,
+        text,
+      ),
       TextSpan(
         children: [
           for (final piece in text.split(RegExp(r'(?=[*†])|(?<=[*†])')))

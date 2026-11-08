@@ -1,0 +1,221 @@
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.3.79 available)
+  archive 4.2.0 (4.6.0 available)
+  async 2.13.0 (2.13.1 available)
+[data] CACHE HIT  readings 2026-11-11
+[data] CACHE HIT  readings 2026-11-12
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _KeyWidgetFinder:<Found 0 widgets with key [<'discovery-card-calendar.date_navigation'>]:
+[]>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart:281:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart line 281
+The test description was:
+  date_navigation: three day arrows, once
+════════════════════════════════════════════════════════════════════════════════════════════════════
+03:39 +427 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text
+03:39 +427 ~9 -1: /workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart: Readings date_navigation: three day arrows, once [E]
+  Test failed. See exception logs above.
+  The test description was: date_navigation: three day arrows, once
+
+03:40 +427 ~9 -1: /workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart: Readings hints off globally: nothing, but the controls work
+[data] CACHE HIT  readings 2026-12-04
+03:41 +428 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases v102 corrects v101 with a third text
+03:41 +428 ~9 -1: /workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart: calendar sheet more_periods only from the third opening, inside the sheet, with no action of its own
+[data] CACHE HIT  readings 2026-11-09
+03:43 +429 ~9 -1: /workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart: calendar sheet more_periods only from the third opening, inside the sheet, with no action of its own
+03:43 +429 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases every collection keeps the version of its own snapshot
+[ContentStore] prayerCategories: 5 docs in 34 ms
+[ContentStore] prayers: 115 docs in 56 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 19 ms
+[ContentStore] completoriums: 35 docs in 20 ms
+[ContentStore] invitatoriums: 4 docs in 63 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 55 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 55 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 72 ms
+[ContentStore] compendiumMeta: 1 docs in 61 ms
+[ContentStore] songs: 447 docs in 74 ms
+[ContentStore] compendium: 27 docs in 78 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 162 ms
+[ContentStore] liturgicalTemplates: 16 docs in 193 ms
+03:43 +430 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases every collection keeps the version of its own snapshot
+[ContentStore] liturgicalProperTexts: 291 docs in 315 ms
+[ContentStore] readings: 822 docs in 422 ms
+[ContentStore] days: 736 docs in 725 ms
+03:44 +431 ~9 -1: /workspace/ibreviarybyapp/test/discovery/p0_hints_screens_test.dart: Ordo CD-A 2026-12-04: dioceses differ -> hint, Паказаць only opens the diocese sheet
+03:44 +431 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+[ContentStore] prayerCategories: 5 docs in 0 ms
+[ContentStore] prayers: 115 docs in 55 ms
+[ContentStore] invitatoriums: 4 docs in 32 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 42 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 43 ms
+[ContentStore] completoriums: 35 docs in 43 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 12 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 53 ms
+[ContentStore] songs: 447 docs in 106 ms
+[ContentStore] compendium: 27 docs in 111 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 134 ms
+[ContentStore] liturgicalTemplates: 16 docs in 350 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 373 ms
+[ContentStore] readings: 822 docs in 473 ms
+[ContentStore] days: 736 docs in 793 ms
+03:45 +432 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:45 +433 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:46 +434 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:46 +435 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:46 +436 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:46 +437 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:47 +438 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:49 +439 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:49 +440 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:50 +441 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:50 +442 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:51 +443 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:52 +444 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:53 +445 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:54 +446 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:54 +447 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:54 +448 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:54 +449 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:54 +450 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:54 +451 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:56 +452 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:56 +453 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:56 +454 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+03:56 +455 ~9 -1: /workspace/ibreviarybyapp/test/content_offline_test.dart: corrections and app releases an older patch gives way to a newer bundle of its collection; a newer one stays
+05:47 +616 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+05:47 +617 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+05:47 +618 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+05:47 +619 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+05:49 +620 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+05:49 +621 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+05:51 +621 ~9 -1: /workspace/ibreviarybyapp/test/lectionary_parity_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 20 ms
+[ContentStore] prayers: 115 docs in 87 ms
+[ContentStore] invitatoriums: 4 docs in 242 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 256 ms
+[ContentStore] completoriums: 35 docs in 265 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 265 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 258 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 264 ms
+[ContentStore] compendiumMeta: 1 docs in 186 ms
+[ContentStore] songs: 447 docs in 199 ms
+[ContentStore] compendium: 27 docs in 207 ms
+[ContentStore] liturgicalTemplates: 16 docs in 348 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 340 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 270 ms
+[ContentStore] readings: 822 docs in 398 ms
+[ContentStore] days: 736 docs in 717 ms
+05:52 +621 ~9 -1: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+09:10 +621 ~9 -2: /workspace/ibreviarybyapp/test/lectionary_parity_test.dart: Flutter Readings screen equals the web screen for every legal option
+09:11 +621 ~9 -2: /workspace/ibreviarybyapp/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses [E]
+  Expected: empty
+    Actual: [
+              '2025-06-12 minsk-mohilev feast-christthehighpriest',
+              '2026-05-28 minsk-mohilev feast-christthehighpriest',
+              '2027-05-20 minsk-mohilev feast-christthehighpriest',
+              '2028-06-08 minsk-mohilev feast-christthehighpriest',
+              '2029-05-24 minsk-mohilev feast-christthehighpriest',
+              '2030-06-13 minsk-mohilev feast-christthehighpriest',
+              '2031-06-05 minsk-mohilev feast-christthehighpriest',
+              '2032-05-20 minsk-mohilev feast-christthehighpriest',
+              '2033-06-09 minsk-mohilev feast-christthehighpriest',
+              '2034-06-01 minsk-mohilev feast-christthehighpriest',
+              '2035-05-17 minsk-mohilev feast-christthehighpriest',
+              '2025-06-12 grodno feast-christthehighpriest',
+              '2026-05-28 grodno feast-christthehighpriest',
+              '2027-05-20 grodno feast-christthehighpriest',
+              '2028-06-08 grodno feast-christthehighpriest',
+              '2029-05-24 grodno feast-christthehighpriest',
+              '2030-06-13 grodno feast-christthehighpriest',
+              '2031-06-05 grodno feast-christthehighpriest',
+              '2032-05-20 grodno feast-christthehighpriest',
+              '2033-06-09 grodno feast-christthehighpriest',
+              '2034-06-01 grodno feast-christthehighpriest',
+              '2035-05-17 grodno feast-christthehighpriest',
+              '2025-06-12 pinsk feast-christthehighpriest',
+              '2026-05-28 pinsk feast-christthehighpriest',
+              ...
+            ]
+  2025-06-12 minsk-mohilev feast-christthehighpriest
+  2026-05-28 minsk-mohilev feast-christthehighpriest
+  2027-05-20 minsk-mohilev feast-christthehighpriest
+  2028-06-08 minsk-mohilev feast-christthehighpriest
+  2029-05-24 minsk-mohilev feast-christthehighpriest
+  2030-06-13 minsk-mohilev feast-christthehighpriest
+  2031-06-05 minsk-mohilev feast-christthehighpriest
+  2032-05-20 minsk-mohilev feast-christthehighpriest
+  2033-06-09 minsk-mohilev feast-christthehighpriest
+  2034-06-01 minsk-mohilev feast-christthehighpriest
+  2035-05-17 minsk-mohilev feast-christthehighpriest
+  2025-06-12 grodno feast-christthehighpriest
+  2026-05-28 grodno feast-christthehighpriest
+  2027-05-20 grodno feast-christthehighpriest
+  2028-06-08 grodno feast-christthehighpriest
+  2029-05-24 grodno feast-christthehighpriest
+  2030-06-13 grodno feast-christthehighpriest
+  2031-06-05 grodno feast-christthehighpriest
+  2032-05-20 grodno feast-christthehighpriest
+  2033-06-09 grodno feast-christthehighpriest
+
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test/hours_parity_test.dart 159:7                   main.<fn>
+
+09:11 +621 ~9 -2: /workspace/ibreviarybyapp/test/lectionary_parity_test.dart: Flutter Readings screen equals the web screen for every legal option
+09:12 +621 ~9 -2: /workspace/ibreviarybyapp/test/lectionary_policy_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 59 ms
+[ContentStore] prayers: 115 docs in 127 ms
+[ContentStore] invitatoriums: 4 docs in 339 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 379 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 359 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 364 ms
+[ContentStore] completoriums: 35 docs in 382 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 367 ms
+[ContentStore] compendiumMeta: 1 docs in 211 ms
+[ContentStore] compendium: 27 docs in 215 ms
+[ContentStore] songs: 447 docs in 261 ms
+[ContentStore] liturgicalTemplates: 16 docs in 540 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 495 ms
+[ContentStore] readings: 822 docs in 597 ms
+22:07 +1863 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+22:07 +1864 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+22:08 +1865 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+22:08 +1866 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail right renders beside the lyrics on 360-430 dp phones in every key (variant: TargetPlatform.iOS)
+22:08 +1867 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail layout button uses distinct above and right glyphs
+22:09 +1868 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.android)
+22:10 +1869 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.android)
+22:10 +1870 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail long chord lines never take the lyric column or overflow (variant: TargetPlatform.android)
+22:10 +1871 ~9 -2: /workspace/ibreviarybyapp/test/reader_prose_test.dart: prayer prose updates immediately; an Office opt-out stays start aligned
+22:11 +1872 ~9 -2: /workspace/ibreviarybyapp/test/reader_prose_test.dart: prayer prose updates immediately; an Office opt-out stays start aligned
+22:11 +1873 ~9 -2: /workspace/ibreviarybyapp/test/reader_prose_test.dart: prayer prose updates immediately; an Office opt-out stays start aligned
+22:12 +1874 ~9 -2: /workspace/ibreviarybyapp/test/reader_prose_test.dart: prayer prose updates immediately; an Office opt-out stays start aligned
+22:13 +1875 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.iOS)
+22:13 +1876 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail chord control geometry is stable across states (variant: TargetPlatform.iOS)
+22:13 +1877 ~9 -2: /workspace/ibreviarybyapp/test/reader_prose_test.dart: live psalm preview shares the renderer and ignores prose alignment
+22:14 +1878 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.android)
+22:15 +1879 ~9 -2: /workspace/ibreviarybyapp/test/reader_prose_test.dart: sheet and Settings controls use the same family and alignment without scroll reset
+22:15 +1880 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail detail with chords does not overflow at 200 percent text (variant: TargetPlatform.iOS)
+22:15 +1881 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song detail unknown song shows a not found state
+22:15 +1882 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence favorites, chords and layout survive restart
+22:15 +1883 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence song favorites are independent from prayer favorites
+22:16 +1884 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored left layout migrates to right
+22:16 +1885 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence stored right and unknown layouts are read safely
+22:16 +1886 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence migration is idempotent and writes nothing once applied
+22:16 +1887 ~9 -2: /workspace/ibreviarybyapp/test/songbook_test.dart: Song preferences persistence old compact list setting is ignored and removed
+22:16 +1888 ~9 -2: Some tests failed.

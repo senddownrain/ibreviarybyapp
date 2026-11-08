@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/models/reader_preferences.dart';
+import 'package:html/parser.dart' show parseFragment;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,9 +70,10 @@ Widget _app(
   Widget child, {
   List<Prayer>? prayers,
   TargetPlatform platform = TargetPlatform.android,
+  SettingsNotifier Function()? settingsFactory,
 }) => ProviderScope(
   overrides: [
-    settingsProvider.overrideWith(_TestSettingsNotifier.new),
+    settingsProvider.overrideWith(settingsFactory ?? _TestSettingsNotifier.new),
     liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
     allPrayersProvider.overrideWithValue(prayers ?? [_belarusian, _latin]),
     prayersContentProvider.overrideWith((ref) async {}),
@@ -131,6 +134,36 @@ bool _onScreen(WidgetTester tester, Finder finder) {
 }
 
 void main() {
+  testWidgets(
+    'Mass prose opts in after semantic parsing; response and headings do not',
+    (tester) async {
+      await tester.pumpWidget(
+        _app(
+          const PrayerDetailScreen(prayerId: _massId),
+          settingsFactory: _JustifiedMassSettings.new,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final html = tester
+          .widgetList<Html>(find.byType(Html))
+          .where((h) => h.data?.contains('reader-prose') ?? false)
+          .toList();
+      expect(html, isNotEmpty);
+      for (final document in html) {
+        final root = parseFragment(document.data!);
+        expect(
+          root.querySelectorAll(
+            'h2.reader-prose,h3.reader-prose,.mass-response.reader-prose,.mass-comment.reader-prose,.mass-posture.reader-prose',
+          ),
+          isEmpty,
+        );
+        expect(document.style['.reader-prose']!.textAlign, TextAlign.justify);
+      }
+      final prose = rootProseText(html.first.data!);
+      expect(prose, isNotEmpty);
+    },
+  );
+
   testWidgets('Holy Mass opens in Belarusian with the section bar', (
     tester,
   ) async {
@@ -681,4 +714,13 @@ class _IdleBootstrap extends ContentUpdatesNotifier {
 class _TestLocalPrayersNotifier extends LocalPrayersNotifier {
   @override
   List<Prayer> build() => const [];
+}
+
+String rootProseText(String html) =>
+    parseFragment(html).querySelector('.reader-prose')?.text ?? '';
+
+class _JustifiedMassSettings extends _TestSettingsNotifier {
+  @override
+  SettingsState build() =>
+      const SettingsState(textAlignment: ReaderTextAlignment.justify);
 }

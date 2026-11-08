@@ -1,3 +1,6 @@
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/models/reader_preferences.dart';
+import 'package:mybrev_flutter/utils/reader_prose.dart';
 import 'dart:async';
 
 import 'package:mybrev_flutter/discovery/discovery_context.dart';
@@ -1839,7 +1842,11 @@ class _SequenceSection extends StatelessWidget {
         for (final strophe in strophes)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _ReadingText(text: strophe, textStyle: textStyle),
+            child: _ReadingText(
+              text: strophe,
+              textStyle: textStyle,
+              isProse: false,
+            ),
           ),
       ],
     );
@@ -2037,10 +2044,11 @@ class _BibleRef extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 
-class _ReadingText extends StatefulWidget {
+class _ReadingText extends ConsumerStatefulWidget {
   final String text;
   final TextStyle textStyle;
   final bool isPsalm;
+  final bool isProse;
   final String? highlightNamespace;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
@@ -2050,6 +2058,7 @@ class _ReadingText extends StatefulWidget {
     required this.text,
     required this.textStyle,
     this.isPsalm = false,
+    this.isProse = true,
     this.highlightNamespace,
     this.highlights = const {},
     this.selectedSentenceId,
@@ -2057,10 +2066,10 @@ class _ReadingText extends StatefulWidget {
   });
 
   @override
-  State<_ReadingText> createState() => _ReadingTextState();
+  ConsumerState<_ReadingText> createState() => _ReadingTextState();
 }
 
-class _ReadingTextState extends State<_ReadingText> {
+class _ReadingTextState extends ConsumerState<_ReadingText> {
   final Map<String, TapGestureRecognizer> _recognizers = {};
 
   TapGestureRecognizer _recognizerFor(String sentenceId) =>
@@ -2081,14 +2090,21 @@ class _ReadingTextState extends State<_ReadingText> {
 
   @override
   Widget build(BuildContext context) {
+    final alignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
+    final prose = widget.isProse && !widget.isPsalm;
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
       return Html(
         data: widget.isPsalm
             ? formatReadingPsalmHtml(widget.text)
+            : prose
+            ? prepareReaderProseHtml(formatLiturgicalHtml(widget.text))
             : formatLiturgicalHtml(widget.text),
         style: {
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
+          if (prose) '.reader-prose': Style(textAlign: alignment.textAlign),
           '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
         },
       );
@@ -2097,11 +2113,14 @@ class _ReadingTextState extends State<_ReadingText> {
     final namespace = widget.highlightNamespace;
     final plainText =
         (widget.isPsalm ? formatReadingPsalmText(widget.text) : widget.text)
-            .replaceAll(RegExp(r'\r?\n[ \t]*\r?\n+'), '\n');
+            .replaceAll('\r\n', '\n');
     final sentences = namespace == null
         ? <_SentencePart>[_SentencePart(plainText, 0)]
         : _splitReadingSentences(plainText);
     return Text.rich(
+      textAlign: prose
+          ? readerProseAlignment(alignment, plainText)
+          : TextAlign.start,
       TextSpan(
         children: [
           for (final sentence in sentences)
@@ -2664,7 +2683,7 @@ class _AlleluiaSection extends StatelessWidget {
         _acclamationLine(context),
         if (verse.isNotEmpty) ...[
           const SizedBox(height: 4),
-          _ReadingText(text: verse, textStyle: textStyle),
+          _ReadingText(text: verse, textStyle: textStyle, isProse: false),
         ],
         _acclamationLine(context),
       ],

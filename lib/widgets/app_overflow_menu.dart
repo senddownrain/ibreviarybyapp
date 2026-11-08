@@ -40,6 +40,7 @@ class AppOverflowMenu extends StatefulWidget {
 }
 
 class _AppOverflowMenuState extends State<AppOverflowMenu> {
+  final _anchorKey = GlobalKey();
   Route<dynamic>? _popupRoute;
   bool _open = false;
 
@@ -61,24 +62,31 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     _open = true;
     final navigator = Navigator.of(context, rootNavigator: true);
     final overlay = navigator.overlay!.context.findRenderObject()! as RenderBox;
-    final button = context.findRenderObject()! as RenderBox;
+    final button = _anchorKey.currentContext!.findRenderObject()! as RenderBox;
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
-    final width = math.min(
-      widget.showPsalmody ? 288.0 : 360.0,
-      media.size.width - 32,
-    );
-    final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
+    RelativeRect positionForButton() {
+      final corner = button.localToGlobal(
+        button.size.bottomRight(Offset.zero),
+        ancestor: overlay,
+      );
+      final right = corner.dx.clamp(
+        media.viewPadding.left + 8,
+        overlay.size.width - media.viewPadding.right - 8,
+      );
+      final top = corner.dy + 4;
+      return RelativeRect.fromRect(
+        Rect.fromLTWH(right, top, 0, 0),
+        Offset.zero & overlay.size,
+      );
+    }
+
+    var position = positionForButton();
     final bottom =
         media.size.height -
         math.max(media.viewInsets.bottom, media.viewPadding.bottom);
-    final menuTop = origin.dy + button.size.height + 8;
-    final availableHeight = math.max(48.0, bottom - menuTop - 8);
-    var position = RelativeRect.fromRect(
-      Rect.fromLTWH(origin.dx, menuTop, button.size.width, 0),
-      Offset.zero & overlay.size,
-    );
+    final availableHeight = math.max(48.0, bottom - position.top - 8);
     // The prayerbook shares this menu across its root, category/catalogue
     // screens and readers. Keep category management in one place, instead of
     // rendering a second overflow button alongside it.
@@ -97,6 +105,35 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
           onSelected: () => context.push('/prayers/categories'),
         ),
     ];
+    // Measure the actual localized labels with the user's text scaler. Short
+    // menus stay compact; long contextual actions may use more of the viewport.
+    final labels = [
+      if (widget.showTextScale) 'Шрыфт',
+      ...actions.map((a) => a.label),
+      'Налады',
+      'Інфармацыя',
+    ];
+    var labelWidth = 0.0;
+    for (final label in labels) {
+      final painter = TextPainter(
+        text: TextSpan(
+          text: label,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        textDirection: Directionality.of(context),
+        textScaler: media.textScaler,
+      )..layout();
+      labelWidth = math.max(labelWidth, painter.width);
+      painter.dispose();
+    }
+    final availableWidth = math.max(
+      0.0,
+      overlay.size.width - media.viewPadding.horizontal - 16,
+    );
+    final width = math.min(
+      availableWidth,
+      (labelWidth + 66).clamp(224.0, actions.isEmpty ? 280.0 : 360.0),
+    );
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -112,16 +149,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       positionBuilder: (_, _) {
         // The source can disappear before the popup's removal frame.
         if (button.attached && overlay.attached) {
-          final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
-          position = RelativeRect.fromRect(
-            Rect.fromLTWH(
-              origin.dx,
-              origin.dy + button.size.height + 8,
-              button.size.width,
-              0,
-            ),
-            Offset.zero & overlay.size,
-          );
+          position = positionForButton();
         }
         return position;
       },
@@ -129,11 +157,15 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
         _OverflowEntry(
           child: Builder(
             builder: (popupContext) {
-              _popupRoute = ModalRoute.of(popupContext);
+              final popupRoute = ModalRoute.of(popupContext);
+              _popupRoute = popupRoute;
               return _OverflowContent(
                 showTextScale: widget.showTextScale,
                 actions: actions,
-                onSelected: (value) => Navigator.pop(popupContext, value),
+                onSelected: (value) {
+                  // A second tap during dismissal must never pop the reader.
+                  if (popupRoute?.isCurrent == true) navigator.pop(value);
+                },
               );
             },
           ),
@@ -161,11 +193,14 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     child: AdaptiveChromeSurface(
       role: ChromeSurfaceRole.control,
       borderRadius: BorderRadius.circular(24),
-      child: IconButton(
-        key: const Key('app-overflow-open'),
-        tooltip: 'Меню',
-        onPressed: _showMenu,
-        icon: const Icon(Icons.more_horiz_rounded, size: 24),
+      child: KeyedSubtree(
+        key: _anchorKey,
+        child: IconButton(
+          key: const Key('app-overflow-open'),
+          tooltip: 'Меню',
+          onPressed: _showMenu,
+          icon: const Icon(Icons.more_horiz_rounded, size: 24),
+        ),
       ),
     ),
   );
@@ -227,9 +262,11 @@ class _OverflowContent extends StatelessWidget {
 
   Widget _item(String label, IconData icon, String value) => ListTile(
     minTileHeight: 48,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+    minLeadingWidth: 22,
+    horizontalTitleGap: 12,
     leading: Icon(icon, size: 22),
     title: Text(label),
-    trailing: const Icon(Icons.chevron_right_rounded, size: 20),
     onTap: () => onSelected(value),
   );
 }
