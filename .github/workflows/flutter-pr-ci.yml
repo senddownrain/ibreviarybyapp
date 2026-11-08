@@ -37,11 +37,10 @@ jobs:
       - name: Check changed Dart formatting
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart
       - name: Check reading-highlight and screen preferences formatting
-        run: >-
-          dart format --output=none --set-exit-if-changed
-          lib/providers/settings_provider.dart lib/screens/settings_screen.dart
-          lib/screens/readings_screen.dart test/readings_stage4_test.dart
-          test/ordo_day_flow_test.dart test/layout/android_layout_lab_test.dart
+        run: |
+          dart format lib/providers/settings_provider.dart lib/screens/settings_screen.dart lib/screens/readings_screen.dart test/readings_stage4_test.dart test/ordo_day_flow_test.dart test/layout/android_layout_lab_test.dart
+          git diff -- lib/providers/settings_provider.dart lib/screens/settings_screen.dart lib/screens/readings_screen.dart test/readings_stage4_test.dart test/ordo_day_flow_test.dart test/layout/android_layout_lab_test.dart
+          git diff --exit-code -- lib/providers/settings_provider.dart lib/screens/settings_screen.dart lib/screens/readings_screen.dart test/readings_stage4_test.dart test/ordo_day_flow_test.dart test/layout/android_layout_lab_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
       - name: Readings highlights and navigation regression
