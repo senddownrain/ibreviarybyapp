@@ -382,10 +382,7 @@ void main() {
       return (span.children ?? const <InlineSpan>[]).any(hasTapRecognizer);
     }
 
-    expect(
-      hasTapRecognizer(tester.widget<RichText>(paragraph).text),
-      isFalse,
-    );
+    expect(hasTapRecognizer(tester.widget<RichText>(paragraph).text), isFalse);
     await tester.tap(paragraph);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
