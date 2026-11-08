@@ -80,7 +80,13 @@ void main() {
           isNull,
         );
         if (doc.profile == 'gadzinki') {
-          expect(doc.sections.map((s) => s.title), gadzinkiParts);
+          expect(doc.sections.map((s) => s.title), [
+            ...gadzinkiParts.take(6),
+            prayer.displayText.contains('## Камплета')
+                ? 'Камплета'
+                : 'Напрыканцы дня',
+            ...gadzinkiParts.skip(7),
+          ]);
           expect(doc.sections.expand((s) => doc.choices(s)), isEmpty);
           expect(
             doc.sections
