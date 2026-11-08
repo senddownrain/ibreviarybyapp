@@ -376,6 +376,16 @@ void main() {
           widget.text.toPlainText().contains('Першы сказ. Другі сказ.'),
     );
     expect(paragraph, findsOneWidget);
+    bool hasTapRecognizer(InlineSpan span) {
+      if (span is! TextSpan) return false;
+      if (span.recognizer != null) return true;
+      return (span.children ?? const <InlineSpan>[]).any(hasTapRecognizer);
+    }
+
+    expect(
+      hasTapRecognizer(tester.widget<RichText>(paragraph).text),
+      isFalse,
+    );
     await tester.tap(paragraph);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
