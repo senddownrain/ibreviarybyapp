@@ -40,8 +40,8 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
   {name:'josaphat-martyr',date:'2026-11-12',dayId:jos,hour:'lectionis'},
   {name:'josaphat-pastors',date:'2026-11-12',dayId:jos+'--pastors',hour:'lectionis'},
   ...['lectionis','terz','sext','non','vespers','completorium'].map(hour=>({name:'dead-'+hour,date:'2026-11-02',dayId:'office-for-dead',hour})),
-  {name:'dead-laudes-146',date:'2026-11-02',dayId:'office-for-dead',hour:'laudes',psalm:'Псальм 146'},
-  {name:'dead-laudes-150',date:'2026-11-02',dayId:'office-for-dead',hour:'laudes',psalm:'Псальм 150',alternative:true},
+  {name:'dead-laudes-146',date:'2026-11-02',dayId:'office-for-dead',hour:'laudes',psalm:'душа мая'},
+  {name:'dead-laudes-150',date:'2026-11-02',dayId:'office-for-dead',hour:'laudes',psalm:'гукам трубы',alternative:true},
   {name:'ordinary',date:'2026-11-05',dayId:'ordinary-w31-d5',hour:'laudes'},
   {name:'daniel',date:'2026-11-01',dayId:'01-11-all-saints',hour:'laudes',needle:'Благаславім Айца і Сына'},
   {name:'solemnity-I',date:'2026-10-31',dayId:'ordinary-w30-d7',hour:'vespers'},
@@ -49,7 +49,7 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
  ];
  const scroll=async needle=>{
   await page.waitForFunction(()=>typeof highPriestScrollTo==='function');
-  assert(await page.evaluate(n=>highPriestScrollTo(n),needle),'Rendered paragraph: '+needle);
+  await page.waitForFunction(async n => await highPriestScrollTo(n), needle, {timeout:30000});
   await pause(400);
  };
  try {
@@ -64,7 +64,7 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
     const dismiss=page.getByRole('button',{name:'Не зараз',exact:true});if(await dismiss.count())await dismiss.first().click();
     if(c.alternative){
      await scroll('@any:Псальм ·');
-     await page.getByRole('button',{name:/Псальм 146/}).first().click();
+     await page.getByRole('button',{name:/Выбар псальма/}).last().click();
      await page.getByRole('button',{name:/Псальм 150/}).first().click();
      await pause(400);
     }
