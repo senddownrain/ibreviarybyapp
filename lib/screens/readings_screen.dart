@@ -1042,8 +1042,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       ),
       reading: reading,
       massSet: massSet,
-      highlights: Map.unmodifiable(_highlights),
-      selectedSentenceId: _selectedSentenceId,
+      highlights: highlightEnabled ? Map.unmodifiable(_highlights) : const {},
+      selectedSentenceId: highlightEnabled ? _selectedSentenceId : null,
       onSentenceTap: highlightEnabled ? _toggleSentence : null,
     );
     return body;
