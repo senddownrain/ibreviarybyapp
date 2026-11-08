@@ -27,6 +27,7 @@ import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -369,6 +370,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _toggleSentence(String sentenceId) {
+    if (!ref.read(settingsProvider).readingsHighlightEnabled) return;
     ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
     setState(() {
       _selectedSentenceId = _selectedSentenceId == sentenceId
@@ -765,6 +767,18 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final highlightEnabled = ref.watch(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+    );
+    if (!highlightEnabled && _selectedSentenceId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted &&
+            !ref.read(settingsProvider).readingsHighlightEnabled &&
+            _selectedSentenceId != null) {
+          setState(() => _clearSentenceSelection());
+        }
+      });
+    }
     _refreshOptionsAfterFrame();
     ref.listen(dioceseSelectionProvider, (previous, next) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -827,7 +841,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReadingBody(reading, selection.massSet, seasonColor),
+                _buildReadingBody(reading, selection.massSet, seasonColor, highlightEnabled),
                 const SourceFooter(
                   key: Key('readings-source-footer'),
                   sourceId: 'lectionary-kkbb-2002-2005',
@@ -1012,6 +1026,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     ParsedReading reading,
     MassSetSelection? massSet,
     Color seasonColor,
+    bool highlightEnabled,
   ) {
     _loadHighlights(reading.id);
     final body = _ReadingBody(
@@ -1024,7 +1039,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       massSet: massSet,
       highlights: Map.unmodifiable(_highlights),
       selectedSentenceId: _selectedSentenceId,
-      onSentenceTap: _toggleSentence,
+      onSentenceTap: highlightEnabled ? _toggleSentence : null,
     );
     return body;
   }
@@ -1366,7 +1381,7 @@ class _ReadingBody extends ConsumerWidget {
   final MassSetSelection? massSet;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
   const _ReadingBody({
     super.key,
     required this.reading,
@@ -1559,7 +1574,7 @@ class _MassSetContent extends StatelessWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2113,7 +2128,7 @@ class _ReadingTextState extends State<_ReadingText> {
                 ))
                   TextSpan(
                     text: piece,
-                    recognizer: namespace == null
+                    recognizer: namespace == null || widget.onSentenceTap == null
                         ? null
                         : _recognizerFor('$namespace:${sentence.index}'),
                     style: piece == '*' || piece == '†'
@@ -2189,7 +2204,7 @@ class _ReadingSection extends StatefulWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   /// Gospel (closing «Гэта слова Пана.»); by default from the label.
   final bool? gospel;
