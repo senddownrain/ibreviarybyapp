@@ -31,14 +31,14 @@ flutter test test/doxology_bundle_test.dart test/common_office_test.dart \
   test/content_offline_test.dart test/ordo_content_update_test.dart \
   test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart
 flutter devices
-flutter run -d chrome -t tool/common_office_smoke.dart --web-port 5238
+flutter run -d chrome -t tool/doxology_smoke.dart --web-port 5241
 ```
 
 Добавлены проверки обеих заупокойных альтернатив и всех часов, двух Commons св. Язафата, Дан 3, обычного псалма и замещения старого локального overlay новым baseline с повторным открытием хранилища. Существующие ContentStore reconciliation/atomic-generation тесты включены в PR CI.
 
-**Проверено в CI:** [Flutter PR checks, run 42455320175](https://github.com/senddownrain/ibreviarybyapp/actions/runs/42455320175) — форматирование, analyze, unit/widget, паритет и обновление старых локальных данных прошли. Отдельный реальный Chrome smoke выполняется в CI (`doxology-visual.yml`); его изображения ещё требуют просмотра.
+**Проверено в CI:** [Flutter PR checks, run 42455320175](https://github.com/senddownrain/ibreviarybyapp/actions/runs/42455320175) — форматирование, analyze, unit/widget, паритет и обновление старых локальных данных прошли. Отдельный реальный Chrome smoke [run 42456459973](https://github.com/senddownrain/ibreviarybyapp/actions/runs/42456459973) прошёл 42 состояния: 390px/desktop, светлая/тёмная тема, крупный шрифт и три режима строф. Обе альтернативы третьего заупокойного псалма включены; errors/external requests = 0. Результаты и ссылка на артефакт: [flutter-chrome-results.json](flutter-chrome-results.json). Изображения созданы, но их просмотр здесь блокируется сетевой политикой (403 для GitHub artifact storage); до просмотра визуальная приёмка остаётся открытой.
 
-**Локальное окружение:** Flutter SDK отсутствует (`flutter devices`: command not found), поэтому нельзя считать Dart/widget/analyze и Flutter Web visual smoke выполненными локально. Анализ и тесты выполнены на CI-раннере; визуальный smoke проверяется отдельно. Нативный smoke нужен перед релизом, а не для изменения платформенного кода (платформенный код не менялся).
+**Локальное окружение:** Flutter SDK отсутствует (`flutter devices`: command not found), поэтому нельзя считать Dart/widget/analyze и Flutter Web visual smoke выполненными локально. Анализ, тесты и браузерный сценарий выполнены на CI-раннере; просмотр изображений проверяется отдельно. Нативный smoke нужен перед релизом, а не для изменения платформенного кода (платформенный код не менялся).
 
 Для визуальной приёмки использовать существующий offline harness, выбирать даты 12.11.2026 (Пінск), 02.11.2026 и воскресенье I недели, а также I/II Нешпары. Проверить 390px/desktop, светлую/тёмную тему, крупный шрифт, оба выбора Пс 146/150, переносы, красные знаки и чередование строф. Web-снимки из связанного PR не заменяют Flutter-снимки.
 
