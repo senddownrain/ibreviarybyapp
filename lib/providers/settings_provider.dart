@@ -113,6 +113,7 @@ class SettingsState {
   final double fontSize;
   final String fontFamily;
   final bool keepScreenOn;
+  final bool readingsHighlightEnabled;
   final List<UserCategory> userCategories;
   final List<String> hiddenGlobalPrayerCategoryIds;
   final List<String> favoriteIds;
@@ -128,7 +129,8 @@ class SettingsState {
     this.themePreference = AppThemePreference.system,
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
-    this.keepScreenOn = false,
+    this.keepScreenOn = true,
+    this.readingsHighlightEnabled = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
     this.favoriteIds = const [],
@@ -151,6 +153,7 @@ class SettingsState {
     double? fontSize,
     String? fontFamily,
     bool? keepScreenOn,
+    bool? readingsHighlightEnabled,
     List<UserCategory>? userCategories,
     List<String>? hiddenGlobalPrayerCategoryIds,
     List<String>? favoriteIds,
@@ -164,6 +167,8 @@ class SettingsState {
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
+    readingsHighlightEnabled:
+        readingsHighlightEnabled ?? this.readingsHighlightEnabled,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
         hiddenGlobalPrayerCategoryIds ?? this.hiddenGlobalPrayerCategoryIds,
@@ -217,7 +222,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
         _box.get('fontFamily', defaultValue: ReaderFontFamily.literata)
             as String,
       ),
-      keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
+      keepScreenOn: _box.get('keepScreenOn', defaultValue: true) as bool,
+      readingsHighlightEnabled:
+          _box.get('readingsHighlightEnabled', defaultValue: false) as bool,
       userCategories: (jsonDecode(cats) as List)
           .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
           .toList(),
@@ -240,6 +247,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
     await _box.put('keepScreenOn', state.keepScreenOn);
+    await _box.put('readingsHighlightEnabled', state.readingsHighlightEnabled);
     await _box.put(
       'userCategories',
       jsonEncode(state.userCategories.map((c) => c.toMap()).toList()),
@@ -306,6 +314,11 @@ class SettingsNotifier extends Notifier<SettingsState> {
   void setKeepScreenOn(bool value) {
     if (state.keepScreenOn != value) analyticsFeature('keep_screen_on_toggle');
     state = state.copyWith(keepScreenOn: value);
+    _save();
+  }
+
+  void setReadingsHighlightEnabled(bool value) {
+    state = state.copyWith(readingsHighlightEnabled: value);
     _save();
   }
 

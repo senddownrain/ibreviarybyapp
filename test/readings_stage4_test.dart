@@ -48,6 +48,12 @@ ReadingsLoader _loader(List<ParsedReading> readings) =>
         );
 
 void main() {
+  test('new settings keep the screen on and reading highlights off', () {
+    const settings = SettingsState();
+    expect(settings.keepScreenOn, isTrue);
+    expect(settings.readingsHighlightEnabled, isFalse);
+  });
+
   late Directory hiveDirectory;
 
   setUpAll(() async {
@@ -345,6 +351,43 @@ void main() {
     expect(find.text('Альтэрнатыўны рэфрэн.'), findsOneWidget);
   });
 
+  testWidgets('reading taps cannot open palette with highlighting off', (
+    tester,
+  ) async {
+    const reading = ParsedReading(
+      id: 'highlights-disabled-fixture',
+      title: 'Чытанні без вылучэння',
+      reading: ParsedSection(text: 'Першы сказ. Другі сказ.'),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith(_DisabledSettingsNotifier.new),
+          liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+          readingsLoaderProvider.overrideWithValue(_loader([reading])),
+        ],
+        child: const MaterialApp(home: ReadingsScreen(dateStr: '2026-09-09')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final paragraph = find.byWidgetPredicate(
+      (widget) =>
+          widget is RichText &&
+          widget.text.toPlainText().contains('Першы сказ. Другі сказ.'),
+    );
+    expect(paragraph, findsOneWidget);
+    bool hasTapRecognizer(InlineSpan span) {
+      if (span is! TextSpan) return false;
+      if (span.recognizer != null) return true;
+      return (span.children ?? const <InlineSpan>[]).any(hasTapRecognizer);
+    }
+
+    expect(hasTapRecognizer(tester.widget<RichText>(paragraph).text), isFalse);
+    await tester.tap(paragraph);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
+  });
+
   testWidgets('a reading sentence opens an accessible color palette', (
     tester,
   ) async {
@@ -627,6 +670,11 @@ void main() {
 }
 
 class _TestSettingsNotifier extends SettingsNotifier {
+  @override
+  SettingsState build() => const SettingsState(readingsHighlightEnabled: true);
+}
+
+class _DisabledSettingsNotifier extends SettingsNotifier {
   @override
   SettingsState build() => const SettingsState();
 }

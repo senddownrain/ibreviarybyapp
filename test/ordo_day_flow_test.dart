@@ -42,7 +42,7 @@ class _Idle extends ContentUpdatesNotifier {
 
 class _Settings extends SettingsNotifier {
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() => const SettingsState(readingsHighlightEnabled: true);
   @override
   void rememberLastSection(String section) {}
 }
