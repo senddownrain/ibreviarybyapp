@@ -39,13 +39,13 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
  const cases=[
   {name:'josaphat-martyr',date:'2026-11-12',dayId:jos,hour:'lectionis'},
   {name:'josaphat-pastors',date:'2026-11-12',dayId:jos+'--pastors',hour:'lectionis'},
-  ...['lectionis','terz','sext','non','vesper','completorium'].map(hour=>({name:'dead-'+hour,date:'2026-11-02',dayId:'office-for-dead',hour})),
+  ...['lectionis','terz','sext','non','vespers','completorium'].map(hour=>({name:'dead-'+hour,date:'2026-11-02',dayId:'office-for-dead',hour})),
   {name:'dead-laudes-146',date:'2026-11-02',dayId:'office-for-dead',hour:'laudes',psalm:'Псальм 146'},
   {name:'dead-laudes-150',date:'2026-11-02',dayId:'office-for-dead',hour:'laudes',psalm:'Псальм 150',alternative:true},
   {name:'ordinary',date:'2026-11-05',dayId:'ordinary-w31-d5',hour:'laudes'},
   {name:'daniel',date:'2026-11-01',dayId:'01-11-all-saints',hour:'laudes',needle:'Благаславім Айца і Сына'},
-  {name:'solemnity-I',date:'2026-10-31',dayId:'ordinary-w30-d7',hour:'vesper'},
-  {name:'solemnity-II',date:'2026-11-01',dayId:'01-11-all-saints',hour:'vesper'},
+  {name:'solemnity-I',date:'2026-10-31',dayId:'ordinary-w30-d7',hour:'vespers'},
+  {name:'solemnity-II',date:'2026-11-01',dayId:'01-11-all-saints',hour:'vespers'},
  ];
  const scroll=async needle=>{
   await page.waitForFunction(()=>typeof highPriestScrollTo==='function');
@@ -56,6 +56,7 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
   for(const profile of [{width:390,height:844,theme:'light',scale:'normal',mode:'leftBreak'},{width:1280,height:900,theme:'dark',scale:'normal',mode:'alternatingStanzas'},{width:390,height:844,theme:'dark',scale:'large',mode:'leftBreakIndent'}]){
    await page.setViewportSize({width:profile.width,height:profile.height});
    for(const c of cases){
+    console.log('Checking',JSON.stringify({...c,...profile}));
     await page.goto(base+'?'+new URLSearchParams({...c,...profile}),{waitUntil:'domcontentloaded'});
     await page.locator('flt-semantics-placeholder').waitFor({timeout:90000});
     await page.locator('flt-semantics-placeholder').evaluate(e=>e.click());
@@ -79,6 +80,7 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
   fs.writeFileSync(path.join(out,'failure-semantics.html'),await page.content());throw e;
  }finally{
   fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({states,errors,external},null,2)+'\n');
+  console.log('DOXOLOGY_VISUAL_RESULTS',JSON.stringify({states,errors,external}));
   await browser.close();
  }
  console.log(JSON.stringify({screenshots:states.length,allPassed:true}));
