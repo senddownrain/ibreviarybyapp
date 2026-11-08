@@ -1,0 +1,10 @@
+{
+  "mode": "dry-run",
+  "psalmodyOnly": true,
+  "webCommit": "fb71b272c5834f2ad8017b9ccee20c6397cfb77c",
+  "webOnOriginMain": false,
+  "properTextsRevision": 6,
+  "templatesRevision": 4,
+  "refusedOnApply": [],
+  "changes": []
+}

@@ -4,6 +4,13 @@
  *     --proper-revision <N> --templates-revision <N>                (dry-run)
  *   ... --apply-bundle [--allow-text-drift id1,id2] [--allow-added id,..] [--allow-removed id,..]
  *
+ * --psalmody-only repairs only real psalm fields in the existing bundle, including
+ * legacy days, with the Web doxology audit. It preserves collection membership,
+ * schema; revisions follow the supplied published values, using the existing
+ * refresh mechanism. The existing Web commit-time version rule applies.
+ * Run the dry-run and list the exact changed ids with --allow-text-drift before
+ * --apply-bundle. This is an app-release candidate, never a manifest publication.
+ *
  * Source of truth is the generated Web content of the checked-out Web commit
  * (`patchs/db-feasts`, `patchs/db-templates`), which is what the next publication
  * of that commit carries. The Web commit is recorded, never pinned: a reviewer
@@ -27,6 +34,7 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { resolveWeb } from './lib/web_source.mjs';
+import { repairPsalmodyBundle } from './lib/psalmody_bundle.mjs';
 
 const args = process.argv.slice(2);
 const arg = (key) => (args.includes(key) ? args[args.indexOf(key) + 1] : undefined);
@@ -34,6 +42,7 @@ const idList = (key) => new Set((arg(key) ?? '').split(',').map((id) => id.trim(
 const source = resolveWeb(args);
 const web = source.web;
 const apply = args.includes('--apply-bundle');
+const psalmodyOnly = args.includes('--psalmody-only');
 const properRevision = Number(arg('--proper-revision'));
 const templatesRevision = Number(arg('--templates-revision'));
 assert(Number.isInteger(properRevision) && Number.isInteger(templatesRevision),
@@ -62,11 +71,26 @@ function fieldDiff(before, after) {
   return out;
 }
 
-const updates = { liturgicalProperTexts: generated('db-feasts'), liturgicalTemplates: generated('db-templates') };
 const meta = read('liturgicalCalendarMeta');
-meta.current.properTextsRevision = properRevision;
-meta.current.templatesRevision = templatesRevision;
-updates.liturgicalCalendarMeta = Object.values(meta);
+let updates;
+if (psalmodyOnly) {
+  assert(properRevision >= meta.current.properTextsRevision, 'Do not roll back the published Proper revision');
+  assert(templatesRevision >= meta.current.templatesRevision, 'Do not roll back the published template revision');
+  const { repairDocument } = await import(pathToFileURL(path.join(web, 'scripts/liturgy/audit-doxologies.mjs')));
+  const { psalmFields, plain } = await import(pathToFileURL(path.join(web, 'scripts/liturgy/lib/psalmody-doxology.mjs')));
+  updates = repairPsalmodyBundle({ read, repairDocument, psalmFields, plain, generated,
+    names: ['liturgicalTemplates', 'liturgicalProperTexts', 'days', 'completoriums', 'invitatoriums'] });
+  if (properRevision !== meta.current.properTextsRevision || templatesRevision !== meta.current.templatesRevision) {
+    meta.current.properTextsRevision = properRevision;
+    meta.current.templatesRevision = templatesRevision;
+    updates.liturgicalCalendarMeta = Object.values(meta);
+  }
+} else {
+  updates = { liturgicalProperTexts: generated('db-feasts'), liturgicalTemplates: generated('db-templates') };
+  meta.current.properTextsRevision = properRevision;
+  meta.current.templatesRevision = templatesRevision;
+  updates.liturgicalCalendarMeta = Object.values(meta);
+}
 
 const changes = [];
 const refusals = [];
@@ -97,7 +121,7 @@ const digest = (name) => changes.find((c) => c.collection === name).after;
 if (arg('--expect-proper-digest')) assert.equal(digest('liturgicalProperTexts'), arg('--expect-proper-digest'));
 if (arg('--expect-templates-digest')) assert.equal(digest('liturgicalTemplates'), arg('--expect-templates-digest'));
 
-if (apply) {
+if (apply && changes.length) {
   assert.deepEqual(refusals, [], `Refused (list the exact ids to accept them):\n${refusals.join('\n')}`);
   // Only the Web checkout decides the content version: the newest of the sources
   // that changed is not knowable offline, so a new version is the Web commit time.
@@ -117,6 +141,6 @@ if (apply) {
   manifest.contentDate = new Date(version).toISOString();
   fs.writeFileSync(path.join(bundle, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 }
-console.log(JSON.stringify({ mode: apply ? 'local-bundle' : 'dry-run', webCommit: source.head,
+console.log(JSON.stringify({ mode: apply ? 'local-bundle' : 'dry-run', psalmodyOnly, webCommit: source.head,
   webOnOriginMain: source.onOriginMain, properTextsRevision: properRevision, templatesRevision,
   refusedOnApply: refusals, changes }, null, 2));

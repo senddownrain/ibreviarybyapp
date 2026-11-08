@@ -1,0 +1,3720 @@
+{
+  "mode": "local-bundle",
+  "psalmodyOnly": true,
+  "webCommit": "fb71b272c5834f2ad8017b9ccee20c6397cfb77c",
+  "webOnOriginMain": false,
+  "properTextsRevision": 6,
+  "templatesRevision": 4,
+  "refusedOnApply": [],
+  "changes": [
+    {
+      "collection": "liturgicalTemplates",
+      "before": "316b5f1487846faf",
+      "after": "eb5361386d552f49",
+      "count": 16,
+      "added": [],
+      "removed": [],
+      "changed": {
+        "apostles": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "blessed-virgin-mary": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "church-dedication": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "holy-men": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "holy-women": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "office-for-dead": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "laudesPs1",
+            "laudesPs2",
+            "laudesPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        },
+        "pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        },
+        "virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "_seasonalVariants"
+          ]
+        }
+      }
+    },
+    {
+      "collection": "liturgicalProperTexts",
+      "before": "8d79a1efaafd1062",
+      "after": "60081a442fa9c4ed",
+      "count": 291,
+      "added": [],
+      "removed": [],
+      "changed": {
+        "01-11-all-saints": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-10-holy-guardian-angels": {
+          "text": [
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        },
+        "06-01-epiphany-lord": {
+          "text": [
+            "vesper1Ps3"
+          ]
+        },
+        "06-08-transfiguration-lord": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-09-exaltation-holy-cross": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-12-sv-john-apostle-evangelist": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3"
+          ]
+        },
+        "29-09-archangels-michael-gabriel-raphael": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        }
+      }
+    },
+    {
+      "collection": "days",
+      "before": "b5f4b077f42f6664",
+      "after": "4d71131ab6bf2f4a",
+      "count": 736,
+      "added": [],
+      "removed": [],
+      "changed": {
+        "01-05-dedication-pinsk-cathedral-diocese": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "01-06-sv-justin": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "01-08-sv-alphonsus-liguori--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "01-08-sv-alphonsus-liguori--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "01-10-sv-teresa-lisieux": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "01-11-all-saints": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-01-sv-basil-gregory-nazianzen--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-01-sv-basil-gregory-nazianzen--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-05-sv-athanasius": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-06-sv-marcellinus-peter": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-07-our-lady-budslav": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-07-our-lady-budslav-minsk": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-07-our-lady-budslav-vitebsk": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-08-sv-eusebius-vercelli": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-08-sv-peter-julian-eymard--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "02-10-holy-guardian-angels": {
+          "text": [
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        },
+        "02-11-all-faithful-departed": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "laudesPs1",
+            "laudesPs2",
+            "laudesPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        },
+        "03-02-sv-anzgar": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-02-sv-blazej--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-02-sv-blazej--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-06-sv-charles-lwanga-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-07-sv-thomas-apostle": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-09-sv-gregory-great--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-09-sv-gregory-great--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "03-12-sv-francis-xavier": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-03-sv-casimir": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-03-sv-casimir-grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-04-sv-isidore-seville--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-04-sv-isidore-seville--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-08-sv-john-vianney": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-09-bl-maria-stella-companions-grodno--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-09-bl-maria-stella-companions-grodno--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-11-sv-charles-borromeo": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-12-grodno-cathedral-dedication": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-12-sv-john-damascene--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "04-12-sv-john-damascene--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-02-sv-agata--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-02-sv-agata--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-04-sv-vincent-ferrer--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-06-sv-boniface--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-06-sv-boniface--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-06-vitebsk-cathedral-dedication": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-07-our-lady-trakai-grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-07-our-lady-trakai-grodno-memoria-ad-libitum": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-07-our-lady-trakai-sanctuary": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-07-sv-anthony-mary-zaccaria--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-08-dedication-st-mary-major": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "05-08-our-lady-congregational-grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-01-epiphany-lord": {
+          "text": [
+            "vesper1Ps3"
+          ]
+        },
+        "06-02-sv-paul-miki": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-06-sv-boniface-vitebsk--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-06-sv-boniface-vitebsk--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-06-sv-norbert": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-07-sv-maria-goretti--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-07-sv-maria-goretti--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-08-transfiguration-lord": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-10-sv-bruno--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "06-12-sv-nicholas": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-01-sv-raymond-penyafort": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-03-sv-perpetua-felicity": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-04-sv-jean-baptiste-de-la-salle--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-08-sv-cajetan--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-08-sv-sixtus-ii-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-10-our-lady-rosary": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3",
+            "vesperPs1",
+            "vesperPs3",
+            "vesperPs2"
+          ]
+        },
+        "07-12-sv-ambrose--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "07-12-sv-ambrose--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "08-02-sv-josephine-bakhita": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "08-08-sv-dominic--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "08-09-nativity-blessed-virgin-mary": {
+          "text": [
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "officeOfReadingsPs3",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs1",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "08-09-our-lady-braslau-vitebsk": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-06-sv-ephrem": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-07-sv-augustine-zhao-rong-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-08-sv-teresa-benedicta-cross--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-09-sv-peter-claver--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-10-sv-denis-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-10-sv-john-leonardi--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "09-11-dedication-lateran-basilica": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "10-02-sv-scholastica": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "10-10-vitebsk-cathedral-dedication": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "10-11-sv-leo-great--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "10-11-sv-leo-great--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "11-02-our-lady-of-lourdes": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "11-04-sv-stanislaus-bishop-martyr": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "11-08-sv-clare--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "11-11-sv-martin-tours": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "11-12-sv-damasus-i": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-05-sv-nereus-achilleus": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-05-sv-pancras": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-06-bl-henryk-hlebowicz-grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-08-sv-jane-frances-de-chantal--holy-women": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-09-holy-name-mary": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-09-holy-name-mary-minsk-mohilev-pinsk--minsk-mohilev": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-11-sv-josaphat--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-11-sv-josaphat--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-11-sv-josaphat-minsk-mohilev-pinsk--minsk-mohilev--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-11-sv-josaphat-minsk-mohilev-pinsk--minsk-mohilev--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-11-sv-josaphat-vitebsk--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "12-11-sv-josaphat-vitebsk--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-01-sv-hilary--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-01-sv-hilary--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-04-sv-martin-i-pope-martyr": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-05-our-lady-of-fatima": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-06-sv-anthony-padua--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-06-sv-anthony-padua--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-07-sv-henry": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-08-sv-pontian-hippolytus--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-08-sv-pontian-hippolytus--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-09-sv-john-chrysostom--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-09-sv-john-chrysostom--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-12-sv-lucy--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "13-12-sv-lucy--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-02-sv-cyril-methodius": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-05-sv-matthias": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-08-sv-maximilian-kolbe--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-08-sv-maximilian-kolbe--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-08-sv-maximilian-kolbe-grodno--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-08-sv-maximilian-kolbe-grodno--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-09-exaltation-holy-cross": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-10-sv-callistus-i--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-10-sv-callistus-i--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-12-sv-john-cross--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "14-12-sv-john-cross--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-02-bl-michal-sopocko-grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-07-sv-bonaventure--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-07-sv-bonaventure--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-09-our-lady-sorrows": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-10-sv-teresa-of-jesus": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-11-sv-albert-great--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "15-11-sv-albert-great--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-03-minsk-mohilev-cathedral-dedication": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-05-sv-andrei-bobola": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-05-sv-andrei-bobola-minsk-mohilev": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-05-sv-andrei-bobola-pinsk": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-07-our-lady-mount-carmel": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-07-our-lady-mount-carmel--minsk-mohilev": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-08-sv-stephen-hungary": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-09-sv-cornelius-cyprian--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-09-sv-cornelius-cyprian--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-10-sv-margaret-mary-alacoque--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-11-our-lady-mother-mercy": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-11-our-lady-mother-mercy-grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-11-our-lady-mother-mercy-minsk-mohilev-pinsk--minsk-mohilev": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "16-11-sv-gertrude--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "17-03-sv-patryk": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "17-09-sv-robert-bellarmine--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "17-09-sv-robert-bellarmine--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "17-10-sv-ignatius-antioch--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "17-10-sv-ignatius-antioch--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "18-03-sv-cyril-jerusalem--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "18-03-sv-cyril-jerusalem--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "18-05-sv-john-i--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "18-05-sv-john-i--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "18-10-sv-luke-evangelist": {
+          "text": [
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "18-11-dedication-basilicas-peter-paul": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "19-08-sv-john-eudes--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "19-09-sv-januarius--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "19-09-sv-januarius--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "19-10-sv-jean-brebeuf-isaac-jogues-companions--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "19-10-sv-jean-brebeuf-isaac-jogues-companions--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "19-10-sv-paul-of-cross--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-01-sv-fabian--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-01-sv-fabian--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-01-sv-sebastian": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-05-sv-bernardine-of-siena--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-07-sv-apollinaris--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-07-sv-apollinaris--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-08-sv-bernard--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-09-sv-andrew-kim-taegon-paul-chong-hasang-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "20-11-sv-raphael-kalinowski": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-01-sv-agnes--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-01-sv-agnes--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-02-sv-peter-damian--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-02-sv-peter-damian--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-04-sv-anselm--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-04-sv-anselm--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-05-sv-christopher-magallanes-companions--martyrs-many": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-05-sv-christopher-magallanes-companions--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-07-sv-lawrence-brindisi--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-07-sv-lawrence-brindisi--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-08-sv-pius-x": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-09-sv-matthew": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "21-11-presentation-blessed-virgin-mary": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-01-sv-vincent": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-05-sv-rita-cascia": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-06-sv-john-fisher-thomas-more": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-06-sv-paulinus-nola": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-07-sv-mary-magdalene": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-08-our-lady-queen": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-10-sv-john-paul-ii": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-11-sv-cecilia--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "22-11-sv-cecilia--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-02-sv-polycarp--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-02-sv-polycarp--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-03-sv-turybius-mongrovejo": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-04-sv-adalbert-wojciech-bishop-martyr--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-04-sv-adalbert-wojciech-bishop-martyr--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-04-sv-george-martyr": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-08-sv-rose-of-lima--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-09-sv-pio-pietrelcina--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-10-sv-john-capistrano": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-11-sv-clement-i--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-11-sv-clement-i--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "23-11-sv-columban--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-01-sv-francis-de-sales--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-01-sv-francis-de-sales--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-04-sv-fidel-sigmaringen--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-04-sv-fidel-sigmaringen--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-07-sv-charbel-makhlouf--holy-men": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-07-sv-charbel-makhlouf--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-08-sv-bartholomew": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-10-sv-anthony-mary-claret": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "24-11-sv-andrew-dung-lac-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-01-conversion-saint-paul": {
+          "text": [
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-05-sv-bede--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-05-sv-gregory-vii": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-05-sv-maria-magdalena-de-pazzi--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-07-sv-james-apostle": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-08-sv-joseph-calasanz--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-08-sv-louis": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-11-sv-catherine-alexandria--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "25-11-sv-catherine-alexandria--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "26-01-sv-timothy-titus": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "26-05-sv-philip-neri--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "26-07-sv-joachim-anne": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "26-08-our-lady-czestochowa--grodno": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "26-09-sv-cosmas-damian": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "26-12-sv-stephen-protomartyr": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3"
+          ]
+        },
+        "27-01-bl-jurgis-matulaitis": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-01-bl-jurgis-matulaitis-vitebsk": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-01-sv-angela-merici--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-05-sv-augustine-of-canterbury": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-06-sv-cyril-alexandrian--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-06-sv-cyril-alexandrian--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-08-sv-monica": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-09-sv-vincent-de-paul--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "27-12-sv-john-apostle-evangelist": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3"
+          ]
+        },
+        "28-01-sv-thomas-aquinas": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-04-sv-louis-marie-grignion-de-montfort--holy-men": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-04-sv-louis-marie-grignion-de-montfort--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-04-sv-peter-chanel": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-06-sv-irenaeus--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-06-sv-irenaeus--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-08-sv-augustine--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-08-sv-augustine--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-09-sv-laurence-ruiz-companions": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-09-sv-wenceslaus": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-10-sv-simon-jude-apostles": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "28-12-holy-innocents": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3"
+          ]
+        },
+        "29-01-bl-boleslawa-lament--martyr-one": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "29-01-bl-boleslawa-lament--virgins": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "29-04-sv-catherine-siena": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "29-05-sv-paul-vi": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "29-07-sv-martha": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "29-09-archangels-michael-gabriel-raphael": {
+          "text": [
+            "officeOfReadingsPs3",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs1",
+            "vesperPs1",
+            "vesperPs3",
+            "vesperPs2"
+          ]
+        },
+        "30-04-sv-pius-v-pope": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "30-06-holy-roman-protomartyrs": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "30-07-sv-peter-chrysologus--doctors-of-church": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "30-07-sv-peter-chrysologus--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "30-09-sv-jerome": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        },
+        "30-11-sv-andrew-apostle": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "31-01-sv-john-bosco--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "31-07-sv-ignatius-loyola--pastors": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "christmas-05-01": {
+          "text": [
+            "vesperPs3"
+          ]
+        },
+        "christmas-11-01": {
+          "text": [
+            "vesperPs3"
+          ]
+        },
+        "christmas-12-01": {
+          "text": [
+            "vesperPs3"
+          ]
+        },
+        "easter-w1-d3": {
+          "text": [
+            "officeOfReadingsPs3"
+          ]
+        },
+        "easter-w1-d4": {
+          "text": [
+            "officeOfReadingsPs2"
+          ]
+        },
+        "easter-w1-d5": {
+          "text": [
+            "officeOfReadingsPs1"
+          ]
+        },
+        "easter-w1-d7": {
+          "text": [
+            "officeOfReadingsPs2"
+          ]
+        },
+        "easter-w6-d4": {
+          "text": [
+            "vesperPs1",
+            "vesperPs2"
+          ]
+        },
+        "feast-ascension": {
+          "text": [
+            "vesper1Ps1",
+            "vesper1Ps2"
+          ]
+        },
+        "feast-buptismofthelord": {
+          "text": [
+            "vesper1Ps3"
+          ]
+        },
+        "feast-christking": {
+          "text": [
+            "officeOfReadingsPs1",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs3",
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3",
+            "vesper1Ps1",
+            "vesper1Ps2",
+            "vesper1Ps3"
+          ]
+        },
+        "holyweek-w1-d6": {
+          "text": [
+            "officeOfReadingsPs2"
+          ]
+        },
+        "office-for-dead": {
+          "text": [
+            "officeOfReadingsPs3",
+            "officeOfReadingsPs2",
+            "officeOfReadingsPs1",
+            "vesperPs1",
+            "vesperPs3",
+            "vesperPs2",
+            "laudesPs3",
+            "laudesPs2",
+            "laudesPs1"
+          ]
+        },
+        "ordinary-w30-d6": {
+          "text": [
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        },
+        "ordinary-w33-d7": {
+          "text": [
+            "vesperPs1",
+            "vesperPs2",
+            "vesperPs3"
+          ]
+        }
+      }
+    },
+    {
+      "collection": "liturgicalCalendarMeta",
+      "before": "67191e93d2d4eec8",
+      "after": "71ad58d830bd0d77",
+      "count": 1,
+      "added": [],
+      "removed": [],
+      "changed": {
+        "current": {
+          "text": [
+            "templatesRevision",
+            "properTextsRevision"
+          ]
+        }
+      }
+    }
+  ]
+}
