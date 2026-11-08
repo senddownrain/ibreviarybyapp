@@ -167,7 +167,8 @@ class SettingsState {
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
-    readingsHighlightEnabled: readingsHighlightEnabled ?? this.readingsHighlightEnabled,
+    readingsHighlightEnabled:
+        readingsHighlightEnabled ?? this.readingsHighlightEnabled,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
         hiddenGlobalPrayerCategoryIds ?? this.hiddenGlobalPrayerCategoryIds,
@@ -222,7 +223,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
             as String,
       ),
       keepScreenOn: _box.get('keepScreenOn', defaultValue: true) as bool,
-      readingsHighlightEnabled: _box.get('readingsHighlightEnabled', defaultValue: false) as bool,
+      readingsHighlightEnabled:
+          _box.get('readingsHighlightEnabled', defaultValue: false) as bool,
       userCategories: (jsonDecode(cats) as List)
           .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
           .toList(),
