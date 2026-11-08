@@ -11,10 +11,10 @@ import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/movable_feasts.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
-
-import 'support/legacy_high_priest_baseline.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
+
+import 'support/legacy_high_priest_baseline.dart';
 
 const _id = 'feast-christthehighpriest';
 const _suffixes = [
