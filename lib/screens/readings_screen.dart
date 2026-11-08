@@ -841,7 +841,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReadingBody(reading, selection.massSet, seasonColor, highlightEnabled),
+                _buildReadingBody(
+                  reading,
+                  selection.massSet,
+                  seasonColor,
+                  highlightEnabled,
+                ),
                 const SourceFooter(
                   key: Key('readings-source-footer'),
                   sourceId: 'lectionary-kkbb-2002-2005',
