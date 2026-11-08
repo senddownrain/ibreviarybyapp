@@ -1,0 +1,37 @@
+name: Flutter doxology visual smoke
+on:
+  pull_request:
+    paths:
+      - 'assets/content/**'
+      - 'tool/doxology_smoke.dart'
+      - 'scripts/smoke_doxologies.cjs'
+      - '.github/workflows/doxology-visual.yml'
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix /tmp/doxology-browser playwright-core@1.63.0
+      - name: Flutter devices and real Chrome
+        run: |
+          mkdir -p audit-evidence/doxologies
+          flutter devices > audit-evidence/doxologies/devices.txt
+          xvfb-run -a flutter run -d chrome -t tool/doxology_smoke.dart --web-port 5241 --web-browser-flag=--no-sandbox > audit-evidence/doxologies/flutter-run.log 2>&1 &
+          NODE_PATH=/tmp/doxology-browser/node_modules node scripts/smoke_doxologies.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: flutter-doxology-visual
+          path: audit-evidence/doxologies
