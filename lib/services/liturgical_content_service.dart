@@ -432,13 +432,17 @@ class LiturgicalContentService {
         if (item.id != seasonalDay?.id && !isSeasonalDateDocumentId(item.id))
           resolveFixed(item),
     ];
-    final dynamicDays = <String, List<LiturgicalDay>>{
+    final rawDynamicDays = <String, List<LiturgicalDay>>{
       for (final code in feastCodes)
         if (exclusive == null || _normalizeFeast(code) == exclusive)
-          code: [
-            for (final item in _daysByFeast(code))
+          code: _daysByFeast(code),
+    };
+    final dynamicDays = <String, List<LiturgicalDay>>{
+      for (final entry in rawDynamicDays.entries)
+        entry.key: [
+            for (final item in entry.value)
               withContext(
-                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, code),
+                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, entry.key),
               )!,
           ],
     };
@@ -458,6 +462,7 @@ class LiturgicalContentService {
       periodFallback: resolvedPeriodDay,
       fixedDateDays: exclusive == null ? resolvedFixed : const [],
       dynamicDaysByFeast: dynamicDays,
+      rawDynamicDaysByFeast: rawDynamicDays,
       seasonalException: exclusive == null ? seasonal : null,
       seasonalDateDay: seasonalDateDay,
       officeForDead: officeForDead == null
@@ -645,6 +650,76 @@ class LiturgicalContentService {
         if (docs.isEmpty && candidate.temporal && temporalDoc != null) {
           docs = [temporalDoc];
         }
+        // Like fixed memorials, movable memorials are assembled from their
+        // unmodified Propers. The old resolved dynamic map already contains
+        // weekday fields and must not masquerade as the celebration's Proper.
+        // The Marian Common is explicitly established for Immaculate Heart,
+        // including offline bundles created before the calendar definition fix.
+        final effectiveTemplates = candidate.templates.isNotEmpty
+            ? candidate.templates
+            : candidate.id == 'immaculate-heart'
+                ? const ['blessed-virgin-mary']
+                : const <String>[];
+        if (!candidate.temporal &&
+            const {'memorial', 'optional-memorial'}.contains(candidate.officeKind) &&
+            effectiveTemplates.isNotEmpty &&
+            currentDay != null) {
+          final rawDocs = _dynamicDocuments(candidate, result, raw: true);
+          final raw = rawDocs.where(isSparseDay).firstOrNull ??
+              rawDocs.firstOrNull;
+          final base = raw?.toMap() ?? _scaffoldOf(candidate).toMap();
+          final proper = LiturgicalDay.fromMap({
+            ...base,
+            if (raw == null) 'id': candidate.feastCode ?? candidate.id,
+            '_feast': base['_feast'] ?? candidate.feastCode,
+            '_feastName': base['_feastName'] ?? candidate.title,
+            '_celebrationId': base['_celebrationId'] ?? candidate.id,
+            '_templates': (base['_templates'] is List &&
+                    (base['_templates'] as List).isNotEmpty)
+                ? base['_templates']
+                : effectiveTemplates,
+            '_defaultTemplate': base['_defaultTemplate'] ??
+                candidate.defaultTemplate ?? effectiveTemplates.first,
+          });
+          final variants = assembled(proper, candidate);
+          if (raw == null) {
+            unavailable.add(
+              UnavailableOption(candidate.id, candidate.title, assembled: true),
+            );
+          }
+          options.add(
+            option(
+              key: 'dynamic-${candidate.id}',
+              source: LiturgicalOptionSource.dynamic,
+              title: candidate.title,
+              subtitle: [
+                _fixedSubtitle(candidate.rank, proper, variants.length),
+                _contentHint(proper),
+              ].where((part) => part.isNotEmpty).join(' · '),
+              day: variants.first.day,
+              templates: [
+                for (final (i, variant) in variants.indexed)
+                  DayTemplate(
+                    id: variant.id,
+                    label: variant.label,
+                    day: variant.day,
+                    choice: variant.choice,
+                    dayIds: [
+                      ...variant.dayIds,
+                      if (i == 0 && raw == null) candidate.id,
+                    ],
+                  ),
+              ],
+              order: 2,
+              ordo: descriptor,
+              properSource: raw == null
+                  ? ProperSource.none
+                  : ProperSource.legacyDays,
+              missingProper: raw == null,
+            ),
+          );
+          continue;
+        }
         if (docs.isEmpty &&
             !candidate.temporal &&
             candidate.templates.isNotEmpty &&
@@ -827,9 +902,16 @@ class LiturgicalContentService {
         '_contextPeriodType': ordo.date.isEmpty ? null : day.periodType,
       });
 
-  List<LiturgicalDay> _dynamicDocuments(OrdoOption option, _DaysResult result) {
+  List<LiturgicalDay> _dynamicDocuments(
+    OrdoOption option,
+    _DaysResult result, {
+    bool raw = false,
+  }) {
     final code = _normalizeFeast(option.feastCode ?? '');
-    for (final entry in result.dynamicDaysByFeast.entries) {
+    final entries = raw
+        ? result.rawDynamicDaysByFeast.entries
+        : result.dynamicDaysByFeast.entries;
+    for (final entry in entries) {
       if (_normalizeFeast(entry.key) == code && entry.value.isNotEmpty) {
         return entry.value;
       }
@@ -1088,6 +1170,7 @@ class _DaysResult {
     required this.periodFallback,
     required this.fixedDateDays,
     required this.dynamicDaysByFeast,
+    required this.rawDynamicDaysByFeast,
     required this.seasonalException,
     required this.seasonalDateDay,
     required this.officeForDead,
@@ -1099,6 +1182,7 @@ class _DaysResult {
   final LiturgicalDay? periodFallback;
   final List<LiturgicalDay> fixedDateDays;
   final Map<String, List<LiturgicalDay>> dynamicDaysByFeast;
+  final Map<String, List<LiturgicalDay>> rawDynamicDaysByFeast;
   final LiturgicalDay? seasonalException;
   final LiturgicalDay? seasonalDateDay;
   final LiturgicalDay? officeForDead;
