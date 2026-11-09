@@ -95,9 +95,7 @@ void main() {
           '<p><span style="color: #ff0000;">Год С:</span>'
           '<span"> Майсей засведчыў, </span></p>';
       final options = getLiturgicalAlternatives(
-        html,
-        kind: 'gospel-antiphon',
-      );
+        html, kind: 'gospel-antiphon');
 
       expect(options, hasLength(3));
       expect(options.map((option) => option.title), [
