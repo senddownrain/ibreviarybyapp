@@ -175,6 +175,18 @@ void main() {
       '_periodWeekNumber': '17',
       '_dayOfWeek': '3',
     });
+    // Regression: on 2026-11-08 an empty canticle antiphon could hide
+    // the entire Benedictus. Keep the source text independent of its antiphon.
+    await HiveService.daysBox.put('missing-gospel-ant-2026-11-08', {
+      ...apostle,
+      'id': 'missing-gospel-ant-2026-11-08',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '32',
+      '_dayOfWeek': '7',
+      '_rank': 'dominica',
+      'laudesAntBen': '',
+      'vesperAntMag': '  ',
+    });
     await HiveService.invitatoriumsBox.put('one', {
       'title': 'Заклік',
       'invitatoriumPs1': '<p>Прыйдзіце, уславім Пана *</p>',
@@ -198,6 +210,53 @@ void main() {
     await Hive.close();
     await directory.delete(recursive: true);
   });
+
+  for (final (hour, caption, firstLine) in const [
+    ('laudes', 'Песня Захарыі', 'Благаслаўлёны Пан'),
+    ('morning', 'Песня Захарыі', 'Благаслаўлёны Пан'),
+    ('vespers', 'Песня Марыі', 'Велічае душа мая Пана'),
+  ]) {
+    testWidgets(
+      '$hour keeps the Gospel canticle when its antiphon is missing',
+      (tester) async {
+        _fontSize = 16;
+        _mode = PsalmodyMode.leftBreak;
+        final container = ProviderContainer(
+          overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+        );
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              home: OraScreen(
+                dayId: 'missing-gospel-ant-2026-11-08',
+                oraType: hour,
+                date: DateTime(2026, 11, 8),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is Html && (widget.data ?? '').contains(caption),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is Html && (widget.data ?? '').contains(firstLine),
+          ),
+          findsWidgets,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        container.dispose();
+      },
+    );
+  }
 
   for (final hour in ['laudes', 'vespers', 'lectionis', 'completorium']) {
     for (final mode in PsalmodyMode.values) {
