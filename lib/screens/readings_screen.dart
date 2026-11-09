@@ -897,7 +897,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
             children: [
               if (usesCalendar)
                 LiturgicalDayHeader(
-                  sectionTitle: 'Чытанні',
+                  sectionTitle: 'Чытанні дня',
                   keyPrefix: 'readings',
                   presentation: sharedPresentation,
                   onDateTap: _showDateActions,
@@ -925,7 +925,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                 )
               else ...[
                 Text(
-                  'Чытанні',
+                  'Чытанні дня',
                   style: ReaderTheme.of(context).displayTitle(36),
                 ),
                 const SizedBox(height: 16),
