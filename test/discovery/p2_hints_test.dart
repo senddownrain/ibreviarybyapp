@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/discovery/ui/coachmark.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
 import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/models/song.dart';
 import 'package:mybrev_flutter/router/discovery_navigation.dart';
@@ -388,6 +389,7 @@ void main() {
       );
       return ProviderScope(
         overrides: [
+          adminSongbookAccessProvider.overrideWith((ref) => Stream.value(true)),
           discoveryStorageProvider.overrideWithValue(storage),
           discoveryRouteOpenerProvider.overrideWithValue(openDiscoveryRoute),
           hintPresenterProvider.overrideWith(
