@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
       - name: Check changed Dart formatting
-        run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart
+        run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
       - name: Local rights and external Web documents
@@ -45,6 +45,20 @@ jobs:
           flutter test test/source_documents_test.dart test/source_documents_widget_test.dart test/bible_repository_test.dart test/source_footer_test.dart test/compendium_screens_test.dart test/router_architecture_test.dart test/stateful_shell_navigation_test.dart test/secondary_menu_test.dart test/privacy_policy_link_test.dart
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
+      - name: Sunday 32 Benedictus visual fixture
+        env:
+          LITURGY_SMOKE_IMAGES: '1'
+        run: >-
+          flutter test test/liturgical_screen_smoke_test.dart
+          --plain-name "08.11.2026 Benedictus Year A antiphon is sung twice"
+      - name: Archive Sunday 32 screen captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benedictus-2026-11-08-pr
+          path: build/liturgy_smoke/2026-11-08-benedictus-year-a-*.png
+          if-no-files-found: warn
+
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression

@@ -175,6 +175,26 @@ void main() {
       '_periodWeekNumber': '17',
       '_dayOfWeek': '3',
     });
+    // 08.11.2026, XXXII Sunday: the shipped Benedictus antiphon had
+    // malformed <span"> openings. Keep the exact broken shape in this fixture.
+    await HiveService.daysBox.put('sunday-32-broken-antiphon', {
+      ...apostle,
+      'id': 'sunday-32-broken-antiphon',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '32',
+      '_dayOfWeek': '7',
+      '_rank': 'dominica',
+      'laudesAntBen':
+          '<p><span style="color: red;">Ант. да песні Захарыі</span></p>'
+          '<p><span style="color: red;">Год А:</span>'
+          '<span"> Сярод ночы ўзняўся крык: </span>'
+          '<span style="color: red;">*</span>'
+          '<span"> Вось жаніх! Выходзьце яму насустрач.</span></p>'
+          '<p><span style="color: red;">Год В:</span>'
+          '<span"> Сапраўды кажу вам.</span></p>'
+          '<p><span style="color: red;">Год С:</span>'
+          '<span"> Майсей засведчыў.</span></p>',
+    });
     await HiveService.invitatoriumsBox.put('one', {
       'title': 'Заклік',
       'invitatoriumPs1': '<p>Прыйдзіце, уславім Пана *</p>',
@@ -197,6 +217,56 @@ void main() {
   tearDownAll(() async {
     await Hive.close();
     await directory.delete(recursive: true);
+  });
+
+  testWidgets('08.11.2026 Benedictus Year A antiphon is sung twice', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    _fontSize = 16;
+    final container = ProviderContainer(
+      overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+    );
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: RepaintBoundary(
+          key: const Key('smoke-capture'),
+          child: MaterialApp(
+            home: OraScreen(
+              dayId: 'sunday-32-broken-antiphon',
+              oraType: 'laudes',
+              date: DateTime(2026, 11, 8),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final sungText = find.byWidgetPredicate(
+      (widget) =>
+          widget is Html &&
+          (widget.data ?? '').contains('Сярод ночы ўзняўся крык') &&
+          (widget.data ?? '').contains('Выходзьце яму насустрач'),
+    );
+    expect(sungText, findsNWidgets(2));
+    await _captureSectionIfRequested(
+      tester,
+      '2026-11-08-benedictus-year-a-opening',
+      sungText.first,
+    );
+    await _captureSectionIfRequested(
+      tester,
+      '2026-11-08-benedictus-year-a-repeat',
+      sungText.last,
+    );
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    container.dispose();
   });
 
   for (final hour in ['laudes', 'vespers', 'lectionis', 'completorium']) {

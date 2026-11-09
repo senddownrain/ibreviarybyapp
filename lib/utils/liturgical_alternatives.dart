@@ -87,7 +87,14 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
   String html, {
   String kind = 'generic',
 }) {
-  final source = html.trim();
+  // Some imported Office antiphons (including ordinary-w32-d1 on
+  // 2026-11-08) contain the malformed literal `<span">` instead of `<span>`.
+  // Repair only this exact damaged opening tag *before* parsing. Otherwise
+  // the HTML parser may swallow the Year A/B/C antiphon text while retaining
+  // its red heading. Preserve the source collection unchanged.
+  final source = kind == 'gospel-antiphon'
+      ? html.trim().replaceAll('<span">', '<span>')
+      : html.trim();
   if (source.isEmpty) return const [];
 
   final root = parseFragment(source);
