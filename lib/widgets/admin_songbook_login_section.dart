@@ -63,16 +63,19 @@ class _AdminLoginDialogState extends State<_AdminLoginDialog> {
       );
       final uid = credentials.user?.uid;
       if (uid == null) throw StateError('No authenticated user');
-      final doc = await FirebaseFirestore.instance
-          .collection('admins')
-          .doc(uid)
-          .get(const GetOptions(source: Source.server));
-      if (!isAdminRecord(uid, doc.data())) {
-        await auth.signOut();
-        if (mounted) {
-          setState(() => _error = 'Гэты ўліковы запіс не мае правоў адміністратара.');
+      // Bootstrap administrators also work without an admins/{uid} record.
+      if (!legacyAdminUids.contains(uid)) {
+        final doc = await FirebaseFirestore.instance
+            .collection('admins')
+            .doc(uid)
+            .get(const GetOptions(source: Source.server));
+        if (!isAdminRecord(uid, doc.data())) {
+          await auth.signOut();
+          if (mounted) {
+            setState(() => _error = 'Гэты ўліковы запіс не мае правоў адміністратара.');
+          }
+          return;
         }
-        return;
       }
       if (mounted) Navigator.of(context).pop();
     } on FirebaseAuthException {
