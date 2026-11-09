@@ -69,7 +69,9 @@ void main() {
           'assets/google_fonts/Literata-Regular.ttf',
         ),
         (
-          GoogleFonts.cormorantGaramond(fontWeight: FontWeight.w700).fontFamily!,
+          GoogleFonts.cormorantGaramond(
+            fontWeight: FontWeight.w700,
+          ).fontFamily!,
           'assets/google_fonts/CormorantGaramond-Bold.ttf',
         ),
         ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
@@ -1169,11 +1171,7 @@ Future<void> _captureVisibleAntiphon(
   final rect = tester.getRect(target.first);
   final screenHeight =
       tester.view.physicalSize.height / tester.view.devicePixelRatio;
-  expect(
-    rect.top,
-    greaterThanOrEqualTo(0),
-    reason: '$name should be onscreen',
-  );
+  expect(rect.top, greaterThanOrEqualTo(0), reason: '$name should be onscreen');
   expect(
     rect.bottom,
     lessThanOrEqualTo(screenHeight),
