@@ -92,6 +92,17 @@ class _AboutContent extends StatelessWidget {
           style: textTheme.bodyLarge?.copyWith(height: 1.5),
         ),
         const SizedBox(height: 6),
+        Text(
+          'у супрацоўніцтве з ККББ',
+          key: const Key('about-cooperation-subtitle'),
+          textAlign: TextAlign.center,
+          style: textTheme.bodySmall?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w400,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 12),
         Semantics(
           link: true,
           label: 'Адкрыць сайт парафіі www.mic-minsk.by',
