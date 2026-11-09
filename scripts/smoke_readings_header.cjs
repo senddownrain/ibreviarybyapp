@@ -72,7 +72,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         return [...document.querySelectorAll('flt-semantics')].some((element) =>
           ((element.getAttribute('aria-label') || '') + (element.textContent || ''))
             .includes('Чытанні дня'));
-      }, { timeout: 60000 });
+      }, null, { timeout: 60000 });
       await pause(800);
       await page.screenshot({
         path: path.join(output, profile.name + '.png'),
