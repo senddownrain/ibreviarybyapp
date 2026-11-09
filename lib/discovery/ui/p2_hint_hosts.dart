@@ -36,7 +36,6 @@ DiscoveryProbe p2Probe(
   final state = _loaded(ref.read(discoveryRepositoryProvider))?.state;
   if (state == null) return const DiscoveryProbe(ready: false);
   final switches = ref.read(navigationSwitchCountProvider);
-  final isAdmin = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
   final active = switches >= kP2MinNavSwitches;
   bool wanted(String id, String visitKey) =>
       active &&
@@ -68,6 +67,7 @@ DiscoveryProbe p2Probe(
       actions: {'discover.prayers': () => open(kPrayersRoute, replace: true)},
     );
   }
+  final isAdmin = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
   // Data is read only while its hint can still win: songs, Compendium and the
   // Bible are decoded from bundled assets, so everything works offline.
   facts[kFactSongbookLoaded] = isAdmin && wanted('discover.songbook', kVisitSongs)
