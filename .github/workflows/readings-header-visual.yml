@@ -1,0 +1,43 @@
+name: Flutter readings header visual capture
+
+on:
+  push:
+    branches: [test/readings-header-capture-20261109]
+    paths:
+      - 'tool/readings_header_visual.dart'
+      - 'scripts/smoke_readings_header.cjs'
+      - '.github/workflows/readings-header-visual.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    name: Capture real Flutter ReadingsScreen in Chrome
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix /tmp/readings-browser playwright-core@1.63.0
+      - name: Run Flutter Web offline and capture heading
+        run: |
+          mkdir -p audit-evidence/readings-header-20261109
+          flutter devices > audit-evidence/readings-header-20261109/devices.txt
+          xvfb-run -a flutter run -d chrome -t tool/readings_header_visual.dart --web-port 5242 --web-browser-flag=--no-sandbox > audit-evidence/readings-header-20261109/flutter-run.log 2>&1 &
+          NODE_PATH=/tmp/readings-browser/node_modules node scripts/smoke_readings_header.cjs
+      - name: Upload real Flutter screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-readings-header-20261109
+          path: audit-evidence/readings-header-20261109
+          retention-days: 30
