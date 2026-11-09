@@ -93,7 +93,7 @@ List<LiturgicalAlternative> getLiturgicalAlternatives(
   // the HTML parser may swallow the Year A/B/C antiphon text while retaining
   // its red heading. Preserve the source collection unchanged.
   final source = kind == 'gospel-antiphon'
-      ? html.trim().replaceAll(RegExp(r'<span"\\s*>', caseSensitive: false), '<span>')
+      ? html.trim().replaceAll('<span">', '<span>')
       : html.trim();
   if (source.isEmpty) return const [];
 
