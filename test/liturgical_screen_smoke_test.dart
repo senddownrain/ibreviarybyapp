@@ -1167,9 +1167,18 @@ Future<void> _captureVisibleAntiphon(
   );
   await tester.pumpAndSettle();
   final rect = tester.getRect(target.first);
-  final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
-  expect(rect.top, greaterThanOrEqualTo(0), reason: '$name should be onscreen');
-  expect(rect.bottom, lessThanOrEqualTo(screenHeight), reason: '$name should be onscreen');
+  final screenHeight =
+      tester.view.physicalSize.height / tester.view.devicePixelRatio;
+  expect(
+    rect.top,
+    greaterThanOrEqualTo(0),
+    reason: '$name should be onscreen',
+  );
+  expect(
+    rect.bottom,
+    lessThanOrEqualTo(screenHeight),
+    reason: '$name should be onscreen',
+  );
   await _captureIfRequested(tester, name);
 }
 
