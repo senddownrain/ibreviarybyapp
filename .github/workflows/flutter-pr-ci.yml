@@ -35,10 +35,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
       - name: Check changed Dart formatting
-        run: |
-          dart format --output=write lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
-          git diff --no-ext-diff -- test/liturgical_screen_smoke_test.dart
-          git diff --quiet -- lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
+        run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
       - name: Local rights and external Web documents
