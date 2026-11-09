@@ -21,6 +21,15 @@ permissions:
   contents: read
 
 jobs:
+  gospel-antiphon-source:
+    name: Shipped Sunday 32 antiphon evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read bundled Sunday 32 antiphons
+        run: python3 scripts/diagnose_antiphon_20261108.py
+
   flutter-check:
     name: Flutter analyze and alternatives regression
     runs-on: ubuntu-latest
@@ -32,8 +41,6 @@ jobs:
           channel: stable
           flutter-version: '3.41.4'
           cache: true
-      - name: Diagnose bundled 2026-11-08 Benedictus antiphon (read-only)
-        run: python3 scripts/diagnose_antiphon_20261108.py
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
       - name: Check changed Dart formatting
