@@ -33,6 +33,7 @@ import 'package:mybrev_flutter/screens/feedback_screen.dart';
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
+import 'package:mybrev_flutter/widgets/admin_songbook_guard.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -467,9 +468,11 @@ final router = GoRouter(
                   pageBuilder: (context, state) => _branchPage(
                     state,
                     _songbookRoute,
-                    const DiscoveryVisitMark(
-                      visitKey: kVisitSongs,
-                      child: SongbookScreen(),
+                    const AdminSongbookGuard(
+                      child: DiscoveryVisitMark(
+                        visitKey: kVisitSongs,
+                        child: SongbookScreen(),
+                      ),
                     ),
                   ),
                   routes: [
@@ -478,7 +481,9 @@ final router = GoRouter(
                       pageBuilder: (context, state) => _branchPage(
                         state,
                         _songDetailRoute,
-                        SongDetailScreen(songId: state.pathParameters['id']!),
+                        AdminSongbookGuard(
+                          child: SongDetailScreen(songId: state.pathParameters['id']!),
+                        ),
                       ),
                     ),
                   ],
