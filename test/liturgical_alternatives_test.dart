@@ -81,6 +81,38 @@ void main() {
       expect(options.last.html, isNot(contains('Тэкст 1')));
     });
 
+    test('08.11.2026 XXXII Sunday repairs broken Gospel antiphon spans', () {
+      // Sanitized excerpt from shipped days/ordinary-w32-d1.laudesAntBen.
+      // The bad <span"> tags previously hid the text after the Year A label.
+      const html =
+          '<p><span style="color: #ff0000;">Ант. да песні Захарыі</span></p>'
+          '<p><span style="color: #ff0000;">Год А:</span>'
+          '<span"> Сярод ночы ўзняўся крык: </span>'
+          '<span style="color: #ff0000;">*</span>'
+          '<span"> Вось жаніх! Выходзьце яму насустрач.</span></p>'
+          '<p><span style="color: #ff0000;">Год В:</span>'
+          '<span"> Сапраўды кажу вам, </span></p>'
+          '<p><span style="color: #ff0000;">Год С:</span>'
+          '<span"> Майсей засведчыў, </span></p>';
+      final options = getLiturgicalAlternatives(
+        html,
+        kind: 'gospel-antiphon',
+      );
+
+      expect(options, hasLength(3));
+      expect(options.map((option) => option.title), [
+        'Год А',
+        'Год В',
+        'Год С',
+      ]);
+      expect(options.first.html, isNot(contains('<span">')));
+      expect(options.first.html, contains('Сярод ночы ўзняўся крык'));
+      expect(options.first.html, contains('Выходзьце яму насустрач'));
+      expect(options.first.html, isNot(contains('Сапраўды кажу вам')));
+      expect(options[1].html, contains('Сапраўды кажу вам'));
+      expect(options[2].html, contains('Майсей засведчыў'));
+    });
+
     test('recognizes gospel-antiphon cycles', () {
       final options = getLiturgicalAlternatives(
         '<p>Год A: Антыфона A.<br>Год B: Антыфона B.<br>'
