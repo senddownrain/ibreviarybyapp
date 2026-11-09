@@ -5,9 +5,11 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:hive/hive.dart';
@@ -56,6 +58,29 @@ void main() {
     await initializeDateFormatting('be');
     directory = await Directory.systemTemp.createTemp('liturgy-smoke-');
     await HiveService.init(path: directory.path);
+    // Widget tests normally render text in Ahem (solid blocks). Load the
+    // packaged real fonts only for screenshot review; production is untouched.
+    if (Platform.environment['LITURGY_SMOKE_IMAGES'] == '1') {
+      GoogleFonts.config.allowRuntimeFetching = false;
+      for (final (family, asset) in [
+        ('VisualPreview', 'assets/google_fonts/Literata-Regular.ttf'),
+        (
+          GoogleFonts.literata().fontFamily!,
+          'assets/google_fonts/Literata-Regular.ttf',
+        ),
+        (
+          GoogleFonts.cormorantGaramond(fontWeight: FontWeight.w700).fontFamily!,
+          'assets/google_fonts/CormorantGaramond-Bold.ttf',
+        ),
+        ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
+        (
+          'packages/phosphor_flutter/PhosphorRegular',
+          'packages/phosphor_flutter/lib/fonts/Phosphor.ttf',
+        ),
+      ]) {
+        await (FontLoader(family)..addFont(rootBundle.load(asset))).load();
+      }
+    }
     final fixture =
         jsonDecode(
               File(
@@ -236,6 +261,7 @@ void main() {
         child: RepaintBoundary(
           key: const Key('smoke-capture'),
           child: MaterialApp(
+            theme: ThemeData(fontFamily: 'VisualPreview'),
             home: OraScreen(
               dayId: 'sunday-32-broken-antiphon',
               oraType: 'laudes',
@@ -254,12 +280,12 @@ void main() {
           (widget.data ?? '').contains('Выходзьце яму насустрач'),
     );
     expect(sungText, findsNWidgets(2));
-    await _captureSectionIfRequested(
+    await _captureVisibleAntiphon(
       tester,
       '2026-11-08-benedictus-year-a-opening',
       sungText.first,
     );
-    await _captureSectionIfRequested(
+    await _captureVisibleAntiphon(
       tester,
       '2026-11-08-benedictus-year-a-repeat',
       sungText.last,
@@ -1126,6 +1152,25 @@ List<double?> _renderedFontSizes(InlineSpan span, TextStyle inherited) {
     for (final child in span.children ?? <InlineSpan>[])
       ..._renderedFontSizes(child, style),
   ];
+}
+
+Future<void> _captureVisibleAntiphon(
+  WidgetTester tester,
+  String name,
+  Finder target,
+) async {
+  if (Platform.environment['LITURGY_SMOKE_IMAGES'] != '1') return;
+  await Scrollable.ensureVisible(
+    tester.element(target.first),
+    alignment: 0.25,
+    duration: Duration.zero,
+  );
+  await tester.pumpAndSettle();
+  final rect = tester.getRect(target.first);
+  final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
+  expect(rect.top, greaterThanOrEqualTo(0), reason: '$name should be onscreen');
+  expect(rect.bottom, lessThanOrEqualTo(screenHeight), reason: '$name should be onscreen');
+  await _captureIfRequested(tester, name);
 }
 
 Future<void> _captureIfRequested(WidgetTester tester, String name) async {
