@@ -817,16 +817,14 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'laudesR', '');
 
     final antBen = (day.field('laudesAntBen') ?? '').trim();
-    if (antBen.isNotEmpty) {
-      _addGospelCanticle(
-        items,
-        antiphon: antBen,
-        controllerScope: 'laudes-ant-ben',
-        caption:
-            '<p><em>Песня Захарыі (Лк 1, 68–79) — Месія і Яго папярэднік</em></p>',
-        psalm: _kBenedictus,
-      );
-    }
+    _addGospelCanticle(
+      items,
+      antiphon: antBen,
+      controllerScope: 'laudes-ant-ben',
+      caption:
+          '<p><em>Песня Захарыі (Лк 1, 68–79) — Месія і Яго папярэднік</em></p>',
+      psalm: _kBenedictus,
+    );
 
     _addDividerBeforeField(items, day, 'laudesInter');
     _addField(items, day, 'laudesInter', 'Просьбы');
@@ -918,16 +916,14 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addField(items, day, 'vesperR', '');
 
     final antMag = (day.field('vesperAntMag') ?? '').trim();
-    if (antMag.isNotEmpty) {
-      _addGospelCanticle(
-        items,
-        antiphon: antMag,
-        controllerScope: 'vespers-ant-mag',
-        caption:
-            '<p><em>Песня Марыі (Лк 1, 46–55) — Радасць душы ў Пану</em></p>',
-        psalm: _kMagnificat,
-      );
-    }
+    _addGospelCanticle(
+      items,
+      antiphon: antMag,
+      controllerScope: 'vespers-ant-mag',
+      caption:
+          '<p><em>Песня Марыі (Лк 1, 46–55) — Радасць душы ў Пану</em></p>',
+      psalm: _kMagnificat,
+    );
 
     _addDividerBeforeField(items, day, 'vesperInter');
     _addField(items, day, 'vesperInter', 'Просьбы');
@@ -993,20 +989,22 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'reading'));
 
     final antS = cf('compAntS');
-    if (antS.isNotEmpty) {
-      final antController = _alternativeController('compline-ant-s');
-      _addMajorBoundary(items);
-      items.add(
-        _OraItem.psalmBlock(
-          _kNunc,
-          openingAntiphon: antS,
-          repeatedAntiphon: antS,
-          antiphonController: antController,
-          canticleCaption:
-              'Песня Сімяона (Лк 2, 29–32) — Хрыстус — святло народаў і хвала Ізраэля',
-        ),
-      );
-    }
+    // Always show the Nunc dimittis, even if its antiphon is unavailable.
+    final effectiveAntiphon = antS.isEmpty ? null : antS;
+    final antController = effectiveAntiphon == null
+        ? null
+        : _alternativeController('compline-ant-s');
+    _addMajorBoundary(items);
+    items.add(
+      _OraItem.psalmBlock(
+        _kNunc,
+        openingAntiphon: effectiveAntiphon,
+        repeatedAntiphon: effectiveAntiphon,
+        antiphonController: antController,
+        canticleCaption:
+            'Песня Сімяона (Лк 2, 29–32) — Хрыстус — святло народаў і хвала Ізраэля',
+      ),
+    );
 
     final pr = cf('compPr');
     if (pr.isNotEmpty) {
@@ -1071,16 +1069,14 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addDividerBeforeField(items, day, 'laudesR');
     _addField(items, day, 'laudesR', '');
     final antBen = (day.field('laudesAntBen') ?? '').trim();
-    if (antBen.isNotEmpty) {
-      _addGospelCanticle(
-        items,
-        antiphon: antBen,
-        controllerScope: 'morning-ant-ben',
-        caption:
-            '<p><em>Песня Захарыі (Лк 1, 68–79)<br>Месія і Яго папярэднік</em></p>',
-        psalm: _kBenedictus,
-      );
-    }
+    _addGospelCanticle(
+      items,
+      antiphon: antBen,
+      controllerScope: 'morning-ant-ben',
+      caption:
+          '<p><em>Песня Захарыі (Лк 1, 68–79)<br>Месія і Яго папярэднік</em></p>',
+      psalm: _kBenedictus,
+    );
     _addDividerBeforeField(items, day, 'laudesInter');
     _addField(items, day, 'laudesInter', 'Просьбы');
     _addPaterAndPrayer(items, (day.field('laudesPr') ?? '').trim());
@@ -1101,13 +1097,17 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     required String caption,
     required String psalm,
   }) {
-    final antController = _alternativeController(controllerScope);
+    // A missing antiphon must not suppress the Gospel canticle itself.
+    final effectiveAntiphon = antiphon.isEmpty ? null : antiphon;
+    final antController = effectiveAntiphon == null
+        ? null
+        : _alternativeController(controllerScope);
     _addMajorBoundary(items);
     items.add(
       _OraItem.psalmBlock(
         psalm,
-        openingAntiphon: antiphon,
-        repeatedAntiphon: antiphon,
+        openingAntiphon: effectiveAntiphon,
+        repeatedAntiphon: effectiveAntiphon,
         antiphonController: antController,
         canticleCaption: parseFragment(caption).text?.trim(),
       ),
