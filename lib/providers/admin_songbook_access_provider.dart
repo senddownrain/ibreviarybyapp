@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Same emergency administrator UIDs as MyBrev Web. Ordinary priest device
@@ -21,6 +22,8 @@ bool isAdminRecord(String uid, Map<String, dynamic>? data) {
 /// Never grant from a cached Firestore role. Revocation and sign-out hide
 /// songbook navigation immediately, including an already open deep link.
 final adminSongbookAccessProvider = StreamProvider<bool>((ref) {
+  // Widget previews and isolated tests have no Firebase app.
+  if (Firebase.apps.isEmpty) return Stream<bool>.value(false);
   final controller = StreamController<bool>();
   StreamSubscription<User?>? authSubscription;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? roleSubscription;
