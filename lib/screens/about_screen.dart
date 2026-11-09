@@ -93,7 +93,7 @@ class _AboutContent extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'у супрацоўніцтве з ККББ',
+          'у супрацоўніцтве з Камісіяй Божага Культу і Дысцыпліны Сакрамэнтаў',
           key: const Key('about-cooperation-subtitle'),
           textAlign: TextAlign.center,
           style: textTheme.bodySmall?.copyWith(
