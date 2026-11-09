@@ -12,6 +12,7 @@ import 'package:mybrev_flutter/discovery/ui/coachmark.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
 import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/models/song.dart';
 import 'package:mybrev_flutter/router/discovery_navigation.dart';
@@ -333,6 +334,7 @@ void main() {
       ]),
       bool compendium = true,
       bool bible = true,
+      bool admin = true,
       List<Prayer> prayers = const [Prayer(id: 'p1', title: 'Ойча наш')],
     }) {
       final router = GoRouter(
@@ -388,6 +390,7 @@ void main() {
       );
       return ProviderScope(
         overrides: [
+          adminSongbookAccessProvider.overrideWith((ref) => Stream.value(admin)),
           discoveryStorageProvider.overrideWithValue(storage),
           discoveryRouteOpenerProvider.overrideWithValue(openDiscoveryRoute),
           hintPresenterProvider.overrideWith(
@@ -414,6 +417,17 @@ void main() {
         await tester.pump(const Duration(milliseconds: 500));
       }
     }
+
+    testWidgets('guests never see a songbook discovery hint', (tester) async {
+      final storage = MemoryDiscoveryStorage();
+      await tester.pumpWidget(app(storage, admin: false));
+      await wait(tester);
+      expect(
+        find.text('Шукаеце спеў? Зазірніце ў «Спеўнік пілігрымковы»'),
+        findsNothing,
+      );
+      await tester.pumpWidget(const SizedBox());
+    });
 
     testWidgets('songbook hint → «Паказаць» opens the list → Back', (
       tester,

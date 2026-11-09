@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
+import 'package:mybrev_flutter/widgets/admin_songbook_guard.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
@@ -133,6 +135,29 @@ void main() {
       expect(cleared.isActive, isTrue);
       notifier.setSearch('  ');
       expect(container.read(songsFilterProvider).isActive, isFalse);
+    });
+  });
+
+  group('Admin-only songbook', () {
+    test('role validation defaults to deny for unknown users', () {
+      expect(isAdminRecord('ordinary', null), isFalse);
+      expect(isAdminRecord('ordinary', {'role': 'other'}), isFalse);
+      expect(isAdminRecord('ordinary', {}), isTrue);
+      expect(isAdminRecord('ordinary', {'role': 'admin'}), isTrue);
+      expect(isAdminRecord('ordinary', {'role': 'superadmin'}), isTrue);
+    });
+
+    testWidgets('guests do not see the tile or the songbook via a deep link', (tester) async {
+      await tester.pumpWidget(_app(const Scaffold(body: PrayersScreen()), admin: false));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('songbook-destination')), findsNothing);
+
+      final router = _router(initialLocation: '/prayers/songs/s-bog');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(null, router: router, admin: false));
+      await tester.pumpAndSettle();
+      expect(find.text('Раздзел недаступны'), findsOneWidget);
+      expect(find.byKey(const Key('songbook-title')), findsNothing);
     });
   });
 
@@ -1587,12 +1612,12 @@ GoRouter _router({String initialLocation = '/prayers'}) => GoRouter(
         ),
         GoRoute(
           path: 'songs',
-          builder: (context, state) => const SongbookScreen(),
+          builder: (context, state) => const AdminSongbookGuard(child: SongbookScreen()),
           routes: [
             GoRoute(
               path: ':id',
               builder: (context, state) =>
-                  SongDetailScreen(songId: state.pathParameters['id']!),
+                  AdminSongbookGuard(child: SongDetailScreen(songId: state.pathParameters['id']!)),
             ),
           ],
         ),
@@ -1621,11 +1646,13 @@ Widget _app(
   ],
   SongPreferences prefs = const SongPreferences(),
   bool seedFails = false,
+  bool admin = true,
   List<Map<String, dynamic>> seed = _seed,
   void Function(ProviderContainer)? onContainer,
 }) {
   return ProviderScope(
     overrides: [
+      adminSongbookAccessProvider.overrideWith((ref) => Stream.value(admin)),
       settingsProvider.overrideWith(_TestSettingsNotifier.new),
       liturgicalSeasonColorProvider.overrideWithValue(Colors.indigo),
       allPrayersProvider.overrideWithValue(prayers),
