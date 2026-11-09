@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
@@ -24,6 +25,7 @@ class PrayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritePrayersProvider);
+    final canSeeSongbook = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
     final categories = ref.watch(prayerMenuCategoriesProvider);
     final catalog = ref.watch(prayerCatalogProvider);
     final massAvailable = catalog.any(
@@ -95,7 +97,8 @@ class PrayersScreen extends ConsumerWidget {
                         );
                       },
                     ),
-                    PrayerbookSectionTile(
+                    if (canSeeSongbook)
+                      PrayerbookSectionTile(
                       key: const Key('songbook-destination'),
                       title: 'Спеўнік',
                       subtitle: 'Пілігрымковы',
