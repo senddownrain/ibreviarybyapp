@@ -1801,7 +1801,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
     };
     final metadata = <PsalmMetadataLine>[
       if (canticleCaption != null) ...[
-        const PsalmMetadataLine('Песня з Евангелля', PsalmMetadataRole.service),
+        const PsalmMetadataLine('ПЕСНЯ З ЕВАНГЕЛЛЯ', PsalmMetadataRole.service),
         PsalmMetadataLine(canticleCaption!, PsalmMetadataRole.subtitle),
       ],
       ...model.metadata,
