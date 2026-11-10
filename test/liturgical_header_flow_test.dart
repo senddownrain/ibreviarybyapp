@@ -280,7 +280,8 @@ void main() {
         (option) => option.badges.contains('Мінск') ||
             option.badges.contains('Віцебск'),
       ).toList();
-      expect(localOptions, isNotEmpty);
+      expect(localOptions.any((o) => o.badges.contains('Мінск')), isTrue);
+      expect(localOptions.any((o) => o.badges.contains('Віцебск')), isTrue);
       for (final option in localOptions) {
         final choice = tester.widget<LiturgicalCelebrationChoice>(
           find.byKey(ValueKey('hours-celebration-${option.key}')),
