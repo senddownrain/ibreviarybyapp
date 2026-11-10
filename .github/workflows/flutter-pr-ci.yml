@@ -56,6 +56,9 @@ jobs:
           test/app_overflow_menu_test.dart
           test/layout/android_layout_lab_test.dart
           test/text_scale_control_test.dart
+          test/liturgical_date_navigation_row_test.dart
+          test/liturgical_controls_test.dart
+          test/liturgical_heading_text_test.dart
       - name: Check changed Dart formatting
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze
