@@ -12,19 +12,28 @@ import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 
 void main() {
-  testWidgets('liturgical section titles are uppercase but input is unchanged', (
+  testWidgets('all common liturgical section titles display uppercase', (
     tester,
   ) async {
-    const label = 'Малітва';
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: LiturgicalSectionHeading(title: label, bodySize: 16),
+    const labels = [
+      'Гімн',
+      'Псалмодыя',
+      'Просьбы',
+      'Малітва',
+      'Першае чытанне',
+      'Другое чытанне',
+    ];
+    for (final label in labels) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LiturgicalSectionHeading(title: label, bodySize: 16),
+          ),
         ),
-      ),
-    );
-    expect(find.text('МАЛІТВА'), findsOneWidget);
-    expect(label, 'Малітва');
+      );
+      expect(find.text(label.toUpperCase()), findsOneWidget);
+    }
+    expect(labels[1], 'Псалмодыя');
   });
 
   testWidgets('document role typography follows one reader contract', (
