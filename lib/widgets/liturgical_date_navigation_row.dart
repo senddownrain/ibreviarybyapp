@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
-import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/liturgical_heading_text.dart';
 
 /// A single date control shared by the Hours and Readings headers.
@@ -44,12 +43,20 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
     );
 
     const target = BoxConstraints.tightFor(width: 48, height: 48);
-    return KeyedSubtree(
+    // Date navigation is contextual, not a raised floating toolbar: keep a
+    // quiet, unified surface that stays below the celebration in hierarchy.
+    return DecoratedBox(
       key: Key('$keyPrefix-date-control'),
-      child: AdaptiveChromeSurface(
-        role: ChromeSurfaceRole.control,
+      decoration: BoxDecoration(
+        color: cs.onSurface.withValues(alpha: dark ? 0.025 : 0.015),
+        border: Border.all(
+          color: cs.onSurface.withValues(alpha: dark ? 0.09 : 0.08),
+          width: 0.8,
+        ),
         borderRadius: BorderRadius.circular(18),
-        padding: const EdgeInsets.all(4),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(2),
         child: Row(
           children: [
             IconButton(
