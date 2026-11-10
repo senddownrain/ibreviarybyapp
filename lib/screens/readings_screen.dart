@@ -45,6 +45,7 @@ import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/utils/readings_cycle_metadata.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
+import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
@@ -899,9 +900,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                   keyPrefix: 'readings',
                   presentation: sharedPresentation,
                   onDateTap: _showDateActions,
+                  // Proper festal readings can be year-independent and
+                  // therefore have no document cycle. The calendar year
+                  // remains visible as context even for those readings.
                   metadata: [
                     sharedPresentation.weekday,
-                    if (cycleLabel != null) 'Год $cycleLabel',
+                    'Год ${cycleLabel ?? _cycleLabel(getCycleForDate(sharedPresentation.date))}',
                   ].join(' · '),
                   onToday: () => ref
                       .read(liturgicalNavigationControllerProvider)

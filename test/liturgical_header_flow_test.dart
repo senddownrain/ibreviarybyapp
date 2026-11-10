@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
@@ -28,6 +29,7 @@ import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/router/router.dart' as production;
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
 import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
@@ -58,6 +60,14 @@ class _FourDioceses extends DioceseSelectionNotifier {
   DioceseSelection build() => const DioceseSelection(
     primary: 'minsk-mohilev',
     selected: ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk'],
+  );
+}
+
+class _VitebskDiocese extends DioceseSelectionNotifier {
+  @override
+  DioceseSelection build() => const DioceseSelection(
+    primary: 'vitebsk',
+    selected: ['vitebsk'],
   );
 }
 
@@ -175,6 +185,134 @@ void main() {
     });
     await tester.pump();
   }
+
+  testWidgets(
+    'approved 12 November Vitebsk Hours and Readings headers',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_VitebskDiocese.new),
+        ],
+      );
+      final presentation = container.read(liturgicalDayPresentationProvider);
+      expect(presentation.title, contains('Язафата'));
+      expect(presentation.place, contains('Віцебская дыяцэзія'));
+      expect(presentation.rank, isNotEmpty);
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
+      expect(
+        tester.getTopLeft(find.text('Віцебская дыяцэзія')).dy,
+        lessThan(
+          tester.getTopLeft(
+            find.byKey(const Key('hours-celebration-title')),
+          ).dy,
+        ),
+      );
+      final hoursMetadata = tester.widget<Text>(
+        find.byKey(const Key('hours-day-metadata')),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-hours-12-nov-2026');
+
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
+      final readingsMetadata = tester.widget<Text>(
+        find.byKey(const Key('readings-day-metadata')),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        contains('Год II'),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    '12 November alternatives show each diocese once while preserving ranks',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_FourDioceses.new),
+        ],
+      );
+      await tester.tap(find.byKey(const Key('hours-alternatives-control')));
+      await tester.pumpAndSettle();
+
+      final options = container
+          .read(hoursLiturgicalSelectionProvider)
+          .sortedOptions
+          .where((option) => !option.disabled && option.day != null)
+          .toList();
+      final localOptions = options.where(
+        (option) => option.badges.contains('Мінск') ||
+            option.badges.contains('Віцебск'),
+      ).toList();
+      expect(localOptions.any((o) => o.badges.contains('Мінск')), isTrue);
+      expect(localOptions.any((o) => o.badges.contains('Віцебск')), isTrue);
+      for (final option in localOptions) {
+        final choice = tester.widget<LiturgicalCelebrationChoice>(
+          find.byKey(ValueKey('hours-celebration-${option.key}')),
+        );
+        final subtitle = choice.subtitle ?? '';
+        final pieces = subtitle.split(' · ');
+        for (final badge in option.badges) {
+          expect(pieces, isNot(contains(badge)),
+              reason: 'Duplicate diocese badge in ${option.title}');
+          final full = switch (badge) {
+            'Мінск' => 'Мінска-Магілёўская архідыяцэзія',
+            'Віцебск' => 'Віцебская дыяцэзія',
+            'Гродна' => 'Гродзенская дыяцэзія',
+            'Пінск' => 'Пінская дыяцэзія',
+            _ => badge,
+          };
+          expect(subtitle, contains(full));
+          expect(full.allMatches(subtitle).length, 1,
+              reason: 'Repeated full diocese in ${option.title}');
+        }
+        if (option.ordo case final ordo?) {
+          final rank = kRankLabels[ordo.rank] ??
+              ordoOfficeKindLabel(ordo.officeKind);
+          if (rank.isNotEmpty) expect(subtitle, startsWith(rank));
+        }
+      }
+      expect(tester.takeException(), isNull);
+      router.pop();
+    },
+  );
 
   test('real weekday and Marian memorial share canonical presentation', () {
     final container = containerFor(DateTime(2026, 10, 6));
