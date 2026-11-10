@@ -34,6 +34,22 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
+      - name: Five Flutter visual acceptance screenshots
+        env:
+          READER_UI_ACCEPTANCE_IMAGES: '1'
+          LITURGY_SMOKE_IMAGES: '1'
+        run: |
+          flutter test test/reader_ui_acceptance_visual_test.dart
+          flutter test test/liturgical_screen_smoke_test.dart --plain-name "readings light 16.0 360.0x800.0 builds document"
+      - name: Archive reader acceptance screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-ui-acceptance-pr
+          path: |
+            build/ui_acceptance/*.png
+            build/liturgy_smoke/reader-acceptance-03-readings-end.png
+          if-no-files-found: warn
       - name: Check changed Dart formatting
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze

@@ -1,0 +1,172 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/screens/settings_screen.dart';
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
+import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+
+class _VisualSettings extends SettingsNotifier {
+  @override
+  SettingsState build() => const SettingsState();
+
+  @override
+  void setFontSize(double size) {
+    state = state.copyWith(fontSize: normalizeReaderFontSize(size));
+  }
+
+  @override
+  Future<void> setPsalmodyMode(PsalmodyMode value) async {
+    state = state.copyWith(psalmodyMode: value);
+  }
+}
+
+Future<void> _capture(WidgetTester tester, String name) async {
+  if (Platform.environment['READER_UI_ACCEPTANCE_IMAGES'] != '1') return;
+  final boundary = tester.renderObject<RenderRepaintBoundary>(
+    find.byKey(const Key('reader-acceptance-capture')),
+  );
+  await tester.runAsync(() async {
+    final image = await boundary.toImage(pixelRatio: 1);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    final directory = Directory('build/ui_acceptance')..createSync(recursive: true);
+    File('${directory.path}/$name.png')
+        .writeAsBytesSync(bytes!.buffer.asUint8List());
+    image.dispose();
+  });
+}
+
+void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    GoogleFonts.config.allowRuntimeFetching = false;
+    for (final (family, asset) in [
+      ('VisualPreview', 'assets/google_fonts/Literata-Regular.ttf'),
+      (
+        GoogleFonts.literata().fontFamily!,
+        'assets/google_fonts/Literata-Regular.ttf',
+      ),
+      ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
+      (
+        'packages/phosphor_flutter/PhosphorRegular',
+        'packages/phosphor_flutter/lib/fonts/Phosphor.ttf',
+      ),
+    ]) {
+      await (FontLoader(family)..addFont(rootBundle.load(asset))).load();
+    }
+  });
+
+  testWidgets('settings typography and live psalm example match Web', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: const Key('reader-acceptance-capture'),
+        child: ProviderScope(
+          overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
+          child: MaterialApp(
+            theme: ThemeData(fontFamily: 'VisualPreview'),
+            home: const Scaffold(body: SettingsScreen()),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('settings-reader-font')), findsOneWidget);
+    expect(find.byKey(const Key('settings-text-preview')), findsOneWidget);
+    expect(find.text('Па шырыні'), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const Key('settings-text-preview')));
+    await tester.pumpAndSettle();
+    await _capture(tester, '01-text-settings');
+    await tester.ensureVisible(find.byKey(const Key('settings-psalmody-preview')));
+    await tester.pumpAndSettle();
+    expect(find.text('Псальмодыя'), findsOneWidget);
+    await _capture(tester, '02-psalmody-example');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('compact reading and prayer menus', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    Future<void> draw(ReaderScaffold reader) async {
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: const Key('reader-acceptance-capture'),
+          child: ProviderScope(
+            overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
+            child: MaterialApp(
+              theme: ThemeData(fontFamily: 'VisualPreview'),
+              home: reader,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('app-overflow-open')));
+      await tester.pumpAndSettle();
+      expect(
+        tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
+        lessThanOrEqualTo(216),
+      );
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+      expect(find.text('Катэгорыі'), findsNothing);
+    }
+
+    await draw(
+      const ReaderScaffold(
+        contextHeader: ReaderContextHeader(
+          eyebrow: 'ЧЫТАННІ',
+          title: 'Евангелле паводле Лукі',
+        ),
+        content: Text(
+          'У той час Езус сказаў: Хто з вас, маючы слугу, '
+          'які арэ або пасвіць, скажа яму, калі ён вернецца з поля?',
+        ),
+      ),
+    );
+    await _capture(tester, '04-readings-menu');
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+
+    await draw(
+      ReaderScaffold(
+        contextHeader: const ReaderContextHeader(
+          eyebrow: 'МАЛІТВА',
+          title: 'Крыжовы шлях',
+        ),
+        content: const Text(
+          'Кланяемся Табе, Пане Езу Хрыстэ! '
+          'Бо праз крыж і муку сваю свет адкупіў Ты!',
+        ),
+        secondaryActions: [
+          ReaderSecondaryAction(
+            label: 'Памылка',
+            icon: Icons.flag_outlined,
+            onSelected: () {},
+          ),
+        ],
+      ),
+    );
+    expect(find.text('Памылка'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Памылка')).dy,
+      greaterThan(tester.getTopLeft(find.text('Інфармацыя')).dy),
+    );
+    await _capture(tester, '05-prayer-menu');
+    expect(tester.takeException(), isNull);
+  });
+}
