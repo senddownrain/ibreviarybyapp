@@ -50,6 +50,12 @@ jobs:
             build/ui_acceptance/*.png
             build/liturgy_smoke/reader-acceptance-03-readings-end.png
           if-no-files-found: warn
+      - name: Reader UI, layout and offline font regressions
+        run: >-
+          flutter test
+          test/app_overflow_menu_test.dart
+          test/layout/android_layout_lab_test.dart
+          test/text_scale_control_test.dart
       - name: Check changed Dart formatting
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -23,6 +24,20 @@ void main() {
       ReaderFontFamily.oldStandardTt,
     );
     expect(normalizeReaderFontFamily('Kurale'), ReaderFontFamily.kurale);
+  });
+
+  test('all five reader font choices work offline', () async {
+    for (final asset in [
+      'assets/google_fonts/Literata-Regular.ttf',
+      'assets/google_fonts/SourceSerif4-Regular.ttf',
+      'assets/google_fonts/OldStandardTT-Regular.ttf',
+      'assets/google_fonts/OldStandardTT-Italic.ttf',
+      'assets/google_fonts/OldStandardTT-Bold.ttf',
+      'assets/google_fonts/Kurale-Regular.ttf',
+    ]) {
+      final fontData = await rootBundle.load(asset);
+      expect(fontData.lengthInBytes, greaterThan(100000), reason: asset);
+    }
   });
 
   testWidgets('opens the slider panel and respects reader-size limits', (
