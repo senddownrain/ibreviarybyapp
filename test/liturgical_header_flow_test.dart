@@ -246,6 +246,10 @@ void main() {
       );
       expect(
         readingsMetadata.textSpan!.toPlainText(),
+        contains('Год II'),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
         isNot(contains('тыдзень Псалтыра')),
       );
       await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
