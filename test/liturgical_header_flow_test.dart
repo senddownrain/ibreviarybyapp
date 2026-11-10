@@ -326,6 +326,19 @@ void main() {
     router.go('/readings');
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-today')), findsOneWidget);
+    // Date has no elevated floating-card shadow; alternatives have a
+    // discoverable but still neutral tap surface.
+    final dateBox = tester.widget<DecoratedBox>(
+      find.byKey(const Key('readings-date-control')),
+    );
+    final dateDecoration = dateBox.decoration as BoxDecoration;
+    expect(dateDecoration.boxShadow, isNull);
+    expect(dateDecoration.color!.a, lessThan(0.04));
+    final alternatives = tester.widget<TextButton>(
+      find.byKey(const Key('readings-alternatives-control')),
+    );
+    expect(alternatives.style?.backgroundColor?.resolve({}), isNotNull);
+    expect(find.byIcon(Icons.layers_outlined), findsOneWidget);
     await snapshot(tester, 'polished-date-control-readings-light-2026-11-13');
     expect(tester.takeException(), isNull);
   });
