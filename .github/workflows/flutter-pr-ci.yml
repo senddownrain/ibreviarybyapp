@@ -71,6 +71,10 @@ jobs:
         run: >-
           flutter test test/liturgical_day_header_metadata_test.dart
           test/hours_root_test.dart
+      - name: Josaphat alternatives deduplicate dioceses
+        run: >-
+          flutter test test/liturgical_header_flow_test.dart
+          --plain-name "12 November alternatives show each diocese once while preserving ranks"
       - name: Approved Vitebsk daily headers screenshots
         env:
           HEADER_PREVIEW_FONT: assets/google_fonts/Literata-Regular.ttf
