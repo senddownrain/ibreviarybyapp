@@ -73,6 +73,7 @@ jobs:
           test/hours_root_test.dart
       - name: Approved Vitebsk daily headers screenshots
         env:
+          HEADER_PREVIEW_FONT: assets/google_fonts/Literata-Regular.ttf
           SELECTOR_EVIDENCE_DIR: build/pr90-header
         run: >-
           flutter test test/liturgical_header_flow_test.dart
