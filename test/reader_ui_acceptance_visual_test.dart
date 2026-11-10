@@ -8,6 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/theme/app_theme.dart';
+import 'package:mybrev_flutter/theme/app_theme_preference.dart';
+import 'package:mybrev_flutter/theme/ib_colors.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
 import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
@@ -15,7 +19,9 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 class _VisualSettings extends SettingsNotifier {
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() => const SettingsState(
+    themePreference: AppThemePreference.marian,
+  );
 
   @override
   void setFontSize(double size) {
@@ -46,12 +52,28 @@ Future<void> _capture(WidgetTester tester, String name) async {
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
+    final hiveDir = await Directory.systemTemp.createTemp('reader-ui-visual-');
+    await HiveService.init(path: hiveDir.path, loadBundle: false);
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(
+      const MethodChannel('dev.fluttercommunity.plus/connectivity_status'),
+      (call) async => null,
+    );
+    messenger.setMockMethodCallHandler(
+      const MethodChannel('dev.fluttercommunity.plus/connectivity'),
+      (call) async => <String>['wifi'],
+    );
     GoogleFonts.config.allowRuntimeFetching = false;
     for (final (family, asset) in [
       ('VisualPreview', 'assets/google_fonts/Literata-Regular.ttf'),
       (
         GoogleFonts.literata().fontFamily!,
         'assets/google_fonts/Literata-Regular.ttf',
+      ),
+      (
+        GoogleFonts.cormorantGaramond(fontWeight: FontWeight.w700).fontFamily!,
+        'assets/google_fonts/CormorantGaramond-Bold.ttf',
       ),
       ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
       (
@@ -76,7 +98,12 @@ void main() {
         child: ProviderScope(
           overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
           child: MaterialApp(
-            theme: ThemeData(fontFamily: 'VisualPreview'),
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: AppPalette.marianScheme,
+              extensions: const [IbColors.marian],
+              fontFamily: 'VisualPreview',
+            ),
             home: const Scaffold(body: SettingsScreen()),
           ),
         ),
@@ -86,10 +113,16 @@ void main() {
     expect(find.byKey(const Key('settings-reader-font')), findsOneWidget);
     expect(find.byKey(const Key('settings-text-preview')), findsOneWidget);
     expect(find.text('Па шырыні'), findsOneWidget);
-    await tester.ensureVisible(find.byKey(const Key('settings-text-preview')));
+    await Scrollable.ensureVisible(
+      tester.element(find.byKey(const Key('settings-reader-font'))),
+      alignment: 0.10,
+    );
     await tester.pumpAndSettle();
     await _capture(tester, '01-text-settings');
-    await tester.ensureVisible(find.byKey(const Key('settings-psalmody-preview')));
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Псальмодыя')),
+      alignment: 0.12,
+    );
     await tester.pumpAndSettle();
     expect(find.text('Псальмодыя'), findsOneWidget);
     await _capture(tester, '02-psalmody-example');
@@ -109,7 +142,12 @@ void main() {
           child: ProviderScope(
             overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
             child: MaterialApp(
-              theme: ThemeData(fontFamily: 'VisualPreview'),
+              theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: AppPalette.marianScheme,
+              extensions: const [IbColors.marian],
+              fontFamily: 'VisualPreview',
+            ),
               home: reader,
             ),
           ),
