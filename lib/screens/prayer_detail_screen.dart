@@ -311,7 +311,7 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
             ),
           // Calm, optional entry (overflow menu, never a pop-up while praying).
           ReaderSecondaryAction(
-            label: 'Паведаміць пра памылку',
+            label: 'Памылка',
             icon: Icons.flag_outlined,
             onSelected: () => context.push(
               feedbackLocation(kind: 'prayer', id: p.id, title: title),

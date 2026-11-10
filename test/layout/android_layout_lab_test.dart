@@ -373,9 +373,9 @@ void main() {
         final palette = tester.getRect(
           find.byKey(const Key('readings-highlight-palette')),
         );
-        // Attribution is the final content, after the reading document.
+        // The final anchor follows the reading document.
         final document = tester.getRect(
-          find.byKey(const Key('readings-source-footer')),
+          find.byKey(const Key('readings-document-end')),
         );
         final safeTop = viewport.height - mode.systemInset;
         final safeGap = safeTop - palette.bottom;
@@ -474,7 +474,7 @@ void main() {
         await _jumpToEnd(tester);
         await tester.pump();
         final readingDocument = tester.getRect(
-          find.byKey(const Key('readings-source-footer')),
+          find.byKey(const Key('readings-document-end')),
         );
         expect(readingsPalette.top - readingDocument.bottom, closeTo(24, 0.01));
         await tester.pumpWidget(const SizedBox.shrink());

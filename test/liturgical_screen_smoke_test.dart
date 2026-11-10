@@ -1047,6 +1047,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: ThemeData(brightness: brightness),
               home: const ReadingsScreen(dateStr: '2028-08-01'),
             ),
@@ -1054,7 +1055,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('readings-source-footer')), findsOneWidget);
+      expect(find.byKey(const Key('readings-document-end')), findsOneWidget);
+      expect(find.textContaining('Крыніца: Catholic.by'), findsNothing);
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
       final responseColor = ReaderTheme.of(
@@ -1087,6 +1089,19 @@ void main() {
         'readings-acclamation-${brightness.name}-$size-${viewport.width}',
         find.text('Пане, навучы нас маліцца.', findRichText: true),
       );
+
+      if (Platform.environment['READER_UI_ACCEPTANCE_IMAGES'] == '1' &&
+          brightness == Brightness.light &&
+          viewport.width == 360) {
+        final scroll = tester
+            .widget<ReaderScaffold>(find.byType(ReaderScaffold))
+            .scrollController!;
+        scroll.jumpTo(scroll.position.maxScrollExtent);
+        await tester.pumpAndSettle();
+        await _captureIfRequested(tester, 'reader-acceptance-03-readings-end');
+        scroll.jumpTo(0);
+        await tester.pumpAndSettle();
+      }
 
       // Exercise the actual Aa slider and settings rebuild at every supported
       // step, including the minimum where absolute metadata floors regress.

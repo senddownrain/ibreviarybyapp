@@ -24,18 +24,28 @@ class ReaderFontOption {
 const kAvailableReaderFonts = <ReaderFontOption>[
   ReaderFontOption(
     id: ReaderFontFamily.literata,
-    label: 'Кніжны',
-    description: 'Literata · рэкамендаваны',
+    label: 'Literata',
+    description: 'Рэкамендаваны кніжны шрыфт',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.sourceSerif4,
+    label: 'Source Serif 4',
+    description: 'Класічны шрыфт',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.oldStandardTt,
+    label: 'Old Standard TT',
+    description: 'Класічны друкаваны шрыфт',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.kurale,
+    label: 'Kurale',
+    description: 'Мяккі кніжны шрыфт',
   ),
   ReaderFontOption(
     id: ReaderFontFamily.system,
     label: 'Сістэмны',
     description: 'Шрыфт вашай прылады',
-  ),
-  ReaderFontOption(
-    id: ReaderFontFamily.sourceSerif4,
-    label: 'Класічны',
-    description: 'Source Serif 4',
   ),
 ];
 
@@ -50,6 +60,9 @@ String normalizeReaderFontFamily(String? stored) => switch (stored) {
   ReaderFontFamily.system => ReaderFontFamily.system,
   ReaderFontFamily.sourceSerif4 ||
   'Source Serif 4' => ReaderFontFamily.sourceSerif4,
+  ReaderFontFamily.oldStandardTt ||
+  'Old Standard TT' => ReaderFontFamily.oldStandardTt,
+  ReaderFontFamily.kurale || 'Kurale' => ReaderFontFamily.kurale,
   // Before VNext this label rendered Literata, not the system face. Preserve
   // the actual reading appearance during migration.
   'Сістэмны' => ReaderFontFamily.literata,

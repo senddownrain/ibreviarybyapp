@@ -140,90 +140,133 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Font size
-                Text(
-                  'Памер шрыфту',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Slider.adaptive(
-                  value: settings.fontSize,
-                  min: kMinReaderFontSize,
-                  max: kMaxReaderFontSize,
-                  divisions: 11,
-                  label: '${readerFontScalePercent(settings.fontSize)}%',
-                  onChanged: (val) =>
-                      ref.read(settingsProvider.notifier).setFontSize(val),
-                ),
-                Text(
-                  'Пан — маё святло і маё збаўленне.',
-                  style: ReaderTheme.of(
-                    context,
-                  ).body(settings.fontSize, family: settings.fontFamily),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Шрыфт чытання',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  key: const Key('settings-reader-font'),
-                  initialValue: settings.fontFamily,
-                  isExpanded: true,
-                  selectedItemBuilder: (context) => [
-                    for (final option in kAvailableReaderFonts)
-                      Text(option.label),
-                  ],
-                  items: [
-                    for (final option in kAvailableReaderFonts)
-                      DropdownMenuItem(
-                        value: option.id,
-                        child: Text(
-                          '${option.label}: Пан — маё святло і маё збаўленне.',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: ReaderTheme.of(
-                            context,
-                          ).body(16, family: option.id),
+                // Same order and live preview as the Web «Тэкст» section.
+                Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    key: const Key('settings-text-section'),
+                    title: Text(
+                      'Тэкст',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    subtitle: const Text('Шрыфт, памер і выраўноўванне'),
+                    tilePadding: EdgeInsets.zero,
+                    childrenPadding: EdgeInsets.zero,
+                    initiallyExpanded: true,
+                    maintainState: true,
+                    children: [
+                      const SizedBox(height: 12),
+                      Text(
+                        'Шрыфт чытання',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        key: const Key('settings-reader-font'),
+                        initialValue: settings.fontFamily,
+                        isExpanded: true,
+                        selectedItemBuilder: (context) => [
+                          for (final option in kAvailableReaderFonts)
+                            Text(option.label),
+                        ],
+                        items: [
+                          for (final option in kAvailableReaderFonts)
+                            DropdownMenuItem(
+                              value: option.id,
+                              child: Text(
+                                option.label,
+                                style: ReaderTheme.of(
+                                  context,
+                                ).body(16, family: option.id),
+                              ),
+                            ),
+                        ],
+                        onChanged: (family) {
+                          if (family != null) {
+                            ref.read(settingsProvider.notifier).setFontFamily(family);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        readerFontOption(settings.fontFamily).description,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                  ],
-                  onChanged: (family) {
-                    if (family != null) {
-                      ref.read(settingsProvider.notifier).setFontFamily(family);
-                    }
-                  },
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  readerFontOption(settings.fontFamily).description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      const SizedBox(height: 20),
+                      Text(
+                        'Памер тэксту',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Slider.adaptive(
+                              key: const Key('settings-font-size'),
+                              value: settings.fontSize,
+                              min: kMinReaderFontSize,
+                              max: kMaxReaderFontSize,
+                              divisions: 11,
+                              label: '${readerFontScalePercent(settings.fontSize)}%',
+                              onChanged: (val) => ref
+                                  .read(settingsProvider.notifier)
+                                  .setFontSize(val),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 52,
+                            child: Text(
+                              '${readerFontScalePercent(settings.fontSize)}%',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        'Выраўноўванне тэксту',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      AdaptiveSegmentedControl<TextAlign>(
+                        value: settings.textAlignment,
+                        segments: const [
+                          AdaptiveSegment(
+                            value: TextAlign.left,
+                            icon: Icon(Icons.format_align_left, size: 18),
+                            label: Text('Па левым краі'),
+                          ),
+                          AdaptiveSegment(
+                            value: TextAlign.justify,
+                            icon: Icon(Icons.format_align_justify, size: 18),
+                            label: Text('Па шырыні'),
+                          ),
+                        ],
+                        onChanged: (alignment) => ref
+                            .read(settingsProvider.notifier)
+                            .setTextAlignment(alignment),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        'Прыклад',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Божа, прыйдзі мне на дапамогу. Пане, паспяшы да мяне на паратунак.',
+                        key: const Key('settings-text-preview'),
+                        textAlign: settings.textAlignment,
+                        style: ReaderTheme.of(
+                          context,
+                        ).body(settings.fontSize, family: settings.fontFamily),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Выраўноўванне тэксту',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                AdaptiveSegmentedControl<TextAlign>(
-                  value: settings.textAlignment,
-                  segments: const [
-                    AdaptiveSegment(
-                      value: TextAlign.left,
-                      icon: Icon(Icons.format_align_left, size: 18),
-                      label: Text('Па левым краі'),
-                    ),
-                    AdaptiveSegment(
-                      value: TextAlign.justify,
-                      icon: Icon(Icons.format_align_justify, size: 18),
-                      label: Text('Па шырыні'),
-                    ),
-                  ],
-                  onChanged: (alignment) => ref
-                      .read(settingsProvider.notifier)
-                      .setTextAlignment(alignment),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),

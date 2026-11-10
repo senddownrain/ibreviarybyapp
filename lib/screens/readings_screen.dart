@@ -6,7 +6,6 @@ import 'package:mybrev_flutter/discovery/p0_facts.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_hint_slot.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_sheet_hint.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_visit.dart';
-import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
@@ -829,10 +828,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildReadingBody(reading, selection.massSet, seasonColor),
-                const SourceFooter(
-                  key: Key('readings-source-footer'),
-                  sourceId: 'lectionary-kkbb-2002-2005',
-                ),
+                // Attribution is available in the app's dedicated Sources page.
+                const SizedBox(key: Key('readings-document-end')),
               ],
             );
     }

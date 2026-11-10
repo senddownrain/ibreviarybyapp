@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -8,16 +9,35 @@ import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 
 void main() {
   test('reader font preferences are compact and legacy-safe', () {
-    expect(kAvailableReaderFonts, hasLength(3));
+    expect(kAvailableReaderFonts, hasLength(5));
     expect(normalizeReaderFontFamily('Сістэмны'), ReaderFontFamily.literata);
     expect(
       normalizeReaderFontFamily(ReaderFontFamily.system),
       ReaderFontFamily.system,
     );
     expect(
-      kAvailableReaderFonts.map((option) => option.label),
-      isNot(contains('Playfair Display')),
+      kAvailableReaderFonts.map((option) => option.label).toList(),
+      ['Literata', 'Source Serif 4', 'Old Standard TT', 'Kurale', 'Сістэмны'],
     );
+    expect(
+      normalizeReaderFontFamily('Old Standard TT'),
+      ReaderFontFamily.oldStandardTt,
+    );
+    expect(normalizeReaderFontFamily('Kurale'), ReaderFontFamily.kurale);
+  });
+
+  test('all five reader font choices work offline', () async {
+    for (final asset in [
+      'assets/google_fonts/Literata-Regular.ttf',
+      'assets/google_fonts/SourceSerif4-Regular.ttf',
+      'assets/google_fonts/OldStandardTT-Regular.ttf',
+      'assets/google_fonts/OldStandardTT-Italic.ttf',
+      'assets/google_fonts/OldStandardTT-Bold.ttf',
+      'assets/google_fonts/Kurale-Regular.ttf',
+    ]) {
+      final fontData = await rootBundle.load(asset);
+      expect(fontData.lengthInBytes, greaterThan(100000), reason: asset);
+    }
   });
 
   testWidgets('opens the slider panel and respects reader-size limits', (
