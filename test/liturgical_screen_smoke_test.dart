@@ -1140,7 +1140,7 @@ void main() {
         ]) {
           expect(
             tester.widget<Text>(find.text(formula)).style!.fontSize,
-            closeTo(requestedSize, .001),
+            closeTo(requestedSize * 1.04, .001),
           );
         }
         final bodyFinder = find.text(

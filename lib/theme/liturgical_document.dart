@@ -30,7 +30,7 @@ Map<String, Style> liturgicalDocumentStyles({
   double paragraphAfter = LiturgicalSpacing.paragraphAfter,
 }) {
   final size = body.fontSize ?? 16;
-  final heading = reader.blockHeading(size);
+  final heading = reader.hourSectionHeading(size);
   final reference = reader.referenceStyle(size);
   final metadataSize = reader.metadata(size).fontSize!;
   final psalmSubtitleSize = reader.psalmSubtitle(size).fontSize!;
@@ -206,7 +206,7 @@ class LiturgicalSectionHeading extends StatelessWidget {
       top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
       bottom: LiturgicalSpacing.sectionTitleToBody,
     ),
-    child: Text(title.toUpperCase(), style: ReaderTheme.of(context).blockHeading(bodySize)),
+    child: Text(title.toUpperCase(), style: ReaderTheme.of(context).hourSectionHeading(bodySize)),
   );
 }
 
@@ -226,7 +226,7 @@ class LiturgicalHeadingReferenceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final reader = ReaderTheme.of(context);
-    final titleStyle = reader.blockHeading(bodySize);
+    final titleStyle = reader.hourSectionHeading(bodySize);
     final displayTitle = title.toUpperCase();
     final referenceStyle = reader.rubricReference(bodySize);
     final ref = reference;
