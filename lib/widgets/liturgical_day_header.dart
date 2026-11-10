@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
 import 'package:mybrev_flutter/widgets/liturgical_heading_text.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
 /// Shared hierarchy and typography for both daily sections.
@@ -43,6 +44,36 @@ class LiturgicalDayHeader extends StatelessWidget {
     final p = presentation;
     final cs = Theme.of(context).colorScheme;
     final ink = cs.onSurface;
+    final metadataSuffix = (metadata ?? p.metadata)
+        .replaceFirst(p.weekday, '')
+        .replaceFirst(RegExp(r'^\s*·\s*'), '')
+        .trim();
+    final rank = p.rank.trim();
+    // The weekday already says "Нядзеля"; a weekday is not a feast rank.
+    final showRank =
+        rank.isNotEmpty &&
+        rank != p.weekday &&
+        rank != 'Будні дзень' &&
+        rank != 'Будзень';
+    final details = [
+      if (showRank) rank,
+      if (metadataSuffix.isNotEmpty) metadataSuffix,
+    ];
+    final metadataTail = details.isEmpty ? '' : ' · ${details.join(' · ')}';
+
+    // A diocesan celebration can have both a short union badge ("Мінск")
+    // and a full _place ("Мінска-Магілёўская архідыяцэзія"). Show its
+    // locality once; retain badge information when _place does not cover it.
+    final placeLower = p.place.toLowerCase();
+    final diocesesNamedInPlace = {
+      for (final entry in kDioceseBadges.entries)
+        if (placeLower.contains((kDioceseNames[entry.key] ?? '').toLowerCase()))
+          entry.value,
+    };
+    final extraDioceseBadges = p.badges
+        .where((badge) => !diocesesNamedInPlace.contains(badge))
+        .toList();
+
     return LayoutBuilder(
       builder: (context, constraints) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,12 +133,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                                     color: cs.onSurface,
                                   ),
                             ),
-                            TextSpan(
-                              text: (metadata ?? p.metadata).replaceFirst(
-                                p.weekday,
-                                '',
-                              ),
-                            ),
+                            TextSpan(text: metadataTail),
                           ],
                         ),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -115,15 +141,13 @@ class LiturgicalDayHeader extends StatelessWidget {
                           color: cs.onSurfaceVariant,
                         ),
                       ),
-                      if (p.badges.isNotEmpty) ...[
+                      if (extraDioceseBadges.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: [
-                            for (final badge in p.badges)
-                              Chip(label: Text(badge)),
-                          ],
+                        Text(
+                          '${extraDioceseBadges.length == 1 ? 'Дыяцэзія' : 'Дыяцэзіі'}: ${extraDioceseBadges.join(', ')}',
+                          key: Key('$keyPrefix-celebration-dioceses'),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: cs.onSurfaceVariant),
                         ),
                       ],
                       if (p.place.isNotEmpty) ...[
