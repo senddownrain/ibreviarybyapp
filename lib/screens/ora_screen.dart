@@ -990,7 +990,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
 
     final resp = cf('compResp');
-    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'reading'));
+    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'responsory'));
 
     final antS = cf('compAntS');
     if (antS.isNotEmpty) {
@@ -1667,7 +1667,8 @@ class _OraItem {
 
   static String _pickerLabel(String kind) => switch (kind) {
     'hymn' => 'Выбар варыянта гімна',
-    'reading' => 'Выбар чытання або рэспансорыя',
+    'reading' => 'Выбар чытання',
+    'responsory' => 'Выбар рэспансорыя',
     'office-reading' => 'Выбар чытання',
     'prayer' => 'Выбар малітвы',
     'intercession' => 'Выбар просьбаў',
@@ -2002,7 +2003,9 @@ class _HtmlOrText extends ConsumerWidget {
       );
     }
     final officeHtml =
-        alternativeKind == 'reading' || alternativeKind == 'office-reading'
+        alternativeKind == 'reading' ||
+            alternativeKind == 'office-reading' ||
+            alternativeKind == 'responsory'
         ? normalizeOfficeHtml(
             html,
             officeReading: alternativeKind == 'office-reading',
@@ -2032,7 +2035,9 @@ class _HtmlOrText extends ConsumerWidget {
         : const {'hymn', 'prayer', 'intercession'}.contains(alternativeKind)
         ? normalizeSemanticBody(officeHtml)
         : officeHtml;
-    if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
+    if (alternativeKind == 'reading' ||
+        alternativeKind == 'office-reading' ||
+        alternativeKind == 'responsory') {
       return _renderOfficeHtml(semanticBody, styles);
     }
     return Html(data: formatLiturgicalHtml(semanticBody), style: styles);
