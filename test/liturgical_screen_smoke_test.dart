@@ -1097,10 +1097,7 @@ void main() {
             .scrollController!;
         scroll.jumpTo(scroll.position.maxScrollExtent);
         await tester.pumpAndSettle();
-        await _captureIfRequested(
-          tester,
-          'reader-acceptance-03-readings-end',
-        );
+        await _captureIfRequested(tester, 'reader-acceptance-03-readings-end');
         scroll.jumpTo(0);
         await tester.pumpAndSettle();
       }
