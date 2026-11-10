@@ -100,11 +100,13 @@ Map<String, Style> prayerDocumentStyles(
       reader: reader,
       body: body,
       margin: Margins.symmetric(vertical: 8),
+      textAlign: TextAlign.left,
     )..padding = HtmlPaddings.zero,
     '.prayer-rubric p': readerRubricHtmlStyle(
       reader: reader,
       body: body,
       margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+      textAlign: TextAlign.left,
     ),
     '.prayer-rubric em': Style(color: reader.rubric),
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
