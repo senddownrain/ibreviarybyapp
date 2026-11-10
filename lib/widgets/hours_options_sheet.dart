@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
@@ -139,11 +140,31 @@ class HoursOptionsSheet extends ConsumerWidget {
   }
 }
 
-String _metadata(DayOption option) => <String>{
-  if (option.ordo case final ordo?)
-    kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind)
-  else if (option.subtitle != null)
-    option.subtitle!,
-  if (option.placeLabel != null) option.placeLabel!,
-  ...option.badges,
-}.where((s) => s.isNotEmpty).join(' · ');
+/// One human-readable diocese per celebration. The union gives us a short
+/// badge, while the document can already carry its full diocese name.
+String _metadata(DayOption option) {
+  final rank = option.ordo case final ordo?
+      ? kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind)
+      : option.subtitle ?? '';
+  final place = option.placeLabel?.trim() ?? '';
+  final parts = <String>{
+    if (rank.isNotEmpty) rank,
+    if (place.isNotEmpty) place,
+  };
+  for (final badge in option.badges) {
+    final fullName = _dioceseNameForBadge(badge);
+    // A full place label already includes this diocese. If the option spans
+    // another diocese, preserve that distinct context, without repeats.
+    if (!place.toLowerCase().contains(fullName.toLowerCase())) {
+      parts.add(fullName);
+    }
+  }
+  return parts.join(' · ');
+}
+
+String _dioceseNameForBadge(String badge) {
+  for (final entry in kDioceseBadges.entries) {
+    if (badge == entry.value) return kDioceseNames[entry.key] ?? badge;
+  }
+  return badge;
+}
