@@ -8,16 +8,21 @@ import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 
 void main() {
   test('reader font preferences are compact and legacy-safe', () {
-    expect(kAvailableReaderFonts, hasLength(3));
+    expect(kAvailableReaderFonts, hasLength(5));
     expect(normalizeReaderFontFamily('Сістэмны'), ReaderFontFamily.literata);
     expect(
       normalizeReaderFontFamily(ReaderFontFamily.system),
       ReaderFontFamily.system,
     );
     expect(
-      kAvailableReaderFonts.map((option) => option.label),
-      isNot(contains('Playfair Display')),
+      kAvailableReaderFonts.map((option) => option.label).toList(),
+      ['Literata', 'Source Serif 4', 'Old Standard TT', 'Kurale', 'Сістэмны'],
     );
+    expect(
+      normalizeReaderFontFamily('Old Standard TT'),
+      ReaderFontFamily.oldStandardTt,
+    );
+    expect(normalizeReaderFontFamily('Kurale'), ReaderFontFamily.kurale);
   });
 
   testWidgets('opens the slider panel and respects reader-size limits', (
