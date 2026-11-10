@@ -66,12 +66,12 @@ jobs:
         run: >-
           flutter test --dart-define=HEADER_PREVIEWS=true
           test/liturgical_header_flow_test.dart
-          --plain-name "date control visual preview: dark Hours and Readings"
+          --plain-name "date control visual preview"
       - name: Upload date control screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: date-control-preview-pr92
+          name: date-control-preview-polish
           path: build/date-control-preview/*.png
           if-no-files-found: warn
       - name: Check changed Dart formatting
