@@ -337,7 +337,10 @@ void main() {
     final alternatives = tester.widget<TextButton>(
       find.byKey(const Key('readings-alternatives-control')),
     );
-    expect(alternatives.style?.backgroundColor?.resolve({}), isNotNull);
+    final alternativesFill = alternatives.style?.backgroundColor?.resolve({});
+    expect(alternativesFill, isNotNull);
+    expect(alternativesFill!.a, lessThan(0.025));
+    expect(alternatives.style?.minimumSize?.resolve({})?.height, 48);
     expect(find.byIcon(Icons.layers_outlined), findsOneWidget);
     await snapshot(tester, 'polished-date-control-readings-light-2026-11-13');
     expect(tester.takeException(), isNull);
