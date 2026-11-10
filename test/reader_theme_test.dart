@@ -76,8 +76,7 @@ void main() {
       expect(readings.letterSpacing, greaterThan(0));
       expect(readings.fontSize, lessThan(hours.fontSize!));
     }
-    // A Scripture introduction is never uppercased by the style itself.
-    expect(reader.readingIntroduction(reader.body(16)).fontFamily, isNotNull);
+    expect(reader.body(16).fontSize, 16);
   });
 
   testWidgets('document roles keep meaning in light and dark themes', (
