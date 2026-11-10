@@ -57,6 +57,7 @@ void main() {
       body: reader.body(16),
     );
     expect(heading.fontFamily, startsWith('CormorantGaramond'));
+    expect(styles['.liturgical-heading']!.fontSize?.value, closeTo(16 * 1.12, 0.001));
     expect(heading.color, reader.rubric);
     expect(rubric.fontStyle, FontStyle.normal);
     expect(rubric.fontSize, lessThan(16));

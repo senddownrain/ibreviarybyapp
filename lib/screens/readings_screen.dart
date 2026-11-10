@@ -1786,7 +1786,7 @@ class _AlternativeReading extends StatelessWidget {
               padding: const EdgeInsets.only(top: 6, bottom: 4),
               child: Text(
                 section.title!,
-                style: textStyle.copyWith(fontWeight: FontWeight.w600),
+                style: reader.readingIntroduction(textStyle),
               ),
             ),
           if (text.isNotEmpty) ...[
@@ -2003,7 +2003,7 @@ class _SectionLabel extends StatelessWidget {
         top: LiturgicalSpacing.sectionBefore,
         bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
-      child: Text(_readingLabel(text).toUpperCase(), style: rubric.blockHeading(base)),
+      child: Text(_readingLabel(text).toUpperCase(), style: rubric.readingsSectionHeading(base)),
     );
   }
 }
@@ -2345,7 +2345,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
             padding: const EdgeInsets.only(top: 6, bottom: 4),
             child: Text(
               s.title!,
-              style: widget.textStyle.copyWith(fontWeight: FontWeight.w600),
+              style: widget.reader.readingIntroduction(widget.textStyle),
             ),
           ),
         if (hasPassion) ...[

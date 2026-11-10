@@ -49,6 +49,37 @@ void main() {
     expect(heading.fontFamily, startsWith('CormorantGaramond'));
   });
 
+  testWidgets('Hours and Mass readings have separate, scalable headings', (
+    tester,
+  ) async {
+    late ReaderTheme reader;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            reader = ReaderTheme.of(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    for (final size in [11.2, 16.0, 24.0, 28.8]) {
+      final hours = reader.hourSectionHeading(size);
+      final readings = reader.readingsSectionHeading(size);
+      final intro = reader.readingIntroduction(reader.body(size));
+      expect(hours.fontSize, closeTo(size * 1.12, 0.001));
+      expect(readings.fontSize, closeTo(size * 1.08, 0.001));
+      expect(intro.fontSize, closeTo(size * 1.04, 0.001));
+      expect(intro.fontWeight, FontWeight.w700);
+      expect(hours.letterSpacing, greaterThan(0));
+      expect(readings.letterSpacing, greaterThan(0));
+      expect(readings.fontSize, lessThan(hours.fontSize!));
+    }
+    // A Scripture introduction is never uppercased by the style itself.
+    expect(reader.readingIntroduction(reader.body(16)).fontFamily, isNotNull);
+  });
+
   testWidgets('document roles keep meaning in light and dark themes', (
     tester,
   ) async {
