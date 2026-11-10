@@ -1047,6 +1047,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: ThemeData(brightness: brightness),
               home: const ReadingsScreen(dateStr: '2028-08-01'),
             ),
