@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
@@ -254,6 +255,60 @@ void main() {
       );
       await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    '12 November alternatives show each diocese once while preserving ranks',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_FourDioceses.new),
+        ],
+      );
+      await tester.tap(find.byKey(const Key('hours-alternatives-control')));
+      await tester.pumpAndSettle();
+
+      final options = container
+          .read(hoursLiturgicalSelectionProvider)
+          .sortedOptions
+          .where((option) => !option.disabled && option.day != null)
+          .toList();
+      final localOptions = options.where(
+        (option) => option.badges.contains('Мінск') ||
+            option.badges.contains('Віцебск'),
+      ).toList();
+      expect(localOptions, isNotEmpty);
+      for (final option in localOptions) {
+        final choice = tester.widget<LiturgicalCelebrationChoice>(
+          find.byKey(ValueKey('hours-celebration-${option.key}')),
+        );
+        final subtitle = choice.subtitle ?? '';
+        final pieces = subtitle.split(' · ');
+        for (final badge in option.badges) {
+          expect(pieces, isNot(contains(badge)),
+              reason: 'Duplicate diocese badge in ${option.title}');
+          final full = switch (badge) {
+            'Мінск' => 'Мінска-Магілёўская архідыяцэзія',
+            'Віцебск' => 'Віцебская дыяцэзія',
+            'Гродна' => 'Гродзенская дыяцэзія',
+            'Пінск' => 'Пінская дыяцэзія',
+            _ => badge,
+          };
+          expect(subtitle, contains(full));
+          expect(full.allMatches(subtitle).length, 1,
+              reason: 'Repeated full diocese in ${option.title}');
+        }
+        if (option.ordo case final ordo?) {
+          final rank = kRankLabels[ordo.rank] ??
+              ordoOfficeKindLabel(ordo.officeKind);
+          if (rank.isNotEmpty) expect(subtitle, startsWith(rank));
+        }
+      }
+      expect(tester.takeException(), isNull);
+      router.pop();
     },
   );
 
