@@ -206,7 +206,7 @@ class LiturgicalSectionHeading extends StatelessWidget {
       top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
       bottom: LiturgicalSpacing.sectionTitleToBody,
     ),
-    child: Text(title, style: ReaderTheme.of(context).blockHeading(bodySize)),
+    child: Text(title.toUpperCase(), style: ReaderTheme.of(context).blockHeading(bodySize)),
   );
 }
 
@@ -227,6 +227,7 @@ class LiturgicalHeadingReferenceRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final reader = ReaderTheme.of(context);
     final titleStyle = reader.blockHeading(bodySize);
+    final displayTitle = title.toUpperCase();
     final referenceStyle = reader.rubricReference(bodySize);
     final ref = reference;
     if (ref == null || ref.isEmpty) {
@@ -253,9 +254,9 @@ class LiturgicalHeadingReferenceRow extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final fits =
-              widthOf(title, titleStyle) + widthOf(ref, referenceStyle) + 12 <=
+              widthOf(displayTitle, titleStyle) + widthOf(ref, referenceStyle) + 12 <=
               constraints.maxWidth;
-          final titleWidget = Text(title, style: titleStyle);
+          final titleWidget = Text(displayTitle, style: titleStyle);
           final referenceWidget = Text(
             ref,
             style: referenceStyle,

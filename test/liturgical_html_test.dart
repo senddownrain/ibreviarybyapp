@@ -2,6 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 
 void main() {
+  test('only semantic HTML section headings become uppercase', () {
+    final html = formatLiturgicalHtml(
+      '<p class="liturgical-heading"><span>Кароткае чытанне</span> '
+      '<span class="liturgical-reading-reference">(2 Кар 13, 4)</span></p>'
+      '<p>Хрыстус быў укрыжаваны праз бяссілле.</p>',
+    );
+    expect(html, contains('>КАРОТКАЕ ЧЫТАННЕ</span>'));
+    expect(html, contains('(2 Кар 13, 4)'));
+    expect(html, contains('Хрыстус быў укрыжаваны'));
+    expect(html, isNot(contains('ХРЫСТУС БЫЎ УКРЫЖАВАНЫ')));
+  });
+
   test('reading psalm verses break after stars and before verse numbers', () {
     const source =
         '2. Я цвёрда спадзяваўся на Пана, * і Ён схіліўся '
