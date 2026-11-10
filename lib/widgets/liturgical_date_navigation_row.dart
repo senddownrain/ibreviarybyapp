@@ -42,7 +42,7 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
       color: cs.onSurface,
     );
 
-    const target = BoxConstraints.tightFor(width: 44, height: 44);
+    const target = BoxConstraints.tightFor(width: 48, height: 48);
     return DecoratedBox(
       key: Key('$keyPrefix-date-control'),
       decoration: BoxDecoration(
@@ -68,7 +68,7 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
                 key: Key('$keyPrefix-date-action'),
                 style: TextButton.styleFrom(
                   foregroundColor: cs.onSurface,
-                  minimumSize: const Size(0, 44),
+                  minimumSize: const Size(0, 48),
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -86,8 +86,8 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
             ),
             if (onToday != null)
               SizedBox(
-                width: 44,
-                height: 44,
+                width: 48,
+                height: 48,
                 child: AnimatedSwitcher(
                   duration: MediaQuery.disableAnimationsOf(context)
                       ? Duration.zero
