@@ -81,6 +81,7 @@ jobs:
         run: >-
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
           test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
+          test/reader_alignment_test.dart
 
       - name: Psalmody bundle, alternatives and existing local data
         run: |
