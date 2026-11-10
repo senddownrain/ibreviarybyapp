@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -8,7 +10,7 @@ import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 
 /// One document surface for ordinary prayer reading and local editor preview.
 /// Access checks belong to the containing screen, before constructing this.
-class PrayerContent extends StatelessWidget {
+class PrayerContent extends ConsumerWidget {
   const PrayerContent({
     super.key,
     required this.prayer,
@@ -24,20 +26,27 @@ class PrayerContent extends StatelessWidget {
   final bool wrapInSelectionArea;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final alignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
     final content = Html(
       data: html,
-      style: prayerDocumentStyles(context, textStyle),
+      style: prayerDocumentStyles(context, textStyle, textAlignment: alignment),
       onLinkTap: onLinkTap,
     );
     return wrapInSelectionArea ? SelectionArea(child: content) : content;
   }
 }
 
-Map<String, Style> prayerDocumentStyles(BuildContext context, TextStyle body) {
+Map<String, Style> prayerDocumentStyles(
+  BuildContext context,
+  TextStyle body, {
+  TextAlign textAlignment = TextAlign.justify,
+}) {
   final reader = ReaderTheme.of(context);
   final size = body.fontSize ?? 16;
   final heading = reader.blockHeading(size);
@@ -50,10 +59,14 @@ Map<String, Style> prayerDocumentStyles(BuildContext context, TextStyle body) {
       fontStyle: body.fontStyle ?? FontStyle.normal,
       color: body.color ?? reader.ink,
       lineHeight: LineHeight(ReaderTheme.bodyHeight),
+      textAlign: textAlignment,
       margin: Margins.zero,
       padding: HtmlPaddings.zero,
     ),
-    'p': Style(margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter)),
+    'p': Style(
+      margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+      textAlign: textAlignment,
+    ),
     'a': Style(
       color: Theme.of(context).colorScheme.primary,
       textDecoration: TextDecoration.underline,
@@ -92,11 +105,13 @@ Map<String, Style> prayerDocumentStyles(BuildContext context, TextStyle body) {
       reader: reader,
       body: body,
       margin: Margins.symmetric(vertical: 8),
+      textAlign: TextAlign.left,
     )..padding = HtmlPaddings.zero,
     '.prayer-rubric p': readerRubricHtmlStyle(
       reader: reader,
       body: body,
       margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+      textAlign: TextAlign.left,
     ),
     '.prayer-rubric em': Style(color: reader.rubric),
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),

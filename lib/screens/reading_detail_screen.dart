@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/reading.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -115,12 +116,13 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   }
 
   Widget _buildRendered(String text, TextStyle textStyle) {
+    final alignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
     if (text.contains('<') && text.contains('>')) {
       final reader = ReaderTheme.of(context);
-      return Html(
-        data: formatLiturgicalHtml(text),
-        style: liturgicalDocumentStyles(reader: reader, body: textStyle),
-      );
+      final styles = liturgicalDocumentStyles(reader: reader, body: textStyle);
+      styles['body']!.textAlign = alignment;
+      styles['p']!.textAlign = alignment;
+      return Html(data: formatLiturgicalHtml(text), style: styles);
     }
     final rubric = ReaderTheme.of(context).rubric;
     return SelectableText.rich(
@@ -138,6 +140,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
             ),
         ],
       ),
+      textAlign: alignment,
     );
   }
 }

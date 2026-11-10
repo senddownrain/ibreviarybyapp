@@ -990,7 +990,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
 
     final resp = cf('compResp');
-    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'reading'));
+    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'responsory'));
 
     final antS = cf('compAntS');
     if (antS.isNotEmpty) {
@@ -1358,17 +1358,17 @@ enum _OraItemType {
   custom,
 }
 
-class _ExpandableFeastComment extends StatefulWidget {
+class _ExpandableFeastComment extends ConsumerStatefulWidget {
   const _ExpandableFeastComment(this.text);
 
   final String text;
 
   @override
-  State<_ExpandableFeastComment> createState() =>
+  ConsumerState<_ExpandableFeastComment> createState() =>
       _ExpandableFeastCommentState();
 }
 
-class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
+class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment> {
   bool _expanded = false;
 
   @override
@@ -1424,6 +1424,7 @@ class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
                   child: Text(
                     widget.text,
                     key: const Key('ora-feast-comment-text'),
+                    textAlign: ref.watch(settingsProvider.select((s) => s.textAlignment)),
                     maxLines: _expanded ? null : 3,
                     overflow: _expanded ? null : TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -1666,7 +1667,8 @@ class _OraItem {
 
   static String _pickerLabel(String kind) => switch (kind) {
     'hymn' => 'Выбар варыянта гімна',
-    'reading' => 'Выбар чытання або рэспансорыя',
+    'reading' => 'Выбар чытання',
+    'responsory' => 'Выбар рэспансорыя',
     'office-reading' => 'Выбар чытання',
     'prayer' => 'Выбар малітвы',
     'intercession' => 'Выбар просьбаў',
@@ -1890,7 +1892,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
   }
 }
 
-class _HtmlOrText extends StatelessWidget {
+class _HtmlOrText extends ConsumerWidget {
   final String content;
   final TextStyle textStyle;
   final bool isPsalm;
@@ -1914,7 +1916,9 @@ class _HtmlOrText extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textAlignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    final alignable = const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind);
     if (content.contains('<') && content.contains('>')) {
       return AlternativeText(
         text: content,
@@ -1927,21 +1931,22 @@ class _HtmlOrText extends StatelessWidget {
           final displayedHtml = alternativeKind == 'intercession'
               ? formatIntercessions(selectedHtml)
               : selectedHtml;
-          return _renderHtml(context, displayedHtml);
+          return _renderHtml(context, displayedHtml, textAlignment);
         },
       );
     }
     if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
-      return _renderHtml(context, content);
+      return _renderHtml(context, content, textAlignment);
     }
     final plain = _LiturgicalSelectableText(
       content: content,
       textStyle: textStyle,
+      textAlign: alignable ? textAlignment : TextAlign.left,
     );
     return plain;
   }
 
-  Widget _renderHtml(BuildContext context, String html) {
+  Widget _renderHtml(BuildContext context, String html, TextAlign textAlignment) {
     final textColor =
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
@@ -1968,6 +1973,25 @@ class _HtmlOrText extends StatelessWidget {
         margin: Margins.zero,
       ),
     };
+    // Only Scripture/Office readings and the final prayer are prose.
+    // In particular, responsory turns, headings and rubrics stay left aligned.
+    if (const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind)) {
+      styles['body']!.textAlign = textAlignment;
+      styles['p']!.textAlign = textAlignment;
+      for (final selector in [
+        '.liturgical-heading',
+        '.liturgical-service-heading',
+        '.liturgical-reference',
+        '.liturgical-subheading',
+        '.liturgical-reading-reference',
+        '.office-reading-pericope-title',
+        '.liturgical-rubric',
+        '.responsory-turn',
+      ]) {
+        styles[selector] = (styles[selector] ?? Style())
+          ..textAlign = TextAlign.left;
+      }
+    }
     if (isPsalm) {
       return PsalmChoirHtml(
         html: formatPsalmHtml(
@@ -1979,7 +2003,9 @@ class _HtmlOrText extends StatelessWidget {
       );
     }
     final officeHtml =
-        alternativeKind == 'reading' || alternativeKind == 'office-reading'
+        alternativeKind == 'reading' ||
+            alternativeKind == 'office-reading' ||
+            alternativeKind == 'responsory'
         ? normalizeOfficeHtml(
             html,
             officeReading: alternativeKind == 'office-reading',
@@ -2009,7 +2035,9 @@ class _HtmlOrText extends StatelessWidget {
         : const {'hymn', 'prayer', 'intercession'}.contains(alternativeKind)
         ? normalizeSemanticBody(officeHtml)
         : officeHtml;
-    if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
+    if (alternativeKind == 'reading' ||
+        alternativeKind == 'office-reading' ||
+        alternativeKind == 'responsory') {
       return _renderOfficeHtml(semanticBody, styles);
     }
     return Html(data: formatLiturgicalHtml(semanticBody), style: styles);
@@ -2058,10 +2086,12 @@ class _HtmlOrText extends StatelessWidget {
 class _LiturgicalSelectableText extends StatelessWidget {
   final String content;
   final TextStyle textStyle;
+  final TextAlign textAlign;
 
   const _LiturgicalSelectableText({
     required this.content,
     required this.textStyle,
+    this.textAlign = TextAlign.left,
   });
 
   @override
@@ -2083,6 +2113,7 @@ class _LiturgicalSelectableText extends StatelessWidget {
             ),
         ],
       ),
+      textAlign: textAlign,
     );
   }
 }

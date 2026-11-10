@@ -201,6 +201,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
+                const SizedBox(height: 20),
+                Text(
+                  'Выраўноўванне тэксту',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                AdaptiveSegmentedControl<TextAlign>(
+                  value: settings.textAlignment,
+                  segments: const [
+                    AdaptiveSegment(
+                      value: TextAlign.left,
+                      icon: Icon(Icons.format_align_left, size: 18),
+                      label: Text('Па левым краі'),
+                    ),
+                    AdaptiveSegment(
+                      value: TextAlign.justify,
+                      icon: Icon(Icons.format_align_justify, size: 18),
+                      label: Text('Па шырыні'),
+                    ),
+                  ],
+                  onChanged: (alignment) => ref
+                      .read(settingsProvider.notifier)
+                      .setTextAlignment(alignment),
+                ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),

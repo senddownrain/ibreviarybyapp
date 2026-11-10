@@ -27,6 +27,7 @@ import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -1789,7 +1790,7 @@ class _AlternativeReading extends StatelessWidget {
             ),
           if (text.isNotEmpty) ...[
             const SizedBox(height: 6),
-            _ReadingText(text: text, textStyle: textStyle),
+            _ReadingText(text: text, textStyle: textStyle, isProse: true),
             if (!hasAcclamation) ...[
               const SizedBox(height: 12),
               Text(
@@ -2037,10 +2038,11 @@ class _BibleRef extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 
-class _ReadingText extends StatefulWidget {
+class _ReadingText extends ConsumerStatefulWidget {
   final String text;
   final TextStyle textStyle;
   final bool isPsalm;
+  final bool isProse;
   final String? highlightNamespace;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
@@ -2050,6 +2052,7 @@ class _ReadingText extends StatefulWidget {
     required this.text,
     required this.textStyle,
     this.isPsalm = false,
+    this.isProse = false,
     this.highlightNamespace,
     this.highlights = const {},
     this.selectedSentenceId,
@@ -2057,10 +2060,10 @@ class _ReadingText extends StatefulWidget {
   });
 
   @override
-  State<_ReadingText> createState() => _ReadingTextState();
+  ConsumerState<_ReadingText> createState() => _ReadingTextState();
 }
 
-class _ReadingTextState extends State<_ReadingText> {
+class _ReadingTextState extends ConsumerState<_ReadingText> {
   final Map<String, TapGestureRecognizer> _recognizers = {};
 
   TapGestureRecognizer _recognizerFor(String sentenceId) =>
@@ -2081,6 +2084,9 @@ class _ReadingTextState extends State<_ReadingText> {
 
   @override
   Widget build(BuildContext context) {
+    final alignment = widget.isProse
+        ? ref.watch(settingsProvider.select((s) => s.textAlignment))
+        : TextAlign.left;
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
       return Html(
@@ -2089,6 +2095,14 @@ class _ReadingTextState extends State<_ReadingText> {
             : formatLiturgicalHtml(widget.text),
         style: {
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
+          if (widget.isProse) ...{
+            'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
+              ..textAlign = alignment,
+            'p': Style(
+              textAlign: alignment,
+              margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+            ),
+          },
           '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
         },
       );
@@ -2128,6 +2142,7 @@ class _ReadingTextState extends State<_ReadingText> {
             ),
         ],
       ),
+      textAlign: alignment,
     );
   }
 
@@ -2344,6 +2359,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
           _ReadingText(
             text: display,
             textStyle: widget.textStyle,
+            isProse: true,
             highlightNamespace: widget.highlightNamespace,
             highlights: widget.highlights,
             selectedSentenceId: widget.selectedSentenceId,
