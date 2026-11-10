@@ -64,6 +64,18 @@ void main() {
             await tester.pumpAndSettle();
             expect(find.byKey(const Key('test-today')), findsOneWidget);
             expect(find.byTooltip('Вярнуцца на сёння'), findsOneWidget);
+            // The action is part of the same surface, not a blue tile.
+            final todayButton = tester.widget<IconButton>(
+              find.byKey(const Key('test-today')),
+            );
+            expect(
+              todayButton.style?.backgroundColor?.resolve({}),
+              Colors.transparent,
+            );
+            expect(
+              todayButton.style?.side?.resolve({}),
+              isNull,
+            );
             expect(find.text('Сёння'), findsNothing);
             expect(tester.getCenter(action).dx, closeTo(originalX, 0.1));
 
