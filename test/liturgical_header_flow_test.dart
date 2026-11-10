@@ -61,6 +61,14 @@ class _FourDioceses extends DioceseSelectionNotifier {
   );
 }
 
+class _VitebskDiocese extends DioceseSelectionNotifier {
+  @override
+  DioceseSelection build() => const DioceseSelection(
+    primary: 'vitebsk',
+    selected: ['vitebsk'],
+  );
+}
+
 void main() {
   late Directory directory;
   final capture = GlobalKey();
@@ -175,6 +183,63 @@ void main() {
     });
     await tester.pump();
   }
+
+  testWidgets(
+    'approved 12 November Vitebsk Hours and Readings headers',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_VitebskDiocese.new),
+        ],
+      );
+      final presentation = container.read(liturgicalDayPresentationProvider);
+      expect(presentation.title, contains('Язафата'));
+      expect(presentation.place, contains('Віцебская дыяцэзія'));
+      expect(presentation.rank, isNotEmpty);
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(find.byType(Chip), findsNothing);
+      expect(
+        tester.getTopLeft(find.text('Віцебская дыяцэзія')).dy,
+        lessThan(
+          tester.getTopLeft(
+            find.byKey(const Key('hours-celebration-title')),
+          ).dy,
+        ),
+      );
+      final hoursMetadata = tester.widget<Text>(
+        find.byKey(const Key('hours-day-metadata')),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-hours-12-nov-2026');
+
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(find.byType(Chip), findsNothing);
+      final readingsMetadata = tester.widget<Text>(
+        find.byKey(const Key('readings-day-metadata')),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   test('real weekday and Marian memorial share canonical presentation', () {
     final container = containerFor(DateTime(2026, 10, 6));
