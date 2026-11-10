@@ -12,6 +12,21 @@ import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 
 void main() {
+  testWidgets('liturgical section titles are uppercase but input is unchanged', (
+    tester,
+  ) async {
+    const label = 'Малітва';
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: LiturgicalSectionHeading(title: label, bodySize: 16),
+        ),
+      ),
+    );
+    expect(find.text('МАЛІТВА'), findsOneWidget);
+    expect(label, 'Малітва');
+  });
+
   testWidgets('document role typography follows one reader contract', (
     tester,
   ) async {
@@ -364,7 +379,7 @@ void main() {
         ),
       );
       expect(tester.takeException(), isNull);
-      expect(find.text('Кароткае чытанне'), findsOneWidget);
+      expect(find.text('КАРОТКАЕ ЧЫТАННЕ'), findsOneWidget);
       expect(find.text('1 Кар 12, 12–31; Эф 4, 11–13'), findsOneWidget);
     });
   }
@@ -390,7 +405,7 @@ void main() {
         ),
       ),
     );
-    final title = tester.getTopLeft(find.text('Кароткае чытанне'));
+    final title = tester.getTopLeft(find.text('КАРОТКАЕ ЧЫТАННЕ'));
     final reference = tester.getTopLeft(find.text('Ер 6, 16'));
     expect((title.dy - reference.dy).abs(), lessThan(6));
     expect(reference.dx, greaterThan(title.dx + 100));

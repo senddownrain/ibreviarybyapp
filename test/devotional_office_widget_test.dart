@@ -113,7 +113,7 @@ void main() {
           expect(html(tester), isNot(before));
         } else {
           expect(find.byType(ChoiceChip), findsNothing);
-          expect(find.text('Гімн'), findsNWidgets(7));
+          expect(find.text('ГІМН'), findsNWidgets(7));
           expect(html(tester), contains('Кантар:'));
         }
         if (!id.startsWith('catholicby')) {

@@ -1999,7 +1999,7 @@ class _SectionLabel extends StatelessWidget {
         top: LiturgicalSpacing.sectionBefore,
         bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
-      child: Text(_readingLabel(text), style: rubric.blockHeading(base)),
+      child: Text(_readingLabel(text).toUpperCase(), style: rubric.blockHeading(base)),
     );
   }
 }

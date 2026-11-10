@@ -53,15 +53,43 @@ String _markCadenceInText(String text) => text.replaceAllMapped(
   (match) => '<span class="psalm-marker">${match.group(0)}</span>',
 );
 
-String formatLiturgicalHtml(String html) => markLiturgicalCadenceSigns(
-  _normalizeLegacyPresentation(
-    _normalizeRubricColors(
-      _markInlineReadingReference(
-        _normalizeRubricBlocks(_markLeadingMetadata(html)),
+String formatLiturgicalHtml(String html) => _uppercaseDocumentHeadings(
+  markLiturgicalCadenceSigns(
+    _normalizeLegacyPresentation(
+      _normalizeRubricColors(
+        _markInlineReadingReference(
+          _normalizeRubricBlocks(_markLeadingMetadata(html)),
+        ),
       ),
     ),
   ),
 );
+
+/// Uppercase only displayed section titles, not Scripture, references or rubrics.
+/// Keep inline markup and the normalized source headings unchanged.
+String _uppercaseDocumentHeadings(String html) {
+  if (!html.contains('liturgical-heading')) return html;
+  final fragment = parseFragment(html);
+  void uppercaseText(dom.Node node) {
+    if (node is dom.Text) {
+      node.data = node.data.toUpperCase();
+      return;
+    }
+    if (node is dom.Element &&
+        (node.classes.contains('liturgical-reading-reference') ||
+            node.classes.contains('liturgical-reference'))) {
+      return;
+    }
+    for (final child in node.nodes) {
+      uppercaseText(child);
+    }
+  }
+
+  for (final heading in fragment.querySelectorAll('.liturgical-heading')) {
+    uppercaseText(heading);
+  }
+  return fragment.outerHtml;
+}
 
 String _normalizeRubricBlocks(String html) {
   final fragment = parseFragment(html);
