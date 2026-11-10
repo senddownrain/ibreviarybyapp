@@ -98,6 +98,7 @@ void main() {
         child: ProviderScope(
           overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: AppPalette.marianScheme,
@@ -142,6 +143,7 @@ void main() {
           child: ProviderScope(
             overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: ThemeData(
               useMaterial3: true,
               colorScheme: AppPalette.marianScheme,
