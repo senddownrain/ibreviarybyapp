@@ -174,9 +174,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             DropdownMenuItem(
                               value: option.id,
                               child: Text(
-                                '${option.label}: Пан — маё святло і маё збаўленне.',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                                option.label,
                                 style: ReaderTheme.of(
                                   context,
                                 ).body(16, family: option.id),
@@ -201,15 +199,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         'Памер тэксту',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      Slider.adaptive(
-                        key: const Key('settings-font-size'),
-                        value: settings.fontSize,
-                        min: kMinReaderFontSize,
-                        max: kMaxReaderFontSize,
-                        divisions: 11,
-                        label: '${readerFontScalePercent(settings.fontSize)}%',
-                        onChanged: (val) =>
-                            ref.read(settingsProvider.notifier).setFontSize(val),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Slider.adaptive(
+                              key: const Key('settings-font-size'),
+                              value: settings.fontSize,
+                              min: kMinReaderFontSize,
+                              max: kMaxReaderFontSize,
+                              divisions: 11,
+                              label: '${readerFontScalePercent(settings.fontSize)}%',
+                              onChanged: (val) => ref
+                                  .read(settingsProvider.notifier)
+                                  .setFontSize(val),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 52,
+                            child: Text(
+                              '${readerFontScalePercent(settings.fontSize)}%',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 18),
                       Text(
