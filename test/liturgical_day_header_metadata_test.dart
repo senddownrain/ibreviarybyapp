@@ -167,7 +167,7 @@ void main() {
       find.byKey(const Key('hours-day-metadata')),
     );
     expect(text.textSpan!.toPlainText(), 'Аўторак');
-    final emphasis = text.textSpan!.children!.first as TextSpan;
+    final emphasis = (text.textSpan! as TextSpan).children!.first as TextSpan;
     expect(emphasis.text, 'Аўторак');
     expect(emphasis.style?.fontWeight, FontWeight.w600);
     tester.view.reset();
@@ -180,7 +180,7 @@ void main() {
     final text = tester.widget<Text>(
       find.byKey(const Key('hours-day-metadata')),
     );
-    final emphasis = text.textSpan!.children!.first as TextSpan;
+    final emphasis = (text.textSpan! as TextSpan).children!.first as TextSpan;
     expect(emphasis.text, 'Успамін');
     expect(emphasis.style?.fontWeight, FontWeight.w600);
     tester.view.reset();
