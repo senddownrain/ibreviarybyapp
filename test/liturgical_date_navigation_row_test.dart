@@ -35,18 +35,18 @@ void main() {
                     child: StatefulBuilder(
                       builder: (context, refresh) =>
                           LiturgicalDateNavigationRow(
-                        date: date,
-                        keyPrefix: 'test',
-                        onDateTap: () => calendarOpens++,
-                        onPrevious: () => refresh(
-                          () => date = date.subtract(const Duration(days: 1)),
-                        ),
-                        onNext: () => refresh(
-                          () => date = date.add(const Duration(days: 1)),
-                        ),
-                        onToday: () => refresh(
-                          () => date = DateUtils.dateOnly(DateTime.now()),
-                        ),
+                            date: date,
+                            keyPrefix: 'test',
+                            onDateTap: () => calendarOpens++,
+                            onPrevious: () => refresh(
+                              () => date = date.subtract(const Duration(days: 1)),
+                            ),
+                            onNext: () => refresh(
+                              () => date = date.add(const Duration(days: 1)),
+                            ),
+                            onToday: () => refresh(
+                              () => date = DateUtils.dateOnly(DateTime.now()),
+                            ),
                       ),
                     ),
                   ),
@@ -63,6 +63,7 @@ void main() {
             await tester.tap(find.byKey(const Key('test-previous-day')));
             await tester.pumpAndSettle();
             expect(find.byKey(const Key('test-today')), findsOneWidget);
+            expect(find.byTooltip('Вярнуцца на сёння'), findsOneWidget);
             expect(find.text('Сёння'), findsNothing);
             expect(tester.getCenter(action).dx, closeTo(originalX, 0.1));
 
