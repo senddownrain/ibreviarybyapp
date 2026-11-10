@@ -47,7 +47,7 @@ void main() {
                             onToday: () => refresh(
                               () => date = DateUtils.dateOnly(DateTime.now()),
                             ),
-                      ),
+                          ),
                     ),
                   ),
                 ),
