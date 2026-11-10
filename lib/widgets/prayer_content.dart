@@ -61,7 +61,10 @@ Map<String, Style> prayerDocumentStyles(
       margin: Margins.zero,
       padding: HtmlPaddings.zero,
     ),
-    'p': Style(margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter), textAlign: textAlignment),
+    'p': Style(
+      margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+      textAlign: textAlignment,
+    ),
     'a': Style(
       color: Theme.of(context).colorScheme.primary,
       textDecoration: TextDecoration.underline,
