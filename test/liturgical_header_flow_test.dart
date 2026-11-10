@@ -245,7 +245,8 @@ void main() {
         container.read(hoursLiturgicalSelectionProvider).dayId,
         alternative,
       );
-      expect(find.text('Сёння'), findsOneWidget);
+      expect(find.byKey(const Key('readings-today')), findsOneWidget);
+      expect(find.text('Сёння'), findsNothing);
       await snapshot(tester, 'readings-marian');
       await tester.tap(find.byKey(const Key('readings-date-action')));
       await tester.pumpAndSettle();
