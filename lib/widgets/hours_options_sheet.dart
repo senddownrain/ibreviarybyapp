@@ -143,9 +143,10 @@ class HoursOptionsSheet extends ConsumerWidget {
 /// One human-readable diocese per celebration. The union gives us a short
 /// badge, while the document can already carry its full diocese name.
 String _metadata(DayOption option) {
-  final rank = option.ordo case final ordo?
-      ? kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind)
-      : option.subtitle ?? '';
+  final ordo = option.ordo;
+  final rank = ordo == null
+      ? option.subtitle ?? ''
+      : kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind);
   final place = option.placeLabel?.trim() ?? '';
   final parts = <String>{
     if (rank.isNotEmpty) rank,
