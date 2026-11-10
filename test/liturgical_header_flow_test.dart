@@ -314,6 +314,32 @@ void main() {
     },
   );
 
+  testWidgets('date control visual preview: dark Hours and Readings', (
+    tester,
+  ) async {
+    // Screenshot evidence from the actual Flutter widgets, not a mockup.
+    final (router, container) = await start(
+      tester,
+      width: 390,
+      brightness: Brightness.dark,
+      date: DateTime(2026, 11, 21),
+    );
+    expect(find.byKey(const Key('hours-today')), findsOneWidget);
+    await snapshot(tester, 'new-date-control-hours-dark-2026-11-21');
+    router.go('/readings');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-today')), findsOneWidget);
+    await snapshot(tester, 'new-date-control-readings-dark-2026-11-21');
+
+    container
+        .read(liturgicalNavigationControllerProvider)
+        .openDate(DateTime.now());
+    router.go('/hours');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('hours-today')), findsNothing);
+    await snapshot(tester, 'new-date-control-hours-dark-today');
+  });
+
   test('real weekday and Marian memorial share canonical presentation', () {
     final container = containerFor(DateTime(2026, 10, 6));
     addTearDown(container.dispose);
@@ -383,7 +409,8 @@ void main() {
         container.read(hoursLiturgicalSelectionProvider).dayId,
         alternative,
       );
-      expect(find.text('Сёння'), findsOneWidget);
+      expect(find.byKey(const Key('readings-today')), findsOneWidget);
+      expect(find.text('Сёння'), findsNothing);
       await snapshot(tester, 'readings-marian');
       await tester.tap(find.byKey(const Key('readings-date-action')));
       await tester.pumpAndSettle();

@@ -96,6 +96,7 @@ class LiturgicalDayHeader extends StatelessWidget {
             onDateTap: onDateTap,
             onPrevious: onPrevious,
             onNext: onNext,
+            onToday: onToday,
           ),
           ?dateHint,
           const SizedBox(height: 12),
@@ -167,16 +168,6 @@ class LiturgicalDayHeader extends StatelessWidget {
               ],
             ),
           ),
-          if (onToday != null)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                key: Key('$keyPrefix-today'),
-                onPressed: onToday,
-                icon: const Icon(Icons.history, size: 18),
-                label: const Text('Сёння'),
-              ),
-            ),
           if (showVariants) ...[
             const SizedBox(height: 2),
             TextButton(
