@@ -49,30 +49,45 @@ class LiturgicalDayHeader extends StatelessWidget {
         .replaceFirst(RegExp(r'^\s*·\s*'), '')
         .trim();
     final rank = p.rank.trim();
-    // The weekday already says "Нядзеля"; a weekday is not a feast rank.
+    // A Sunday or an ordinary weekday already has its rank in the day label.
     final showRank =
         rank.isNotEmpty &&
         rank != p.weekday &&
         rank != 'Будні дзень' &&
         rank != 'Будзень';
-    final details = [
-      if (showRank) rank,
+
+    // A rank (feast/memorial/solemnity) is the important metadata for a
+    // celebration. For an ordinary day, emphasize the weekday instead.
+    final emphasizedMetadata = showRank ? rank : p.weekday;
+    final quietMetadata = [
+      if (showRank) p.weekday,
       if (metadataSuffix.isNotEmpty) metadataSuffix,
     ];
-    final metadataTail = details.isEmpty ? '' : ' · ${details.join(' · ')}';
+    final metadataTail = quietMetadata.isEmpty
+        ? ''
+        : ' · ${quietMetadata.join(' · ')}';
 
-    // A diocesan celebration can have both a short union badge ("Мінск")
-    // and a full _place ("Мінска-Магілёўская архідыяцэзія"). Show its
-    // locality once; retain badge information when _place does not cover it.
-    final placeLower = p.place.toLowerCase();
-    final diocesesNamedInPlace = {
-      for (final entry in kDioceseBadges.entries)
-        if (placeLower.contains((kDioceseNames[entry.key] ?? '').toLowerCase()))
-          entry.value,
-    };
-    final extraDioceseBadges = p.badges
-        .where((badge) => !diocesesNamedInPlace.contains(badge))
+    // _place and badges can independently identify the same diocese.
+    // Diocesan identity is represented only by chips, never repeated below
+    // as a full locality subtitle. Keep any non-diocesan place text.
+    final placeParts = p.place
+        .split(',')
+        .map((part) => part.trim())
+        .where((part) => part.isNotEmpty)
         .toList();
+    final placeBadges = <String>{};
+    final otherPlaces = <String>[];
+    for (final place in placeParts) {
+      final badge = _dioceseBadgeForPlace(place);
+      if (badge != null) {
+        placeBadges.add(badge);
+      } else {
+        otherPlaces.add(place);
+      }
+    }
+    // The union badges explicitly indicate which dioceses have this option,
+    // so they take priority over inferred locality labels.
+    final dioceseChips = p.badges.isNotEmpty ? p.badges.toSet() : placeBadges;
 
     return LayoutBuilder(
       builder: (context, constraints) => Column(
@@ -125,7 +140,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: p.weekday,
+                              text: emphasizedMetadata,
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontSize: 18,
@@ -141,19 +156,27 @@ class LiturgicalDayHeader extends StatelessWidget {
                           color: cs.onSurfaceVariant,
                         ),
                       ),
-                      if (extraDioceseBadges.isNotEmpty) ...[
+                      if (dioceseChips.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Text(
-                          '${extraDioceseBadges.length == 1 ? 'Дыяцэзія' : 'Дыяцэзіі'}: ${extraDioceseBadges.join(', ')}',
+                        Wrap(
                           key: Key('$keyPrefix-celebration-dioceses'),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: cs.onSurfaceVariant),
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            for (final badge in dioceseChips)
+                              Chip(
+                                label: Text(badge),
+                                visualDensity: VisualDensity.compact,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                          ],
                         ),
                       ],
-                      if (p.place.isNotEmpty) ...[
+                      if (otherPlaces.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
-                          p.place,
+                          otherPlaces.join(', '),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: cs.onSurfaceVariant),
                         ),
@@ -200,4 +223,17 @@ class LiturgicalDayHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Full labels in liturgical content are normalized to short UI badges.
+String? _dioceseBadgeForPlace(String place) {
+  final normalized = place.trim().toLowerCase();
+  for (final entry in kDioceseNames.entries) {
+    if (normalized == entry.value.toLowerCase() ||
+        normalized == kDioceseShortNames[entry.key]?.toLowerCase() ||
+        normalized == kDioceseBadges[entry.key]?.toLowerCase()) {
+      return kDioceseBadges[entry.key];
+    }
+  }
+  return null;
 }
