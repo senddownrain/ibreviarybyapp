@@ -27,7 +27,9 @@ class PrayerContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final alignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    final alignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
