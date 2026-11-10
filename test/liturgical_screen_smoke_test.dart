@@ -726,7 +726,7 @@ void main() {
       await _captureSectionIfRequested(
         tester,
         '$captureName-second-reading',
-        find.text('Другое чытанне'),
+        find.text('ДРУГОЕ ЧЫТАННЕ'),
       );
       await _captureSectionIfRequested(
         tester,
@@ -736,7 +736,7 @@ void main() {
       await _captureSectionIfRequested(
         tester,
         '$captureName-prayer',
-        find.text('Малітва'),
+        find.text('МАЛІТВА'),
       );
       if (hour == 'morning' && psalms.evaluate().length > 4) {
         await _captureSectionIfRequested(
