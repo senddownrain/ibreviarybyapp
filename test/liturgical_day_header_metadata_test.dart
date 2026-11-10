@@ -60,7 +60,7 @@ void main() {
     );
     expect(
       text.textSpan!.toPlainText(),
-      'Аўторак · Успамін · IV тыдзень Псалтыра',
+      'Успамін · Аўторак · IV тыдзень Псалтыра',
     );
     expect(tester.takeException(), isNull);
     tester.view.reset();
@@ -75,11 +75,11 @@ void main() {
     final text = tester.widget<Text>(
       find.byKey(const Key('hours-day-metadata')),
     );
-    expect(text.textSpan!.toPlainText(), 'Аўторак · Успамін · Год II');
+    expect(text.textSpan!.toPlainText(), 'Успамін · Аўторак · Год II');
     tester.view.reset();
   });
 
-  testWidgets('does not repeat a fully named Minsk diocese as a chip', (
+  testWidgets('uses one short Minsk chip instead of full diocese text', (
     tester,
   ) async {
     await showHeader(
@@ -89,12 +89,10 @@ void main() {
         badges: const ['Мінск'],
       ),
     );
-    expect(find.text('Мінска-Магілёўская архідыяцэзія'), findsOneWidget);
-    expect(find.byType(Chip), findsNothing);
-    expect(
-      find.byKey(const Key('hours-celebration-dioceses')),
-      findsNothing,
-    );
+    expect(find.text('Мінска-Магілёўская архідыяцэзія'), findsNothing);
+    expect(find.text('Мінск'), findsOneWidget);
+    expect(find.byType(Chip), findsOneWidget);
+    expect(find.byKey(const Key('hours-celebration-dioceses')), findsOneWidget);
     tester.view.reset();
   });
 
@@ -114,9 +112,10 @@ void main() {
     final text = tester.widget<Text>(
       find.byKey(const Key('hours-day-metadata')),
     );
-    expect(text.textSpan!.toPlainText(), 'Чацвер · Урачыстасць');
-    expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
-    expect(find.byType(Chip), findsNothing);
+    expect(text.textSpan!.toPlainText(), 'Урачыстасць · Чацвер');
+    expect(find.text('Віцебская дыяцэзія'), findsNothing);
+    expect(find.text('Віцебск'), findsOneWidget);
+    expect(find.byType(Chip), findsOneWidget);
     tester.view.reset();
   });
 
@@ -130,8 +129,42 @@ void main() {
         badges: const ['Мінск', 'Віцебск'],
       ),
     );
-    expect(find.text('Дыяцэзіі: Мінск, Віцебск'), findsOneWidget);
-    expect(find.byType(Chip), findsNothing);
+    expect(find.text('Мінск'), findsOneWidget);
+    expect(find.text('Віцебск'), findsOneWidget);
+    expect(find.byType(Chip), findsNWidgets(2));
+    tester.view.reset();
+  });
+
+  testWidgets('ordinary weekday stays prominent without a rank', (
+    tester,
+  ) async {
+    await showHeader(
+      tester,
+      presentation: sample(
+        rank: 'Будні дзень',
+        contextMetadata: 'IV тыдзень Псалтыра',
+      ),
+    );
+    final text = tester.widget<Text>(
+      find.byKey(const Key('hours-day-metadata')),
+    );
+    expect(text.textSpan!.toPlainText(), 'Аўторак · IV тыдзень Псалтыра');
+    final emphasis = text.textSpan!.children!.first as TextSpan;
+    expect(emphasis.text, 'Аўторак');
+    expect(emphasis.style?.fontWeight, FontWeight.w600);
+    tester.view.reset();
+  });
+
+  testWidgets('memorial rank is prominent, while weekday is secondary', (
+    tester,
+  ) async {
+    await showHeader(tester, presentation: sample());
+    final text = tester.widget<Text>(
+      find.byKey(const Key('hours-day-metadata')),
+    );
+    final emphasis = text.textSpan!.children!.first as TextSpan;
+    expect(emphasis.text, 'Успамін');
+    expect(emphasis.style?.fontWeight, FontWeight.w600);
     tester.view.reset();
   });
 
