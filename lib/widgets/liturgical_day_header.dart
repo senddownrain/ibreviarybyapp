@@ -169,22 +169,34 @@ class LiturgicalDayHeader extends StatelessWidget {
             ),
           ),
           if (showVariants) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 8),
             TextButton(
               key: Key('$keyPrefix-alternatives-control'),
               style: TextButton.styleFrom(
                 foregroundColor: ink,
+                // A quiet affordance, not a second prominent filled card.
+                backgroundColor: cs.onSurface.withValues(
+                  alpha: Theme.of(context).brightness == Brightness.dark
+                      ? 0.035
+                      : 0.018,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
                 minimumSize: const Size(48, 48),
               ),
               onPressed: onVariants,
-              child: const Row(
+              child: Row(
                 children: [
-                  Expanded(child: Text('Іншыя варыянты')),
-                  Icon(Icons.chevron_right, size: 20),
+                  Icon(Icons.layers_outlined, size: 18, color: cs.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  const Expanded(child: Text('Іншыя варыянты')),
+                  Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
                 ],
               ),
             ),

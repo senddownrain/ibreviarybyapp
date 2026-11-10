@@ -314,6 +314,38 @@ void main() {
     },
   );
 
+  testWidgets('date control visual preview: light Readings', (
+    tester,
+  ) async {
+    final (router, _) = await start(
+      tester,
+      width: 390,
+      brightness: Brightness.light,
+      date: DateTime(2026, 11, 13),
+    );
+    router.go('/readings');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-today')), findsOneWidget);
+    // Date has no elevated floating-card shadow; alternatives have a
+    // discoverable but still neutral tap surface.
+    final dateBox = tester.widget<DecoratedBox>(
+      find.byKey(const Key('readings-date-control')),
+    );
+    final dateDecoration = dateBox.decoration as BoxDecoration;
+    expect(dateDecoration.boxShadow, isNull);
+    expect(dateDecoration.color!.a, lessThan(0.04));
+    final alternatives = tester.widget<TextButton>(
+      find.byKey(const Key('readings-alternatives-control')),
+    );
+    final alternativesFill = alternatives.style?.backgroundColor?.resolve({});
+    expect(alternativesFill, isNotNull);
+    expect(alternativesFill!.a, lessThan(0.025));
+    expect(alternatives.style?.minimumSize?.resolve({})?.height, 48);
+    expect(find.byIcon(Icons.layers_outlined), findsOneWidget);
+    await snapshot(tester, 'polished-date-control-readings-light-2026-11-13');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('date control visual preview: dark Hours and Readings', (
     tester,
   ) async {
@@ -325,11 +357,11 @@ void main() {
       date: DateTime(2026, 11, 21),
     );
     expect(find.byKey(const Key('hours-today')), findsOneWidget);
-    await snapshot(tester, 'new-date-control-hours-dark-2026-11-21');
+    await snapshot(tester, 'polished-date-control-hours-dark-2026-11-21');
     router.go('/readings');
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-today')), findsOneWidget);
-    await snapshot(tester, 'new-date-control-readings-dark-2026-11-21');
+    await snapshot(tester, 'polished-date-control-readings-dark-2026-11-21');
 
     container
         .read(liturgicalNavigationControllerProvider)
@@ -337,7 +369,7 @@ void main() {
     router.go('/hours');
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('hours-today')), findsNothing);
-    await snapshot(tester, 'new-date-control-hours-dark-today');
+    await snapshot(tester, 'polished-date-control-hours-dark-today');
   });
 
   test('real weekday and Marian memorial share canonical presentation', () {

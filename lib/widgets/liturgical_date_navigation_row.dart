@@ -43,15 +43,20 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
     );
 
     const target = BoxConstraints.tightFor(width: 48, height: 48);
+    // Date navigation is contextual, not a raised floating toolbar: keep a
+    // quiet, unified surface that stays below the celebration in hierarchy.
     return DecoratedBox(
       key: Key('$keyPrefix-date-control'),
       decoration: BoxDecoration(
-        color: cs.onSurface.withValues(alpha: dark ? 0.07 : 0.04),
-        border: Border.all(color: cs.onSurface.withValues(alpha: 0.11)),
+        color: cs.onSurface.withValues(alpha: dark ? 0.025 : 0.015),
+        border: Border.all(
+          color: cs.onSurface.withValues(alpha: dark ? 0.09 : 0.08),
+          width: 0.8,
+        ),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(2),
         child: Row(
           children: [
             IconButton(
@@ -100,14 +105,14 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
                           constraints: target,
                           padding: EdgeInsets.zero,
                           color: todayAccent,
+                          // No second card inside the date capsule.
+                          // Only the glyph is accented; the state layer
+                          // appears on press/focus and stays inside the 48 dp
+                          // touch target.
                           style: IconButton.styleFrom(
-                            backgroundColor: todayAccent.withValues(alpha: 0.17),
-                            side: BorderSide(
-                              color: todayAccent.withValues(alpha: 0.42),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            backgroundColor: Colors.transparent,
+                            overlayColor: todayAccent.withValues(alpha: 0.14),
+                            shape: const CircleBorder(),
                           ),
                           onPressed: onToday,
                           icon: const Icon(Icons.history, size: 21),
