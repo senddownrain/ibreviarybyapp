@@ -51,7 +51,7 @@ void main() {
     contextMetadata: contextMetadata,
   );
 
-  testWidgets('shows the selected celebration rank before psalter week', (
+  testWidgets('shows celebration rank but not the psalter week in daily header', (
     tester,
   ) async {
     await showHeader(tester, presentation: sample());
@@ -60,7 +60,7 @@ void main() {
     );
     expect(
       text.textSpan!.toPlainText(),
-      'Успамін · Аўторак · IV тыдзень Псалтыра',
+      'Успамін · Аўторак',
     );
     expect(tester.takeException(), isNull);
     tester.view.reset();
@@ -79,7 +79,7 @@ void main() {
     tester.view.reset();
   });
 
-  testWidgets('uses one short Minsk chip instead of full diocese text', (
+  testWidgets('uses full Minsk diocese name above the title, no chips', (
     tester,
   ) async {
     await showHeader(
@@ -89,10 +89,14 @@ void main() {
         badges: const ['Мінск'],
       ),
     );
-    expect(find.text('Мінска-Магілёўская архідыяцэзія'), findsNothing);
-    expect(find.text('Мінск'), findsOneWidget);
-    expect(find.byType(Chip), findsOneWidget);
+    expect(find.text('Мінска-Магілёўская архідыяцэзія'), findsOneWidget);
+    expect(find.text('Мінск'), findsNothing);
+    expect(find.byType(Chip), findsNothing);
     expect(find.byKey(const Key('hours-celebration-dioceses')), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Мінска-Магілёўская архідыяцэзія')).dy,
+      lessThan(tester.getTopLeft(find.byKey(const Key('hours-celebration-title'))).dy),
+    );
     tester.view.reset();
   });
 
@@ -113,9 +117,9 @@ void main() {
       find.byKey(const Key('hours-day-metadata')),
     );
     expect(text.textSpan!.toPlainText(), 'Урачыстасць · Чацвер');
-    expect(find.text('Віцебская дыяцэзія'), findsNothing);
-    expect(find.text('Віцебск'), findsOneWidget);
-    expect(find.byType(Chip), findsOneWidget);
+    expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+    expect(find.text('Віцебск'), findsNothing);
+    expect(find.byType(Chip), findsNothing);
     tester.view.reset();
   });
 
@@ -129,9 +133,23 @@ void main() {
         badges: const ['Мінск', 'Віцебск'],
       ),
     );
-    expect(find.text('Мінск'), findsOneWidget);
-    expect(find.text('Віцебск'), findsOneWidget);
-    expect(find.byType(Chip), findsNWidgets(2));
+    expect(
+      find.text('Мінска-Магілёўская архідыяцэзія · Віцебская дыяцэзія'),
+      findsOneWidget,
+    );
+    expect(find.byType(Chip), findsNothing);
+    tester.view.reset();
+  });
+
+  testWidgets('ordinary shared day has no diocese label or chips', (
+    tester,
+  ) async {
+    await showHeader(
+      tester,
+      presentation: sample(rank: 'Будні дзень', place: '', badges: const []),
+    );
+    expect(find.byKey(const Key('hours-celebration-dioceses')), findsNothing);
+    expect(find.byType(Chip), findsNothing);
     tester.view.reset();
   });
 
@@ -148,7 +166,7 @@ void main() {
     final text = tester.widget<Text>(
       find.byKey(const Key('hours-day-metadata')),
     );
-    expect(text.textSpan!.toPlainText(), 'Аўторак · IV тыдзень Псалтыра');
+    expect(text.textSpan!.toPlainText(), 'Аўторак');
     final emphasis = text.textSpan!.children!.first as TextSpan;
     expect(emphasis.text, 'Аўторак');
     expect(emphasis.style?.fontWeight, FontWeight.w600);
@@ -180,7 +198,7 @@ void main() {
     final text = tester.widget<Text>(
       find.byKey(const Key('hours-day-metadata')),
     );
-    expect(text.textSpan!.toPlainText(), 'Нядзеля · IV тыдзень Псалтыра');
+    expect(text.textSpan!.toPlainText(), 'Нядзеля');
     tester.view.reset();
   });
 }
