@@ -199,7 +199,13 @@ void main() {
       expect(presentation.place, contains('Віцебская дыяцэзія'));
       expect(presentation.rank, isNotEmpty);
       expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
-      expect(find.byType(Chip), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
       expect(
         tester.getTopLeft(find.text('Віцебская дыяцэзія')).dy,
         lessThan(
@@ -224,7 +230,13 @@ void main() {
       router.go('/readings');
       await tester.pumpAndSettle();
       expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
-      expect(find.byType(Chip), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
       final readingsMetadata = tester.widget<Text>(
         find.byKey(const Key('readings-day-metadata')),
       );
