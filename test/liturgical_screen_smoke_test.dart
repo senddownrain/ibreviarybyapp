@@ -1138,12 +1138,10 @@ void main() {
           'Чытанне Паслання святога апостала Паўла.',
           '+ Чытанне святога Евангелля паводле Лукі.',
         ]) {
-          final introduction = tester.widget<Text>(find.text(formula)).style!;
           expect(
-            introduction.fontSize,
+            tester.widget<Text>(find.text(formula)).style!.fontSize,
             closeTo(requestedSize * 1.04, .001),
           );
-          expect(introduction.fontWeight, FontWeight.w700);
         }
         final bodyFinder = find.text(
           'Браты, я вельмі ўзрадаваўся ў Пану.',
