@@ -1054,7 +1054,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('readings-source-footer')), findsOneWidget);
+      expect(find.byKey(const Key('readings-document-end')), findsOneWidget);
+      expect(find.textContaining('Крыніца: Catholic.by'), findsNothing);
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
       final responseColor = ReaderTheme.of(

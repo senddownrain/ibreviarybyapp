@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
@@ -65,9 +64,11 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
+    final textScale = media.textScaler.scale(1);
+    // Smaller than the former 360 dp popup; responsive for large text.
     final width = math.min(
-      widget.showPsalmody ? 288.0 : 360.0,
-      media.size.width - 32,
+      math.max(216.0, 200.0 * textScale),
+      media.size.width - 24,
     );
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
     final bottom =
@@ -79,24 +80,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       Rect.fromLTWH(origin.dx, menuTop, button.size.width, 0),
       Offset.zero & overlay.size,
     );
-    // The prayerbook shares this menu across its root, category/catalogue
-    // screens and readers. Keep category management in one place, instead of
-    // rendering a second overflow button alongside it.
-    final isPrayerbook =
-        AppRouteEntryScope.maybeOf(context)?.entry.descriptor.branch ==
-        AppBranch.prayerbook;
-    final routePath = GoRouter.maybeOf(
-      context,
-    )?.routeInformationProvider.value.uri.path;
-    final actions = [
-      ...widget.actions,
-      if (isPrayerbook && routePath != '/prayers/categories')
-        ReaderSecondaryAction(
-          label: 'Катэгорыі',
-          icon: Icons.category_outlined,
-          onSelected: () => context.push('/prayers/categories'),
-        ),
-    ];
+    final actions = widget.actions;
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -216,10 +200,18 @@ class _OverflowContent extends StatelessWidget {
           if (showTextScale)
             _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
           for (var index = 0; index < actions.length; index++)
-            _item(actions[index].label, actions[index].icon, '$index'),
-          if (showTextScale || actions.isNotEmpty) const Divider(height: 16),
+            if (actions[index].label != 'Памылка')
+              _item(actions[index].label, actions[index].icon, '$index'),
+          if (showTextScale ||
+              actions.any((action) => action.label != 'Памылка'))
+            const Divider(height: 16),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
+          for (var index = 0; index < actions.length; index++)
+            if (actions[index].label == 'Памылка') ...[
+              const Divider(height: 16),
+              _item('Памылка', actions[index].icon, '$index'),
+            ],
         ],
       ),
     ),
@@ -227,9 +219,11 @@ class _OverflowContent extends StatelessWidget {
 
   Widget _item(String label, IconData icon, String value) => ListTile(
     minTileHeight: 48,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+    minLeadingWidth: 24,
+    horizontalTitleGap: 10,
     leading: Icon(icon, size: 22),
     title: Text(label),
-    trailing: const Icon(Icons.chevron_right_rounded, size: 20),
     onTap: () => onSelected(value),
   );
 }
