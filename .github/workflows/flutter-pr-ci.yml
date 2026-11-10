@@ -85,6 +85,29 @@ jobs:
           python3 scripts/check_web_source_import.py
           dart format --output=none --set-exit-if-changed lib/models/source_documents.dart lib/screens/source_documents_screen.dart test/source_documents_test.dart test/source_documents_widget_test.dart tool/source_documents_smoke.dart
           flutter test test/source_documents_test.dart test/source_documents_widget_test.dart test/bible_repository_test.dart test/source_footer_test.dart test/compendium_screens_test.dart test/router_architecture_test.dart test/stateful_shell_navigation_test.dart test/secondary_menu_test.dart test/privacy_policy_link_test.dart
+      - name: Daily Hours and Readings heading regressions
+        run: >-
+          flutter test test/liturgical_day_header_metadata_test.dart
+          test/hours_root_test.dart
+      - name: Josaphat alternatives deduplicate dioceses
+        run: >-
+          flutter test test/liturgical_header_flow_test.dart
+          --plain-name "12 November alternatives show each diocese once while preserving ranks"
+      - name: Approved Vitebsk daily headers screenshots
+        env:
+          HEADER_PREVIEW_FONT: assets/google_fonts/Literata-Regular.ttf
+          SELECTOR_EVIDENCE_DIR: build/pr90-header
+        run: >-
+          flutter test test/liturgical_header_flow_test.dart
+          --dart-define=HEADER_PREVIEWS=true
+          --plain-name "approved 12 November Vitebsk Hours and Readings headers"
+      - name: Archive approved 12 November Flutter screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-header-pr90
+          path: build/pr90-header/approved-vitebsk-*.png
+          if-no-files-found: warn
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
       - name: Sunday 32 Benedictus visual fixture
