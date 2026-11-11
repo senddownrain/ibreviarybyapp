@@ -1399,7 +1399,7 @@ class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment
                   children: [
                     Expanded(
                       child: Text(
-                        'Пра святкаванне',
+                        'Уступ да літургіі дня',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               color: cs.onSurface,
