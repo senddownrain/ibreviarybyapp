@@ -186,6 +186,9 @@ void main() {
       await tester.tap(link);
       await _load(tester);
       expect(_path(router), sourcesRoute);
+      expect(find.text('«Рымскі Імшал для дыяцэзій на Беларусі» (Мінск, 2004)'), findsOneWidget);
+      expect(find.text('Спеўнік «Божа, мы Цябе ўслаўляем» (Мінск, 2026)'), findsOneWidget);
+      expect(find.text('© Камісія Божага Культу і Дысцыпліны Сакрамэнтаў, 2022'), findsOneWidget);
       expect(find.textContaining('Libreria'), findsNothing);
       for (final document in kSourceDocumentLinks) {
         final button = find.widgetWithText(TextButton, document.label);
@@ -281,7 +284,7 @@ void main() {
             await _load(tester);
             expect(find.textContaining('Libreria'), findsNothing);
             expect(
-              find.text('© Канферэнцыя Каталіцкіх Біскупаў Беларусі'),
+              find.text('© Мінска-Магілёўская архідыяцэзія, 2010'),
               findsOneWidget,
             );
             for (final doc in kSourceDocumentLinks) {

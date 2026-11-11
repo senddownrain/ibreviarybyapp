@@ -54,7 +54,7 @@ async function load(width, theme, scale, launchError = false) {
   await waitText('Распрацоўшчык @davin_dev');
   await click('Крыніцы і аўтарскія правы');
   await waitRoute('/sources');
-  await waitText('Святое Пісанне');
+  await waitText('«Рымскі Імшал для дыяцэзій на Беларусі» (Мінск, 2004)');
 }
 (async () => {
   await fs.mkdir(out, { recursive: true });
@@ -90,7 +90,7 @@ async function load(width, theme, scale, launchError = false) {
       console.log(`${width}-${theme}-${scale} starting`);
       await load(width, theme, scale);
       const result = await snapshot();
-      for (const text of ['Святое Пісанне', 'Чытанні', 'Літургія гадзінаў', 'Кампендый ККК', 'Дакументы', '«Літургія гадзінаў» (Мінск, 2012–2020)', '© Канферэнцыя Каталіцкіх Біскупаў Беларусі']) assert(result.text.includes(text), text);
+      for (const text of ['«Новы запавет» (Мінск, 2017)', '«Рымскі Імшал для дыяцэзій на Беларусі» (Мінск, 2004)', '«Парадак хросту дзяцей» (Мінск, 2026)', '«Літургічная агенда» (Мінск, 2010)', 'Малітоўнік «Ойча наш» (Мінск, 2022)', 'Спеўнік «Божа, мы Цябе ўслаўляем» (Мінск, 2026)', '© Мінска-Магілёўская архідыяцэзія, 2010', '© Камісія Божага Культу і Дысцыпліны Сакрамэнтаў, 2022', 'Дакументы']) assert(result.text.includes(text), text);
       assert(!result.text.join('\n').includes('Libreria'));
       assert(!result.text.join('\n').includes('pending'));
       assert.equal(result.links.length, 3);
