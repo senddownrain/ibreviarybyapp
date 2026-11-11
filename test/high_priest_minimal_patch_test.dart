@@ -13,6 +13,8 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 
+import 'support/legacy_high_priest_baseline.dart';
+
 const _id = 'feast-christthehighpriest';
 final _referenceFields = {
   for (final h in [1, 2, 3])
@@ -75,6 +77,9 @@ void main() {
 
       try {
         await open();
+        // The shipped bundle now contains this patch. Restore only the
+        // historical baseline inside the test to preserve the migration QA.
+        await installLegacyHighPriestBaseline();
         final before = Map<String, dynamic>.from(
           HiveService.daysBox.get(_id) as Map,
         );

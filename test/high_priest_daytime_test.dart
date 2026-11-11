@@ -14,6 +14,8 @@ import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 
+import 'support/legacy_high_priest_baseline.dart';
+
 const _id = 'feast-christthehighpriest';
 const _suffixes = [
   'Hymn',
@@ -297,12 +299,12 @@ void main() {
       await directory.delete(recursive: true);
     });
 
-    test('28 May 2026 Pinsk: all three hours from the original bundle', () {
+    test('28 May 2026 Pinsk: all three hours from the current bundle', () {
       final actual = feast();
       final raw = Map<String, dynamic>.from(
         HiveService.daysBox.get(_id) as Map,
       );
-      expect(documentHash(raw), 'c62263e79af628b2');
+      expect(documentHash(raw), '82cc1163da5f1e12');
       expect(HiveService.daysBox.overlayLength, 0);
       final period = resolvePeriodDayAgainstPsalter(
         _day(
@@ -366,6 +368,8 @@ void main() {
     test(
       'safe patch is verified, survives restart, and later text wins',
       () async {
+        // Exercise the old-app migration, not the already updated bundle.
+        await installLegacyHighPriestBaseline();
         final plan =
             jsonDecode(
                   File(

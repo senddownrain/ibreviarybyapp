@@ -981,11 +981,23 @@ void main() {
           reason: name,
         );
       }
-      // The two snapshots of this bundle differ: no shared minimum.
-      expect(
-        HiveService.daysBox.baselineVersion,
-        isNot(HiveService.prayersBox.baselineVersion),
+      // A full content rebuild may legitimately use ONE snapshot timestamp
+      // for every collection. Verify independence by changing only the test
+      // baseline of days; prayers must keep their original version.
+      final days = HiveService.daysBox;
+      final prayerVersion = HiveService.prayersBox.baselineVersion;
+      final dayVersion = days.baselineVersion;
+      final docs = {
+        for (final id in days.keys)
+          id: Map<String, dynamic>.from(days.baselineDocument(id)!),
+      };
+      await days.debugReplaceBaseline(
+        docs,
+        {for (final entry in docs.entries) entry.key: documentHash(entry.value)},
+        dayVersion + 1,
       );
+      expect(days.baselineVersion, dayVersion + 1);
+      expect(HiveService.prayersBox.baselineVersion, prayerVersion);
     });
 
     test('an older patch gives way to a newer bundle of its collection; a '

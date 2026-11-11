@@ -1,180 +1,151 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1794092262000,
-  "contentDate": "2026-11-07T22:57:42.000Z",
+  "contentVersion": 1794175950576,
+  "contentDate": "2026-11-08T22:12:30.576Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 736,
-      "digest": "4d71131ab6bf2f4a",
-      "storedBytes": 54608675,
-      "bundleBytes": 2319360
+      "digest": "d43628dbf6e23e2e",
+      "storedBytes": 54608942,
+      "bundleBytes": 2319833
     },
     "readings": {
       "file": "readings.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 822,
-      "digest": "93314983ba9c1bd5",
-      "storedBytes": 4813227,
-      "bundleBytes": 901221
+      "digest": "779b58fa62f2f087",
+      "storedBytes": 4813252,
+      "bundleBytes": 901358
     },
     "liturgicalTemplates": {
       "file": "liturgicalTemplates.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 16,
       "digest": "eb5361386d552f49",
-      "storedBytes": 3022599,
-      "bundleBytes": 344031
+      "storedBytes": 3023031,
+      "bundleBytes": 344603
     },
     "invitatoriums": {
       "file": "invitatoriums.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 4,
       "digest": "587d64f9ff8e7b0d",
       "storedBytes": 9678,
-      "bundleBytes": 2710
+      "bundleBytes": 2715
     },
     "completoriums": {
       "file": "completoriums.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 35,
       "digest": "42eb55a0b377d638",
       "storedBytes": 323076,
-      "bundleBytes": 10381
-    },
-    "liturgicalCalendarMeta": {
-      "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
-      "count": 1,
-      "digest": "71ad58d830bd0d77",
-      "storedBytes": 139,
-      "bundleBytes": 205
-    },
-    "liturgicalCelebrations": {
-      "file": "liturgicalCelebrations.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
-      "count": 241,
-      "digest": "8fb0b75436b7f528",
-      "storedBytes": 132977,
-      "bundleBytes": 22601
-    },
-    "liturgicalDioceseOverrides": {
-      "file": "liturgicalDioceseOverrides.json.gz",
-      "contentVersion": 1793950365664,
-      "contentDate": "2026-11-06T07:32:45.664Z",
-      "count": 75,
-      "digest": "d5f7d42724c985cb",
-      "storedBytes": 53185,
-      "bundleBytes": 7750
-    },
-    "liturgicalYearOverrides": {
-      "file": "liturgicalYearOverrides.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
-      "count": 15,
-      "digest": "62198d0893b2a40f",
-      "storedBytes": 8111,
-      "bundleBytes": 1728
-    },
-    "liturgicalProperTexts": {
-      "file": "liturgicalProperTexts.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
-      "count": 291,
-      "digest": "60081a442fa9c4ed",
-      "storedBytes": 3211295,
-      "bundleBytes": 590720
-    },
-    "liturgicalOrdoNotes": {
-      "file": "liturgicalOrdoNotes.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
-      "count": 1337,
-      "digest": "db0465255c4bc5a3",
-      "storedBytes": 780774,
-      "bundleBytes": 112657
+      "bundleBytes": 10405
     },
     "prayers": {
       "file": "prayers.json.gz",
-      "contentVersion": 1791877294111,
-      "contentDate": "2026-10-13T07:41:34.111Z",
-      "count": 115,
-      "digest": "43711607f69fe4c5",
-      "storedBytes": 2369569,
-      "bundleBytes": 364359
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 106,
+      "digest": "cc452d471f599595",
+      "storedBytes": 2407007,
+      "bundleBytes": 362706
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
-      "contentVersion": 1791877294111,
-      "contentDate": "2026-10-13T07:41:34.111Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 5,
       "digest": "2615b158b86e8582",
       "storedBytes": 1058,
-      "bundleBytes": 580
+      "bundleBytes": 581
     },
     "songs": {
       "file": "songs.json.gz",
-      "contentVersion": 1791877294111,
-      "contentDate": "2026-10-13T07:41:34.111Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 447,
       "digest": "9752aef2fd846b49",
       "storedBytes": 369604,
-      "bundleBytes": 111478
+      "bundleBytes": 110806
     },
     "compendium": {
       "file": "compendium.json.gz",
-      "contentVersion": 1791877294111,
-      "contentDate": "2026-10-13T07:41:34.111Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 27,
       "digest": "7659d6be6ac3ead8",
       "storedBytes": 536467,
-      "bundleBytes": 113291
+      "bundleBytes": 113297
     },
     "compendiumMeta": {
       "file": "compendiumMeta.json.gz",
-      "contentVersion": 1791877294111,
-      "contentDate": "2026-10-13T07:41:34.111Z",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
       "count": 1,
       "digest": "879c4b7ae16cb312",
       "storedBytes": 6072,
-      "bundleBytes": 1776
+      "bundleBytes": 1807
+    },
+    "liturgicalCalendarMeta": {
+      "file": "liturgicalCalendarMeta.json.gz",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 1,
+      "digest": "0be7c846a536b858",
+      "storedBytes": 139,
+      "bundleBytes": 204
+    },
+    "liturgicalCelebrations": {
+      "file": "liturgicalCelebrations.json.gz",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 241,
+      "digest": "8fb0b75436b7f528",
+      "storedBytes": 132977,
+      "bundleBytes": 22628
+    },
+    "liturgicalDioceseOverrides": {
+      "file": "liturgicalDioceseOverrides.json.gz",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 75,
+      "digest": "d5f7d42724c985cb",
+      "storedBytes": 53212,
+      "bundleBytes": 7799
+    },
+    "liturgicalYearOverrides": {
+      "file": "liturgicalYearOverrides.json.gz",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 15,
+      "digest": "62198d0893b2a40f",
+      "storedBytes": 8111,
+      "bundleBytes": 1732
+    },
+    "liturgicalProperTexts": {
+      "file": "liturgicalProperTexts.json.gz",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 291,
+      "digest": "60081a442fa9c4ed",
+      "storedBytes": 3219152,
+      "bundleBytes": 591365
+    },
+    "liturgicalOrdoNotes": {
+      "file": "liturgicalOrdoNotes.json.gz",
+      "contentVersion": 1794175950576,
+      "contentDate": "2026-11-08T22:12:30.576Z",
+      "count": 1347,
+      "digest": "7dbc652d7cbcc5fb",
+      "storedBytes": 787749,
+      "bundleBytes": 113533
     }
-  },
-  "priestCacheCleanup": {
-    "digest": "8c812bdabc045acd55661afaf2ba58532cc8223b0f04659b6ef7116ed2a799b8",
-    "protectedPrayerIds": [
-      "0cRVj5FPNwF4nw0BxQC8",
-      "19wH3DQbZRUPfThpuZ1s",
-      "7wpK9LBY9DCnLRVnHCw6",
-      "ApZTeHQJwhYCZW14m9Rc",
-      "CE5LNSwEKAp5Az4uUgkx",
-      "GFEHCku34G75P03dguxS",
-      "Ip3HkiO83hIpCP9uWs72",
-      "MQNZJOhMHM0AzEb2s0g5",
-      "O7u3uGOyXxHqecBCIpZJ",
-      "P0PPlLItJkgr1NmqL9GW",
-      "QuQtc7TuVg76BCUfJg9g",
-      "Ru2lSospoxSf3Ucb7OPi",
-      "Y42tcKtlcBhqMsQ1WDdL",
-      "Z2bxieW6pf0qBOGa9Jq5",
-      "ajGyoTMlqldD4d4xgS9p",
-      "d3GPdAFoOlbJUDvnEjgU",
-      "hi4FSOGf61u2B2xqA8dx",
-      "kgkiyIjCgNdKyem7qafj",
-      "oqf7gXKa3opFPlDZr0EC",
-      "scV1QWTpTyQ5RculcQoF",
-      "xXVJUqSExxkfx6Rq0E8s"
-    ],
-    "protectedCategoryIds": [
-      "gMzVAGRUogiZa2MAxpr4"
-    ]
   }
 }
