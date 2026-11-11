@@ -127,7 +127,7 @@ jobs:
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression
-        run: flutter test test/content_offline_test.dart test/ordo_content_update_test.dart
+        run: flutter test test/content_offline_test.dart test/ordo_content_update_test.dart test/juan_diego_optional_memorial_test.dart
       - name: Movable feast daytime prayer and delivery regression
         run: >-
           flutter test test/high_priest_daytime_test.dart
