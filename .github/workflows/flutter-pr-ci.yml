@@ -79,7 +79,7 @@ jobs:
       - name: Analyze
         run: flutter analyze --no-fatal-infos
       - name: Admin-only Songbook and contextual hint regressions
-        run: flutter test test/songbook_test.dart test/discovery/p2_hints_test.dart
+        run: flutter test test/songbook_test.dart test/discovery/p2_hints_test.dart test/juan_diego_optional_memorial_test.dart
       - name: Local rights and external Web documents
         run: |
           python3 scripts/check_web_source_import.py
