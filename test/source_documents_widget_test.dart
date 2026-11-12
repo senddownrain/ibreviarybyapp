@@ -186,6 +186,20 @@ void main() {
       await tester.tap(link);
       await _load(tester);
       expect(_path(router), sourcesRoute);
+      expect(find.text('Касцёльныя крыніцы'), findsOneWidget);
+      expect(find.text('Іншыя крыніцы'), findsOneWidget);
+      expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2018)'), findsOneWidget);
+      expect(find.text('Малітоўнік «Каб пазналі Цябе» (Гродна, 2014)'), findsOneWidget);
+      expect(find.text('«Біблія» (Мінск, 2017)'), findsOneWidget);
+      expect(find.text('«Біблія» Синодальный перевод'), findsOneWidget);
+      expect(
+        find.text('Стары Запавет - на падставе рукапісаў кс. У. Чарняўскага'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('© «Біблійнае таварыства ў Рэспубліцы Беларусь», 2017'),
+        findsOneWidget,
+      );
       expect(
         find.text('«Рымскі Імшал для дыяцэзій на Беларусі» (Мінск, 2004)'),
         findsOneWidget,
