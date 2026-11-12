@@ -609,7 +609,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
-      expect(find.byKey(const Key('ora-source-footer')), findsOneWidget);
+      expect(find.byKey(const Key('ora-source-footer')), findsNothing);
       expect(tester.takeException(), isNull);
       final headings = tester
           .widgetList<LiturgicalSectionHeading>(

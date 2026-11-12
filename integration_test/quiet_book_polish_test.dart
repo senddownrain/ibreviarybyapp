@@ -144,10 +144,7 @@ void main() {
           find.byKey(const Key('ora-next-hour')).hitTestable(),
           findsOneWidget,
         );
-        expect(
-          find.byKey(const Key('ora-source-footer')).hitTestable(),
-          findsOneWidget,
-        );
+        expect(find.byKey(const Key('ora-source-footer')), findsNothing);
         await shot('$theme-laudes-end');
         await tap(find.byKey(const Key('ora-next-hour')));
         await shot('$theme-next-hour-start');
