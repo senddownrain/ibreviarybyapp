@@ -23,6 +23,7 @@ void main() {
         ];
         final matches = options.where((option) => option.id == 'sv-juan-diego');
         expect(matches, hasLength(1), reason: '$diocese/$date');
+        expect(matches.single.title, 'Св. Хуана Дыега Куаўтлатаацына', reason: '$diocese/$date');
         expect(matches.single.rank, 'memoria-ad-libitum',
             reason: '$diocese/$date');
       }
