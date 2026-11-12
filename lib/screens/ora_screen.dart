@@ -1,5 +1,4 @@
 import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
-import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -487,10 +486,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
               letterSpacing: 6,
             ),
           ),
-        ),
-        const SourceFooter(
-          key: Key('ora-source-footer'),
-          sourceId: 'liturgy-hours-2012-2020',
         ),
         if (next != null) ...[
           const SizedBox(height: 28),
