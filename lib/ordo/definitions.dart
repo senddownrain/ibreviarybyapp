@@ -237,9 +237,11 @@ class OrdoDefinitions {
         // Calendar data in older installed bundles / Firestore revisions
         // may still contain the retired spelling of Juan Diego's name.
         // Normalize by stable celebration ID for Hours, Readings and Ordo.
-        kept.add(label == 'celebration' && doc['id'] == 'sv-juan-diego'
-            ? {...doc, 'title': 'Св. Хуана Дыега Куаўтлатаацына'}
-            : doc);
+        kept.add(
+          label == 'celebration' && doc['id'] == 'sv-juan-diego'
+              ? {...doc, 'title': 'Св. Хуана Дыега Куаўтлатаацына'}
+              : doc,
+        );
       }
       kept.sort(_byOrder);
       return kept;
