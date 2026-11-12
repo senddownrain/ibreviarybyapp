@@ -45,18 +45,24 @@ class SourcesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => _ArticleScroll(
     children: [
       const _Title('Крыніцы і аўтарскія правы'),
-      for (final entry in kPublicSourceBibliography.indexed) ...[
-        if (entry.$1 > 0) const Divider(height: 24),
-        Column(
-          key: ValueKey(entry.$2.id),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(entry.$2.title),
-            for (final notice in entry.$2.notices) Text(notice),
-          ],
-        ),
+      for (final section in kPublicSourceBibliographySections) ...[
+        _SectionTitle(section),
+        for (final entry in kPublicSourceBibliography
+            .where((item) => item.section == section)
+            .indexed) ...[
+          if (entry.$1 > 0) const Divider(height: 24),
+          Column(
+            key: ValueKey(entry.$2.id),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(entry.$2.title),
+              for (final detail in entry.$2.details) Text(detail),
+              for (final notice in entry.$2.notices) Text(notice),
+            ],
+          ),
+        ],
+        const SizedBox(height: 24),
       ],
-      const SizedBox(height: 24),
       const Divider(),
       const _SectionTitle('Дакументы'),
       for (final document in kSourceDocumentLinks)
