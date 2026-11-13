@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/widgets/priest_access_settings_section.dart';
 import 'package:mybrev_flutter/widgets/admin_songbook_login_section.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
+import 'package:mybrev_flutter/review/app_review_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -356,6 +357,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/settings/feedback'),
                 ),
+                const AppReviewSettingsSection(),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
