@@ -65,6 +65,28 @@ void main() {
       expect(result, contains('<span class="psalm-marker">†</span>'));
     });
 
+    test('Psalm 50 soft break remains inside one strophe and keeps parity', () {
+      const source =
+          '<p>Пане, адкрый мае вусны, * і вусны мае будуць абвяшчаць хвалу.</p>'
+          '<p>Бо Ты не прагнеш ахвяры, * Табе не спадабаецца.</p>'
+          '<p>Ахвяра Богу – гэта скрушаны дух, * не пагарджай, Божа, '
+          'пакорным<br>і прыгнечаным сэрцам.</p>'
+          '<p>У сваёй дабрыні будзь ласкавы да Сіёна, * адбудуй муры.</p>';
+      final result = formatPsalmHtml(source);
+
+      expect(RegExp('class="psalm-strophe').allMatches(result), hasLength(4));
+      expect(
+        result,
+        contains('пакорным<br>і прыгнечаным сэрцам.</p>'),
+      );
+      expect(RegExp('data-psalm-choir="1"').allMatches(result), hasLength(2));
+      expect(RegExp('data-psalm-choir="2"').allMatches(result), hasLength(2));
+      expect(
+        result,
+        contains('data-psalm-choir="2" class="psalm-strophe psalm-strophe-even">У сваёй'),
+      );
+    });
+
     test('prepares alternating choirs and dims only the selected choir', () {
       final formatted = formatPsalmHtml(
         '<p>Першы радок *<br>другі радок</p>'
