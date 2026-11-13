@@ -108,7 +108,6 @@ class _CompendiumRoot extends ConsumerWidget {
             },
             onTap: () => context.push(compendiumPartLocation(part.id)),
           ),
-        const CompendiumSourceAttribution(),
       ];
     }
 
@@ -176,7 +175,7 @@ class _CompendiumPartScreenState extends ConsumerState<CompendiumPartScreen> {
         if (mounted && _items.isAttached) _items.jumpTo(index: targetIndex + 1);
       });
     }
-    final itemCount = outline == null ? 1 : outline.items.length + 2;
+    final itemCount = outline == null ? 1 : outline.items.length + 1;
     return CompendiumSearchHost(
       child: Scaffold(
         body: Stack(
@@ -214,9 +213,6 @@ class _CompendiumPartScreenState extends ConsumerState<CompendiumPartScreen> {
                           );
                   }
                   if (position == 0) return _PartHeader(outline: outline);
-                  if (position == itemCount - 1) {
-                    return const CompendiumSourceAttribution();
-                  }
                   return _PartItem(
                     item: outline.items[position - 1],
                     bodySize: bodySize,

@@ -5,9 +5,11 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:html/parser.dart' show parseFragment;
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:hive/hive.dart';
@@ -56,6 +58,31 @@ void main() {
     await initializeDateFormatting('be');
     directory = await Directory.systemTemp.createTemp('liturgy-smoke-');
     await HiveService.init(path: directory.path);
+    // Widget tests normally render text in Ahem (solid blocks). Load the
+    // packaged real fonts only for screenshot review; production is untouched.
+    if (Platform.environment['LITURGY_SMOKE_IMAGES'] == '1') {
+      GoogleFonts.config.allowRuntimeFetching = false;
+      for (final (family, asset) in [
+        ('VisualPreview', 'assets/google_fonts/Literata-Regular.ttf'),
+        (
+          GoogleFonts.literata().fontFamily!,
+          'assets/google_fonts/Literata-Regular.ttf',
+        ),
+        (
+          GoogleFonts.cormorantGaramond(
+            fontWeight: FontWeight.w700,
+          ).fontFamily!,
+          'assets/google_fonts/CormorantGaramond-Bold.ttf',
+        ),
+        ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
+        (
+          'packages/phosphor_flutter/PhosphorRegular',
+          'packages/phosphor_flutter/lib/fonts/Phosphor.ttf',
+        ),
+      ]) {
+        await (FontLoader(family)..addFont(rootBundle.load(asset))).load();
+      }
+    }
     final fixture =
         jsonDecode(
               File(
@@ -175,6 +202,26 @@ void main() {
       '_periodWeekNumber': '17',
       '_dayOfWeek': '3',
     });
+    // 08.11.2026, XXXII Sunday: the shipped Benedictus antiphon had
+    // malformed <span"> openings. Keep the exact broken shape in this fixture.
+    await HiveService.daysBox.put('sunday-32-broken-antiphon', {
+      ...apostle,
+      'id': 'sunday-32-broken-antiphon',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': '32',
+      '_dayOfWeek': '7',
+      '_rank': 'dominica',
+      'laudesAntBen':
+          '<p><span style="color: red;">Ант. да песні Захарыі</span></p>'
+          '<p><span style="color: red;">Год А:</span>'
+          '<span"> Сярод ночы ўзняўся крык: </span>'
+          '<span style="color: red;">*</span>'
+          '<span"> Вось жаніх! Выходзьце яму насустрач.</span></p>'
+          '<p><span style="color: red;">Год В:</span>'
+          '<span"> Сапраўды кажу вам.</span></p>'
+          '<p><span style="color: red;">Год С:</span>'
+          '<span"> Майсей засведчыў.</span></p>',
+    });
     await HiveService.invitatoriumsBox.put('one', {
       'title': 'Заклік',
       'invitatoriumPs1': '<p>Прыйдзіце, уславім Пана *</p>',
@@ -197,6 +244,57 @@ void main() {
   tearDownAll(() async {
     await Hive.close();
     await directory.delete(recursive: true);
+  });
+
+  testWidgets('08.11.2026 Benedictus Year A antiphon is sung twice', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    _fontSize = 16;
+    final container = ProviderContainer(
+      overrides: [settingsProvider.overrideWith(_SmokeSettings.new)],
+    );
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: RepaintBoundary(
+          key: const Key('smoke-capture'),
+          child: MaterialApp(
+            theme: ThemeData(fontFamily: 'VisualPreview'),
+            home: OraScreen(
+              dayId: 'sunday-32-broken-antiphon',
+              oraType: 'laudes',
+              date: DateTime(2026, 11, 8),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final sungText = find.byWidgetPredicate(
+      (widget) =>
+          widget is Html &&
+          (widget.data ?? '').contains('Сярод ночы ўзняўся крык') &&
+          (widget.data ?? '').contains('Выходзьце яму насустрач'),
+    );
+    expect(sungText, findsNWidgets(2));
+    await _captureVisibleAntiphon(
+      tester,
+      '2026-11-08-benedictus-year-a-opening',
+      sungText.first,
+    );
+    await _captureVisibleAntiphon(
+      tester,
+      '2026-11-08-benedictus-year-a-repeat',
+      sungText.last,
+    );
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    container.dispose();
   });
 
   for (final hour in ['laudes', 'vespers', 'lectionis', 'completorium']) {
@@ -511,7 +609,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
-      expect(find.byKey(const Key('ora-source-footer')), findsOneWidget);
+      expect(find.byKey(const Key('ora-source-footer')), findsNothing);
       expect(tester.takeException(), isNull);
       final headings = tester
           .widgetList<LiturgicalSectionHeading>(
@@ -628,7 +726,7 @@ void main() {
       await _captureSectionIfRequested(
         tester,
         '$captureName-second-reading',
-        find.text('Другое чытанне'),
+        find.text('ДРУГОЕ ЧЫТАННЕ'),
       );
       await _captureSectionIfRequested(
         tester,
@@ -638,7 +736,7 @@ void main() {
       await _captureSectionIfRequested(
         tester,
         '$captureName-prayer',
-        find.text('Малітва'),
+        find.text('МАЛІТВА'),
       );
       if (hour == 'morning' && psalms.evaluate().length > 4) {
         await _captureSectionIfRequested(
@@ -831,7 +929,7 @@ void main() {
         final service = find.byWidgetPredicate(
           (widget) =>
               widget is Html &&
-              (widget.data ?? '').contains('Песня з Евангелля'),
+              (widget.data ?? '').contains('ПЕСНЯ З ЕВАНГЕЛЛЯ'),
         );
         final caption = find.byWidgetPredicate(
           (widget) =>
@@ -949,6 +1047,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: ThemeData(brightness: brightness),
               home: const ReadingsScreen(dateStr: '2028-08-01'),
             ),
@@ -956,7 +1055,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('readings-source-footer')), findsOneWidget);
+      expect(find.byKey(const Key('readings-document-end')), findsOneWidget);
+      expect(find.textContaining('Крыніца: Catholic.by'), findsNothing);
       expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
       expect(tester.takeException(), isNull);
       final responseColor = ReaderTheme.of(
@@ -989,6 +1089,19 @@ void main() {
         'readings-acclamation-${brightness.name}-$size-${viewport.width}',
         find.text('Пане, навучы нас маліцца.', findRichText: true),
       );
+
+      if (Platform.environment['READER_UI_ACCEPTANCE_IMAGES'] == '1' &&
+          brightness == Brightness.light &&
+          viewport.width == 360) {
+        final scroll = tester
+            .widget<ReaderScaffold>(find.byType(ReaderScaffold))
+            .scrollController!;
+        scroll.jumpTo(scroll.position.maxScrollExtent);
+        await tester.pumpAndSettle();
+        await _captureIfRequested(tester, 'reader-acceptance-03-readings-end');
+        scroll.jumpTo(0);
+        await tester.pumpAndSettle();
+      }
 
       // Exercise the actual Aa slider and settings rebuild at every supported
       // step, including the minimum where absolute metadata floors regress.
@@ -1027,7 +1140,7 @@ void main() {
         ]) {
           expect(
             tester.widget<Text>(find.text(formula)).style!.fontSize,
-            closeTo(requestedSize, .001),
+            closeTo(requestedSize * 1.04, .001),
           );
         }
         final bodyFinder = find.text(
@@ -1056,6 +1169,30 @@ List<double?> _renderedFontSizes(InlineSpan span, TextStyle inherited) {
     for (final child in span.children ?? <InlineSpan>[])
       ..._renderedFontSizes(child, style),
   ];
+}
+
+Future<void> _captureVisibleAntiphon(
+  WidgetTester tester,
+  String name,
+  Finder target,
+) async {
+  if (Platform.environment['LITURGY_SMOKE_IMAGES'] != '1') return;
+  await Scrollable.ensureVisible(
+    tester.element(target.first),
+    alignment: 0.25,
+    duration: Duration.zero,
+  );
+  await tester.pumpAndSettle();
+  final rect = tester.getRect(target.first);
+  final screenHeight =
+      tester.view.physicalSize.height / tester.view.devicePixelRatio;
+  expect(rect.top, greaterThanOrEqualTo(0), reason: '$name should be onscreen');
+  expect(
+    rect.bottom,
+    lessThanOrEqualTo(screenHeight),
+    reason: '$name should be onscreen',
+  );
+  await _captureIfRequested(tester, name);
 }
 
 Future<void> _captureIfRequested(WidgetTester tester, String name) async {

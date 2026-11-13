@@ -6,7 +6,7 @@ import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
-import 'package:mybrev_flutter/utils/liturgical_office.dart';
+import 'package:mybrev_flutter/utils/liturgical_vespers.dart';
 import 'support/ordo_fixture.dart';
 import 'hours_parity_test.dart' show officeHash;
 

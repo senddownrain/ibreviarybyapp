@@ -1,7 +1,4 @@
-import 'package:mybrev_flutter/ordo/runtime.dart';
-import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
-import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +22,7 @@ import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
+import 'package:mybrev_flutter/utils/liturgical_vespers.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
@@ -246,47 +244,37 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
     if (selected == null || widget.oraType != 'vespers') return selected;
     if (usesOwnVespers(selected)) return selected;
-    // I Vespers may belong to tomorrow's celebration.
+    // The Ordo, not non-empty `vesper1*`, decides which Office owns tonight.
+    final today = content.contentForDate(widget.date, diocese: diocese);
     final tomorrow = DateUtils.addDaysToDate(widget.date, 1);
     return _vespersFrom(
       selected,
-      tomorrow,
-      content.getContentForDate(
-        tomorrow,
-        calendar.getYearOptionsCached(tomorrow.year),
-        calendar.getYearOptionsCached(tomorrow.year + 1),
-        calendar.getDynamicDatesCached(tomorrow.year),
-        diocese: diocese,
-      ),
+      today,
+      content.contentForDate(tomorrow, diocese: diocese),
     );
   }
 
-  /// Vespers of [selected] given tomorrow's options (already on the device).
+  /// Resolves tonight's Office from the Ordo precedence and the on-device
+  /// text sources. I Vespers of an ordinary Sunday borrow Saturday's psalter,
+  /// never the Sunday document's II Vespers.
   LiturgicalDay _vespersFrom(
     LiturgicalDay selected,
-    DateTime tomorrow,
-    List<DayOption> options,
+    LiturgicalDayContent today,
+    LiturgicalDayContent tomorrow,
   ) {
-    final diocese =
-        widget.diocese ?? ref.read(dioceseSelectionProvider).primary;
-    final evening = OrdoRuntime.engine
-        .resolve(isoOf(widget.date), diocese: diocese)
-        .evening;
-    if (evening.vespersType == 'first') {
-      final option =
-          options
-              .where((o) => o.optionId == evening.celebrationId)
-              .firstOrNull ??
-          options.where((o) => o.ordo?.role == 'primary').firstOrNull;
-      if (option?.day case final LiturgicalDay day) {
-        final title = liturgicalDayDisplayTitle(day, tomorrow);
-        _vespersRubric =
-            'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
-        return assembleFirstVespers(day, civilDay: selected);
-      }
+    final evening = resolveEveningOffice(
+      date: widget.date,
+      selected: selected,
+      today: today,
+      tomorrow: tomorrow,
+    );
+    if (evening.isFirst) {
+      final title = (evening.firstVespersTitle ?? '').trim();
+      _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+    } else if (evening.isSecond) {
+      _vespersRubric = 'II Нешпары';
     }
-    _vespersRubric = evening.vespersType == 'second' ? 'II Нешпары' : null;
-    return selected;
+    return evening.day;
   }
 
   @override
@@ -498,10 +486,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
               letterSpacing: 6,
             ),
           ),
-        ),
-        const SourceFooter(
-          key: Key('ora-source-footer'),
-          sourceId: 'liturgy-hours-2012-2020',
         ),
         if (next != null) ...[
           const SizedBox(height: 28),
@@ -906,6 +890,23 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         ),
       );
     }
+    final missingFirst = day.data['_missingFirstVespersFields'];
+    if (missingFirst is List && missingFirst.isNotEmpty) {
+      items.add(
+        _OraItem.custom(
+          (context, _) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Не ўсе тэксты I Нешпараў знойдзены ў псалтыры. '
+              'Тэксты II Нешпараў не падстаўляюцца.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     _addHymn(items, day, 'vesperHymn');
     _addPsalmBlock(items, day, 'vesperAnt', 'vesperPs', 3);
     _addDividerBeforeField(items, day, 'vesperR');
@@ -984,7 +985,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
 
     final resp = cf('compResp');
-    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'reading'));
+    if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'responsory'));
 
     final antS = cf('compAntS');
     if (antS.isNotEmpty) {
@@ -1352,17 +1353,17 @@ enum _OraItemType {
   custom,
 }
 
-class _ExpandableFeastComment extends StatefulWidget {
+class _ExpandableFeastComment extends ConsumerStatefulWidget {
   const _ExpandableFeastComment(this.text);
 
   final String text;
 
   @override
-  State<_ExpandableFeastComment> createState() =>
+  ConsumerState<_ExpandableFeastComment> createState() =>
       _ExpandableFeastCommentState();
 }
 
-class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
+class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment> {
   bool _expanded = false;
 
   @override
@@ -1393,7 +1394,7 @@ class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Пра святкаванне',
+                        'Уступ да літургіі дня',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               color: cs.onSurface,
@@ -1418,6 +1419,7 @@ class _ExpandableFeastCommentState extends State<_ExpandableFeastComment> {
                   child: Text(
                     widget.text,
                     key: const Key('ora-feast-comment-text'),
+                    textAlign: ref.watch(settingsProvider.select((s) => s.textAlignment)),
                     maxLines: _expanded ? null : 3,
                     overflow: _expanded ? null : TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -1660,7 +1662,8 @@ class _OraItem {
 
   static String _pickerLabel(String kind) => switch (kind) {
     'hymn' => 'Выбар варыянта гімна',
-    'reading' => 'Выбар чытання або рэспансорыя',
+    'reading' => 'Выбар чытання',
+    'responsory' => 'Выбар рэспансорыя',
     'office-reading' => 'Выбар чытання',
     'prayer' => 'Выбар малітвы',
     'intercession' => 'Выбар просьбаў',
@@ -1793,7 +1796,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
     };
     final metadata = <PsalmMetadataLine>[
       if (canticleCaption != null) ...[
-        const PsalmMetadataLine('Песня з Евангелля', PsalmMetadataRole.service),
+        const PsalmMetadataLine('ПЕСНЯ З ЕВАНГЕЛЛЯ', PsalmMetadataRole.service),
         PsalmMetadataLine(canticleCaption!, PsalmMetadataRole.subtitle),
       ],
       ...model.metadata,
@@ -1884,7 +1887,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
   }
 }
 
-class _HtmlOrText extends StatelessWidget {
+class _HtmlOrText extends ConsumerWidget {
   final String content;
   final TextStyle textStyle;
   final bool isPsalm;
@@ -1908,7 +1911,9 @@ class _HtmlOrText extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textAlignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    final alignable = const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind);
     if (content.contains('<') && content.contains('>')) {
       return AlternativeText(
         text: content,
@@ -1921,21 +1926,22 @@ class _HtmlOrText extends StatelessWidget {
           final displayedHtml = alternativeKind == 'intercession'
               ? formatIntercessions(selectedHtml)
               : selectedHtml;
-          return _renderHtml(context, displayedHtml);
+          return _renderHtml(context, displayedHtml, textAlignment);
         },
       );
     }
     if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
-      return _renderHtml(context, content);
+      return _renderHtml(context, content, textAlignment);
     }
     final plain = _LiturgicalSelectableText(
       content: content,
       textStyle: textStyle,
+      textAlign: alignable ? textAlignment : TextAlign.left,
     );
     return plain;
   }
 
-  Widget _renderHtml(BuildContext context, String html) {
+  Widget _renderHtml(BuildContext context, String html, TextAlign textAlignment) {
     final textColor =
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
@@ -1962,6 +1968,25 @@ class _HtmlOrText extends StatelessWidget {
         margin: Margins.zero,
       ),
     };
+    // Only Scripture/Office readings and the final prayer are prose.
+    // In particular, responsory turns, headings and rubrics stay left aligned.
+    if (const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind)) {
+      styles['body']!.textAlign = textAlignment;
+      styles['p']!.textAlign = textAlignment;
+      for (final selector in [
+        '.liturgical-heading',
+        '.liturgical-service-heading',
+        '.liturgical-reference',
+        '.liturgical-subheading',
+        '.liturgical-reading-reference',
+        '.office-reading-pericope-title',
+        '.liturgical-rubric',
+        '.responsory-turn',
+      ]) {
+        styles[selector] = (styles[selector] ?? Style())
+          ..textAlign = TextAlign.left;
+      }
+    }
     if (isPsalm) {
       return PsalmChoirHtml(
         html: formatPsalmHtml(
@@ -1973,7 +1998,9 @@ class _HtmlOrText extends StatelessWidget {
       );
     }
     final officeHtml =
-        alternativeKind == 'reading' || alternativeKind == 'office-reading'
+        alternativeKind == 'reading' ||
+            alternativeKind == 'office-reading' ||
+            alternativeKind == 'responsory'
         ? normalizeOfficeHtml(
             html,
             officeReading: alternativeKind == 'office-reading',
@@ -2003,7 +2030,9 @@ class _HtmlOrText extends StatelessWidget {
         : const {'hymn', 'prayer', 'intercession'}.contains(alternativeKind)
         ? normalizeSemanticBody(officeHtml)
         : officeHtml;
-    if (alternativeKind == 'reading' || alternativeKind == 'office-reading') {
+    if (alternativeKind == 'reading' ||
+        alternativeKind == 'office-reading' ||
+        alternativeKind == 'responsory') {
       return _renderOfficeHtml(semanticBody, styles);
     }
     return Html(data: formatLiturgicalHtml(semanticBody), style: styles);
@@ -2052,10 +2081,12 @@ class _HtmlOrText extends StatelessWidget {
 class _LiturgicalSelectableText extends StatelessWidget {
   final String content;
   final TextStyle textStyle;
+  final TextAlign textAlign;
 
   const _LiturgicalSelectableText({
     required this.content,
     required this.textStyle,
+    this.textAlign = TextAlign.left,
   });
 
   @override
@@ -2077,6 +2108,7 @@ class _LiturgicalSelectableText extends StatelessWidget {
             ),
         ],
       ),
+      textAlign: textAlign,
     );
   }
 }

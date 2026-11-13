@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
@@ -38,14 +41,21 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   String? _error;
   String? _sentId;
   bool _sending = false;
-  final String _requestId =
-      _newRequestId(); // one id per composed message => no duplicates
+  // Same message => same id (a retry never duplicates); an edited message => a new id.
+  final _attempt = FeedbackAttempt(_newRequestId);
+  bool _offline = false;
+  bool _copied = false;
+  StreamSubscription<List<ConnectivityResult>>? _connectivity;
 
   @override
   void initState() {
     super.initState();
     _context = widget.context;
+    _category = widget.context == null
+        ? FeedbackCategory.other
+        : FeedbackCategory.textError;
     _service = widget.service;
+    _watchConnectivity();
     if (_service == null) {
       PackageInfo.fromPlatform().then((info) {
         if (mounted)
@@ -54,8 +64,25 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     }
   }
 
+  /// Offline is announced up front; typing stays possible and nothing is lost.
+  Future<void> _watchConnectivity() async {
+    try {
+      final connectivity = Connectivity();
+      bool off(List<ConnectivityResult> r) =>
+          r.isNotEmpty && r.every((e) => e == ConnectivityResult.none);
+      final first = await connectivity.checkConnectivity();
+      if (mounted) setState(() => _offline = off(first));
+      _connectivity = connectivity.onConnectivityChanged.listen((r) {
+        if (mounted) setState(() => _offline = off(r));
+      });
+    } catch (_) {
+      // No plugin (tests, unsupported platform): a failed send reports the network state.
+    }
+  }
+
   @override
   void dispose() {
+    _connectivity?.cancel();
     _body.dispose();
     _email.dispose();
     super.dispose();
@@ -69,7 +96,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     FeedbackFailure.unavailable =>
       'Сервіс часова недаступны. Тэкст захаваны — паспрабуйце пазней.',
     FeedbackFailure.notConfigured => 'Адпраўка пакуль не падключана.',
-    FeedbackFailure.rejected =>
+    FeedbackFailure.rejected || FeedbackFailure.requestIdReused =>
       'Не атрымалася адправіць. Праверце тэкст і паспрабуйце яшчэ раз.',
   };
 
@@ -86,15 +113,31 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     final service = _service;
     if (service == null) return;
     setState(() => _sending = true);
+    final payload = [
+      _category.code,
+      _body.text.trim(),
+      _email.text.trim(),
+      _context?.toJson(),
+    ];
+    Future<String> submit() => service.submit(
+      category: _category,
+      body: _body.text,
+      email: _email.text,
+      context: _context,
+      requestId: _attempt.idFor(payload),
+    );
     try {
-      final id = await service.submit(
-        category: _category,
-        body: _body.text,
-        email: _email.text,
-        context: _context,
-        requestId: _requestId,
-      );
+      String id;
+      try {
+        id = await submit();
+      } on FeedbackException catch (e) {
+        if (e.failure != FeedbackFailure.requestIdReused) rethrow;
+        _attempt
+            .reset(); // the Worker saw this id with other text: one fresh id
+        id = await submit();
+      }
       if (!mounted) return;
+      _attempt.reset();
       setState(() {
         _sentId = id;
         _body.clear();
@@ -114,21 +157,61 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       return ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Card(
+          Container(
             key: const Key('feedback-success'),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Дзякуй! Паведамленне прынята.',
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  SelectableText('Нумар звароту: $_sentId'),
-                ],
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 40,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Дзякуй! Паведамленне прынята.',
+                  style: theme.textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text('Нумар звароту', style: theme.textTheme.bodySmall),
+                const SizedBox(height: 4),
+                SelectableText(
+                  _sentId!,
+                  key: const Key('feedback-id'),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall,
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton(
+                  key: const Key('feedback-copy'),
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: _sentId!));
+                    if (mounted) setState(() => _copied = true);
+                  },
+                  child: Text(_copied ? 'Скапіявана' : 'Скапіяваць нумар'),
+                ),
+                const SizedBox(height: 8),
+                FilledButton(
+                  key: const Key('feedback-return'),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  child: const Text('Вярнуцца да чытання'),
+                ),
+                TextButton(
+                  key: const Key('feedback-again'),
+                  onPressed: () => setState(() {
+                    _sentId = null;
+                    _copied = false;
+                    _context = null;
+                    _category = FeedbackCategory.other;
+                  }),
+                  child: const Text('Напісаць яшчэ'),
+                ),
+              ],
             ),
           ),
         ],
@@ -144,9 +227,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: [
         Text(
-          'Знайшлі памылку ў тэксце або маеце прапанову? Напішыце нам — уваход не патрэбны.',
-          style: theme.textTheme.bodyMedium,
+          'Напішыце нам — уваход не патрэбны. Мы чытаем кожнае паведамленне.',
+          style: theme.textTheme.bodyLarge,
         ),
+        if (_offline) ...[
+          const SizedBox(height: 12),
+          Text(
+            'Няма сеткі. Можна напісаць цяпер — адправіце, калі злучэнне вернецца.',
+            key: const Key('feedback-offline'),
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
         if (!configured) ...[
           const SizedBox(height: 12),
           Text(
@@ -158,37 +249,48 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         const SizedBox(height: 16),
         Text('Што вы хочаце паведаміць?', style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final c in FeedbackCategory.values)
-              ChoiceChip(
-                key: Key('feedback-category-${c.code}'),
-                label: Text(c.label),
-                selected: _category == c,
-                onSelected: (_) => setState(() => _category = c),
-              ),
-          ],
+        SizedBox(
+          height: 48,
+          child: ListView.separated(
+            key: const Key('feedback-categories'),
+            scrollDirection: Axis.horizontal,
+            itemCount: FeedbackCategory.values.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, i) {
+              final c = FeedbackCategory.values[i];
+              return Center(
+                child: ChoiceChip(
+                  key: Key('feedback-category-${c.code}'),
+                  label: Text(c.label),
+                  selected: _category == c,
+                  showCheckmark: false,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  materialTapTargetSize: MaterialTapTargetSize.padded,
+                  onSelected: (_) => setState(() => _category = c),
+                ),
+              );
+            },
+          ),
         ),
         if (_context != null) ...[
           const SizedBox(height: 12),
-          Container(
-            key: const Key('feedback-context'),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(child: Text('Кантэкст: ${_context!.summary}')),
-                TextButton(
-                  key: const Key('feedback-context-remove'),
-                  onPressed: () => setState(() => _context = null),
-                  child: const Text('Прыбраць'),
-                ),
-              ],
+          Align(
+            alignment: Alignment.centerLeft,
+            child: InputChip(
+              key: const Key('feedback-context'),
+              avatar: const Icon(Icons.flag_outlined, size: 16),
+              label: Text(
+                _context!.summary,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              deleteIcon: const Icon(
+                Icons.close_rounded,
+                key: Key('feedback-context-remove'),
+                size: 18,
+              ),
+              deleteButtonTooltipMessage: 'Прыбраць кантэкст',
+              onDeleted: () => setState(() => _context = null),
             ),
           ),
         ],
@@ -250,13 +352,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         FilledButton(
           key: const Key('feedback-submit'),
           onPressed: _sending || !configured ? null : _send,
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           child: _sending
               ? const SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Адправіць'),
+              : Text(_error != null ? 'Паспрабаваць яшчэ раз' : 'Адправіць'),
         ),
       ],
     );

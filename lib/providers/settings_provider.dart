@@ -24,26 +24,45 @@ class ReaderFontOption {
 const kAvailableReaderFonts = <ReaderFontOption>[
   ReaderFontOption(
     id: ReaderFontFamily.literata,
-    label: 'Кніжны',
-    description: 'Literata · рэкамендаваны',
+    label: 'Literata',
+    description: 'Рэкамендаваны кніжны шрыфт',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.sourceSerif4,
+    label: 'Source Serif 4',
+    description: 'Класічны шрыфт',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.oldStandardTt,
+    label: 'Old Standard TT',
+    description: 'Класічны друкаваны шрыфт',
+  ),
+  ReaderFontOption(
+    id: ReaderFontFamily.kurale,
+    label: 'Kurale',
+    description: 'Мяккі кніжны шрыфт',
   ),
   ReaderFontOption(
     id: ReaderFontFamily.system,
     label: 'Сістэмны',
     description: 'Шрыфт вашай прылады',
   ),
-  ReaderFontOption(
-    id: ReaderFontFamily.sourceSerif4,
-    label: 'Класічны',
-    description: 'Source Serif 4',
-  ),
 ];
+
+/// Keep an explicit left choice; default continuous prose to justified text.
+TextAlign normalizeTextAlignment(Object? stored) =>
+    stored == 'left' || stored == 'start'
+    ? TextAlign.left
+    : TextAlign.justify;
 
 String normalizeReaderFontFamily(String? stored) => switch (stored) {
   ReaderFontFamily.literata || 'Literata' => ReaderFontFamily.literata,
   ReaderFontFamily.system => ReaderFontFamily.system,
   ReaderFontFamily.sourceSerif4 ||
   'Source Serif 4' => ReaderFontFamily.sourceSerif4,
+  ReaderFontFamily.oldStandardTt ||
+  'Old Standard TT' => ReaderFontFamily.oldStandardTt,
+  ReaderFontFamily.kurale || 'Kurale' => ReaderFontFamily.kurale,
   // Before VNext this label rendered Literata, not the system face. Preserve
   // the actual reading appearance during migration.
   'Сістэмны' => ReaderFontFamily.literata,
@@ -112,6 +131,7 @@ class SettingsState {
   ThemeMode get themeMode => themePreference.themeMode;
   final double fontSize;
   final String fontFamily;
+  final TextAlign textAlignment;
   final bool keepScreenOn;
   final List<UserCategory> userCategories;
   final List<String> hiddenGlobalPrayerCategoryIds;
@@ -128,6 +148,7 @@ class SettingsState {
     this.themePreference = AppThemePreference.system,
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
+    this.textAlignment = TextAlign.justify,
     this.keepScreenOn = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
@@ -150,6 +171,7 @@ class SettingsState {
     AppThemePreference? themePreference,
     double? fontSize,
     String? fontFamily,
+    TextAlign? textAlignment,
     bool? keepScreenOn,
     List<UserCategory>? userCategories,
     List<String>? hiddenGlobalPrayerCategoryIds,
@@ -163,6 +185,7 @@ class SettingsState {
     themePreference: themePreference ?? this.themePreference,
     fontSize: fontSize ?? this.fontSize,
     fontFamily: fontFamily ?? this.fontFamily,
+    textAlignment: textAlignment ?? this.textAlignment,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
@@ -217,6 +240,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
         _box.get('fontFamily', defaultValue: ReaderFontFamily.literata)
             as String,
       ),
+      textAlignment: normalizeTextAlignment(_box.get('textAlignment')),
       keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
       userCategories: (jsonDecode(cats) as List)
           .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
@@ -239,6 +263,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
   Future<void> _save() async {
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
+    await _box.put('textAlignment', state.textAlignment.name);
     await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
@@ -301,6 +326,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     if (state.fontFamily != next) analyticsFeature('font_family_change');
     state = state.copyWith(fontFamily: next);
     _save();
+  }
+
+  void setTextAlignment(TextAlign alignment) {
+    if (alignment != TextAlign.left && alignment != TextAlign.justify) return;
+    if (state.textAlignment == alignment) return;
+    state = state.copyWith(textAlignment: alignment);
+    _box.put('textAlignment', alignment.name);
   }
 
   void setKeepScreenOn(bool value) {

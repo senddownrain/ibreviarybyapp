@@ -10,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _parishWebsite = Uri.parse('https://www.mic-minsk.by');
+final _developerTelegram = Uri.parse('https://t.me/davin_dev');
 
 class AboutScreen extends ConsumerWidget {
   const AboutScreen({super.key});
@@ -92,6 +93,17 @@ class _AboutContent extends StatelessWidget {
           style: textTheme.bodyLarge?.copyWith(height: 1.5),
         ),
         const SizedBox(height: 6),
+        Text(
+          'у супрацоўніцтве з Камісіяй Божага Культу і Дысцыпліны Сакрамэнтаў пры Канферэнцыі Каталіцкіх Біскупаў Беларусі',
+          key: const Key('about-cooperation-subtitle'),
+          textAlign: TextAlign.center,
+          style: textTheme.bodySmall?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w400,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 12),
         Semantics(
           link: true,
           label: 'Адкрыць сайт парафіі www.mic-minsk.by',
@@ -116,10 +128,31 @@ class _AboutContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text(
-          'Распрацоўшчык @davin_dev',
-          textAlign: TextAlign.center,
-          style: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+        Wrap(
+          key: const Key('about-developer-telegram'),
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 4,
+          children: [
+            Text(
+              'Распрацоўшчык:',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+            InkWell(
+              onTap: () => _openDeveloperTelegram(context),
+              borderRadius: BorderRadius.circular(4),
+              child: Text(
+                'Глеб Шаршнёў',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  decoration: TextDecoration.underline,
+                  decorationColor: colors.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 18),
         TextButton(
@@ -168,6 +201,18 @@ class _AboutContent extends StatelessWidget {
         const SnackBar(
           content: Text('Не ўдалося адкрыць палітыку прыватнасці'),
         ),
+      );
+    }
+  }
+
+  Future<void> _openDeveloperTelegram(BuildContext context) async {
+    final opened = await launchUrl(
+      _developerTelegram,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Не ўдалося адкрыць Telegram')),
       );
     }
   }

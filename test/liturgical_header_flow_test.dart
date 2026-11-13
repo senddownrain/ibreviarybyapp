@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
+import 'package:mybrev_flutter/ordo/day_union.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/providers/content_updates_provider.dart';
@@ -28,6 +29,7 @@ import 'package:mybrev_flutter/models/parsed_reading.dart';
 import 'package:mybrev_flutter/widgets/selection_option_card.dart';
 import 'package:mybrev_flutter/router/router.dart' as production;
 import 'package:mybrev_flutter/services/hive_service.dart';
+import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/screens/liturgical_picker_screen.dart';
 import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/utils/liturgical_visual.dart';
@@ -59,6 +61,23 @@ class _FourDioceses extends DioceseSelectionNotifier {
     primary: 'minsk-mohilev',
     selected: ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk'],
   );
+}
+
+class _VitebskDiocese extends DioceseSelectionNotifier {
+  @override
+  DioceseSelection build() => const DioceseSelection(
+    primary: 'vitebsk',
+    selected: ['vitebsk'],
+  );
+}
+
+/// The «Today» buttons exist only when the shown date is not the real today
+/// (the wall clock), so a fixed preview date must never be today.
+DateTime _notToday(DateTime date) {
+  final now = DateTime.now();
+  final isToday =
+      date.year == now.year && date.month == now.month && date.day == now.day;
+  return isToday ? date.add(const Duration(days: 1)) : date;
 }
 
 void main() {
@@ -176,6 +195,192 @@ void main() {
     await tester.pump();
   }
 
+  testWidgets(
+    'approved 12 November Vitebsk Hours and Readings headers',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_VitebskDiocese.new),
+        ],
+      );
+      final presentation = container.read(liturgicalDayPresentationProvider);
+      expect(presentation.title, contains('Язафата'));
+      expect(presentation.place, contains('Віцебская дыяцэзія'));
+      expect(presentation.rank, isNotEmpty);
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
+      expect(
+        tester.getTopLeft(find.text('Віцебская дыяцэзія')).dy,
+        lessThan(
+          tester.getTopLeft(
+            find.byKey(const Key('hours-celebration-title')),
+          ).dy,
+        ),
+      );
+      final hoursMetadata = tester.widget<Text>(
+        find.byKey(const Key('hours-day-metadata')),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-hours-12-nov-2026');
+
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
+      final readingsMetadata = tester.widget<Text>(
+        find.byKey(const Key('readings-day-metadata')),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        contains('Год II'),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    '12 November alternatives show each diocese once while preserving ranks',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_FourDioceses.new),
+        ],
+      );
+      await tester.tap(find.byKey(const Key('hours-alternatives-control')));
+      await tester.pumpAndSettle();
+
+      final options = container
+          .read(hoursLiturgicalSelectionProvider)
+          .sortedOptions
+          .where((option) => !option.disabled && option.day != null)
+          .toList();
+      final localOptions = options.where(
+        (option) => option.badges.contains('Мінск') ||
+            option.badges.contains('Віцебск'),
+      ).toList();
+      expect(localOptions.any((o) => o.badges.contains('Мінск')), isTrue);
+      expect(localOptions.any((o) => o.badges.contains('Віцебск')), isTrue);
+      for (final option in localOptions) {
+        final choice = tester.widget<LiturgicalCelebrationChoice>(
+          find.byKey(ValueKey('hours-celebration-${option.key}')),
+        );
+        final subtitle = choice.subtitle ?? '';
+        final pieces = subtitle.split(' · ');
+        for (final badge in option.badges) {
+          expect(pieces, isNot(contains(badge)),
+              reason: 'Duplicate diocese badge in ${option.title}');
+          final full = switch (badge) {
+            'Мінск' => 'Мінска-Магілёўская архідыяцэзія',
+            'Віцебск' => 'Віцебская дыяцэзія',
+            'Гродна' => 'Гродзенская дыяцэзія',
+            'Пінск' => 'Пінская дыяцэзія',
+            _ => badge,
+          };
+          expect(subtitle, contains(full));
+          expect(full.allMatches(subtitle).length, 1,
+              reason: 'Repeated full diocese in ${option.title}');
+        }
+        if (option.ordo case final ordo?) {
+          final rank = kRankLabels[ordo.rank] ??
+              ordoOfficeKindLabel(ordo.officeKind);
+          if (rank.isNotEmpty) expect(subtitle, startsWith(rank));
+        }
+      }
+      expect(tester.takeException(), isNull);
+      router.pop();
+    },
+  );
+
+  testWidgets('date control visual preview: light Readings', (
+    tester,
+  ) async {
+    final (router, _) = await start(
+      tester,
+      width: 390,
+      brightness: Brightness.light,
+      date: _notToday(DateTime(2026, 11, 13)),
+    );
+    router.go('/readings');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-today')), findsOneWidget);
+    // Date has no elevated floating-card shadow; alternatives have a
+    // discoverable but still neutral tap surface.
+    final dateBox = tester.widget<DecoratedBox>(
+      find.byKey(const Key('readings-date-control')),
+    );
+    final dateDecoration = dateBox.decoration as BoxDecoration;
+    expect(dateDecoration.boxShadow, isNull);
+    expect(dateDecoration.color!.a, lessThan(0.04));
+    final alternatives = tester.widget<TextButton>(
+      find.byKey(const Key('readings-alternatives-control')),
+    );
+    final alternativesFill = alternatives.style?.backgroundColor?.resolve({});
+    expect(alternativesFill, isNotNull);
+    expect(alternativesFill!.a, lessThan(0.025));
+    expect(alternatives.style?.minimumSize?.resolve({})?.height, 48);
+    expect(find.byIcon(Icons.layers_outlined), findsOneWidget);
+    await snapshot(tester, 'polished-date-control-readings-light-2026-11-13');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('date control visual preview: dark Hours and Readings', (
+    tester,
+  ) async {
+    // Screenshot evidence from the actual Flutter widgets, not a mockup.
+    final (router, container) = await start(
+      tester,
+      width: 390,
+      brightness: Brightness.dark,
+      date: _notToday(DateTime(2026, 11, 21)),
+    );
+    expect(find.byKey(const Key('hours-today')), findsOneWidget);
+    await snapshot(tester, 'polished-date-control-hours-dark-2026-11-21');
+    router.go('/readings');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('readings-today')), findsOneWidget);
+    await snapshot(tester, 'polished-date-control-readings-dark-2026-11-21');
+
+    container
+        .read(liturgicalNavigationControllerProvider)
+        .openDate(DateTime.now());
+    router.go('/hours');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('hours-today')), findsNothing);
+    await snapshot(tester, 'polished-date-control-hours-dark-today');
+  });
+
   test('real weekday and Marian memorial share canonical presentation', () {
     final container = containerFor(DateTime(2026, 10, 6));
     addTearDown(container.dispose);
@@ -245,7 +450,8 @@ void main() {
         container.read(hoursLiturgicalSelectionProvider).dayId,
         alternative,
       );
-      expect(find.text('Сёння'), findsOneWidget);
+      expect(find.byKey(const Key('readings-today')), findsOneWidget);
+      expect(find.text('Сёння'), findsNothing);
       await snapshot(tester, 'readings-marian');
       await tester.tap(find.byKey(const Key('readings-date-action')));
       await tester.pumpAndSettle();

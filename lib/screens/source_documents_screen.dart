@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:mybrev_flutter/models/source_documents.dart';
+import 'package:mybrev_flutter/constants/source_bibliography.dart';
 import 'package:mybrev_flutter/constants/legal_links.dart';
 
 /// Same external-application launch policy as the privacy document.
@@ -42,41 +42,36 @@ class SourcesScreen extends ConsumerWidget {
   const SourcesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ref
-      .watch(sourceRegistryProvider)
-      .when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) =>
-            _LoadError(retry: () => ref.invalidate(sourceRegistryProvider)),
-        data: (registry) => _ArticleScroll(
-          children: [
-            const _Title('Крыніцы і аўтарскія правы'),
-            for (final group in registry.groups) ...[
-              _SectionTitle(group.title),
-              for (final entry in group.entries.indexed) ...[
-                if (entry.$1 > 0) const Divider(height: 24),
-                Column(
-                  key: ValueKey(entry.$2.id),
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (entry.$2.textLabel.isNotEmpty) Text(entry.$2.textLabel),
-                    if (entry.$2.edition.isNotEmpty) Text(entry.$2.edition),
-                    for (final notice in entry.$2.notices) Text(notice),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 24),
+  Widget build(BuildContext context, WidgetRef ref) => _ArticleScroll(
+    children: [
+      const _Title('Крыніцы і аўтарскія правы'),
+      for (final section in kPublicSourceBibliographySections) ...[
+        _SectionTitle(section),
+        for (final entry in kPublicSourceBibliography
+            .where((item) => item.section == section)
+            .indexed) ...[
+          if (entry.$1 > 0) const Divider(height: 24),
+          Column(
+            key: ValueKey(entry.$2.id),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(entry.$2.title),
+              for (final detail in entry.$2.details) Text(detail),
+              for (final notice in entry.$2.notices) Text(notice),
             ],
-            const Divider(),
-            const _SectionTitle('Дакументы'),
-            for (final document in kSourceDocumentLinks)
-              _DocumentLink(
-                label: document.label,
-                onPressed: () => _openDocument(context, ref, document.url),
-              ),
-          ],
+          ),
+        ],
+        const SizedBox(height: 24),
+      ],
+      const Divider(),
+      const _SectionTitle('Дакументы'),
+      for (final document in kSourceDocumentLinks)
+        _DocumentLink(
+          label: document.label,
+          onPressed: () => _openDocument(context, ref, document.url),
         ),
-      );
+    ],
+  );
 }
 
 class _ArticleScroll extends StatelessWidget {
@@ -149,18 +144,6 @@ class _DocumentLink extends StatelessWidget {
         minimumSize: const Size(48, 48),
       ),
       child: Text(label),
-    ),
-  );
-}
-
-class _LoadError extends StatelessWidget {
-  const _LoadError({required this.retry});
-  final VoidCallback retry;
-  @override
-  Widget build(BuildContext context) => Center(
-    child: TextButton(
-      onPressed: retry,
-      child: const Text('Не ўдалося адкрыць дакумент. Паўтарыць'),
     ),
   );
 }

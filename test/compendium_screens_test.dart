@@ -24,7 +24,9 @@ final _aliases = readCompendiumAliasFile();
 
 void main() {
   group('root', () {
-    testWidgets('shows the four parts and the attribution', (tester) async {
+    testWidgets('shows the four parts without inline source attribution', (
+      tester,
+    ) async {
       final router = _router();
       addTearDown(router.dispose);
       await tester.pumpWidget(_app(router));
@@ -60,50 +62,15 @@ void main() {
         reason: 'the Compendium dock is search-only',
       );
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('compendium-source')),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(
-        find.textContaining('Catholic.by', findRichText: true),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('Libreria Editrice Vaticana', findRichText: true),
-        findsNothing,
-      );
-      final sourceText = tester.widget<Text>(
-        find.descendant(
-          of: find.byKey(const Key('compendium-source')),
-          matching: find.byType(Text),
-        ),
-      );
-      expect(sourceText.style?.height, ReaderTheme.metadataHeight);
-      expect(
-        sourceText.style?.color,
-        ReaderTheme.of(
-          tester.element(find.byKey(const Key('compendium-source'))),
-        ).muted,
-      );
+      expect(find.byKey(const Key('compendium-source')), findsNothing);
     });
 
-    testWidgets('source attribution opens Catholic.by externally', (
+    testWidgets('question references remain without inline source credit', (
       tester,
     ) async {
-      final opened = <Uri>[];
-      var result = true;
       final router = _router(initialLocation: '/prayers/compendium/question/1');
       addTearDown(router.dispose);
-      await tester.pumpWidget(
-        _app(
-          router,
-          launcher: (uri) async {
-            opened.add(uri);
-            return result;
-          },
-        ),
-      );
+      await tester.pumpWidget(_app(router));
       await tester.pumpAndSettle();
       final refs = tester.widget<Text>(
         find.byKey(const ValueKey('compendium-refs-1')),
@@ -113,21 +80,11 @@ void main() {
       );
       expect(refs.style?.color, reader.muted);
       expect(refs.style?.height, ReaderTheme.referenceHeight);
-      final source = find.byKey(const Key('compendium-source'));
-      await tester.ensureVisible(source);
-      await tester.pumpAndSettle();
-      await tester.tap(source);
-      await tester.pump();
-      expect(opened.single.toString(), kCompendiumSourceUrl);
+      expect(find.byKey(const Key('compendium-source')), findsNothing);
       expect(
-        kCompendiumSourceUrl,
-        'https://catholic.by/3/lib/documents/kasciol/3963-kampendyj-katekhizisa-katalitskaga-kastsjola',
+        find.textContaining('Catholic.by', findRichText: true),
+        findsNothing,
       );
-
-      result = false;
-      await tester.tap(source);
-      await tester.pump();
-      expect(find.text('Не ўдалося адкрыць сайт'), findsOneWidget);
     });
 
     testWidgets('bundle failure without a synced copy shows a retry', (
@@ -440,39 +397,24 @@ void main() {
               dock.bottom,
               lessThanOrEqualTo(size.height - math.max(bottom, gesture)),
             );
-            if (location.contains('/part/')) {
-              expect(
-                find.byKey(const ValueKey('compendium-question-row-598')),
-                findsOneWidget,
-              );
-              await tester.ensureVisible(
-                find.byKey(const Key('compendium-source')),
-              );
-              await tester.pumpAndSettle();
-              expect(
-                tester
-                    .getRect(find.byKey(const Key('compendium-source')))
-                    .bottom,
-                lessThanOrEqualTo(dock.top),
-              );
-            } else {
-              await tester.fling(
-                find.byType(CustomScrollView),
-                const Offset(0, -20000),
-                4000,
-              );
-              await tester.pumpAndSettle();
-              await tester.ensureVisible(
-                find.byKey(const Key('compendium-source')),
-              );
-              await tester.pumpAndSettle();
-              expect(
-                tester
-                    .getRect(find.byKey(const Key('compendium-source')))
-                    .bottom,
-                lessThanOrEqualTo(dock.top),
+            final lastContent = location.contains('/part/')
+                ? find.byKey(const ValueKey('compendium-question-row-598'))
+                : find.byType(CompendiumPager);
+            if (lastContent.evaluate().isEmpty) {
+              // At large text the end of the answer is not built until scrolled to.
+              await tester.scrollUntilVisible(
+                lastContent,
+                300,
+                scrollable: find.byType(Scrollable).first,
               );
             }
+            await tester.ensureVisible(lastContent);
+            await tester.pumpAndSettle();
+            expect(
+              tester.getRect(lastContent).bottom,
+              lessThanOrEqualTo(dock.top),
+            );
+            expect(find.byKey(const Key('compendium-source')), findsNothing);
             await tester.pumpWidget(const SizedBox.shrink());
             router.dispose();
           }

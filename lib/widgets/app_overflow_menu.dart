@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
@@ -65,9 +65,11 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // A nested Scaffold can consume viewInsets for its body. The root overlay
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
+    final textScale = media.textScaler.scale(1);
+    // Smaller than the former 360 dp popup; responsive for large text.
     final width = math.min(
-      widget.showPsalmody ? 288.0 : 360.0,
-      media.size.width - 32,
+      math.max(216.0, 200.0 * textScale),
+      media.size.width - 24,
     );
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
     final bottom =
@@ -79,24 +81,14 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       Rect.fromLTWH(origin.dx, menuTop, button.size.width, 0),
       Offset.zero & overlay.size,
     );
-    // The prayerbook shares this menu across its root, category/catalogue
-    // screens and readers. Keep category management in one place, instead of
-    // rendering a second overflow button alongside it.
-    final isPrayerbook =
-        AppRouteEntryScope.maybeOf(context)?.entry.descriptor.branch ==
-        AppBranch.prayerbook;
-    final routePath = GoRouter.maybeOf(
-      context,
-    )?.routeInformationProvider.value.uri.path;
-    final actions = [
-      ...widget.actions,
-      if (isPrayerbook && routePath != '/prayers/categories')
-        ReaderSecondaryAction(
-          label: 'Катэгорыі',
-          icon: Icons.category_outlined,
-          onSelected: () => context.push('/prayers/categories'),
-        ),
-    ];
+    final actions = widget.actions;
+    // One consistent "report an error" entry on every material. A screen may
+    // supply its own action (with a title); otherwise the route gives the context.
+    final router = GoRouter.maybeOf(context);
+    final reportLocation =
+        router == null || actions.any((a) => a.label == kReportErrorLabel)
+        ? null
+        : feedbackLocationForUri(_visibleUri(router));
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -133,6 +125,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
               return _OverflowContent(
                 showTextScale: widget.showTextScale,
                 actions: actions,
+                showReport: reportLocation != null,
                 onSelected: (value) => Navigator.pop(popupContext, value),
               );
             },
@@ -150,6 +143,8 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       await showTextScalePanel(context, showPsalmody: widget.showPsalmody);
     } else if (result == 'settings' || result == 'about') {
       context.push('/$result');
+    } else if (result == 'report') {
+      context.push(reportLocation!);
     } else {
       actions[int.parse(result)].onSelected();
     }
@@ -197,11 +192,13 @@ class _OverflowContent extends StatelessWidget {
   const _OverflowContent({
     required this.showTextScale,
     required this.actions,
+    required this.showReport,
     required this.onSelected,
   });
 
   final bool showTextScale;
   final List<ReaderSecondaryAction> actions;
+  final bool showReport;
   final ValueChanged<String> onSelected;
 
   @override
@@ -216,10 +213,22 @@ class _OverflowContent extends StatelessWidget {
           if (showTextScale)
             _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
           for (var index = 0; index < actions.length; index++)
-            _item(actions[index].label, actions[index].icon, '$index'),
-          if (showTextScale || actions.isNotEmpty) const Divider(height: 16),
+            if (actions[index].label != kReportErrorLabel)
+              _item(actions[index].label, actions[index].icon, '$index'),
+          if (showTextScale ||
+              actions.any((action) => action.label != kReportErrorLabel))
+            const Divider(height: 16),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
+          for (var index = 0; index < actions.length; index++)
+            if (actions[index].label == kReportErrorLabel) ...[
+              const Divider(height: 16),
+              _item(kReportErrorLabel, actions[index].icon, '$index'),
+            ],
+          if (showReport) ...[
+            const Divider(height: 16),
+            _item(kReportErrorLabel, Icons.flag_outlined, 'report'),
+          ],
         ],
       ),
     ),
@@ -227,9 +236,20 @@ class _OverflowContent extends StatelessWidget {
 
   Widget _item(String label, IconData icon, String value) => ListTile(
     minTileHeight: 48,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+    minLeadingWidth: 24,
+    horizontalTitleGap: 10,
     leading: Icon(icon, size: 22),
-    title: Text(label),
-    trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+    title: Text(label, maxLines: 2, overflow: TextOverflow.ellipsis),
     onTap: () => onSelected(value),
   );
+}
+
+/// The location the reader actually sees. A page opened with `context.push` is
+/// an imperative match with its own match list, while `routeInformationProvider`
+/// and `currentConfiguration.uri` keep naming the page underneath it.
+Uri _visibleUri(GoRouter router) {
+  final configuration = router.routerDelegate.currentConfiguration;
+  final last = configuration.lastOrNull;
+  return (last is ImperativeRouteMatch ? last.matches : configuration).uri;
 }

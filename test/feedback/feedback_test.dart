@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -9,6 +10,46 @@ import 'package:mybrev_flutter/feedback/feedback_service.dart';
 import 'package:mybrev_flutter/screens/feedback_screen.dart';
 
 void main() {
+  group('summary, attempt id and Ordo location', () {
+    test('summary is human readable', () {
+      expect(
+        const FeedbackContext(kind: 'prayer', title: 'Ойча наш').summary,
+        'Малітва · Ойча наш',
+      );
+      expect(
+        const FeedbackContext(
+          kind: 'hour',
+          date: '2026-11-13',
+          hour: 'lauds',
+        ).summary,
+        'Літургія гадзінаў · 2026-11-13 · Ютрань',
+      );
+      expect(const FeedbackContext(id: 'x1').summary, 'ID: x1');
+    });
+
+    test('attempt keeps the id for the same payload only', () {
+      var n = 0;
+      final a = FeedbackAttempt(() => 'id-${++n}');
+      final first = a.idFor(['text_error', 'one']);
+      expect(a.idFor(['text_error', 'one']), first);
+      final second = a.idFor(['text_error', 'one edited']);
+      expect(second, isNot(first));
+      a.reset();
+      expect(a.idFor(['text_error', 'one edited']), isNot(second));
+    });
+
+    test('Ordo day gets a context, the month grid does not', () {
+      final q = Uri.parse(
+        feedbackLocationForUri(
+              Uri.parse('/hours/ordo?date=2026-11-13&dayId=d1'),
+            ) ??
+            '',
+      ).queryParameters;
+      expect(q, {'ctx_kind': 'day', 'ctx_id': 'd1', 'ctx_date': '2026-11-13'});
+      expect(feedbackLocationForUri(Uri.parse('/hours/ordo/month')), isNull);
+    });
+  });
+
   group('context', () {
     test('keeps only whitelisted safe values', () {
       expect(FeedbackContext.fromQuery({}), isNull);
@@ -175,6 +216,135 @@ void main() {
         expect(ids[0], ids[1]);
         expect(find.byKey(const Key('feedback-success')), findsOneWidget);
         expect(find.textContaining('T-1'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'an edited message after a failed attempt gets a new request id; an identical retry keeps it',
+      (t) async {
+        tall(t);
+        final ids = <String>[];
+        var attempt = 0;
+        final s = FeedbackService(
+          baseUrl: 'https://w.test',
+          platform: 'android',
+          client: MockClient((r) async {
+            ids.add((jsonDecode(r.body) as Map)['requestId'] as String);
+            attempt++;
+            return attempt < 3
+                ? http.Response('{}', 503)
+                : http.Response('{"id":"T-2"}', 201);
+          }),
+        );
+        await t.pumpWidget(host(s));
+        await t.enterText(find.byKey(const Key('feedback-body')), 'first text');
+        await tapSubmit(t);
+        await t.pumpAndSettle();
+        await tapSubmit(t); // identical retry
+        await t.pumpAndSettle();
+        expect(ids[0], ids[1], reason: 'identical retry stays idempotent');
+        await t.enterText(
+          find.byKey(const Key('feedback-body')),
+          'first text, corrected',
+        );
+        await tapSubmit(t);
+        await t.pumpAndSettle();
+        expect(
+          ids[2],
+          isNot(ids[1]),
+          reason: 'edited text must not reuse the id',
+        );
+        expect(find.byKey(const Key('feedback-success')), findsOneWidget);
+      },
+    );
+
+    testWidgets('a 409 request_id_reused is retried once with a fresh id', (
+      t,
+    ) async {
+      tall(t);
+      final ids = <String>[];
+      final s = FeedbackService(
+        baseUrl: 'https://w.test',
+        platform: 'ios',
+        client: MockClient((r) async {
+          ids.add((jsonDecode(r.body) as Map)['requestId'] as String);
+          return ids.length == 1
+              ? http.Response('{"error":"request_id_reused"}', 409)
+              : http.Response('{"id":"T-3"}', 201);
+        }),
+      );
+      await t.pumpWidget(host(s));
+      await t.enterText(find.byKey(const Key('feedback-body')), 'some text');
+      await tapSubmit(t);
+      await t.pumpAndSettle();
+      expect(ids.length, 2);
+      expect(ids[0], isNot(ids[1]));
+      expect(find.byKey(const Key('feedback-success')), findsOneWidget);
+    });
+
+    testWidgets('success screen: copyable id, return and write another', (
+      t,
+    ) async {
+      tall(t);
+      final clip = <String>[];
+      t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'Clipboard.setData') {
+            clip.add((call.arguments as Map)['text'] as String);
+          }
+          return null;
+        },
+      );
+      addTearDown(
+        () => t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
+      final s = FeedbackService(
+        baseUrl: 'https://w.test',
+        platform: 'android',
+        client: MockClient((r) async => http.Response('{"id":"T-4"}', 201)),
+      );
+      await t.pumpWidget(
+        host(
+          s,
+          ctx: const FeedbackContext(kind: 'song', id: 's1'),
+        ),
+      );
+      await t.enterText(find.byKey(const Key('feedback-body')), 'good text');
+      await tapSubmit(t);
+      await t.pumpAndSettle();
+      expect(find.byKey(const Key('feedback-id')), findsOneWidget);
+      expect(find.byKey(const Key('feedback-return')), findsOneWidget);
+      await t.tap(find.byKey(const Key('feedback-copy')));
+      await t.pump();
+      expect(clip, ['T-4']);
+      expect(find.text('Скапіявана'), findsOneWidget);
+      await t.tap(find.byKey(const Key('feedback-again')));
+      await t.pump();
+      expect(find.byKey(const Key('feedback-body')), findsOneWidget);
+      expect(find.byKey(const Key('feedback-context')), findsNothing);
+    });
+
+    testWidgets(
+      'a screen opened without context starts on the neutral category',
+      (t) async {
+        tall(t);
+        await t.pumpWidget(host(FeedbackService(baseUrl: 'https://w.test')));
+        await t.scrollUntilVisible(
+          find.byKey(const Key('feedback-category-other')),
+          100,
+          scrollable: find.descendant(
+            of: find.byKey(const Key('feedback-categories')),
+            matching: find.byType(Scrollable),
+          ),
+        );
+        final chip = t.widget<ChoiceChip>(
+          find.byKey(const Key('feedback-category-other')),
+        );
+        expect(chip.selected, isTrue);
       },
     );
 

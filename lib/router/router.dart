@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
@@ -8,6 +9,7 @@ import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/source_documents.dart';
 import 'package:mybrev_flutter/screens/source_documents_screen.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/screens/about_screen.dart';
@@ -33,6 +35,7 @@ import 'package:mybrev_flutter/screens/feedback_screen.dart';
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
+import 'package:mybrev_flutter/widgets/admin_songbook_guard.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -467,9 +470,11 @@ final router = GoRouter(
                   pageBuilder: (context, state) => _branchPage(
                     state,
                     _songbookRoute,
-                    const DiscoveryVisitMark(
-                      visitKey: kVisitSongs,
-                      child: SongbookScreen(),
+                    const AdminSongbookGuard(
+                      child: DiscoveryVisitMark(
+                        visitKey: kVisitSongs,
+                        child: SongbookScreen(),
+                      ),
                     ),
                   ),
                   routes: [
@@ -478,7 +483,11 @@ final router = GoRouter(
                       pageBuilder: (context, state) => _branchPage(
                         state,
                         _songDetailRoute,
-                        SongDetailScreen(songId: state.pathParameters['id']!),
+                        AdminSongbookGuard(
+                          child: SongDetailScreen(
+                            songId: state.pathParameters['id']!,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -753,7 +762,10 @@ final router = GoRouter(
         child: SecondaryPageScaffold(
           title: 'Зваротная сувязь',
           child: FeedbackScreen(
-            context: FeedbackContext.fromQuery(state.uri.queryParameters),
+            context: FeedbackContext.fromQuery(
+              state.uri.queryParameters,
+              diocese: _feedbackDiocese(context),
+            ),
           ),
         ),
       ),
@@ -962,4 +974,17 @@ class _InvalidRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Scaffold(body: Center(child: Text(message)));
+}
+
+/// Public diocese id of the reader for the feedback context (the Worker allows `[a-z_]` only).
+String? _feedbackDiocese(BuildContext context) {
+  try {
+    final ordered = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(dioceseSelectionProvider).ordered;
+    return ordered.isEmpty ? null : ordered.first.replaceAll('-', '_');
+  } catch (_) {
+    return null;
+  }
 }

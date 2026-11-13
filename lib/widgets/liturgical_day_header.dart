@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/liturgical_date_navigation_row.dart';
 import 'package:mybrev_flutter/widgets/liturgical_heading_text.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
+import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 
 /// Shared hierarchy and typography for both daily sections.
@@ -43,6 +44,43 @@ class LiturgicalDayHeader extends StatelessWidget {
     final p = presentation;
     final cs = Theme.of(context).colorScheme;
     final ink = cs.onSurface;
+    // Reading-year metadata is supplied explicitly by ReadingsScreen. Do not
+    // repeat the psalter week here: it belongs inside the individual Hour.
+    final metadataSuffix = (metadata ?? '')
+        .replaceFirst(p.weekday, '')
+        .replaceFirst(RegExp(r'^\s*·\s*'), '')
+        .trim();
+    final rank = p.rank.trim();
+    // A Sunday or an ordinary weekday already has its rank in the day label.
+    final showRank =
+        rank.isNotEmpty &&
+        rank != p.weekday &&
+        rank != 'Будні дзень' &&
+        rank != 'Будзень';
+
+    // A rank (feast/memorial/solemnity) is the important metadata for a
+    // celebration. For an ordinary day, emphasize the weekday instead.
+    final emphasizedMetadata = showRank ? rank : p.weekday;
+    final quietMetadata = [
+      if (showRank) p.weekday,
+      if (metadataSuffix.isNotEmpty) metadataSuffix,
+    ];
+    final metadataTail = quietMetadata.isEmpty
+        ? ''
+        : ' · ${quietMetadata.join(' · ')}';
+
+    // Display local diocesan context in one quiet line ABOVE the celebration
+    // title. Explicit union badges take precedence over _place (which may
+    // describe a broader source); neither is shown for a common weekday.
+    final diocesanLabels = (p.badges.isNotEmpty
+            ? p.badges.map(_fullDioceseLabel)
+            : p.place
+                .split(',')
+                .map((label) => _fullDioceseLabel(label.trim())))
+        .where((label) => label.isNotEmpty)
+        .toSet()
+        .toList();
+
     return LayoutBuilder(
       builder: (context, constraints) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,6 +96,7 @@ class LiturgicalDayHeader extends StatelessWidget {
             onDateTap: onDateTap,
             onPrevious: onPrevious,
             onNext: onNext,
+            onToday: onToday,
           ),
           ?dateHint,
           const SizedBox(height: 12),
@@ -80,6 +119,18 @@ class LiturgicalDayHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (diocesanLabels.isNotEmpty) ...[
+                        Text(
+                          diocesanLabels.join(' · '),
+                          key: Key('$keyPrefix-celebration-dioceses'),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontSize: 12.5,
+                                color: cs.onSurfaceVariant,
+                              ),
+                        ),
+                        const SizedBox(height: 6),
+                      ],
                       LiturgicalHeadingText(
                         p.title,
                         key: Key('$keyPrefix-celebration-title'),
@@ -94,7 +145,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: p.weekday,
+                              text: emphasizedMetadata,
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontSize: 18,
@@ -102,12 +153,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                                     color: cs.onSurface,
                                   ),
                             ),
-                            TextSpan(
-                              text: (metadata ?? p.metadata).replaceFirst(
-                                p.weekday,
-                                '',
-                              ),
-                            ),
+                            TextSpan(text: metadataTail),
                           ],
                         ),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -115,58 +161,42 @@ class LiturgicalDayHeader extends StatelessWidget {
                           color: cs.onSurfaceVariant,
                         ),
                       ),
-                      if (p.badges.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: [
-                            for (final badge in p.badges)
-                              Chip(label: Text(badge)),
-                          ],
-                        ),
-                      ],
-                      if (p.place.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          p.place,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: cs.onSurfaceVariant),
-                        ),
-                      ],
+
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          if (onToday != null)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                key: Key('$keyPrefix-today'),
-                onPressed: onToday,
-                icon: const Icon(Icons.history, size: 18),
-                label: const Text('Сёння'),
-              ),
-            ),
           if (showVariants) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 8),
             TextButton(
               key: Key('$keyPrefix-alternatives-control'),
               style: TextButton.styleFrom(
                 foregroundColor: ink,
+                // A quiet affordance, not a second prominent filled card.
+                backgroundColor: cs.onSurface.withValues(
+                  alpha: Theme.of(context).brightness == Brightness.dark
+                      ? 0.035
+                      : 0.018,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
                 minimumSize: const Size(48, 48),
               ),
               onPressed: onVariants,
-              child: const Row(
+              child: Row(
                 children: [
-                  Expanded(child: Text('Іншыя варыянты')),
-                  Icon(Icons.chevron_right, size: 20),
+                  Icon(Icons.layers_outlined, size: 18, color: cs.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  const Expanded(child: Text('Іншыя варыянты')),
+                  Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
                 ],
               ),
             ),
@@ -176,4 +206,20 @@ class LiturgicalDayHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Accepts either a union badge or a document locality and returns a single
+/// readable Belarusian diocesan name without a chip or a duplicate caption.
+String _fullDioceseLabel(String label) {
+  if (label.isEmpty) return '';
+  final normalized = label.toLowerCase();
+  for (final entry in kDioceseNames.entries) {
+    final id = entry.key;
+    if (normalized == entry.value.toLowerCase() ||
+        normalized == kDioceseShortNames[id]?.toLowerCase() ||
+        normalized == kDioceseBadges[id]?.toLowerCase()) {
+      return entry.value;
+    }
+  }
+  return label;
 }

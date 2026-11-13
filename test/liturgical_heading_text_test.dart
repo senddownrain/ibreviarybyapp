@@ -119,9 +119,10 @@ void main() {
       ),
       hasLength(1),
     );
+    // The full date, including the year, is now a single calendar action.
+    expect(find.textContaining('2026'), findsWidgets);
     await tester.tap(find.byKey(const Key('date-date-action')));
-    await tester.tap(find.widgetWithText(TextButton, '2026'));
-    expect(opens, 2);
+    expect(opens, 1);
     expect(tester.takeException(), isNull);
   });
 }

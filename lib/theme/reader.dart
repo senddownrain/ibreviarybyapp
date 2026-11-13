@@ -8,6 +8,8 @@ abstract final class ReaderFontFamily {
   static const literata = 'literata';
   static const system = 'system';
   static const sourceSerif4 = 'sourceSerif4';
+  static const oldStandardTt = 'oldStandardTt';
+  static const kurale = 'kurale';
 }
 
 /// Allows deterministic widget harnesses to use Flutter's bundled test font.
@@ -89,6 +91,10 @@ class ReaderTheme {
         ReaderFontFamily.sourceSerif4 => GoogleFonts.sourceSerif4(
           textStyle: base,
         ),
+        ReaderFontFamily.oldStandardTt => GoogleFonts.oldStandardTt(
+          textStyle: base,
+        ),
+        ReaderFontFamily.kurale => GoogleFonts.kurale(textStyle: base),
         _ => GoogleFonts.literata(textStyle: base),
       };
     } catch (_) {
@@ -136,6 +142,27 @@ class ReaderTheme {
         ? base
         : GoogleFonts.cormorantGaramond(textStyle: base);
   }
+
+  /// Compact uppercase heading in the Liturgy of the Hours (112% of the body).
+  /// The shared document headings elsewhere retain their established scale.
+  TextStyle hourSectionHeading(double bodySize) =>
+      blockHeading(bodySize).copyWith(
+        fontSize: bodySize * 1.12,
+        letterSpacing: bodySize * 0.04,
+      );
+
+  /// Section label on the Mass readings page (108% of the body).
+  TextStyle readingsSectionHeading(double bodySize) =>
+      blockHeading(bodySize).copyWith(
+        fontSize: bodySize * 1.08,
+        letterSpacing: bodySize * 0.065,
+      );
+
+  /// The Scripture/Gospel introduction is prose, not an uppercase section.
+  TextStyle readingIntroduction(TextStyle bodyStyle) => bodyStyle.copyWith(
+    fontSize: (bodyStyle.fontSize ?? 16) * 1.04,
+    fontWeight: FontWeight.w700,
+  );
 
   TextStyle serviceHeading(double bodySize, {String? family}) => body(
     bodySize * .88,

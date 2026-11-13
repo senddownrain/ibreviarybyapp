@@ -6,7 +6,6 @@ import 'package:mybrev_flutter/discovery/p0_facts.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_hint_slot.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_sheet_hint.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_visit.dart';
-import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
@@ -27,6 +26,7 @@ import 'package:mybrev_flutter/widgets/ordo/liturgical_month_calendar.dart';
 import 'package:mybrev_flutter/widgets/liturgical_selector_components.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/widgets/reading_scaffold.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -45,6 +45,7 @@ import 'package:mybrev_flutter/utils/readings_selection.dart';
 import 'package:mybrev_flutter/utils/readings_cycle_metadata.dart';
 import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
+import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
@@ -828,10 +829,8 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildReadingBody(reading, selection.massSet, seasonColor),
-                const SourceFooter(
-                  key: Key('readings-source-footer'),
-                  sourceId: 'lectionary-kkbb-2002-2005',
-                ),
+                // Attribution is available in the app's dedicated Sources page.
+                const SizedBox(key: Key('readings-document-end')),
               ],
             );
     }
@@ -897,13 +896,16 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
             children: [
               if (usesCalendar)
                 LiturgicalDayHeader(
-                  sectionTitle: 'Чытанні',
+                  sectionTitle: 'Чытанні дня',
                   keyPrefix: 'readings',
                   presentation: sharedPresentation,
                   onDateTap: _showDateActions,
+                  // Proper festal readings can be year-independent and
+                  // therefore have no document cycle. The calendar year
+                  // remains visible as context even for those readings.
                   metadata: [
                     sharedPresentation.weekday,
-                    if (cycleLabel != null) 'Год $cycleLabel',
+                    'Год ${cycleLabel ?? _cycleLabel(getCycleForDate(sharedPresentation.date))}',
                   ].join(' · '),
                   onToday: () => ref
                       .read(liturgicalNavigationControllerProvider)
@@ -925,7 +927,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                 )
               else ...[
                 Text(
-                  'Чытанні',
+                  'Чытанні дня',
                   style: ReaderTheme.of(context).displayTitle(36),
                 ),
                 const SizedBox(height: 16),
@@ -1784,12 +1786,12 @@ class _AlternativeReading extends StatelessWidget {
               padding: const EdgeInsets.only(top: 6, bottom: 4),
               child: Text(
                 section.title!,
-                style: textStyle.copyWith(fontWeight: FontWeight.w600),
+                style: reader.readingIntroduction(textStyle),
               ),
             ),
           if (text.isNotEmpty) ...[
             const SizedBox(height: 6),
-            _ReadingText(text: text, textStyle: textStyle),
+            _ReadingText(text: text, textStyle: textStyle, isProse: true),
             if (!hasAcclamation) ...[
               const SizedBox(height: 12),
               Text(
@@ -2001,7 +2003,7 @@ class _SectionLabel extends StatelessWidget {
         top: LiturgicalSpacing.sectionBefore,
         bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
-      child: Text(_readingLabel(text), style: rubric.blockHeading(base)),
+      child: Text(_readingLabel(text).toUpperCase(), style: rubric.readingsSectionHeading(base)),
     );
   }
 }
@@ -2037,10 +2039,11 @@ class _BibleRef extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 
-class _ReadingText extends StatefulWidget {
+class _ReadingText extends ConsumerStatefulWidget {
   final String text;
   final TextStyle textStyle;
   final bool isPsalm;
+  final bool isProse;
   final String? highlightNamespace;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
@@ -2050,6 +2053,7 @@ class _ReadingText extends StatefulWidget {
     required this.text,
     required this.textStyle,
     this.isPsalm = false,
+    this.isProse = false,
     this.highlightNamespace,
     this.highlights = const {},
     this.selectedSentenceId,
@@ -2057,10 +2061,10 @@ class _ReadingText extends StatefulWidget {
   });
 
   @override
-  State<_ReadingText> createState() => _ReadingTextState();
+  ConsumerState<_ReadingText> createState() => _ReadingTextState();
 }
 
-class _ReadingTextState extends State<_ReadingText> {
+class _ReadingTextState extends ConsumerState<_ReadingText> {
   final Map<String, TapGestureRecognizer> _recognizers = {};
 
   TapGestureRecognizer _recognizerFor(String sentenceId) =>
@@ -2081,6 +2085,9 @@ class _ReadingTextState extends State<_ReadingText> {
 
   @override
   Widget build(BuildContext context) {
+    final alignment = widget.isProse
+        ? ref.watch(settingsProvider.select((s) => s.textAlignment))
+        : TextAlign.left;
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
       return Html(
@@ -2089,6 +2096,14 @@ class _ReadingTextState extends State<_ReadingText> {
             : formatLiturgicalHtml(widget.text),
         style: {
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
+          if (widget.isProse) ...{
+            'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
+              ..textAlign = alignment,
+            'p': Style(
+              textAlign: alignment,
+              margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
+            ),
+          },
           '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
         },
       );
@@ -2128,6 +2143,7 @@ class _ReadingTextState extends State<_ReadingText> {
             ),
         ],
       ),
+      textAlign: alignment,
     );
   }
 
@@ -2329,7 +2345,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
             padding: const EdgeInsets.only(top: 6, bottom: 4),
             child: Text(
               s.title!,
-              style: widget.textStyle.copyWith(fontWeight: FontWeight.w600),
+              style: widget.reader.readingIntroduction(widget.textStyle),
             ),
           ),
         if (hasPassion) ...[
@@ -2344,6 +2360,7 @@ class _ReadingSectionState extends State<_ReadingSection> {
           _ReadingText(
             text: display,
             textStyle: widget.textStyle,
+            isProse: true,
             highlightNamespace: widget.highlightNamespace,
             highlights: widget.highlights,
             selectedSentenceId: widget.selectedSentenceId,

@@ -760,8 +760,9 @@ void main() {
       ),
       overrides: [dayOptionsProvider.overrideWithValue(options)],
     );
-    expect(find.textContaining('Гродна'), findsOneWidget);
-    expect(find.textContaining('Пінск'), findsOneWidget);
+    // Short badges render as full diocese names in the option metadata.
+    expect(find.textContaining('Гродзенская дыяцэзія'), findsOneWidget);
+    expect(find.textContaining('Пінская дыяцэзія'), findsOneWidget);
     final row = find.byKey(ValueKey('hours-celebration-${options.last.key}'));
     await tester.ensureVisible(row);
     await tester.tap(row);

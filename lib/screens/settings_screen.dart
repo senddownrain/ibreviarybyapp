@@ -11,7 +11,9 @@ import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/widgets/priest_access_settings_section.dart';
+import 'package:mybrev_flutter/widgets/admin_songbook_login_section.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
+import 'package:mybrev_flutter/review/app_review_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -139,65 +141,137 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Font size
-                Text(
-                  'Памер шрыфту',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Slider.adaptive(
-                  value: settings.fontSize,
-                  min: kMinReaderFontSize,
-                  max: kMaxReaderFontSize,
-                  divisions: 11,
-                  label: '${readerFontScalePercent(settings.fontSize)}%',
-                  onChanged: (val) =>
-                      ref.read(settingsProvider.notifier).setFontSize(val),
-                ),
-                Text(
-                  'Пан — маё святло і маё збаўленне.',
-                  style: ReaderTheme.of(
+                // Same order and live preview as the Web «Тэкст» section.
+                Theme(
+                  data: Theme.of(
                     context,
-                  ).body(settings.fontSize, family: settings.fontFamily),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Шрыфт чытання',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  key: const Key('settings-reader-font'),
-                  initialValue: settings.fontFamily,
-                  isExpanded: true,
-                  selectedItemBuilder: (context) => [
-                    for (final option in kAvailableReaderFonts)
-                      Text(option.label),
-                  ],
-                  items: [
-                    for (final option in kAvailableReaderFonts)
-                      DropdownMenuItem(
-                        value: option.id,
-                        child: Text(
-                          '${option.label}: Пан — маё святло і маё збаўленне.',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: ReaderTheme.of(
-                            context,
-                          ).body(16, family: option.id),
+                  ).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    key: const Key('settings-text-section'),
+                    title: Text(
+                      'Тэкст',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    subtitle: const Text('Шрыфт, памер і выраўноўванне'),
+                    tilePadding: EdgeInsets.zero,
+                    childrenPadding: EdgeInsets.zero,
+                    initiallyExpanded: true,
+                    maintainState: true,
+                    children: [
+                      const SizedBox(height: 12),
+                      Text(
+                        'Шрыфт чытання',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        key: const Key('settings-reader-font'),
+                        initialValue: settings.fontFamily,
+                        isExpanded: true,
+                        selectedItemBuilder: (context) => [
+                          for (final option in kAvailableReaderFonts)
+                            Text(option.label),
+                        ],
+                        items: [
+                          for (final option in kAvailableReaderFonts)
+                            DropdownMenuItem(
+                              value: option.id,
+                              child: Text(
+                                option.label,
+                                style: ReaderTheme.of(
+                                  context,
+                                ).body(16, family: option.id),
+                              ),
+                            ),
+                        ],
+                        onChanged: (family) {
+                          if (family != null) {
+                            ref
+                                .read(settingsProvider.notifier)
+                                .setFontFamily(family);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        readerFontOption(settings.fontFamily).description,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                  ],
-                  onChanged: (family) {
-                    if (family != null) {
-                      ref.read(settingsProvider.notifier).setFontFamily(family);
-                    }
-                  },
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  readerFontOption(settings.fontFamily).description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      const SizedBox(height: 20),
+                      Text(
+                        'Памер тэксту',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Slider.adaptive(
+                              key: const Key('settings-font-size'),
+                              value: settings.fontSize,
+                              min: kMinReaderFontSize,
+                              max: kMaxReaderFontSize,
+                              divisions: 11,
+                              label:
+                                  '${readerFontScalePercent(settings.fontSize)}%',
+                              onChanged: (val) => ref
+                                  .read(settingsProvider.notifier)
+                                  .setFontSize(val),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 52,
+                            child: Text(
+                              '${readerFontScalePercent(settings.fontSize)}%',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        'Выраўноўванне тэксту',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      AdaptiveSegmentedControl<TextAlign>(
+                        value: settings.textAlignment,
+                        segments: const [
+                          AdaptiveSegment(
+                            value: TextAlign.left,
+                            icon: Icon(Icons.format_align_left, size: 18),
+                            label: Text('Па левым краі'),
+                          ),
+                          AdaptiveSegment(
+                            value: TextAlign.justify,
+                            icon: Icon(Icons.format_align_justify, size: 18),
+                            label: Text('Па шырыні'),
+                          ),
+                        ],
+                        onChanged: (alignment) => ref
+                            .read(settingsProvider.notifier)
+                            .setTextAlignment(alignment),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        'Прыклад',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Божа, прыйдзі мне на дапамогу. Пане, паспяшы да мяне на паратунак.',
+                        key: const Key('settings-text-preview'),
+                        textAlign: settings.textAlignment,
+                        style: ReaderTheme.of(
+                          context,
+                        ).body(settings.fontSize, family: settings.fontFamily),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -272,6 +346,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
+                ListTile(
+                  key: const Key('settings-feedback'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.chat_bubble_outline_rounded),
+                  title: const Text('Зваротная сувязь'),
+                  subtitle: const Text(
+                    'Прапанова, пытанне або праблема з праграмай. Пра памылку ў тэксце — праз меню «⋯» на патрэбнай старонцы.',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/settings/feedback'),
+                ),
+                const AppReviewSettingsSection(),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                const AdminSongbookLoginSection(),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
                 const PriestAccessSettingsSection(),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -281,16 +374,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   future: PackageInfo.fromPlatform(),
                   builder: (context, snapshot) =>
                       Text('Версія ${snapshot.data?.version ?? '—'}'),
-                ),
-                ListTile(
-                  key: const Key('settings-feedback'),
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Зваротная сувязь'),
-                  subtitle: const Text(
-                    'Паведаміць пра памылку ў тэксце або даслаць прапанову',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/settings/feedback'),
                 ),
                 Align(
                   alignment: Alignment.centerLeft,

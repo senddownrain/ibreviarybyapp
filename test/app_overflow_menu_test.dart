@@ -37,11 +37,12 @@ void main() {
 
     await openMenu(tester);
     expect(find.text('Шрыфт'), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
     expect(find.byType(FilterChip), findsNothing);
     expect(find.byType(SwitchListTile), findsNothing);
     expect(
       tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
-      lessThanOrEqualTo(288),
+      lessThanOrEqualTo(216),
     );
 
     await tester.tap(find.text('Шрыфт'));
@@ -229,6 +230,43 @@ void main() {
       router.pop();
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets('prayer error is last and short; categories absent', (
+    tester,
+  ) async {
+    var reports = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AppOverflowMenu(
+            showTextScale: true,
+            actions: [
+              ReaderSecondaryAction(
+                label: 'Памылка',
+                icon: Icons.flag_outlined,
+                onSelected: () => reports++,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await openMenu(tester);
+    expect(find.text('Катэгорыі'), findsNothing);
+    expect(find.text('Паведаміць пра памылку'), findsNothing);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
+      lessThanOrEqualTo(216),
+    );
+    expect(
+      tester.getTopLeft(find.text('Памылка')).dy,
+      greaterThan(tester.getTopLeft(find.text('Інфармацыя')).dy),
+    );
+    await tester.tap(find.text('Памылка'));
+    await tester.pumpAndSettle();
+    expect(reports, 1);
   });
 
   testWidgets('context action runs after popup closes', (tester) async {

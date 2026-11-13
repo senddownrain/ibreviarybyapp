@@ -4,6 +4,7 @@ import 'package:mybrev_flutter/discovery/discovery_providers.dart';
 import 'package:mybrev_flutter/discovery/hints/p2_hints.dart';
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/discovery/ui/discovery_hint_host.dart';
+import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
 import 'package:mybrev_flutter/providers/bible_data_provider.dart';
 import 'package:mybrev_flutter/providers/compendium_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
@@ -66,9 +67,10 @@ DiscoveryProbe p2Probe(
       actions: {'discover.prayers': () => open(kPrayersRoute, replace: true)},
     );
   }
+  final isAdmin = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
   // Data is read only while its hint can still win: songs, Compendium and the
   // Bible are decoded from bundled assets, so everything works offline.
-  facts[kFactSongbookLoaded] = wanted('discover.songbook', kVisitSongs)
+  facts[kFactSongbookLoaded] = isAdmin && wanted('discover.songbook', kVisitSongs)
       ? (_loaded(ref.watch(songsProvider))?.isNotEmpty ?? false)
       : false;
   facts[kFactCompendiumAvailable] =
@@ -82,13 +84,13 @@ DiscoveryProbe p2Probe(
   return DiscoveryProbe(
     facts: facts,
     anchors: {
-      'discover.songbook.link': [_songbookTile],
+      if (isAdmin) 'discover.songbook.link': [_songbookTile],
       'discover.compendium.link': [_compendiumTile],
       'discover.bible.tab': [_bibleTab],
     },
     chromeAnchors: const {'discover.bible.tab'},
     actions: {
-      'discover.songbook': () => open(kSongbookRoute),
+      if (isAdmin) 'discover.songbook': () => open(kSongbookRoute),
       'discover.catechism': () => open(kCompendiumRoute),
       'discover.bible': () => open(kBibleRoute, replace: true),
     },

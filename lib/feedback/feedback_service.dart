@@ -7,7 +7,10 @@ import 'package:http/http.dart' as http;
 import 'feedback_models.dart';
 
 /// Public URL of the shared feedback Worker (no secret): `--dart-define=FEEDBACK_API_URL=...`.
-const String kFeedbackApiUrl = String.fromEnvironment('FEEDBACK_API_URL');
+const String kFeedbackApiUrl = String.fromEnvironment(
+  'FEEDBACK_API_URL',
+  defaultValue: 'https://mybrev-feedback.slovo-app.workers.dev',
+);
 
 enum FeedbackFailure {
   notConfigured,
@@ -15,6 +18,9 @@ enum FeedbackFailure {
   rateLimited,
   unavailable,
   rejected,
+
+  /// The Worker saw this request id with another message (409).
+  requestIdReused,
 }
 
 class FeedbackException implements Exception {
@@ -87,6 +93,8 @@ class FeedbackService {
       if (id is String) return id;
       throw const FeedbackException(FeedbackFailure.unavailable);
     }
+    if (res.statusCode == 409)
+      throw const FeedbackException(FeedbackFailure.requestIdReused);
     if (res.statusCode == 429)
       throw const FeedbackException(FeedbackFailure.rateLimited);
     if (res.statusCode >= 500)

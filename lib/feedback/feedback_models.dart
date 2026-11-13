@@ -104,13 +104,60 @@ class FeedbackContext {
     'lang': lang,
   };
 
-  String get summary => [
-    title,
-    if (kind != null) 'тып: $kind',
-    if (id != null) 'ID: $id',
-    date,
-    hour,
-  ].whereType<String>().join(' · ');
+  /// Short human label, e.g. «Малітва · Ойча наш». Never the whole text.
+  String get summary {
+    final parts = [
+      _kindLabels[kind],
+      title,
+      date,
+      _hourLabels[hour],
+    ].whereType<String>().where((e) => e.isNotEmpty).toList();
+    if (parts.isNotEmpty) return parts.join(' · ');
+    return id == null ? '' : 'ID: $id';
+  }
+}
+
+const _kindLabels = {
+  'prayer': 'Малітва',
+  'song': 'Спеў',
+  'reading': 'Чытанні',
+  'hour': 'Літургія гадзінаў',
+  'day': 'Дзень літургіі',
+  'bible': 'Біблія',
+  'compendium': 'Кампендый',
+  'other': 'Іншае',
+};
+const _hourLabels = {
+  'invitatory': 'Запрашальнае',
+  'office_of_readings': 'Гадзіна чытанняў',
+  'lauds': 'Ютрань',
+  'daytime': 'Дзённая малітва',
+  'vespers': 'Вячэрня',
+  'compline': 'Камплета',
+  'mass': 'Імша',
+};
+
+/// One request id per composed message: a retry of the SAME message keeps the id
+/// (idempotent on the server), any change to the payload gets a new one.
+class FeedbackAttempt {
+  FeedbackAttempt(this._generate);
+  final String Function() _generate;
+  String? _id;
+  String? _key;
+
+  String idFor(Object payload) {
+    final key = payload.toString();
+    if (_id == null || _key != key) {
+      _id = _generate();
+      _key = key;
+    }
+    return _id!;
+  }
+
+  void reset() {
+    _id = null;
+    _key = null;
+  }
 }
 
 /// Location of the "report an error" action for a material.
@@ -130,6 +177,95 @@ String feedbackLocation({
     if (title != null) 'ctx_title': title,
   },
 ).toString();
+
+/// Label of the one "report an error" entry in the overflow menu of content screens.
+const String kReportErrorLabel = 'Памылка';
+
+const _hourByType = {
+  'invitatorium': 'invitatory',
+  'lectionis': 'office_of_readings',
+  'laudes': 'lauds',
+  'morning': 'lauds',
+  'terz': 'daytime',
+  'sext': 'daytime',
+  'non': 'daytime',
+  'vespers': 'vespers',
+  'completorium': 'compline',
+  'mass': 'mass',
+};
+
+/// Automatic "report an error" location for the screen at [uri], or null when
+/// the screen is not a material (home, lists, settings, about, the form itself).
+/// Only public ids, dates and hour codes from the route are used.
+String? feedbackLocationForUri(Uri uri) {
+  final segments = [
+    for (final s in uri.pathSegments)
+      if (s.isNotEmpty) s,
+  ];
+  if (segments.isEmpty) return null;
+  final query = uri.queryParameters;
+  String? safe(String? v) => v != null && _safeId.hasMatch(v) ? v : null;
+  String? date(String? v) => v != null && _date.hasMatch(v) ? v : null;
+
+  final rest = segments.first == 'hours' || segments.first == 'prayers'
+      ? segments.sublist(1)
+      : segments;
+  if (rest.isEmpty) return null;
+  final head = rest.first;
+  final tail = rest.sublist(1);
+  String? part(int i) => i < tail.length ? tail[i] : null;
+  if (tail.contains('edit') || tail.contains('add')) return null;
+
+  switch (head) {
+    case 'ora':
+      return feedbackLocation(
+        kind: 'hour',
+        id: safe(part(1)),
+        date: date(part(0)),
+        hour: _hourByType[part(2)] ?? 'other',
+      );
+    case 'hora':
+      return feedbackLocation(
+        kind: 'day',
+        id: safe(part(1)),
+        date: date(part(0)),
+      );
+    case 'ordo':
+      return part(0) == 'month'
+          ? null
+          : feedbackLocation(
+              kind: 'day',
+              id: safe(query['dayId']),
+              date: date(query['date']),
+            );
+    case 'readings':
+    case 'reading':
+      if (part(0) == 'picker' || part(0) == 'options') return null;
+      final byId = head == 'reading' ? part(0) : null;
+      return feedbackLocation(
+        kind: 'reading',
+        id: safe(byId ?? (part(0) == 'reading' ? part(1) : null)),
+        date: date(query['date']) ?? date(part(0)),
+      );
+    case 'prayer':
+      return part(0) == null
+          ? null
+          : feedbackLocation(kind: 'prayer', id: safe(part(0)));
+    case 'songs':
+      return part(0) == null
+          ? null
+          : feedbackLocation(kind: 'song', id: safe(part(0)));
+    case 'compendium':
+      return tail.isEmpty
+          ? null
+          : feedbackLocation(kind: 'compendium', id: safe(tail.last));
+    case 'bible':
+      return part(0) == null || part(0) == 'search'
+          ? null
+          : feedbackLocation(kind: 'bible', id: safe(tail.join('-')));
+  }
+  return null;
+}
 
 final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
 

@@ -77,48 +77,6 @@ LiturgicalDay? normalizeFirstVespers(LiturgicalDay day) {
   return LiturgicalDay.fromMap(data);
 }
 
-/// Web assembleFirstVespers: fill each absent I-Vespers field from the
-/// celebration's own Vespers. The Advent O antiphon belongs to tonight.
-LiturgicalDay assembleFirstVespers(
-  LiturgicalDay tomorrow, {
-  LiturgicalDay? civilDay,
-}) {
-  final data = tomorrow.toMap();
-  var own = 0;
-  const suffixes = [
-    'Hymn',
-    'Ant1',
-    'Ant2',
-    'Ant3',
-    'Ps1',
-    'Ps2',
-    'Ps3',
-    'R',
-    'AntMag',
-    'Inter',
-    'Pr',
-  ];
-  for (final suffix in suffixes) {
-    final first = tomorrow.field('vesper1$suffix') ?? '';
-    if (first.trim().isNotEmpty) own++;
-    data['vesper$suffix'] = first.trim().isNotEmpty
-        ? first
-        : tomorrow.field('vesper$suffix') ?? '';
-  }
-  data['_firstVespersSource'] = own == suffixes.length
-      ? 'vesper1'
-      : own > 0
-      ? 'vesper1+proper'
-      : 'proper';
-  if (civilDay?.periodType == 'advent' &&
-      tomorrow.periodType == 'advent' &&
-      RegExp(r'^advent-\d{2}-12$').hasMatch(civilDay!.id) &&
-      (civilDay.field('vesperAntMag') ?? '').trim().isNotEmpty) {
-    data['vesperAntMag'] = civilDay.field('vesperAntMag');
-  }
-  return LiturgicalDay.fromMap(data);
-}
-
 bool shouldShowTeDeum(LiturgicalDay? day) {
   if (day == null || day.field('_kind') == 'office-for-dead') return false;
   final period = (day.periodType ?? '').toLowerCase();

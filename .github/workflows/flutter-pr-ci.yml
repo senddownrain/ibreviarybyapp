@@ -34,17 +34,100 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
+      - name: Five Flutter visual acceptance screenshots
+        env:
+          READER_UI_ACCEPTANCE_IMAGES: '1'
+          LITURGY_SMOKE_IMAGES: '1'
+        run: |
+          flutter test test/reader_ui_acceptance_visual_test.dart
+          flutter test test/liturgical_screen_smoke_test.dart --plain-name "readings light 16.0 360.0x800.0 builds document"
+      - name: Archive reader acceptance screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-ui-acceptance-pr
+          path: |
+            build/ui_acceptance/*.png
+            build/liturgy_smoke/reader-acceptance-03-readings-end.png
+          if-no-files-found: warn
+      - name: Reader UI, layout and offline font regressions
+        run: >-
+          flutter test
+          test/app_overflow_menu_test.dart
+          test/layout/android_layout_lab_test.dart
+          test/text_scale_control_test.dart
+          test/liturgical_date_navigation_row_test.dart
+          test/liturgical_controls_test.dart
+          test/liturgical_heading_text_test.dart
+      - name: Actual date control screenshots (dark mode)
+        env:
+          HEADER_PREVIEW_FONT: assets/google_fonts/Literata-Regular.ttf
+          SELECTOR_EVIDENCE_DIR: build/date-control-preview
+        run: >-
+          flutter test --dart-define=HEADER_PREVIEWS=true
+          test/liturgical_header_flow_test.dart
+          --plain-name "date control visual preview"
+      - name: Upload date control screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: date-control-preview-polish
+          path: build/date-control-preview/*.png
+          if-no-files-found: warn
       - name: Check changed Dart formatting
-        run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart
+        run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
+      - name: Admin-only Songbook and contextual hint regressions
+        run: flutter test test/songbook_test.dart test/discovery/p2_hints_test.dart test/juan_diego_optional_memorial_test.dart
       - name: Local rights and external Web documents
         run: |
           python3 scripts/check_web_source_import.py
           dart format --output=none --set-exit-if-changed lib/models/source_documents.dart lib/screens/source_documents_screen.dart test/source_documents_test.dart test/source_documents_widget_test.dart tool/source_documents_smoke.dart
           flutter test test/source_documents_test.dart test/source_documents_widget_test.dart test/bible_repository_test.dart test/source_footer_test.dart test/compendium_screens_test.dart test/router_architecture_test.dart test/stateful_shell_navigation_test.dart test/secondary_menu_test.dart test/privacy_policy_link_test.dart
+      - name: Daily Hours and Readings heading regressions
+        run: >-
+          flutter test test/liturgical_day_header_metadata_test.dart
+          test/hours_root_test.dart
+      - name: Josaphat alternatives deduplicate dioceses
+        run: >-
+          flutter test test/liturgical_header_flow_test.dart
+          --plain-name "12 November alternatives show each diocese once while preserving ranks"
+      - name: Approved Vitebsk daily headers screenshots
+        env:
+          HEADER_PREVIEW_FONT: assets/google_fonts/Literata-Regular.ttf
+          SELECTOR_EVIDENCE_DIR: build/pr90-header
+        run: >-
+          flutter test test/liturgical_header_flow_test.dart
+          --dart-define=HEADER_PREVIEWS=true
+          --plain-name "approved 12 November Vitebsk Hours and Readings headers"
+      - name: Archive approved 12 November Flutter screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-header-pr90
+          path: build/pr90-header/approved-vitebsk-*.png
+          if-no-files-found: warn
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
+      - name: Sunday 32 Benedictus visual fixture
+        env:
+          LITURGY_SMOKE_IMAGES: '1'
+        run: >-
+          flutter test test/liturgical_screen_smoke_test.dart
+          --plain-name "08.11.2026 Benedictus Year A antiphon is sung twice"
+      - name: Archive Sunday 32 screen captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benedictus-2026-11-08-pr
+          path: build/liturgy_smoke/2026-11-08-benedictus-year-a-*.png
+          if-no-files-found: warn
+
+      - name: Immaculate Heart and Sunday I Vespers regression
+        run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
+      - name: Offline content, atomic updates and calendar refresh regression
+        run: flutter test test/content_offline_test.dart test/ordo_content_update_test.dart
       - name: Movable feast daytime prayer and delivery regression
         run: >-
           flutter test test/high_priest_daytime_test.dart
@@ -61,6 +144,7 @@ jobs:
         run: >-
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
           test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
+          test/reader_alignment_test.dart
 
       - name: Psalmody bundle, alternatives and existing local data
         run: |
