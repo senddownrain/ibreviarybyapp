@@ -18,6 +18,9 @@ enum FeedbackFailure {
   rateLimited,
   unavailable,
   rejected,
+
+  /// The Worker saw this request id with another message (409).
+  requestIdReused,
 }
 
 class FeedbackException implements Exception {
@@ -90,6 +93,8 @@ class FeedbackService {
       if (id is String) return id;
       throw const FeedbackException(FeedbackFailure.unavailable);
     }
+    if (res.statusCode == 409)
+      throw const FeedbackException(FeedbackFailure.requestIdReused);
     if (res.statusCode == 429)
       throw const FeedbackException(FeedbackFailure.rateLimited);
     if (res.statusCode >= 500)

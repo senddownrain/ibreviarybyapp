@@ -104,13 +104,60 @@ class FeedbackContext {
     'lang': lang,
   };
 
-  String get summary => [
-    title,
-    if (kind != null) 'тып: $kind',
-    if (id != null) 'ID: $id',
-    date,
-    hour,
-  ].whereType<String>().join(' · ');
+  /// Short human label, e.g. «Малітва · Ойча наш». Never the whole text.
+  String get summary {
+    final parts = [
+      _kindLabels[kind],
+      title,
+      date,
+      _hourLabels[hour],
+    ].whereType<String>().where((e) => e.isNotEmpty).toList();
+    if (parts.isNotEmpty) return parts.join(' · ');
+    return id == null ? '' : 'ID: $id';
+  }
+}
+
+const _kindLabels = {
+  'prayer': 'Малітва',
+  'song': 'Спеў',
+  'reading': 'Чытанні',
+  'hour': 'Літургія гадзінаў',
+  'day': 'Дзень літургіі',
+  'bible': 'Біблія',
+  'compendium': 'Кампендый',
+  'other': 'Іншае',
+};
+const _hourLabels = {
+  'invitatory': 'Запрашальнае',
+  'office_of_readings': 'Гадзіна чытанняў',
+  'lauds': 'Ютрань',
+  'daytime': 'Дзённая малітва',
+  'vespers': 'Вячэрня',
+  'compline': 'Камплета',
+  'mass': 'Імша',
+};
+
+/// One request id per composed message: a retry of the SAME message keeps the id
+/// (idempotent on the server), any change to the payload gets a new one.
+class FeedbackAttempt {
+  FeedbackAttempt(this._generate);
+  final String Function() _generate;
+  String? _id;
+  String? _key;
+
+  String idFor(Object payload) {
+    final key = payload.toString();
+    if (_id == null || _key != key) {
+      _id = _generate();
+      _key = key;
+    }
+    return _id!;
+  }
+
+  void reset() {
+    _id = null;
+    _key = null;
+  }
 }
 
 /// Location of the "report an error" action for a material.
@@ -136,18 +183,14 @@ const String kReportErrorLabel = 'Памылка';
 
 const _hourByType = {
   'invitatorium': 'invitatory',
-  'invitatory': 'invitatory',
-  'office_of_readings': 'office_of_readings',
-  'readings': 'office_of_readings',
-  'lauds': 'lauds',
+  'lectionis': 'office_of_readings',
+  'laudes': 'lauds',
   'morning': 'lauds',
-  'daytime': 'daytime',
-  'terce': 'daytime',
+  'terz': 'daytime',
   'sext': 'daytime',
-  'none': 'daytime',
+  'non': 'daytime',
   'vespers': 'vespers',
-  'evening': 'vespers',
-  'compline': 'compline',
+  'completorium': 'compline',
   'mass': 'mass',
 };
 
@@ -187,6 +230,14 @@ String? feedbackLocationForUri(Uri uri) {
         id: safe(part(1)),
         date: date(part(0)),
       );
+    case 'ordo':
+      return part(0) == 'month'
+          ? null
+          : feedbackLocation(
+              kind: 'day',
+              id: safe(query['dayId']),
+              date: date(query['date']),
+            );
     case 'readings':
     case 'reading':
       if (part(0) == 'picker' || part(0) == 'options') return null;
