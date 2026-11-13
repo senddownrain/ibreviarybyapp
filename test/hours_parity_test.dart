@@ -153,6 +153,11 @@ void main() {
             'daysCompared': compared,
             'assembliesCompared': templatesCompared,
             'structureMismatches': structure.length,
+            'mismatchesByDioceseYear': {
+              for (final diocese in (fixture['dioceses'] as List).cast<String>()) diocese: {
+                  for (var year = 2025; year <= 2035; year++) '$year': {'structure': structure.where((m) => m.startsWith('$year-') && m.split('\n').first.contains(diocese)).length, 'text': text.where((m) => m.startsWith('$year-') && m.split('\n').first.contains(diocese)).length},
+                },
+            },
             'officeTextMismatches': text.length,
             'structureExamples': structure.take(10).toList(),
             'officeTextExamples': text.take(20).toList(),
