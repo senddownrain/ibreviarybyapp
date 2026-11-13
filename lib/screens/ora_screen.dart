@@ -1,3 +1,5 @@
+import 'package:mybrev_flutter/ordo/runtime.dart';
+import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
 import 'package:mybrev_flutter/widgets/source_footer.dart';
 import 'package:flutter/foundation.dart';
@@ -264,51 +266,27 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     LiturgicalDay selected,
     DateTime tomorrow,
     List<DayOption> options,
-  ) => _firstVespersOf(tomorrow, options) ?? _secondVespers(selected);
-
-  LiturgicalDay _secondVespers(LiturgicalDay selected) {
-    if (widget.date.weekday == DateTime.sunday || isSolemnity(selected)) {
-      _vespersRubric = 'II Нешпары';
-    }
-    return selected;
-  }
-
-  /// I Vespers of tomorrow's celebration, when tomorrow has them.
-  LiturgicalDay? _firstVespersOf(DateTime tomorrow, List<DayOption> options) {
-    final candidates = options
-        .map((option) => option.day)
-        .whereType<LiturgicalDay>();
-
-    bool isUniversal(LiturgicalDay day) {
-      final place = day.data['_place'];
-      return place == null ||
-          (place is String && place.trim().isEmpty) ||
-          (place is List && place.isEmpty);
-    }
-
-    final first = candidates
-        .where(
-          (day) =>
-              isUniversal(day) &&
-              hasFirstVespersRank(day) &&
-              hasFirstVespers(day),
-        )
-        .firstOrNull;
-    if (first != null) {
-      final title = liturgicalDayDisplayTitle(first, tomorrow);
-      _vespersRubric =
-          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
-      return normalizeFirstVespers(first)!;
-    }
-    if (widget.date.weekday == DateTime.saturday) {
-      final tomorrowDay = candidates.where(isUniversal).firstOrNull;
-      if (tomorrowDay != null) {
-        final title = liturgicalDayDisplayTitle(tomorrowDay, tomorrow);
-        _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'нядзелі' : title}';
-        return tomorrowDay;
+  ) {
+    final diocese =
+        widget.diocese ?? ref.read(dioceseSelectionProvider).primary;
+    final evening = OrdoRuntime.engine
+        .resolve(isoOf(widget.date), diocese: diocese)
+        .evening;
+    if (evening.vespersType == 'first') {
+      final option =
+          options
+              .where((o) => o.optionId == evening.celebrationId)
+              .firstOrNull ??
+          options.where((o) => o.ordo?.role == 'primary').firstOrNull;
+      if (option?.day case final LiturgicalDay day) {
+        final title = liturgicalDayDisplayTitle(day, tomorrow);
+        _vespersRubric =
+            'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+        return assembleFirstVespers(day, civilDay: selected);
       }
     }
-    return null;
+    _vespersRubric = evening.vespersType == 'second' ? 'II Нешпары' : null;
+    return selected;
   }
 
   @override

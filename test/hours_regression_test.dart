@@ -142,34 +142,27 @@ void main() {
     expect(service.contentForDate(DateTime(2025, 11, 3)).ordo.isSplit, false);
   });
 
-  test('Immaculate Heart + St Anthony (13.06.2026): exactly two memorial '
-      'Offices, no weekday card (§11.2)', () {
+  test('Immaculate Heart + St Anthony: weekday and two optional Offices', () {
     for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
       final content = service.contentForDate(
         DateTime(2026, 6, 13),
         diocese: diocese,
       );
       expect(
-        [for (final option in content.options) option.ordo?.optionId],
-        ['immaculate-heart', 'sv-anthony-padua'],
+        [
+          for (final option in content.options.where((o) => o.ordo != null))
+            option.ordo?.optionId,
+        ],
+        [content.ordo.primary.id, 'immaculate-heart', 'sv-anthony-padua'],
         reason: diocese,
       );
-      expect(content.options.first.ordo!.role, 'primary');
-      expect(content.options.last.ordo!.role, 'alternative');
+      expect(content.options.first.ordo!.kind, 'temporal');
       expect(
-        content.options.any((o) => o.ordo?.kind == 'temporal'),
-        isFalse,
-        reason: 'the weekday is not a third option',
-      );
-      // The Immaculate Heart card has no «З дня» assembly; St Anthony keeps
-      // the rubrical memorial choice of the day's psalmody, as on the web.
-      expect(
-        content.options.first.templates.map((t) => t.choice),
-        isNot(contains(kCurrentDayChoice)),
-      );
-      expect(
-        content.options.first.templates.map((t) => t.label),
-        isNot(contains(kCurrentDayLabel)),
+        content.options
+            .where((o) => o.ordo != null)
+            .skip(1)
+            .every((o) => o.ordo!.rank == 'memoria-ad-libitum'),
+        isTrue,
       );
     }
   });

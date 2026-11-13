@@ -1,20 +1,20 @@
 {
   "heads": {
-    "web": "08b12838fcc7a737149dccd4225a043b6efcaec3",
-    "flutter": "d17578cd196fed3a6cf5330e9667217583a9317c",
+    "web": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+    "flutter": null,
     "flutterSdk": "3.41.4"
   },
-  "fixtureSnapshot": "2026-10-20T10:21:54.388Z",
-  "bundleContentVersion": 1792491714388,
+  "fixtureSnapshot": "2026-11-08T22:16:20.000Z",
+  "bundleContentVersion": 1794176180000,
   "daysCompared": 16068,
-  "assembliesCompared": 37738,
+  "assembliesCompared": 37716,
   "structureMismatches": 0,
   "officeTextMismatches": 0,
   "structureExamples": [],
   "officeTextExamples": [],
   "optionsByProperSource": {
-    "liturgicalProperTexts": 8006,
-    "-": 18894,
-    "none": 906
+    "liturgicalProperTexts": 7771,
+    "-": 19230,
+    "none": 955
   }
 }

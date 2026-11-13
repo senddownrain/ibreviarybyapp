@@ -469,7 +469,11 @@ void main() {
         final option = LiturgicalContentService()
             .contentForDate(date)
             .options
-            .where((o) => o.ordo?.role == 'alternative')
+            .where(
+              (o) =>
+                  o.ordo?.role == 'alternative' &&
+                  (date.month != 6 || o.optionId == 'sv-anthony-padua'),
+            )
             .first;
         await frame(
           tester,

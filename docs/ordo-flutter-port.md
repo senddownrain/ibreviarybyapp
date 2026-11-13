@@ -1,3 +1,8 @@
+> Актуализация 09.11.2026: календарь 06.11.2026, general collision norms,
+> revision/cache guards и полный parity 2025–2035 описаны в
+> [отчёте кандидата #75](audits/belarus-approved-2026-11/REPORT.md).
+> Старые product rules ниже — историческое описание предыдущего этапа.
+
 # Ordo / Hours во Flutter: перенос web-архитектуры MyBrev
 
 > Октябрь 2026. План — `docs/ordo-flutter-port-plan.md`. Источник истины по

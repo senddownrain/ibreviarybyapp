@@ -89,7 +89,17 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
       final matchingTemplate = option.templates
           .where((candidate) => candidate.answers(selectedDayId))
           .firstOrNull;
-      if (option.dayId == selectedDayId || matchingTemplate != null) {
+      final septemberAlias =
+          RegExp(
+            r'^08-09-(?:nativity-blessed-virgin-mary|our-lady-braslau-vitebsk)(?:--|$)',
+          ).hasMatch(selectedDayId) &&
+          [
+            'nativity-blessed-virgin-mary',
+            'our-lady-braslau',
+          ].contains(option.optionId);
+      if (option.dayId == selectedDayId ||
+          matchingTemplate != null ||
+          septemberAlias) {
         selected = option;
         template = matchingTemplate;
         break;

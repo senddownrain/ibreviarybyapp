@@ -110,6 +110,66 @@ class ContentStore {
     revision.value++;
   }
 
+  /// An old cache may have a later download timestamp but an older calendar
+  /// revision. Select the bundled calendar as one unit, never mix its layers.
+  bool get calendarUsesBaseline {
+    final meta = collection('liturgicalCalendarMeta');
+    final baseline = meta.baselineDocument('current');
+    if (baseline == null || !areLoaded(kOrdoCalendarCollections)) return false;
+    final effective = meta.get('current');
+    if (effective is! Map || effective['schemaVersion'] != 1) return true;
+    final baseRevision = (baseline['revision'] as num?)?.toInt() ?? 0;
+    final revision = (effective['revision'] as num?)?.toInt() ?? 0;
+    if (revision < baseRevision) return true;
+    // One revision identifies one set of definitions. A different set under
+    // the same revision is an unfinished/stale publication, not an update.
+    return revision == baseRevision &&
+        kOrdoCalendarCollections.skip(1).any((name) {
+          final item = collection(name);
+          return item.digest() != contentDigest(item._baselineHashes);
+        });
+  }
+
+  int get calendarRevision {
+    final meta = collection('liturgicalCalendarMeta');
+    final raw = calendarUsesBaseline
+        ? meta.baselineDocument('current')
+        : meta.get('current');
+    return raw is Map ? (raw['revision'] as num?)?.toInt() ?? 0 : 0;
+  }
+
+  void _validateCalendarGeneration(
+    Map<String, Map<String, Map<String, dynamic>?>> ops,
+  ) {
+    if (!ops.keys.any(kOrdoCalendarCollections.contains)) return;
+    final meta = collection('liturgicalCalendarMeta');
+    if (meta.baselineDocument('current') == null) return;
+    final current = calendarUsesBaseline
+        ? meta.baselineDocument('current')
+        : meta.get('current');
+    final writesMeta =
+        ops['liturgicalCalendarMeta']?.containsKey('current') ?? false;
+    final metaOps = ops['liturgicalCalendarMeta'];
+    final metaWrite = metaOps == null ? null : metaOps['current'];
+    final next = writesMeta
+        ? (metaWrite == null ? null : metaWrite['d'])
+        : current;
+    final changesDefinitions = kOrdoCalendarCollections
+        .skip(1)
+        .any((name) => ops[name]?.isNotEmpty ?? false);
+    final nextRevision = next is Map
+        ? (next['revision'] as num?)?.toInt() ?? 0
+        : 0;
+    if (next is! Map ||
+        next['schemaVersion'] != 1 ||
+        nextRevision < calendarRevision ||
+        (changesDefinitions && nextRevision <= calendarRevision)) {
+      throw StateError(
+        'Calendar update requires schema 1 and a larger revision for changed definitions',
+      );
+    }
+  }
+
   /// Starts loading everything in the background, liturgy first.
   void preloadAll() {
     _preload = ensureLoaded(kLiturgicalCollections)
@@ -166,6 +226,10 @@ class ContentStore {
     ContentCommitPhase? stopAfter,
   }) async {
     await _recover();
+    if (_bundleEnabled && ops.keys.any(kOrdoCalendarCollections.contains)) {
+      await ensureLoaded(kOrdoCalendarCollections);
+      _validateCalendarGeneration(ops);
+    }
     final staging = await _stagingBox();
     await staging.clear();
     await staging.putAll({
@@ -488,6 +552,8 @@ class ContentCollection {
 
   /// Bundled document of [key], ignoring the overlay.
   Map<String, dynamic>? baselineDocument(String key) => _baseline[key];
+
+  Iterable<String> get baselineKeys => _baseline.keys;
 
   int get overlayLength => _view.length;
 

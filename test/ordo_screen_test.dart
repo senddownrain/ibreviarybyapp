@@ -188,7 +188,7 @@ void main() {
     expect(find.textContaining('Не адзначаюцца'), findsOneWidget);
   });
 
-  testWidgets('13.06.2026: two memorial choices, no demotion badge', (
+  testWidgets('13.06.2026: weekday primary and two optional memorials', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1170, 2532);
@@ -197,7 +197,7 @@ void main() {
     await pump(tester, app(DateTime(2026, 6, 13)));
     expect(
       find.byKey(
-        const Key('ordo-row-immaculate-heart-primary'),
+        const Key('ordo-row-immaculate-heart-alternative'),
         skipOffstage: false,
       ),
       findsOneWidget,

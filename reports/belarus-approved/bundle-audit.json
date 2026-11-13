@@ -1,0 +1,28 @@
+{
+  "changed": [
+    "liturgicalCalendarMeta",
+    "liturgicalCelebrations",
+    "liturgicalDioceseOverrides",
+    "liturgicalYearOverrides"
+  ],
+  "unchanged": [
+    "days",
+    "readings",
+    "liturgicalTemplates",
+    "invitatoriums",
+    "completoriums",
+    "liturgicalProperTexts",
+    "liturgicalOrdoNotes",
+    "prayers",
+    "prayerCategories",
+    "songs",
+    "compendium",
+    "compendiumMeta"
+  ],
+  "fixtureSha256": "56c0fee592624d563b9a23a5af15c8e6a949181f5feb3494f26e8fc75c67eecf",
+  "manifestSha256": "b16a01a0787c092047d18226413f0d4685c99ce9cfb11028586bcd642f92c46f",
+  "sourceReferenceSha256": "91166efd32828facc37d90258c87150ac15e864431d2a38f2af6abab3b6a952a",
+  "baseline": "729f17a",
+  "webCommit": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+  "lectionaryFixtureSha256": "8921ae679e1baa04a215d74074b6793e817cc277de914bbc9c24e04316fea873"
+}

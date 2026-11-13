@@ -385,17 +385,32 @@ void main() {
       expect(citations.last.bible, 'Мц 16, 13–19');
     });
 
-    test('Our Lady of Lahishyn: the alternative citation', () {
-      final result = readingsOn(
-        '2026-08-22',
-        diocese: 'pinsk',
-        dayId: '22-08-our-lady-lahishyn-pinsk',
-      );
-      final citations = result.massSet!.set.citations('');
-      expect(citations.first.bible, 'Саф 3, 14–18');
-      expect(citations.first.alternatives, ['Рым 12, 9–16аb']);
-      expect(citations.last.bible, 'Лк 1, 39–59');
-    });
+    test(
+      'Our Lady of Lahishyn: retained source citations without a general calendar assignment',
+      () {
+        final raw = HiveService.readingsBox.values.cast<Map>().firstWhere(
+          (doc) =>
+              '${doc['id']}'.contains('lahishyn') &&
+              doc['massReadings'] != null,
+        );
+        final source = ParsedReading.fromMap(
+          '${raw['id']}',
+          raw.cast<String, dynamic>(),
+        );
+        final citations = source.massReadings!.sets.first.citations('');
+        expect(citations.first.bible, 'Саф 3, 14–18');
+        expect(citations.first.alternatives, ['Рым 12, 9–16аb']);
+        expect(citations.last.bible, 'Лк 1, 39–59');
+        expect(
+          LiturgicalContentService()
+              .contentForDate(DateTime(2026, 8, 22), diocese: 'pinsk')
+              .ordo
+              .options
+              .map((o) => o.id),
+          isNot(contains('our-lady-lahishyn')),
+        );
+      },
+    );
   });
 
   group('All Souls', () {

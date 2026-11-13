@@ -79,6 +79,12 @@ void main() {
           final date = dateOfIso(record['date'] as String);
           final content = service.contentForDate(date, diocese: diocese);
           compared++;
+          if (Platform.environment['HOURS_PARITY_REPORT'] == '1' &&
+              '${record['date']}'.endsWith('-12-31')) {
+            stdout.writeln(
+              'Hours parity: $diocese ${record['date']} ($compared dates)',
+            );
+          }
           final actual = content.options;
           String shape(Map<String, dynamic> item) => jsonEncode({
             'key': item['key'],
@@ -154,10 +160,10 @@ void main() {
           })}\n',
         );
       }
-      expect(compared, greaterThan(11000));
+      expect(compared, 16068);
       expect(structure, isEmpty, reason: structure.take(6).join('\n'));
       expect(text, isEmpty, reason: text.take(20).join('\n'));
     },
-    timeout: const Timeout(Duration(minutes: 10)),
+    timeout: const Timeout(Duration(minutes: 20)),
   );
 }

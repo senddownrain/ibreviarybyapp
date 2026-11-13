@@ -45,6 +45,20 @@ void main() {
     };
     await store.commit(
       {
+        'liturgicalCalendarMeta': store
+            .collection('liturgicalCalendarMeta')
+            .planUpdate(
+              {
+                'current': {
+                  ...(store.collection('liturgicalCalendarMeta').get('current')
+                          as Map)
+                      .cast<String, dynamic>(),
+                  'revision': store.calendarRevision + 1,
+                },
+              },
+              {},
+              version,
+            ),
         'liturgicalCelebrations': celebrations.planUpdate(
           {'sv-bruno': bruno},
           {'sv-bruno': documentHash(bruno)},

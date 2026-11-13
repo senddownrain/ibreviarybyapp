@@ -330,8 +330,14 @@ OrdoEvening resolveEvening(
       tomorrowPrecedence == todayPrecedence &&
       tomorrowSeason.isSunday &&
       !todaySeason.isSunday;
+  // GNLYC 33, 39: Advent ends before Christmas I Vespers, even
+  // when 24 December is the fourth Sunday of Advent.
+  final christmasBoundary =
+      todaySeason.period == 'advent' &&
+      tomorrowPrimary['id'] == 'nativity-lord';
   final tomorrowWins =
-      tomorrowHasFirst && (tomorrowPrecedence < todayPrecedence || sundayTie);
+      tomorrowHasFirst &&
+      (tomorrowPrecedence < todayPrecedence || sundayTie || christmasBoundary);
   final todayKind = todayPrimary['officeKind'] as String;
   final todaySecond =
       todayKind == 'solemnity' ||

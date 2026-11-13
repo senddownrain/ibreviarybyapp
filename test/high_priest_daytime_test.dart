@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/generated/approved_office_sources.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -15,6 +16,9 @@ import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 
 const _id = 'feast-christthehighpriest';
+final _webCanonical =
+    ((approvedOfficeSources['highPriest'] as Map)['fields'] as Map)
+        .cast<String, dynamic>();
 const _suffixes = [
   'Hymn',
   'Ant1',
@@ -332,7 +336,7 @@ void main() {
         }
         expect(daytimeHourField(actual, h, 'Ant2'), '');
         expect(daytimeHourField(actual, h, 'Ant3'), '');
-        expect(actual.field('sext${h}Pr'), raw['laudesPr']);
+        expect(actual.field('sext${h}Pr'), _webCanonical['sext${h}Pr']);
       }
       final previous = resolveDayAgainstPeriod(_day(raw), period)!;
       for (final field in previous.data.keys.where(
@@ -408,7 +412,10 @@ void main() {
         expect(remote.fetched.toSet(), {_id});
         expect((await updater.check()).kind, ContentCheckKind.current);
         for (final entry in _canonical.entries) {
-          expect(feast().data[entry.key], before[entry.key] ?? '');
+          expect(
+            feast().data[entry.key],
+            _webCanonical[entry.key] ?? before[entry.key] ?? '',
+          );
         }
         // Explicit markers also fix older resolvers (before this Dart change).
         final oldResolver = resolveDayAgainstPeriod(_day(after), _period())!;
@@ -419,17 +426,20 @@ void main() {
         await Hive.close();
         await open();
         for (final entry in _canonical.entries) {
-          expect(feast().data[entry.key], before[entry.key] ?? '');
+          expect(
+            feast().data[entry.key],
+            _webCanonical[entry.key] ?? before[entry.key] ?? '',
+          );
         }
-        // A subsequent reviewed patch is the only content authority. No runtime
-        // JSON overlay can mask it. Reuse a real supplied reading as the marker.
+        // A subsequent edited field is authoritative: the Web fallback must
+        // not mask it. Reuse a real supplied reading as the marker.
         docs[_id] = {...after, 'sext2R': _canonical['sext3R']};
         final next = ContentUpdater(
           remote: _Remote(docs, remote.version + 1000),
         );
         await next.apply((await next.check()).plan!);
         expect(feast().field('sext2R'), _canonical['sext3R']);
-        expect(feast().field('sext1R'), before['sext1R']);
+        expect(feast().field('sext1R'), _webCanonical['sext1R']);
       },
     );
   });
