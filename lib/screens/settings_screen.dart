@@ -142,7 +142,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                 // Same order and live preview as the Web «Тэкст» section.
                 Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  data: Theme.of(
+                    context,
+                  ).copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
                     key: const Key('settings-text-section'),
                     title: Text(
@@ -183,7 +185,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ],
                         onChanged: (family) {
                           if (family != null) {
-                            ref.read(settingsProvider.notifier).setFontFamily(family);
+                            ref
+                                .read(settingsProvider.notifier)
+                                .setFontFamily(family);
                           }
                         },
                       ),
@@ -208,7 +212,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               min: kMinReaderFontSize,
                               max: kMaxReaderFontSize,
                               divisions: 11,
-                              label: '${readerFontScalePercent(settings.fontSize)}%',
+                              label:
+                                  '${readerFontScalePercent(settings.fontSize)}%',
                               onChanged: (val) => ref
                                   .read(settingsProvider.notifier)
                                   .setFontSize(val),
@@ -340,6 +345,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
+                ListTile(
+                  key: const Key('settings-feedback'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.chat_bubble_outline_rounded),
+                  title: const Text('Зваротная сувязь'),
+                  subtitle: const Text(
+                    'Прапанова, пытанне або праблема з праграмай. Пра памылку ў тэксце — праз меню «⋯» на патрэбнай старонцы.',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/settings/feedback'),
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
                 const AdminSongbookLoginSection(),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -353,16 +372,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   future: PackageInfo.fromPlatform(),
                   builder: (context, snapshot) =>
                       Text('Версія ${snapshot.data?.version ?? '—'}'),
-                ),
-                ListTile(
-                  key: const Key('settings-feedback'),
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Зваротная сувязь'),
-                  subtitle: const Text(
-                    'Паведаміць пра памылку ў тэксце або даслаць прапанову',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/settings/feedback'),
                 ),
                 Align(
                   alignment: Alignment.centerLeft,

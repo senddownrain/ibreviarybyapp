@@ -7,7 +7,10 @@ import 'package:http/http.dart' as http;
 import 'feedback_models.dart';
 
 /// Public URL of the shared feedback Worker (no secret): `--dart-define=FEEDBACK_API_URL=...`.
-const String kFeedbackApiUrl = String.fromEnvironment('FEEDBACK_API_URL');
+const String kFeedbackApiUrl = String.fromEnvironment(
+  'FEEDBACK_API_URL',
+  defaultValue: 'https://mybrev-feedback.slovo-app.workers.dev',
+);
 
 enum FeedbackFailure {
   notConfigured,
