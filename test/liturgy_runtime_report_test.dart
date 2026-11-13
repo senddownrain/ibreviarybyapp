@@ -79,6 +79,7 @@ void main() {
       'readingsReferenceOnly': 0,
       'readingsMissing': 0,
     };
+    final legacyOptionIds = <String>{};
     final missingProper = <String>{};
     final unavailable = <String>{};
     final referenceOnly = <String>{};
@@ -97,6 +98,7 @@ void main() {
             switch (option.properSource) {
               case ProperSource.legacyDays:
                 counts['legacyFixedDays'] = counts['legacyFixedDays']! + 1;
+                legacyOptionIds.add(option.ordo?.optionId ?? 'office-for-dead');
               case ProperSource.properTexts:
                 counts['properTexts'] = counts['properTexts']! + 1;
             }
@@ -172,7 +174,12 @@ void main() {
         })}\n',
       );
     }
-    expect(counts['legacyFixedDays'], 0);
+    // No option may depend on the legacy fixed `days` collection, except the
+    // known transitional Immaculate Heart (its Proper is the bundled `days`
+    // document `feast-heartofmary` since the Marian Hours work, Flutter #60;
+    // it is not yet published in `liturgicalProperTexts`). Any other legacy
+    // dependency still fails here.
+    expect(legacyOptionIds.difference({'immaculate-heart'}), isEmpty);
     expect(counts['integrityErrors'], 0);
   }, timeout: const Timeout(Duration(minutes: 10)));
 }

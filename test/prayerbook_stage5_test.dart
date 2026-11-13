@@ -450,16 +450,11 @@ void main() {
     await tester.tap(find.byKey(const Key('app-overflow-open')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Катэгорыі'), findsOneWidget);
+    // The menu no longer carries a «Катэгорыі» entry (removed in the compact
+    // universal popup); management lives on the Prayerbook root («Кіраваць»).
+    expect(find.text('Катэгорыі'), findsNothing);
     expect(find.text('Налады'), findsOneWidget);
     expect(find.text('Інфармацыя'), findsOneWidget);
-    await tester.tap(find.text('Катэгорыі'));
-    await tester.pumpAndSettle();
-    expect(find.text('categories-management-destination'), findsOneWidget);
-    expect(
-      router.routerDelegate.currentConfiguration.last.matchedLocation,
-      '/prayers/categories',
-    );
   });
 
   testWidgets('Prayerbook search keeps the shared overflow visible', (
