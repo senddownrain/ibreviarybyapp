@@ -88,7 +88,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     final reportLocation =
         router == null || actions.any((a) => a.label == kReportErrorLabel)
         ? null
-        : feedbackLocationForUri(router.routeInformationProvider.value.uri);
+        : feedbackLocationForUri(_visibleUri(router));
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -243,4 +243,13 @@ class _OverflowContent extends StatelessWidget {
     title: Text(label, maxLines: 2, overflow: TextOverflow.ellipsis),
     onTap: () => onSelected(value),
   );
+}
+
+/// The location the reader actually sees. A page opened with `context.push` is
+/// an imperative match with its own match list, while `routeInformationProvider`
+/// and `currentConfiguration.uri` keep naming the page underneath it.
+Uri _visibleUri(GoRouter router) {
+  final configuration = router.routerDelegate.currentConfiguration;
+  final last = configuration.lastOrNull;
+  return (last is ImperativeRouteMatch ? last.matches : configuration).uri;
 }

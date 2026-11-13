@@ -22,7 +22,7 @@ void main() {
       'ctx_kind': 'reading',
       'ctx_id': 'r9',
     });
-    expect(ctx('/hours/ora/2026-11-13/day-1/lauds'), {
+    expect(ctx('/hours/ora/2026-11-13/day-1/laudes'), {
       'ctx_kind': 'hour',
       'ctx_id': 'day-1',
       'ctx_date': '2026-11-13',
