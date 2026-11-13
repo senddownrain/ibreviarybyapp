@@ -390,9 +390,7 @@ void main() {
       );
       return ProviderScope(
         overrides: [
-          adminSongbookAccessProvider.overrideWith(
-            (ref) => Stream.value(admin),
-          ),
+          adminSongbookAccessProvider.overrideWith((ref) => Stream.value(admin)),
           discoveryStorageProvider.overrideWithValue(storage),
           discoveryRouteOpenerProvider.overrideWithValue(openDiscoveryRoute),
           hintPresenterProvider.overrideWith(

@@ -46,18 +46,15 @@ void main() {
     expect(first.field('vesperR'), isEmpty, reason: 'do not invent text');
   });
 
-  test(
-    'celebrations other than ordinary Sundays keep their own Vespers fallback',
-    () {
-      final feast = day('solemnity', {
-        'vesperHymn': 'celebration hymn',
-        'vesper1AntMag': 'own first antiphon',
-        'vesperAntMag': 'second antiphon',
-      });
-      final first = assembleFirstVespers(feast);
-      expect(first.field('vesperHymn'), 'celebration hymn');
-      expect(first.field('vesperAntMag'), 'own first antiphon');
-      expect(first.data['_firstVespersSource'], 'vesper1+proper');
-    },
-  );
+  test('celebrations other than ordinary Sundays keep their own Vespers fallback', () {
+    final feast = day('solemnity', {
+      'vesperHymn': 'celebration hymn',
+      'vesper1AntMag': 'own first antiphon',
+      'vesperAntMag': 'second antiphon',
+    });
+    final first = assembleFirstVespers(feast);
+    expect(first.field('vesperHymn'), 'celebration hymn');
+    expect(first.field('vesperAntMag'), 'own first antiphon');
+    expect(first.data['_firstVespersSource'], 'vesper1+proper');
+  });
 }

@@ -482,9 +482,7 @@ final router = GoRouter(
                         state,
                         _songDetailRoute,
                         AdminSongbookGuard(
-                          child: SongDetailScreen(
-                            songId: state.pathParameters['id']!,
-                          ),
+                          child: SongDetailScreen(songId: state.pathParameters['id']!),
                         ),
                       ),
                     ),

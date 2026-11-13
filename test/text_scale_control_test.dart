@@ -15,13 +15,10 @@ void main() {
       normalizeReaderFontFamily(ReaderFontFamily.system),
       ReaderFontFamily.system,
     );
-    expect(kAvailableReaderFonts.map((option) => option.label).toList(), [
-      'Literata',
-      'Source Serif 4',
-      'Old Standard TT',
-      'Kurale',
-      'Сістэмны',
-    ]);
+    expect(
+      kAvailableReaderFonts.map((option) => option.label).toList(),
+      ['Literata', 'Source Serif 4', 'Old Standard TT', 'Kurale', 'Сістэмны'],
+    );
     expect(
       normalizeReaderFontFamily('Old Standard TT'),
       ReaderFontFamily.oldStandardTt,

@@ -51,18 +51,20 @@ void main() {
     contextMetadata: contextMetadata,
   );
 
-  testWidgets(
-    'shows celebration rank but not the psalter week in daily header',
-    (tester) async {
-      await showHeader(tester, presentation: sample());
-      final text = tester.widget<Text>(
-        find.byKey(const Key('hours-day-metadata')),
-      );
-      expect(text.textSpan!.toPlainText(), 'Успамін · Аўторак');
-      expect(tester.takeException(), isNull);
-      tester.view.reset();
-    },
-  );
+  testWidgets('shows celebration rank but not the psalter week in daily header', (
+    tester,
+  ) async {
+    await showHeader(tester, presentation: sample());
+    final text = tester.widget<Text>(
+      find.byKey(const Key('hours-day-metadata')),
+    );
+    expect(
+      text.textSpan!.toPlainText(),
+      'Успамін · Аўторак',
+    );
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
 
   testWidgets('preserves readings-specific cycle metadata', (tester) async {
     await showHeader(
@@ -93,14 +95,14 @@ void main() {
     expect(find.byKey(const Key('hours-celebration-dioceses')), findsOneWidget);
     expect(
       tester.getTopLeft(find.text('Мінска-Магілёўская архідыяцэзія')).dy,
-      lessThan(
-        tester.getTopLeft(find.byKey(const Key('hours-celebration-title'))).dy,
-      ),
+      lessThan(tester.getTopLeft(find.byKey(const Key('hours-celebration-title'))).dy),
     );
     tester.view.reset();
   });
 
-  testWidgets('preserves a Vitebsk-specific rank and locality', (tester) async {
+  testWidgets('preserves a Vitebsk-specific rank and locality', (
+    tester,
+  ) async {
     await showHeader(
       tester,
       presentation: sample(
@@ -126,7 +128,10 @@ void main() {
   ) async {
     await showHeader(
       tester,
-      presentation: sample(place: '', badges: const ['Мінск', 'Віцебск']),
+      presentation: sample(
+        place: '',
+        badges: const ['Мінск', 'Віцебск'],
+      ),
     );
     expect(
       find.text('Мінска-Магілёўская архідыяцэзія · Віцебская дыяцэзія'),

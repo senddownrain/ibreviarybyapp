@@ -2003,10 +2003,7 @@ class _SectionLabel extends StatelessWidget {
         top: LiturgicalSpacing.sectionBefore,
         bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
-      child: Text(
-        _readingLabel(text).toUpperCase(),
-        style: rubric.readingsSectionHeading(base),
-      ),
+      child: Text(_readingLabel(text).toUpperCase(), style: rubric.readingsSectionHeading(base)),
     );
   }
 }
@@ -2100,10 +2097,8 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
         style: {
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
           if (widget.isProse) ...{
-            'body': liturgicalDocumentStyles(
-              reader: reader,
-              body: widget.textStyle,
-            )['body']!..textAlign = alignment,
+            'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
+              ..textAlign = alignment,
             'p': Style(
               textAlign: alignment,
               margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),

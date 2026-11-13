@@ -6,17 +6,8 @@ import 'package:mybrev_flutter/utils/liturgical_office.dart';
 /// Liturgical evening is selected by the Ordo's precedence decision, not by
 /// whether tomorrow's document happens to contain `vesper1*` fields.
 const firstVespersSuffixes = [
-  'Hymn',
-  'Ant1',
-  'Ant2',
-  'Ant3',
-  'Ps1',
-  'Ps2',
-  'Ps3',
-  'R',
-  'AntMag',
-  'Inter',
-  'Pr',
+  'Hymn', 'Ant1', 'Ant2', 'Ant3', 'Ps1', 'Ps2', 'Ps3', 'R', 'AntMag',
+  'Inter', 'Pr',
 ];
 
 bool _hasText(String? value) => value?.trim().isNotEmpty == true;
@@ -30,15 +21,12 @@ LiturgicalDay assembleFirstVespers(LiturgicalDay celebration) {
   for (final suffix in firstVespersSuffixes) {
     final first = celebration.field('vesper1$suffix');
     if (_hasText(first)) own++;
-    data['vesper$suffix'] = _hasText(first)
-        ? first
-        : (celebration.field('vesper$suffix') ?? '');
+    data['vesper$suffix'] =
+        _hasText(first) ? first : (celebration.field('vesper$suffix') ?? '');
   }
   data['_firstVespersSource'] = own == firstVespersSuffixes.length
       ? 'vesper1'
-      : own > 0
-      ? 'vesper1+proper'
-      : 'proper';
+      : own > 0 ? 'vesper1+proper' : 'proper';
   return LiturgicalDay.fromMap(data);
 }
 
@@ -54,15 +42,12 @@ LiturgicalDay assembleOrdinarySundayFirstVespers(
   for (final suffix in firstVespersSuffixes) {
     final proper = sunday.field('vesper1$suffix');
     final psalter = saturdayPsalter?.field('vesper$suffix');
-    final value = _hasText(proper)
-        ? proper!
-        : (_hasText(psalter) ? psalter! : '');
+    final value = _hasText(proper) ? proper! : (_hasText(psalter) ? psalter! : '');
     data['vesper$suffix'] = value;
     if (!_hasText(value)) missing.add(suffix);
   }
   data['_firstVespersSource'] = hasFirstVespers(sunday)
-      ? 'vesper1+saturday-psalter'
-      : 'saturday-psalter';
+      ? 'vesper1+saturday-psalter' : 'saturday-psalter';
   data['_missingFirstVespersFields'] = missing;
   return LiturgicalDay.fromMap(data);
 }
@@ -98,13 +83,10 @@ EveningOfficeResolution resolveEveningOffice({
     );
   }
 
-  final legal =
-      tomorrow.options
-          .where((option) => option.ordo?.optionId == evening.celebrationId)
-          .firstOrNull ??
-      tomorrow.options
-          .where((option) => option.ordo?.role == 'primary')
-          .firstOrNull;
+  final legal = tomorrow.options.where((option) =>
+      option.ordo?.optionId == evening.celebrationId).firstOrNull ??
+      tomorrow.options.where((option) =>
+          option.ordo?.role == 'primary').firstOrNull;
   final celebration = legal?.day;
   if (celebration == null) {
     // No legal source: do not label the current day's ordinary office as
@@ -112,8 +94,7 @@ EveningOfficeResolution resolveEveningOffice({
     return EveningOfficeResolution(day: selected);
   }
 
-  final ordinarySunday =
-      date.weekday == DateTime.saturday &&
+  final ordinarySunday = date.weekday == DateTime.saturday &&
       legal?.ordo?.officeKind == 'sunday' &&
       tomorrow.ordo.period == 'ordinary';
   final periodId = periodDayDocumentId(
@@ -123,8 +104,7 @@ EveningOfficeResolution resolveEveningOffice({
   );
   final resolved = ordinarySunday
       ? assembleOrdinarySundayFirstVespers(
-          celebration,
-          today.itemsDays[periodId],
+          celebration, today.itemsDays[periodId],
         )
       : assembleFirstVespers(celebration);
   return EveningOfficeResolution(

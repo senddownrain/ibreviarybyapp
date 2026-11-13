@@ -116,9 +116,7 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   }
 
   Widget _buildRendered(String text, TextStyle textStyle) {
-    final alignment = ref.watch(
-      settingsProvider.select((s) => s.textAlignment),
-    );
+    final alignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
     if (text.contains('<') && text.contains('>')) {
       final reader = ReaderTheme.of(context);
       final styles = liturgicalDocumentStyles(reader: reader, body: textStyle);

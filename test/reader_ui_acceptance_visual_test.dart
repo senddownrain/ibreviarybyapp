@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
@@ -20,8 +19,9 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 class _VisualSettings extends SettingsNotifier {
   @override
-  SettingsState build() =>
-      const SettingsState(themePreference: AppThemePreference.marian);
+  SettingsState build() => const SettingsState(
+    themePreference: AppThemePreference.marian,
+  );
 
   @override
   void setFontSize(double size) {
@@ -42,11 +42,9 @@ Future<void> _capture(WidgetTester tester, String name) async {
   await tester.runAsync(() async {
     final image = await boundary.toImage(pixelRatio: 1);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    final directory = Directory('build/ui_acceptance')
-      ..createSync(recursive: true);
-    File(
-      '${directory.path}/$name.png',
-    ).writeAsBytesSync(bytes!.buffer.asUint8List());
+    final directory = Directory('build/ui_acceptance')..createSync(recursive: true);
+    File('${directory.path}/$name.png')
+        .writeAsBytesSync(bytes!.buffer.asUint8List());
     image.dispose();
   });
 }
@@ -147,11 +145,11 @@ void main() {
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
-                useMaterial3: true,
-                colorScheme: AppPalette.marianScheme,
-                extensions: const [IbColors.marian],
-                fontFamily: 'VisualPreview',
-              ),
+              useMaterial3: true,
+              colorScheme: AppPalette.marianScheme,
+              extensions: const [IbColors.marian],
+              fontFamily: 'VisualPreview',
+            ),
               home: reader,
             ),
           ),

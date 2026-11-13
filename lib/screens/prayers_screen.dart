@@ -25,8 +25,7 @@ class PrayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritePrayersProvider);
-    final canSeeSongbook =
-        ref.watch(adminSongbookAccessProvider).valueOrNull == true;
+    final canSeeSongbook = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
     final categories = ref.watch(prayerMenuCategoriesProvider);
     final catalog = ref.watch(prayerCatalogProvider);
     final massAvailable = catalog.any(
@@ -100,12 +99,12 @@ class PrayersScreen extends ConsumerWidget {
                     ),
                     if (canSeeSongbook)
                       PrayerbookSectionTile(
-                        key: const Key('songbook-destination'),
-                        title: 'Спеўнік',
-                        subtitle: 'Пілігрымковы',
-                        icon: PhosphorIconsRegular.playlist,
-                        onTap: () => context.push('/prayers/songs'),
-                      ),
+                      key: const Key('songbook-destination'),
+                      title: 'Спеўнік',
+                      subtitle: 'Пілігрымковы',
+                      icon: PhosphorIconsRegular.playlist,
+                      onTap: () => context.push('/prayers/songs'),
+                    ),
                     PrayerbookSectionTile(
                       key: const Key('catechism-destination'),
                       title: 'Катэхізіс',

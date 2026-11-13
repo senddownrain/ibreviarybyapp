@@ -47,10 +47,9 @@ class SourcesScreen extends ConsumerWidget {
       const _Title('Крыніцы і аўтарскія правы'),
       for (final section in kPublicSourceBibliographySections) ...[
         _SectionTitle(section),
-        for (final entry
-            in kPublicSourceBibliography
-                .where((item) => item.section == section)
-                .indexed) ...[
+        for (final entry in kPublicSourceBibliography
+            .where((item) => item.section == section)
+            .indexed) ...[
           if (entry.$1 > 0) const Divider(height: 24),
           Column(
             key: ValueKey(entry.$2.id),

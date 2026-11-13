@@ -65,8 +65,10 @@ class _FourDioceses extends DioceseSelectionNotifier {
 
 class _VitebskDiocese extends DioceseSelectionNotifier {
   @override
-  DioceseSelection build() =>
-      const DioceseSelection(primary: 'vitebsk', selected: ['vitebsk']);
+  DioceseSelection build() => const DioceseSelection(
+    primary: 'vitebsk',
+    selected: ['vitebsk'],
+  );
 }
 
 void main() {
@@ -184,70 +186,78 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('approved 12 November Vitebsk Hours and Readings headers', (
-    tester,
-  ) async {
-    final (router, container) = await start(
-      tester,
-      date: DateTime(2026, 11, 12),
-      overrides: [dioceseSelectionProvider.overrideWith(_VitebskDiocese.new)],
-    );
-    final presentation = container.read(liturgicalDayPresentationProvider);
-    expect(presentation.title, contains('Язафата'));
-    expect(presentation.place, contains('Віцебская дыяцэзія'));
-    expect(presentation.rank, isNotEmpty);
-    expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(LiturgicalDayHeader),
-        matching: find.byType(Chip),
-      ),
-      findsNothing,
-    );
-    expect(
-      tester.getTopLeft(find.text('Віцебская дыяцэзія')).dy,
-      lessThan(
-        tester.getTopLeft(find.byKey(const Key('hours-celebration-title'))).dy,
-      ),
-    );
-    final hoursMetadata = tester.widget<Text>(
-      find.byKey(const Key('hours-day-metadata')),
-    );
-    expect(
-      hoursMetadata.textSpan!.toPlainText(),
-      startsWith(presentation.rank),
-    );
-    expect(
-      hoursMetadata.textSpan!.toPlainText(),
-      isNot(contains('тыдзень Псалтыра')),
-    );
-    await snapshot(tester, 'approved-vitebsk-hours-12-nov-2026');
+  testWidgets(
+    'approved 12 November Vitebsk Hours and Readings headers',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        date: DateTime(2026, 11, 12),
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_VitebskDiocese.new),
+        ],
+      );
+      final presentation = container.read(liturgicalDayPresentationProvider);
+      expect(presentation.title, contains('Язафата'));
+      expect(presentation.place, contains('Віцебская дыяцэзія'));
+      expect(presentation.rank, isNotEmpty);
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
+      expect(
+        tester.getTopLeft(find.text('Віцебская дыяцэзія')).dy,
+        lessThan(
+          tester.getTopLeft(
+            find.byKey(const Key('hours-celebration-title')),
+          ).dy,
+        ),
+      );
+      final hoursMetadata = tester.widget<Text>(
+        find.byKey(const Key('hours-day-metadata')),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        hoursMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-hours-12-nov-2026');
 
-    router.go('/readings');
-    await tester.pumpAndSettle();
-    expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(LiturgicalDayHeader),
-        matching: find.byType(Chip),
-      ),
-      findsNothing,
-    );
-    final readingsMetadata = tester.widget<Text>(
-      find.byKey(const Key('readings-day-metadata')),
-    );
-    expect(
-      readingsMetadata.textSpan!.toPlainText(),
-      startsWith(presentation.rank),
-    );
-    expect(readingsMetadata.textSpan!.toPlainText(), contains('Год II'));
-    expect(
-      readingsMetadata.textSpan!.toPlainText(),
-      isNot(contains('тыдзень Псалтыра')),
-    );
-    await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
-    expect(tester.takeException(), isNull);
-  });
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      expect(find.text('Віцебская дыяцэзія'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(LiturgicalDayHeader),
+          matching: find.byType(Chip),
+        ),
+        findsNothing,
+      );
+      final readingsMetadata = tester.widget<Text>(
+        find.byKey(const Key('readings-day-metadata')),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        startsWith(presentation.rank),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        contains('Год II'),
+      );
+      expect(
+        readingsMetadata.textSpan!.toPlainText(),
+        isNot(contains('тыдзень Псалтыра')),
+      );
+      await snapshot(tester, 'approved-vitebsk-readings-12-nov-2026');
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     '12 November alternatives show each diocese once while preserving ranks',
@@ -255,7 +265,9 @@ void main() {
       final (router, container) = await start(
         tester,
         date: DateTime(2026, 11, 12),
-        overrides: [dioceseSelectionProvider.overrideWith(_FourDioceses.new)],
+        overrides: [
+          dioceseSelectionProvider.overrideWith(_FourDioceses.new),
+        ],
       );
       await tester.tap(find.byKey(const Key('hours-alternatives-control')));
       await tester.pumpAndSettle();
@@ -265,13 +277,10 @@ void main() {
           .sortedOptions
           .where((option) => !option.disabled && option.day != null)
           .toList();
-      final localOptions = options
-          .where(
-            (option) =>
-                option.badges.contains('Мінск') ||
-                option.badges.contains('Віцебск'),
-          )
-          .toList();
+      final localOptions = options.where(
+        (option) => option.badges.contains('Мінск') ||
+            option.badges.contains('Віцебск'),
+      ).toList();
       expect(localOptions.any((o) => o.badges.contains('Мінск')), isTrue);
       expect(localOptions.any((o) => o.badges.contains('Віцебск')), isTrue);
       for (final option in localOptions) {
@@ -281,11 +290,8 @@ void main() {
         final subtitle = choice.subtitle ?? '';
         final pieces = subtitle.split(' · ');
         for (final badge in option.badges) {
-          expect(
-            pieces,
-            isNot(contains(badge)),
-            reason: 'Duplicate diocese badge in ${option.title}',
-          );
+          expect(pieces, isNot(contains(badge)),
+              reason: 'Duplicate diocese badge in ${option.title}');
           final full = switch (badge) {
             'Мінск' => 'Мінска-Магілёўская архідыяцэзія',
             'Віцебск' => 'Віцебская дыяцэзія',
@@ -294,15 +300,12 @@ void main() {
             _ => badge,
           };
           expect(subtitle, contains(full));
-          expect(
-            full.allMatches(subtitle).length,
-            1,
-            reason: 'Repeated full diocese in ${option.title}',
-          );
+          expect(full.allMatches(subtitle).length, 1,
+              reason: 'Repeated full diocese in ${option.title}');
         }
         if (option.ordo case final ordo?) {
-          final rank =
-              kRankLabels[ordo.rank] ?? ordoOfficeKindLabel(ordo.officeKind);
+          final rank = kRankLabels[ordo.rank] ??
+              ordoOfficeKindLabel(ordo.officeKind);
           if (rank.isNotEmpty) expect(subtitle, startsWith(rank));
         }
       }
@@ -311,7 +314,9 @@ void main() {
     },
   );
 
-  testWidgets('date control visual preview: light Readings', (tester) async {
+  testWidgets('date control visual preview: light Readings', (
+    tester,
+  ) async {
     final (router, _) = await start(
       tester,
       width: 390,

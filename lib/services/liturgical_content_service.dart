@@ -440,15 +440,11 @@ class LiturgicalContentService {
     final dynamicDays = <String, List<LiturgicalDay>>{
       for (final entry in rawDynamicDays.entries)
         entry.key: [
-          for (final item in entry.value)
-            withContext(
-              resolveMovableFeastAgainstPeriod(
-                item,
-                resolvedPeriodDay,
-                entry.key,
-              ),
-            )!,
-        ],
+            for (final item in entry.value)
+              withContext(
+                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, entry.key),
+              )!,
+          ],
     };
     return _DaysResult(
       properDays: [
@@ -662,18 +658,15 @@ class LiturgicalContentService {
         final effectiveTemplates = candidate.templates.isNotEmpty
             ? candidate.templates
             : candidate.id == 'immaculate-heart'
-            ? const ['blessed-virgin-mary']
-            : const <String>[];
+                ? const ['blessed-virgin-mary']
+                : const <String>[];
         if (!candidate.temporal &&
-            const {
-              'memorial',
-              'optional-memorial',
-            }.contains(candidate.officeKind) &&
+            const {'memorial', 'optional-memorial'}.contains(candidate.officeKind) &&
             effectiveTemplates.isNotEmpty &&
             currentDay != null) {
           final rawDocs = _dynamicDocuments(candidate, result, raw: true);
-          final raw =
-              rawDocs.where(isSparseDay).firstOrNull ?? rawDocs.firstOrNull;
+          final raw = rawDocs.where(isSparseDay).firstOrNull ??
+              rawDocs.firstOrNull;
           final base = raw?.toMap() ?? _scaffoldOf(candidate).toMap();
           final proper = LiturgicalDay.fromMap({
             ...base,
@@ -681,15 +674,12 @@ class LiturgicalContentService {
             '_feast': base['_feast'] ?? candidate.feastCode,
             '_feastName': base['_feastName'] ?? candidate.title,
             '_celebrationId': base['_celebrationId'] ?? candidate.id,
-            '_templates':
-                (base['_templates'] is List &&
+            '_templates': (base['_templates'] is List &&
                     (base['_templates'] as List).isNotEmpty)
                 ? base['_templates']
                 : effectiveTemplates,
-            '_defaultTemplate':
-                base['_defaultTemplate'] ??
-                candidate.defaultTemplate ??
-                effectiveTemplates.first,
+            '_defaultTemplate': base['_defaultTemplate'] ??
+                candidate.defaultTemplate ?? effectiveTemplates.first,
           });
           final variants = assembled(proper, candidate);
           if (raw == null) {
