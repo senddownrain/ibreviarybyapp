@@ -15,6 +15,7 @@ import 'package:mybrev_flutter/dev/discovery_qa_flags.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
+import 'package:mybrev_flutter/review/app_review_storage.dart';
 import 'package:mybrev_flutter/router/discovery_navigation.dart';
 import 'package:mybrev_flutter/router/router.dart';
 import 'package:mybrev_flutter/services/firebase_bootstrap.dart';
@@ -92,6 +93,12 @@ void main() async {
   // Test profile only: forget the hint history (the discovery box alone).
   if (discoveryQaResetRequested(discoveryBoxPath)) {
     await discoveryStorage.clear();
+  }
+
+  try {
+    await Hive.openBox<String>(HiveAppReviewStorage.defaultBoxName);
+  } catch (error) {
+    debugPrint('[Review] box unavailable: $error');
   }
 
   runApp(

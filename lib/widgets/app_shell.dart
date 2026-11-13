@@ -17,6 +17,7 @@ import 'package:mybrev_flutter/widgets/app_navigation_dock.dart';
 import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 import 'package:mybrev_flutter/widgets/content_update_scheduler.dart';
+import 'package:mybrev_flutter/review/app_review_host.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({
@@ -186,6 +187,11 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                   extendBody: true,
                   body: Stack(
                     children: [
+                      const Positioned(
+                        width: 0,
+                        height: 0,
+                        child: AppReviewHost(child: SizedBox.shrink()),
+                      ),
                       Positioned.fill(
                         child: descriptor.reserveShellTopInset
                             ? Column(
