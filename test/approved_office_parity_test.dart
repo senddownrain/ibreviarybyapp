@@ -22,40 +22,36 @@ void main() {
     await Hive.close();
     await dir.delete(recursive: true);
   });
-  test(
-    'reviewed Advent sources and High Priest match the independent Web Office oracle',
-    () {
-      final days = ordoParityFixture()['days'] as Map;
-      for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
-        for (final date in [
-          '2025-06-12',
-          '2026-12-21',
-          '2025-12-24',
-          '2028-12-24',
-          '2026-12-19',
-        ]) {
-          final expected =
-              (days[diocese] as List).cast<Map>().singleWhere(
-                    (d) => d['date'] == date,
-                  )['hours']
-                  as List;
-          final actual = LiturgicalContentService()
-              .contentForDate(DateTime.parse(date), diocese: diocese)
-              .options;
-          for (var i = 0; i < actual.length; i++) {
-            final templates = (expected[i] as Map)['templates'] as List;
-            for (var j = 0; j < actual[i].templates.length; j++) {
-              expect(
-                officeHash(actual[i].templates[j].day),
-                (templates[j] as Map)['hash'],
-                reason: '$date/$diocese/${actual[i].templates[j].id}',
-              );
-            }
+  test('reviewed Advent sources match the independent Web Office oracle', () {
+    final days = ordoParityFixture()['days'] as Map;
+    for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+      for (final date in [
+        '2026-12-21',
+        '2025-12-24',
+        '2028-12-24',
+        '2026-12-19',
+      ]) {
+        final expected =
+            (days[diocese] as List).cast<Map>().singleWhere(
+                  (d) => d['date'] == date,
+                )['hours']
+                as List;
+        final actual = LiturgicalContentService()
+            .contentForDate(DateTime.parse(date), diocese: diocese)
+            .options;
+        for (var i = 0; i < actual.length; i++) {
+          final templates = (expected[i] as Map)['templates'] as List;
+          for (var j = 0; j < actual[i].templates.length; j++) {
+            expect(
+              officeHash(actual[i].templates[j].day),
+              (templates[j] as Map)['hash'],
+              reason: '$date/$diocese/${actual[i].templates[j].id}',
+            );
           }
         }
       }
-    },
-  );
+    }
+  });
   test(
     'I Vespers keeps missing fields from the Proper and tonight\'s O antiphon',
     () {

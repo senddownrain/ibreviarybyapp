@@ -461,11 +461,7 @@ class LiturgicalContentService {
           for (final item in entry.value)
             withContext(
               resolveMovableFeastAgainstPeriod(
-                applyHighPriestDaytimeProper(
-                  item,
-                  entry.key,
-                  baseline: HiveService.daysBox.baselineDocument(item.id),
-                ),
+                item,
                 resolvedPeriodDay,
                 entry.key,
               ),

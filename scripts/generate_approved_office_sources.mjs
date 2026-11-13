@@ -3,7 +3,7 @@ import fs from 'node:fs';import path from 'node:path';import {pathToFileURL}from
 import {createHash}from'node:crypto';import {resolveWeb}from'./lib/web_source.mjs';
 const source=resolveWeb(process.argv.slice(2));
 const {OFFICE_CONTENT_FIELDS}=await import(pathToFileURL(path.join(source.web,'src/constants/officeFields.js')));
-const files={advent:'advent-vespers-by.json',highPriest:'christ-high-priest-daytime-by.json'};
+const files={advent:'advent-vespers-by.json'};
 const payload={fields:OFFICE_CONTENT_FIELDS};const hashes={};
 for(const [key,file]of Object.entries(files)){const raw=fs.readFileSync(path.join(source.web,'src/data/liturgical',file));payload[key]=JSON.parse(raw);hashes[file]=createHash('sha256').update(raw).digest('hex');}
 const json=JSON.stringify(payload);if(json.includes("'''"))throw Error('Unsafe raw Dart delimiter');
