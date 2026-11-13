@@ -144,85 +144,136 @@ void main() {
     expect(service.contentForDate(DateTime(2025, 11, 3)).ordo.isSplit, false);
   });
 
-  test('13-14.06.2026: memorial assembly and I/II Vespers field routing in four dioceses', () {
-    final date = DateTime(2026, 6, 13);
-    for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
-      final today = service.contentForDate(date, diocese: diocese);
-      final tomorrow = service.contentForDate(DateTime(2026, 6, 14), diocese: diocese);
-      final heart = today.options.firstWhere(
-        (option) => option.ordo?.optionId == 'immaculate-heart',
-      );
-      final antony = today.options.firstWhere(
-        (option) => option.ordo?.optionId == 'sv-anthony-padua',
-      );
-      expect(antony.day, isNotNull, reason: diocese);
-      for (final option in [heart, antony]) {
-        for (final variant in option.templates) {
-          for (final field in kOfficeFieldSlots.keys) {
-            if (field.startsWith('vesper')) continue;
-            expect(variant.day.field(field)?.trim(), isNotEmpty,
-                reason: '$diocese ${option.optionId} ${variant.choice} $field');
+  test(
+    '13-14.06.2026: memorial assembly and I/II Vespers field routing in four dioceses',
+    () {
+      final date = DateTime(2026, 6, 13);
+      for (final diocese in ['minsk-mohilev', 'grodno', 'pinsk', 'vitebsk']) {
+        final today = service.contentForDate(date, diocese: diocese);
+        final tomorrow = service.contentForDate(
+          DateTime(2026, 6, 14),
+          diocese: diocese,
+        );
+        final heart = today.options.firstWhere(
+          (option) => option.ordo?.optionId == 'immaculate-heart',
+        );
+        final antony = today.options.firstWhere(
+          (option) => option.ordo?.optionId == 'sv-anthony-padua',
+        );
+        expect(antony.day, isNotNull, reason: diocese);
+        for (final option in [heart, antony]) {
+          for (final variant in option.templates) {
+            for (final field in kOfficeFieldSlots.keys) {
+              if (field.startsWith('vesper')) continue;
+              expect(
+                variant.day.field(field)?.trim(),
+                isNotEmpty,
+                reason: '$diocese ${option.optionId} ${variant.choice} $field',
+              );
+            }
+            expect(
+              variant.day.data['officeOfReadingsTeDeum'],
+              isNot(true),
+              reason: 'no Te Deum on a memorial',
+            );
           }
-          expect(variant.day.data['officeOfReadingsTeDeum'], isNot(true),
-              reason: 'no Te Deum on a memorial');
         }
-      }
-      expect(heart.day, isNotNull, reason: diocese);
-      expect(heart.templates.map((choice) => choice.choice),
-          contains('blessed-virgin-mary'), reason: diocese);
-      expect(heart.day!.field('laudesHymn')?.trim(), isNotEmpty,
-          reason: 'Marian Lauds hymn $diocese');
-      expect(heart.day!.field('officeOfReadingsR2')?.trim(), isNotEmpty,
-          reason: 'Marian second reading $diocese');
+        expect(heart.day, isNotNull, reason: diocese);
+        expect(
+          heart.templates.map((choice) => choice.choice),
+          contains('blessed-virgin-mary'),
+          reason: diocese,
+        );
+        expect(
+          heart.day!.field('laudesHymn')?.trim(),
+          isNotEmpty,
+          reason: 'Marian Lauds hymn $diocese',
+        );
+        expect(
+          heart.day!.field('officeOfReadingsR2')?.trim(),
+          isNotEmpty,
+          reason: 'Marian second reading $diocese',
+        );
 
-      expect(today.ordo.evening.vespersType, 'first', reason: diocese);
-      final saturdayId = periodDayDocumentId(
-        today.ordo.period, today.ordo.week, today.ordo.dayOfWeek,
-      );
-      final saturdayPsalter = today.itemsDays[saturdayId];
-      expect(saturdayPsalter, isNotNull, reason: '$diocese $saturdayId');
-      expect(saturdayId, 'ordinary-w10-d7', reason: diocese);
-      final sunday = tomorrow.options.firstWhere(
-        (option) => option.ordo?.optionId == today.ordo.evening.celebrationId,
-      );
-      expect(sunday.ordo?.officeKind, 'sunday', reason: diocese);
-      final first = resolveEveningOffice(
-        date: date, selected: heart.day!, today: today, tomorrow: tomorrow,
-      );
-      expect(first.isFirst, isTrue, reason: diocese);
-      expect(first.day.id, sunday.day?.id, reason: diocese);
-      expect(first.day.data['_firstVespersSource'], isNot('proper'),
-          reason: diocese);
-      for (final suffix in firstVespersSuffixes) {
-        final own = sunday.day?.field('vesper1$suffix');
-        final expected = own != null && own.trim().isNotEmpty
-            ? own : saturdayPsalter?.field('vesper$suffix');
-        expect(expected?.trim(), isNotEmpty,
-            reason: '$diocese I Vespers source: $suffix');
-        expect(first.day.field('vesper$suffix'), expected,
-            reason: '$diocese I Vespers: $suffix');
+        expect(today.ordo.evening.vespersType, 'first', reason: diocese);
+        final saturdayId = periodDayDocumentId(
+          today.ordo.period,
+          today.ordo.week,
+          today.ordo.dayOfWeek,
+        );
+        final saturdayPsalter = today.itemsDays[saturdayId];
+        expect(saturdayPsalter, isNotNull, reason: '$diocese $saturdayId');
+        expect(saturdayId, 'ordinary-w10-d7', reason: diocese);
+        final sunday = tomorrow.options.firstWhere(
+          (option) => option.ordo?.optionId == today.ordo.evening.celebrationId,
+        );
+        expect(sunday.ordo?.officeKind, 'sunday', reason: diocese);
+        final first = resolveEveningOffice(
+          date: date,
+          selected: heart.day!,
+          today: today,
+          tomorrow: tomorrow,
+        );
+        expect(first.isFirst, isTrue, reason: diocese);
+        expect(first.day.id, sunday.day?.id, reason: diocese);
+        expect(
+          first.day.data['_firstVespersSource'],
+          isNot('proper'),
+          reason: diocese,
+        );
+        for (final suffix in firstVespersSuffixes) {
+          final own = sunday.day?.field('vesper1$suffix');
+          final expected = own != null && own.trim().isNotEmpty
+              ? own
+              : saturdayPsalter?.field('vesper$suffix');
+          expect(
+            expected?.trim(),
+            isNotEmpty,
+            reason: '$diocese I Vespers source: $suffix',
+          );
+          expect(
+            first.day.field('vesper$suffix'),
+            expected,
+            reason: '$diocese I Vespers: $suffix',
+          );
+        }
+        expect(
+          first.day.data['_missingFirstVespersFields'],
+          isEmpty,
+          reason: diocese,
+        );
+        final second = resolveEveningOffice(
+          date: DateTime(2026, 6, 14),
+          selected: sunday.day!,
+          today: tomorrow,
+          tomorrow: service.contentForDate(
+            DateTime(2026, 6, 15),
+            diocese: diocese,
+          ),
+        );
+        expect(second.isFirst, isFalse, reason: diocese);
+        expect(second.isSecond, isTrue, reason: diocese);
+        for (final suffix in firstVespersSuffixes) {
+          expect(
+            second.day.field('vesper$suffix'),
+            sunday.day!.field('vesper$suffix'),
+            reason: '$diocese Sunday II Vespers: $suffix',
+          );
+        }
+        final anthonyVespers = resolveEveningOffice(
+          date: date,
+          selected: antony.day!,
+          today: today,
+          tomorrow: tomorrow,
+        );
+        expect(
+          anthonyVespers.day.field('vesperHymn'),
+          first.day.field('vesperHymn'),
+          reason: diocese,
+        );
       }
-      expect(first.day.data['_missingFirstVespersFields'], isEmpty,
-          reason: diocese);
-      final second = resolveEveningOffice(
-        date: DateTime(2026, 6, 14),
-        selected: sunday.day!,
-        today: tomorrow,
-        tomorrow: service.contentForDate(DateTime(2026, 6, 15), diocese: diocese),
-      );
-      expect(second.isFirst, isFalse, reason: diocese);
-      expect(second.isSecond, isTrue, reason: diocese);
-      for (final suffix in firstVespersSuffixes) {
-        expect(second.day.field('vesper$suffix'), sunday.day!.field('vesper$suffix'),
-            reason: '$diocese Sunday II Vespers: $suffix');
-      }
-      final anthonyVespers = resolveEveningOffice(
-        date: date, selected: antony.day!, today: today, tomorrow: tomorrow,
-      );
-      expect(anthonyVespers.day.field('vesperHymn'),
-          first.day.field('vesperHymn'), reason: diocese);
-    }
-  });
+    },
+  );
 
   test('Immaculate Heart + St Anthony (13.06.2026): exactly two memorial '
       'Offices, no weekday card (§11.2)', () {
@@ -380,9 +431,11 @@ void main() {
     for (final iso in daysOfYear(2026)) {
       final content = service.contentForDate(dateOfIso(iso));
       legacy += content.options
-          .where((option) =>
-              option.source == LiturgicalOptionSource.fixed &&
-              option.properSource == ProperSource.legacyDays)
+          .where(
+            (option) =>
+                option.source == LiturgicalOptionSource.fixed &&
+                option.properSource == ProperSource.legacyDays,
+          )
           .length;
     }
     expect(legacy, 0);

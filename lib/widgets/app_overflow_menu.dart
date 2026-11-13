@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
@@ -81,6 +82,13 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       Offset.zero & overlay.size,
     );
     final actions = widget.actions;
+    // One consistent "report an error" entry on every material. A screen may
+    // supply its own action (with a title); otherwise the route gives the context.
+    final router = GoRouter.maybeOf(context);
+    final reportLocation =
+        router == null || actions.any((a) => a.label == kReportErrorLabel)
+        ? null
+        : feedbackLocationForUri(router.routeInformationProvider.value.uri);
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -117,6 +125,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
               return _OverflowContent(
                 showTextScale: widget.showTextScale,
                 actions: actions,
+                showReport: reportLocation != null,
                 onSelected: (value) => Navigator.pop(popupContext, value),
               );
             },
@@ -134,6 +143,8 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
       await showTextScalePanel(context, showPsalmody: widget.showPsalmody);
     } else if (result == 'settings' || result == 'about') {
       context.push('/$result');
+    } else if (result == 'report') {
+      context.push(reportLocation!);
     } else {
       actions[int.parse(result)].onSelected();
     }
@@ -181,11 +192,13 @@ class _OverflowContent extends StatelessWidget {
   const _OverflowContent({
     required this.showTextScale,
     required this.actions,
+    required this.showReport,
     required this.onSelected,
   });
 
   final bool showTextScale;
   final List<ReaderSecondaryAction> actions;
+  final bool showReport;
   final ValueChanged<String> onSelected;
 
   @override
@@ -200,18 +213,22 @@ class _OverflowContent extends StatelessWidget {
           if (showTextScale)
             _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
           for (var index = 0; index < actions.length; index++)
-            if (actions[index].label != 'Памылка')
+            if (actions[index].label != kReportErrorLabel)
               _item(actions[index].label, actions[index].icon, '$index'),
           if (showTextScale ||
-              actions.any((action) => action.label != 'Памылка'))
+              actions.any((action) => action.label != kReportErrorLabel))
             const Divider(height: 16),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
           for (var index = 0; index < actions.length; index++)
-            if (actions[index].label == 'Памылка') ...[
+            if (actions[index].label == kReportErrorLabel) ...[
               const Divider(height: 16),
-              _item('Памылка', actions[index].icon, '$index'),
+              _item(kReportErrorLabel, actions[index].icon, '$index'),
             ],
+          if (showReport) ...[
+            const Divider(height: 16),
+            _item(kReportErrorLabel, Icons.flag_outlined, 'report'),
+          ],
         ],
       ),
     ),
@@ -223,7 +240,7 @@ class _OverflowContent extends StatelessWidget {
     minLeadingWidth: 24,
     horizontalTitleGap: 10,
     leading: Icon(icon, size: 22),
-    title: Text(label),
+    title: Text(label, maxLines: 2, overflow: TextOverflow.ellipsis),
     onTap: () => onSelected(value),
   );
 }

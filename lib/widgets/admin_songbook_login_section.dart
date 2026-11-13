@@ -15,7 +15,9 @@ class AdminSongbookLoginSection extends ConsumerWidget {
       key: const Key('settings-admin-login'),
       contentPadding: EdgeInsets.zero,
       title: const Text('Адміністрацыйны доступ'),
-      subtitle: Text(admin ? 'Вы ўвайшлі як адміністратар' : 'Уваход па email і паролі'),
+      subtitle: Text(
+        admin ? 'Вы ўвайшлі як адміністратар' : 'Уваход па email і паролі',
+      ),
       trailing: Icon(admin ? Icons.logout : Icons.login),
       onTap: admin
           ? () async {
@@ -72,16 +74,24 @@ class _AdminLoginDialogState extends State<_AdminLoginDialog> {
         if (!isAdminRecord(uid, doc.data())) {
           await auth.signOut();
           if (mounted) {
-            setState(() => _error = 'Гэты ўліковы запіс не мае правоў адміністратара.');
+            setState(
+              () => _error = 'Гэты ўліковы запіс не мае правоў адміністратара.',
+            );
           }
           return;
         }
       }
       if (mounted) Navigator.of(context).pop();
     } on FirebaseAuthException {
-      if (mounted) setState(() => _error = 'Не атрымалася ўвайсці. Праверце email і пароль.');
+      if (mounted)
+        setState(
+          () => _error = 'Не атрымалася ўвайсці. Праверце email і пароль.',
+        );
     } catch (_) {
-      if (mounted) setState(() => _error = 'Не атрымалася праверыць доступ. Праверце злучэнне.');
+      if (mounted)
+        setState(
+          () => _error = 'Не атрымалася праверыць доступ. Праверце злучэнне.',
+        );
     } finally {
       if (mounted) setState(() => _busy = false);
     }

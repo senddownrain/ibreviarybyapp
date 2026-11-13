@@ -67,7 +67,8 @@ const kPublicSourceBibliography = <SourceBibliographyItem>[
   SourceBibliographyItem(
     id: 'sviataja-kamunija-2017',
     section: 'Касцёльныя крыніцы',
-    title: '«Святая Камунія і культ эўхарыстычнай таямніцы па-за Імшой» (Мінск, 2017)',
+    title:
+        '«Святая Камунія і культ эўхарыстычнай таямніцы па-за Імшой» (Мінск, 2017)',
     notices: ['© Канферэнцыя Каталіцкіх Біскупаў Беларусі, 2017'],
   ),
   SourceBibliographyItem(
@@ -92,7 +93,10 @@ const kPublicSourceBibliography = <SourceBibliographyItem>[
     id: 'ojcha-nash-2022',
     section: 'Касцёльныя крыніцы',
     title: 'Малітоўнік «Ойча наш» (Мінск, 2022)',
-    notices: ['© Камісія Божага Культу і Дысцыпліны Сакрамэнтаў, 2022', '© Выдавецтва «Про Хрысто», 2022'],
+    notices: [
+      '© Камісія Божага Культу і Дысцыпліны Сакрамэнтаў, 2022',
+      '© Выдавецтва «Про Хрысто», 2022',
+    ],
   ),
   SourceBibliographyItem(
     id: 'prasitsee-i-atrymaetse-2024',

@@ -206,7 +206,10 @@ class LiturgicalSectionHeading extends StatelessWidget {
       top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
       bottom: LiturgicalSpacing.sectionTitleToBody,
     ),
-    child: Text(title.toUpperCase(), style: ReaderTheme.of(context).hourSectionHeading(bodySize)),
+    child: Text(
+      title.toUpperCase(),
+      style: ReaderTheme.of(context).hourSectionHeading(bodySize),
+    ),
   );
 }
 
@@ -254,7 +257,9 @@ class LiturgicalHeadingReferenceRow extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final fits =
-              widthOf(displayTitle, titleStyle) + widthOf(ref, referenceStyle) + 12 <=
+              widthOf(displayTitle, titleStyle) +
+                  widthOf(ref, referenceStyle) +
+                  12 <=
               constraints.maxWidth;
           final titleWidget = Text(displayTitle, style: titleStyle);
           final referenceWidget = Text(

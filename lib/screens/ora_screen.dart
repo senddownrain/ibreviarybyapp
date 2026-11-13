@@ -270,7 +270,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
     if (evening.isFirst) {
       final title = (evening.firstVespersTitle ?? '').trim();
-      _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+      _vespersRubric =
+          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
     } else if (evening.isSecond) {
       _vespersRubric = 'II Нешпары';
     }
@@ -1363,7 +1364,8 @@ class _ExpandableFeastComment extends ConsumerStatefulWidget {
       _ExpandableFeastCommentState();
 }
 
-class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment> {
+class _ExpandableFeastCommentState
+    extends ConsumerState<_ExpandableFeastComment> {
   bool _expanded = false;
 
   @override
@@ -1419,7 +1421,9 @@ class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment
                   child: Text(
                     widget.text,
                     key: const Key('ora-feast-comment-text'),
-                    textAlign: ref.watch(settingsProvider.select((s) => s.textAlignment)),
+                    textAlign: ref.watch(
+                      settingsProvider.select((s) => s.textAlignment),
+                    ),
                     maxLines: _expanded ? null : 3,
                     overflow: _expanded ? null : TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -1912,8 +1916,14 @@ class _HtmlOrText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textAlignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
-    final alignable = const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind);
+    final textAlignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
+    final alignable = const {
+      'reading',
+      'office-reading',
+      'prayer',
+    }.contains(alternativeKind);
     if (content.contains('<') && content.contains('>')) {
       return AlternativeText(
         text: content,
@@ -1941,7 +1951,11 @@ class _HtmlOrText extends ConsumerWidget {
     return plain;
   }
 
-  Widget _renderHtml(BuildContext context, String html, TextAlign textAlignment) {
+  Widget _renderHtml(
+    BuildContext context,
+    String html,
+    TextAlign textAlignment,
+  ) {
     final textColor =
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
@@ -1970,7 +1984,11 @@ class _HtmlOrText extends ConsumerWidget {
     };
     // Only Scripture/Office readings and the final prayer are prose.
     // In particular, responsory turns, headings and rubrics stay left aligned.
-    if (const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind)) {
+    if (const {
+      'reading',
+      'office-reading',
+      'prayer',
+    }.contains(alternativeKind)) {
       styles['body']!.textAlign = textAlignment;
       styles['p']!.textAlign = textAlignment;
       for (final selector in [

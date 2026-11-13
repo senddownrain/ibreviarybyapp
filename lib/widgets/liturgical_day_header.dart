@@ -72,14 +72,15 @@ class LiturgicalDayHeader extends StatelessWidget {
     // Display local diocesan context in one quiet line ABOVE the celebration
     // title. Explicit union badges take precedence over _place (which may
     // describe a broader source); neither is shown for a common weekday.
-    final diocesanLabels = (p.badges.isNotEmpty
-            ? p.badges.map(_fullDioceseLabel)
-            : p.place
-                .split(',')
-                .map((label) => _fullDioceseLabel(label.trim())))
-        .where((label) => label.isNotEmpty)
-        .toSet()
-        .toList();
+    final diocesanLabels =
+        (p.badges.isNotEmpty
+                ? p.badges.map(_fullDioceseLabel)
+                : p.place
+                      .split(',')
+                      .map((label) => _fullDioceseLabel(label.trim())))
+            .where((label) => label.isNotEmpty)
+            .toSet()
+            .toList();
 
     return LayoutBuilder(
       builder: (context, constraints) => Column(
@@ -161,7 +162,6 @@ class LiturgicalDayHeader extends StatelessWidget {
                           color: cs.onSurfaceVariant,
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -193,10 +193,18 @@ class LiturgicalDayHeader extends StatelessWidget {
               onPressed: onVariants,
               child: Row(
                 children: [
-                  Icon(Icons.layers_outlined, size: 18, color: cs.onSurfaceVariant),
+                  Icon(
+                    Icons.layers_outlined,
+                    size: 18,
+                    color: cs.onSurfaceVariant,
+                  ),
                   const SizedBox(width: 8),
                   const Expanded(child: Text('Іншыя варыянты')),
-                  Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: cs.onSurfaceVariant,
+                  ),
                 ],
               ),
             ),

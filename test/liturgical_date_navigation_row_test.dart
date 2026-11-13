@@ -19,14 +19,11 @@ void main() {
 
             await tester.pumpWidget(
               MaterialApp(
-                theme: ThemeData(
-                  useMaterial3: true,
-                  brightness: brightness,
-                ),
+                theme: ThemeData(useMaterial3: true, brightness: brightness),
                 builder: (context, child) => MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    textScaler: TextScaler.linear(scale),
-                  ),
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(textScaler: TextScaler.linear(scale)),
                   child: child!,
                 ),
                 home: Scaffold(
@@ -39,7 +36,8 @@ void main() {
                             keyPrefix: 'test',
                             onDateTap: () => calendarOpens++,
                             onPrevious: () => refresh(
-                              () => date = date.subtract(const Duration(days: 1)),
+                              () =>
+                                  date = date.subtract(const Duration(days: 1)),
                             ),
                             onNext: () => refresh(
                               () => date = date.add(const Duration(days: 1)),
@@ -72,10 +70,7 @@ void main() {
               todayButton.style?.backgroundColor?.resolve({}),
               Colors.transparent,
             );
-            expect(
-              todayButton.style?.side?.resolve({}),
-              isNull,
-            );
+            expect(todayButton.style?.side?.resolve({}), isNull);
             expect(find.text('Сёння'), findsNothing);
             expect(tester.getCenter(action).dx, closeTo(originalX, 0.1));
 

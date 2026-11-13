@@ -51,9 +51,7 @@ const kAvailableReaderFonts = <ReaderFontOption>[
 
 /// Keep an explicit left choice; default continuous prose to justified text.
 TextAlign normalizeTextAlignment(Object? stored) =>
-    stored == 'left' || stored == 'start'
-    ? TextAlign.left
-    : TextAlign.justify;
+    stored == 'left' || stored == 'start' ? TextAlign.left : TextAlign.justify;
 
 String normalizeReaderFontFamily(String? stored) => switch (stored) {
   ReaderFontFamily.literata || 'Literata' => ReaderFontFamily.literata,

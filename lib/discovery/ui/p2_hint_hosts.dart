@@ -70,7 +70,8 @@ DiscoveryProbe p2Probe(
   final isAdmin = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
   // Data is read only while its hint can still win: songs, Compendium and the
   // Bible are decoded from bundled assets, so everything works offline.
-  facts[kFactSongbookLoaded] = isAdmin && wanted('discover.songbook', kVisitSongs)
+  facts[kFactSongbookLoaded] =
+      isAdmin && wanted('discover.songbook', kVisitSongs)
       ? (_loaded(ref.watch(songsProvider))?.isNotEmpty ?? false)
       : false;
   facts[kFactCompendiumAvailable] =

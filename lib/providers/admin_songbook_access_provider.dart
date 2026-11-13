@@ -33,38 +33,37 @@ final adminSongbookAccessProvider = StreamProvider<bool>((ref) {
     if (!controller.isClosed) controller.add(allowed);
   }
 
-  authSubscription = FirebaseAuth.instance.authStateChanges().listen(
-    (user) async {
-      final current = ++generation;
-      await roleSubscription?.cancel();
-      roleSubscription = null;
-      if (current != generation) return;
-      emit(false);
-      if (user == null || user.isAnonymous) return;
-      if (legacyAdminUids.contains(user.uid)) {
-        emit(true);
-        return;
-      }
-      roleSubscription = FirebaseFirestore.instance
-          .collection('admins')
-          .doc(user.uid)
-          .snapshots(includeMetadataChanges: true)
-          .listen(
-            (snapshot) {
-              if (current != generation) return;
-              if (snapshot.metadata.isFromCache) {
-                emit(false);
-                return;
-              }
-              emit(isAdminRecord(user.uid, snapshot.data()));
-            },
-            onError: (Object _) {
-              if (current == generation) emit(false);
-            },
-          );
-    },
-    onError: (Object _) => emit(false),
-  );
+  authSubscription = FirebaseAuth.instance.authStateChanges().listen((
+    user,
+  ) async {
+    final current = ++generation;
+    await roleSubscription?.cancel();
+    roleSubscription = null;
+    if (current != generation) return;
+    emit(false);
+    if (user == null || user.isAnonymous) return;
+    if (legacyAdminUids.contains(user.uid)) {
+      emit(true);
+      return;
+    }
+    roleSubscription = FirebaseFirestore.instance
+        .collection('admins')
+        .doc(user.uid)
+        .snapshots(includeMetadataChanges: true)
+        .listen(
+          (snapshot) {
+            if (current != generation) return;
+            if (snapshot.metadata.isFromCache) {
+              emit(false);
+              return;
+            }
+            emit(isAdminRecord(user.uid, snapshot.data()));
+          },
+          onError: (Object _) {
+            if (current == generation) emit(false);
+          },
+        );
+  }, onError: (Object _) => emit(false));
 
   ref.onDispose(() {
     ++generation;

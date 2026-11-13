@@ -144,8 +144,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: [
         Text(
-          'Знайшлі памылку ў тэксце або маеце прапанову? Напішыце нам — уваход не патрэбны.',
-          style: theme.textTheme.bodyMedium,
+          'Напішыце нам — уваход не патрэбны. Мы чытаем кожнае паведамленне.',
+          style: theme.textTheme.bodyLarge,
         ),
         if (!configured) ...[
           const SizedBox(height: 12),
@@ -158,18 +158,28 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         const SizedBox(height: 16),
         Text('Што вы хочаце паведаміць?', style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final c in FeedbackCategory.values)
-              ChoiceChip(
-                key: Key('feedback-category-${c.code}'),
-                label: Text(c.label),
-                selected: _category == c,
-                onSelected: (_) => setState(() => _category = c),
-              ),
-          ],
+        SizedBox(
+          height: 48,
+          child: ListView.separated(
+            key: const Key('feedback-categories'),
+            scrollDirection: Axis.horizontal,
+            itemCount: FeedbackCategory.values.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, i) {
+              final c = FeedbackCategory.values[i];
+              return Center(
+                child: ChoiceChip(
+                  key: Key('feedback-category-${c.code}'),
+                  label: Text(c.label),
+                  selected: _category == c,
+                  showCheckmark: false,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  materialTapTargetSize: MaterialTapTargetSize.padded,
+                  onSelected: (_) => setState(() => _category = c),
+                ),
+              );
+            },
+          ),
         ),
         if (_context != null) ...[
           const SizedBox(height: 12),
@@ -250,6 +260,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         FilledButton(
           key: const Key('feedback-submit'),
           onPressed: _sending || !configured ? null : _send,
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           child: _sending
               ? const SizedBox(
                   width: 20,

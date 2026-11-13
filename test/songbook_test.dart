@@ -147,8 +147,12 @@ void main() {
       expect(isAdminRecord('ordinary', {'role': 'superadmin'}), isTrue);
     });
 
-    testWidgets('guests do not see the tile or the songbook via a deep link', (tester) async {
-      await tester.pumpWidget(_app(const Scaffold(body: PrayersScreen()), admin: false));
+    testWidgets('guests do not see the tile or the songbook via a deep link', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _app(const Scaffold(body: PrayersScreen()), admin: false),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('songbook-destination')), findsNothing);
 
@@ -1612,12 +1616,14 @@ GoRouter _router({String initialLocation = '/prayers'}) => GoRouter(
         ),
         GoRoute(
           path: 'songs',
-          builder: (context, state) => const AdminSongbookGuard(child: SongbookScreen()),
+          builder: (context, state) =>
+              const AdminSongbookGuard(child: SongbookScreen()),
           routes: [
             GoRoute(
               path: ':id',
-              builder: (context, state) =>
-                  AdminSongbookGuard(child: SongDetailScreen(songId: state.pathParameters['id']!)),
+              builder: (context, state) => AdminSongbookGuard(
+                child: SongDetailScreen(songId: state.pathParameters['id']!),
+              ),
             ),
           ],
         ),
