@@ -24,7 +24,9 @@ final _aliases = readCompendiumAliasFile();
 
 void main() {
   group('root', () {
-    testWidgets('shows the four parts without inline source attribution', (tester) async {
+    testWidgets('shows the four parts without inline source attribution', (
+      tester,
+    ) async {
       final router = _router();
       addTearDown(router.dispose);
       await tester.pumpWidget(_app(router));
@@ -63,7 +65,9 @@ void main() {
       expect(find.byKey(const Key('compendium-source')), findsNothing);
     });
 
-    testWidgets('question references remain without inline source credit', (tester) async {
+    testWidgets('question references remain without inline source credit', (
+      tester,
+    ) async {
       final router = _router(initialLocation: '/prayers/compendium/question/1');
       addTearDown(router.dispose);
       await tester.pumpWidget(_app(router));
@@ -77,7 +81,10 @@ void main() {
       expect(refs.style?.color, reader.muted);
       expect(refs.style?.height, ReaderTheme.referenceHeight);
       expect(find.byKey(const Key('compendium-source')), findsNothing);
-      expect(find.textContaining('Catholic.by', findRichText: true), findsNothing);
+      expect(
+        find.textContaining('Catholic.by', findRichText: true),
+        findsNothing,
+      );
     });
 
     testWidgets('bundle failure without a synced copy shows a retry', (
@@ -393,9 +400,20 @@ void main() {
             final lastContent = location.contains('/part/')
                 ? find.byKey(const ValueKey('compendium-question-row-598'))
                 : find.byType(CompendiumPager);
+            if (lastContent.evaluate().isEmpty) {
+              // At large text the end of the answer is not built until scrolled to.
+              await tester.scrollUntilVisible(
+                lastContent,
+                300,
+                scrollable: find.byType(Scrollable).first,
+              );
+            }
             await tester.ensureVisible(lastContent);
             await tester.pumpAndSettle();
-            expect(tester.getRect(lastContent).bottom, lessThanOrEqualTo(dock.top));
+            expect(
+              tester.getRect(lastContent).bottom,
+              lessThanOrEqualTo(dock.top),
+            );
             expect(find.byKey(const Key('compendium-source')), findsNothing);
             await tester.pumpWidget(const SizedBox.shrink());
             router.dispose();

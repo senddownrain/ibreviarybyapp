@@ -71,6 +71,15 @@ class _VitebskDiocese extends DioceseSelectionNotifier {
   );
 }
 
+/// The «Today» buttons exist only when the shown date is not the real today
+/// (the wall clock), so a fixed preview date must never be today.
+DateTime _notToday(DateTime date) {
+  final now = DateTime.now();
+  final isToday =
+      date.year == now.year && date.month == now.month && date.day == now.day;
+  return isToday ? date.add(const Duration(days: 1)) : date;
+}
+
 void main() {
   late Directory directory;
   final capture = GlobalKey();
@@ -321,7 +330,7 @@ void main() {
       tester,
       width: 390,
       brightness: Brightness.light,
-      date: DateTime(2026, 11, 13),
+      date: _notToday(DateTime(2026, 11, 13)),
     );
     router.go('/readings');
     await tester.pumpAndSettle();
@@ -354,7 +363,7 @@ void main() {
       tester,
       width: 390,
       brightness: Brightness.dark,
-      date: DateTime(2026, 11, 21),
+      date: _notToday(DateTime(2026, 11, 21)),
     );
     expect(find.byKey(const Key('hours-today')), findsOneWidget);
     await snapshot(tester, 'polished-date-control-hours-dark-2026-11-21');

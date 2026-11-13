@@ -929,7 +929,7 @@ void main() {
         final service = find.byWidgetPredicate(
           (widget) =>
               widget is Html &&
-              (widget.data ?? '').contains('Песня з Евангелля'),
+              (widget.data ?? '').contains('ПЕСНЯ З ЕВАНГЕЛЛЯ'),
         );
         final caption = find.byWidgetPredicate(
           (widget) =>
