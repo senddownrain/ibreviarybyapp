@@ -1,0 +1,317 @@
+{
+  "version": 1,
+  "defaultKey": "prayer",
+  "seeds": {
+    "mary": "virgin-mary",
+    "litanies": "litany",
+    "novenas": "novena"
+  },
+  "groups": [
+    {
+      "id": "prayer",
+      "label": "Малітва і духоўнае жыццё"
+    },
+    {
+      "id": "church",
+      "label": "Хрыстус, Касцёл і сакрамэнты"
+    },
+    {
+      "id": "daily",
+      "label": "Штодзённае жыццё і набажэнствы"
+    },
+    {
+      "id": "symbols",
+      "label": "Хрысціянскія сімвалы"
+    }
+  ],
+  "icons": [
+    {
+      "key": "prayer",
+      "label": "Малітва",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "adoration",
+      "label": "Адарацыя",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "praise",
+      "label": "Праслаўленне",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "thanksgiving",
+      "label": "Падзяка",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "petitions",
+      "label": "Просьбы",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "trust",
+      "label": "Давер",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "meditation",
+      "label": "Разважанні",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "novena",
+      "label": "Навэнны",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "litany",
+      "label": "Літаніі",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "spiritual-reading",
+      "label": "Духоўнае чытанне",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "repentance",
+      "label": "Пакаянне",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "hope",
+      "label": "Надзея",
+      "group": "prayer",
+      "kind": "phosphor"
+    },
+    {
+      "key": "cross",
+      "label": "Крыж",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "church",
+      "label": "Касцёл",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "gospel",
+      "label": "Евангелле",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "kingdom",
+      "label": "Валадарства",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "bread-of-life",
+      "label": "Хлеб жыцця",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "baptism",
+      "label": "Хрост",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "scripture",
+      "label": "Святое Пісанне",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "holy-spirit",
+      "label": "Святы Дух",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "faith",
+      "label": "Вера",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "apostles",
+      "label": "Апосталы",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "vocation",
+      "label": "Пакліканне",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "bell",
+      "label": "Звон",
+      "group": "church",
+      "kind": "phosphor"
+    },
+    {
+      "key": "morning",
+      "label": "Раніца",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "evening",
+      "label": "Вечар",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "family",
+      "label": "Сям’я",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "children",
+      "label": "Дзеці",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "saints",
+      "label": "Святыя",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "mary-flowers",
+      "label": "Кветкі Марыі",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "gift",
+      "label": "Дар Божы",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "peace",
+      "label": "Мір",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "pilgrimage",
+      "label": "Паломніцтва",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "creation",
+      "label": "Стварэнне",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "silence",
+      "label": "Цішыня",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "daily",
+      "label": "На кожны дзень",
+      "group": "daily",
+      "kind": "phosphor"
+    },
+    {
+      "key": "praying-hands",
+      "label": "Складзеныя рукі",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "rosary",
+      "label": "Ружанец",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "monstrance",
+      "label": "Найсвяцейшы Сакрамэнт",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "chalice-host",
+      "label": "Келіх і Гостыя",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "sacred-heart",
+      "label": "Найсвяцейшае Сэрца Езуса",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "immaculate-heart",
+      "label": "Беззаганнае Сэрца Марыі",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "virgin-mary",
+      "label": "Маці Божая",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "holy-spirit-dove",
+      "label": "Дух Святы",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "angel",
+      "label": "Анёл",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "saint-halo",
+      "label": "Святы",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "crucifix",
+      "label": "Укрыжаванне",
+      "group": "symbols",
+      "kind": "svg"
+    },
+    {
+      "key": "candle",
+      "label": "Свечка",
+      "group": "symbols",
+      "kind": "svg"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,9 +52,7 @@ const kAvailableReaderFonts = <ReaderFontOption>[
 
 /// Keep an explicit left choice; default continuous prose to justified text.
 TextAlign normalizeTextAlignment(Object? stored) =>
-    stored == 'left' || stored == 'start'
-    ? TextAlign.left
-    : TextAlign.justify;
+    stored == 'left' || stored == 'start' ? TextAlign.left : TextAlign.justify;
 
 String normalizeReaderFontFamily(String? stored) => switch (stored) {
   ReaderFontFamily.literata || 'Literata' => ReaderFontFamily.literata,
@@ -110,19 +109,37 @@ class UserCategory {
   final String name;
   final List<String> tags;
 
+  /// Stable semantic icon key (see `prayer_category_icons.dart`). Missing in
+  /// categories created before icons existed; [SettingsNotifier] assigns one
+  /// once on load and stores it. An unrecognised value is kept as it is.
+  final String? iconKey;
+
   const UserCategory({
     required this.id,
     required this.name,
     required this.tags,
+    this.iconKey,
   });
 
-  Map<String, dynamic> toMap() => {'id': id, 'name': name, 'tags': tags};
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'name': name,
+    'tags': tags,
+    if (iconKey != null) 'iconKey': iconKey,
+  };
 
   factory UserCategory.fromMap(Map<String, dynamic> m) => UserCategory(
     id: m['id'] as String,
     name: m['name'] as String,
     tags: List<String>.from(m['tags'] as List? ?? []),
+    iconKey:
+        m['iconKey'] is String && (m['iconKey'] as String).trim().isNotEmpty
+        ? m['iconKey'] as String
+        : null,
   );
+
+  UserCategory withIconKey(String? key) =>
+      UserCategory(id: id, name: name, tags: tags, iconKey: key);
 }
 
 class SettingsState {
@@ -242,9 +259,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
       ),
       textAlignment: normalizeTextAlignment(_box.get('textAlignment')),
       keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
-      userCategories: (jsonDecode(cats) as List)
-          .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
-          .toList(),
+      userCategories: _migratedUserCategories(cats),
       hiddenGlobalPrayerCategoryIds: List<String>.from(
         jsonDecode(hiddenCategories) as List,
       ),
@@ -258,6 +273,39 @@ class SettingsNotifier extends Notifier<SettingsState> {
       ),
       prayerCategoryMap: prayerCategoryMap,
     );
+  }
+
+  /// Decodes stored categories; those without an `iconKey` get a meaningful
+  /// one, persisted right away so renaming never changes it later. A valid or
+  /// unknown stored key is never replaced.
+  List<UserCategory> _migratedUserCategories(String stored) {
+    final categories = (jsonDecode(stored) as List)
+        .map((e) => UserCategory.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    var changed = false;
+    final migrated = [
+      for (final category in categories)
+        if (category.iconKey == null)
+          () {
+            changed = true;
+            return category.withIconKey(
+              suggestCategoryIconKey(
+                id: category.id,
+                name: category.name,
+                tags: category.tags,
+              ),
+            );
+          }()
+        else
+          category,
+    ];
+    if (changed) {
+      _box.put(
+        'userCategories',
+        jsonEncode(migrated.map((c) => c.toMap()).toList()),
+      );
+    }
+    return migrated;
   }
 
   Future<void> _save() async {
@@ -363,21 +411,42 @@ class SettingsNotifier extends Notifier<SettingsState> {
     return _save();
   }
 
-  String addCategory(String name, List<String> tags) {
+  String addCategory(String name, List<String> tags, {String? iconKey}) {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
     final cats = [
       ...state.userCategories,
-      UserCategory(id: id, name: name, tags: tags),
+      UserCategory(
+        id: id,
+        name: name,
+        tags: tags,
+        iconKey:
+            normalizeCategoryIconKey(iconKey) ??
+            suggestCategoryIconKey(id: id, name: name, tags: tags),
+      ),
     ];
     state = state.copyWith(userCategories: cats);
     _save();
     return id;
   }
 
-  void updateCategory(String id, String name, List<String> tags) {
+  /// Edits a personal category. The icon is kept unless a valid [iconKey] is
+  /// given, so editing name or tags never loses (or re-guesses) the choice.
+  void updateCategory(
+    String id,
+    String name,
+    List<String> tags, {
+    String? iconKey,
+  }) {
     final cats = state.userCategories
         .map(
-          (c) => c.id == id ? UserCategory(id: id, name: name, tags: tags) : c,
+          (c) => c.id == id
+              ? UserCategory(
+                  id: id,
+                  name: name,
+                  tags: tags,
+                  iconKey: normalizeCategoryIconKey(iconKey) ?? c.iconKey,
+                )
+              : c,
         )
         .toList();
     state = state.copyWith(userCategories: cats);

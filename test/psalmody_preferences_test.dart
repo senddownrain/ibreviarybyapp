@@ -37,7 +37,8 @@ void main() {
       await box.putAll({
         'fontSize': 20.0,
         'favoriteIds': '["favorite"]',
-        'userCategories': '[{"id":"personal","name":"Маё","tags":[]}]',
+        'userCategories':
+            '[{"id":"personal","name":"Маё","tags":[],"iconKey":"prayer"}]',
         'themeMode': 'dark',
         'selectedDiocese': 'pinsk',
       });
