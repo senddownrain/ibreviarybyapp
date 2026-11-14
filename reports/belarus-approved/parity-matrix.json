@@ -1,0 +1,971 @@
+{
+  "webCommit": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+  "sourceSha256": "a55dc34c89317bd0a4b683ea84b46941213aa2b981d0a9de1fe3ebeb71dc9696",
+  "snapshot": "2026-11-08T22:16:20.000Z",
+  "fixtureGeneratedAt": "2026-11-08T22:32:18.498Z",
+  "mode": "approved-Web-candidate vs Flutter, same snapshot",
+  "productionFirestoreVerified": false,
+  "status": "DIFFERENCES_REQUIRE_REVIEW",
+  "dates": 16068,
+  "assembliesCompared": 37508,
+  "readingsSections": 155486,
+  "coverageNotes": [
+    "Hours text hashes are compared only on dates whose card structure matches; all other dates remain structural failures.",
+    "The raw Readings report inherits historical delivery-fixture bundle metadata; actual candidate manifest metadata is recorded here. Readings digest/count match both."
+  ],
+  "candidateBundle": {
+    "contentVersion": 1794176180000,
+    "readings": {
+      "file": "readings.json.gz",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
+      "count": 822,
+      "digest": "93314983ba9c1bd5",
+      "storedBytes": 4813227,
+      "bundleBytes": 901221
+    }
+  },
+  "measuredHeads": {
+    "hours": {
+      "web": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+      "flutter": "37d38290d0b828335f4d8f1645bdad5a0ead656c",
+      "flutterSdk": "3.41.4"
+    },
+    "readingsScreen": {
+      "web": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+      "flutter": "27f0b899a7e1b55f31bb6425579a5173b4300501",
+      "flutterSdk": "3.41.4"
+    }
+  },
+  "differences": {
+    "ordo": {},
+    "readingReferences": 0,
+    "hoursStructure": 70,
+    "hoursText": 44,
+    "readingsScreen": 38,
+    "readingsScreenByKind": {
+      "route-day-id": 38
+    }
+  },
+  "fields": [
+    "period",
+    "periodPhase",
+    "week",
+    "dayOfWeek",
+    "psalterWeek",
+    "cycle",
+    "color",
+    "colorAlternatives",
+    "primary",
+    "alternatives",
+    "commemorations",
+    "suppressed",
+    "transfers",
+    "sources",
+    "books",
+    "evening",
+    "office",
+    "notes"
+  ],
+  "rows": [
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2025,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 97,
+      "suppressed": 164,
+      "hoursAssemblies": 841,
+      "readings": {
+        "proper": 48,
+        "weekday": 414
+      },
+      "firstVespers": 62,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2026,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 105,
+      "suppressed": 157,
+      "hoursAssemblies": 856,
+      "readings": {
+        "proper": 47,
+        "weekday": 423
+      },
+      "firstVespers": 63,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2027,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 113,
+      "suppressed": 150,
+      "hoursAssemblies": 876,
+      "readings": {
+        "proper": 50,
+        "weekday": 428
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2028,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 105,
+      "suppressed": 159,
+      "hoursAssemblies": 859,
+      "readings": {
+        "proper": 52,
+        "weekday": 419
+      },
+      "firstVespers": 61,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2029,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 106,
+      "suppressed": 159,
+      "hoursAssemblies": 858,
+      "readings": {
+        "proper": 50,
+        "weekday": 421
+      },
+      "firstVespers": 61,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2030,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 96,
+      "suppressed": 167,
+      "hoursAssemblies": 835,
+      "readings": {
+        "proper": 52,
+        "weekday": 409
+      },
+      "firstVespers": 56,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2031,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 103,
+      "suppressed": 159,
+      "hoursAssemblies": 855,
+      "readings": {
+        "proper": 49,
+        "weekday": 419
+      },
+      "firstVespers": 62,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2032,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 110,
+      "suppressed": 153,
+      "hoursAssemblies": 874,
+      "readings": {
+        "proper": 49,
+        "weekday": 427
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2033,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 97,
+      "suppressed": 164,
+      "hoursAssemblies": 836,
+      "readings": {
+        "proper": 54,
+        "weekday": 408
+      },
+      "firstVespers": 59,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2034,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 102,
+      "suppressed": 163,
+      "hoursAssemblies": 853,
+      "readings": {
+        "proper": 51,
+        "weekday": 416
+      },
+      "firstVespers": 62,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "minsk-mohilev",
+      "year": 2035,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 109,
+      "suppressed": 156,
+      "hoursAssemblies": 869,
+      "readings": {
+        "proper": 51,
+        "weekday": 423
+      },
+      "firstVespers": 62,
+      "secondVespers": 70,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 0
+    },
+    {
+      "diocese": "grodno",
+      "year": 2025,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 100,
+      "suppressed": 167,
+      "hoursAssemblies": 844,
+      "readings": {
+        "proper": 49,
+        "weekday": 415,
+        "reference-only": 1
+      },
+      "firstVespers": 61,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2026,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 111,
+      "suppressed": 158,
+      "hoursAssemblies": 867,
+      "readings": {
+        "proper": 47,
+        "weekday": 428,
+        "reference-only": 1
+      },
+      "firstVespers": 63,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2027,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 113,
+      "suppressed": 156,
+      "hoursAssemblies": 873,
+      "readings": {
+        "proper": 50,
+        "weekday": 427,
+        "reference-only": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2028,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 108,
+      "suppressed": 163,
+      "hoursAssemblies": 860,
+      "readings": {
+        "proper": 53,
+        "weekday": 420,
+        "reference-only": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2029,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 109,
+      "suppressed": 161,
+      "hoursAssemblies": 861,
+      "readings": {
+        "proper": 49,
+        "weekday": 424,
+        "reference-only": 1
+      },
+      "firstVespers": 61,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2030,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 101,
+      "suppressed": 168,
+      "hoursAssemblies": 841,
+      "readings": {
+        "proper": 52,
+        "weekday": 413,
+        "reference-only": 1
+      },
+      "firstVespers": 55,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2031,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 106,
+      "suppressed": 163,
+      "hoursAssemblies": 859,
+      "readings": {
+        "proper": 50,
+        "weekday": 420,
+        "reference-only": 1
+      },
+      "firstVespers": 61,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2032,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 110,
+      "suppressed": 160,
+      "hoursAssemblies": 871,
+      "readings": {
+        "proper": 49,
+        "weekday": 426,
+        "reference-only": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2033,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 105,
+      "suppressed": 163,
+      "hoursAssemblies": 851,
+      "readings": {
+        "proper": 53,
+        "weekday": 417
+      },
+      "firstVespers": 60,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2034,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 105,
+      "suppressed": 167,
+      "hoursAssemblies": 854,
+      "readings": {
+        "proper": 52,
+        "weekday": 417,
+        "reference-only": 1
+      },
+      "firstVespers": 63,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "grodno",
+      "year": 2035,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 112,
+      "suppressed": 158,
+      "hoursAssemblies": 872,
+      "readings": {
+        "proper": 50,
+        "weekday": 426,
+        "reference-only": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 0
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2025,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 97,
+      "suppressed": 164,
+      "hoursAssemblies": 841,
+      "readings": {
+        "proper": 49,
+        "weekday": 413
+      },
+      "firstVespers": 62,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2026,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 105,
+      "suppressed": 157,
+      "hoursAssemblies": 856,
+      "readings": {
+        "proper": 47,
+        "weekday": 423
+      },
+      "firstVespers": 63,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2027,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 113,
+      "suppressed": 151,
+      "hoursAssemblies": 876,
+      "readings": {
+        "proper": 50,
+        "weekday": 428
+      },
+      "firstVespers": 61,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 0
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2028,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 104,
+      "suppressed": 160,
+      "hoursAssemblies": 856,
+      "readings": {
+        "proper": 52,
+        "weekday": 418
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2029,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 106,
+      "suppressed": 159,
+      "hoursAssemblies": 858,
+      "readings": {
+        "proper": 50,
+        "weekday": 421
+      },
+      "firstVespers": 61,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2030,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 96,
+      "suppressed": 167,
+      "hoursAssemblies": 835,
+      "readings": {
+        "proper": 52,
+        "weekday": 409
+      },
+      "firstVespers": 56,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2031,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 103,
+      "suppressed": 159,
+      "hoursAssemblies": 855,
+      "readings": {
+        "proper": 50,
+        "weekday": 418
+      },
+      "firstVespers": 62,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2032,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 110,
+      "suppressed": 154,
+      "hoursAssemblies": 874,
+      "readings": {
+        "proper": 49,
+        "weekday": 427
+      },
+      "firstVespers": 61,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 0
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2033,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 99,
+      "suppressed": 162,
+      "hoursAssemblies": 840,
+      "readings": {
+        "proper": 53,
+        "weekday": 411
+      },
+      "firstVespers": 59,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2034,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 101,
+      "suppressed": 164,
+      "hoursAssemblies": 850,
+      "readings": {
+        "proper": 51,
+        "weekday": 415
+      },
+      "firstVespers": 63,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "pinsk",
+      "year": 2035,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 109,
+      "suppressed": 156,
+      "hoursAssemblies": 869,
+      "readings": {
+        "proper": 51,
+        "weekday": 423
+      },
+      "firstVespers": 62,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 0
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2025,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 98,
+      "suppressed": 165,
+      "hoursAssemblies": 841,
+      "readings": {
+        "proper": 48,
+        "weekday": 414,
+        "missing": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2026,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 106,
+      "suppressed": 158,
+      "hoursAssemblies": 856,
+      "readings": {
+        "proper": 46,
+        "weekday": 424,
+        "missing": 1
+      },
+      "firstVespers": 63,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2027,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 115,
+      "suppressed": 149,
+      "hoursAssemblies": 879,
+      "readings": {
+        "proper": 48,
+        "weekday": 431,
+        "missing": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2028,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 108,
+      "suppressed": 158,
+      "hoursAssemblies": 864,
+      "readings": {
+        "proper": 52,
+        "weekday": 422
+      },
+      "firstVespers": 61,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2029,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 107,
+      "suppressed": 159,
+      "hoursAssemblies": 858,
+      "readings": {
+        "proper": 49,
+        "weekday": 422,
+        "missing": 1
+      },
+      "firstVespers": 61,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2030,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 101,
+      "suppressed": 164,
+      "hoursAssemblies": 844,
+      "readings": {
+        "proper": 51,
+        "weekday": 414,
+        "missing": 1
+      },
+      "firstVespers": 56,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2031,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 104,
+      "suppressed": 160,
+      "hoursAssemblies": 855,
+      "readings": {
+        "proper": 49,
+        "weekday": 419,
+        "missing": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 72,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2032,
+      "dates": 366,
+      "primary": 366,
+      "alternatives": 112,
+      "suppressed": 153,
+      "hoursAssemblies": 877,
+      "readings": {
+        "proper": 47,
+        "weekday": 430,
+        "missing": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2033,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 100,
+      "suppressed": 163,
+      "hoursAssemblies": 840,
+      "readings": {
+        "proper": 53,
+        "weekday": 411,
+        "missing": 1
+      },
+      "firstVespers": 59,
+      "secondVespers": 73,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2034,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 105,
+      "suppressed": 162,
+      "hoursAssemblies": 858,
+      "readings": {
+        "proper": 51,
+        "weekday": 419
+      },
+      "firstVespers": 62,
+      "secondVespers": 71,
+      "hoursDifferences": {
+        "structure": 2,
+        "text": 1
+      },
+      "readingsScreenDifferences": 1
+    },
+    {
+      "diocese": "vitebsk",
+      "year": 2035,
+      "dates": 365,
+      "primary": 365,
+      "alternatives": 110,
+      "suppressed": 156,
+      "hoursAssemblies": 869,
+      "readings": {
+        "proper": 50,
+        "weekday": 424,
+        "missing": 1
+      },
+      "firstVespers": 62,
+      "secondVespers": 70,
+      "hoursDifferences": {
+        "structure": 1,
+        "text": 1
+      },
+      "readingsScreenDifferences": 0
+    }
+  ]
+}

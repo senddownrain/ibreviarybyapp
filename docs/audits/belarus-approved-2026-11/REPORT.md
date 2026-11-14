@@ -51,6 +51,98 @@ Live Firestore reads/writes, публикация contentManifest, Hosting deplo
 - Деталь Ordo вычисляет выбор Office по собственной дате/диоцезиям; она больше не подписана
   на ленивый глобальный выбор скрытого Hours root. Устранено уведомление скрытого экрана
   во время build при переходах Ordo → Hours и смене дня (поймано Chrome smoke).
+- Для позднего Адвента перенесены Web-правила источников Office: воскресный period Office,
+  текущий псалтирь буднего дня, собственные Benedictus/Magnificat и антифоны.
+  I Vespers сохраняет O-антифон гражданского вечера. Таблица источников генерируется из Web,
+  её исходные SHA256 записаны в `reports/belarus-approved/office-sources.json`.
+- Ветка включает актуальный проверенный `main` (`1a628b9197d481c0495cb944d4ce127357fa3a54`),
+  в том числе Marian Hours и общий сборщик I Vespers из #60, canonical Juan Diego из #100,
+  review prompt и triage UI. Удалён общий skip Hours parity и исключения route ID в Readings:
+  расхождения теперь действительно проверяются и приводят к красному тесту.
+
+## Границы паритета
+
+959 календарных назначений и правила выбора Ordo проверяются отдельно от содержимого Office.
+Web oracle сгенерирован независимым Web pipeline из **того же** локального snapshot, что bundle;
+это позволяет проверить календарную миграцию без изменения литургических текстовых документов.
+
+После включения актуального `main` обнаружены отличия от Web #217 в Hours:
+идентификаторы документов Mother Church и сборка Immaculate Heart/Marian Common из #60.
+Кроме того, существующий принятый Flutter Proper Христа Первосвященника сохраняет исходный HTML
+и полную заключительную формулу молитвы, тогда как общий Web oracle содержит другое представление
+и сокращённую формулу. Подмена этих текстов ради совпадения хешей нарушает уже существующие
+`high_priest_daytime_parity_test` и `high_priest_minimal_patch_test`, включая будущий updater patch.
+Эта подмена не входит в окончательный diff. Специализированные проверки полного Proper и
+минимального reference-only обновления выполнены повторно после её удаления.
+
+Расхождения не объявлены допустимыми исключениями: общий Hours parity остаётся красным.
+До приёмки нужен согласованный Web/Flutter источник этих Office и повторный полный паритет.
+Проверка текстовых хешей общего Hours-теста охватывает только дни с одинаковой структурой карт;
+на остальных датах отчёт фиксирует structural mismatch, а не утверждает совпадение текстов.
+В Readings сравниваются также default screen, все legal option routes, наборы, циклы и sections hashes;
+старые route-ID исключения не скрывают результат.
+
+## Выполненные проверки
+
+| Проверка | Результат |
+|---|---|
+| PDF inventory | 262 строки → 959 назначений, exact ID/rank/fixed date, 0 extras |
+| Ordo 2025–2035 × 4 | 16 068 дат, 0 расхождений по всем 18 полям, включая primary/alternatives/suppressed и решение I/II Vespers |
+| Readings references | 16 068 дат, 0 расхождений |
+| Readings screen | 16 068 дат / 20 700 legal options / 155 486 sections: 0 content/sets/cycle mismatches; **38 route-day-id mismatches**, тест FAIL |
+| Hours | 16 068 дат; 37 508 сравнённых сборок; **70 structural / 44 text mismatches**, тест FAIL |
+| Целевые проверки после merge main | 47 PASS: inventory, cache/update, picker, Hours и Marian/vespers regressions |
+| Полный Proper High Priest / minimal patch / Advent | Повторно 14 PASS после сохранения принятого полного текста |
+| Навигация и вечерний Office | 51 PASS: Ordo → Hours, Christmas I Vespers, Grodno solemnity I Vespers и регрессии |
+| Web `npm run test:ordo` | 220 PASS / 8 SKIP / 0 FAIL на зафиксированном Web source |
+| Полный доступный Flutter suite, parity отдельно | 1950 PASS / 9 SKIP / 3 FAIL; подробности и повторная проверка ниже |
+| Дополнительные opt-in прогоны | Local analytics 8 PASS / 1 обратный flag SKIP; HTTP/R02 17 PASS, включая loopback Worker/SQLite и kill-switch |
+| `dart format` | 28 изменённых Dart-файлов, 0 дополнительных изменений форматтера |
+| `flutter analyze --no-pub` | 0 errors / 0 warnings / 29 info; стандартная команда exit 1 |
+| `flutter analyze --no-pub --no-fatal-infos` | Exit 0, те же 29 info в существующих feedback/pastors/analytics/reader файлах |
+| Chrome visual smoke после merge main | 36 состояний / 34 различных PNG; 0 Flutter/JS errors; 0 внешних запросов |
+| Android visual / установка поверх старого APK | **BLOCKED**: нет Android SDK, AVD, подключённого Android; команда integration test не нашла устройство |
+
+Hours: 44 structural случая Mother Church (document/template identity) и 26 Immaculate Heart
+(Common/Proper assembly из актуального #60). Все 44 text mismatch относятся к High Priest,
+один день × 11 лет × 4 диоцезии. Это не ошибки матрицы PDF и не основание менять утверждённые ранги.
+Тесты не пропущены и ожидают ноль; их красный результат сохранён в machine-readable отчёте.
+
+Все 38 Readings mismatches — `mary-mother-church` → `feast-marymotherchurch` в route ID;
+это та же document identity из актуального #60. Сами reading groups, документы, sets, cycles
+и все сравниваемые sections hashes совпали. Route-проверка остаётся строгой и красной.
+`reports/belarus-approved/parity-matrix.json` содержит все 44 пары диоцезия/год,
+проверенные количества и фактические расхождения; итог **DIFFERENCES_REQUIRE_REVIEW**.
+В raw Readings report часть bundle metadata унаследована из исторического readings delivery fixture;
+actual candidate manifest записан отдельно в matrix, digest/count Readings проверены на совпадение.
+
+Полный Flutter suite запускался без четырёх parity-файлов, которые выполнялись отдельным полным
+прогоном; их skip из main удалён. Из трёх failures общего прогона два относились к временному
+High Priest overlay, нарушавшему принятый исходный Proper. Overlay удалён, все три High Priest
+файла вместе с Advent повторно дали 14 PASS. Исходный общий лог сохраняет эти failures и не
+выдаётся за полностью зелёный запуск окончательного дерева.
+Оставшийся `discovery/p0_hints_screens_test.dart` → `date_navigation: three day arrows, once`
+воспроизводится на исходной базе `729f17a` (14 PASS / 1 FAIL); calendar branch его не исправляет.
+Baseline и итоговые логи сохранены в `reports/belarus-approved/logs/`.
+Девять исходных skips — compile-time opt-in local analytics и локальный R02 HTTP endpoint;
+календарные и parity-тесты в это число не входят.
+Они дополнительно выполнены с `ANALYTICS_LOCAL=true` и локальным Web Worker на `127.0.0.1:8875`,
+с отдельным scratch SQLite и тестовым admin token: 8 и 17 PASS соответственно. Единственный skip
+дополнительного прогона — обратная ветвь «flag выключен», уже пройденная общим suite.
+Внешний analytics endpoint не использовался.
+
+Chrome: использованы реальные production router/providers и bundled content, Firebase не инициализируется.
+Проверены все четыре диоцезии и возврат Витебск → другие → Витебск, ключевые даты из задачи,
+декабрь 2026/2027, Hours/Readings/month, прокрутка, reload с persisted Hive.
+Viewport 390 px/light/×1 и 320 px/dark/×1.8. Внешняя сеть блокируется; CanvasKit и шрифты
+отдаются из локального SDK. Реальные PNG просмотрены для Ordo и обоих reader roots с крупным шрифтом.
+`audit-evidence/belarus-approved/{results,provenance}.json` фиксируют сценарии и исходный commit.
+Это Flutter Web в Chrome, **не Android**.
+
+Hive upgrade-проверки охватывают revision3, конфликтующую revision4, неизвестную schema99,
+кэш с будущим timestamp, принятие большей revision5, повторный запуск, обновление уже открытой даты,
+декодирование слоёв на старте, удалённый saved option и диоцезальные старые deep links.
+Они не доказывают обновление установленного подписанного Android-приложения без очистки данных.
 
 ## Проверенные ранги
 
@@ -108,6 +200,10 @@ Snapshot содержит только public app content, находится в
 Полные SHA256 bundle/fixture и матрица — в `reports/belarus-approved/`.
 
 ## Приёмка и публикация
+
+Перед признанием паритета полным устранить 70/44 Hours и 38 Readings route-ID расхождений
+на согласованном Web/Flutter Office source, сохранив принятый полный Proper, и повторить строгие
+parity-тесты. Общий suite также должен получить зелёный результат, включая существующий date hint failure.
 
 1. Подтвердить завершённый отдельный sealed Firestore revision4 release; не добавлять в него декабрьские операции.
 2. Принять/опубликовать #217 и отдельный controlled revision5 patch двух enabled entries с новым dry-run,

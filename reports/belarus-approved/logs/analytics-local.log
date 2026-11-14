@@ -1,0 +1,14 @@
+Waiting for another flutter command to release the startup lock...
+00:00 +0: loading /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart
+00:00 +0: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit a two-line text in a roomy viewport is fit
+00:06 +1: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit a text that ends within the screen is fit although the blank reserve below it makes the view scrollable by a few points
+00:11 +2: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit the same page on a small phone (320x720) stays fit
+00:17 +3: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit a text that overflows the viewport is not fit
+00:22 +4: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit a text hidden by just a few lines is not fit
+00:28 +5: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit a long text read to the end reaches p100
+00:33 +6: /workspace/ibreviarybyapp/test/analytics/fit_detection_test.dart: sd = fit a larger font turns a fitting text into a scrolling one
+00:44 +7: loading /workspace/ibreviarybyapp/test/analytics/local_analytics_test.dart
+00:46 +7: /workspace/ibreviarybyapp/test/analytics/local_analytics_test.dart: without ANALYTICS_LOCAL the glue does nothing
+  Skip: flag is on
+00:46 +7 ~1: /workspace/ibreviarybyapp/test/analytics/local_analytics_test.dart: a scrolled read, a short fitting read, a loader, a closed id and a catalog
+01:04 +8 ~1: All tests passed!
