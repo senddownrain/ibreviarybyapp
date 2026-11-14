@@ -5,7 +5,8 @@ import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/providers/local_prayers_provider.dart';
-import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
+export 'package:mybrev_flutter/services/prayer_category_membership.dart'
+    show prayerBelongsToCategory, prayersForCategory;
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/services/priest_access_policy.dart';
@@ -107,7 +108,7 @@ final allPrayersProvider = Provider<List<Prayer>>((ref) {
       };
   final prayers = <Prayer>[];
   for (final entry in documents.entries) {
-    final restricted = policy.prayerRestricted(entry.value);
+    final restricted = policy.prayerRestricted(entry.value, id: entry.key);
     if (restricted && access.content == null) continue;
     try {
       prayers.add(
@@ -142,35 +143,6 @@ final favoritePrayersProvider = Provider<List<Prayer>>((ref) {
   );
   return ids.map((id) => byId[id]).whereType<Prayer>().toList();
 });
-
-bool prayerBelongsToCategory(
-  Prayer prayer,
-  PrayerMenuCategory category,
-  SettingsState settings,
-) {
-  if (settings.prayerCategoryMap[prayer.id]?.contains(category.id) == true) {
-    return true;
-  }
-  if (prayer.categoryId == category.id ||
-      prayer.categoryIds.contains(category.id)) {
-    return true;
-  }
-  final categoryTags = category.tags
-      .map((tag) => tag.trim().toLowerCase())
-      .where((tag) => tag.isNotEmpty)
-      .toSet();
-  return prayer.tags.any(
-    (tag) => categoryTags.contains(tag.trim().toLowerCase()),
-  );
-}
-
-List<Prayer> prayersForCategory(
-  List<Prayer> prayers,
-  PrayerMenuCategory category,
-  SettingsState settings,
-) => prayers
-    .where((prayer) => prayerBelongsToCategory(prayer, category, settings))
-    .toList(growable: false);
 
 final allTagsProvider = Provider<List<String>>((ref) {
   final prayers = ref.watch(prayerCatalogProvider);

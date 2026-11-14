@@ -45,7 +45,9 @@ Future<void> persistPublicPrayerContent(PrayerAccessContent content) async {
   final store = ContentStore.instance;
   await store.ensureLoaded(['prayers', 'prayerCategories']);
   final policy = PriestAccessPolicy(content.categories);
-  if (content.prayers.values.any(policy.prayerRestricted) ||
+  if (content.prayers.entries.any(
+        (entry) => policy.prayerRestricted(entry.value, id: entry.key),
+      ) ||
       content.categories.keys.any(policy.categoryRestricted)) {
     throw const FormatException('Protected content in public snapshot');
   }

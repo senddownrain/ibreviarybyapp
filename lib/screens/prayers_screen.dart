@@ -13,6 +13,8 @@ import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
+import 'package:mybrev_flutter/services/prayer_category_tree.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
@@ -148,11 +150,8 @@ class PrayersScreen extends ConsumerWidget {
                     child: Text('Катэгорый пакуль няма'),
                   )
                 else
-                  for (final category in categories)
-                    if (category.parentId == null ||
-                        category.parentId!.isEmpty ||
-                        !categories.any((c) => c.id == category.parentId))
-                      _CategoryRow(category: category),
+                  for (final node in buildPrayerCategoryTree(categories))
+                    _CategoryTreeRow(node: node),
                 const SizedBox(height: 28),
                 const _SectionTitle(title: 'Усе малітвы'),
                 _DestinationRow(
@@ -329,10 +328,6 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
     }
     final settings = ref.watch(settingsProvider);
-    final children = ref
-        .watch(prayerMenuCategoriesProvider)
-        .where((item) => item.parentId == category.id)
-        .toList();
     final prayers = prayersForCategory(
       ref.watch(prayerCatalogProvider),
       category,
@@ -344,7 +339,6 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
       prayers: prayers,
-      categories: children,
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
     );
   }
@@ -357,6 +351,7 @@ class PrayerCategoriesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final globals = ref.watch(globalPrayerCategoriesProvider);
+    final allowRestricted = ref.watch(priestAccessProvider).content != null;
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       body: Stack(
@@ -391,24 +386,24 @@ class PrayerCategoriesScreen extends ConsumerWidget {
                   data: (items) => Column(
                     children: [
                       for (final category in items)
-                        _ManageCategoryRow(
-                          key: ValueKey('manage-global-${category.id}'),
-                          category: category,
-                          hidden: settings.hiddenGlobalPrayerCategoryIds
-                              .contains(category.id),
-                          onVisibility: () {
-                            final notifier = ref.read(
-                              settingsProvider.notifier,
-                            );
-                            if (settings.hiddenGlobalPrayerCategoryIds.contains(
-                              category.id,
-                            )) {
-                              notifier.showGlobalPrayerCategory(category.id);
-                            } else {
-                              notifier.hideGlobalPrayerCategory(category.id);
-                            }
-                          },
-                        ),
+                        if (allowRestricted || !category.priestOnly)
+                          _ManageCategoryRow(
+                            key: ValueKey('manage-global-${category.id}'),
+                            category: category,
+                            hidden: settings.hiddenGlobalPrayerCategoryIds
+                                .contains(category.id),
+                            onVisibility: () {
+                              final notifier = ref.read(
+                                settingsProvider.notifier,
+                              );
+                              if (settings.hiddenGlobalPrayerCategoryIds
+                                  .contains(category.id)) {
+                                notifier.showGlobalPrayerCategory(category.id);
+                              } else {
+                                notifier.hideGlobalPrayerCategory(category.id);
+                              }
+                            },
+                          ),
                     ],
                   ),
                 ),
@@ -592,7 +587,6 @@ class _PrayerListPage extends StatelessWidget {
     required this.scrollController,
     required this.scrollKey,
     this.searchDock,
-    this.categories = const [],
   });
 
   final String title;
@@ -602,7 +596,6 @@ class _PrayerListPage extends StatelessWidget {
   final ScrollController scrollController;
   final PageStorageKey<String> scrollKey;
   final Widget? searchDock;
-  final List<PrayerMenuCategory> categories;
 
   @override
   Widget build(BuildContext context) {
@@ -633,10 +626,7 @@ class _PrayerListPage extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
                 const SizedBox(height: 18),
-                for (final category in categories)
-                  _CategoryRow(category: category),
-                if (categories.isNotEmpty) const SizedBox(height: 18),
-                if (prayers.isEmpty && categories.isEmpty)
+                if (prayers.isEmpty)
                   Padding(
                     key: const Key('prayer-list-empty'),
                     padding: const EdgeInsets.symmetric(vertical: 42),
@@ -875,8 +865,87 @@ class _CategoryRow extends StatelessWidget {
     key: ValueKey('category-${category.id}'),
     title: category.name,
     leading: CategoryIcon(category.displayIconKey),
-    onTap: () => context.push('/prayers/category/${category.id}'),
+    onTap: () =>
+        context.push('/prayers/category/${Uri.encodeComponent(category.id)}'),
   );
+}
+
+class _CategoryTreeRow extends ConsumerWidget {
+  const _CategoryTreeRow({super.key, required this.node, this.depth = 0});
+  final PrayerCategoryNode node;
+  final int depth;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final category = node.category;
+    final expanded = ref
+        .watch(expandedPrayerCategoryIdsProvider)
+        .contains(category.id);
+    final hasChildren = node.children.isNotEmpty;
+    final hasDirect =
+        hasChildren &&
+        prayersForCategory(
+          ref.watch(prayerCatalogProvider),
+          category,
+          ref.watch(settingsProvider),
+        ).isNotEmpty;
+    final indent = depth.clamp(0, 3) * 14.0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: indent),
+          child: hasChildren
+              ? Semantics(
+                  expanded: expanded,
+                  child: ListTile(
+                    key: ValueKey('category-${category.id}'),
+                    contentPadding: EdgeInsets.zero,
+                    minTileHeight: 58,
+                    leading: CategoryIcon(category.displayIconKey),
+                    title: Text(category.name),
+                    trailing: Icon(
+                      expanded
+                          ? Icons.expand_less_rounded
+                          : Icons.expand_more_rounded,
+                    ),
+                    onTap: () {
+                      final ids = {
+                        ...ref.read(expandedPrayerCategoryIdsProvider),
+                      };
+                      expanded ? ids.remove(category.id) : ids.add(category.id);
+                      ref
+                              .read(expandedPrayerCategoryIdsProvider.notifier)
+                              .state =
+                          ids;
+                    },
+                  ),
+                )
+              : _CategoryRow(category: category),
+        ),
+        if (hasChildren && expanded) ...[
+          if (hasDirect)
+            Padding(
+              padding: EdgeInsets.only(left: (depth + 1).clamp(0, 3) * 14.0),
+              child: _DestinationRow(
+                key: ValueKey('category-direct-${category.id}'),
+                title: 'Малітвы гэтай катэгорыі',
+                icon: PhosphorIconsRegular.listBullets,
+                onTap: () => context.push(
+                  '/prayers/category/${Uri.encodeComponent(category.id)}',
+                ),
+              ),
+            ),
+          for (final child in node.children)
+            _CategoryTreeRow(
+              key: ValueKey('category-node-${child.category.id}'),
+              node: child,
+              depth: depth + 1,
+            ),
+        ],
+      ],
+    );
+  }
 }
 
 class _DestinationRow extends StatelessWidget {

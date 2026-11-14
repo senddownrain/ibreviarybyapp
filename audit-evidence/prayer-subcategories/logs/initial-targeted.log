@@ -1,0 +1,131 @@
+00:00 +0: loading /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart
+00:00 +0: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C01-old-field-absent
+00:00 +1: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C02-folder
+00:00 +2: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C03-union-no-descendants
+00:00 +3: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C04-two-level-leaf
+00:00 +4: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C05-restriction-wins
+00:00 +5: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C06-visible-ancestors
+00:00 +6: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C07-remove-manual-keep-tag
+00:00 +7: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C08-remove-last-protected-link
+00:00 +8: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C09-parent-move
+00:00 +9: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: new model uses the real Web gzip and preserves old icons and opaque IDs
+00:00 +10: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: personal membership stays local and cannot change global membership
+00:00 +11: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: hidden parent promotes children; global duplicates retain distinct IDs
+00:00 +12: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: numeric finite order, Belarusian names and ID tie break
+00:00 +13: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: missing/self/cycle/depth fail closed regardless of cache lookup order
+00:00 +14: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: own/effective/tag/manual/legacy restrictions each survive removing another reason
+00:00 +15: loading /workspace/flutter-prayer-subcategories/test/prayer_category_old_decoder_test.dart
+00:03 +15: /workspace/flutter-prayer-subcategories/test/prayer_category_old_decoder_test.dart: OLD DECODER x NEW GZIP: schema, string table, hashes and old model
+00:03 +16: /workspace/flutter-prayer-subcategories/test/prayer_category_old_decoder_test.dart: OLD ContentStore: bundle, update overlay, close/restart/reload
+[ContentStore] prayers: 6 docs in 15 ms
+[ContentStore] prayerCategories: 6 docs in 18 ms
+[ContentStore] prayerCategories: 6 docs in 2 ms
+[ContentStore] prayers: 6 docs in 2 ms
+00:03 +17: /workspace/flutter-prayer-subcategories/test/prayer_category_old_decoder_test.dart: OLD category list UI accepts new documents without crashing
+00:03 +18: loading /workspace/flutter-prayer-subcategories/test/prayer_categories_provider_test.dart
+00:04 +18: /workspace/flutter-prayer-subcategories/test/prayer_categories_provider_test.dart: combines global and personal categories without duplicate names
+00:04 +19: /workspace/flutter-prayer-subcategories/test/prayer_categories_provider_test.dart: hidden global category can be replaced by a personal one
+00:04 +20: loading /workspace/flutter-prayer-subcategories/test/prayers_provider_test.dart
+00:05 +20: /workspace/flutter-prayer-subcategories/test/prayers_provider_test.dart: selected tags match any selected tag
+00:05 +21: /workspace/flutter-prayer-subcategories/test/prayers_provider_test.dart: search checks title and prayer text without HTML tags
+00:05 +22: /workspace/flutter-prayer-subcategories/test/prayers_provider_test.dart: search normalizes whitespace, HTML boundaries, and apostrophes
+00:05 +23: /workspace/flutter-prayer-subcategories/test/prayers_provider_test.dart: favorites are sorted first and titles ignore leading spaces
+00:05 +24: loading /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart
+00:06 +24: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+00:08 +25: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:09 +26: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: My Prayers add button stays above the app dock
+00:09 +27: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category grouping uses tags and explicit persisted membership
+00:09 +28: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: root order is Favorites, Holy Mass, Categories, All Prayers
+00:09 +29: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+00:09 +30: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: empty favorites is compact and categories remain visible
+00:09 +31: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: missing Holy Mass stays recognizable
+00:10 +32: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: favorite toggle is shared by catalog and root providers
+00:10 +33: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: All Prayers contains built-in and user prayers
+00:10 +34: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer catalog owns the contextual bottom slot
+00:10 +35: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+00:10 +36: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: search focuses, filters title/body, and keeps query state
+00:10 +37: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: All Prayers re-entry keeps query and results synchronized
+00:10 +38: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category page includes tag and explicit members
+00:10 +39: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayer category uses a single shared menu for management
+00:10 +40: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayerbook search keeps the shared overflow visible
+00:11 +41: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category management hides and shows defaults
+00:11 +42: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: user category can be created, renamed, and deleted
+00:11 +43: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category icon is chosen on create and survives edits
+00:12 +44: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category editor supports quick tags and searchable prayers
+00:13 +45: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayer Detail uses shared reader and only local has edit
+00:13 +46: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer reader shows scroll-to-top only outside fullscreen
+00:13 +47: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Holy Mass exposes section navigation without sharing
+00:14 +48: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: built-in prayer cannot be opened as a destructive edit
+00:14 +49: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: local prayer keeps editable form and detail edit action
+00:14 +50: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: local prayer editor formats text and shows preview
+00:14 +51: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayerbook remains usable at 200 percent system text
+00:14 +52: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayerbook title clears top search at narrow and wide sizes
+00:14 +53: loading /workspace/flutter-prayer-subcategories/test/priest_access_test.dart
+00:15 +53: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: exact official web normalization/proof vectors, including Unicode rejection
+00:15 +54: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: inherited categories, multi-tags, explicit IDs, dangling links and cycles fail closed
+00:15 +55: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: APK source bundle has no explicitly or transitively protected documents
+00:16 +56: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: merge preserves IDs, deduplicates and never persists protected storage documents
+00:16 +57: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: first launch makes no anonymous account; server rejects wrong proof; restart/code rotation keeps UID
+00:16 +58: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: offline/background clears texts, retains registration, reuses Auth on resume
+00:16 +59: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: server grant listener removes active reader and UI on individual revoke
+00:16 +60: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: server recovery retries without a connectivity change
+00:22 +61: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: proof cleanup rollout does not revoke or replace the restored UID
+00:22 +62: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: offline disable persists intent and blocks all protected reads until server acknowledges after restart
+00:22 +63: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: late reader and content cannot restore disabled access
+00:22 +64: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: revocation clears content even when secure storage fails
+00:22 +65: /workspace/flutter-prayer-subcategories/test/priest_access_test.dart: failed durable disable signs out locally and cannot restore access
+00:22 +66: loading /workspace/flutter-prayer-subcategories/test/priest_public_cache_test.dart
+00:23 +66: /workspace/flutter-prayer-subcategories/test/priest_public_cache_test.dart: public snapshot removes private records, compacts old frames and keeps user data
+00:23 +67: /workspace/flutter-prayer-subcategories/test/priest_public_cache_test.dart: a protected snapshot is rejected before any disk write
+00:23 +68: /workspace/flutter-prayer-subcategories/test/priest_public_cache_test.dart: new public bundle removes migrated IDs with false legacy flags, even from newer overlays; user data and later public updates survive
+[ContentStore] prayerCategories: 5 docs in 13 ms
+[ContentStore] prayers: 115 docs in 68 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 27 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 140 ms
+[ContentStore] invitatoriums: 4 docs in 141 ms
+[ContentStore] completoriums: 35 docs in 141 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 142 ms
+[ContentStore] compendiumMeta: 1 docs in 106 ms
+[ContentStore] compendium: 27 docs in 107 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 437 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 406 ms
+[ContentStore] songs: 447 docs in 417 ms
+[ContentStore] liturgicalTemplates: 16 docs in 519 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 515 ms
+[ContentStore] readings: 822 docs in 563 ms
+[ContentStore] days: 736 docs in 709 ms
+[ContentStore] prayerCategories: 5 docs in 0 ms
+[ContentStore] prayers: 115 docs in 30 ms
+[ContentStore] invitatoriums: 4 docs in 22 ms
+[ContentStore] completoriums: 35 docs in 23 ms
+[ContentStore] compendiumMeta: 1 docs in 21 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 23 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 23 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 23 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 23 ms
+[ContentStore] songs: 447 docs in 51 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 103 ms
+[ContentStore] liturgicalTemplates: 16 docs in 134 ms
+[ContentStore] compendium: 27 docs in 135 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 219 ms
+[ContentStore] readings: 822 docs in 320 ms
+[ContentStore] days: 736 docs in 480 ms
+00:24 +69: /workspace/flutter-prayer-subcategories/test/priest_public_cache_test.dart: legacy cache cannot reintroduce migrated IDs after startup cleanup
+[ContentStore] prayerCategories: 5 docs in 0 ms
+[ContentStore] prayers: 115 docs in 19 ms
+[ContentStore] invitatoriums: 4 docs in 19 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 32 ms
+[ContentStore] liturgicalCelebrations: 241 docs in 71 ms
+[ContentStore] liturgicalDioceseOverrides: 75 docs in 71 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 71 ms
+[ContentStore] completoriums: 35 docs in 73 ms
+[ContentStore] songs: 447 docs in 61 ms
+[ContentStore] compendiumMeta: 1 docs in 69 ms
+[ContentStore] compendium: 27 docs in 70 ms
+[ContentStore] liturgicalTemplates: 16 docs in 166 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 189 ms
+[ContentStore] readings: 822 docs in 213 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 221 ms
+[ContentStore] days: 736 docs in 371 ms
+[ContentMigration] done, 0 newer documents kept
+00:25 +70: All tests passed!

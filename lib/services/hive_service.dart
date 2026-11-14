@@ -112,7 +112,7 @@ class HiveService {
       });
       final restricted = {
         for (final id in prayersBox.keys)
-          if (policy.prayerRestricted(prayersBox.get(id) as Map) ||
+          if (policy.prayerRestricted(prayersBox.get(id) as Map, id: id) ||
               (migrationNeeded && cleanup.prayers.contains(id)))
             id: null,
       };
