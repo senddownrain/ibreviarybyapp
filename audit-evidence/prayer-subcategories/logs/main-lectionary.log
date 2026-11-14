@@ -223,10 +223,10 @@
   {"diocese":"minsk-mohilev","date":"2030-06-10","option":"mary-mother-church","kind":"route-day-id","web":"mary-mother-church","app":"feast-marymotherchurch"}
   {"diocese":"minsk-mohilev","date":"2031-06-02","option":"mary-mother-church","kind":"route-day-id","web":"mary-mother-church","app":"feast-marymotherchurch"}
   {"diocese":"minsk-mohilev","date":"2032-05-17","option":"mary-mother-church","kind":"route-day-id","web":"mary-mother-church","app":"feast-marymotherchurch"}
-  
+
   package:matcher                                     expect
   package:flutter_test/src/widget_tester.dart 473:18  expect
   test/lectionary_parity_test.dart 414:7              main.<fn>
-  
+
 06:51 +0 -1: (tearDownAll)
 06:51 +0 -1: Some tests failed.

@@ -112,10 +112,10 @@
   2027-06-05 minsk-mohilev
     web:     [{"key":"period-ordinary-w9-d7","optionId":"temporal:ordinary-w9-d7","source":"period","properSource":null,"missingProper":false,"templates":[["ordinary-w9-d7","Перыяд",null,null]]}, {"key":"dynamic-feast-heartofmary","optionId":"immaculate-heart","source":"dynamic","properSource":null,"missingProper":false,"templates":[["feast-heartofmary","feast-heartofmary",null,null]]}, {"key":"fixed-sv-boniface","optionId":"sv-boniface","source":"fixed","properSource":"liturgicalProperTexts","missingProper":false,"templates":[["05-06-sv-boniface","З дня","current-day",null],["05-06-sv-boniface--martyr-one","Пра аднаго мучаніка","martyr-one",null],["05-06-sv-boniface--pastors","Пра пастыраў","pastors",null]]}, {"key":"office-for-dead","optionId":"office-for-dead","source":"office-for-dead","properSource":null,"missingProper":false,"templates":[["office-for-dead","Афіцый за памерлых",null,null]]}]
     flutter: [{"key":"period-ordinary-w9-d7","optionId":"temporal:ordinary-w9-d7","source":"period","properSource":null,"missingProper":false,"templates":[["ordinary-w9-d7","Перыяд",null,null]]}, {"key":"dynamic-immaculate-heart","optionId":"immaculate-heart","source":"dynamic","properSource":"legacy-days","missingProper":false,"templates":[["feast-heartofmary","З дня","current-day",null],["feast-heartofmary--blessed-virgin-mary","Пра Найсвяцейшую Панну Марыю","blessed-virgin-mary",null]]}, {"key":"fixed-sv-boniface","optionId":"sv-boniface","source":"fixed","properSource":"liturgicalProperTexts","missingProper":false,"templates":[["05-06-sv-boniface","З дня","current-day",null],["05-06-sv-boniface--martyr-one","Пра аднаго мучаніка","martyr-one",null],["05-06-sv-boniface--pastors","Пра пастыраў","pastors",null]]}, {"key":"office-for-dead","optionId":"office-for-dead","source":"office-for-dead","properSource":null,"missingProper":false,"templates":[["office-for-dead","Афіцый за памерлых",null,null]]}]
-  
+
   package:matcher                                     expect
   package:flutter_test/src/widget_tester.dart 473:18  expect
   test/hours_parity_test.dart 169:7                   main.<fn>
-  
+
 03:09 +0 -1: (tearDownAll)
 03:09 +0 -1: Some tests failed.
