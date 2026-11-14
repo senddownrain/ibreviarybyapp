@@ -13,6 +13,8 @@ import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
+import 'package:mybrev_flutter/services/prayer_category_tree.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
@@ -148,11 +150,8 @@ class PrayersScreen extends ConsumerWidget {
                     child: Text('Катэгорый пакуль няма'),
                   )
                 else
-                  for (final category in categories)
-                    if (category.parentId == null ||
-                        category.parentId!.isEmpty ||
-                        !categories.any((c) => c.id == category.parentId))
-                      _CategoryRow(category: category),
+                  for (final node in buildPrayerCategoryTree(categories))
+                    _CategoryRow(category: node.category),
                 const SizedBox(height: 28),
                 const _SectionTitle(title: 'Усе малітвы'),
                 _DestinationRow(
@@ -321,18 +320,15 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final category = ref
-        .watch(prayerMenuCategoriesProvider)
-        .where((item) => item.id == widget.categoryId)
-        .firstOrNull;
+    final node = findPrayerCategoryNode(
+      buildPrayerCategoryTree(ref.watch(prayerMenuCategoriesProvider)),
+      widget.categoryId,
+    );
+    final category = node?.category;
     if (category == null) {
       return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
     }
     final settings = ref.watch(settingsProvider);
-    final children = ref
-        .watch(prayerMenuCategoriesProvider)
-        .where((item) => item.parentId == category.id)
-        .toList();
     final prayers = prayersForCategory(
       ref.watch(prayerCatalogProvider),
       category,
@@ -344,7 +340,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
       prayers: prayers,
-      categories: children,
+      categories: [for (final child in node!.children) child.category],
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
     );
   }
@@ -357,6 +353,7 @@ class PrayerCategoriesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final globals = ref.watch(globalPrayerCategoriesProvider);
+    final allowRestricted = ref.watch(priestAccessProvider).content != null;
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       body: Stack(
@@ -391,24 +388,24 @@ class PrayerCategoriesScreen extends ConsumerWidget {
                   data: (items) => Column(
                     children: [
                       for (final category in items)
-                        _ManageCategoryRow(
-                          key: ValueKey('manage-global-${category.id}'),
-                          category: category,
-                          hidden: settings.hiddenGlobalPrayerCategoryIds
-                              .contains(category.id),
-                          onVisibility: () {
-                            final notifier = ref.read(
-                              settingsProvider.notifier,
-                            );
-                            if (settings.hiddenGlobalPrayerCategoryIds.contains(
-                              category.id,
-                            )) {
-                              notifier.showGlobalPrayerCategory(category.id);
-                            } else {
-                              notifier.hideGlobalPrayerCategory(category.id);
-                            }
-                          },
-                        ),
+                        if (allowRestricted || !category.priestOnly)
+                          _ManageCategoryRow(
+                            key: ValueKey('manage-global-${category.id}'),
+                            category: category,
+                            hidden: settings.hiddenGlobalPrayerCategoryIds
+                                .contains(category.id),
+                            onVisibility: () {
+                              final notifier = ref.read(
+                                settingsProvider.notifier,
+                              );
+                              if (settings.hiddenGlobalPrayerCategoryIds
+                                  .contains(category.id)) {
+                                notifier.showGlobalPrayerCategory(category.id);
+                              } else {
+                                notifier.hideGlobalPrayerCategory(category.id);
+                              }
+                            },
+                          ),
                     ],
                   ),
                 ),
@@ -635,7 +632,8 @@ class _PrayerListPage extends StatelessWidget {
                 const SizedBox(height: 18),
                 for (final category in categories)
                   _CategoryRow(category: category),
-                if (categories.isNotEmpty) const SizedBox(height: 18),
+                if (categories.isNotEmpty && prayers.isNotEmpty)
+                  const SizedBox(height: 18),
                 if (prayers.isEmpty && categories.isEmpty)
                   Padding(
                     key: const Key('prayer-list-empty'),
@@ -875,7 +873,8 @@ class _CategoryRow extends StatelessWidget {
     key: ValueKey('category-${category.id}'),
     title: category.name,
     leading: CategoryIcon(category.displayIconKey),
-    onTap: () => context.push('/prayers/category/${category.id}'),
+    onTap: () =>
+        context.push('/prayers/category/${Uri.encodeComponent(category.id)}'),
   );
 }
 

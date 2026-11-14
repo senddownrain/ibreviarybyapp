@@ -1,0 +1,38 @@
+Command: flutter test --no-pub --reporter expanded
+Base: aacfd044546d6f2a8e1cc5eff2589fde6bd1ee99
+Result: 2030 PASS / 9 SKIP / 2 FAIL
+Complete raw log SHA-256: 8441f50909bdf17851bc4bede8f8ede8a6cd48296f62f3259e9f04a820198291
+Complete output: gzip -dc flutter-full.log.gz
+
+{"dates":16068,"options":20700,"sets":2340,"sections":155486,"mismatches":38,"byKind":{"route-day-id":38},"documentedDifferences":0,"webDayIdRouteDiffersFromOptionRoute":958}
+21:47 +1934 ~9 -1: /workspace/flutter-prayer-subcategories/test/lectionary_parity_test.dart: Flutter Readings screen equals the web screen for every legal option [E]
+  Expected: empty
+    Actual: [
+              {
+                'diocese': 'minsk-mohilev',
+                'date': '2025-06-09',
+                'option': 'mary-mother-church',
+                'kind': 'route-day-id',
+                'web': 'mary-mother-church',
+                'app': 'feast-marymotherchurch'
+              },
+              {
+                'diocese': 'minsk-mohilev',
+... (complete output retained in flutter-full.log.gz)
+22:23 +2011 ~9 -1: /workspace/flutter-prayer-subcategories/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses
+25:35 +2011 ~9 -2: /workspace/flutter-prayer-subcategories/test/hours_parity_test.dart: Hours cards and assemblies equal the web, 2025–2035 × 4 dioceses [E]
+  Expected: empty
+    Actual: [
+              '2025-06-09 minsk-mohilev\n'
+                '  web:     [{"key":"dynamic-mary-mother-church","optionId":"mary-mother-church","source":"dynamic","properSource":"none","missingProper":true,"templates":[["mary-mother-church","З дня","current-day",null],["mary-mother-church--blessed-virgin-mary","Пра Найсвяцейшую Панну Марыю","blessed-virgin-mary",null]]}]\n'
+                '  flutter: [{"key":"dynamic-mary-mother-church","optionId":"mary-mother-church","source":"dynamic","properSource":"none","missingProper":true,"templates":[["feast-marymotherchurch","З дня","current-day",null],["feast-marymotherchurch--blessed-virgin-mary","Пра Найсвяцейшую Панну Марыю","blessed-virgin-mary",null]]}]',
+              '2025-06-28 minsk-mohilev\n'
+                '  web:     [{"key":"period-ordinary-w12-d7","optionId":"temporal:ordinary-w12-d7","source":"period","properSource":null,"missingProper":false,"templates":[["ordinary-w12-d7","Перыяд",null,null]]}, {"key":"dynamic-feast-heartofmary","optionId":"immaculate-heart","source":"dynamic","properSource":null,"missingProper":false,"templates":[["feast-heartofmary","feast-heartofmary",null,null]]}, {"key":"fixed-sv-irenaeus","optionId":"sv-irenaeus","source":"fixed","properSource":"liturgicalProperTexts","missingProper":false,"templates":[["28-06-sv-irenaeus","З дня","current-day",null],["28-06-sv-irenaeus--martyr-one","Пра аднаго мучаніка","martyr-one",null],["28-06-sv-irenaeus--pastors","Пра пастыраў","pastors",null]]}, {"key":"office-for-dead","optionId":"office-for-dead","source":"office-for-dead","properSource":null,"missingProper":false,"templates":[["office-for-dead","Афіцый за памерлых",null,null]]}]\n'
+                '  flutter: [{"key":"period-ordinary-w12-d7","optionId":"temporal:ordinary-w12-d7","source":"period","properSource":null,"missingProper":false,"templates":[["ordinary-w12-d7","Перыяд",null,null]]}, {"key":"dynamic-immaculate-heart","optionId":"immaculate-heart","source":"dynamic","properSource":"legacy-days","missingProper":false,"templates":[["feast-heartofmary","З дня","current-day",null],["feast-heartofmary--blessed-virgin-mary","Пра Найсвяцейшую Панну Марыю","blessed-virgin-mary",null]]}, {"key":"fixed-sv-irenaeus","optionId":"sv-irenaeus","source":"fixed","properSource":"liturgicalProperTexts","missingProper":false,"templates":[["28-06-sv-irenaeus","З дня","current-day",null],["28-06-sv-irenaeus--martyr-one","Пра аднаго мучаніка","martyr-one",null],["28-06-sv-irenaeus--pastors","Пра пастыраў","pastors",null]]}, {"key":"office-for-dead","optionId":"office-for-dead","source":"office-for-dead","properSource":null,"missingProper":false,"templates":[["office-for-dead","Афіцый за памерлых",null,null]]}]',
+              '2026-05-25 minsk-mohilev\n'
+                '  web:     [{"key":"dynamic-mary-mother-church","optionId":"mary-mother-church","source":"dynamic","properSource":"none","missingProper":true,"templates":[["mary-mother-church","З дня","current-day",null],["mary-mother-church--blessed-virgin-mary","Пра Найсвяцейшую Панну Марыю","blessed-virgin-mary",null]]}]\n'
+                '  flutter: [{"key":"dynamic-mary-mother-church","optionId":"mary-mother-church","source":"dynamic","properSource":"none","missingProper":true,"templates":[["feast-marymotherchurch","З дня","current-day",null],["feast-marymotherchurch--blessed-virgin-mary","Пра Найсвяцейшую Панну Марыю","blessed-virgin-mary",null]]}]',
+              '2026-06-13 minsk-mohilev\n'
+... (complete output retained in flutter-full.log.gz)
+
+25:50 +2030 ~9 -2: Some tests failed.

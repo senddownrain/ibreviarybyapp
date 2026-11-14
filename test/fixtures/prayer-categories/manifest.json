@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1000,
+  "contentDate": "1970-01-01T00:00:01.000Z",
+  "collections": {
+    "prayers": {
+      "file": "prayers.json.gz",
+      "contentVersion": 1000,
+      "contentDate": "1970-01-01T00:00:01.000Z",
+      "count": 6,
+      "digest": "18f1d0eb0b8518d7",
+      "storedBytes": 388,
+      "bundleBytes": 320
+    },
+    "prayerCategories": {
+      "file": "prayerCategories.json.gz",
+      "contentVersion": 1000,
+      "contentDate": "1970-01-01T00:00:01.000Z",
+      "count": 6,
+      "digest": "b82a34a49fb6e69a",
+      "storedBytes": 894,
+      "bundleBytes": 514
+    }
+  }
+}

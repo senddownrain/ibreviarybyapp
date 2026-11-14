@@ -189,7 +189,10 @@ void main() {
       expect(find.text('Касцёльныя крыніцы'), findsOneWidget);
       expect(find.text('Іншыя крыніцы'), findsOneWidget);
       expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2018)'), findsOneWidget);
-      expect(find.text('Малітоўнік «Каб пазналі Цябе» (Гродна, 2014)'), findsOneWidget);
+      expect(
+        find.text('Малітоўнік «Каб пазналі Цябе» (Гродна, 2014)'),
+        findsOneWidget,
+      );
       expect(find.text('«Біблія» (Мінск, 2017)'), findsOneWidget);
       expect(find.text('«Біблія» Синодальный перевод'), findsOneWidget);
       expect(

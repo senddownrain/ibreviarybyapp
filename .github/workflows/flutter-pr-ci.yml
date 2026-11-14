@@ -110,6 +110,12 @@ jobs:
           if-no-files-found: warn
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
+      - name: Prayer category pages, membership and cache regression
+        run: >-
+          flutter test test/prayer_category_widget_test.dart
+          test/prayer_category_contract_test.dart test/prayer_category_security_test.dart
+          test/prayer_categories_provider_test.dart test/prayers_provider_test.dart
+          test/category_icons_test.dart
       - name: Sunday 32 Benedictus visual fixture
         env:
           LITURGY_SMOKE_IMAGES: '1'

@@ -1,0 +1,7 @@
+Prior PR #109 head: 98835388816f592603daf9ed5954884ae4987f5a
+GitHub run: https://github.com/senddownrain/ibreviarybyapp/actions/runs/43604660942
+Failed step: Local rights and external Web documents
+PASS: local rights registry matches Web PR #192; two Bible corpora unchanged
+Formatter reported Changed lib/screens/source_documents_screen.dart and Changed test/source_documents_widget_test.dart
+Exit code 1; subsequent test steps were skipped. Analytics job passed.
+Correction in this revision: Dart formatter only, preserving all strings and behavior.

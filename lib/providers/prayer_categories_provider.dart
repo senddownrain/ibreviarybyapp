@@ -1,5 +1,9 @@
+import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/models/prayer_menu_category.dart';
+import 'package:mybrev_flutter/providers/prayers_provider.dart';
+import 'package:mybrev_flutter/services/prayer_category_tree.dart';
+export 'package:mybrev_flutter/models/prayer_menu_category.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -8,64 +12,6 @@ import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/services/priest_access_policy.dart';
 
 const kPrayerCategoriesCollection = 'prayerCategories';
-
-class PrayerMenuCategory {
-  final String id;
-  final String name;
-  final List<String> tags;
-  final bool isGlobal;
-  final bool priestOnly;
-  final String? parentId;
-
-  /// Stored icon key (may be null or unknown); draw with [displayIconKey].
-  final String? iconKey;
-
-  const PrayerMenuCategory({
-    required this.id,
-    required this.name,
-    required this.tags,
-    required this.isGlobal,
-    this.priestOnly = false,
-    this.parentId,
-    this.iconKey,
-  });
-
-  /// The key to draw: the stored one, or a deterministic suggestion until the
-  /// category has one (e.g. a global category not yet migrated in Firestore).
-  String get displayIconKey =>
-      displayCategoryIconKey(iconKey: iconKey, id: id, name: name, tags: tags);
-
-  factory PrayerMenuCategory.global(String id, Map data) {
-    return PrayerMenuCategory(
-      id: id,
-      name: data['name']?.toString().trim() ?? '',
-      tags: _cleanTags(data['tags']),
-      isGlobal: true,
-      priestOnly:
-          data['priestOnly'] == true || data['effectivePriestOnly'] == true,
-      parentId: data['parentId']?.toString(),
-      iconKey: data['iconKey'] is String ? data['iconKey'] as String : null,
-    );
-  }
-
-  factory PrayerMenuCategory.personal(UserCategory category) =>
-      PrayerMenuCategory(
-        id: category.id,
-        name: category.name,
-        tags: category.tags,
-        isGlobal: false,
-        iconKey: category.iconKey,
-      );
-}
-
-List<String> _cleanTags(dynamic value) {
-  if (value is! Iterable) return const [];
-  return value
-      .map((tag) => tag.toString().trim())
-      .where((tag) => tag.isNotEmpty)
-      .toSet()
-      .toList();
-}
 
 /// Categories of the Prayerbook from the app's content (bundled, kept
 /// current by the content update), ordered by `order`, then by name.
@@ -88,7 +34,8 @@ final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
     final policy = PriestAccessPolicy(source);
     final documents = [
       for (final entry in source.entries)
-        if (access.content != null || !policy.categoryRestricted(entry.key))
+        if (policy.categoryValid(entry.key) &&
+            (access.content != null || !policy.categoryRestricted(entry.key)))
           (
             entry.key,
             {
@@ -97,20 +44,11 @@ final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
             },
           ),
     ];
-    double order(Map data) =>
-        (data['order'] is num ? (data['order'] as num).toDouble() : null) ??
-        double.maxFinite;
-    documents.sort((left, right) {
-      final byOrder = order(left.$2).compareTo(order(right.$2));
-      if (byOrder != 0) return byOrder;
-      return (left.$2['name']?.toString() ?? '').toLowerCase().compareTo(
-        (right.$2['name']?.toString() ?? '').toLowerCase(),
-      );
-    });
     yield documents
         .map((item) => PrayerMenuCategory.global(item.$1, item.$2))
         .where((category) => category.name.isNotEmpty)
-        .toList(growable: false);
+        .toList(growable: false)
+      ..sort(comparePrayerCategories);
   },
 );
 
@@ -124,19 +62,36 @@ final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
     globalCategories,
     settings.userCategories,
     settings.hiddenGlobalPrayerCategoryIds,
+    permittedPrayers: ref.watch(prayerCatalogProvider),
+    settings: settings,
+    allowRestricted: ref.watch(priestAccessProvider).content != null,
   );
 });
 
 List<PrayerMenuCategory> buildPrayerCategoryMenu(
   List<PrayerMenuCategory> globalCategories,
   List<UserCategory> personalCategories,
-  List<String> hiddenGlobalCategoryIds,
-) {
+  List<String> hiddenGlobalCategoryIds, {
+  List<Prayer>? permittedPrayers,
+  SettingsState settings = const SettingsState(),
+  bool allowRestricted = false,
+}) {
   final hiddenIds = hiddenGlobalCategoryIds.toSet();
   final names = <String>{};
   final result = <PrayerMenuCategory>[];
+  final policy = PriestAccessPolicy({
+    for (final category in globalCategories)
+      category.id: {
+        'parentId': category.parentId,
+        'priestOnly': category.priestOnly,
+      },
+  });
 
   for (final category in globalCategories) {
+    if (!policy.categoryValid(category.id) ||
+        (!allowRestricted && policy.categoryRestricted(category.id))) {
+      continue;
+    }
     if (hiddenIds.contains(category.id)) continue;
     final nameKey = category.name.toLowerCase();
     names.add(nameKey);
@@ -149,5 +104,34 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
     result.add(PrayerMenuCategory.personal(category));
   }
 
-  return result;
+  if (permittedPrayers == null) return result;
+  final byId = {
+    for (final category in result.where((c) => c.isGlobal))
+      category.id: category,
+  };
+  final visible = <String>{};
+  for (final category in byId.values) {
+    if (prayersForCategory(permittedPrayers, category, settings).isEmpty) {
+      continue;
+    }
+    var current = category;
+    final seen = <String>{};
+    while (seen.add(current.id)) {
+      visible.add(current.id);
+      final parent = byId[current.parentId];
+      if (parent == null) break;
+      current = parent;
+    }
+  }
+  return result
+      .where(
+        (category) => category.isGlobal
+            ? visible.contains(category.id)
+            : prayersForCategory(
+                permittedPrayers,
+                category,
+                settings,
+              ).isNotEmpty,
+      )
+      .toList(growable: false);
 }

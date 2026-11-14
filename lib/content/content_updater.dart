@@ -346,7 +346,9 @@ class ContentUpdater {
       final categories = effective('prayerCategories');
       final policy = PriestAccessPolicy(categories);
       if (categories.keys.any(policy.categoryRestricted) ||
-          effective('prayers').values.any(policy.prayerRestricted)) {
+          effective('prayers').entries.any(
+            (entry) => policy.prayerRestricted(entry.value, id: entry.key),
+          )) {
         throw const ContentUpdateRejected(
           'Protected content cannot enter the public cache',
         );

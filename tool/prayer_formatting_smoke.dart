@@ -24,7 +24,7 @@ Future<void> main() async {
   final policy = PriestAccessPolicy(categories.docs);
   final public = [
     for (final entry in prayers.docs.entries)
-      if (!policy.prayerRestricted(entry.value))
+      if (!policy.prayerRestricted(entry.value, id: entry.key))
         Prayer.fromMap(entry.value, entry.key),
   ]..sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
   runApp(PrayerFormattingHarness(realPrayers: public));

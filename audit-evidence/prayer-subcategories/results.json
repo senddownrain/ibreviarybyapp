@@ -1,0 +1,139 @@
+{
+  "ux": "Separate category pages; no accordions",
+  "browser": "154.0.8037.57",
+  "cases": [
+    {
+      "theme": "light",
+      "width": 320,
+      "scale": 1,
+      "screenshot": "light-320-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "screenshot": "light-320-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "scale": 1,
+      "screenshot": "light-375-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "scale": 2,
+      "screenshot": "light-375-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "scale": 1,
+      "screenshot": "light-768-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "scale": 2,
+      "screenshot": "light-768-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "scale": 1,
+      "screenshot": "dark-320-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "screenshot": "dark-320-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "scale": 1,
+      "screenshot": "dark-375-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "scale": 2,
+      "screenshot": "dark-375-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "scale": 1,
+      "screenshot": "dark-768-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "scale": 2,
+      "screenshot": "dark-768-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "marian",
+      "width": 320,
+      "scale": 1,
+      "screenshot": "marian-320-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "screenshot": "marian-320-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "marian",
+      "width": 375,
+      "scale": 1,
+      "screenshot": "marian-375-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "marian",
+      "width": 375,
+      "scale": 2,
+      "screenshot": "marian-375-scale2.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "marian",
+      "width": 768,
+      "scale": 1,
+      "screenshot": "marian-768-scale1.png",
+      "status": "PASS"
+    },
+    {
+      "theme": "marian",
+      "width": 768,
+      "scale": 2,
+      "screenshot": "marian-768-scale2.png",
+      "status": "PASS"
+    }
+  ],
+  "reader_back": "PASS",
+  "category_back_scroll": "PASS",
+  "children_before_direct_prayers": "PASS",
+  "child_only_folder": "PASS",
+  "home_roots_only": "PASS",
+  "page_errors": [],
+  "resources": "Engine-matched local SDK CanvasKit and Roboto; external CDN unavailable"
+}

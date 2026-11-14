@@ -126,7 +126,8 @@ class ContentMigration {
       if (raw is! Map) continue;
       final doc = Map<String, dynamic>.from(raw);
       final id = key.toString();
-      if ((name == 'prayers' && accessPolicy?.prayerRestricted(doc) == true) ||
+      if ((name == 'prayers' &&
+              accessPolicy?.prayerRestricted(doc, id: id) == true) ||
           (name == 'prayerCategories' &&
               accessPolicy?.categoryRestricted(id) == true)) {
         continue;
