@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -16,6 +17,9 @@ class PrayerMenuCategory {
   final bool priestOnly;
   final String? parentId;
 
+  /// Stored icon key (may be null or unknown); draw with [displayIconKey].
+  final String? iconKey;
+
   const PrayerMenuCategory({
     required this.id,
     required this.name,
@@ -23,7 +27,13 @@ class PrayerMenuCategory {
     required this.isGlobal,
     this.priestOnly = false,
     this.parentId,
+    this.iconKey,
   });
+
+  /// The key to draw: the stored one, or a deterministic suggestion until the
+  /// category has one (e.g. a global category not yet migrated in Firestore).
+  String get displayIconKey =>
+      displayCategoryIconKey(iconKey: iconKey, id: id, name: name, tags: tags);
 
   factory PrayerMenuCategory.global(String id, Map data) {
     return PrayerMenuCategory(
@@ -34,6 +44,7 @@ class PrayerMenuCategory {
       priestOnly:
           data['priestOnly'] == true || data['effectivePriestOnly'] == true,
       parentId: data['parentId']?.toString(),
+      iconKey: data['iconKey'] is String ? data['iconKey'] as String : null,
     );
   }
 
@@ -43,6 +54,7 @@ class PrayerMenuCategory {
         name: category.name,
         tags: category.tags,
         isGlobal: false,
+        iconKey: category.iconKey,
       );
 }
 

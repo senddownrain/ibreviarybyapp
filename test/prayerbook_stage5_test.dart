@@ -525,6 +525,50 @@ void main() {
     expect(notifier.current.userCategories, isEmpty);
   });
 
+  testWidgets('category icon is chosen on create and survives edits', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 3200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final notifier = _TestSettingsNotifier();
+    await tester.pumpWidget(
+      _app(const PrayerCategoriesScreen(), settingsOverride: notifier),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('create-category-action')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('category-name-field')), 'Мая');
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('category-icon-field')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('category-icon-option-candle')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('save-category-action')));
+    await tester.pumpAndSettle();
+    expect(notifier.current.userCategories.single.iconKey, 'candle');
+
+    // Editing the name and tags keeps the icon; cancelling the picker changes nothing.
+    await tester.tap(find.byTooltip('Рэдагаваць'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('category-name-field')),
+      'Ружанец',
+    );
+    await tester.pump();
+    expect(find.text('Свечка'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('category-icon-field')));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('save-category-action')));
+    await tester.pumpAndSettle();
+    final saved = notifier.current.userCategories.single;
+    expect(saved.name, 'Ружанец');
+    expect(saved.iconKey, 'candle');
+  });
+
   testWidgets('category editor supports quick tags and searchable prayers', (
     tester,
   ) async {
@@ -825,24 +869,34 @@ class _TestSettingsNotifier extends SettingsNotifier {
   }
 
   @override
-  String addCategory(String name, List<String> tags) {
+  String addCategory(String name, List<String> tags, {String? iconKey}) {
     const id = 'created-category';
     state = state.copyWith(
       userCategories: [
         ...state.userCategories,
-        UserCategory(id: id, name: name, tags: tags),
+        UserCategory(id: id, name: name, tags: tags, iconKey: iconKey),
       ],
     );
     return id;
   }
 
   @override
-  void updateCategory(String id, String name, List<String> tags) {
+  void updateCategory(
+    String id,
+    String name,
+    List<String> tags, {
+    String? iconKey,
+  }) {
     state = state.copyWith(
       userCategories: [
         for (final category in state.userCategories)
           category.id == id
-              ? UserCategory(id: id, name: name, tags: tags)
+              ? UserCategory(
+                  id: id,
+                  name: name,
+                  tags: tags,
+                  iconKey: iconKey ?? category.iconKey,
+                )
               : category,
       ],
     );

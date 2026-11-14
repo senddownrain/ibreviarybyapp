@@ -6,6 +6,9 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
+import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
+import 'package:mybrev_flutter/widgets/category_icon.dart';
+import 'package:mybrev_flutter/widgets/category_icon_picker.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
@@ -25,7 +28,8 @@ class PrayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritePrayersProvider);
-    final canSeeSongbook = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
+    final canSeeSongbook =
+        ref.watch(adminSongbookAccessProvider).valueOrNull == true;
     final categories = ref.watch(prayerMenuCategoriesProvider);
     final catalog = ref.watch(prayerCatalogProvider);
     final massAvailable = catalog.any(
@@ -99,12 +103,12 @@ class PrayersScreen extends ConsumerWidget {
                     ),
                     if (canSeeSongbook)
                       PrayerbookSectionTile(
-                      key: const Key('songbook-destination'),
-                      title: 'Спеўнік',
-                      subtitle: 'Пілігрымковы',
-                      icon: PhosphorIconsRegular.playlist,
-                      onTap: () => context.push('/prayers/songs'),
-                    ),
+                        key: const Key('songbook-destination'),
+                        title: 'Спеўнік',
+                        subtitle: 'Пілігрымковы',
+                        icon: PhosphorIconsRegular.playlist,
+                        onTap: () => context.push('/prayers/songs'),
+                      ),
                     PrayerbookSectionTile(
                       key: const Key('catechism-destination'),
                       title: 'Катэхізіс',
@@ -460,10 +464,19 @@ class PrayerCategoriesScreen extends ConsumerWidget {
     if (result == null || !context.mounted) return;
     final notifier = ref.read(settingsProvider.notifier);
     final id = existing == null
-        ? notifier.addCategory(result.name, result.tags)
+        ? notifier.addCategory(
+            result.name,
+            result.tags,
+            iconKey: result.iconKey,
+          )
         : existing.id;
     if (existing != null) {
-      notifier.updateCategory(id, result.name, result.tags);
+      notifier.updateCategory(
+        id,
+        result.name,
+        result.tags,
+        iconKey: result.iconKey,
+      );
     }
     for (final prayer in catalog) {
       notifier.setPrayerCategory(
@@ -861,7 +874,7 @@ class _CategoryRow extends StatelessWidget {
   Widget build(BuildContext context) => _DestinationRow(
     key: ValueKey('category-${category.id}'),
     title: category.name,
-    icon: PhosphorIconsRegular.folder,
+    leading: CategoryIcon(category.displayIconKey),
     onTap: () => context.push('/prayers/category/${category.id}'),
   );
 }
@@ -870,20 +883,22 @@ class _DestinationRow extends StatelessWidget {
   const _DestinationRow({
     super.key,
     required this.title,
-    required this.icon,
+    this.icon,
+    this.leading,
     required this.onTap,
     this.subtitle,
-  });
+  }) : assert(icon != null || leading != null);
   final String title;
   final String? subtitle;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? leading;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => ListTile(
     contentPadding: EdgeInsets.zero,
     minTileHeight: 58,
-    leading: Icon(icon),
+    leading: leading ?? Icon(icon),
     title: Text(title),
     subtitle: subtitle == null ? null : Text(subtitle!),
     trailing: const Icon(Icons.chevron_right_rounded),
@@ -909,6 +924,7 @@ class _ManageCategoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListTile(
     contentPadding: EdgeInsets.zero,
+    leading: CategoryIcon(category.displayIconKey),
     title: Text(category.name),
     subtitle: Text(
       category.isGlobal ? 'Стандартная катэгорыя' : 'Ваша катэгорыя',
@@ -945,7 +961,8 @@ class _ManageCategoryRow extends StatelessWidget {
 }
 
 class _CategoryDraft {
-  const _CategoryDraft(this.name, this.tags, this.memberIds);
+  const _CategoryDraft(this.name, this.tags, this.memberIds, this.iconKey);
+  final String iconKey;
   final String name;
   final List<String> tags;
   final Set<String> memberIds;
@@ -973,6 +990,24 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
   );
   late final Set<String> _tags = {...?widget.existing?.tags};
   late final Set<String> _members = Set<String>.from(widget.memberIds);
+  late String _iconKey = widget.existing == null
+      ? kDefaultCategoryIconKey
+      : displayCategoryIconKey(
+          iconKey: widget.existing!.iconKey,
+          id: widget.existing!.id,
+          name: widget.existing!.name,
+          tags: widget.existing!.tags,
+        );
+  // While creating, the suggested icon follows the name until one is picked.
+  bool _iconPicked = false;
+
+  void _suggestIcon() {
+    if (widget.existing != null || _iconPicked) return;
+    final name = _name.text.trim();
+    _iconKey = name.isEmpty && _tags.isEmpty
+        ? kDefaultCategoryIconKey
+        : suggestCategoryIconKey(name: name, tags: _tags.toList());
+  }
 
   List<String> get _visibleTags => ({...widget.availableTags, ..._tags}.toList()
     ..sort((left, right) => left.toLowerCase().compareTo(right.toLowerCase())));
@@ -1006,7 +1041,7 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
     if (name.isEmpty) return;
     Navigator.pop(
       context,
-      _CategoryDraft(name, _tags.toList(growable: false), _members),
+      _CategoryDraft(name, _tags.toList(growable: false), _members, _iconKey),
     );
   }
 
@@ -1047,11 +1082,19 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
               textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _save(),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(_suggestIcon),
               decoration: const InputDecoration(
                 labelText: 'Назва катэгорыі',
                 hintText: 'Напрыклад, Малітвы на кожны дзень',
               ),
+            ),
+            const SizedBox(height: 16),
+            CategoryIconField(
+              iconKey: _iconKey,
+              onChanged: (key) => setState(() {
+                _iconKey = key;
+                _iconPicked = true;
+              }),
             ),
             const SizedBox(height: 28),
             Text(
@@ -1082,9 +1125,10 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
                       label: Text(tag),
                       selected: _tags.contains(tag),
                       showCheckmark: true,
-                      onSelected: (selected) => setState(
-                        () => selected ? _tags.add(tag) : _tags.remove(tag),
-                      ),
+                      onSelected: (selected) => setState(() {
+                        selected ? _tags.add(tag) : _tags.remove(tag);
+                        _suggestIcon();
+                      }),
                     ),
                 ],
               ),
