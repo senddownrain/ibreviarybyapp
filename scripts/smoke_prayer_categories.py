@@ -13,7 +13,6 @@ from playwright.sync_api import sync_playwright
 parser = argparse.ArgumentParser()
 parser.add_argument('--cdp', required=True)
 parser.add_argument('--flutter-sdk', type=Path, required=True)
-parser.add_argument('--resume', action='store_true', help='Retain screenshots from already passed cases')
 args = parser.parse_args()
 out = Path('audit-evidence/prayer-subcategories')
 out.mkdir(parents=True, exist_ok=True)
@@ -44,8 +43,7 @@ with sync_playwright() as p:
         path=str(cache / 'artifacts/material_fonts/Roboto-Regular.ttf'),
         headers={'Access-Control-Allow-Origin': '*'}))
 
-    def reveal_button(name):
-        button = page.get_by_role('button', name=name, exact=True)
+    def reveal_locator(button):
         # Flutter ListView lazily builds rows; browser DOM scrolling cannot
         # reveal a row that has not yet entered Flutter's layout/cache extent.
         for _ in range(12):
@@ -62,7 +60,18 @@ with sync_playwright() as p:
             page.mouse.move(page.viewport_size['width'] / 2, 650)
             page.mouse.wheel(0, 400)
             page.wait_for_timeout(120)
-        raise AssertionError(f'Button not built: {name}')
+        raise AssertionError(f'Row not built: {button}')
+
+    def reveal_button(name):
+        return reveal_locator(page.get_by_role('button', name=name, exact=True))
+
+    def back():
+        page.get_by_role('button', name=re.compile('Назад')).first.click()
+        page.mouse.move(300, 500)
+        page.wait_for_timeout(250)
+
+    def semantic_text():
+        return page.locator('body').inner_text() + ' '.join(page.locator('[aria-label]').evaluate_all('(es) => es.map(e => e.getAttribute("aria-label"))'))
 
     page.set_viewport_size({'width': 375, 'height': 900})
     page.goto('http://localhost:5237/')
@@ -71,82 +80,70 @@ with sync_playwright() as p:
     if placeholder.count():
         placeholder.evaluate('(e) => e.click()')
     page.get_by_role('button', name='Theme', exact=True).wait_for()
-    root = reveal_button(root_name)
-    assert root.get_attribute('aria-expanded') == 'false'
-    assert page.get_by_role('button', name=middle_name, exact=True).count() == 0
     current_scale = 1
     for theme in ['light', 'dark', 'marian']:
         page.get_by_role('button', name='Theme', exact=True).click()
         page.get_by_role('menuitem', name=theme, exact=True).click()
         for width in [320, 375, 768]:
             for scale in [1, 2]:
-                filename = f'{theme}-{width}-scale{scale}.png'
-                if args.resume and (out / filename).exists():
-                    results.append({'theme': theme, 'width': width, 'scale': scale,
-                                    'screenshot': filename, 'status': 'PASS', 'resumed': True})
-                    print(filename, 'PASS (retained)', flush=True)
-                    continue
                 page.set_viewport_size({'width': width, 'height': 900})
                 if current_scale != scale:
                     page.get_by_role('button', name='Text size', exact=True).click()
                     current_scale = scale
-                page.mouse.move(width / 2, 500)
-                page.mouse.wheel(0, -5000)
-                page.wait_for_timeout(200)
                 root = reveal_button(root_name)
-                if root.get_attribute('aria-expanded') == 'false':
-                    root.click()
+                assert root.get_attribute('aria-expanded') is None
+                assert page.get_by_role('button', name=middle_name, exact=True).count() == 0
+                assert page.get_by_role('button', name=leaf_name, exact=True).count() == 0
+                if width == 375 and scale == 1:
+                    page.screenshot(path=str(out / f'home-{theme}.png'))
+                root.click()
                 middle = reveal_button(middle_name)
-                if middle.get_attribute('aria-expanded') == 'false':
-                    middle.click()
-                leaf = reveal_button(leaf_name)
-                page.wait_for_timeout(300)
-                assert root.get_attribute('aria-expanded') == 'true'
-                assert middle.get_attribute('aria-expanded') == 'true'
-                text = page.locator('body').inner_text() + ' '.join(page.locator('[aria-label]').evaluate_all('(es) => es.map(e => e.getAttribute("aria-label"))'))
-                assert 'PRIVATE' not in text and 'Empty fixture folder' not in text
+                assert page.get_by_role('button', name=leaf_name, exact=True).count() == 0
+                manual = reveal_locator(page.get_by_role('button', name=re.compile('^Асобна дададзеная малітва')))
+                assert not page.get_by_role('button', name=re.compile('^Малітва ў падкатэгорыі')).count()
+                assert 'PRIVATE' not in semantic_text()
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-                assert leaf.bounding_box()['width'] >= 48
                 filename = f'{theme}-{width}-scale{scale}.png'
                 page.screenshot(path=str(out / filename))
+                middle = reveal_button(middle_name)
+                assert middle.bounding_box()['y'] < manual.bounding_box()['y']
+                middle.click()
+                leaf = reveal_button(leaf_name)
+                assert 'У гэтай катэгорыі няма малітваў' not in semantic_text()
+                assert not page.get_by_role('button', name=re.compile('^Асобна дададзеная малітва')).count()
+                assert leaf.bounding_box()['width'] >= 48
+                if width == 375 and scale == 1:
+                    page.screenshot(path=str(out / f'child-only-{theme}.png'))
+                before = leaf.bounding_box()['y']
+                leaf.click()
+                prayer = page.get_by_role('button', name=re.compile('^Малітва ў падкатэгорыі'))
+                prayer.wait_for()
+                if width == 375 and scale == 1:
+                    page.screenshot(path=str(out / f'leaf-{theme}.png'))
+                if theme == 'marian' and width == 768 and scale == 2:
+                    prayer.click()
+                    page.wait_for_function('document.body.innerText.includes("Тэкст у другім узроўні ўкладзенасці.") || [...document.querySelectorAll("[aria-label]")].some(e => (e.getAttribute("aria-label") || "").includes("Тэкст у другім узроўні ўкладзенасці."))')
+                    page.screenshot(path=str(out / 'reader.png'))
+                    back()
+                    prayer.wait_for()
+                    page.screenshot(path=str(out / 'reader-back.png'))
+                back()
+                page.get_by_role('button', name=leaf_name, exact=True).wait_for()
+                assert abs(page.get_by_role('button', name=leaf_name, exact=True).bounding_box()['y'] - before) <= 1
+                back()
+                page.get_by_role('button', name=middle_name, exact=True).wait_for()
+                back()
+                assert page.get_by_role('button', name=middle_name, exact=True).count() == 0
                 results.append({'theme': theme, 'width': width, 'scale': scale,
-                                'url': page.url, 'screenshot': filename, 'status': 'PASS'})
-                print(filename, 'PASS', flush=True)
-
-    # Ordinary direct list and the real reader, then the app's Back twice.
-    # GoRouter imperative pushes retain the application's existing URL policy.
-    root = reveal_button(root_name)
-    if root.get_attribute('aria-expanded') == 'false':
-        root.click()
-    middle = reveal_button(middle_name)
-    if middle.get_attribute('aria-expanded') == 'false':
-        middle.click()
-    page.get_by_role('button', name='Малітвы гэтай катэгорыі', exact=True).click()
-    page.get_by_role('button', name=re.compile('^Асобна дададзеная малітва')).wait_for()
-    assert page.get_by_role('button', name=re.compile('^Малітва ў падкатэгорыі')).count() == 0
-    assert not page.locator('[aria-label*="PRIVATE"]').count()
-    page.get_by_role('button', name=re.compile('Назад')).first.click()
-    page.mouse.move(350, 400)
-    page.wait_for_timeout(250)
-    leaf = reveal_button(leaf_name)
-    leaf.click()
-    page.get_by_role('button', name=re.compile('^Малітва ў падкатэгорыі')).click()
-    page.wait_for_function('document.body.innerText.includes("Тэкст у другім узроўні ўкладзенасці.") || [...document.querySelectorAll("[aria-label]")].some(e => (e.getAttribute("aria-label") || "").includes("Тэкст у другім узроўні ўкладзенасці."))')
-    page.screenshot(path=str(out / 'reader.png'))
-    page.get_by_role('button', name=re.compile('Назад')).first.click()
-    page.mouse.move(350, 400)
-    page.wait_for_timeout(250)
-    page.get_by_role('button', name=re.compile('Назад')).first.click()
-    page.mouse.move(350, 400)
-    page.wait_for_timeout(250)
-    leaf = reveal_button(leaf_name)
-    page.screenshot(path=str(out / 'reader-back.png'))
-    assert page.get_by_role('button', name=root_name, exact=True).get_attribute('aria-expanded') == 'true'
+                                'screenshot': filename, 'status': 'PASS'})
+                print(filename, 'category → child → leaf → Back: PASS', flush=True)
     assert not errors, errors
     (out / 'results.json').write_text(json.dumps({
-        'browser': browser.version, 'cases': results, 'reader_back': 'PASS',
-        'direct_only': 'PASS', 'page_errors': errors,
-        'back_method': 'Existing in-app Back controls; GoRouter URL policy preserved',
+        'ux': 'Separate category pages; no accordions',
+        'browser': browser.version, 'cases': results,
+        'reader_back': 'PASS', 'category_back_scroll': 'PASS',
+        'children_before_direct_prayers': 'PASS', 'child_only_folder': 'PASS',
+        'home_roots_only': 'PASS', 'page_errors': errors,
         'resources': 'Engine-matched local SDK CanvasKit and Roboto; external CDN unavailable',
     }, ensure_ascii=False, indent=2) + '\n')
-    print('direct-only list / leaf reader / app Back: PASS', flush=True)
+    print('Category pages, direct prayers, folder-only page, reader/Back: PASS', flush=True)

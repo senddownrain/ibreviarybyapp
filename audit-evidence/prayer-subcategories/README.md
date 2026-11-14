@@ -10,6 +10,22 @@ including icons PR #108 (`60e8e7f9dbe69676d1042ae63809822f7cdf0046`).
 Changes were checkpointed in `8cad1ed4443f46670ca81961de22847bb321c262`
 before merging the newer main (local checkpoint). The original workspace was preserved.
 
+## Owner UX revision: separate category pages
+
+The owner superseded the accordion UX after verified commit
+`98835388816f592603daf9ed5954884ae4987f5a`. Web contract data/membership/access
+semantics remain unchanged; Flutter now uses navigation pages:
+
+1. Home shows only permitted roots and flat personal categories with their icons.
+2. A category page shows immediate child categories first, then direct prayers.
+3. Each child opens another instance of the same category page via existing routes.
+4. Existing Back restores the previous page and its scroll position.
+5. A folder containing children is nonempty even without direct prayers.
+
+The accordion widget and expansion-state provider are removed. Existing
+`PrayerCategoryNode`, `buildPrayerCategoryTree`, `CategoryIcon`, route stack and
+list scroll controllers are reused.
+
 ## Behavior and storage
 
 - Global model retains `iconKey`, `icon`, `iconId`, parent and finite order;
@@ -23,10 +39,10 @@ before merging the newer main (local checkpoint). The original workspace was pre
   Restriction wins; invalid parents, cycles and paths over 64 nodes close access.
 - The public menu filters access before user hiding, promotes permitted children
   of user-hidden parents, prunes empty branches and retains global same-name IDs.
-  Parents expand in place; their own prayers use a separate direct-list action.
-  Leaves and old category URLs use the existing list and reader.
-- Session state contains expanded IDs only. Back/remount retains expansion;
-  reader/back retains scroll. Protected data stays in the existing grant-gated
+  Home renders roots; each category page renders immediate children before its
+  direct prayers. Leaves and old category URLs retain the existing reader.
+- Category and reader Back retain their route scroll positions.
+  Protected data stays in the existing grant-gated
   memory channel. Opaque private IDs remain in canonical public category data.
   Revocation also filters retained asynchronous category names in management UI.
 
@@ -86,7 +102,7 @@ prayers.json.gz           1f9025d974c41dd1837354d0d298181ac1ef9d2026f7e92b32f9ea
 ```
 
 This proves old Dart source compatibility, **not** an old APK/TestFlight binary.
-Older versions still lack manual-membership and accordion semantics. Coordinate
+Older versions still lack the new manual-membership and hierarchical navigation semantics. Coordinate
 Web and Flutter review, then test protected delivery and native builds before a
 separate owner decision about publishing a new bundle/application release.
 
@@ -96,18 +112,20 @@ Flutter 3.41.4, Dart 3.11.1; Linux with Flutter Chrome device (Chromium 154).
 
 - Initial contract and existing prayerbook/security regression set: **70 PASS**,
   [log](logs/initial-targeted.log). No need to repeat the old frozen-client gate.
-- Resumed widget/security/icon set: **56 PASS**, [log](logs/widget-security-icons.log).
+- Prior revision (9883538) widget/security/icon set: **56 PASS**, [log](logs/widget-security-icons.log).
   Includes all 48 icons/picker/personal icon storage, chosen Mary/rosary/candle
-  icons in the expanded tree and after Hive restart, grant/background/offline/
+  icons and persistence after Hive restart, grant/background/offline/
   resume/revoke, absence of private disk data, opaque IDs, legacy migration,
-  keyboard Tab/Space/Enter, direct-only list, reader/back and scroll.
+  original keyboard/list checks, reader/back and scroll. This historical log is
+  retained; current page-navigation results are below.
 - Widget layout matrix: Android and iOS **theme/platform configuration**, three
   themes × 320/375/768 widths × 100%/200% text = **36 configurations**.
   These are widget tests, not Android/iOS binary runs.
 - `flutter analyze --no-pub`: **0 errors, 0 warnings, 29 existing infos**; strict
   command exits 1 on infos. Clean baseline/evidence: [baseline-main.txt](logs/baseline-main.txt).
   [Current analyzer output](logs/flutter-analyze.log).
-- Full final `flutter test --no-pub --reporter expanded`: **2030 PASS / 9 SKIP /
+- Historical full suite at verified SHA `9883538`,
+  `flutter test --no-pub --reporter expanded`: **2030 PASS / 9 SKIP /
   2 FAIL**, [summary](logs/flutter-full.log), [complete compressed output](logs/flutter-full.log.gz).
   Failures: `lectionary_parity_test.dart` (38 route-ID differences,
   `mary-mother-church` vs `feast-marymotherchurch`) and `hours_parity_test.dart`
@@ -115,7 +133,8 @@ Flutter 3.41.4, Dart 3.11.1; Linux with Flutter Chrome device (Chromium 154).
   are recorded below. No category/security/widget/icon test failed.
   The earlier clean-main run completed with 1957 PASS / 10 SKIP
   including the three added compatibility checks (1954 original tests).
-- `dart format --output=none --set-exit-if-changed` on all 20 changed Dart files:
+- `dart format --output=none --set-exit-if-changed` on the six Dart files changed
+  by the page-navigation/formatting revision:
   **PASS**, zero changes. `git diff --check`: **PASS**.
 
 Chrome reproducer:
@@ -128,20 +147,41 @@ flutter run --no-pub -d chrome -t tool/prayer_categories_smoke.dart --web-port 5
 python3 scripts/smoke_prayer_categories.py --cdp http://127.0.0.1:PORT --flutter-sdk /path/to/flutter
 ```
 
-Synthetic-only Chrome screenshots and machine results live in this directory.
-Observed: **18 PASS** (3 themes × 3 widths × 2 font scales), plus the direct-only
-list → leaf → real reader → existing in-app Back twice: **PASS**, no page errors.
-[Machine results](results.json), [Chrome log](logs/chrome-visual.log),
-[reader](reader.png) and [return to expanded tree](reader-back.png).
-The resumed screenshot runner retained 15 completed cases after the debug tab
-crashed on repeated DDC reloads, then completed the remaining three in the same
-scenario using live theme/text controls. This is recorded in the machine results.
-Screenshots were opened and inspected, including each theme at 320px/200% and
-the complete three-icon tree at 375px/200% and 768px.
-The harness shows Mary on the parent, rosary on its child and candle on the leaf.
-The external engine/font CDN was unavailable; the browser script serves the
-matching installed SDK CanvasKit and Roboto through request interception.
-Actual app screens, SVG assets, navigation and reader are used.
+Synthetic-only current Chrome screenshots and machine results live in this directory.
+Observed: **18 PASS**, no page errors. The runner checks theme/width/font
+combinations through home → category → child
+→ leaf → Back. It checks immediate children before direct prayers, absence of
+inherited prayer rows, child-only folders and Back scroll, then the real reader.
+[Current machine results](results.json), [current Chrome log](logs/category-pages-visual.log),
+[reader](reader.png) and [reader Back to leaf category](reader-back.png).
+Current screenshots were opened and inspected in light/dark/marian at narrow widths
+and 200% text. Home/child-only/leaf screenshots are saved per theme at 375px; the 18 primary
+screenshots now show the category page instead of the superseded accordion.
+The harness uses Mary for the root, rosary for its child, candle for the leaf.
+The external engine/font CDN was unavailable; the browser script serves matching
+installed SDK CanvasKit and Roboto through request interception. Actual Flutter
+screens, SVG assets, navigation and reader are used.
+
+### Current page-navigation checks
+
+- **101 PASS**: updated category widget tests, existing prayerbook tests, C01–C09,
+  security/cache and all 48 icons ([log](logs/category-pages-targeted.log)).
+- **40 category widget tests**, including 36 platform/theme/width/font combinations,
+  keyboard navigation, root-only home, children-first ordering, personal pages,
+  child-only folders, reader Back and a long parent list retaining scroll after
+  both child and reader navigation.
+- Analyze: 0 errors/warnings, the same 29 existing infos. The old frozen decoder,
+  synthetic gzip and C01–C09 source fixture are unchanged. Their successful gate
+  and provenance above remain applicable; old binary testing is not claimed.
+- **78 PASS** for the exact new CI command ([log](logs/category-pages-ci-step.log)).
+  The category/widget/membership/cache step is added to the existing PR CI workflow.
+- The preceding CI at 9883538 failed the formatter in `source_documents_screen.dart`
+  and `source_documents_widget_test.dart` before category tests could run. Only
+  formatter-generated whitespace in those two files is corrected; source text and
+  behavior are unchanged. The updated PR CI run is checked separately.
+- Firebase quota exhaustion does not affect this validation: fixture tests and the
+  synthetic browser harness do not initialize or query production Firestore.
+  No Firebase retry loop, live content fetch, upload, deploy or release is used.
 
 Native smoke: **not run** — no Android/iOS device is attached. Required before
 mobile release: grant verification/revoke/offline/background/foreground on a real

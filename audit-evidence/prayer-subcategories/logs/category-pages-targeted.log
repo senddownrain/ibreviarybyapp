@@ -1,0 +1,108 @@
+00:00 +0: loading /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart
+00:00 +0: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category pages: roots, keyboard, children before direct prayers, reader/back
+00:02 +1: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category scroll survives child page and prayer reader Back
+00:03 +2: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: revoke removes private lists, favorites/search, category management and deep links immediately
+00:03 +3: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: hidden root promotes middle; personal categories remain separate pages
+00:03 +4: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android light width=320.0 scale=1.0
+00:04 +5: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android light width=320.0 scale=2.0
+00:04 +6: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android light width=375.0 scale=1.0
+00:04 +7: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android light width=375.0 scale=2.0
+00:04 +8: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android light width=768.0 scale=1.0
+00:04 +9: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android light width=768.0 scale=2.0
+00:05 +10: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android dark width=320.0 scale=1.0
+00:05 +11: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android dark width=320.0 scale=2.0
+00:05 +12: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android dark width=375.0 scale=1.0
+00:05 +13: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android dark width=375.0 scale=2.0
+00:05 +14: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android dark width=768.0 scale=1.0
+00:06 +15: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android dark width=768.0 scale=2.0
+00:06 +16: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android marian width=320.0 scale=1.0
+00:06 +17: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android marian width=320.0 scale=2.0
+00:06 +18: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android marian width=375.0 scale=1.0
+00:06 +19: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android marian width=375.0 scale=2.0
+00:06 +20: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android marian width=768.0 scale=1.0
+00:07 +21: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation android marian width=768.0 scale=2.0
+00:07 +22: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS light width=320.0 scale=1.0
+00:07 +23: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS light width=320.0 scale=2.0
+00:07 +24: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS light width=375.0 scale=1.0
+00:08 +25: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS light width=375.0 scale=2.0
+00:08 +26: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS light width=768.0 scale=1.0
+00:08 +27: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS light width=768.0 scale=2.0
+00:08 +28: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS dark width=320.0 scale=1.0
+00:08 +29: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS dark width=320.0 scale=2.0
+00:08 +30: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS dark width=375.0 scale=1.0
+00:09 +31: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS dark width=375.0 scale=2.0
+00:09 +32: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS dark width=768.0 scale=1.0
+00:09 +33: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS dark width=768.0 scale=2.0
+00:09 +34: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS marian width=320.0 scale=1.0
+00:09 +35: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS marian width=320.0 scale=2.0
+00:10 +36: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS marian width=375.0 scale=1.0
+00:10 +37: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS marian width=375.0 scale=2.0
+00:10 +38: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS marian width=768.0 scale=1.0
+00:10 +39: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: category page navigation iOS marian width=768.0 scale=2.0
+00:10 +40: loading /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart
+00:11 +40: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer links navigate and return from linked
+00:13 +41: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer links navigate and return from eMmCtxwyJ75ogmL5rwye
+00:13 +42: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: My Prayers add button stays above the app dock
+00:13 +43: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category grouping uses tags and explicit persisted membership
+00:13 +44: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: root order is Favorites, Holy Mass, Categories, All Prayers
+00:14 +45: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: root magnifier opens the original prayer-only search
+00:14 +46: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: empty favorites is compact and categories remain visible
+00:14 +47: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: missing Holy Mass stays recognizable
+00:14 +48: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: favorite toggle is shared by catalog and root providers
+00:14 +49: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: All Prayers contains built-in and user prayers
+00:14 +50: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer catalog owns the contextual bottom slot
+00:14 +51: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: search and filter use reported system navigation inset
+00:14 +52: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: search focuses, filters title/body, and keeps query state
+00:15 +53: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: All Prayers re-entry keeps query and results synchronized
+00:15 +54: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category page includes tag and explicit members
+00:15 +55: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayer category uses a single shared menu for management
+00:15 +56: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayerbook search keeps the shared overflow visible
+00:15 +57: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category management hides and shows defaults
+00:15 +58: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: user category can be created, renamed, and deleted
+00:15 +59: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category icon is chosen on create and survives edits
+00:16 +60: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: category editor supports quick tags and searchable prayers
+00:17 +61: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayer Detail uses shared reader and only local has edit
+00:17 +62: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: prayer reader shows scroll-to-top only outside fullscreen
+00:17 +63: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Holy Mass exposes section navigation without sharing
+00:17 +64: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: built-in prayer cannot be opened as a destructive edit
+00:17 +65: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: local prayer keeps editable form and detail edit action
+00:18 +66: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: local prayer editor formats text and shows preview
+00:18 +67: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayerbook remains usable at 200 percent system text
+00:18 +68: /workspace/flutter-prayer-subcategories/test/prayerbook_stage5_test.dart: Prayerbook title clears top search at narrow and wide sizes
+00:18 +69: loading /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart
+00:19 +69: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C01-old-field-absent
+00:19 +70: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C02-folder
+00:19 +71: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C03-union-no-descendants
+00:19 +72: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C04-two-level-leaf
+00:19 +73: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C05-restriction-wins
+00:19 +74: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C06-visible-ancestors
+00:19 +75: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C07-remove-manual-keep-tag
+00:19 +76: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C08-remove-last-protected-link
+00:19 +77: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: C09-parent-move
+00:19 +78: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: new model uses the real Web gzip and preserves old icons and opaque IDs
+00:19 +79: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: personal membership stays local and cannot change global membership
+00:19 +80: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: hidden parent promotes children; global duplicates retain distinct IDs
+00:19 +81: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: numeric finite order, Belarusian names and ID tie break
+00:19 +82: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: missing/self/cycle/depth fail closed regardless of cache lookup order
+00:19 +83: /workspace/flutter-prayer-subcategories/test/prayer_category_contract_test.dart: own/effective/tag/manual/legacy restrictions each survive removing another reason
+00:19 +84: loading /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart
+00:20 +84: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: manual-only protection rejects keyed records without embedded id before writing
+00:20 +85: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: tree iconKey, parent/order/manual links survive public Hive restart together
+00:20 +86: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: grant/merge, background, offline, reopen, revoke: protected data stays off disk
+00:20 +87: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: public update overlay accepts opaque IDs, rejects restricted records atomically, and reloads
+00:20 +88: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: legacy migration blocks manual restriction when neither document embeds its ID
+[ContentMigration] done, 0 newer documents kept
+00:20 +89: loading /workspace/flutter-prayer-subcategories/test/category_icons_test.dart
+00:21 +89: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) 48 keys, 12 per group, identical to the exported catalog.json
+00:21 +90: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) all 12 authored SVG assets exist, are 24x24 and use currentColor
+00:21 +91: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) suggestions match the shared vectors and are deterministic
+00:21 +92: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) allowlist normaliser and display fallback
+00:21 +93: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: UserCategory legacy map without iconKey still loads; icon round-trips
+00:21 +94: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: settings storage old categories get a meaningful icon once and it is persisted
+00:21 +95: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: settings storage add and update keep the chosen icon, reject unknown keys
+00:21 +96: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: settings storage hide/restore global categories and memberships are untouched
+00:22 +97: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: global categories iconKey passes from bundle data; missing ones get a suggestion
+00:22 +98: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: rendering every one of the 48 icons renders real, non-empty artwork
+00:22 +99: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: rendering unknown or missing keys fall back without errors
+00:22 +100: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: rendering picker lists 48 icons; choosing changes, dismissing does not
+00:23 +101: All tests passed!

@@ -135,9 +135,3 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
       )
       .toList(growable: false);
 }
-
-/// Session state survives reader/back and normal shell branch switches.
-/// Only category IDs are retained here, never protected names or documents.
-final expandedPrayerCategoryIdsProvider = StateProvider<Set<String>>(
-  (ref) => {},
-);

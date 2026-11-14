@@ -151,7 +151,7 @@ class PrayersScreen extends ConsumerWidget {
                   )
                 else
                   for (final node in buildPrayerCategoryTree(categories))
-                    _CategoryTreeRow(node: node),
+                    _CategoryRow(category: node.category),
                 const SizedBox(height: 28),
                 const _SectionTitle(title: 'Усе малітвы'),
                 _DestinationRow(
@@ -320,10 +320,11 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final category = ref
-        .watch(prayerMenuCategoriesProvider)
-        .where((item) => item.id == widget.categoryId)
-        .firstOrNull;
+    final node = findPrayerCategoryNode(
+      buildPrayerCategoryTree(ref.watch(prayerMenuCategoriesProvider)),
+      widget.categoryId,
+    );
+    final category = node?.category;
     if (category == null) {
       return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
     }
@@ -339,6 +340,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
       prayers: prayers,
+      categories: [for (final child in node!.children) child.category],
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
     );
   }
@@ -587,6 +589,7 @@ class _PrayerListPage extends StatelessWidget {
     required this.scrollController,
     required this.scrollKey,
     this.searchDock,
+    this.categories = const [],
   });
 
   final String title;
@@ -596,6 +599,7 @@ class _PrayerListPage extends StatelessWidget {
   final ScrollController scrollController;
   final PageStorageKey<String> scrollKey;
   final Widget? searchDock;
+  final List<PrayerMenuCategory> categories;
 
   @override
   Widget build(BuildContext context) {
@@ -626,7 +630,11 @@ class _PrayerListPage extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
                 const SizedBox(height: 18),
-                if (prayers.isEmpty)
+                for (final category in categories)
+                  _CategoryRow(category: category),
+                if (categories.isNotEmpty && prayers.isNotEmpty)
+                  const SizedBox(height: 18),
+                if (prayers.isEmpty && categories.isEmpty)
                   Padding(
                     key: const Key('prayer-list-empty'),
                     padding: const EdgeInsets.symmetric(vertical: 42),
@@ -868,84 +876,6 @@ class _CategoryRow extends StatelessWidget {
     onTap: () =>
         context.push('/prayers/category/${Uri.encodeComponent(category.id)}'),
   );
-}
-
-class _CategoryTreeRow extends ConsumerWidget {
-  const _CategoryTreeRow({super.key, required this.node, this.depth = 0});
-  final PrayerCategoryNode node;
-  final int depth;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final category = node.category;
-    final expanded = ref
-        .watch(expandedPrayerCategoryIdsProvider)
-        .contains(category.id);
-    final hasChildren = node.children.isNotEmpty;
-    final hasDirect =
-        hasChildren &&
-        prayersForCategory(
-          ref.watch(prayerCatalogProvider),
-          category,
-          ref.watch(settingsProvider),
-        ).isNotEmpty;
-    final indent = depth.clamp(0, 3) * 14.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(left: indent),
-          child: hasChildren
-              ? Semantics(
-                  expanded: expanded,
-                  child: ListTile(
-                    key: ValueKey('category-${category.id}'),
-                    contentPadding: EdgeInsets.zero,
-                    minTileHeight: 58,
-                    leading: CategoryIcon(category.displayIconKey),
-                    title: Text(category.name),
-                    trailing: Icon(
-                      expanded
-                          ? Icons.expand_less_rounded
-                          : Icons.expand_more_rounded,
-                    ),
-                    onTap: () {
-                      final ids = {
-                        ...ref.read(expandedPrayerCategoryIdsProvider),
-                      };
-                      expanded ? ids.remove(category.id) : ids.add(category.id);
-                      ref
-                              .read(expandedPrayerCategoryIdsProvider.notifier)
-                              .state =
-                          ids;
-                    },
-                  ),
-                )
-              : _CategoryRow(category: category),
-        ),
-        if (hasChildren && expanded) ...[
-          if (hasDirect)
-            Padding(
-              padding: EdgeInsets.only(left: (depth + 1).clamp(0, 3) * 14.0),
-              child: _DestinationRow(
-                key: ValueKey('category-direct-${category.id}'),
-                title: 'Малітвы гэтай катэгорыі',
-                icon: PhosphorIconsRegular.listBullets,
-                onTap: () => context.push(
-                  '/prayers/category/${Uri.encodeComponent(category.id)}',
-                ),
-              ),
-            ),
-          for (final child in node.children)
-            _CategoryTreeRow(
-              key: ValueKey('category-node-${child.category.id}'),
-              node: child,
-              depth: depth + 1,
-            ),
-        ],
-      ],
-    );
-  }
 }
 
 class _DestinationRow extends StatelessWidget {

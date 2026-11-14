@@ -31,6 +31,19 @@ class PrayerCategoryNode {
   final List<PrayerCategoryNode> children = [];
 }
 
+/// Resolve any permitted category, including promoted children and personal roots.
+PrayerCategoryNode? findPrayerCategoryNode(
+  Iterable<PrayerCategoryNode> tree,
+  String id,
+) {
+  for (final node in tree) {
+    if (node.category.id == id) return node;
+    final child = findPrayerCategoryNode(node.children, id);
+    if (child != null) return child;
+  }
+  return null;
+}
+
 /// Input is access-filtered, then user-hidden. Only the latter may promote
 /// children to roots. Never call this on an unvalidated canonical graph.
 List<PrayerCategoryNode> buildPrayerCategoryTree(

@@ -30,4 +30,4 @@ Analyzing flutter-prayer-subcategories...
    info • The import of 'package:mybrev_flutter/widgets/app_overflow_menu.dart' is unnecessary because all of the used elements are also provided by the import of 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart' • test/reader_ui_acceptance_visual_test.dart:17:8 • unnecessary_import
    info • Unnecessary use of string interpolation • test/reading_choices_test.dart:58:11 • unnecessary_string_interpolations
 
-29 issues found. (ran in 5.6s)
+29 issues found. (ran in 5.5s)

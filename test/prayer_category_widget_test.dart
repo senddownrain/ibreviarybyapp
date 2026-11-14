@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/dev/prayer_categories_harness.dart';
-import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -29,7 +28,7 @@ Future<void> reveal(WidgetTester tester, Finder finder) async {
 
 void main() {
   testWidgets(
-    'accordion, keyboard/focus, direct-only list, leaf reader/back and scroll',
+    'category pages: roots, keyboard, children before direct prayers, reader/back',
     (tester) async {
       final semantics = tester.ensureSemantics();
       try {
@@ -42,69 +41,64 @@ void main() {
         await tester.pumpAndSettle();
         await reveal(tester, root);
         expect(middle, findsNothing);
-        expect(
-          tester.getSemantics(root).flagsCollection.isExpanded,
-          Tristate.isFalse,
-        );
-        await tester.tap(root);
-        await tester.pumpAndSettle();
-        expect(middle, findsOneWidget);
         expect(leaf, findsNothing);
         expect(
           tester.getSemantics(root).flagsCollection.isExpanded,
-          Tristate.isTrue,
+          Tristate.none,
         );
-        // Touch does not focus a tile on every platform. Reach it through actual
-        // keyboard traversal before checking the Material activation shortcuts.
-        bool rootFocused() =>
-            FocusManager.instance.primaryFocus?.context
-                ?.findAncestorWidgetOfExactType<ListTile>()
-                ?.key ==
-            const ValueKey('category-root');
+        void expectIcon(Finder row, String key) {
+          expect(
+            tester
+                .widget<CategoryIcon>(
+                  find.descendant(of: row, matching: find.byType(CategoryIcon)),
+                )
+                .iconKey,
+            key,
+          );
+          expect(
+            find.descendant(
+              of: row,
+              matching: find.byKey(ValueKey('category-svg-$key')),
+            ),
+            findsOneWidget,
+          );
+        }
+
+        expectIcon(root, 'virgin-mary');
+        final router = GoRouter.of(tester.element(root));
+        bool rootFocused() {
+          final title = FocusManager.instance.primaryFocus?.context
+              ?.findAncestorWidgetOfExactType<ListTile>()
+              ?.title;
+          return title is Text && title.data == 'Fixture root';
+        }
+
         for (var i = 0; i < 30 && !rootFocused(); i++) {
           await tester.sendKeyEvent(LogicalKeyboardKey.tab);
           await tester.pump();
         }
         expect(rootFocused(), isTrue);
-        await tester.sendKeyEvent(LogicalKeyboardKey.space);
-        await tester.pumpAndSettle();
-        expect(middle, findsNothing);
         await tester.sendKeyEvent(LogicalKeyboardKey.enter);
         await tester.pumpAndSettle();
-        expect(middle, findsOneWidget);
-        final router = GoRouter.of(tester.element(root));
-        await tester.tap(find.byKey(const ValueKey('category-direct-root')));
-        await tester.pumpAndSettle();
+        expect(find.byType(PrayerCategoryScreen), findsOneWidget);
+        expectIcon(middle, 'rosary');
+        expect(leaf, findsNothing);
         expect(find.text('Fixture manual'), findsOneWidget);
         expect(find.text('Fixture leaf prayer'), findsNothing);
         expect(find.text('PRIVATE SHARED FIXTURE'), findsNothing);
-        router.pop();
-        await tester.pumpAndSettle();
-        await reveal(tester, middle);
+        expect(
+          tester.getTopLeft(middle).dy,
+          lessThan(
+            tester
+                .getTopLeft(find.byKey(const ValueKey('prayer-row-manual')))
+                .dy,
+          ),
+        );
         await tester.tap(middle);
         await tester.pumpAndSettle();
-        await reveal(tester, leaf);
-        for (final pair in [
-          (root, 'virgin-mary'),
-          (middle, 'rosary'),
-          (leaf, 'candle'),
-        ]) {
-          final icon = tester.widget<CategoryIcon>(
-            find.descendant(of: pair.$1, matching: find.byType(CategoryIcon)),
-          );
-          expect(icon.iconKey, pair.$2);
-          expect(
-            find.descendant(
-              of: pair.$1,
-              matching: find.byKey(ValueKey('category-svg-${pair.$2}')),
-            ),
-            findsOneWidget,
-          );
-        }
-        final scroll = tester
-            .state<ScrollableState>(find.byType(Scrollable).first)
-            .position
-            .pixels;
+        expectIcon(leaf, 'candle');
+        expect(find.byKey(const Key('prayer-list-empty')), findsNothing);
+        expect(find.text('Fixture manual'), findsNothing);
         await tester.tap(leaf);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Fixture leaf prayer'));
@@ -115,21 +109,63 @@ void main() {
         );
         router.pop();
         await tester.pumpAndSettle();
+        expect(find.text('Fixture leaf prayer'), findsOneWidget);
         router.pop();
         await tester.pumpAndSettle();
         expect(leaf, findsOneWidget);
-        expect(
-          tester
-              .state<ScrollableState>(find.byType(Scrollable).first)
-              .position
-              .pixels,
-          closeTo(scroll, 1),
-        );
+        router.pop();
+        await tester.pumpAndSettle();
+        expect(middle, findsOneWidget);
+        expect(find.text('Fixture manual'), findsOneWidget);
+        router.pop();
+        await tester.pumpAndSettle();
+        expect(root, findsOneWidget);
+        expect(middle, findsNothing);
       } finally {
         semantics.dispose();
       }
     },
   );
+
+  testWidgets('category scroll survives child page and prayer reader Back', (
+    tester,
+  ) async {
+    final content = fixtureContent();
+    for (var i = 0; i < 30; i++) {
+      content.categories['child-$i'] = {
+        'name': 'Child $i',
+        'parentId': 'root',
+        'order': i,
+        'prayerIds': ['tagged'],
+      };
+    }
+    await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+    await tester.pumpAndSettle();
+    await reveal(tester, root);
+    final router = GoRouter.of(tester.element(root));
+    await tester.tap(root);
+    await tester.pumpAndSettle();
+    final last = find.byKey(const ValueKey('category-child-29'));
+    await reveal(tester, last);
+    double offset() => tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position
+        .pixels;
+    final beforeChild = offset();
+    expect(beforeChild, greaterThan(300));
+    await tester.tap(last);
+    await tester.pumpAndSettle();
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(offset(), closeTo(beforeChild, 1));
+    await reveal(tester, find.byKey(const ValueKey('prayer-row-manual')));
+    final beforeReader = offset();
+    await tester.tap(find.byKey(const ValueKey('prayer-row-manual')));
+    await tester.pumpAndSettle();
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(offset(), closeTo(beforeReader, 1));
+  });
 
   testWidgets(
     'revoke removes private lists, favorites/search, category management and deep links immediately',
@@ -175,7 +211,7 @@ void main() {
   );
 
   testWidgets(
-    'hidden root promotes middle and expansion survives root remount',
+    'hidden root promotes middle; personal categories remain separate pages',
     (tester) async {
       await tester.pumpWidget(
         PrayerCategoriesHarness(content: fixtureContent()),
@@ -189,16 +225,19 @@ void main() {
       await tester.pumpAndSettle();
       await reveal(tester, middle);
       expect(root, findsNothing);
+      expect(leaf, findsNothing);
       await tester.tap(middle);
       await tester.pumpAndSettle();
       expect(leaf, findsOneWidget);
-      router.go('/prayers/all');
+      router.pop();
       await tester.pumpAndSettle();
-      router.go('/prayers');
+      final personal = find.byKey(const ValueKey('category-mine'));
+      await reveal(tester, personal);
+      await tester.tap(personal);
       await tester.pumpAndSettle();
-      expect(scope.read(expandedPrayerCategoryIdsProvider), contains('middle'));
-      await reveal(tester, leaf);
-      expect(leaf, findsOneWidget);
+      expect(find.text('Fixture tagged'), findsOneWidget);
+      expect(middle, findsNothing);
+      expect(leaf, findsNothing);
     },
   );
 
@@ -207,7 +246,7 @@ void main() {
       for (final width in [320.0, 375.0, 768.0]) {
         for (final scale in [1.0, 2.0]) {
           testWidgets(
-            'expanded tree ${platform.name} $theme width=$width scale=$scale',
+            'category page navigation ${platform.name} $theme width=$width scale=$scale',
             (tester) async {
               tester.view.devicePixelRatio = 1;
               tester.view.physicalSize = Size(width, 900);
@@ -230,10 +269,15 @@ void main() {
               await reveal(tester, root);
               await tester.tap(root);
               await tester.pumpAndSettle();
+              expect(leaf, findsNothing);
+              await reveal(tester, find.text('Fixture manual'));
+              expect(find.text('Fixture manual'), findsOneWidget);
               await reveal(tester, middle);
               await tester.tap(middle);
               await tester.pumpAndSettle();
               await reveal(tester, leaf);
+              expect(find.byKey(const Key('prayer-list-empty')), findsNothing);
+              expect(find.text('Fixture manual'), findsNothing);
               expect(tester.getRect(leaf).right, lessThanOrEqualTo(width));
               expect(tester.getRect(leaf).height, greaterThanOrEqualTo(48));
               expect(find.text('PRIVATE SHARED FIXTURE'), findsNothing);
