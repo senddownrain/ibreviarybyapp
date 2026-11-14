@@ -1,0 +1,172 @@
+{
+  "webCommit": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+  "webOnOriginMain": false,
+  "sourceSha256": "a55dc34c89317bd0a4b683ea84b46941213aa2b981d0a9de1fe3ebeb71dc9696",
+  "sourceRows": 262,
+  "effectiveAssignments": 959,
+  "candidateOnly": true,
+  "serverPublicationVerified": false,
+  "releaseGate": "Verify completed Firestore revision4 then separately accepted revision5, regenerate from final snapshot; no store release before acceptance.",
+  "collections": {
+    "days": {
+      "file": "days.json.gz",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
+      "count": 736,
+      "digest": "4d71131ab6bf2f4a",
+      "storedBytes": 54608675,
+      "bundleBytes": 2319360,
+      "sha256": "3e4292abd7d850fb19473a0a013d85505595103c9e8c7de935d0e94e54953273"
+    },
+    "readings": {
+      "file": "readings.json.gz",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
+      "count": 822,
+      "digest": "93314983ba9c1bd5",
+      "storedBytes": 4813227,
+      "bundleBytes": 901221,
+      "sha256": "a01371c4692026df9e3e2597be9b93e56b4b0093eef8028e5612b4144865288b"
+    },
+    "liturgicalTemplates": {
+      "file": "liturgicalTemplates.json.gz",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
+      "count": 16,
+      "digest": "eb5361386d552f49",
+      "storedBytes": 3022599,
+      "bundleBytes": 344031,
+      "sha256": "60bcb5a644b40af16336760816241ad4d8c259e291c399a5885c55e9daa82f7d"
+    },
+    "invitatoriums": {
+      "file": "invitatoriums.json.gz",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
+      "count": 4,
+      "digest": "587d64f9ff8e7b0d",
+      "storedBytes": 9678,
+      "bundleBytes": 2710,
+      "sha256": "835b2b332b17e8cb3675601a935ee0416627a6b9288d6a3c96e08be70bb28d79"
+    },
+    "completoriums": {
+      "file": "completoriums.json.gz",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
+      "count": 35,
+      "digest": "42eb55a0b377d638",
+      "storedBytes": 323076,
+      "bundleBytes": 10381,
+      "sha256": "56e0c118d6bfc9651a847ee1cf29d2d56e449ea7046312b237e9c92b5b436b5d"
+    },
+    "liturgicalCalendarMeta": {
+      "file": "liturgicalCalendarMeta.json.gz",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 1,
+      "digest": "50c0b92f2b345128",
+      "storedBytes": 273,
+      "bundleBytes": 297,
+      "sha256": "e00867c56bd5500f120b8636551056736a9df167a73d26060276542abb5ddea0"
+    },
+    "liturgicalCelebrations": {
+      "file": "liturgicalCelebrations.json.gz",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 242,
+      "digest": "b1ec5380202bf506",
+      "storedBytes": 127232,
+      "bundleBytes": 22683,
+      "sha256": "adff7cb32a14f82a6e6c02e5a21c03f8df976e88c557f776daa34ac87d168533"
+    },
+    "liturgicalDioceseOverrides": {
+      "file": "liturgicalDioceseOverrides.json.gz",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 77,
+      "digest": "5e20e47ab78d3552",
+      "storedBytes": 53823,
+      "bundleBytes": 7996,
+      "sha256": "4f055ae09ba7e6be3da85ee4f1a795b2f3c5d9d98d6cfdbe7370cfabca5f9a91"
+    },
+    "liturgicalYearOverrides": {
+      "file": "liturgicalYearOverrides.json.gz",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 15,
+      "digest": "679696243c3aa1c2",
+      "storedBytes": 8391,
+      "bundleBytes": 1772,
+      "sha256": "0f663553f3c44ad040c6da435bf1966ebdcf5ccee57a9740dde5174ebe63abd5"
+    },
+    "liturgicalProperTexts": {
+      "file": "liturgicalProperTexts.json.gz",
+      "contentVersion": 1794092262000,
+      "contentDate": "2026-11-07T22:57:42.000Z",
+      "count": 291,
+      "digest": "60081a442fa9c4ed",
+      "storedBytes": 3211295,
+      "bundleBytes": 590720,
+      "sha256": "895b881f693f28b00692cad22b31759240057c061ac511b0305a6d7bfeb742d0"
+    },
+    "liturgicalOrdoNotes": {
+      "file": "liturgicalOrdoNotes.json.gz",
+      "contentVersion": 1791877243449,
+      "contentDate": "2026-10-13T07:40:43.449Z",
+      "count": 1337,
+      "digest": "db0465255c4bc5a3",
+      "storedBytes": 780774,
+      "bundleBytes": 112657,
+      "sha256": "a69a6ab7c22093db2b9b49d12dc532f0091a83fa2e08180cb485a8532aee61c1"
+    },
+    "prayers": {
+      "file": "prayers.json.gz",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 115,
+      "digest": "43711607f69fe4c5",
+      "storedBytes": 2369569,
+      "bundleBytes": 364359,
+      "sha256": "6edd638b13e76820367771357161d14bd51273ede2c4e551b15925e9c5e9e3ee"
+    },
+    "prayerCategories": {
+      "file": "prayerCategories.json.gz",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 5,
+      "digest": "2615b158b86e8582",
+      "storedBytes": 1058,
+      "bundleBytes": 580,
+      "sha256": "8f5b1f32979c9a8cd4c9e1e23f4f5cdf0b40d1cb68de7b9c4d7b2534611ec491"
+    },
+    "songs": {
+      "file": "songs.json.gz",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 447,
+      "digest": "9752aef2fd846b49",
+      "storedBytes": 369604,
+      "bundleBytes": 111478,
+      "sha256": "79e41914bd4cb23bf5df01f5943ae77651149415d804a0d6000537cd8f4a93c5"
+    },
+    "compendium": {
+      "file": "compendium.json.gz",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 27,
+      "digest": "7659d6be6ac3ead8",
+      "storedBytes": 536467,
+      "bundleBytes": 113291,
+      "sha256": "632735c5e171542ba67206e8874d710d9683b9c08dd6558b22585d0a8eedab1c"
+    },
+    "compendiumMeta": {
+      "file": "compendiumMeta.json.gz",
+      "contentVersion": 1791877294111,
+      "contentDate": "2026-10-13T07:41:34.111Z",
+      "count": 1,
+      "digest": "879c4b7ae16cb312",
+      "storedBytes": 6072,
+      "bundleBytes": 1776,
+      "sha256": "1df323a19eec0772e68929245ac25f2b7ade6de1f98c4e9b9b69886e4242e3f8"
+    }
+  }
+}

@@ -17,11 +17,6 @@ import 'package:mybrev_flutter/ordo/season.dart';
 
 bool _obligatory(Json c) => c['rankKind'] == 'memorial';
 
-/// `concurrentObligatoryMemorials` values that open a memorial choice
-/// ('legal-choice'; the legacy 'both-optional' of published definitions
-/// revision 2 means the same).
-const _concurrentChoiceValues = {'legal-choice', 'both-optional'};
-
 /// Jesus Christ, the High and Eternal Priest (national feast, Thursday after
 /// Pentecost).
 const kChristHighPriestId = 'christ-the-high-priest';
@@ -113,23 +108,44 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
   var celebrations = active.where((c) => c['kind'] != 'temporal').toList();
   stableSort(celebrations, compareCandidates);
 
-  // Product rule (Belarus, final phase §11.2–11.3): when the Immaculate
-  // Heart or Mary, Mother of the Church meets another obligatory memorial,
-  // both obligatory memorials are legal choices (Marian first) and the
-  // weekday is NOT a third option.
+  // Approved general norms: Mother Church prevails over other memorials;
+  // an Immaculate Heart collision makes both memorials optional.
   final obligatory = celebrations.where(_obligatory).toList();
-  final memorialChoice =
+  final motherChurch = obligatory
+      .where((c) => c['id'] == 'mary-mother-church')
+      .firstOrNull;
+  final heartCollision =
       obligatory.length > 1 &&
-      obligatory.any(
-        (c) => _concurrentChoiceValues.contains(
-          (c['rules'] as Map?)?['concurrentObligatoryMemorials'],
-        ),
-      );
-  if (memorialChoice) {
+      obligatory.any((c) => c['id'] == 'immaculate-heart');
+  if (motherChurch != null) {
+    celebrations = celebrations.where((c) {
+      if (!identical(c, motherChurch) && _anyMemorial(c)) {
+        suppressed.add(_suppress(c, 'mother-church-prevails'));
+        return false;
+      }
+      return true;
+    }).toList();
     appliedRules.add({
-      'rule': 'concurrent-obligatory-memorials-legal-choice',
+      'rule': 'mother-church-prevails',
+      'basis': 'CDW 24.03.2018',
+    });
+  } else if (heartCollision) {
+    celebrations = celebrations
+        .map(
+          (c) => _obligatory(c)
+              ? <String, dynamic>{
+                  ...c,
+                  'rank': 'memoria-ad-libitum',
+                  'rankKind': 'optional-memorial',
+                  'precedence': 12,
+                }
+              : c,
+        )
+        .toList();
+    appliedRules.add({
+      'rule': 'immaculate-heart-both-optional',
+      'basis': '2671/98/L',
       'ids': [for (final c in obligatory) c['id']],
-      'basis': 'product-decision',
     });
   }
 
@@ -194,12 +210,14 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
       identical(primary, temporal) && temporalPrecedenceValue == 9;
   final primaryIsOrdinaryWeekday =
       identical(primary, temporal) && temporalPrecedenceValue == 13;
-  final hasObligatoryMemorial = obligatory.isNotEmpty;
+  final hasObligatoryMemorial = celebrations.any(_obligatory);
 
   for (final candidate in celebrations) {
     if (identical(candidate, primary)) continue;
     if (candidate['id'] == 'saturday-blessed-virgin-mary') {
-      if (primaryIsOrdinaryWeekday && !hasObligatoryMemorial) {
+      if (primaryIsOrdinaryWeekday &&
+          !hasObligatoryMemorial &&
+          !heartCollision) {
         alternatives.add({...candidate, 'role': 'alternative'});
         appliedRules.add({'rule': 'saturday-memorial-of-mary'});
       } else {
@@ -220,24 +238,6 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
       continue;
     }
     if (kind == 'feast') {
-      // Provisional product rule (§11.4): Christ the High Priest meeting
-      // another feast keeps both as legal options.
-      if (primary['rankKind'] == 'feast' &&
-          (candidate['id'] == kChristHighPriestId ||
-              primary['id'] == kChristHighPriestId)) {
-        alternatives.add({
-          ...candidate,
-          'role': 'alternative',
-          'provisional': true,
-        });
-        appliedRules.add({
-          'rule': 'christ-high-priest-collision-both-options',
-          'id': candidate['id'],
-          'with': primary['id'],
-          'status': 'provisional',
-        });
-        continue;
-      }
       suppressed.add(_suppress(candidate, 'impeded-omitted'));
       appliedRules.add({
         'rule': 'impeded-feast-omitted',
@@ -269,8 +269,7 @@ DisplayResult resolveDisplay(List<Json> candidates, Season season) {
     }
     if (primary['rankKind'] == 'memorial') {
       if (_obligatory(candidate) &&
-          (candidate['precedence'] == primary['precedence'] ||
-              memorialChoice)) {
+          candidate['precedence'] == primary['precedence']) {
         alternatives.add({...candidate, 'role': 'alternative'});
         appliedRules.add({
           'rule': 'concurrent-obligatory-memorials-choice',

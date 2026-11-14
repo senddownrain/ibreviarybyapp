@@ -1,20 +1,239 @@
 {
   "heads": {
-    "web": "08b12838fcc7a737149dccd4225a043b6efcaec3",
-    "flutter": "d17578cd196fed3a6cf5330e9667217583a9317c",
+    "web": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+    "flutter": "37d38290d0b828335f4d8f1645bdad5a0ead656c",
     "flutterSdk": "3.41.4"
   },
-  "fixtureSnapshot": "2026-10-20T10:21:54.388Z",
-  "bundleContentVersion": 1792491714388,
+  "fixtureSnapshot": "2026-11-08T22:16:20.000Z",
+  "bundleContentVersion": 1794176180000,
   "daysCompared": 16068,
-  "assembliesCompared": 37738,
-  "structureMismatches": 0,
-  "officeTextMismatches": 0,
-  "structureExamples": [],
-  "officeTextExamples": [],
+  "assembliesCompared": 37508,
+  "structureMismatches": 70,
+  "mismatchesByDioceseYear": {
+    "minsk-mohilev": {
+      "2025": {
+        "structure": 2,
+        "text": 1
+      },
+      "2026": {
+        "structure": 2,
+        "text": 1
+      },
+      "2027": {
+        "structure": 2,
+        "text": 1
+      },
+      "2028": {
+        "structure": 1,
+        "text": 1
+      },
+      "2029": {
+        "structure": 2,
+        "text": 1
+      },
+      "2030": {
+        "structure": 1,
+        "text": 1
+      },
+      "2031": {
+        "structure": 2,
+        "text": 1
+      },
+      "2032": {
+        "structure": 2,
+        "text": 1
+      },
+      "2033": {
+        "structure": 1,
+        "text": 1
+      },
+      "2034": {
+        "structure": 2,
+        "text": 1
+      },
+      "2035": {
+        "structure": 1,
+        "text": 1
+      }
+    },
+    "grodno": {
+      "2025": {
+        "structure": 2,
+        "text": 1
+      },
+      "2026": {
+        "structure": 2,
+        "text": 1
+      },
+      "2027": {
+        "structure": 2,
+        "text": 1
+      },
+      "2028": {
+        "structure": 1,
+        "text": 1
+      },
+      "2029": {
+        "structure": 2,
+        "text": 1
+      },
+      "2030": {
+        "structure": 1,
+        "text": 1
+      },
+      "2031": {
+        "structure": 2,
+        "text": 1
+      },
+      "2032": {
+        "structure": 2,
+        "text": 1
+      },
+      "2033": {
+        "structure": 1,
+        "text": 1
+      },
+      "2034": {
+        "structure": 2,
+        "text": 1
+      },
+      "2035": {
+        "structure": 1,
+        "text": 1
+      }
+    },
+    "pinsk": {
+      "2025": {
+        "structure": 2,
+        "text": 1
+      },
+      "2026": {
+        "structure": 2,
+        "text": 1
+      },
+      "2027": {
+        "structure": 1,
+        "text": 1
+      },
+      "2028": {
+        "structure": 1,
+        "text": 1
+      },
+      "2029": {
+        "structure": 2,
+        "text": 1
+      },
+      "2030": {
+        "structure": 1,
+        "text": 1
+      },
+      "2031": {
+        "structure": 2,
+        "text": 1
+      },
+      "2032": {
+        "structure": 1,
+        "text": 1
+      },
+      "2033": {
+        "structure": 1,
+        "text": 1
+      },
+      "2034": {
+        "structure": 2,
+        "text": 1
+      },
+      "2035": {
+        "structure": 1,
+        "text": 1
+      }
+    },
+    "vitebsk": {
+      "2025": {
+        "structure": 2,
+        "text": 1
+      },
+      "2026": {
+        "structure": 2,
+        "text": 1
+      },
+      "2027": {
+        "structure": 2,
+        "text": 1
+      },
+      "2028": {
+        "structure": 1,
+        "text": 1
+      },
+      "2029": {
+        "structure": 2,
+        "text": 1
+      },
+      "2030": {
+        "structure": 1,
+        "text": 1
+      },
+      "2031": {
+        "structure": 2,
+        "text": 1
+      },
+      "2032": {
+        "structure": 2,
+        "text": 1
+      },
+      "2033": {
+        "structure": 1,
+        "text": 1
+      },
+      "2034": {
+        "structure": 2,
+        "text": 1
+      },
+      "2035": {
+        "structure": 1,
+        "text": 1
+      }
+    }
+  },
+  "officeTextMismatches": 44,
+  "structureExamples": [
+    "2025-06-09 minsk-mohilev\n  web:     [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"mary-mother-church\",\"З дня\",\"current-day\",null],[\"mary-mother-church--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]\n  flutter: [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"feast-marymotherchurch\",\"З дня\",\"current-day\",null],[\"feast-marymotherchurch--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]",
+    "2025-06-28 minsk-mohilev\n  web:     [{\"key\":\"period-ordinary-w12-d7\",\"optionId\":\"temporal:ordinary-w12-d7\",\"source\":\"period\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"ordinary-w12-d7\",\"Перыяд\",null,null]]}, {\"key\":\"dynamic-feast-heartofmary\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"feast-heartofmary\",null,null]]}, {\"key\":\"fixed-sv-irenaeus\",\"optionId\":\"sv-irenaeus\",\"source\":\"fixed\",\"properSource\":\"liturgicalProperTexts\",\"missingProper\":false,\"templates\":[[\"28-06-sv-irenaeus\",\"З дня\",\"current-day\",null],[\"28-06-sv-irenaeus--martyr-one\",\"Пра аднаго мучаніка\",\"martyr-one\",null],[\"28-06-sv-irenaeus--pastors\",\"Пра пастыраў\",\"pastors\",null]]}, {\"key\":\"office-for-dead\",\"optionId\":\"office-for-dead\",\"source\":\"office-for-dead\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"office-for-dead\",\"Афіцый за памерлых\",null,null]]}]\n  flutter: [{\"key\":\"period-ordinary-w12-d7\",\"optionId\":\"temporal:ordinary-w12-d7\",\"source\":\"period\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"ordinary-w12-d7\",\"Перыяд\",null,null]]}, {\"key\":\"dynamic-immaculate-heart\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":\"legacy-days\",\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"З дня\",\"current-day\",null],[\"feast-heartofmary--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}, {\"key\":\"fixed-sv-irenaeus\",\"optionId\":\"sv-irenaeus\",\"source\":\"fixed\",\"properSource\":\"liturgicalProperTexts\",\"missingProper\":false,\"templates\":[[\"28-06-sv-irenaeus\",\"З дня\",\"current-day\",null],[\"28-06-sv-irenaeus--martyr-one\",\"Пра аднаго мучаніка\",\"martyr-one\",null],[\"28-06-sv-irenaeus--pastors\",\"Пра пастыраў\",\"pastors\",null]]}, {\"key\":\"office-for-dead\",\"optionId\":\"office-for-dead\",\"source\":\"office-for-dead\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"office-for-dead\",\"Афіцый за памерлых\",null,null]]}]",
+    "2026-05-25 minsk-mohilev\n  web:     [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"mary-mother-church\",\"З дня\",\"current-day\",null],[\"mary-mother-church--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]\n  flutter: [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"feast-marymotherchurch\",\"З дня\",\"current-day\",null],[\"feast-marymotherchurch--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]",
+    "2026-06-13 minsk-mohilev\n  web:     [{\"key\":\"period-ordinary-w10-d7\",\"optionId\":\"temporal:ordinary-w10-d7\",\"source\":\"period\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"ordinary-w10-d7\",\"Перыяд\",null,null]]}, {\"key\":\"dynamic-feast-heartofmary\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"feast-heartofmary\",null,null]]}, {\"key\":\"fixed-sv-anthony-padua\",\"optionId\":\"sv-anthony-padua\",\"source\":\"fixed\",\"properSource\":\"liturgicalProperTexts\",\"missingProper\":false,\"templates\":[[\"13-06-sv-anthony-padua\",\"З дня\",\"current-day\",null],[\"13-06-sv-anthony-padua--pastors\",\"Пра пастыраў\",\"pastors\",null],[\"13-06-sv-anthony-padua--doctors-of-church\",\"Пра доктараў касцёла\",\"doctors-of-church\",null],[\"13-06-sv-anthony-padua--religious\",\"Пра законнікаў\",\"religious\",null]]}, {\"key\":\"office-for-dead\",\"optionId\":\"office-for-dead\",\"source\":\"office-for-dead\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"office-for-dead\",\"Афіцый за памерлых\",null,null]]}]\n  flutter: [{\"key\":\"period-ordinary-w10-d7\",\"optionId\":\"temporal:ordinary-w10-d7\",\"source\":\"period\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"ordinary-w10-d7\",\"Перыяд\",null,null]]}, {\"key\":\"dynamic-immaculate-heart\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":\"legacy-days\",\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"З дня\",\"current-day\",null],[\"feast-heartofmary--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}, {\"key\":\"fixed-sv-anthony-padua\",\"optionId\":\"sv-anthony-padua\",\"source\":\"fixed\",\"properSource\":\"liturgicalProperTexts\",\"missingProper\":false,\"templates\":[[\"13-06-sv-anthony-padua\",\"З дня\",\"current-day\",null],[\"13-06-sv-anthony-padua--pastors\",\"Пра пастыраў\",\"pastors\",null],[\"13-06-sv-anthony-padua--doctors-of-church\",\"Пра доктараў касцёла\",\"doctors-of-church\",null],[\"13-06-sv-anthony-padua--religious\",\"Пра законнікаў\",\"religious\",null]]}, {\"key\":\"office-for-dead\",\"optionId\":\"office-for-dead\",\"source\":\"office-for-dead\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"office-for-dead\",\"Афіцый за памерлых\",null,null]]}]",
+    "2027-05-17 minsk-mohilev\n  web:     [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"mary-mother-church\",\"З дня\",\"current-day\",null],[\"mary-mother-church--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]\n  flutter: [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"feast-marymotherchurch\",\"З дня\",\"current-day\",null],[\"feast-marymotherchurch--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]",
+    "2027-06-05 minsk-mohilev\n  web:     [{\"key\":\"period-ordinary-w9-d7\",\"optionId\":\"temporal:ordinary-w9-d7\",\"source\":\"period\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"ordinary-w9-d7\",\"Перыяд\",null,null]]}, {\"key\":\"dynamic-feast-heartofmary\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"feast-heartofmary\",null,null]]}, {\"key\":\"fixed-sv-boniface\",\"optionId\":\"sv-boniface\",\"source\":\"fixed\",\"properSource\":\"liturgicalProperTexts\",\"missingProper\":false,\"templates\":[[\"05-06-sv-boniface\",\"З дня\",\"current-day\",null],[\"05-06-sv-boniface--martyr-one\",\"Пра аднаго мучаніка\",\"martyr-one\",null],[\"05-06-sv-boniface--pastors\",\"Пра пастыраў\",\"pastors\",null]]}, {\"key\":\"office-for-dead\",\"optionId\":\"office-for-dead\",\"source\":\"office-for-dead\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"office-for-dead\",\"Афіцый за памерлых\",null,null]]}]\n  flutter: [{\"key\":\"period-ordinary-w9-d7\",\"optionId\":\"temporal:ordinary-w9-d7\",\"source\":\"period\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"ordinary-w9-d7\",\"Перыяд\",null,null]]}, {\"key\":\"dynamic-immaculate-heart\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":\"legacy-days\",\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"З дня\",\"current-day\",null],[\"feast-heartofmary--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}, {\"key\":\"fixed-sv-boniface\",\"optionId\":\"sv-boniface\",\"source\":\"fixed\",\"properSource\":\"liturgicalProperTexts\",\"missingProper\":false,\"templates\":[[\"05-06-sv-boniface\",\"З дня\",\"current-day\",null],[\"05-06-sv-boniface--martyr-one\",\"Пра аднаго мучаніка\",\"martyr-one\",null],[\"05-06-sv-boniface--pastors\",\"Пра пастыраў\",\"pastors\",null]]}, {\"key\":\"office-for-dead\",\"optionId\":\"office-for-dead\",\"source\":\"office-for-dead\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"office-for-dead\",\"Афіцый за памерлых\",null,null]]}]",
+    "2028-06-05 minsk-mohilev\n  web:     [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"mary-mother-church\",\"З дня\",\"current-day\",null],[\"mary-mother-church--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]\n  flutter: [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"feast-marymotherchurch\",\"З дня\",\"current-day\",null],[\"feast-marymotherchurch--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]",
+    "2029-05-21 minsk-mohilev\n  web:     [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"mary-mother-church\",\"З дня\",\"current-day\",null],[\"mary-mother-church--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]\n  flutter: [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"feast-marymotherchurch\",\"З дня\",\"current-day\",null],[\"feast-marymotherchurch--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]",
+    "2029-06-09 minsk-mohilev\n  web:     [{\"key\":\"dynamic-feast-heartofmary\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":null,\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"feast-heartofmary\",null,null]]}]\n  flutter: [{\"key\":\"dynamic-immaculate-heart\",\"optionId\":\"immaculate-heart\",\"source\":\"dynamic\",\"properSource\":\"legacy-days\",\"missingProper\":false,\"templates\":[[\"feast-heartofmary\",\"З дня\",\"current-day\",null],[\"feast-heartofmary--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]",
+    "2030-06-10 minsk-mohilev\n  web:     [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"mary-mother-church\",\"З дня\",\"current-day\",null],[\"mary-mother-church--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]\n  flutter: [{\"key\":\"dynamic-mary-mother-church\",\"optionId\":\"mary-mother-church\",\"source\":\"dynamic\",\"properSource\":\"none\",\"missingProper\":true,\"templates\":[[\"feast-marymotherchurch\",\"З дня\",\"current-day\",null],[\"feast-marymotherchurch--blessed-virgin-mary\",\"Пра Найсвяцейшую Панну Марыю\",\"blessed-virgin-mary\",null]]}]"
+  ],
+  "officeTextExamples": [
+    "2025-06-12 minsk-mohilev feast-christthehighpriest",
+    "2026-05-28 minsk-mohilev feast-christthehighpriest",
+    "2027-05-20 minsk-mohilev feast-christthehighpriest",
+    "2028-06-08 minsk-mohilev feast-christthehighpriest",
+    "2029-05-24 minsk-mohilev feast-christthehighpriest",
+    "2030-06-13 minsk-mohilev feast-christthehighpriest",
+    "2031-06-05 minsk-mohilev feast-christthehighpriest",
+    "2032-05-20 minsk-mohilev feast-christthehighpriest",
+    "2033-06-09 minsk-mohilev feast-christthehighpriest",
+    "2034-06-01 minsk-mohilev feast-christthehighpriest",
+    "2035-05-17 minsk-mohilev feast-christthehighpriest",
+    "2025-06-12 grodno feast-christthehighpriest",
+    "2026-05-28 grodno feast-christthehighpriest",
+    "2027-05-20 grodno feast-christthehighpriest",
+    "2028-06-08 grodno feast-christthehighpriest",
+    "2029-05-24 grodno feast-christthehighpriest",
+    "2030-06-13 grodno feast-christthehighpriest",
+    "2031-06-05 grodno feast-christthehighpriest",
+    "2032-05-20 grodno feast-christthehighpriest",
+    "2033-06-09 grodno feast-christthehighpriest"
+  ],
   "optionsByProperSource": {
-    "liturgicalProperTexts": 8006,
-    "-": 18894,
-    "none": 906
+    "liturgicalProperTexts": 7771,
+    "-": 19198,
+    "none": 955,
+    "legacy-days": 32
   }
 }

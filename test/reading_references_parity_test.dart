@@ -69,6 +69,7 @@ void main() {
           '${const JsonEncoder.withIndent('  ').convert({'daysCompared': compared, 'mismatches': mismatches.length, 'optionsByStatus': statuses, 'examples': mismatches.take(10).toList()})}\n',
         );
       }
+      expect(compared, 16068);
       expect(mismatches, isEmpty, reason: mismatches.take(5).join('\n'));
     },
     timeout: const Timeout(Duration(minutes: 5)),

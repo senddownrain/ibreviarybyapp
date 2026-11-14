@@ -1062,7 +1062,7 @@ void main() {
   );
 
   testWidgets(
-    'Grodno impeded in 2027 opens Grodno in 2028, preserving Settings',
+    'Nicholas has the approved shared optional rank and opens 2027 without a year jump',
     (tester) async {
       final (router, container) = await start(
         tester,
@@ -1078,17 +1078,14 @@ void main() {
       );
       await tester.pumpAndSettle();
       final rows = find.byKey(const Key('picker-feast-sv-nicholas-2027-12-06'));
-      expect(rows, findsNWidgets(2));
+      expect(rows, findsOneWidget);
       await tapVisible(tester, rows.last);
       expect(find.byType(HomeScreen), findsOneWidget);
       final picked = container.read(hoursLiturgicalSelectionProvider);
-      expect(picked.diocese, 'grodno');
-      expect(container.read(selectedDateProvider), DateTime(2028, 12, 6));
+      expect(picked.diocese, selection.primary);
+      expect(container.read(selectedDateProvider), DateTime(2027, 12, 6));
       expect(picked.selected!.optionId, 'sv-nicholas');
-      expect(
-        find.textContaining('Адкрыты тэксты за 2028 год.'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Адкрыты тэксты за 2028 год.'), findsNothing);
       expect(
         container.read(dioceseSelectionProvider).selected,
         selection.selected,
@@ -1098,7 +1095,7 @@ void main() {
             .resolve('2027-12-06', diocese: 'grodno')
             .options
             .any((o) => o.id == 'sv-nicholas'),
-        isFalse,
+        isTrue,
       );
       expect(router.canPop(), isTrue);
     },
@@ -1439,4 +1436,40 @@ void main() {
       );
     }
   }
+  testWidgets(
+    'retained Ordo detail is independent of the Hours root when dates change',
+    (tester) async {
+      final (router, container) = await start(
+        tester,
+        location: '/hours/ordo?date=2026-09-08&diocese=vitebsk',
+        selectedDate: DateTime(2026, 9, 8),
+      );
+      expect(tester.takeException(), isNull);
+      router.go('/hours');
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      container
+          .read(liturgicalNavigationControllerProvider)
+          .openDate(DateTime(2026, 11, 16));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      router.go('/hours/ordo?date=2026-11-16&diocese=vitebsk');
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('Вастрабрамскай'), findsWidgets);
+    },
+  );
+  testWidgets(
+    'Ora uses the Ordo I Vespers for Christmas on Advent Sunday and a diocesan solemnity',
+    (tester) async {
+      for (final route in [
+        '/ora/2028-12-24/advent-24-12/vespers?diocese=minsk-mohilev',
+        '/ora/2026-11-15/ordinary-w33-d1/vespers?diocese=grodno',
+      ]) {
+        await start(tester, location: route);
+        expect(find.textContaining('I Нешпары'), findsWidgets);
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
 }

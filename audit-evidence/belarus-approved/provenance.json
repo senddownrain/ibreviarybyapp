@@ -1,0 +1,17 @@
+{
+  "testedFlutterCommit": "37d3829",
+  "mergedMain": "1a628b9197d481c0495cb944d4ce127357fa3a54",
+  "command": "flutter run --release --no-pub -d chrome -t tool/approved_calendar_smoke.dart --web-port 5242 --web-hostname 127.0.0.1 --web-browser-debug-port=9222",
+  "runner": "node scripts/smoke_approved_calendar.cjs",
+  "states": 36,
+  "distinctScreenshots": 34,
+  "errors": [],
+  "externalRequests": [],
+  "platform": "Flutter Web / Chrome, not Android",
+  "inspectedScreenshots": [
+    "390-light-1-sept-vitebsk.png",
+    "320-dark-1.8-braslau-readings.png",
+    "320-dark-1.8-braslau-hours.png"
+  ],
+  "bundleManifestSha256": "b16a01a0787c092047d18226413f0d4685c99ce9cfb11028586bcd642f92c46f"
+}

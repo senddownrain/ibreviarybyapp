@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/approved_office_sources.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
@@ -173,12 +174,29 @@ class LiturgicalDayContent {
   /// Every document of the date addressable by a route id (legacy links).
   final Map<String, LiturgicalDay> itemsDays;
 
+  DayOption? _septemberOption(String dayId) =>
+      RegExp(
+        r'^08-09-(?:nativity-blessed-virgin-mary|our-lady-braslau-vitebsk)(?:--|$)',
+      ).hasMatch(dayId)
+      ? options
+            .where(
+              (o) => [
+                'nativity-blessed-virgin-mary',
+                'our-lady-braslau',
+              ].contains(o.optionId),
+            )
+            .firstOrNull
+      : null;
+
   DayOption? optionOwning(String dayId) =>
+      _septemberOption(dayId) ??
       options.where((option) => option.ownsDayId(dayId)).firstOrNull;
 
   /// The document a route id opens: the option's resolved assembly first,
   /// then any document of the date.
   LiturgicalDay? dayById(String dayId) {
+    final september = _septemberOption(dayId);
+    if (september != null) return september.day;
     for (final option in options) {
       for (final template in option.templates) {
         if (template.answers(dayId)) {
@@ -387,7 +405,7 @@ class LiturgicalContentService {
     }
 
     final resolvedPeriodDay = withContext(
-      resolveDayAgainstPeriod(periodDay, null),
+      resolveDayAgainstPeriod(applyReviewedAdventVespers(periodDay), null),
     );
     final hasSeasonalException =
         isSeasonalDateException(date, period) && seasonalDay != null;
@@ -403,22 +421,22 @@ class LiturgicalContentService {
         ? 'advent'
         : 'christmas';
     final seasonal = hasSeasonalException
-        ? applySeasonalWeekdayAntiphons(
-            withContext(
-              period == 'christmas'
-                  ? resolveChristmasDateAgainstPeriod(
+        ? withContext(
+            period == 'christmas'
+                ? applySeasonalWeekdayAntiphons(
+                    resolveChristmasDateAgainstPeriod(
                       seasonalDay,
                       resolvedPeriodDay,
-                    )
-                  : resolveDayAgainstPeriod(
-                      seasonalDay,
-                      resolvedPeriodDay,
-                      fillMissing: true,
-                    ),
-              periodType: seasonalPeriodType,
-              periodWeek: week,
-            )!,
-            dayOfWeek,
+                    )!,
+                    dayOfWeek,
+                  )
+                : resolveAdventDateAgainstPeriod(
+                    applyReviewedAdventVespers(seasonalDay),
+                    resolvedPeriodDay,
+                    dayOfWeek,
+                  ),
+            periodType: seasonalPeriodType,
+            periodWeek: week,
           )
         : null;
     LiturgicalDay resolveFixed(LiturgicalDay item) => withContext(
@@ -440,11 +458,15 @@ class LiturgicalContentService {
     final dynamicDays = <String, List<LiturgicalDay>>{
       for (final entry in rawDynamicDays.entries)
         entry.key: [
-            for (final item in entry.value)
-              withContext(
-                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, entry.key),
-              )!,
-          ],
+          for (final item in entry.value)
+            withContext(
+              resolveMovableFeastAgainstPeriod(
+                item,
+                resolvedPeriodDay,
+                entry.key,
+              ),
+            )!,
+        ],
     };
     return _DaysResult(
       properDays: [
@@ -494,9 +516,20 @@ class LiturgicalContentService {
     if (fallbackId.isEmpty || fallbackId == resolved.id) return resolved;
     final fallback = _dayById(fallbackId);
     if (fallback == null) return resolved;
-    return period == 'advent'
-        ? resolveDayAgainstPeriod(resolved, fallback, fillMissing: true)
-        : resolvePeriodDayAgainstPsalter(resolved, fallback);
+    if (period == 'advent') {
+      final data = resolveDayAgainstPeriod(
+        resolved,
+        fallback,
+        fillMissing: true,
+      )!.toMap();
+      if (dayOfWeek != 1) {
+        for (final field in ['vesperPs1', 'vesperPs2', 'vesperPs3']) {
+          data[field] = fallback.data[field] ?? '';
+        }
+      }
+      return LiturgicalDay.fromMap(data);
+    }
+    return resolvePeriodDayAgainstPsalter(resolved, fallback);
   }
 
   // ── options (port of buildOrdoDayOptions) ─────────────────────────────
@@ -658,15 +691,18 @@ class LiturgicalContentService {
         final effectiveTemplates = candidate.templates.isNotEmpty
             ? candidate.templates
             : candidate.id == 'immaculate-heart'
-                ? const ['blessed-virgin-mary']
-                : const <String>[];
+            ? const ['blessed-virgin-mary']
+            : const <String>[];
         if (!candidate.temporal &&
-            const {'memorial', 'optional-memorial'}.contains(candidate.officeKind) &&
+            const {
+              'memorial',
+              'optional-memorial',
+            }.contains(candidate.officeKind) &&
             effectiveTemplates.isNotEmpty &&
             currentDay != null) {
           final rawDocs = _dynamicDocuments(candidate, result, raw: true);
-          final raw = rawDocs.where(isSparseDay).firstOrNull ??
-              rawDocs.firstOrNull;
+          final raw =
+              rawDocs.where(isSparseDay).firstOrNull ?? rawDocs.firstOrNull;
           final base = raw?.toMap() ?? _scaffoldOf(candidate).toMap();
           final proper = LiturgicalDay.fromMap({
             ...base,
@@ -674,12 +710,15 @@ class LiturgicalContentService {
             '_feast': base['_feast'] ?? candidate.feastCode,
             '_feastName': base['_feastName'] ?? candidate.title,
             '_celebrationId': base['_celebrationId'] ?? candidate.id,
-            '_templates': (base['_templates'] is List &&
+            '_templates':
+                (base['_templates'] is List &&
                     (base['_templates'] as List).isNotEmpty)
                 ? base['_templates']
                 : effectiveTemplates,
-            '_defaultTemplate': base['_defaultTemplate'] ??
-                candidate.defaultTemplate ?? effectiveTemplates.first,
+            '_defaultTemplate':
+                base['_defaultTemplate'] ??
+                candidate.defaultTemplate ??
+                effectiveTemplates.first,
           });
           final variants = assembled(proper, candidate);
           if (raw == null) {
@@ -779,6 +818,9 @@ class LiturgicalContentService {
           : const [];
       var docs = select(properDocs);
       String? properSource = docs.isNotEmpty ? ProperSource.properTexts : null;
+      if (docs.isNotEmpty && candidate.id == 'our-lady-braslau') {
+        docs = select([...properDocs, ...fixedDocs]);
+      }
       if (docs.isEmpty) {
         docs = select(fixedDocs);
         if (docs.isNotEmpty) properSource = ProperSource.legacyDays;
@@ -1012,7 +1054,29 @@ class LiturgicalContentService {
 
     final ref = option.daysRef ?? const <String, dynamic>{};
     final own = byIds(ref['dayIds']);
-    if (own.isNotEmpty) return own;
+    if (own.isNotEmpty) {
+      if (option.id == 'our-lady-braslau') {
+        final inherited = byIds([
+          for (final fallback in option.fallbackDaysRefs)
+            ...?(fallback['dayIds'] as List?),
+        ]).firstOrNull;
+        if (inherited != null) {
+          return [
+            for (final doc in own)
+              LiturgicalDay.fromMap({
+                ...inherited.data,
+                ...doc.data,
+                'id': doc.id,
+                '_fieldRules': {
+                  ...?(inherited.data['_fieldRules'] as Map?),
+                  ...?(doc.data['_fieldRules'] as Map?),
+                },
+              }),
+          ];
+        }
+      }
+      return own;
+    }
     for (final fallback in option.fallbackDaysRefs) {
       final found = byIds(fallback['dayIds']);
       if (found.isNotEmpty) return found;

@@ -558,7 +558,12 @@ Json? _overrideFor(List<Json> overrides, Placement placement, String iso) =>
       var target = computed;
       if (override != null) {
         usedOverrides.add(override);
-        if (_isIso(override['effectiveDate'])) {
+        final staleAuto =
+            override['source'] == 'auto-transfer' &&
+            override['status'] != 'confirmed' &&
+            override['effectiveDate'] == override['computedDate'] &&
+            override['computedDate'] != computed;
+        if (!staleAuto && _isIso(override['effectiveDate'])) {
           target = override['effectiveDate'] as String;
         }
       }
@@ -664,7 +669,13 @@ YearPlan buildYearPlan(
   var order = 0;
   for (final celebration in celebrations.values.toList()) {
     final date = _placeCelebration(celebration, year, anchors);
-    if (date == null) continue;
+    if (date == null ||
+        (celebration['validFrom'] is String &&
+            date.compareTo(celebration['validFrom'] as String) < 0) ||
+        (celebration['validUntil'] is String &&
+            date.compareTo(celebration['validUntil'] as String) > 0)) {
+      continue;
+    }
     final placement = Placement(
       celebration: celebration,
       date: date,

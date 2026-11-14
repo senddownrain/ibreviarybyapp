@@ -1,0 +1,19 @@
+{
+  "fixtureSourceCommit": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+  "observedPr217Head": "d00dff03a11cb82fcb8bb9b957923280328a79b8",
+  "calendarEngineAndGeneratorPaths": [
+    "src/utils",
+    "src/data/ordo",
+    "src/constants/officeFields.js",
+    "scripts/ordo",
+    "scripts/content",
+    "scripts/liturgy/build-reading-references.mjs",
+    "scripts/liturgy/lib/snapshot-content.mjs",
+    "public/documents/proper-calendar.pdf",
+    "docs/audits/belarus-own-calendar-2026/approved-evidence/reference-2026-11-06.json"
+  ],
+  "changedPaths": [],
+  "status": "identical",
+  "pr217Draft": true,
+  "productionPublicationVerified": false
+}

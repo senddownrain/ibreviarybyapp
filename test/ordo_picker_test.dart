@@ -67,7 +67,7 @@ void main() {
           'grodno',
           readingsMode: readingsMode,
         ).first;
-        expect(next.date, '2028-12-06');
+        expect(next.date, '2027-12-06');
         expect(next.diocese, 'grodno');
         expect(
           pickerFeastTextDays(
@@ -77,7 +77,7 @@ void main() {
             'minsk-mohilev',
             readingsMode: readingsMode,
           ),
-          isEmpty,
+          isNotEmpty,
         );
       }
       expect(
@@ -92,7 +92,7 @@ void main() {
             .resolve('2027-12-06', diocese: 'grodno')
             .options
             .any((o) => o.id == 'sv-nicholas'),
-        isFalse,
+        isTrue,
       );
     });
 
@@ -211,16 +211,16 @@ void main() {
         final grodno = next.singleWhere((f) => f.dioceses.contains('grodno'));
         expect(minsk.hoursAllowed, isTrue);
         expect(minsk.readingsAllowed, isTrue);
-        expect(grodno.hoursAllowed, isFalse);
-        expect(grodno.readingsAllowed, isFalse);
-        expect(grodno.badges, ['Гродна']);
+        expect(grodno.hoursAllowed, isTrue);
+        expect(grodno.readingsAllowed, isTrue);
+        expect(grodno.badges, isEmpty);
         // Search never adds legal alternatives or colours to the engine.
         expect(
           engine
               .resolve('2027-12-06', diocese: 'grodno')
               .options
               .any((o) => o.id == 'sv-nicholas'),
-          isFalse,
+          isTrue,
         );
       },
     );
@@ -445,14 +445,17 @@ void main() {
       }
     }
 
-    test('a year override moves a diocesan celebration (Grodno 2027)', () {
-      final grodno = pickerFeastsOfYear(engine, 2027, ['grodno']);
-      final dedication = grodno.firstWhere(
-        (f) => f.id == 'grodno-cathedral-dedication',
-      );
-      expect(dedication.date, '2027-12-06');
-      expect(dedication.option.movedFrom, '2027-12-04');
-    });
+    test(
+      'disabled manual move keeps Grodno dedication on its approved fixed date',
+      () {
+        final grodno = pickerFeastsOfYear(engine, 2027, ['grodno']);
+        final dedication = grodno.firstWhere(
+          (f) => f.id == 'grodno-cathedral-dedication',
+        );
+        expect(dedication.date, '2027-12-04');
+        expect(dedication.option.movedFrom, isNull);
+      },
+    );
   });
 
   group('«Перыяды»: exact dates by the engine', () {

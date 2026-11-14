@@ -1,0 +1,19 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/analytics/staging_http_test.dart
+00:00 +0: gate (compile-time flags + URL) both flags and a valid URL are required
+00:00 +1: gate (compile-time flags + URL) normal test run has the gate closed and no URL baked in
+00:00 +2: gate (compile-time flags + URL) URL parsing: https or loopback http only, path fixed
+00:00 +3: HttpStagingTransport one POST with the contract body and nothing identifying
+00:00 +4: HttpStagingTransport non-204 is returned as is and never retried
+00:00 +5: HttpStagingTransport oversized packet is not sent at all
+00:00 +6: HttpStagingTransport unreachable server: exception, no retry
+00:00 +7: HttpStagingTransport redirects are not followed
+00:00 +8: StagingSender (at-most-once, kill switch) 204 counts as sent; other statuses and errors as lost, no retry
+00:00 +9: StagingSender (at-most-once, kill switch) 503 halts: the rest of the batch and later batches are not sent
+00:00 +10: StagingSender (at-most-once, kill switch) 426 also halts
+00:00 +11: collector.drainPackets removes what it returns (so it can never be sent twice)
+00:00 +12: collector.drainPackets days older than 2 are dropped, not returned
+00:00 +13: no flags -> no network channel LocalAnalytics gate constant is closed without both flags
+00:00 +14: no flags -> no network channel lib: only staging_http.dart touches dart:io network; guarded
+00:00 +15: no flags -> no network channel pubspec: no new packages, manifests: no new permissions
+00:00 +16: R02 server end-to-end 204 / 400 / kill-switch against the real Worker code
+00:01 +17: All tests passed!

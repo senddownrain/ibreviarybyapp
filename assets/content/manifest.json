@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1794092262000,
-  "contentDate": "2026-11-07T22:57:42.000Z",
+  "contentVersion": 1794176180000,
+  "contentDate": "2026-11-08T22:16:20.000Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -50,39 +50,39 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
       "count": 1,
-      "digest": "71ad58d830bd0d77",
-      "storedBytes": 139,
-      "bundleBytes": 205
+      "digest": "50c0b92f2b345128",
+      "storedBytes": 273,
+      "bundleBytes": 297
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
-      "count": 241,
-      "digest": "8fb0b75436b7f528",
-      "storedBytes": 132977,
-      "bundleBytes": 22601
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 242,
+      "digest": "b1ec5380202bf506",
+      "storedBytes": 127232,
+      "bundleBytes": 22683
     },
     "liturgicalDioceseOverrides": {
       "file": "liturgicalDioceseOverrides.json.gz",
-      "contentVersion": 1793950365664,
-      "contentDate": "2026-11-06T07:32:45.664Z",
-      "count": 75,
-      "digest": "d5f7d42724c985cb",
-      "storedBytes": 53185,
-      "bundleBytes": 7750
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 77,
+      "digest": "5e20e47ab78d3552",
+      "storedBytes": 53823,
+      "bundleBytes": 7996
     },
     "liturgicalYearOverrides": {
       "file": "liturgicalYearOverrides.json.gz",
-      "contentVersion": 1791877243449,
-      "contentDate": "2026-10-13T07:40:43.449Z",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
       "count": 15,
-      "digest": "62198d0893b2a40f",
-      "storedBytes": 8111,
-      "bundleBytes": 1728
+      "digest": "679696243c3aa1c2",
+      "storedBytes": 8391,
+      "bundleBytes": 1772
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",

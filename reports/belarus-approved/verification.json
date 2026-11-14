@@ -1,0 +1,116 @@
+{
+  "status": "DRAFT_NOT_READY_FOR_RELEASE",
+  "testedRuntimeCommit": "37d38290d0b828335f4d8f1645bdad5a0ead656c",
+  "reviewedMainCommit": "1a628b9197d481c0495cb944d4ce127357fa3a54",
+  "inventory": {
+    "rows": 262,
+    "assignments": 959,
+    "mismatches": 0
+  },
+  "ordo": {
+    "dates": 16068,
+    "mismatches": 0,
+    "fieldsCompared": 18
+  },
+  "readingReferences": {
+    "dates": 16068,
+    "mismatches": 0
+  },
+  "hours": {
+    "heads": {
+      "web": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+      "flutter": "37d38290d0b828335f4d8f1645bdad5a0ead656c",
+      "flutterSdk": "3.41.4"
+    },
+    "daysCompared": 16068,
+    "assembliesCompared": 37508,
+    "structureMismatches": 70,
+    "officeTextMismatches": 44
+  },
+  "readingsScreen": {
+    "heads": {
+      "web": "7a5fb196c129814d1be436d57cbce368eafb91fd",
+      "flutter": "27f0b899a7e1b55f31bb6425579a5173b4300501",
+      "flutterSdk": "3.41.4"
+    },
+    "dates": 16068,
+    "options": 20700,
+    "sets": 2340,
+    "sections": 155486,
+    "mismatches": 38,
+    "byKind": {
+      "route-day-id": 38
+    },
+    "documentedDifferences": 0,
+    "webDayIdRouteDiffersFromOptionRoute": 958
+  },
+  "fullSuite": {
+    "passed": 1950,
+    "skipped": 9,
+    "failed": 3,
+    "twoHighPriestFailuresResolvedAndRetested": true,
+    "residualDiscoveryHintReproducedOnBaseline": "729f17a",
+    "note": "Raw full run predates the final removal of a temporary High Priest text overlay; final focused rerun is recorded separately."
+  },
+  "targetedAfterMain": {
+    "passed": 47
+  },
+  "preservedProperAndAdvent": {
+    "passed": 14
+  },
+  "navigationEveningOffice": {
+    "passed": 51
+  },
+  "additionalOptIn": {
+    "localAnalyticsPassed": 8,
+    "localAnalyticsInverseFlagSkippedAlreadyCoveredInFullSuite": 1,
+    "loopbackWorkerHttpPassed": 17
+  },
+  "webOrdo": {
+    "passed": 220,
+    "skipped": 8,
+    "failed": 0
+  },
+  "format": {
+    "files": 28,
+    "changed": 0
+  },
+  "analyze": {
+    "strictExit": 1,
+    "noFatalInfosExit": 0,
+    "errors": 0,
+    "warnings": 0,
+    "infos": 29
+  },
+  "chrome": {
+    "states": 36,
+    "distinctPngs": 34,
+    "errors": 0,
+    "externalRequests": 0,
+    "nativeAndroid": false
+  },
+  "installedUpgrade": {
+    "hiveSimulation": "PASS",
+    "signedAndroidInstall": "BLOCKED_NO_SDK_DEVICE_OR_AVD"
+  },
+  "productionFirestoreVerified": false,
+  "liveFirestoreWrites": false,
+  "storeReleasePerformed": false,
+  "logs": {
+    "analytics-http-r02-local.log": "edb86187256254f43b73113969abab6ff4841302f9b4afb58ed9b4cc698fd45a",
+    "analytics-local.log": "e0396d1e05e520661dead131372a82718ca2f299a284f9b58e363c663af91369",
+    "android-smoke.log": "90963e9d46258b8caa08ea5bea518d153cb06095e271594c712a0f147fd0dba4",
+    "baseline-discovery-failure.log": "7f82e7b62a659578452a61a028c478019bac6f2ddf297baac71c0c18f8852d30",
+    "flutter-analyze-no-fatal-infos.log": "686a655b40ab9daf4902ab8d03b9d60ef60abcd2fff99686a3a36ad41d3168b3",
+    "flutter-analyze.log": "1b085632fdd3f340aa34286b3b6ce3ce8ca908de01def6dfa903f3087f6299b1",
+    "flutter-doctor.log": "1230e20298d18d86e08972238d21eafb50378b1ddd03963aa5f8d7c4743457c3",
+    "flutter-full.log": "f76437d5b34a4faeba7e1da465ba9c41255c856c0e5383b603fdce34e3aaab64",
+    "flutter-hours-final.log": "1937e61472a4ea7947bc7af9b5a08ac6e3c696b9aa53ee6b0e4f1544c6555de5",
+    "flutter-parity.log": "c419ef9d70b5292900adbbbd73b2f5fdc2a3bd3dee6ccaa3c9b5648118a33425",
+    "navigation-evening-office.log": "d54eefa4433a7052f6d0fd9858862493b84a895006acaaf00bf94cce52e28352",
+    "parity-summary.log": "434a829a550e4007c0cf7ee691222f7cd13576fd5c70dcd1f5ba184865442ef1",
+    "preserved-proper-final.log": "2ee53e9143302eb48ed2cc8134915504eff7bba916f7415103e4200126db399e",
+    "targeted-after-main.log": "70b7d676d4dcbf452a67682612873f826486c29c2717297a2c77c619f7964524",
+    "web-ordo.log": "953d550331f873bc70e336f0fd0d5603e4a28335557f039aa78ffaa0a8990988"
+  }
+}

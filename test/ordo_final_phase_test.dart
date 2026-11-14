@@ -35,60 +35,39 @@ OrdoEngine _engineWith({
 void main() {
   final engine = bundledOrdoEngine();
 
-  group('memorial choices (§11.2–11.3)', () {
-    test('13.06.2026: Immaculate Heart + St Anthony — two memorial choices, '
-        'Marian first, no weekday, nothing demoted', () {
+  group('approved general memorial collision norms', () {
+    test('13.06.2026: weekday primary and two optional memorials', () {
       for (final diocese in _dioceses) {
         final day = engine.resolve('2026-06-13', diocese: diocese);
-        expect(day.primary.id, 'immaculate-heart', reason: diocese);
-        expect(day.primary.rankKind, 'memorial');
-        expect(day.alternatives.map((o) => o.id), ['sv-anthony-padua']);
-        expect(day.alternatives.single.rankKind, 'memorial');
-        expect(day.options.any((o) => o.demotedFrom != null), isFalse);
-        expect(day.options.any((o) => o.isTemporal), isFalse);
+        expect(day.primary.isTemporal, isTrue);
+        expect(day.alternatives.map((o) => o.id), [
+          'immaculate-heart',
+          'sv-anthony-padua',
+        ]);
         expect(
-          day.suppressed.where((o) => o.isTemporal).map((o) => o.reason).single,
-          'weekday-under-memorial',
+          day.alternatives.every((o) => o.rankKind == 'optional-memorial'),
+          isTrue,
         );
         expect(
           day.appliedRules.map((r) => r['rule']),
-          containsAll([
-            'concurrent-obligatory-memorials-legal-choice',
-            'concurrent-obligatory-memorials-choice',
-          ]),
+          contains('immaculate-heart-both-optional'),
         );
         expect(day.officeOptions.map((o) => o.id), [
+          day.primary.id,
           'immaculate-heart',
           'sv-anthony-padua',
         ]);
       }
     });
-
-    test('the legacy value both-optional means legal-choice', () {
-      final engine = OrdoEngine(
-        OrdoDefinitions.fromDocuments(
-          celebrations: [
-            for (final item in bundledCollection(
-              'liturgicalCelebrations',
-            ).values)
-              if (item['id'] == 'immaculate-heart')
-                {
-                  ...item,
-                  'rules': {'concurrentObligatoryMemorials': 'both-optional'},
-                }
-              else
-                item,
-          ],
-          dioceseOverrides: bundledCollection(
-            'liturgicalDioceseOverrides',
-          ).values,
-          yearOverrides: bundledCollection('liturgicalYearOverrides').values,
-        ),
-      );
-      final day = engine.resolve('2026-06-13');
-      expect(day.primary.id, 'immaculate-heart');
-      expect(day.alternatives.map((o) => o.id), ['sv-anthony-padua']);
-    });
+    test(
+      'legacy product-rule metadata cannot override the approved general norm',
+      () {
+        final day = engine.resolve('2028-06-05');
+        expect(day.primary.id, 'mary-mother-church');
+        expect(day.alternatives, isEmpty);
+        expect(day.suppressed.map((o) => o.id), contains('sv-boniface'));
+      },
+    );
   });
 
   group('All Souls on a Sunday (§11.1)', () {
@@ -153,39 +132,34 @@ void main() {
     });
   });
 
-  test('Christ the High Priest + another feast: both options, the '
-      'alternative provisional (§11.4)', () {
-    final engine = _engineWith(
-      extra: [
-        {
-          'id': 'test-feast-2026',
-          'year': 2026,
-          'scope': 'belarus',
-          'action': 'add',
-          'to': '2026-05-28',
-          'celebration': {
-            'id': 'test-feast',
-            'title': 'Тэставае свята',
-            'rank': 'festum',
-            'category': 'saint',
-            'color': 'ruber',
+  test(
+    'Christ the High Priest + another feast follows the precedence table',
+    () {
+      final engine = _engineWith(
+        extra: [
+          {
+            'id': 'test-feast-2026',
+            'year': 2026,
+            'scope': 'belarus',
+            'action': 'add',
+            'to': '2026-05-28',
+            'celebration': {
+              'id': 'test-feast',
+              'title': 'Тэставае свята',
+              'rank': 'festum',
+              'category': 'saint',
+              'color': 'ruber',
+            },
           },
-        },
-      ],
-    );
-    final day = engine.resolve('2026-05-28');
-    expect(day.primary.id, 'christ-the-high-priest');
-    expect(day.primary.provisional, isFalse);
-    expect(day.alternatives.map((o) => o.id), ['test-feast']);
-    expect(day.alternatives.single.provisional, isTrue);
-    expect(
-      day.appliedRules.firstWhere(
-        (r) => r['rule'] == 'christ-high-priest-collision-both-options',
-      )['status'],
-      'provisional',
-    );
-    expect(day.suppressed.any((o) => o.id == 'test-feast'), isFalse);
-  });
+        ],
+      );
+      final day = engine.resolve('2026-05-28');
+      expect(day.primary.id, 'christ-the-high-priest');
+      expect(day.primary.provisional, isFalse);
+      expect(day.alternatives, isEmpty);
+      expect(day.suppressed.any((o) => o.id == 'test-feast'), isTrue);
+    },
+  );
 
   group('transfers and Year Overrides (§12)', () {
     test('legacy from/to and free-text source are normalized', () {
@@ -373,36 +347,45 @@ void main() {
         unconfirmedDiocesanSolemnity({'id': 'x', 'layer': 'belarus'}),
         isFalse,
       );
-      // St Dismas raised to a solemnity on Good Friday 2027 (Pinsk): no
-      // calendar confirms the rank, so it is impeded without transfer.
+      // A synthetic local solemnity without source rank evidence on Good Friday
+      // remains impeded. Dismas is no longer a general diocesan assignment.
       final engine = _engineWith(
         extra: [
           {
-            'id': 'test-dismas-rank',
+            'id': 'test-unconfirmed-solemnity',
             'year': 2027,
             'scope': 'diocese',
             'dioceseId': 'pinsk',
-            'targetCelebrationId': 'sv-dismas',
-            'action': 'changeRank',
-            'rank': 'solemnitas',
+            'action': 'add',
+            'to': '2027-03-26',
+            'celebration': {
+              'id': 'unconfirmed-saint',
+              'title': 'Unconfirmed local rank',
+              'rank': 'solemnitas',
+              'category': 'saint',
+              'layer': 'diocese',
+              'dioceseId': 'pinsk',
+            },
           },
         ],
       );
       final day = engine.resolve('2027-03-26', diocese: 'pinsk');
-      final dismas = day.suppressed.firstWhere((o) => o.id == 'sv-dismas');
+      final dismas = day.suppressed.firstWhere(
+        (o) => o.id == 'unconfirmed-saint',
+      );
       expect(dismas.reason, 'impeded-without-transfer');
       expect(dismas.transferBlocked, 'rank-not-source-confirmed');
       expect(
         engine.plan(2027, 'pinsk').transfers.map((t) => t.celebrationId),
-        isNot(contains('sv-dismas')),
+        isNot(contains('unconfirmed-saint')),
       );
       // Bobola (confirmed) is transferred in 2027 (16.05 = Pentecost).
       final bobola = engine
           .plan(2027, 'pinsk')
           .transfers
           .firstWhere((t) => t.celebrationId == 'sv-andrei-bobola');
-      expect(bobola.to, '2027-05-18');
-      expect(bobola.computedDate, '2027-05-18');
+      expect(bobola.to, '2027-05-17');
+      expect(bobola.computedDate, '2027-05-17');
     });
   });
 

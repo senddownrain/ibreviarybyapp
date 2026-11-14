@@ -1,0 +1,33 @@
+Analyzing ibreviarybyapp...                                     
+
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:98:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:99:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:100:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:101:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:102:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:103:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:174:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:175:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:176:5 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/feedback/feedback_models.dart:177:5 • use_null_aware_elements
+   info • Statements in an if should be enclosed in a block • lib/feedback/feedback_models.dart:277:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/feedback/feedback_service.dart:68:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/feedback/feedback_service.dart:97:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/feedback/feedback_service.dart:99:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/feedback/feedback_service.dart:101:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/screens/feedback_screen.dart:62:11 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:17:5 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:25:5 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:46:5 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:62:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:67:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/utils/pastors_hymn.dart:124:5 • curly_braces_in_flow_control_structures
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:149:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:151:13 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:153:13 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/utils/pastors_hymn.dart:160:10 • prefer_interpolation_to_compose_strings
+   info • Use an initializing formal to assign a parameter to a field • test/analytics/consent_mock_test.dart:45:8 • prefer_initializing_formals
+   info • The import of 'package:mybrev_flutter/widgets/app_overflow_menu.dart' is unnecessary because all of the used elements are also provided by the import of 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart' • test/reader_ui_acceptance_visual_test.dart:17:8 • unnecessary_import
+   info • Unnecessary use of string interpolation • test/reading_choices_test.dart:58:11 • unnecessary_string_interpolations
+
+29 issues found. (ran in 9.7s)
