@@ -19,7 +19,12 @@ final _referenceFields = {
     for (final s in ['Hymn', 'Ps1', 'Ps2', 'Ps3']) 'sext$h$s',
 };
 String _text(Object? html) => parseFragment(
-  html?.toString() ?? '',
+  // Keep paragraph/line boundaries when comparing historical Web HTML
+  // with the exact approved PR255 strings (their SHA checks are separate).
+  (html?.toString() ?? '').replaceAll(
+    RegExp(r'<(?:br\s*/?|/?p)(?:\s[^>]*)?>', caseSensitive: false),
+    ' ',
+  ),
 ).text!.replaceAll(RegExp(r'\s+'), ' ').trim();
 
 class _PatchRemote implements ContentRemote {

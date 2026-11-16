@@ -1,7 +1,7 @@
 {
   "mode": "OFFLINE REVIEW ONLY — NOT PUBLISHED",
   "input": "shipped-bundle; live IDs and hashes must be verified before writing",
-  "webCommit": "ee369ef2402da99148de88b92e2c48496b709c9e",
+  "webCommit": "c35dbad33b3f56ff6176fff3120c5f39dce75242",
   "sourcePath": "src/data/liturgical/christ-high-priest-daytime-by.json",
   "sourceSha256": "a210e791f69642e1f4b9d8291f8e11cb69f2c0313f55215f2ab8e286c0dbb8fc",
   "strategy": "Only missing daytime hymn/psalm references. Preserve all Proper fields and full Lauds conclusions byte-for-byte; refuse unexpected source data.",
@@ -9,8 +9,8 @@
   "updates": [
     {
       "id": "feast-christthehighpriest",
-      "preconditionHash": "c62263e79af628b2",
-      "resultHash": "82cc1163da5f1e12",
+      "preconditionHash": "702d908c1157bb74",
+      "resultHash": "a30440a58a95f9a3",
       "set": {
         "sext1Hymn": "from-day",
         "sext1Ps1": "from-day",
@@ -56,7 +56,7 @@
         "sext3Ps2",
         "sext3Ps3"
       ],
-      "storedBytes": 53042
+      "storedBytes": 53960
     }
   ],
   "publication": "After explicit approval: compare live IDs/preconditions, field-only transaction update; content:manifest dry-run must say SAFE CONTENT PATCH before separate publication approval."

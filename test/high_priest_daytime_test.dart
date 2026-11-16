@@ -44,7 +44,12 @@ LiturgicalDay _period() => _day({
     for (final s in _suffixes) 'sext$h$s': 'weekday:$h:$s',
 });
 String _text(Object? html) => parseFragment(
-  html?.toString() ?? '',
+  // PR255 separates headings and replies into paragraphs. Compare the words
+  // with the historical source, retaining boundaries of both p and br.
+  (html?.toString() ?? '').replaceAll(
+    RegExp(r'<(?:br\s*/?|/?p)(?:\s[^>]*)?>', caseSensitive: false),
+    ' ',
+  ),
 ).text!.replaceAll(RegExp(r'\s+'), ' ').trim();
 
 class _Remote implements ContentRemote {
@@ -302,7 +307,7 @@ void main() {
       final raw = Map<String, dynamic>.from(
         HiveService.daysBox.get(_id) as Map,
       );
-      expect(documentHash(raw), 'c62263e79af628b2');
+      expect(documentHash(raw), '702d908c1157bb74');
       expect(HiveService.daysBox.overlayLength, 0);
       final period = resolvePeriodDayAgainstPsalter(
         _day(
