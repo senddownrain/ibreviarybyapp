@@ -88,7 +88,7 @@ jobs:
       - name: Daily Hours and Readings heading regressions
         run: >-
           flutter test test/liturgical_day_header_metadata_test.dart
-          test/hours_root_test.dart
+          test/hours_root_test.dart test/christ_king_genitive_test.dart
       - name: Josaphat alternatives deduplicate dioceses
         run: >-
           flutter test test/liturgical_header_flow_test.dart
