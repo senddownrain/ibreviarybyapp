@@ -407,11 +407,18 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
 
     if (!isMass) {
       if (office != null) {
-        return DevotionalOfficeReader(
-          key: ValueKey('devotional-office-${prayer.id}'),
-          document: office,
-          textStyle: textStyle,
-          onLinkTap: _onLinkTap,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DevotionalOfficeReader(
+              key: ValueKey('devotional-office-${prayer.id}'),
+              document: office,
+              textStyle: textStyle,
+              onLinkTap: _onLinkTap,
+            ),
+            PrayerSourceNote(source: prayer.source, textStyle: textStyle),
+          ],
         );
       }
       return PrayerContent(

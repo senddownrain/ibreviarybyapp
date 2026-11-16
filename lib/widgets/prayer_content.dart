@@ -33,10 +33,18 @@ class PrayerContent extends ConsumerWidget {
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
-    final content = Html(
+    final body = Html(
       data: html,
       style: prayerDocumentStyles(context, textStyle, textAlignment: alignment),
       onLinkTap: onLinkTap,
+    );
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        body,
+        PrayerSourceNote(source: prayer.source, textStyle: textStyle),
+      ],
     );
     return wrapInSelectionArea ? SelectionArea(child: content) : content;
   }
@@ -117,4 +125,27 @@ Map<String, Style> prayerDocumentStyles(
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
     '.liturgical-rubric-inline': Style(color: reader.rubric),
   };
+}
+
+/// Displays the server's canonical value; the shared registry lives in MyBrev /sources.
+class PrayerSourceNote extends StatelessWidget {
+  const PrayerSourceNote({super.key, this.source, required this.textStyle});
+  final String? source;
+  final TextStyle textStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    if (source == null || source!.trim().isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Text(
+        'Крыніца: ${source!.trim()}',
+        key: const Key('prayer-source'),
+        style: textStyle.copyWith(
+          fontSize: (textStyle.fontSize ?? 16) * 0.8,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
 }
