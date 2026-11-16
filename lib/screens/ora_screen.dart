@@ -1945,7 +1945,6 @@ class _HtmlOrText extends ConsumerWidget {
     final textColor =
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
-    final baseSize = textStyle.fontSize ?? 16;
     final paragraphSpacing = alternativeKind == 'hymn'
         ? LiturgicalSpacing.hymnStropheAfter
         : alternativeKind == 'psalm-antiphon' ||
@@ -2006,22 +2005,7 @@ class _HtmlOrText extends ConsumerWidget {
             officeReading: alternativeKind == 'office-reading',
           )
         : html;
-    if (alternativeKind == 'reading') {
-      final header = extractShortReadingHeader(officeHtml);
-      if (header != null) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            LiturgicalHeadingReferenceRow(
-              title: header.title,
-              reference: header.reference,
-              bodySize: baseSize,
-            ),
-            _renderOfficeHtml(header.bodyHtml, styles),
-          ],
-        );
-      }
-    }
+
     final isAntiphon =
         alternativeKind == 'psalm-antiphon' ||
         alternativeKind == 'gospel-antiphon';
@@ -2041,17 +2025,54 @@ class _HtmlOrText extends ConsumerWidget {
   Widget _renderOfficeHtml(String html, Map<String, Style> styles) {
     final formatted = formatLiturgicalHtml(html);
     final root = parseFragment(formatted);
-    final parts = <({bool turns, String html})>[];
+    final parts =
+        <({bool turns, String html, String? title, String? reference})>[];
     var buffer = StringBuffer();
     bool? turnGroup;
     void flush() {
       if (turnGroup != null && buffer.toString().trim().isNotEmpty) {
-        parts.add((turns: turnGroup, html: buffer.toString()));
+        parts.add((
+          turns: turnGroup,
+          html: buffer.toString(),
+          title: null,
+          reference: null,
+        ));
       }
       buffer = StringBuffer();
     }
 
-    for (final node in root.nodes) {
+    final nodes = root.nodes;
+    for (var i = 0; i < nodes.length; i++) {
+      final node = nodes[i];
+      if (node is dom.Element &&
+          node.classes.contains('liturgical-heading') &&
+          const {
+            'КАРОТКАЕ ЧЫТАННЕ',
+            'КАРОТКІ РЭСПАНСОРЫЙ',
+            'РЭСПАНСОРЫЙ',
+          }.contains(node.text.trim().toUpperCase())) {
+        flush();
+        turnGroup = null;
+        final next = node.nextElementSibling;
+        final reference =
+            next != null &&
+                next.classes.contains('liturgical-reference') &&
+                nodes
+                    .sublist(i + 1, nodes.indexOf(next))
+                    .every(
+                      (node) => node is dom.Text && node.text.trim().isEmpty,
+                    )
+            ? next
+            : null;
+        parts.add((
+          turns: false,
+          html: '',
+          title: node.text,
+          reference: reference?.text,
+        ));
+        if (reference != null) i = nodes.indexOf(reference);
+        continue;
+      }
       final isTurn =
           node is dom.Element && node.classes.contains('responsory-turn');
       if (node is dom.Text && node.text.trim().isEmpty) {
@@ -2063,16 +2084,28 @@ class _HtmlOrText extends ConsumerWidget {
       buffer.write(node is dom.Element ? node.outerHtml : node.text);
     }
     flush();
-    if (!parts.any((part) => part.turns)) {
+    if (!parts.any((part) => part.turns || part.title != null)) {
       return Html(data: formatted, style: styles);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (final part in parts)
-          part.turns
-              ? LiturgicalResponsoryBlock(html: part.html, style: styles)
-              : Html(data: part.html, style: styles),
+          if (part.title != null && part.reference == null)
+            LiturgicalSectionHeading(
+              title: part.title!,
+              bodySize: styles['body']?.fontSize?.value ?? 16,
+            )
+          else if (part.title != null)
+            LiturgicalHeadingReferenceRow(
+              title: part.title!,
+              reference: part.reference,
+              bodySize: styles['body']?.fontSize?.value ?? 16,
+            )
+          else
+            part.turns
+                ? LiturgicalResponsoryBlock(html: part.html, style: styles)
+                : Html(data: part.html, style: styles),
       ],
     );
   }
