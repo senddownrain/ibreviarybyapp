@@ -64,6 +64,13 @@ String readingCelebrationKey(ParsedReading reading) {
 }
 
 String _groupLabel(List<ParsedReading> documents) {
+  // Keep display names canonical even when the bundled lectionary has an
+  // older nominative title; retain the document contents unchanged.
+  if (documents.any((reading) =>
+      reading.feast == 'feast-christking' ||
+      reading.ordoOptionId == 'christ-king')) {
+    return 'Пана нашага Езуса Хрыста, Валадара Сусвету';
+  }
   final withContent = documents.where(readingHasVisibleContent).toList();
   final reading = withContent.isNotEmpty ? withContent.first : documents.first;
   final title = reading.title?.trim();

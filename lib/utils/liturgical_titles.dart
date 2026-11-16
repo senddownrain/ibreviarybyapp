@@ -122,6 +122,11 @@ String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {
   if (isOfficeForDead) {
     return day.feastName ?? day.title ?? 'Афіцый за памерлых';
   }
+  if (day.feast == 'feast-christking' ||
+      day.field('_celebrationId') == 'christ-king' ||
+      day.id == 'feast-christking') {
+    return 'Пана нашага Езуса Хрыста, Валадара Сусвету';
+  }
 
   final periodTitle = formatLiturgicalPeriodTitle(
     periodType: periodType,
