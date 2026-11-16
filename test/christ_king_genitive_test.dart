@@ -41,4 +41,33 @@ void main() {
       expect(liturgicalDayDisplayTitle(day, DateTime(2026, 11, 22)), title);
     }
   });
+
+  test('old lectionary readings render canonical group labels', () {
+    final docs = [
+      const ParsedReading(
+        id: 'christ-king-a',
+        feast: 'feast-christking',
+        title: 'Езус Хрыстус, Валадар Сусвету',
+        year: 'A',
+      ),
+      const ParsedReading(
+        id: 'christ-king-b',
+        feast: 'feast-christking',
+        title: 'Езус Хрыстус, Валадар Сусвету',
+        year: 'B',
+      ),
+    ];
+    final groups = groupReadings(docs);
+    expect(groups, isNotEmpty);
+    for (final group in groups) {
+      expect(group.label, title);
+    }
+    expect(
+      groupReadings([
+        const ParsedReading(id: 'other', title: 'Іншая нядзеля'),
+      ]).single.label,
+      'Іншая нядзеля',
+    );
+  });
+
 }
