@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1794176180000,
-  "contentDate": "2026-11-08T22:16:20.000Z",
+  "contentVersion": 1794815100000,
+  "contentDate": "2026-11-16T07:45:00.000Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
+      "contentVersion": 1794815100000,
+      "contentDate": "2026-11-16T07:45:00.000Z",
       "count": 736,
-      "digest": "4d71131ab6bf2f4a",
-      "storedBytes": 54608675,
-      "bundleBytes": 2319360
+      "digest": "259c01cbdac7469d",
+      "storedBytes": 54673238,
+      "bundleBytes": 2326153
     },
     "readings": {
       "file": "readings.json.gz",
@@ -23,12 +23,12 @@
     },
     "liturgicalTemplates": {
       "file": "liturgicalTemplates.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
+      "contentVersion": 1794815100000,
+      "contentDate": "2026-11-16T07:45:00.000Z",
       "count": 16,
-      "digest": "eb5361386d552f49",
-      "storedBytes": 3022599,
-      "bundleBytes": 344031
+      "digest": "a1d498c34dd96ab8",
+      "storedBytes": 3028066,
+      "bundleBytes": 324576
     },
     "invitatoriums": {
       "file": "invitatoriums.json.gz",
@@ -86,12 +86,12 @@
     },
     "liturgicalProperTexts": {
       "file": "liturgicalProperTexts.json.gz",
-      "contentVersion": 1794092262000,
-      "contentDate": "2026-11-07T22:57:42.000Z",
+      "contentVersion": 1794815100000,
+      "contentDate": "2026-11-16T07:45:00.000Z",
       "count": 291,
-      "digest": "60081a442fa9c4ed",
-      "storedBytes": 3211295,
-      "bundleBytes": 590720
+      "digest": "dccd7a25a8393a4f",
+      "storedBytes": 3271712,
+      "bundleBytes": 593316
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",
