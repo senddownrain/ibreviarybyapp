@@ -112,7 +112,9 @@ Map<String, Style> liturgicalDocumentStyles({
     '.responsory-turn': Style(
       fontSize: FontSize(size),
       lineHeight: LineHeight(ReaderTheme.responsoryHeight),
-      margin: Margins.only(bottom: LiturgicalSpacing.responsoryTurnAfter),
+      // Reset both edges: a bottom-only margin retains HTML paragraph spacing.
+      margin: Margins.zero,
+      padding: HtmlPaddings.zero,
     ),
     '.intercessions__intro': Style(
       margin: Margins.only(bottom: LiturgicalSpacing.intercessionIntroAfter),

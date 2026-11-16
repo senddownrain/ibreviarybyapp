@@ -124,42 +124,95 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
     r'^(КАРОТКАЕ\s+ЧЫТАННЕ|КАРОТКІ\s+РЭСПАНСОРЫЙ|РЭСПАНСОРЫЙ)(?:\s+(.+))?$',
     caseSensitive: false,
   );
-  for (final paragraph in fragment.querySelectorAll('p').toList()) {
-    final parts = paragraph.innerHtml.split(
-      RegExp(r'<br\s*/?>', caseSensitive: false),
-    );
-    final firstLine =
-        parseFragment(
-          parts.first,
-        ).text?.replaceAll(RegExp(r'\s+'), ' ').trim() ??
-        '';
-    final match = heading.firstMatch(
-      firstLine.replaceAllMapped(RegExp(r'\s+([,.;:])'), (m) => m.group(1)!),
-    );
-    if (match == null) continue;
-    final title = switch (match
-        .group(1)!
-        .toUpperCase()
-        .replaceAll(RegExp(r'\s+'), ' ')) {
-      'КАРОТКАЕ ЧЫТАННЕ' => 'Кароткае чытанне',
-      'КАРОТКІ РЭСПАНСОРЫЙ' => 'Кароткі рэспансорый',
-      _ => 'Рэспансорый',
-    };
-    final titleNode = dom.Element.tag('p')
-      ..classes.add('liturgical-heading')
-      ..text = title;
-    paragraph.parentNode!.insertBefore(titleNode, paragraph);
-    final reference = match.group(2)?.trim();
-    if (reference != null && reference.isNotEmpty) {
-      final referenceNode = dom.Element.tag('p')
-        ..classes.add('liturgical-reference')
-        ..text = reference;
-      paragraph.parentNode!.insertBefore(referenceNode, paragraph);
+  const blocks = 'p, div, h1, h2, h3, h4, h5, h6';
+  if (fragment.querySelector(blocks) == null && fragment.nodes.isNotEmpty) {
+    final paragraph = dom.Element.tag('p');
+    paragraph.nodes.addAll(fragment.nodes.toList());
+    fragment.nodes.add(paragraph);
+  }
+  for (final paragraph in fragment.querySelectorAll(blocks).toList()) {
+    if (paragraph.querySelector(blocks) != null) continue;
+    final plain = _textWithBreaks(paragraph);
+    var cursor = 0;
+    var lineStart = 0;
+    var foundHeading = false;
+    void insertBody(int end) {
+      var start = cursor;
+      while (start < end && plain[start].trim().isEmpty) {
+        start++;
+      }
+      while (end > start && plain[end - 1].trim().isEmpty) {
+        end--;
+      }
+      if (start == end) return;
+      final body = dom.Element.tag('p')
+        ..attributes.addAll(paragraph.attributes);
+      body.nodes.addAll(_copyTextRange(paragraph, start, end));
+      paragraph.parentNode!.insertBefore(body, paragraph);
     }
-    if (parts.length == 1) {
+
+    // A responsory may start after the reading in the SAME source paragraph.
+    // Match whole displayed lines; retain the surrounding inline body markup.
+    for (final line in plain.split('\n')) {
+      final match = heading.firstMatch(
+        line
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim()
+            .replaceAllMapped(RegExp(r'\s+([,.;:])'), (m) => m.group(1)!),
+      );
+      if (match != null) {
+        insertBody(lineStart);
+        final title = switch (match.group(1)!.toUpperCase()) {
+          'КАРОТКАЕ ЧЫТАННЕ' => 'Кароткае чытанне',
+          'КАРОТКІ РЭСПАНСОРЫЙ' => 'Кароткі рэспансорый',
+          _ => 'Рэспансорый',
+        };
+        final titleNode = dom.Element.tag('p')
+          ..classes.add('liturgical-heading')
+          ..text = title;
+        paragraph.parentNode!.insertBefore(titleNode, paragraph);
+        final reference = match.group(2)?.trim();
+        if (reference != null && reference.isNotEmpty) {
+          final referenceNode = dom.Element.tag('p')
+            ..classes.add('liturgical-reference')
+            ..text = reference;
+          paragraph.parentNode!.insertBefore(referenceNode, paragraph);
+        }
+        cursor = lineStart + line.length + 1;
+        foundHeading = true;
+      }
+      lineStart += line.length + 1;
+    }
+    if (foundHeading) {
+      cursor = cursor.clamp(0, plain.length);
+      insertBody(plain.length);
       paragraph.remove();
+    }
+  }
+
+  // Some imports put the reference on its own line/paragraph after the title.
+  final bibleReference = RegExp(
+    r'^(?:пар\.\s*)?(?:[1-3]\s*)?[\p{L}]+(?:\s+[\p{L}]+)?\s+\d+\s*[,.:][\d\p{L}\s,;.:–—()\-]*$',
+    unicode: true,
+    caseSensitive: false,
+  );
+  for (final title in fragment.querySelectorAll('.liturgical-heading')) {
+    final next = title.nextElementSibling;
+    if (next == null || next.classes.contains('liturgical-reference')) continue;
+    final plain = _textWithBreaks(next);
+    final firstLine = plain.split('\n').first.trim();
+    if (!bibleReference.hasMatch(firstLine)) continue;
+    final reference = dom.Element.tag('p')
+      ..classes.add('liturgical-reference')
+      ..text = firstLine;
+    next.parentNode!.insertBefore(reference, next);
+    final start = plain.indexOf('\n');
+    if (start < 0) {
+      next.remove();
     } else {
-      paragraph.innerHtml = parts.skip(1).join('<br>');
+      final body = _copyTextRange(next, start + 1, plain.length);
+      next.nodes.clear();
+      next.nodes.addAll(body);
     }
   }
 
@@ -173,7 +226,16 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
     }
     final plain = _textWithBreaks(paragraph).replaceAll('\u00a0', ' ');
     final matches = speaker.allMatches(plain).toList();
-    if (matches.isEmpty) continue;
+    if (matches.isEmpty) {
+      if (plain.trimLeft().startsWith('*') &&
+          paragraph.previousElementSibling?.classes.contains(
+                'responsory-turn',
+              ) ==
+              true) {
+        paragraph.classes.add('responsory-turn');
+      }
+      continue;
+    }
     if (matches.first.start > 0 &&
         plain.substring(0, matches.first.start).trim().isNotEmpty) {
       final prefix = dom.Element.tag('p');
@@ -197,6 +259,20 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
       paragraph.parentNode!.insertBefore(node, paragraph);
     }
     paragraph.remove();
+  }
+
+  // Empty legacy paragraphs between turns are separators, not spoken lines.
+  for (final paragraph in fragment.querySelectorAll('p').toList()) {
+    if (paragraph.text.trim().isNotEmpty) continue;
+    var next = paragraph.nextElementSibling;
+    while (next?.localName == 'p' && next!.text.trim().isEmpty) {
+      next = next.nextElementSibling;
+    }
+    if (paragraph.previousElementSibling?.classes.contains('responsory-turn') ==
+            true &&
+        next?.classes.contains('responsory-turn') == true) {
+      paragraph.remove();
+    }
   }
 
   if (officeReading) {
@@ -613,7 +689,10 @@ String _markLeadingMetadata(
     // Explicit document roles own their typography. In particular, opening
     // rubrics must not be reclassified as smaller leading metadata merely
     // because all of their source text is red or emphasized.
-    if (_hasClass(attributes, 'liturgical-rubric') ||
+    if (_hasClass(attributes, 'liturgical-heading') ||
+        _hasClass(attributes, 'liturgical-reference') ||
+        _hasClass(attributes, 'responsory-turn') ||
+        _hasClass(attributes, 'liturgical-rubric') ||
         _hasClass(attributes, 'office-reading-pericope-title')) {
       return match.group(0)!;
     }

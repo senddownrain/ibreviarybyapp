@@ -130,6 +130,9 @@ jobs:
           path: build/liturgy_smoke/2026-11-08-benedictus-year-a-*.png
           if-no-files-found: warn
 
+      - name: Office headings and compact responsory layout
+        run: flutter test test/office_responsory_formatting_test.dart test/liturgical_visual_contract_test.dart
+
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression
