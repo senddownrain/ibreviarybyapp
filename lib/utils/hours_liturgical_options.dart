@@ -127,6 +127,12 @@ String completoriumRecordIdForDay(LiturgicalDay? day) {
   final period = (day.periodType ?? day.field('_periodType') ?? '').trim();
   final weekday =
       day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 0;
+  // The Ordo chooses Sunday I/II Compline for solemnities, the Triduum,
+  // and the octave. A weekday-only fallback loses that decision.
+  final ordoDay = int.tryParse(day.field('_ordoComplineDay') ?? '');
+  if (ordoDay != null && ordoDay >= 1 && ordoDay <= 7) {
+    return completoriumId(period, ordoDay);
+  }
   return completoriumId(period, weekday, day);
 }
 
