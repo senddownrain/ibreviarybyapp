@@ -79,7 +79,8 @@ class _DevotionalOfficeReaderState
         ? section.title
         : switch (section.type) {
             'intro' => doc.profile == 'laudes' ? 'Ютрань' : 'Нешпары',
-            'canticle' => 'Песня з Евангелля',
+            'canticle' =>
+              doc.profile == 'laudes' ? 'Песня Захарыі' : 'Песня Марыі',
             'reading' => '',
             _ => section.title,
           };
@@ -192,30 +193,18 @@ class _DevotionalOfficeReaderState
       case 'heading':
       case 'readingTitle':
       case 'responseTitle':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Semantics(
-              header: true,
-              child: LiturgicalSectionHeading(
-                title: item.kind == 'readingTitle'
-                    ? 'Кароткае чытанне'
-                    : item.text,
-                bodySize: size,
-                startsSection: true,
-              ),
+        return Padding(
+          padding: const EdgeInsets.only(top: LiturgicalSpacing.sectionBefore),
+          child: Semantics(
+            header: true,
+            child: LiturgicalHeadingReferenceRow(
+              title: item.kind == 'readingTitle'
+                  ? 'Кароткае чытанне'
+                  : item.text,
+              reference: item.reference.isEmpty ? null : item.reference,
+              bodySize: size,
             ),
-            if (item.reference.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: LiturgicalSpacing.metadataToBody,
-                ),
-                child: Text(
-                  item.reference,
-                  style: reader.rubricReference(size),
-                ),
-              ),
-          ],
+          ),
         );
       case 'psalmTitle':
         return Padding(

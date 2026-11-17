@@ -18,6 +18,7 @@ void main() {
       '<p>Слова <em>чытання</em>.<br><br><span style="color:red">Рэспансорый $reference</span><br>Н. Адказ.</p>',
     ),
     ('div', '<div>Рэспансорый $reference<br>Н. Адказ.</div>'),
+    ('separate div turns', '<p>Рэспансорый $reference</p><div>Н. Адказ.</div>'),
     ('heading tag', '<h3>Рэспансорый $reference</h3><p>Н. Адказ.</p>'),
     ('inline root', '<span>Рэспансорый $reference</span><br>Н. Адказ.'),
     ('reference on next line', '<p>Рэспансорый<br>$reference<br>Н. Адказ.</p>'),

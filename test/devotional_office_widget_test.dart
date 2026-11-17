@@ -114,7 +114,7 @@ void main() {
         } else {
           expect(find.byType(ChoiceChip), findsNothing);
           expect(find.text('ГІМН'), findsNWidgets(7));
-          expect(html(tester), contains('Кантар:'));
+          expect(html(tester), contains('К.'));
         }
         if (!id.startsWith('catholicby')) {
           expect(find.byType(PsalmChoirHtml), findsNWidgets(4));

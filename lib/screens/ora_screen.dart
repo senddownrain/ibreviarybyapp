@@ -270,7 +270,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
     if (evening.isFirst) {
       final title = (evening.firstVespersTitle ?? '').trim();
-      _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+      _vespersRubric =
+          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
     } else if (evening.isSecond) {
       _vespersRubric = 'II Нешпары';
     }
@@ -1252,7 +1253,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     items.add(
       _OraItem.blockHeader(
-        'ПСАЛМОДЫЯ',
+        'ПСАЛЬМОДЫЯ',
         startsSection: items.isEmpty || items.last.type != _OraItemType.divider,
       ),
     );
@@ -1363,7 +1364,8 @@ class _ExpandableFeastComment extends ConsumerStatefulWidget {
       _ExpandableFeastCommentState();
 }
 
-class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment> {
+class _ExpandableFeastCommentState
+    extends ConsumerState<_ExpandableFeastComment> {
   bool _expanded = false;
 
   @override
@@ -1419,7 +1421,9 @@ class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment
                   child: Text(
                     widget.text,
                     key: const Key('ora-feast-comment-text'),
-                    textAlign: ref.watch(settingsProvider.select((s) => s.textAlignment)),
+                    textAlign: ref.watch(
+                      settingsProvider.select((s) => s.textAlignment),
+                    ),
                     maxLines: _expanded ? null : 3,
                     overflow: _expanded ? null : TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -1675,7 +1679,7 @@ class _OraItem {
 
 String _managedHeading(String value) => switch (value.toUpperCase()) {
   'ГІМН' => 'Гімн',
-  'ПСАЛМОДЫЯ' => 'Псалмодыя',
+  'ПСАЛЬМОДЫЯ' => 'Псальмодыя',
   'ПЕСНЯ З ЕВАНГЕЛЛЯ' => 'Песня з Евангелля',
   'АНТЫФОНЫ НА ЗАКАНЧЭННЕ ДА НАЙСВЯЦЕЙШАЙ ПАННЫ МАРЫІ' =>
     'Антыфоны на заканчэнне да Найсвяцейшай Панны Марыі',
@@ -1704,19 +1708,35 @@ class _LabeledSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = textStyle.fontSize ?? 16;
+    final header = alternativeKind == 'office-reading'
+        ? extractOfficeReadingReference(content)
+        : (reference: null, bodyHtml: content);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LiturgicalSectionHeading(
-          key: Key('liturgical-$alternativeKind-title'),
-          title: label,
-          bodySize: base,
-          startsSection: startsSection,
-        ),
+        if (header.reference != null)
+          Padding(
+            key: Key('liturgical-$alternativeKind-title'),
+            padding: EdgeInsets.only(
+              top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
+            ),
+            child: LiturgicalHeadingReferenceRow(
+              title: label,
+              reference: header.reference,
+              bodySize: base,
+            ),
+          )
+        else
+          LiturgicalSectionHeading(
+            key: Key('liturgical-$alternativeKind-title'),
+            title: label,
+            bodySize: base,
+            startsSection: startsSection,
+          ),
         KeyedSubtree(
           key: Key('liturgical-$alternativeKind-body'),
           child: _HtmlOrText(
-            content: content,
+            content: header.bodyHtml,
             textStyle: textStyle,
             alternativeKind: alternativeKind,
             pickerLabel: _OraItem._pickerLabel(alternativeKind),
@@ -1796,7 +1816,6 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
     };
     final metadata = <PsalmMetadataLine>[
       if (canticleCaption != null) ...[
-        const PsalmMetadataLine('ПЕСНЯ З ЕВАНГЕЛЛЯ', PsalmMetadataRole.service),
         PsalmMetadataLine(canticleCaption!, PsalmMetadataRole.subtitle),
       ],
       ...model.metadata,
@@ -1815,6 +1834,15 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
       key: const Key('liturgical-psalm-block'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (canticleCaption != null)
+          LiturgicalSectionHeading(
+            title:
+                RegExp(
+                  r'^Песня (Захарыі|Марыі|Сімяона)',
+                ).firstMatch(canticleCaption!)?.group(0) ??
+                'Песня з Евангелля',
+            bodySize: size,
+          ),
         if (model.leadingHtml.isNotEmpty)
           _HtmlOrText(content: model.leadingHtml, textStyle: textStyle),
         if (model.openingAntiphon case final opening?) ...[
@@ -1887,6 +1915,13 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
   }
 }
 
+/// Shared production Office document surface, also used by isolated acceptance tools.
+Widget officeDocument({
+  required String html,
+  required TextStyle body,
+  String kind = 'reading',
+}) => _HtmlOrText(content: html, textStyle: body, alternativeKind: kind);
+
 class _HtmlOrText extends ConsumerWidget {
   final String content;
   final TextStyle textStyle;
@@ -1912,8 +1947,14 @@ class _HtmlOrText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textAlignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
-    final alignable = const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind);
+    final textAlignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
+    final alignable = const {
+      'reading',
+      'office-reading',
+      'prayer',
+    }.contains(alternativeKind);
     if (content.contains('<') && content.contains('>')) {
       return AlternativeText(
         text: content,
@@ -1941,7 +1982,11 @@ class _HtmlOrText extends ConsumerWidget {
     return plain;
   }
 
-  Widget _renderHtml(BuildContext context, String html, TextAlign textAlignment) {
+  Widget _renderHtml(
+    BuildContext context,
+    String html,
+    TextAlign textAlignment,
+  ) {
     final textColor =
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
@@ -1969,15 +2014,17 @@ class _HtmlOrText extends ConsumerWidget {
     };
     // Only Scripture/Office readings and the final prayer are prose.
     // In particular, responsory turns, headings and rubrics stay left aligned.
-    if (const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind)) {
+    if (const {
+      'reading',
+      'office-reading',
+      'prayer',
+    }.contains(alternativeKind)) {
       styles['body']!.textAlign = textAlignment;
       styles['p']!.textAlign = textAlignment;
       for (final selector in [
         '.liturgical-heading',
         '.liturgical-service-heading',
-        '.liturgical-reference',
         '.liturgical-subheading',
-        '.liturgical-reading-reference',
         '.office-reading-pericope-title',
         '.liturgical-rubric',
         '.responsory-turn',

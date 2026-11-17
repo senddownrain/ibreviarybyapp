@@ -1,0 +1,44 @@
+{
+  "status": "LITURGICAL FIRESTORE: 7791/7791 VERIFIED",
+  "verifiedFields": 7791,
+  "verifiedDocuments": 749,
+  "writtenFields": 7791,
+  "writtenDocuments": 749,
+  "alreadyAfterFields": 0,
+  "alreadyAfterDocuments": 0,
+  "manifestWrites": 4,
+  "manifestContentVersion": 1794938108754,
+  "collections": {
+    "days": {
+      "digest": "b80a2589e5651bd7",
+      "count": 736,
+      "bytes": 54678897,
+      "version": 7
+    },
+    "liturgicalTemplates": {
+      "digest": "a1d498c34dd96ab8",
+      "count": 16,
+      "bytes": 3028498,
+      "version": 4
+    },
+    "liturgicalProperTexts": {
+      "digest": "b23370f9d589fff1",
+      "count": 291,
+      "bytes": 3281631,
+      "version": 1
+    }
+  },
+  "firebaseReads": 3609,
+  "firebaseReadBreakdown": {
+    "dataDocumentReads": 1498,
+    "manifestDocumentReads": 24,
+    "metadataDocumentReads": 2086,
+    "uncachedDocumentReads": 1
+  },
+  "firebaseWrites": 753,
+  "receiptSha256": "8e65162f89ced4fef4bc5ef901ecc2c72d80e96962af6e3cce659d3c72876464",
+  "snapshotManifestSha256": "e09b01a1a389ee939fa9b6d76a9378133bb9064c01183adddbd334addf6798ab",
+  "catalogSha256": "24b8ec880697d9e2c4ceaa327a020f3f706dc7dc91d9a0b90fc8d74f83140a04",
+  "conflicts": [],
+  "newLiveReads": 0
+}

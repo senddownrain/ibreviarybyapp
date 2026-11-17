@@ -17,7 +17,7 @@ void main() {
   ) async {
     const labels = [
       'Гімн',
-      'Псалмодыя',
+      'Псальмодыя',
       'Просьбы',
       'Малітва',
       'Першае чытанне',
@@ -33,7 +33,7 @@ void main() {
       );
       expect(find.text(label.toUpperCase()), findsOneWidget);
     }
-    expect(labels[1], 'Псалмодыя');
+    expect(labels[1], 'Псальмодыя');
   });
 
   testWidgets('document role typography follows one reader contract', (
@@ -57,7 +57,10 @@ void main() {
       body: reader.body(16),
     );
     expect(heading.fontFamily, startsWith('CormorantGaramond'));
-    expect(styles['.liturgical-heading']!.fontSize?.value, closeTo(16 * 1.12, 0.001));
+    expect(
+      styles['.liturgical-heading']!.fontSize?.value,
+      closeTo(16 * 1.12, 0.001),
+    );
     expect(heading.color, reader.rubric);
     expect(rubric.fontStyle, FontStyle.normal);
     expect(rubric.fontSize, lessThan(16));
@@ -72,7 +75,7 @@ void main() {
     expect(htmlRubric.fontSize?.value, prayerRubric.fontSize?.value);
     expect(htmlRubric.lineHeight?.size, prayerRubric.lineHeight?.size);
     expect(htmlRubric.fontStyle, FontStyle.normal);
-    expect(styles['.liturgical-reading-reference']?.color, reader.muted);
+    expect(styles['.liturgical-reading-reference']?.color, reader.rubric);
   });
 
   test('short reading title and reference become distinct roles', () {

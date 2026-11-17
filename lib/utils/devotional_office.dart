@@ -338,6 +338,11 @@ DevotionalOfficeDocument? parseDevotionalOffice(Prayer prayer) {
       ).hasMatch(headings[i].text)) {
         return null;
       }
+    } else if (profile == 'gadzinki' && i == 6) {
+      // Both observed source labels are supported; the displayed source stays verbatim.
+      if (!{'Напрыканцы дня', 'Камплета'}.contains(headings[i].text)) {
+        return null;
+      }
     } else if (headings[i].text != expected[i]) {
       return null;
     }

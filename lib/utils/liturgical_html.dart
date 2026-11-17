@@ -219,7 +219,8 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
   // Responsory source often places several turns in one paragraph, including
   // inline spans. Rebuild only those paragraphs as turns; other text survives.
   final speaker = RegExp(r'(?<![\p{L}\p{N}])[КН]\.\s*', unicode: true);
-  for (final paragraph in fragment.querySelectorAll('p').toList()) {
+  for (final paragraph in fragment.querySelectorAll('p, div').toList()) {
+    if (paragraph.querySelector('p, div') != null) continue;
     if (paragraph.classes.contains('liturgical-heading') ||
         paragraph.classes.contains('liturgical-reference')) {
       continue;
@@ -294,6 +295,50 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
     }
   }
   return fragment.outerHtml;
+}
+
+/// Moves only a first reading's explicit Scripture citation into header metadata.
+/// Book/author introductions and Patristic references remain ordinary source text.
+({String? reference, String bodyHtml}) extractOfficeReadingReference(
+  String html,
+) {
+  final root = parseFragment(html);
+  dom.Element? first;
+  for (final node in root.querySelectorAll('p, div')) {
+    if (node.querySelector('p, div') == null) {
+      first = node;
+      break;
+    }
+  }
+  if (first == null) return (reference: null, bodyHtml: html);
+  final citation = RegExp(
+    r'^\(?\s*(?:(?:[1-3]\s*)?[\p{L}.]{1,12}(?:\s+[\p{L}.]{1,12})?\s+)?\d+\s*[,.:](?:\d+[\p{L}]?|[\s,;.:–—()\-])+\)?$',
+    unicode: true,
+  );
+  final full = first.text.trim();
+  final patristic = RegExp(
+    r'\b(?:PL|PG|CCL|CCSL|SC)\s*\d',
+    caseSensitive: false,
+  );
+  if (patristic.hasMatch(full)) return (reference: null, bodyHtml: html);
+  if (citation.hasMatch(full)) {
+    first.remove();
+    return (reference: full, bodyHtml: root.outerHtml);
+  }
+  for (final node in first.querySelectorAll('span, font').reversed) {
+    final text = node.text.trim();
+    if (!citation.hasMatch(text)) continue;
+    final red =
+        (node.attributes['style'] ?? '').contains(
+          RegExp(r'color\s*:\s*(?:red|#ff0000)', caseSensitive: false),
+        ) ||
+        node.classes.contains('liturgical-rubric-inline') ||
+        node.attributes['color'] == 'red';
+    if (!red) continue;
+    node.remove();
+    return (reference: text, bodyHtml: root.outerHtml);
+  }
+  return (reference: null, bodyHtml: html);
 }
 
 /// Pulls the already-normalized short-reading header out as semantic pieces.
