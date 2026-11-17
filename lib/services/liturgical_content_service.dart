@@ -946,6 +946,9 @@ class LiturgicalContentService {
         if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
         '_ordoOptionId': ordo.optionId,
         '_ordoOfficeKind': ordo.officeKind,
+        // Preserve the Ordo decision for the actual Compline template.
+        '_ordoCompline': ordo.compline,
+        '_ordoComplineDay': ordo.complineDay,
         '_contextPeriodType': ordo.date.isEmpty ? null : day.periodType,
       });
 
