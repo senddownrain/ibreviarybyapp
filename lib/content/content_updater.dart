@@ -298,6 +298,11 @@ class ContentUpdater {
   /// [ContentUpdateRejected] (or a network error) without changing
   /// anything when any document is missing or does not match its hash.
   Future<void> apply(ContentUpdatePlan plan) async {
+    if (plan.isRebuildSized) {
+      throw const ContentUpdateRejected(
+        'A content rebuild requires a new bundled app release',
+      );
+    }
     final staged = <CollectionUpdate, Map<String, Map<String, dynamic>>>{};
     for (final update in plan.collections) {
       if (update.download.isEmpty) {
