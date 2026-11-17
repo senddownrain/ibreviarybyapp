@@ -874,11 +874,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildVespers(LiturgicalDay day) {
     final items = <_OraItem>[];
-    _addIntro(items);
     final triduumNotice = triduumVespersNotice(day);
     if (triduumNotice.isNotEmpty) {
       items.add(_OraItem.html('<p><span style="color:red">$triduumNotice</span></p>'));
     }
+    _addIntro(items);
     if (_vespersRubric case final rubric?) {
       items.add(
         _OraItem.custom(
@@ -956,11 +956,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildCompline(Map<String, dynamic>? comp, LiturgicalDay day) {
     final items = <_OraItem>[];
-    _addIntro(items);
     final notice = triduumComplineNotice(day);
     if (notice.isNotEmpty) {
       items.add(_OraItem.html('<p><span style="color:red">$notice</span></p>'));
     }
+    _addIntro(items);
 
     if (comp == null) {
       items.add(
