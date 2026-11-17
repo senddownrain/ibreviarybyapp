@@ -133,6 +133,9 @@ jobs:
       - name: Office headings and compact responsory layout
         run: flutter test test/office_responsory_formatting_test.dart test/liturgical_visual_contract_test.dart
 
+      - name: Triduum and Compline regression
+        run: flutter test test/triduum_compline_test.dart test/liturgical_titles_test.dart
+
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression

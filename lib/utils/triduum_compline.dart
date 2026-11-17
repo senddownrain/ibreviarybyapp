@@ -9,7 +9,7 @@ const _triduumAntiphons = <int, String>{
 };
 
 const _solemnityPrayer =
-    '<p>Просім Цябе, Пане, наведай гэты дом і аддалі ад яго ўсе варожыя подступы. Няхай Твае святыя анёлы апякуюцца ім і захоўваюць нас у спакоі, а Тваё благаслаўленне няхай заўсёды будзе над намі. Праз Хрыста, Пана нашага.</p>';
+    '<p>Просім Цябе, Пане, наведай гэты дом і аддалі ад яго ўсе варожыя подступы. Няхай Твае святыя анёлы апякуюцца ім і захоўваюць нас у спакоі, а Тваё благаслаўленне няхай заўсёды будзе над намі. Праз Хрыста, Пана нашага. Амэн.</p>';
 
 int? triduumWeekday(LiturgicalDay day) {
   final weekday = day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '');
@@ -23,26 +23,25 @@ String triduumAntiphon(LiturgicalDay day) {
 }
 
 String triduumVespersNotice(LiturgicalDay day) => switch (triduumWeekday(day)) {
-  5 => 'Нешпары чытаюць толькі тыя, хто не ўдзельнічае ў вечаровай Імшы Вячэры Пана.',
+  5 =>
+    'Нешпары чытаюць толькі тыя, хто не ўдзельнічае ў вечаровай Імшы Вячэры Пана.',
   6 => 'Нешпары чытаюць толькі тыя, хто не ўдзельнічае ў Літургіі Мукі Пана.',
   _ => '',
 };
 
-String triduumComplineNotice(LiturgicalDay day) =>
-    triduumWeekday(day) == 7
-        ? 'Камплету чытаюць толькі тыя, хто не ўдзельнічае ў Пасхальнай вігіліі.'
-        : '';
+String triduumComplineNotice(LiturgicalDay day) => triduumWeekday(day) == 7
+    ? 'Камплету чытаюць толькі тыя, хто не ўдзельнічае ў Пасхальнай вігіліі.'
+    : '';
 
 String goodFridayIntercessionsRubric(LiturgicalDay day) =>
     triduumWeekday(day) == 6
-        ? 'У якасці просьбаў будзе пахвальным выкарыстаць агульную малітву, якая пададзена ў Імшале на гэты дзень. Аднак на выбар могуць выкарыстоўвацца ніжэйпададзеныя просьбы або малітва ў маўчанні ў прапанаваных тут інтэнцыях.'
-        : '';
+    ? 'У якасці просьбаў будзе пахвальным выкарыстаць агульную малітву, якая пададзена ў Імшале на гэты дзень. Аднак на выбар могуць выкарыстоўвацца ніжэйпададзеныя просьбы або малітва ў маўчанні ў прапанаваных тут інтэнцыях.'
+    : '';
 
-String specialComplinePrayer(LiturgicalDay day) {
-  final kind = day.field('_ordoOfficeKind');
-  final isWeekdaySolemnity =
-      kind == 'solemnity' && day.dayOfWeek != 1;
-  return kind == 'triduum' || isWeekdaySolemnity
-      ? _solemnityPrayer
-      : '';
-}
+String specialComplinePrayer(LiturgicalDay day) =>
+    day.field('_ordoComplineSolemnityPrayer') == 'true' ? _solemnityPrayer : '';
+
+String specialComplineResponsory(LiturgicalDay day) =>
+    day.field('_ordoComplineChoice') == 'true'
+    ? '<p><span style="color:red">Ант.</span> Вось дзень, які Пан учыніў, * будзем радавацца ў ім і весяліцца,<br>аллелюя</p>'
+    : triduumAntiphon(day);
