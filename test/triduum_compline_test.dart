@@ -248,7 +248,8 @@ void main() {
         .toList();
 
     final selector = find.byKey(const Key('compline-formula-picker'));
-    await tester.ensureVisible(selector);
+    await Scrollable.ensureVisible(tester.element(selector), alignment: 0.3);
+    await tester.pumpAndSettle();
     await tester.tap(selector);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Пасля I Нешпараў нядзелі'));
