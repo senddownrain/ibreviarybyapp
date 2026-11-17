@@ -879,10 +879,12 @@ class LiturgicalContentService {
           source: docs.first.field('_kind') == 'office-for-dead'
               ? LiturgicalOptionSource.officeForDead
               : LiturgicalOptionSource.fixed,
-          title: _dayTitle(day, date).isNotEmpty
-              ? _dayTitle(day, date)
-              : candidate.title,
-          subtitle: _fixedSubtitle(day.rank, day, groups.$2.length),
+          // Legacy documents may retain an obsolete optional-memorial rank.
+          // The Ordo candidate owns the legal title and rank.
+          title: candidate.title.isNotEmpty
+              ? candidate.title
+              : _dayTitle(day, date),
+          subtitle: _fixedSubtitle(candidate.rank, day, groups.$2.length),
           day: day,
           templates: groups.$2,
           order: 3,
@@ -936,6 +938,9 @@ class LiturgicalContentService {
   LiturgicalDay _stamp(LiturgicalDay day, OrdoOptionDescriptor ordo) =>
       LiturgicalDay.fromMap({
         ...day.toMap(),
+        if (ordo.celebrationId != null && ordo.rank.isNotEmpty)
+          '_rank': ordo.rank,
+        // Keep authored feast titles: they can have specific case and style.
         '_vestmentColor': ordo.color,
         if (ordo.category.isNotEmpty) '_celebrationCategory': ordo.category,
         if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
