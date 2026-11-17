@@ -65,6 +65,8 @@ String formatLiturgicalPeriodTitle({
 
   if (dayOfWeek == 1 && week.isNotEmpty) {
     final title = switch (periodType) {
+      'ordinary' when periodWeek == 3 =>
+          '$week нядзеля звычайная · Нядзеля Божага Слова',
       'ordinary' => '$week нядзеля звычайная',
       'advent' => '$week нядзеля Адвэнту',
       'lent' => '$week нядзеля Вялікага посту',
