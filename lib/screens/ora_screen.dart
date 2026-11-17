@@ -42,6 +42,7 @@ import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/pastors_hymn.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/triduum_compline.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
 
@@ -188,6 +189,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   final _psalmodyController = ValueNotifier<int?>(null);
   final _hourTitleAnchor = GlobalKey();
   int? _selectedInvitIndex;
+  bool _firstVespersCompline = false;
   String? _vespersRubric;
   late final Future<LiturgicalDay?> _dayFuture;
   late final ScrollController _scrollController;
@@ -241,6 +243,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       calendar.getYearOptionsCached(widget.date.year + 1),
       calendar.getDynamicDatesCached(widget.date.year),
       diocese: diocese,
+      forCompline: widget.oraType == 'completorium',
     );
     if (selected == null || widget.oraType != 'vespers') return selected;
     if (usesOwnVespers(selected)) return selected;
@@ -270,7 +273,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
     if (evening.isFirst) {
       final title = (evening.firstVespersTitle ?? '').trim();
-      _vespersRubric = 'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
+      _vespersRubric =
+          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
     } else if (evening.isSecond) {
       _vespersRubric = 'II Нешпары';
     }
@@ -340,7 +344,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         .toList();
 
     // Completorium — keyed by {periodType}-d{dayOfWeek}
-    final compId = _completoriumId(day);
+    final compId = completoriumRecordIdForDay(
+      day,
+      firstVespers: _firstVespersCompline,
+    );
     final compRaw = HiveService.completoriumsBox.get(compId);
     final comp = compRaw != null
         ? Map<String, dynamic>.from(compRaw as Map)
@@ -465,7 +472,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       'sext' => _buildSextHour(day, num: 2),
       'non' => _buildSextHour(day, num: 3),
       'vespers' => _buildVespers(day),
-      'completorium' => _buildCompline(comp),
+      'completorium' => _buildCompline(comp, day),
       _ => <_OraItem>[],
     };
     if (hourSections.isEmpty) {
@@ -653,13 +660,43 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     );
   }
 
+  bool _containsLiturgicalText(String? html, String text) =>
+      (parseFragment(html ?? '').text ?? '')
+          .replaceAll(RegExp(r'[\s\u00a0]+'), ' ')
+          .contains(text);
+
+  static const _complineFormulas = {
+    false: 'Пасля II Нешпараў нядзелі',
+    true: 'Пасля I Нешпараў нядзелі',
+  };
+
+  Widget _complineFormulaButton(BuildContext context) => TextButton.icon(
+    key: const Key('compline-formula-picker'),
+    icon: const PhosphorIcon(PhosphorIconsRegular.listChecks, size: 19),
+    label: Text(_complineFormulas[_firstVespersCompline]!),
+    onPressed: () async {
+      final selected = await showReaderChoiceSheet<bool>(
+        context: context,
+        title: 'Фармуляр Камплеты',
+        selectedValue: _firstVespersCompline,
+        choices: [
+          for (final formula in _complineFormulas.entries)
+            ReaderChoice(
+              value: formula.key,
+              label: formula.value,
+              icon: Icons.menu_book_rounded,
+            ),
+        ],
+      );
+      if (mounted && selected != null) {
+        setState(() => _firstVespersCompline = selected);
+      }
+    },
+  );
+
   // ─── Completorium ID ─────────────────────────────────────────────────────────
   // Format: {periodType}-d{dayOfWeek}, Sunday = d1, Saturday = d7
   // Solemnities/feasts → d1; holyweek → lent
-
-  String _completoriumId(LiturgicalDay day) {
-    return completoriumRecordIdForDay(day);
-  }
 
   // ─── Invitatorium ─────────────────────────────────────────────────────────────
   // Ant from days; Ps1–6 from invitatoriums collection.
@@ -873,6 +910,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
   List<_OraItem> _buildVespers(LiturgicalDay day) {
     final items = <_OraItem>[];
+    final triduumNotice = triduumVespersNotice(day);
+    if (triduumNotice.isNotEmpty &&
+        !_containsLiturgicalText(day.field('vesperR'), triduumNotice)) {
+      items.add(
+        _OraItem.html('<p><span style="color:red">$triduumNotice</span></p>'),
+      );
+    }
     _addIntro(items);
     if (_vespersRubric case final rubric?) {
       items.add(
@@ -911,6 +955,14 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addPsalmBlock(items, day, 'vesperAnt', 'vesperPs', 3);
     _addDividerBeforeField(items, day, 'vesperR');
     _addField(items, day, 'vesperR', '');
+    final specialAntiphon = triduumAntiphon(day);
+    if (specialAntiphon.isNotEmpty &&
+        !_containsLiturgicalText(
+          day.field('vesperR'),
+          'Хрыстус стаў дзеля нас паслухмяным',
+        )) {
+      items.add(_OraItem.html(specialAntiphon, kind: 'responsory'));
+    }
 
     final antMag = (day.field('vesperAntMag') ?? '').trim();
     if (antMag.isNotEmpty) {
@@ -925,7 +977,22 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
 
     _addDividerBeforeField(items, day, 'vesperInter');
-    _addField(items, day, 'vesperInter', 'Просьбы');
+    final intercessionsNotice = goodFridayIntercessionsRubric(day);
+    final intercessions = (day.field('vesperInter') ?? '').trim();
+    if (intercessionsNotice.isNotEmpty &&
+        !_containsLiturgicalText(intercessions, intercessionsNotice)) {
+      items.add(_OraItem.blockHeader('ПРОСЬБЫ', startsSection: false));
+      items.add(
+        _OraItem.html(
+          '<p><span style="color:red">$intercessionsNotice</span></p>',
+        ),
+      );
+      if (intercessions.isNotEmpty) {
+        items.add(_OraItem.html(intercessions, kind: 'intercession'));
+      }
+    } else {
+      _addField(items, day, 'vesperInter', 'Просьбы');
+    }
     // vesperPr fallback to laudesPr
     final pr = (day.field('vesperPr') ?? '').trim();
     final effectivePr = pr.isNotEmpty
@@ -940,8 +1007,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   // ─── Completorium (Камплета) ──────────────────────────────────────────────────
   // Uses completoriums collection.
 
-  List<_OraItem> _buildCompline(Map<String, dynamic>? comp) {
+  List<_OraItem> _buildCompline(Map<String, dynamic>? comp, LiturgicalDay day) {
     final items = <_OraItem>[];
+    final notice = triduumComplineNotice(day);
+    if (notice.isNotEmpty) {
+      items.add(_OraItem.html('<p><span style="color:red">$notice</span></p>'));
+    }
     _addIntro(items);
 
     if (comp == null) {
@@ -949,6 +1020,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
         _OraItem.html('<p><em>Камплета для гэтага дня не знойдзена.</em></p>'),
       );
       return items;
+    }
+
+    if (day.field('_ordoComplineChoice') == 'true') {
+      items.add(
+        _OraItem.custom((context, _) => _complineFormulaButton(context)),
+      );
     }
 
     String cf(String name) {
@@ -984,7 +1061,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(_OraItem.html(r, kind: 'reading'));
     }
 
-    final resp = cf('compResp');
+    final specialResp = specialComplineResponsory(day);
+    final resp = specialResp.isNotEmpty ? specialResp : cf('compResp');
     if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'responsory'));
 
     final antS = cf('compAntS');
@@ -1003,7 +1081,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       );
     }
 
-    final pr = cf('compPr');
+    final specialPrayer = specialComplinePrayer(day);
+    final pr = specialPrayer.isNotEmpty ? specialPrayer : cf('compPr');
     if (pr.isNotEmpty) {
       _addMajorBoundary(items);
       items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
@@ -1363,7 +1442,8 @@ class _ExpandableFeastComment extends ConsumerStatefulWidget {
       _ExpandableFeastCommentState();
 }
 
-class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment> {
+class _ExpandableFeastCommentState
+    extends ConsumerState<_ExpandableFeastComment> {
   bool _expanded = false;
 
   @override
@@ -1419,7 +1499,9 @@ class _ExpandableFeastCommentState extends ConsumerState<_ExpandableFeastComment
                   child: Text(
                     widget.text,
                     key: const Key('ora-feast-comment-text'),
-                    textAlign: ref.watch(settingsProvider.select((s) => s.textAlignment)),
+                    textAlign: ref.watch(
+                      settingsProvider.select((s) => s.textAlignment),
+                    ),
                     maxLines: _expanded ? null : 3,
                     overflow: _expanded ? null : TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -1912,8 +1994,14 @@ class _HtmlOrText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textAlignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
-    final alignable = const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind);
+    final textAlignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
+    final alignable = const {
+      'reading',
+      'office-reading',
+      'prayer',
+    }.contains(alternativeKind);
     if (content.contains('<') && content.contains('>')) {
       return AlternativeText(
         text: content,
@@ -1941,7 +2029,11 @@ class _HtmlOrText extends ConsumerWidget {
     return plain;
   }
 
-  Widget _renderHtml(BuildContext context, String html, TextAlign textAlignment) {
+  Widget _renderHtml(
+    BuildContext context,
+    String html,
+    TextAlign textAlignment,
+  ) {
     final textColor =
         textStyle.color ?? Theme.of(context).colorScheme.onSurface;
     final reader = ReaderTheme.of(context);
@@ -1969,7 +2061,11 @@ class _HtmlOrText extends ConsumerWidget {
     };
     // Only Scripture/Office readings and the final prayer are prose.
     // In particular, responsory turns, headings and rubrics stay left aligned.
-    if (const {'reading', 'office-reading', 'prayer'}.contains(alternativeKind)) {
+    if (const {
+      'reading',
+      'office-reading',
+      'prayer',
+    }.contains(alternativeKind)) {
       styles['body']!.textAlign = textAlignment;
       styles['p']!.textAlign = textAlignment;
       for (final selector in [

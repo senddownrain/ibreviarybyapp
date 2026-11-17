@@ -300,6 +300,7 @@ class OrdoEvening {
     required this.date,
     required this.title,
     required this.compline,
+    this.complineSolemnityPrayer = false,
     this.omittedFirstVespers,
     this.conflict,
   });
@@ -310,6 +311,7 @@ class OrdoEvening {
   final String date;
   final String title;
   final String compline;
+  final bool complineSolemnityPrayer;
   final String? omittedFirstVespers;
   final Json? conflict;
 }
@@ -360,6 +362,8 @@ OrdoEvening resolveEvening(
           date: tomorrowSeason.date,
           title: '${tomorrowPrimary['title']}',
           compline: compline,
+          complineSolemnityPrayer:
+              tomorrowKind == 'solemnity' && !tomorrowSeason.isSunday,
           conflict: {
             'today': todayPrimary['id'],
             'tomorrow': tomorrowPrimary['id'],

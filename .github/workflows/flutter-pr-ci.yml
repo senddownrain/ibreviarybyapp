@@ -133,6 +133,9 @@ jobs:
       - name: Office headings and compact responsory layout
         run: flutter test test/office_responsory_formatting_test.dart test/liturgical_visual_contract_test.dart
 
+      - name: Triduum and Compline regression
+        run: flutter test test/triduum_compline_test.dart test/liturgical_titles_test.dart
+
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression
@@ -181,3 +184,31 @@ jobs:
         run: flutter test test/analytics
       - name: Analytics enabled fit and recording tests
         run: flutter test --dart-define=ANALYTICS_LOCAL=true test/analytics
+
+  triduum-visual:
+    name: Triduum and Compline in Chrome
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix /tmp/triduum-browser playwright-core@1.63.0
+      - name: Read both Compline formulas and the Triduum offices in Chrome
+        run: |
+          mkdir -p audit-evidence/triduum
+          flutter devices > audit-evidence/triduum/devices.txt
+          xvfb-run -a flutter run -d chrome -t tool/doxology_smoke.dart --web-port 5241 --web-browser-flag=--no-sandbox > audit-evidence/triduum/flutter-run.log 2>&1 &
+          NODE_PATH=/tmp/triduum-browser/node_modules node scripts/smoke_doxologies.cjs --triduum
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: flutter-triduum-visual
+          path: audit-evidence/triduum

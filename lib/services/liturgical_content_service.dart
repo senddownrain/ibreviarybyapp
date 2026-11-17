@@ -291,10 +291,17 @@ class LiturgicalContentService {
     YearOptions? nextYearOpts,
     DynamicDates? dynamicDates, {
     String diocese = kDefaultDiocese,
+    bool forCompline = false,
   }) {
     if (!HiveService.content.isLoaded('days')) return null;
     final content = contentForDate(date, diocese: diocese);
-    final day = content.dayById(dayId) ?? _legacyDay(date, dayId, content);
+    var day = content.dayById(dayId) ?? _legacyDay(date, dayId, content);
+    if (forCompline && dayId != 'office-for-dead') {
+      final descriptor =
+          content.optionOwning(dayId)?.ordo ??
+          optionDescriptor(content.ordo, content.ordo.officeOptions.first);
+      day = _stamp(day ?? LiturgicalDay.fromMap({'id': dayId}), descriptor);
+    }
     if (day == null) return null;
     final data = day.toMap()
       ..['_periodType'] = content.ordo.period
@@ -659,7 +666,9 @@ class LiturgicalContentService {
             source: seasonal
                 ? LiturgicalOptionSource.fixed
                 : LiturgicalOptionSource.period,
-            title: _dayTitle(temporalDoc, date),
+            title: candidate.id == 'temporal:ordinary-w3-d1'
+                ? candidate.title
+                : _dayTitle(temporalDoc, date),
             subtitle: seasonal
                 ? _fixedSubtitle(temporalDoc.rank, temporalDoc, 1)
                 : 'Літургічны дзень',
@@ -935,19 +944,25 @@ class LiturgicalContentService {
   // ── helpers ───────────────────────────────────────────────────────────
 
   /// One colour for the card, its Office pages and its readings: the Ordo's.
-  LiturgicalDay _stamp(LiturgicalDay day, OrdoOptionDescriptor ordo) =>
-      LiturgicalDay.fromMap({
-        ...day.toMap(),
-        if (ordo.celebrationId != null && ordo.rank.isNotEmpty)
-          '_rank': ordo.rank,
-        // Keep authored feast titles: they can have specific case and style.
-        '_vestmentColor': ordo.color,
-        if (ordo.category.isNotEmpty) '_celebrationCategory': ordo.category,
-        if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
-        '_ordoOptionId': ordo.optionId,
-        '_ordoOfficeKind': ordo.officeKind,
-        '_contextPeriodType': ordo.date.isEmpty ? null : day.periodType,
-      });
+  LiturgicalDay _stamp(
+    LiturgicalDay day,
+    OrdoOptionDescriptor ordo,
+  ) => LiturgicalDay.fromMap({
+    ...day.toMap(),
+    if (ordo.celebrationId != null && ordo.rank.isNotEmpty) '_rank': ordo.rank,
+    // Keep authored feast titles: they can have specific case and style.
+    '_vestmentColor': ordo.color,
+    if (ordo.category.isNotEmpty) '_celebrationCategory': ordo.category,
+    if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
+    '_ordoOptionId': ordo.optionId,
+    '_ordoOfficeKind': ordo.officeKind,
+    // Preserve the Ordo decision for the actual Compline template.
+    '_ordoCompline': ordo.compline,
+    '_ordoComplineDay': ordo.complineDay,
+    '_ordoComplineChoice': ordo.complineChoice,
+    '_ordoComplineSolemnityPrayer': ordo.complineSolemnityPrayer,
+    '_contextPeriodType': ordo.date.isEmpty ? null : day.periodType,
+  });
 
   List<LiturgicalDay> _dynamicDocuments(
     OrdoOption option,
