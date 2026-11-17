@@ -1,5 +1,4 @@
 import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
-import 'package:html/parser.dart' show parseFragment;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

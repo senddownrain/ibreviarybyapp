@@ -23,7 +23,7 @@ LiturgicalDay litDay(int weekday, String officeKind, {int? complineDay}) =>
       '_dayOfWeek': weekday,
       '_ordoOfficeKind': officeKind,
       '_ordoComplineSolemnityPrayer': officeKind == 'triduum',
-      if (complineDay != null) '_ordoComplineDay': complineDay,
+      '_ordoComplineDay': ?complineDay,
     });
 
 class _SmokeSettings extends SettingsNotifier {
