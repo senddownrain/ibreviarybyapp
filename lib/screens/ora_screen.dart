@@ -42,6 +42,7 @@ import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/pastors_hymn.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/triduum_compline.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
 
@@ -465,7 +466,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       'sext' => _buildSextHour(day, num: 2),
       'non' => _buildSextHour(day, num: 3),
       'vespers' => _buildVespers(day),
-      'completorium' => _buildCompline(comp),
+      'completorium' => _buildCompline(comp, day),
       _ => <_OraItem>[],
     };
     if (hourSections.isEmpty) {
@@ -874,6 +875,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   List<_OraItem> _buildVespers(LiturgicalDay day) {
     final items = <_OraItem>[];
     _addIntro(items);
+    final triduumNotice = triduumVespersNotice(day);
+    if (triduumNotice.isNotEmpty) {
+      items.add(_OraItem.html('<p><span style="color:red">$triduumNotice</span></p>'));
+    }
     if (_vespersRubric case final rubric?) {
       items.add(
         _OraItem.custom(
@@ -911,6 +916,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     _addPsalmBlock(items, day, 'vesperAnt', 'vesperPs', 3);
     _addDividerBeforeField(items, day, 'vesperR');
     _addField(items, day, 'vesperR', '');
+    final specialAntiphon = triduumAntiphon(day);
+    if (specialAntiphon.isNotEmpty &&
+        !(day.field('vesperR') ?? '').contains('Хрыстус стаў дзеля нас')) {
+      items.add(_OraItem.html(specialAntiphon, kind: 'responsory'));
+    }
 
     final antMag = (day.field('vesperAntMag') ?? '').trim();
     if (antMag.isNotEmpty) {
@@ -925,6 +935,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     }
 
     _addDividerBeforeField(items, day, 'vesperInter');
+    final intercessionsNotice = goodFridayIntercessionsRubric(day);
+    if (intercessionsNotice.isNotEmpty) {
+      items.add(_OraItem.html('<p><span style="color:red">$intercessionsNotice</span></p>'));
+    }
     _addField(items, day, 'vesperInter', 'Просьбы');
     // vesperPr fallback to laudesPr
     final pr = (day.field('vesperPr') ?? '').trim();
@@ -940,9 +954,13 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   // ─── Completorium (Камплета) ──────────────────────────────────────────────────
   // Uses completoriums collection.
 
-  List<_OraItem> _buildCompline(Map<String, dynamic>? comp) {
+  List<_OraItem> _buildCompline(Map<String, dynamic>? comp, LiturgicalDay day) {
     final items = <_OraItem>[];
     _addIntro(items);
+    final notice = triduumComplineNotice(day);
+    if (notice.isNotEmpty) {
+      items.add(_OraItem.html('<p><span style="color:red">$notice</span></p>'));
+    }
 
     if (comp == null) {
       items.add(
@@ -984,7 +1002,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(_OraItem.html(r, kind: 'reading'));
     }
 
-    final resp = cf('compResp');
+    final specialResp = triduumAntiphon(day);
+    final resp = specialResp.isNotEmpty ? specialResp : cf('compResp');
     if (resp.isNotEmpty) items.add(_OraItem.html(resp, kind: 'responsory'));
 
     final antS = cf('compAntS');
@@ -1003,7 +1022,8 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       );
     }
 
-    final pr = cf('compPr');
+    final specialPrayer = specialComplinePrayer(day);
+    final pr = specialPrayer.isNotEmpty ? specialPrayer : cf('compPr');
     if (pr.isNotEmpty) {
       _addMajorBoundary(items);
       items.add(_OraItem.labeled('Малітва', pr, kind: 'prayer'));
