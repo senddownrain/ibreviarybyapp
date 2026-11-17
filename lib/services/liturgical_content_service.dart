@@ -940,8 +940,7 @@ class LiturgicalContentService {
         ...day.toMap(),
         if (ordo.celebrationId != null && ordo.rank.isNotEmpty)
           '_rank': ordo.rank,
-        if (ordo.celebrationId != null && ordo.title.isNotEmpty)
-          '_feastName': ordo.title,
+        // Keep authored feast titles: they can have specific case and style.
         '_vestmentColor': ordo.color,
         if (ordo.category.isNotEmpty) '_celebrationCategory': ordo.category,
         if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
