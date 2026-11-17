@@ -6,6 +6,15 @@ LiturgicalDay day(String id, Map<String, dynamic> fields) =>
     LiturgicalDay.fromMap({'id': id, ...fields});
 
 void main() {
+  test('Vespers numeral is part of the hour name', () {
+    expect(vespersHourTitle('first'), 'I Нешпары');
+    expect(vespersHourTitle('first', uppercase: true), 'I НЕШПАРЫ');
+    expect(vespersHourTitle('second'), 'II Нешпары');
+    expect(vespersHourTitle('second', uppercase: true), 'II НЕШПАРЫ');
+    expect(vespersHourTitle('of-the-day'), 'Нешпары');
+    expect(vespersHourTitle(null), 'Нешпары');
+  });
+
   test('I Vespers uses Saturday source, never Sunday II Vespers', () {
     final sunday = day('ordinary-w11-d1', {
       'vesperHymn': 'II hymn',

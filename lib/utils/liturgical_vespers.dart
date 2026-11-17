@@ -3,6 +3,17 @@ import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
 
+/// The liturgical numeral belongs to the Vespers hour name.
+/// It never changes the selected civil date or the source of the texts.
+String vespersHourTitle(String? type, {bool uppercase = false}) {
+  final numeral = switch (type) {
+    'first' => 'I ',
+    'second' => 'II ',
+    _ => '',
+  };
+  return '$numeral${uppercase ? 'НЕШПАРЫ' : 'Нешпары'}';
+}
+
 /// Liturgical evening is selected by the Ordo's precedence decision, not by
 /// whether tomorrow's document happens to contain `vesper1*` fields.
 const firstVespersSuffixes = [
