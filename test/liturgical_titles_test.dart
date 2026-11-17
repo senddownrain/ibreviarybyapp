@@ -37,6 +37,19 @@ void main() {
     );
   });
 
+  test('III ordinary Sunday is Sunday of the Word of God', () {
+    final sunday = LiturgicalDay.fromMap({
+      'id': 'ordinary-w3-d1',
+      '_periodType': 'ordinary',
+      '_periodWeekNumber': 3,
+      '_dayOfWeek': 1,
+    });
+    expect(
+      liturgicalDayDisplayTitle(sunday, DateTime(2027, 1, 24)),
+      'III нядзеля звычайная · Нядзеля Божага Слова',
+    );
+  });
+
   test('uses Christmas octave and celebration titles', () {
     final octave = LiturgicalDay.fromMap({
       'id': 'christmas-26-12',
