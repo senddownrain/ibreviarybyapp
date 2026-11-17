@@ -73,4 +73,21 @@ void main() {
       expect(result.field('vesperAntMag'), 'tonight O');
     },
   );
+  test('Vitebsk 16 November Hours display the approved obligatory memorial', () {
+    for (final year in [2026, 2027]) {
+      final content = LiturgicalContentService().contentForDate(
+        DateTime(year, 11, 16),
+        diocese: 'vitebsk',
+      );
+      final option = content.options.firstWhere(
+        (item) => item.optionId == 'our-lady-mother-mercy',
+      );
+      expect(option.ordo?.rank, 'memoria');
+      expect(option.subtitle, startsWith('Успамін'));
+      expect(option.subtitle, isNot(contains('Неабавязковы')));
+      expect(option.day?.rank, 'memoria');
+      expect(option.templates.first.day.rank, 'memoria');
+    }
+  });
+
 }
