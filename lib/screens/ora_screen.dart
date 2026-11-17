@@ -190,7 +190,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
   final _hourTitleAnchor = GlobalKey();
   int? _selectedInvitIndex;
   bool _firstVespersCompline = false;
-  String? _vespersRubric;
+  String? _vespersTitle;
   late final Future<LiturgicalDay?> _dayFuture;
   late final ScrollController _scrollController;
   ReaderChromeMode _chromeMode = ReaderChromeMode.compact;
@@ -271,13 +271,11 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       today: today,
       tomorrow: tomorrow,
     );
-    if (evening.isFirst) {
-      final title = (evening.firstVespersTitle ?? '').trim();
-      _vespersRubric =
-          'I Нешпары · ${title.isEmpty ? 'заўтрашняга дня' : title}';
-    } else if (evening.isSecond) {
-      _vespersRubric = 'II Нешпары';
-    }
+    _vespersTitle = evening.isFirst
+        ? vespersHourTitle('first')
+        : evening.isSecond
+        ? vespersHourTitle('second')
+        : null;
     return evening.day;
   }
 
@@ -918,22 +916,6 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       );
     }
     _addIntro(items);
-    if (_vespersRubric case final rubric?) {
-      items.add(
-        _OraItem.custom(
-          (context, _) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Text(
-              rubric,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: liturgicalColorForDay(day),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
     final missingFirst = day.data['_missingFirstVespersFields'];
     if (missingFirst is List && missingFirst.isNotEmpty) {
       items.add(
@@ -1411,7 +1393,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
     'terz' => 'Малітва перад поўднем',
     'sext' => 'Малітва апоўдні',
     'non' => 'Малітва пасля поўдня',
-    'vespers' => 'Нешпары',
+    'vespers' => _vespersTitle ?? 'Нешпары',
     'completorium' => 'Камплета',
     _ => type,
   };
