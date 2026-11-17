@@ -4,6 +4,7 @@ class Prayer {
   final String? titleBe;
   final String? body;
   final String? textFormat;
+  final String? source;
   final List<String> tags;
   final bool isLocal;
   final bool priestOnly;
@@ -16,6 +17,7 @@ class Prayer {
     this.titleBe,
     this.body,
     this.textFormat,
+    this.source,
     this.tags = const [],
     this.isLocal = false,
     this.priestOnly = false,
@@ -47,6 +49,7 @@ class Prayer {
       titleBe: _asString(data['titleBe']),
       body: _resolveBody(data),
       textFormat: _asString(data['textFormat']),
+      source: _asString(data['source']),
       tags: _resolveTags(data['tags']),
       isLocal: data['isLocal'] == true,
       priestOnly:
@@ -62,6 +65,7 @@ class Prayer {
     // Persist under Firestore-canonical `text` so re-sync/round-trip matches web.
     if (body != null) 'text': body,
     if (textFormat != null) 'textFormat': textFormat,
+    if (source != null) 'source': source,
     'tags': tags,
     'isLocal': isLocal,
     if (priestOnly) 'priestOnly': true,
@@ -75,6 +79,7 @@ class Prayer {
     String? titleBe,
     String? body,
     String? textFormat,
+    String? source,
     List<String>? tags,
     bool? isLocal,
   }) => Prayer(
@@ -83,6 +88,7 @@ class Prayer {
     titleBe: titleBe ?? this.titleBe,
     body: body ?? this.body,
     textFormat: textFormat ?? this.textFormat,
+    source: source ?? this.source,
     tags: tags ?? this.tags,
     isLocal: isLocal ?? this.isLocal,
     priestOnly: priestOnly,

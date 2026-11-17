@@ -149,6 +149,10 @@ jobs:
           lib/widgets/prayer_content.dart lib/screens/prayer_detail_screen.dart
           lib/dev/devotional_office_harness.dart tool/devotional_office_smoke.dart
           test/devotional_office_test.dart test/devotional_office_widget_test.dart
+      - name: Canonical prayer source contract and reader
+        run: |
+          dart format --output=none --set-exit-if-changed lib/models/prayer.dart test/prayer_source_test.dart tool/prayer_source_smoke.dart
+          flutter test test/prayer_source_test.dart
       - name: Devotional offices and reader regression
         run: >-
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
