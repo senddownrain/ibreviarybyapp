@@ -59,11 +59,15 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
   await pause(400);
  };
  const tapRenderedText=async text=>{
-  const position=await page.waitForFunction(needle=>window.highPriestTextCenter?.(needle)||false,
-   '@any:'+text,{timeout:15000});
-  const [x,y]=JSON.parse(await position.jsonValue());
-  assert(x>=0&&x<page.viewportSize().width&&y>=0&&y<page.viewportSize().height,
-   `Outside viewport: ${text} at ${x},${y}`);
+  // Give the choice sheet time to finish sliding into the viewport.
+  await pause(350);
+  const position=await page.waitForFunction(needle=>{
+   const json=window.highPriestTextCenter?.(needle);
+   if(!json)return false;
+   const [x,y]=JSON.parse(json);
+   return x>=0&&x<innerWidth&&y>=0&&y<innerHeight ? [x,y] : false;
+  },'@any:'+text,{timeout:15000});
+  const [x,y]=await position.jsonValue();
   await page.mouse.click(x,y);
  };
  try {
