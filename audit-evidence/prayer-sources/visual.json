@@ -1,0 +1,52 @@
+{
+  "browser": "157.0.8103.78",
+  "fixture": "tool/prayer_source_smoke.dart",
+  "rows": [
+    {
+      "office": false,
+      "dark": false,
+      "width": 390,
+      "scale": 1,
+      "source": "Бог добры",
+      "scripturePreserved": true,
+      "horizontalOverflow": false,
+      "url": "http://127.0.0.1:5237/?office=0&theme=light&scale=1#/prayers/prayer/local_source_smoke",
+      "linkNavigation": true
+    },
+    {
+      "office": false,
+      "dark": true,
+      "width": 390,
+      "scale": 2,
+      "source": "Бог добры",
+      "scripturePreserved": true,
+      "horizontalOverflow": false,
+      "url": "http://127.0.0.1:5237/?office=0&theme=dark&scale=2#/prayers/prayer/local_source_smoke"
+    },
+    {
+      "office": true,
+      "dark": false,
+      "width": 390,
+      "scale": 1,
+      "source": "Літургія гадзін",
+      "scripturePreserved": null,
+      "horizontalOverflow": false,
+      "url": "http://127.0.0.1:5237/?office=1&theme=light&scale=1#/prayers/prayer/mybrev-devotion-blessed-virgin-mary-laudes"
+    },
+    {
+      "office": true,
+      "dark": true,
+      "width": 390,
+      "scale": 2,
+      "source": "Літургія гадзін",
+      "scripturePreserved": null,
+      "horizontalOverflow": false,
+      "url": "http://127.0.0.1:5237/?office=1&theme=dark&scale=2#/prayers/prayer/mybrev-devotion-blessed-virgin-mary-laudes"
+    }
+  ],
+  "errors": [],
+  "blocked": [],
+  "productionFirestoreRequests": 0,
+  "canvasKit": "Local SDK engine e4b8dca3f1b4ede4c30371002441c88c12187ed6",
+  "font": "Cached engine bootstrap Roboto; no external app requests"
+}

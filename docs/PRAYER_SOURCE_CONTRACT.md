@@ -12,11 +12,11 @@ Web PR: https://github.com/senddownrain/mybrev/pull/259
 
 ## Проверки и release gate
 
-SDK Flutter/Dart в рабочей среде отсутствует. Изменение остаётся draft: analyze/unit/widget и реальный Flutter Chrome visual smoke не выполнены. Не заявляется проверка установленного приложения. Native smoke не требовался для данной общей UI-правки; перед мобильным релизом выполнить предусмотренный репозиторием отдельный smoke.
+Продолжение 2026-11-17: установлен Flutter 3.41.4 / Dart 3.11.1. Форматирование, analyze по CI-политике --no-fatal-infos и все 50 целевых тестов прошли, включая 6 source tests. Реальный Flutter Web проверен в Google Chrome: ordinary/office, 390px, light/dark 200%, прокрутка и ссылка. Скриншоты и логи: audit-evidence/prayer-sources/. Проверка установленного мобильного приложения и production-публикация не заявляются. Native smoke не требовался для данной общей UI-правки; перед мобильным релизом выполнить предусмотренный репозиторием отдельный smoke.
 
 ```sh
 dart format lib/models/prayer.dart lib/widgets/prayer_content.dart lib/screens/prayer_detail_screen.dart test/prayer_source_test.dart
-flutter analyze
+flutter analyze --no-fatal-infos
 flutter test test/prayer_source_test.dart test/prayer_formatting_widget_test.dart test/mass_reader_test.dart
 flutter devices
 flutter run -d chrome -t tool/prayer_formatting_smoke.dart --web-port 5237

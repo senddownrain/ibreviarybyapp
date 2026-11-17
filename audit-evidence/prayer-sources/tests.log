@@ -1,0 +1,62 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/prayer_source_test.dart
+00:00 +0: /workspace/ibreviarybyapp/test/prayer_source_test.dart: old bundle without source still decodes
+00:00 +1: /workspace/ibreviarybyapp/test/prayer_source_test.dart: source survives bundle decode, copy and local serialization
+00:00 +2: /workspace/ibreviarybyapp/test/prayer_source_test.dart: reader source note displays the canonical server value
+00:00 +3: /workspace/ibreviarybyapp/test/prayer_source_test.dart: legacy record without a source has no empty footer
+00:00 +4: /workspace/ibreviarybyapp/test/prayer_source_test.dart: production ordinary reader preserves the source and Scripture
+00:01 +5: /workspace/ibreviarybyapp/test/prayer_source_test.dart: production devotional reader displays canonical source
+00:03 +6: loading /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart
+00:03 +6: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: offline smoke harness opens reader, theme, narrow layout and preview
+00:07 +7: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.dark 16.0
+00:08 +8: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.dark 28.8
+00:08 +9: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.light 16.0
+00:08 +10: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: reader and preview share semantics/styles at Brightness.light 28.8
+00:09 +11: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to test-id keeps access checks and back navigation
+00:09 +12: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to missing keeps access checks and back navigation
+00:09 +13: /workspace/ibreviarybyapp/test/prayer_formatting_widget_test.dart: internal link to restricted keeps access checks and back navigation
+00:09 +14: loading /workspace/ibreviarybyapp/test/mass_reader_test.dart
+00:12 +14: /workspace/ibreviarybyapp/test/mass_reader_test.dart: Holy Mass opens in Belarusian with the section bar
+00:13 +15: /workspace/ibreviarybyapp/test/mass_reader_test.dart: Mass top actions are language and text scale, no favorite
+00:14 +16: /workspace/ibreviarybyapp/test/mass_reader_test.dart: a favorited Mass keeps its state without a top control
+00:15 +17: /workspace/ibreviarybyapp/test/mass_reader_test.dart: section bar shows every full section name within two lines
+00:16 +18: /workspace/ibreviarybyapp/test/mass_reader_test.dart: sections sheet lists the five Belarusian sections and jumps
+00:16 +19: /workspace/ibreviarybyapp/test/mass_reader_test.dart: scrolling updates the current section
+00:16 +20: /workspace/ibreviarybyapp/test/mass_reader_test.dart: switching language keeps the semantic section
+00:17 +21: /workspace/ibreviarybyapp/test/mass_reader_test.dart: missing section falls back to its parent
+00:18 +22: /workspace/ibreviarybyapp/test/mass_reader_test.dart: legacy Latin prayer id opens the Mass reader in Latin
+00:18 +23: /workspace/ibreviarybyapp/test/mass_reader_test.dart: controls fit a narrow phone with large text
+00:18 +24: /workspace/ibreviarybyapp/test/mass_reader_test.dart: English works offline from the bundled asset
+00:18 +25: /workspace/ibreviarybyapp/test/mass_reader_test.dart: system back closes the sections sheet before the reader
+00:19 +26: /workspace/ibreviarybyapp/test/mass_reader_test.dart: section bar uses the TargetPlatform.android chrome surface
+00:19 +27: /workspace/ibreviarybyapp/test/mass_reader_test.dart: section bar uses the TargetPlatform.iOS chrome surface
+00:19 +28: /workspace/ibreviarybyapp/test/mass_reader_test.dart: ordinary prayers keep the regular reader
+00:19 +29: /workspace/ibreviarybyapp/test/mass_reader_test.dart: Mass variant ids open the dedicated Mass reader route
+00:19 +30: /workspace/ibreviarybyapp/test/mass_reader_test.dart: app dock is hidden in the Mass reader and restored on leave
+[Review] state unavailable: Bad state: Review box "app_review_v1" is not open
+[Review] state not saved: Bad state: Review box "app_review_v1" is not open
+00:19 +31: loading /workspace/ibreviarybyapp/test/devotional_office_test.dart
+00:20 +31: /workspace/ibreviarybyapp/test/devotional_office_test.dart: (setUpAll)
+00:20 +31: /workspace/ibreviarybyapp/test/devotional_office_test.dart: mybrev-devotion-office-for-dead-laudes: strict profile, exact source ranges and all hidden alternatives retained
+00:21 +32: /workspace/ibreviarybyapp/test/devotional_office_test.dart: mybrev-devotion-office-for-dead-vesper: strict profile, exact source ranges and all hidden alternatives retained
+00:21 +33: /workspace/ibreviarybyapp/test/devotional_office_test.dart: mybrev-devotion-blessed-virgin-mary-laudes: strict profile, exact source ranges and all hidden alternatives retained
+00:21 +34: /workspace/ibreviarybyapp/test/devotional_office_test.dart: mybrev-devotion-blessed-virgin-mary-vesper: strict profile, exact source ranges and all hidden alternatives retained
+00:21 +35: /workspace/ibreviarybyapp/test/devotional_office_test.dart: catholicby-yearcycle-100116: strict profile, exact source ranges and all hidden alternatives retained
+00:21 +36: /workspace/ibreviarybyapp/test/devotional_office_test.dart: mybrev-devotion-office-for-dead-laudes: four intentions synchronously choose exact source hymn and prayer
+00:21 +37: /workspace/ibreviarybyapp/test/devotional_office_test.dart: mybrev-devotion-office-for-dead-vesper: four intentions synchronously choose exact source hymn and prayer
+00:21 +38: /workspace/ibreviarybyapp/test/devotional_office_test.dart: office labels stay red-ready, compact and safe, including no-space legacy replies
+00:21 +39: /workspace/ibreviarybyapp/test/devotional_office_test.dart: (tearDownAll)
+00:21 +39: loading /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart
+00:22 +39: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: (setUpAll)
+00:22 +39: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-office-for-dead-laudes: real screen 320px light
+00:25 +40: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-office-for-dead-laudes: real screen 320px dark 200%
+00:27 +41: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-office-for-dead-vesper: real screen 320px light
+00:28 +42: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-office-for-dead-vesper: real screen 320px dark 200%
+00:29 +43: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-blessed-virgin-mary-laudes: real screen 320px light
+00:30 +44: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-blessed-virgin-mary-laudes: real screen 320px dark 200%
+00:31 +45: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-blessed-virgin-mary-vesper: real screen 320px light
+00:32 +46: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: mybrev-devotion-blessed-virgin-mary-vesper: real screen 320px dark 200%
+00:33 +47: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: catholicby-yearcycle-100116: real screen 320px light
+00:34 +48: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: catholicby-yearcycle-100116: real screen 320px dark 200%
+00:34 +49: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: changing all four intentions updates both dependent sections, with no duplicate labels
+00:36 +50: /workspace/ibreviarybyapp/test/devotional_office_widget_test.dart: (tearDownAll)
+00:36 +50: All tests passed!

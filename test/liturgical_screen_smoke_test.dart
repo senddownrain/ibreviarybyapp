@@ -633,9 +633,30 @@ void main() {
         );
         expect(
           find.byType(LiturgicalHeadingReferenceRow),
-          hour == 'lectionis' ? findsNothing : findsOneWidget,
+          findsNWidgets(hour == 'morning' ? 2 : 1),
         );
         expect(find.byType(LiturgicalResponsoryBlock), findsWidgets);
+        if (hour == 'lectionis' || hour == 'morning') {
+          expect(find.text('РЭСПАНСОРЫЙ'), findsOneWidget);
+        }
+        // Embedded headings use the same real Text style as other sections;
+        // HTML fallback must not silently render a smaller/lighter heading.
+        for (final label in const [
+          'КАРОТКАЕ ЧЫТАННЕ',
+          'КАРОТКІ РЭСПАНСОРЫЙ',
+          'РЭСПАНСОРЫЙ',
+        ]) {
+          final finder = find.text(label);
+          final texts = tester.widgetList<Text>(finder);
+          for (final text in texts) {
+            expect(
+              text.style,
+              ReaderTheme.of(
+                tester.element(finder.first),
+              ).hourSectionHeading(size),
+            );
+          }
+        }
       }
       if (const {
         'structured-smoke',

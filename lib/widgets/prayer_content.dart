@@ -135,7 +135,9 @@ class PrayerSourceNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (source == null || source!.trim().isEmpty) return const SizedBox.shrink();
+    if (source == null || source!.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Text(
