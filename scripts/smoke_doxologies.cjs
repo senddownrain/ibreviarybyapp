@@ -58,6 +58,14 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
   await page.waitForFunction(async n => await highPriestScrollTo(n), needle, {timeout:30000});
   await pause(400);
  };
+ const tapRenderedText=async text=>{
+  const position=await page.waitForFunction(needle=>window.highPriestTextCenter?.(needle)||false,
+   '@any:'+text,{timeout:15000});
+  const [x,y]=JSON.parse(await position.jsonValue());
+  assert(x>=0&&x<page.viewportSize().width&&y>=0&&y<page.viewportSize().height,
+   `Outside viewport: ${text} at ${x},${y}`);
+  await page.mouse.click(x,y);
+ };
  try {
   for(const profile of [{width:390,height:844,theme:'light',scale:'normal',mode:'leftBreak'},{width:1280,height:900,theme:'dark',scale:'normal',mode:'alternatingStanzas'},{width:390,height:844,theme:'dark',scale:'large',mode:'leftBreakIndent'}]){
    if (triduum && profile.width !== 390) continue;
@@ -79,8 +87,8 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     await page.screenshot({path:path.join(out,`${profile.width}-${profile.theme}-${profile.scale}-${c.name}.png`)});
     if(c.octave){
-     await page.getByRole('button',{name:/Пасля II Нешпараў нядзелі/u}).first().click();
-     await page.locator('flt-semantics[aria-label="Пасля I Нешпараў нядзелі"]').first().click();
+     await tapRenderedText('Пасля II Нешпараў нядзелі');
+     await tapRenderedText('Пасля I Нешпараў нядзелі');
      await scroll('@any:Пане, будзь з намі ў гэтую ноч');
      await page.screenshot({path:path.join(out,`${profile.width}-${profile.theme}-${profile.scale}-${c.name}-first-prayer.png`)});
      await scroll('@any:Вось дзень, які Пан учыніў');
