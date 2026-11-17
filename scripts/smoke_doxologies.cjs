@@ -5,7 +5,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const base = 'http://localhost:5241/';
-const out = path.resolve('audit-evidence/doxologies');
+const triduum = process.argv.includes('--triduum');
+const out = path.resolve('audit-evidence', triduum ? 'triduum' : 'doxologies');
 const pause = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
  fs.mkdirSync(out, {recursive:true});
@@ -36,7 +37,12 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
   external.push(u.origin+u.pathname);return route.abort();
  });
  const jos='12-11-sv-josaphat-minsk-mohilev-pinsk--pinsk';
- const cases=[
+ const cases=triduum ? [
+  {name:'good-friday',date:'2027-03-26',dayId:'holyweek-w1-d6',hour:'vespers',needle:'@any:У якасці просьбаў'},
+  {name:'holy-saturday',date:'2027-03-27',dayId:'holyweek-w1-d7',hour:'completorium',needle:'@any:Камплету чытаюць толькі тыя'},
+  {name:'solemnity-eve',date:'2027-12-07',dayId:'legacy-copy',hour:'completorium',needle:'@any:наведай гэты дом'},
+  {name:'easter-octave',date:'2027-03-29',dayId:'easter-w1-d2',hour:'completorium',needle:'@any:Пасля II Нешпараў нядзелі',octave:true},
+ ] : [
   {name:'josaphat-martyr',date:'2026-11-12',dayId:jos,hour:'lectionis'},
   {name:'josaphat-pastors',date:'2026-11-12',dayId:jos+'--pastors',hour:'lectionis'},
   ...['lectionis','terz','sext','non','vespers','completorium'].map(hour=>({name:'dead-'+hour,date:'2026-11-02',dayId:'office-for-dead',hour})),
@@ -54,6 +60,7 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
  };
  try {
   for(const profile of [{width:390,height:844,theme:'light',scale:'normal',mode:'leftBreak'},{width:1280,height:900,theme:'dark',scale:'normal',mode:'alternatingStanzas'},{width:390,height:844,theme:'dark',scale:'large',mode:'leftBreakIndent'}]){
+   if (triduum && profile.width !== 390) continue;
    await page.setViewportSize({width:profile.width,height:profile.height});
    for(const c of cases){
     console.log('Checking',JSON.stringify({...c,...profile}));
@@ -71,6 +78,13 @@ const pause = ms => new Promise(r => setTimeout(r, ms));
     await scroll(c.needle||'Хвала Айцу і Сыну');
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     await page.screenshot({path:path.join(out,`${profile.width}-${profile.theme}-${profile.scale}-${c.name}.png`)});
+    if(c.octave){
+     await page.getByRole('button',{name:/Пасля II Нешпараў нядзелі/u}).first().click();
+     await page.locator('flt-semantics[aria-label="Пасля I Нешпараў нядзелі"]').first().click();
+     await scroll('@any:Пане, будзь з намі ў гэтую ноч');
+     await page.screenshot({path:path.join(out,`${profile.width}-${profile.theme}-${profile.scale}-${c.name}-first-prayer.png`)});
+     await scroll('@any:Вось дзень, які Пан учыніў');
+    }
     states.push({case:c.name,...profile,url:page.url(),endingReached:true});
    }
   }
