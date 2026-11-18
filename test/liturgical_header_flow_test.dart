@@ -323,6 +323,38 @@ void main() {
     },
   );
 
+  testWidgets(
+    'date control visual preview: quiet celebration edit on 18 November',
+    (tester) async {
+      final (router, _) = await start(
+        tester,
+        width: 390,
+        brightness: Brightness.light,
+        date: DateTime(2026, 11, 18),
+      );
+      expect(
+        find.byKey(const Key('hours-alternatives-control')),
+        findsOneWidget,
+      );
+      await snapshot(tester, 'quiet-celebration-hours-light-2026-11-18');
+      // Capture the real press-feedback state without opening the selector.
+      final action = find.byKey(const Key('hours-alternatives-control'));
+      final gesture = await tester.startGesture(tester.getCenter(action));
+      await tester.pump(const Duration(milliseconds: 120));
+      await snapshot(tester, 'quiet-celebration-hours-pressed-2026-11-18');
+      await gesture.cancel();
+      await tester.pumpAndSettle();
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('readings-alternatives-control')),
+        findsOneWidget,
+      );
+      await snapshot(tester, 'quiet-celebration-readings-light-2026-11-18');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('date control visual preview: light Readings', (
     tester,
   ) async {
@@ -335,22 +367,29 @@ void main() {
     router.go('/readings');
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-today')), findsOneWidget);
-    // Date has no elevated floating-card shadow; alternatives have a
-    // discoverable but still neutral tap surface.
+    // Both controls are quiet, but the celebration has no visible border.
     final dateBox = tester.widget<DecoratedBox>(
       find.byKey(const Key('readings-date-control')),
     );
     final dateDecoration = dateBox.decoration as BoxDecoration;
     expect(dateDecoration.boxShadow, isNull);
     expect(dateDecoration.color!.a, lessThan(0.04));
-    final alternatives = tester.widget<TextButton>(
-      find.byKey(const Key('readings-alternatives-control')),
+    final action = find.byKey(const Key('readings-alternatives-control'));
+    expect(tester.widget<InkWell>(action).onTap, isNotNull);
+    final celebration = tester.widget<Ink>(
+      find.descendant(of: action, matching: find.byType(Ink)),
     );
-    final alternativesFill = alternatives.style?.backgroundColor?.resolve({});
-    expect(alternativesFill, isNotNull);
-    expect(alternativesFill!.a, lessThan(0.025));
-    expect(alternatives.style?.minimumSize?.resolve({})?.height, 48);
-    expect(find.byIcon(Icons.layers_outlined), findsOneWidget);
+    final surfaceDecoration = celebration.decoration! as BoxDecoration;
+    expect(surfaceDecoration.border, isNull);
+    expect(surfaceDecoration.color!.a, closeTo(0.025, 0.0001));
+    expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
+    expect(find.text('Варыянты'), findsNothing);
+    expect(
+      tester.getRect(action).contains(
+        tester.getCenter(find.byKey(const Key('readings-celebration-title'))),
+      ),
+      isTrue,
+    );
     await snapshot(tester, 'polished-date-control-readings-light-2026-11-13');
     expect(tester.takeException(), isNull);
   });

@@ -79,13 +79,13 @@ const List<TourStep> defaultTourSteps = [
     id: 'tour.variants',
     titleBe: 'Варыянты дня і цыклы',
     bodyBe:
-        'Іншыя варыянты дня, калі яны ёсць, выбіраюцца асобна. '
+        'Націсніце на ўвесь блок літургічнага дня з алоўкам, '
+        'каб выбраць іншы даступны варыянт. '
         'Іншы цыкл чытанняў (A, B, C) можна толькі паглядзець, '
         'ён не мяняе вашу Імшу.',
-    anchors: [
-      TourAnchor.suffix('-alternatives-control'),
-      TourAnchor.exact('readings-celebration-title'),
-    ],
+    // Only highlight the real tappable area. When the selector is not
+    // available, the tour must not point at an inactive title.
+    anchors: [TourAnchor.suffix('-alternatives-control')],
     branch: AppBranch.readings,
   ),
   TourStep(
