@@ -762,7 +762,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(
         _OraItem.antiphon(ant, controller: antController, showPicker: i == 1),
       );
-      items.add(_OraItem.psalm(ps));
+      items.add(_OraItem.psalm(ps, externalAntiphon: ant, antiphonController: antController));
     }
     items.add(
       _OraItem.antiphon(ant, controller: antController, showPicker: false),
@@ -1608,11 +1608,16 @@ class _OraItem {
   factory _OraItem.html(String html, {String kind = 'generic'}) =>
       _OraItem._(_OraItemType.html, html, alternativeKind: kind);
 
-  factory _OraItem.psalm(String html, {String? externalAntiphon}) => _OraItem._(
+  factory _OraItem.psalm(
+    String html, {
+    String? externalAntiphon,
+    ValueNotifier<int>? antiphonController,
+  }) => _OraItem._(
     _OraItemType.psalm,
     html,
     alternativeKind: 'psalm',
     externalAntiphon: externalAntiphon,
+    antiphonController: antiphonController,
   );
 
   factory _OraItem.plain(
@@ -1698,6 +1703,7 @@ class _OraItem {
             textStyle: textStyle,
             isPsalm: true,
             externalAntiphon: externalAntiphon,
+            psalmAntiphonController: antiphonController,
           ),
         );
 
@@ -1990,6 +1996,7 @@ class _HtmlOrText extends ConsumerWidget {
   final bool showPicker;
   final String pickerLabel;
   final String? externalAntiphon;
+  final ValueNotifier<int>? psalmAntiphonController;
   final ReadingChoiceSlot? choice;
 
   const _HtmlOrText({
@@ -2001,6 +2008,7 @@ class _HtmlOrText extends ConsumerWidget {
     this.showPicker = true,
     this.pickerLabel = 'Выбар варыянта',
     this.externalAntiphon,
+    this.psalmAntiphonController,
     this.choice,
   });
 
@@ -2095,14 +2103,37 @@ class _HtmlOrText extends ConsumerWidget {
       }
     }
     if (isPsalm) {
-      return PsalmChoirHtml(
-        html: formatPsalmHtml(
+      Widget render(int selectedAntiphon) {
+        var displayed = formatPsalmHtml(
           stripEmbeddedAntiphon(html, externalAntiphon: externalAntiphon),
-        ),
-        style: styles,
-        textColor: textColor,
-        rubricColor: reader.rubric,
-      );
+        );
+        if (externalAntiphon case final opening?) {
+          final options = getLiturgicalAlternatives(
+            opening,
+            kind: 'psalm-antiphon',
+          );
+          if (selectedAntiphon >= 0 && selectedAntiphon < options.length) {
+            displayed = omitEchoedPsalmOpening(
+              displayed,
+              options[selectedAntiphon].html,
+            );
+          }
+        }
+        return PsalmChoirHtml(
+          html: displayed,
+          style: styles,
+          textColor: textColor,
+          rubricColor: reader.rubric,
+        );
+      }
+
+      final controller = psalmAntiphonController;
+      return controller == null
+          ? render(0)
+          : ValueListenableBuilder<int>(
+              valueListenable: controller,
+              builder: (context, selected, child) => render(selected),
+            );
     }
     final officeHtml =
         alternativeKind == 'reading' ||
