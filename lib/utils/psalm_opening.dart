@@ -14,7 +14,7 @@ String omitEchoedPsalmOpening(String psalmHtml, String? selectedAntiphonHtml) {
       (marker.text.trim() != '†' && marker.text.trim() != '*')) {
     return psalmHtml;
   }
-  final antiphon = parseFragment(selectedAntiphonHtml).text.replaceFirst(
+  final antiphon = (parseFragment(selectedAntiphonHtml).text ?? '').replaceFirst(
     RegExp(r'^\s*(?:[1-9]\s*)?ант\.\s*', caseSensitive: false), '',
   );
   final prefix = _textBefore(paragraph, marker).replaceFirst(
