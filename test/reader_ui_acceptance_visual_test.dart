@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mybrev_flutter/main.dart' show buildAppTheme;
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
@@ -16,6 +17,13 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
 import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+
+class _DarkVisualSettings extends _VisualSettings {
+  @override
+  SettingsState build() => const SettingsState(
+    themePreference: AppThemePreference.dark,
+  );
+}
 
 class _VisualSettings extends SettingsNotifier {
   @override
@@ -96,16 +104,19 @@ void main() {
       RepaintBoundary(
         key: const Key('reader-acceptance-capture'),
         child: ProviderScope(
-          overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
+          overrides: [
+            settingsProvider.overrideWith(_DarkVisualSettings.new),
+          ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              useMaterial3: true,
-              colorScheme: AppPalette.marianScheme,
-              extensions: const [IbColors.marian],
-              fontFamily: 'VisualPreview',
+            theme: buildAppTheme(
+              AppPalette.scheme(Brightness.dark),
+              preference: AppThemePreference.dark,
             ),
-            home: const Scaffold(body: SettingsScreen()),
+            home: const Scaffold(
+              appBar: AppBar(title: Text('Налады')),
+              body: SettingsScreen(),
+            ),
           ),
         ),
       ),
@@ -116,9 +127,19 @@ void main() {
     expect(find.byTooltip('Па левым краі'), findsOneWidget);
     expect(find.byTooltip('Па шырыні'), findsOneWidget);
     expect(find.text('Прыклад'), findsNothing);
+    // Top-level sections share the same production chrome typography.
+    final sectionSize = tester.widget<Text>(find.text('Тэкст')).style?.fontSize;
+    expect(
+      tester.widget<Text>(find.text('Псальмодыя')).style?.fontSize,
+      sectionSize,
+    );
+    expect(
+      tester.widget<Text>(find.text('Стартовы раздзел')).style?.fontSize,
+      sectionSize,
+    );
     await Scrollable.ensureVisible(
-      tester.element(find.byKey(const Key('settings-reader-font'))),
-      alignment: 0.10,
+      tester.element(find.text('Тэкст')),
+      alignment: 0.06,
     );
     await tester.pumpAndSettle();
     await _capture(tester, '01-text-settings');
