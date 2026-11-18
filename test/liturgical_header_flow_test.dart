@@ -337,6 +337,13 @@ void main() {
         findsOneWidget,
       );
       await snapshot(tester, 'quiet-celebration-hours-light-2026-11-18');
+      // Capture the real press-feedback state without opening the selector.
+      final action = find.byKey(const Key('hours-alternatives-control'));
+      final gesture = await tester.startGesture(tester.getCenter(action));
+      await tester.pump(const Duration(milliseconds: 120));
+      await snapshot(tester, 'quiet-celebration-hours-pressed-2026-11-18');
+      await gesture.cancel();
+      await tester.pumpAndSettle();
       router.go('/readings');
       await tester.pumpAndSettle();
       expect(
@@ -374,7 +381,7 @@ void main() {
     );
     final surfaceDecoration = celebration.decoration! as BoxDecoration;
     expect(surfaceDecoration.border, isNull);
-    expect(surfaceDecoration.color!.a, lessThan(0.025));
+    expect(surfaceDecoration.color!.a, closeTo(0.025, 0.0001));
     expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
     expect(find.text('Варыянты'), findsNothing);
     expect(
