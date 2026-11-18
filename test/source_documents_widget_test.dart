@@ -188,13 +188,15 @@ void main() {
       expect(_path(router), sourcesRoute);
       expect(find.text('Касцёльныя крыніцы'), findsOneWidget);
       expect(find.text('Іншыя крыніцы'), findsOneWidget);
-      expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2018)'), findsOneWidget);
+      expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2022)'), findsOneWidget);
       expect(
         find.text('Малітоўнік «Каб пазналі Цябе» (Гродна, 2014)'),
         findsOneWidget,
       );
       expect(find.text('«Біблія» (Мінск, 2017)'), findsOneWidget);
-      expect(find.text('«Біблія» Синодальный перевод'), findsOneWidget);
+      expect(find.text('© Выдавецтва Пінскай дыяцэзіі, 2022'), findsOneWidget);
+      expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2018)'), findsNothing);
+      expect(find.text('«Библия» (Синодальный перевод)'), findsOneWidget);
       expect(
         find.text('Стары Запавет - на падставе рукапісаў кс. У. Чарняўскага'),
         findsOneWidget,

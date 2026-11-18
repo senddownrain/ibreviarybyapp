@@ -38,7 +38,9 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/office_collect_conclusion.dart';
 import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
+import 'package:mybrev_flutter/utils/psalm_opening.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/pastors_hymn.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
@@ -758,9 +760,12 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       final ps = (invit['invitatoriumPs$i']?.toString() ?? '').trim();
       if (ps.isEmpty) break;
       items.add(
-        _OraItem.antiphon(ant, controller: antController, showPicker: i == 1),
+        _OraItem.antiphon(
+          ant, controller: antController, showPicker: i == 1,
+          followingPsalmHtml: ps,
+        ),
       );
-      items.add(_OraItem.psalm(ps));
+      items.add(_OraItem.psalm(ps, externalAntiphon: ant, antiphonController: antController));
     }
     items.add(
       _OraItem.antiphon(ant, controller: antController, showPicker: false),
@@ -1193,7 +1198,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(
         _OraItem.labeled(
           'Малітва',
-          prayer,
+          expandOfficeCollectConclusion(prayer),
           kind: 'prayer',
           startsSection: false,
         ),
@@ -1522,6 +1527,7 @@ class _OraItem {
   final String? sourceAntiphon;
   final ValueNotifier<int>? antiphonController;
   final String? canticleCaption;
+  final String? followingPsalmHtml;
   final bool startsSection;
   final ReadingChoiceSlot? choice;
   final double trailingSpacing;
@@ -1540,6 +1546,7 @@ class _OraItem {
     this.sourceAntiphon,
     this.antiphonController,
     this.canticleCaption,
+    this.followingPsalmHtml,
     this.startsSection = false,
     this.choice,
     this.trailingSpacing = LiturgicalSpacing.plainTextAfter,
@@ -1580,12 +1587,14 @@ class _OraItem {
     String kind = 'generic',
     ValueNotifier<int>? controller,
     bool showPicker = true,
+    String? followingPsalmHtml,
   }) => _OraItem._(
     _OraItemType.antiphon,
     text,
     alternativeKind: kind,
     alternativeController: controller,
     showPicker: showPicker,
+    followingPsalmHtml: followingPsalmHtml,
   );
 
   factory _OraItem.labeled(
@@ -1606,11 +1615,16 @@ class _OraItem {
   factory _OraItem.html(String html, {String kind = 'generic'}) =>
       _OraItem._(_OraItemType.html, html, alternativeKind: kind);
 
-  factory _OraItem.psalm(String html, {String? externalAntiphon}) => _OraItem._(
+  factory _OraItem.psalm(
+    String html, {
+    String? externalAntiphon,
+    ValueNotifier<int>? antiphonController,
+  }) => _OraItem._(
     _OraItemType.psalm,
     html,
     alternativeKind: 'psalm',
     externalAntiphon: externalAntiphon,
+    antiphonController: antiphonController,
   );
 
   factory _OraItem.plain(
@@ -1664,6 +1678,7 @@ class _OraItem {
             alternativeController: alternativeController,
             showPicker: showPicker,
             pickerLabel: 'Выбар антыфоны',
+            followingPsalmHtml: followingPsalmHtml,
           ),
         );
 
@@ -1696,6 +1711,7 @@ class _OraItem {
             textStyle: textStyle,
             isPsalm: true,
             externalAntiphon: externalAntiphon,
+            psalmAntiphonController: antiphonController,
           ),
         );
 
@@ -1880,7 +1896,9 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
       ],
       ...model.metadata,
     ];
-    Widget antiphon(String html, {required bool showPicker}) => _HtmlOrText(
+    Widget antiphon(
+      String html, {required bool showPicker, String? followingPsalmHtml}
+    ) => _HtmlOrText(
       content: html,
       textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
       alternativeKind: canticleCaption == null
@@ -1889,6 +1907,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
       alternativeController: antiphonController,
       showPicker: showPicker,
       pickerLabel: 'Выбар антыфоны',
+      followingPsalmHtml: followingPsalmHtml,
     );
     return Column(
       key: const Key('liturgical-psalm-block'),
@@ -1908,7 +1927,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
         if (model.openingAntiphon case final opening?) ...[
           KeyedSubtree(
             key: const Key('liturgical-psalm-opening'),
-            child: antiphon(opening, showPicker: true),
+            child: antiphon(opening, showPicker: true, followingPsalmHtml: model.bodyHtml),
           ),
           const SizedBox(height: LiturgicalSpacing.antiphonToPsalm),
         ],
@@ -1924,12 +1943,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
         if (model.bodyHtml.trim().isNotEmpty)
           KeyedSubtree(
             key: const Key('liturgical-psalm-body'),
-            child: PsalmChoirHtml(
-              html: model.bodyHtml,
-              style: styles,
-              textColor: textStyle.color ?? reader.ink,
-              rubricColor: reader.rubric,
-            ),
+            child: _psalmBody(model, styles, reader),
           ),
         if (model.repeatedAntiphon case final repeated?) ...[
           const SizedBox(height: LiturgicalSpacing.antiphonToPsalm),
@@ -1942,6 +1956,39 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
           _HtmlOrText(content: model.trailingHtml, textStyle: textStyle),
       ],
     );
+  }
+
+  Widget _psalmBody(
+    LiturgicalPsalmModel model,
+    Map<String, Style> styles,
+    ReaderTheme reader,
+  ) {
+    Widget render(int selectedAntiphon) {
+      var html = model.bodyHtml;
+      if (model.openingAntiphon case final opening?) {
+        final choices = getLiturgicalAlternatives(
+          opening,
+          kind: canticleCaption == null ? 'psalm-antiphon' : 'gospel-antiphon',
+        );
+        if (selectedAntiphon >= 0 && selectedAntiphon < choices.length) {
+          html = omitEchoedPsalmOpening(html, choices[selectedAntiphon].html);
+        }
+      }
+      return PsalmChoirHtml(
+        html: html,
+        style: styles,
+        textColor: textStyle.color ?? reader.ink,
+        rubricColor: reader.rubric,
+      );
+    }
+
+    final controller = antiphonController;
+    return controller == null
+        ? render(0)
+        : ValueListenableBuilder<int>(
+            valueListenable: controller,
+            builder: (context, selected, child) => render(selected),
+          );
   }
 
   Widget _metadata(BuildContext context, PsalmMetadataLine line, double size) {
@@ -1991,6 +2038,8 @@ class _HtmlOrText extends ConsumerWidget {
   final bool showPicker;
   final String pickerLabel;
   final String? externalAntiphon;
+  final ValueNotifier<int>? psalmAntiphonController;
+  final String? followingPsalmHtml;
   final ReadingChoiceSlot? choice;
 
   const _HtmlOrText({
@@ -2002,6 +2051,8 @@ class _HtmlOrText extends ConsumerWidget {
     this.showPicker = true,
     this.pickerLabel = 'Выбар варыянта',
     this.externalAntiphon,
+    this.psalmAntiphonController,
+    this.followingPsalmHtml,
     this.choice,
   });
 
@@ -2015,7 +2066,7 @@ class _HtmlOrText extends ConsumerWidget {
       'office-reading',
       'prayer',
     }.contains(alternativeKind);
-    if (content.contains('<') && content.contains('>')) {
+    if ((content.contains('<') && content.contains('>')) || followingPsalmHtml != null) {
       return AlternativeText(
         text: content,
         label: pickerLabel,
@@ -2024,9 +2075,17 @@ class _HtmlOrText extends ConsumerWidget {
         showPicker: showPicker,
         choice: choice,
         contentBuilder: (context, selectedHtml) {
-          final displayedHtml = alternativeKind == 'intercession'
+          var displayedHtml = alternativeKind == 'intercession'
               ? formatIntercessions(selectedHtml)
               : selectedHtml;
+          if (followingPsalmHtml case final source?) {
+            final psalm = source.contains('psalm-strophe')
+                ? source
+                : formatPsalmHtml(source);
+            if (omitEchoedPsalmOpening(psalm, selectedHtml) != psalm) {
+              displayedHtml = addOpeningAntiphonFlexa(displayedHtml);
+            }
+          }
           return _renderHtml(context, displayedHtml, textAlignment);
         },
       );
@@ -2071,6 +2130,7 @@ class _HtmlOrText extends ConsumerWidget {
         fontWeight: FontWeight.w600,
         margin: Margins.zero,
       ),
+      '.psalm-antiphon-flexa': Style(color: reader.rubric),
     };
     // Only Scripture/Office readings and the final prayer are prose.
     // In particular, responsory turns, headings and rubrics stay left aligned.
@@ -2094,14 +2154,37 @@ class _HtmlOrText extends ConsumerWidget {
       }
     }
     if (isPsalm) {
-      return PsalmChoirHtml(
-        html: formatPsalmHtml(
+      Widget render(int selectedAntiphon) {
+        var displayed = formatPsalmHtml(
           stripEmbeddedAntiphon(html, externalAntiphon: externalAntiphon),
-        ),
-        style: styles,
-        textColor: textColor,
-        rubricColor: reader.rubric,
-      );
+        );
+        if (externalAntiphon case final opening?) {
+          final options = getLiturgicalAlternatives(
+            opening,
+            kind: 'psalm-antiphon',
+          );
+          if (selectedAntiphon >= 0 && selectedAntiphon < options.length) {
+            displayed = omitEchoedPsalmOpening(
+              displayed,
+              options[selectedAntiphon].html,
+            );
+          }
+        }
+        return PsalmChoirHtml(
+          html: displayed,
+          style: styles,
+          textColor: textColor,
+          rubricColor: reader.rubric,
+        );
+      }
+
+      final controller = psalmAntiphonController;
+      return controller == null
+          ? render(0)
+          : ValueListenableBuilder<int>(
+              valueListenable: controller,
+              builder: (context, selected, child) => render(selected),
+            );
     }
     final officeHtml =
         alternativeKind == 'reading' ||

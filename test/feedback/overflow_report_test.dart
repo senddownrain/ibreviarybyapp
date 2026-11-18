@@ -61,10 +61,43 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('no report entry on a list screen', (tester) async {
+  testWidgets('root list offers generic report with a section label', (
+    tester,
+  ) async {
     await pumpApp(tester);
     await openMenu(tester);
-    expect(find.text(kReportErrorLabel), findsNothing);
+    expect(find.text(kReportErrorLabel), findsOneWidget);
+    await tester.tap(find.text(kReportErrorLabel));
+    await tester.pumpAndSettle();
+    expect(find.textContaining("ctx_kind: other"), findsOneWidget);
+    expect(find.textContaining("ctx_title: Літургія гадзінаў"), findsOneWidget);
+  });
+
+  test('menu reports cover roots and lists, but not the feedback form', () {
+    for (final path in [
+      '/',
+      '/hours',
+      '/hours/ordo/month',
+      '/readings',
+      '/prayers',
+      '/prayers/compendium',
+      '/bible',
+    ]) {
+      expect(
+        feedbackLocationForMenuUri(Uri.parse(path)),
+        isNotNull,
+        reason: path,
+      );
+    }
+    expect(
+      feedbackLocationForMenuUri(Uri.parse('/settings/feedback')),
+      isNull,
+    );
+    final specific = feedbackLocationForMenuUri(
+      Uri.parse('/hours/ora/2026-11-18/day-1/lectionis'),
+    )!;
+    expect(specific, contains('ctx_kind=hour'));
+    expect(specific, contains('ctx_hour=office_of_readings'));
   });
 
   testWidgets('a pushed Hours page offers the entry with its context', (

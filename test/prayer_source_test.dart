@@ -21,10 +21,13 @@ void main() {
         'title': 'Малітва',
         'text': 'Пс 23, 1–6',
         'source': source,
+        'pages': '34–36',
       }, 'p');
       expect(prayer.copyWith(body: 'Тэкст').source, source);
       expect(Prayer.fromMap(prayer.toMap(), 'p').source, source);
       expect(prayer.displayText, 'Пс 23, 1–6');
+      expect(prayer.copyWith(body: 'Тэкст').pages, '34–36');
+      expect(Prayer.fromMap(prayer.toMap(), 'p').pages, '34–36');
     }
   });
 
@@ -61,13 +64,14 @@ void main() {
   ) async {
     await tester.pumpWidget(
       DevotionalOfficeHarness(
-        prayers: const [sourceSmokePrayer],
+        prayers: [sourceSmokePrayer.copyWith(pages: '26–27')],
         initialId: sourceSmokePrayer.id,
         systemFonts: true,
       ),
     );
     await tester.pumpAndSettle();
     expect(find.text('Крыніца: Бог добры'), findsOneWidget);
+    expect(find.text('26–27'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -82,7 +86,7 @@ void main() {
     final office = Prayer.fromMap(
       bundle.docs[sourceOfficeId]!,
       sourceOfficeId,
-    ).copyWith(source: 'Літургія гадзін');
+    ).copyWith(source: 'Літургія гадзін', pages: '78–80');
     await tester.pumpWidget(
       DevotionalOfficeHarness(
         prayers: [office],
@@ -92,6 +96,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Крыніца: Літургія гадзін'), findsOneWidget);
+    expect(find.text('78–80'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

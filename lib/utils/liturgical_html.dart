@@ -589,9 +589,13 @@ String preparePsalmChoirHtml(
     for (final piece in pieces) {
       if (piece.isMarker) {
         flushLink();
+        final cadence = parseFragment(piece.html).querySelector('.psalm-marker');
         rendered.write(piece.html);
+        // The ordinary † and * terminate their current line. Only the †
+        // inserted for a fully echoed first half-verse stays with that line.
         if (breakAfterMarker &&
-            parseFragment(piece.html).querySelector('.psalm-marker') != null) {
+            cadence != null &&
+            !cadence.classes.contains('psalm-opening-flexa')) {
           segments.add(rendered.toString());
           rendered.clear();
         }
@@ -606,8 +610,8 @@ String preparePsalmChoirHtml(
       }
       final lines = StringBuffer();
       for (var i = 0; i < segments.length; i++) {
-        // Source breaks inside a segment remain intact. Cadence signs stay
-        // with the preceding line; only continuations get an em-based inset.
+        // Ordinary cadence signs end a line. An echoed-opening dagger is
+        // exempt and remains at the start of the first psalm line.
         final segment = segments[i].replaceFirst(RegExp(r'^(\s|&nbsp;)+'), '');
         lines.write(
           '<span class="psalm-line${i == 0 ? '' : ' psalm-continuation'}">$segment</span>',

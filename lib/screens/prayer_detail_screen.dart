@@ -418,6 +418,11 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
               onLinkTap: _onLinkTap,
             ),
             PrayerSourceNote(source: prayer.source, textStyle: textStyle),
+            PrayerPagesNote(
+              pages: prayer.pages,
+              textStyle: textStyle,
+              topSpacing: prayer.source?.trim().isNotEmpty == true ? 6 : 16,
+            ),
           ],
         );
       }
@@ -525,6 +530,8 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
           sourceStyle: reader
               .sourceStyle(textStyle.fontSize ?? 16)
               .copyWith(fontFamily: textStyle.fontFamily),
+          pages: prayer.pages,
+          pagesTextStyle: textStyle,
         );
       }
       return Html(onLinkTap: _onLinkTap, data: formattedHtml, style: styles);
@@ -662,6 +669,8 @@ class _MassDocument extends StatefulWidget {
     required this.controller,
     required this.scrollController,
     required this.sourceStyle,
+    required this.pages,
+    required this.pagesTextStyle,
   });
 
   final String html;
@@ -671,6 +680,8 @@ class _MassDocument extends StatefulWidget {
   final MassNavigatorController controller;
   final ScrollController scrollController;
   final TextStyle sourceStyle;
+  final String? pages;
+  final TextStyle pagesTextStyle;
 
   @override
   State<_MassDocument> createState() => _MassDocumentState();
@@ -863,6 +874,11 @@ class _MassDocumentState extends State<_MassDocument> {
             style: widget.sourceStyle,
           ),
         ],
+        PrayerPagesNote(
+          pages: widget.pages,
+          textStyle: widget.pagesTextStyle,
+          topSpacing: source == null ? 16 : 6,
+        ),
         // Keeps the last lines clear of the floating section bar. Same
         // window-inset anchor as the bar itself, minus the space the reader
         // surface already adds below its content.

@@ -164,22 +164,35 @@ bool isHourAvailable(
   return hour.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
 }
 
-/// The picker and the document footer share both ordering and availability.
+/// The footer follows an explicit reading sequence, independent of the hour
+/// picker order. The Invitatory and Office of Readings both lead to Lauds.
+/// The combined morning Office and Compline do not have a footer successor.
+const kNextHourByType = <String, String>{
+  'invitatorium': 'laudes',
+  'lectionis': 'laudes',
+  'laudes': 'terz',
+  'terz': 'sext',
+  'sext': 'non',
+  'non': 'vespers',
+  'vespers': 'completorium',
+};
+
+/// Never skip over the intended destination to an unrelated later hour.
+/// Hide the footer button if that specific hour has no available content.
 HoraItem? nextAvailableHour(
   LiturgicalDay day,
   String currentType, {
   bool? completoriumAvailable,
 }) {
-  final index = kHoraItems.indexWhere((hour) => hour.type == currentType);
-  if (index < 0) return null;
-  return kHoraItems
-      .skip(index + 1)
-      .where(
-        (hour) => isHourAvailable(
-          day,
-          hour,
-          completoriumAvailable: completoriumAvailable,
-        ),
-      )
-      .firstOrNull;
+  final nextType = kNextHourByType[currentType];
+  if (nextType == null) return null;
+  final next = kHoraItems.where((hour) => hour.type == nextType).firstOrNull;
+  return next != null &&
+          isHourAvailable(
+            day,
+            next,
+            completoriumAvailable: completoriumAvailable,
+          )
+      ? next
+      : null;
 }

@@ -6,7 +6,7 @@
 
 ## Структура root `Малітоўнік`
 
-`Абраныя → Раздзелы (2 × 2) → Катэгорыі → Усе малітвы → Мае малітвы`.
+`Абраныя → Раздзелы (тры плиткі для адміністратара, дзве для астатніх) → Катэгорыі → Усе малітвы → Мае малітвы`.
 
 Плитки (`lib/widgets/prayerbook_section_tiles.dart`): iOS — `GlassSurface`,
 Android — tonal Material surface, одинаковая структура (иконка Phosphor,
@@ -19,11 +19,10 @@ Android — tonal Material surface, одинаковая структура (и�
 | Святая Імша | прежний `/prayers/prayer/<_kMassOrderPrayerId>`; без текста — «Тэкст Імшы недаступны» | `church` |
 | Спеўнік | `/prayers/songs` | `playlist` (строки текста с нотой — сборник песен, а не «воспроизведение») |
 | Катэхізіс | `/prayers/compendium` — Кампендый (см. `docs/compendium.md`); `/prayers/catechism` — redirect | `bookOpenText` |
-| Сакрамэнты | `/prayers/sacraments` — заглушка | `cross` |
 
-Заглушка Сакрамэнтаў — `PrayerbookPlaceholderScreen` («Раздзел у
-распрацоўцы»). Route стабилен: будущий модуль заменяет только widget в
-`router.dart`.
+Плитка «Сакрамэнты» («Хутка») скрыта из корня Малітоўніка до готовности раздела.
+Прямой маршрут `/prayers/sacraments` остаётся доступным для совместимости;
+пока он открывает `PrayerbookPlaceholderScreen` («Раздзел у распрацоўцы»).
 
 ## Модель и Firestore
 
