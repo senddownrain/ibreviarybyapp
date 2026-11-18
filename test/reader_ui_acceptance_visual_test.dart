@@ -113,20 +113,55 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('settings-reader-font')), findsOneWidget);
     expect(find.byKey(const Key('settings-text-preview')), findsOneWidget);
-    expect(find.text('Па шырыні'), findsOneWidget);
+    expect(find.byTooltip('Па левым краі'), findsOneWidget);
+    expect(find.byTooltip('Па шырыні'), findsOneWidget);
+    expect(find.text('Прыклад'), findsNothing);
     await Scrollable.ensureVisible(
       tester.element(find.byKey(const Key('settings-reader-font'))),
       alignment: 0.10,
     );
     await tester.pumpAndSettle();
     await _capture(tester, '01-text-settings');
+    tester.view.physicalSize = const Size(320, 800);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('settings-text-alignment')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await _capture(tester, '01b-text-settings-320');
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pumpAndSettle();
     await Scrollable.ensureVisible(
       tester.element(find.text('Псальмодыя')),
       alignment: 0.12,
     );
     await tester.pumpAndSettle();
     expect(find.text('Псальмодыя'), findsOneWidget);
+    final psalmTitle = find.text('Псальмодыя');
+    final psalmSelector = find.byKey(const Key('settings-psalmody-mode'));
+    expect(psalmSelector, findsOneWidget);
+    expect(
+      (tester.getCenter(psalmTitle).dy - tester.getCenter(psalmSelector).dy)
+          .abs(),
+      lessThan(5),
+    );
+    expect(
+      tester.getTopRight(psalmTitle).dx,
+      lessThan(tester.getTopLeft(psalmSelector).dx),
+    );
     await _capture(tester, '02-psalmody-example');
+
+    tester.view.physicalSize = const Size(320, 800);
+    await tester.pumpAndSettle();
+    await Scrollable.ensureVisible(tester.element(psalmSelector), alignment: 0.12);
+    await tester.pumpAndSettle();
+    expect(
+      (tester.getCenter(psalmTitle).dy - tester.getCenter(psalmSelector).dy)
+          .abs(),
+      lessThan(5),
+    );
+    expect(tester.takeException(), isNull);
+    await _capture(tester, '02b-psalmody-320');
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 

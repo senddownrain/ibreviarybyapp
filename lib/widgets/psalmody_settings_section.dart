@@ -40,20 +40,38 @@ class _PsalmodySettingsSectionState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Псальмодыя', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
-        PsalmodyModeSelector(
-          value: settings.psalmodyMode,
-          onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final title = Text(
+              'Псальмодыя',
+              style: Theme.of(context).textTheme.titleSmall,
+            );
+            final selector = PsalmodyModeSelector(
+              key: const Key('settings-psalmody-mode'),
+              value: settings.psalmodyMode,
+              onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
+            );
+            // Keep the three modes next to the title on narrow phones.
+            // Only stack for very small available widths or enlarged text.
+            final inline =
+                constraints.maxWidth >= 254 &&
+                MediaQuery.textScalerOf(context).scale(1) <= 1.3;
+            if (!inline) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [title, const SizedBox(height: 8), selector],
+              );
+            }
+            return Row(
+              children: [
+                Expanded(child: title),
+                const SizedBox(width: 8),
+                SizedBox(width: 144, child: selector),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 16),
-        Text(
-          'Прыклад',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 8),
         PsalmodyScope(
           controller: _choir,
           mode: settings.psalmodyMode,
