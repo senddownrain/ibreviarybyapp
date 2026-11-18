@@ -75,16 +75,10 @@ void main() {
       final result = formatPsalmHtml(source);
 
       expect(RegExp('class="psalm-strophe').allMatches(result), hasLength(4));
-      expect(
-        result,
-        contains('пакорным<br>і прыгнечаным сэрцам.</p>'),
-      );
+      expect(result, contains('пакорным<br>і прыгнечаным сэрцам.</p>'));
       expect(RegExp('data-psalm-choir="1"').allMatches(result), hasLength(2));
       expect(RegExp('data-psalm-choir="2"').allMatches(result), hasLength(2));
-      expect(
-        result,
-        contains('psalm-strophe-even">У сваёй'),
-      );
+      expect(result, contains('psalm-strophe-even">У сваёй'));
     });
 
     test('soft wrap before later cadence preserves choir parity', () {
