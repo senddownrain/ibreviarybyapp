@@ -65,6 +65,46 @@ void main() {
       expect(result, contains('<span class="psalm-marker">†</span>'));
     });
 
+    test('Psalm 50 soft break remains inside one strophe and keeps parity', () {
+      const source =
+          '<p>Пане, адкрый мае вусны, * і вусны мае будуць абвяшчаць хвалу.</p>'
+          '<p>Бо Ты не прагнеш ахвяры, * Табе не спадабаецца.</p>'
+          '<p>Ахвяра Богу – гэта скрушаны дух, * не пагарджай, Божа, '
+          'пакорным<br>і прыгнечаным сэрцам.</p>'
+          '<p>У сваёй дабрыні будзь ласкавы да Сіёна, * адбудуй муры.</p>';
+      final result = formatPsalmHtml(source);
+
+      expect(RegExp('class="psalm-strophe').allMatches(result), hasLength(4));
+      expect(result, contains('пакорным<br>і прыгнечаным сэрцам.</p>'));
+      expect(RegExp('data-psalm-choir="1"').allMatches(result), hasLength(2));
+      expect(RegExp('data-psalm-choir="2"').allMatches(result), hasLength(2));
+      expect(result, contains('psalm-strophe-even">У сваёй'));
+    });
+
+    test('soft wrap before later cadence preserves choir parity', () {
+      const source =
+          '<p>Першы радок * другая палова<br>працяг без кадэнцыі<br>'
+          'Новы радок † працяг * другая палова<br>'
+          'Яшчэ адзін радок * завяршэнне.</p>';
+      final result = formatPsalmHtml(source);
+
+      expect(RegExp('class="psalm-strophe').allMatches(result), hasLength(3));
+      expect(result, contains('другая палова<br>працяг без кадэнцыі'));
+      expect(RegExp('data-psalm-choir="1"').allMatches(result), hasLength(2));
+      expect(RegExp('data-psalm-choir="2"').allMatches(result), hasLength(1));
+    });
+
+    test('encoded cadence on the next line still begins a new strophe', () {
+      const source =
+          '<p>Радок * працяг<br>мяккі перанос<br>'
+          'Наступны радок &#x2a; другая палова.</p>';
+      final result = formatPsalmHtml(source);
+
+      expect(RegExp('class="psalm-strophe').allMatches(result), hasLength(2));
+      expect(result, contains('працяг<br>мяккі перанос'));
+      expect(result, contains('data-psalm-choir="2"'));
+    });
+
     test('prepares alternating choirs and dims only the selected choir', () {
       final formatted = formatPsalmHtml(
         '<p>Першы радок *<br>другі радок</p>'

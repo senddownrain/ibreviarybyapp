@@ -411,9 +411,20 @@ String formatPsalmHtml(String html) {
     final strophes = <String>[];
     var cursor = 0;
     var current = '';
-    for (final br in _breakPattern.allMatches(content)) {
+    final breaks = _breakPattern.allMatches(content).toList();
+    for (var i = 0; i < breaks.length; i++) {
+      final br = breaks[i];
       current += content.substring(cursor, br.start);
-      if (_asteriskPattern.hasMatch(current)) {
+      final nextLineEnd = i + 1 < breaks.length
+          ? breaks[i + 1].start
+          : content.length;
+      final nextLine = content.substring(br.end, nextLineEnd);
+
+      // A source <br> can be a soft wrap inside one verse. Split only when
+      // the following line introduces another cadence-bearing strophe.
+      // Otherwise a trailing half-verse becomes a false choir/indent.
+      if (_asteriskPattern.hasMatch(current) &&
+          _cadencePattern.hasMatch(nextLine)) {
         if (current.trim().isNotEmpty) strophes.add(current);
         current = '';
       } else {
@@ -589,7 +600,9 @@ String preparePsalmChoirHtml(
     for (final piece in pieces) {
       if (piece.isMarker) {
         flushLink();
-        final cadence = parseFragment(piece.html).querySelector('.psalm-marker');
+        final cadence = parseFragment(
+          piece.html,
+        ).querySelector('.psalm-marker');
         rendered.write(piece.html);
         // The ordinary † and * terminate their current line. Only the †
         // inserted for a fully echoed first half-verse stays with that line.
