@@ -113,13 +113,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('settings-reader-font')), findsOneWidget);
     expect(find.byKey(const Key('settings-text-preview')), findsOneWidget);
-    expect(find.text('Па шырыні'), findsOneWidget);
+    expect(find.byTooltip('Па левым краі'), findsOneWidget);
+    expect(find.byTooltip('Па шырыні'), findsOneWidget);
+    expect(find.text('Прыклад'), findsNothing);
     await Scrollable.ensureVisible(
       tester.element(find.byKey(const Key('settings-reader-font'))),
       alignment: 0.10,
     );
     await tester.pumpAndSettle();
     await _capture(tester, '01-text-settings');
+    tester.view.physicalSize = const Size(320, 800);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('settings-text-alignment')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await _capture(tester, '01b-text-settings-320');
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pumpAndSettle();
     await Scrollable.ensureVisible(
       tester.element(find.text('Псальмодыя')),
       alignment: 0.12,
