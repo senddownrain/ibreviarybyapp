@@ -113,9 +113,9 @@ void main() {
               AppPalette.scheme(Brightness.dark),
               preference: AppThemePreference.dark,
             ),
-            home: const Scaffold(
-              appBar: AppBar(title: Text('Налады')),
-              body: SettingsScreen(),
+            home: Scaffold(
+              appBar: AppBar(title: const Text('Налады')),
+              body: const SettingsScreen(),
             ),
           ),
         ),
