@@ -600,7 +600,9 @@ String preparePsalmChoirHtml(
     for (final piece in pieces) {
       if (piece.isMarker) {
         flushLink();
-        final cadence = parseFragment(piece.html).querySelector('.psalm-marker');
+        final cadence = parseFragment(
+          piece.html,
+        ).querySelector('.psalm-marker');
         rendered.write(piece.html);
         // The ordinary † and * terminate their current line. Only the †
         // inserted for a fully echoed first half-verse stays with that line.
