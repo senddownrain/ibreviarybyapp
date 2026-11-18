@@ -15,6 +15,7 @@ void main() {
     double width = 390,
     String keyPrefix = 'hours',
     VoidCallback? onVariants,
+    bool showVariants = true,
   }) async {
     tester.view.physicalSize = Size(width, 844);
     tester.view.devicePixelRatio = 1;
@@ -31,6 +32,7 @@ void main() {
               onPrevious: () {},
               onNext: () {},
               onVariants: onVariants ?? () {},
+              showVariants: showVariants,
             ),
           ),
         ),
@@ -205,7 +207,7 @@ void main() {
     expect(text.textSpan!.toPlainText(), 'Нядзеля');
     tester.view.reset();
   });
-  testWidgets('compact variants control stays beside an ordinary weekday', (
+  testWidgets('whole liturgical day is a quiet tap target, not a button chip', (
     tester,
   ) async {
     var taps = 0;
@@ -215,22 +217,33 @@ void main() {
       onVariants: () => taps++,
     );
     final action = find.byKey(const Key('hours-alternatives-control'));
+    final title = find.byKey(const Key('hours-celebration-title'));
     final metadata = find.byKey(const Key('hours-day-metadata'));
+    final edit = find.byKey(const Key('hours-celebration-edit-icon'));
     expect(action, findsOneWidget);
-    expect(find.text('Варыянты'), findsOneWidget);
-    expect(find.text('Іншыя варыянты'), findsNothing);
-    expect(tester.getRect(action).left, greaterThan(tester.getRect(metadata).left));
+    expect(find.text('Варыянты'), findsNothing);
+    expect(edit, findsOneWidget);
+    expect(tester.getRect(action).contains(tester.getCenter(title)), isTrue);
+    expect(tester.getRect(action).contains(tester.getCenter(metadata)), isTrue);
     expect(
-      (tester.getRect(action).center.dy - tester.getRect(metadata).center.dy).abs(),
-      lessThan(12),
+      (tester.getRect(edit).center.dy - tester.getRect(metadata).center.dy).abs(),
+      lessThan(15),
     );
-    await tester.tap(action);
+    final surface = tester.widget<Ink>(
+      find.descendant(of: action, matching: find.byType(Ink)),
+    );
+    final decoration = surface.decoration! as BoxDecoration;
+    expect(decoration.border, isNull);
+    expect(decoration.color!.a, lessThan(0.025));
+    await tester.tap(title);
     expect(taps, 1);
+    await tester.tap(edit);
+    expect(taps, 2);
     expect(tester.takeException(), isNull);
     tester.view.reset();
   });
 
-  testWidgets('long metadata wraps variants right without overflow', (
+  testWidgets('long feast and metadata fit at narrow width; tour targets full day', (
     tester,
   ) async {
     await showHeader(
@@ -241,8 +254,15 @@ void main() {
       metadata: 'Аўторак · Год II',
     );
     final action = find.byKey(const Key('readings-alternatives-control'));
+    final title = find.byKey(const Key('readings-celebration-title'));
     final metadata = find.byKey(const Key('readings-day-metadata'));
     expect(action, findsOneWidget);
+    expect(tester.getRect(action).contains(tester.getCenter(title)), isTrue);
+    expect(tester.getRect(action).contains(tester.getCenter(metadata)), isTrue);
+    expect(
+      tester.getRect(find.byKey(const Key('readings-celebration-edit-icon'))).right,
+      lessThanOrEqualTo(tester.view.physicalSize.width),
+    );
     final tourVariants = defaultTourSteps.singleWhere(
       (step) => step.id == 'tour.variants',
     );
@@ -252,10 +272,25 @@ void main() {
       ),
       isTrue,
     );
-    expect(tester.getTopLeft(action).dy,
-        greaterThan(tester.getBottomLeft(metadata).dy));
     expect(tester.takeException(), isNull);
     tester.view.reset();
   });
 
+  testWidgets('nonselectable celebration has no edit glyph or tap action', (
+    tester,
+  ) async {
+    var taps = 0;
+    await showHeader(
+      tester,
+      presentation: sample(rank: 'Будні дзень'),
+      showVariants: false,
+      onVariants: () => taps++,
+    );
+    expect(find.byKey(const Key('hours-alternatives-control')), findsNothing);
+    expect(find.byKey(const Key('hours-celebration-edit-icon')), findsNothing);
+    await tester.tap(find.byKey(const Key('hours-celebration-title')));
+    expect(taps, 0);
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
 }
