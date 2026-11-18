@@ -130,6 +130,10 @@ jobs:
           name: daily-header-pr90
           path: build/pr90-header/approved-vitebsk-*.png
           if-no-files-found: warn
+      - name: Daytime collect source by rank and Office parity
+        run: |
+          dart format --output=none --set-exit-if-changed lib/utils/office_assembly.dart test/daytime_collect_rank_test.dart
+          flutter test test/daytime_collect_rank_test.dart test/office_assembly_test.dart test/memorial_structure_trakai_test.dart
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
       - name: Prayer category pages, membership and cache regression
