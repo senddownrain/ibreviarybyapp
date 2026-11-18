@@ -174,7 +174,14 @@ void main() {
     final sectionSize = tester.widget<Text>(find.text('Тэкст')).style?.fontSize;
     expect(
       tester.widget<Text>(find.text('Псальмодыя')).style?.fontSize,
-      sectionSize,
+      tester.widget<Text>(find.text('Выраўноўванне тэксту')).style?.fontSize,
+    );
+    expect(
+      find.ancestor(
+        of: find.text('Псальмодыя'),
+        matching: find.byKey(const Key('settings-text-section')),
+      ),
+      findsOneWidget,
     );
     expect(
       tester.widget<Text>(find.text('Стартовы раздзел')).style?.fontSize,
@@ -211,6 +218,12 @@ void main() {
       tester.getTopRight(psalmTitle).dx,
       lessThan(tester.getTopLeft(psalmSelector).dx),
     );
+    expect(tester.getSize(psalmSelector).height, 48);
+    expect(tester.getSize(psalmSelector).width, 144);
+    expect(
+      tester.getSize(find.byKey(const Key('settings-text-alignment'))).height,
+      48,
+    );
     await _capture(tester, '02-psalmody-example');
 
     tester.view.physicalSize = const Size(320, 800);
@@ -226,6 +239,13 @@ void main() {
     await _capture(tester, '02b-psalmody-320');
     tester.view.physicalSize = const Size(390, 844);
     await tester.pumpAndSettle();
+    final about = find.byKey(const Key('settings-about'));
+    await Scrollable.ensureVisible(tester.element(about), alignment: 0.30);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
+    expect(find.text('Пра дадатак, крыніцы і правы'), findsOneWidget);
+    expect(find.byKey(const Key('settings-version')), findsOneWidget);
+    await _capture(tester, '03-settings-info-footer');
     expect(tester.takeException(), isNull);
   });
 
