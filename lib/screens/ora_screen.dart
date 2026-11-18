@@ -760,7 +760,10 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       final ps = (invit['invitatoriumPs$i']?.toString() ?? '').trim();
       if (ps.isEmpty) break;
       items.add(
-        _OraItem.antiphon(ant, controller: antController, showPicker: i == 1),
+        _OraItem.antiphon(
+          ant, controller: antController, showPicker: i == 1,
+          followingPsalmHtml: ps,
+        ),
       );
       items.add(_OraItem.psalm(ps, externalAntiphon: ant, antiphonController: antController));
     }
@@ -1524,6 +1527,7 @@ class _OraItem {
   final String? sourceAntiphon;
   final ValueNotifier<int>? antiphonController;
   final String? canticleCaption;
+  final String? followingPsalmHtml;
   final bool startsSection;
   final ReadingChoiceSlot? choice;
   final double trailingSpacing;
@@ -1542,6 +1546,7 @@ class _OraItem {
     this.sourceAntiphon,
     this.antiphonController,
     this.canticleCaption,
+    this.followingPsalmHtml,
     this.startsSection = false,
     this.choice,
     this.trailingSpacing = LiturgicalSpacing.plainTextAfter,
@@ -1582,12 +1587,14 @@ class _OraItem {
     String kind = 'generic',
     ValueNotifier<int>? controller,
     bool showPicker = true,
+    String? followingPsalmHtml,
   }) => _OraItem._(
     _OraItemType.antiphon,
     text,
     alternativeKind: kind,
     alternativeController: controller,
     showPicker: showPicker,
+    followingPsalmHtml: followingPsalmHtml,
   );
 
   factory _OraItem.labeled(
@@ -1671,6 +1678,7 @@ class _OraItem {
             alternativeController: alternativeController,
             showPicker: showPicker,
             pickerLabel: 'Выбар антыфоны',
+            followingPsalmHtml: followingPsalmHtml,
           ),
         );
 
@@ -1873,7 +1881,9 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
       ],
       ...model.metadata,
     ];
-    Widget antiphon(String html, {required bool showPicker}) => _HtmlOrText(
+    Widget antiphon(
+      String html, {required bool showPicker, String? followingPsalmHtml}
+    ) => _HtmlOrText(
       content: html,
       textStyle: textStyle.copyWith(fontWeight: FontWeight.w600),
       alternativeKind: canticleCaption == null
@@ -1882,6 +1892,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
       alternativeController: antiphonController,
       showPicker: showPicker,
       pickerLabel: 'Выбар антыфоны',
+      followingPsalmHtml: followingPsalmHtml,
     );
     return Column(
       key: const Key('liturgical-psalm-block'),
@@ -1892,7 +1903,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
         if (model.openingAntiphon case final opening?) ...[
           KeyedSubtree(
             key: const Key('liturgical-psalm-opening'),
-            child: antiphon(opening, showPicker: true),
+            child: antiphon(opening, showPicker: true, followingPsalmHtml: model.bodyHtml),
           ),
           const SizedBox(height: LiturgicalSpacing.antiphonToPsalm),
         ],
@@ -1997,6 +2008,7 @@ class _HtmlOrText extends ConsumerWidget {
   final String pickerLabel;
   final String? externalAntiphon;
   final ValueNotifier<int>? psalmAntiphonController;
+  final String? followingPsalmHtml;
   final ReadingChoiceSlot? choice;
 
   const _HtmlOrText({
@@ -2009,6 +2021,7 @@ class _HtmlOrText extends ConsumerWidget {
     this.pickerLabel = 'Выбар варыянта',
     this.externalAntiphon,
     this.psalmAntiphonController,
+    this.followingPsalmHtml,
     this.choice,
   });
 
@@ -2022,7 +2035,7 @@ class _HtmlOrText extends ConsumerWidget {
       'office-reading',
       'prayer',
     }.contains(alternativeKind);
-    if (content.contains('<') && content.contains('>')) {
+    if ((content.contains('<') && content.contains('>')) || followingPsalmHtml != null) {
       return AlternativeText(
         text: content,
         label: pickerLabel,
@@ -2031,9 +2044,17 @@ class _HtmlOrText extends ConsumerWidget {
         showPicker: showPicker,
         choice: choice,
         contentBuilder: (context, selectedHtml) {
-          final displayedHtml = alternativeKind == 'intercession'
+          var displayedHtml = alternativeKind == 'intercession'
               ? formatIntercessions(selectedHtml)
               : selectedHtml;
+          if (followingPsalmHtml case final source?) {
+            final psalm = source.contains('psalm-strophe')
+                ? source
+                : formatPsalmHtml(source);
+            if (omitEchoedPsalmOpening(psalm, selectedHtml) != psalm) {
+              displayedHtml = addOpeningAntiphonFlexa(displayedHtml);
+            }
+          }
           return _renderHtml(context, displayedHtml, textAlignment);
         },
       );
@@ -2078,6 +2099,7 @@ class _HtmlOrText extends ConsumerWidget {
         fontWeight: FontWeight.w600,
         margin: Margins.zero,
       ),
+      '.psalm-antiphon-flexa': Style(color: reader.rubric),
     };
     // Only Scripture/Office readings and the final prayer are prose.
     // In particular, responsory turns, headings and rubrics stay left aligned.
