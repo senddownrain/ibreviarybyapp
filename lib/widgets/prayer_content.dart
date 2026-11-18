@@ -44,6 +44,11 @@ class PrayerContent extends ConsumerWidget {
       children: [
         body,
         PrayerSourceNote(source: prayer.source, textStyle: textStyle),
+        PrayerPagesNote(
+          pages: prayer.pages,
+          textStyle: textStyle,
+          topSpacing: prayer.source?.trim().isNotEmpty == true ? 6 : 16,
+        ),
       ],
     );
     return wrapInSelectionArea ? SelectionArea(child: content) : content;
@@ -125,6 +130,38 @@ Map<String, Style> prayerDocumentStyles(
     '.psalm-marker': Style(color: reader.rubric, fontWeight: FontWeight.w600),
     '.liturgical-rubric-inline': Style(color: reader.rubric),
   };
+}
+
+/// Optional, unobtrusive printed page reference at the end of the prayer.
+class PrayerPagesNote extends StatelessWidget {
+  const PrayerPagesNote({
+    super.key,
+    this.pages,
+    required this.textStyle,
+    this.topSpacing = 16,
+  });
+
+  final String? pages;
+  final TextStyle textStyle;
+  final double topSpacing;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = pages?.trim() ?? '';
+    if (value.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: EdgeInsets.only(top: topSpacing),
+      child: Text(
+        'Старонкі: $value',
+        key: const Key('prayer-pages'),
+        style: textStyle.copyWith(
+          fontSize: ((textStyle.fontSize ?? 16) * 0.75).clamp(11.0, 16.0),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          height: 1.35,
+        ),
+      ),
+    );
+  }
 }
 
 /// Displays the server's canonical value; the shared registry lives in MyBrev /sources.
