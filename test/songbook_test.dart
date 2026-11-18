@@ -162,7 +162,7 @@ void main() {
   });
 
   group('Prayerbook sections', () {
-    testWidgets('root shows four section tiles after Favorites', (
+    testWidgets('root shows three section tiles after Favorites', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(400, 1400);
@@ -179,7 +179,6 @@ void main() {
         'holy-mass-destination',
         'songbook-destination',
         'catechism-destination',
-        'sacraments-destination',
       ];
       for (final key in keys) {
         expect(find.byKey(Key(key)), findsOneWidget, reason: key);
@@ -187,22 +186,22 @@ void main() {
       final mass = tester.getRect(find.byKey(Key(keys[0])));
       final songs = tester.getRect(find.byKey(Key(keys[1])));
       final catechism = tester.getRect(find.byKey(Key(keys[2])));
-      final sacraments = tester.getRect(find.byKey(Key(keys[3])));
       expect(mass.top, songs.top, reason: '2 × 2 grid rows');
       expect(mass.height, songs.height, reason: 'row tiles share a height');
       expect(catechism.top, greaterThan(mass.bottom));
-      expect(catechism.top, sacraments.top);
+      expect(find.byKey(const Key('sacraments-destination')), findsNothing);
+      expect(find.text('Сакрамэнты'), findsNothing);
       expect(mass.left, lessThan(songs.left));
 
       final favoritesY = tester.getTopLeft(find.text('Абраныя')).dy;
       final categoriesY = tester.getTopLeft(find.text('Катэгорыі')).dy;
       final allY = tester.getTopLeft(find.text('Усе малітвы')).dy;
       expect(favoritesY, lessThan(mass.top));
-      expect(sacraments.bottom, lessThan(categoriesY));
+      expect(catechism.bottom, lessThan(categoriesY));
       expect(categoriesY, lessThan(allY));
     });
 
-    testWidgets('section tiles open Mass, Songbook, Compendium, placeholder', (
+    testWidgets('section tiles open Mass, Songbook and Compendium', (
       tester,
     ) async {
       final router = _router();
@@ -232,28 +231,25 @@ void main() {
       await tester.tap(find.byTooltip('Назад'));
       await tester.pumpAndSettle();
 
-      for (final (key, path, title) in [
-        ('sacraments-destination', '/prayers/sacraments', 'Сакрамэнты'),
-      ]) {
-        await tester.tap(find.byKey(Key(key)));
-        await tester.pumpAndSettle();
-        expect(_location(router), path);
-        expect(
-          find.byKey(const Key('prayerbook-placeholder-title')),
-          findsOneWidget,
-        );
-        expect(find.text(title), findsWidgets);
-        expect(find.text('Раздзел у распрацоўцы'), findsOneWidget);
-        await tester.tap(find.byTooltip('Назад'));
-        await tester.pumpAndSettle();
-        expect(find.byKey(const Key('prayerbook-title')), findsOneWidget);
-      }
-
       await tester.tap(find.byKey(const Key('songbook-destination')));
       await tester.pumpAndSettle();
       expect(_location(router), '/prayers/songs');
       expect(find.byKey(const Key('songbook-title')), findsOneWidget);
       expect(find.byKey(const Key('songbook-subtitle')), findsOneWidget);
+    });
+
+    testWidgets('legacy Sacraments deep link stays valid without a root tile', (
+      tester,
+    ) async {
+      final router = _router(initialLocation: '/prayers/sacraments');
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_app(null, router: router));
+      await tester.pumpAndSettle();
+
+      expect(_location(router), '/prayers/sacraments');
+      expect(find.byKey(const Key('prayerbook-placeholder-title')), findsOneWidget);
+      expect(find.text('Сакрамэнты'), findsOneWidget);
+      expect(find.text('Раздзел у распрацоўцы'), findsOneWidget);
     });
 
     testWidgets('missing Mass says so on the tile', (tester) async {
@@ -287,7 +283,7 @@ void main() {
           find.byKey(const Key('prayerbook-sections-list')),
           findsOneWidget,
         );
-        expect(find.text('Сакрамэнты'), findsOneWidget);
+        expect(find.text('Сакрамэнты'), findsNothing);
       }
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
