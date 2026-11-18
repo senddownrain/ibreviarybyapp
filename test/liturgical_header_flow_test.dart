@@ -323,6 +323,31 @@ void main() {
     },
   );
 
+  testWidgets(
+    'date control visual preview: compact variants on 18 November',
+    (tester) async {
+      final (router, _) = await start(
+        tester,
+        width: 390,
+        brightness: Brightness.light,
+        date: DateTime(2026, 11, 18),
+      );
+      expect(
+        find.byKey(const Key('hours-alternatives-control')),
+        findsOneWidget,
+      );
+      await snapshot(tester, 'compact-variants-hours-light-2026-11-18');
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('readings-alternatives-control')),
+        findsOneWidget,
+      );
+      await snapshot(tester, 'compact-variants-readings-light-2026-11-18');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('date control visual preview: light Readings', (
     tester,
   ) async {
