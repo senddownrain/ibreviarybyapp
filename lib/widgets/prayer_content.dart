@@ -155,7 +155,9 @@ class PrayerPagesNote extends StatelessWidget {
         'Старонкі: $value',
         key: const Key('prayer-pages'),
         style: textStyle.copyWith(
-          fontSize: ((textStyle.fontSize ?? 16) * 0.75).clamp(11.0, 16.0),
+          fontSize: ((textStyle.fontSize ?? 16) * 0.75)
+              .clamp(11.0, 16.0)
+              .toDouble(),
           color: Theme.of(context).colorScheme.onSurfaceVariant,
           height: 1.35,
         ),
