@@ -118,13 +118,6 @@ class PrayersScreen extends ConsumerWidget {
                       icon: PhosphorIconsRegular.bookOpenText,
                       onTap: () => context.push('/prayers/compendium'),
                     ),
-                    PrayerbookSectionTile(
-                      key: const Key('sacraments-destination'),
-                      title: 'Сакрамэнты',
-                      subtitle: 'Хутка',
-                      icon: PhosphorIconsRegular.cross,
-                      onTap: () => context.push('/prayers/sacraments'),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
