@@ -5,6 +5,7 @@ class Prayer {
   final String? body;
   final String? textFormat;
   final String? source;
+
   /// Optional printed page reference supplied by the prayer document.
   final String? pages;
   final List<String> tags;
