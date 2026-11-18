@@ -29,7 +29,11 @@ import 'package:mybrev_flutter/ordo/year_plan.dart';
 /// or suppressed).
 extension type OrdoOption(Json data) {
   String get id => '${data['id']}';
-  String get title => '${data['title'] ?? ''}';
+  // The installed offline bundle may still carry the older nominative label.
+  // Match the approved canonical calendar title without changing the feast ID.
+  String get title => id == 'holy-family'
+      ? kHolyFamilyGenitiveTitle
+      : '${data['title'] ?? ''}';
   String get kind => '${data['kind'] ?? ''}';
   String get rank => '${data['rank'] ?? ''}';
   String get rankKind => '${data['rankKind'] ?? ''}';

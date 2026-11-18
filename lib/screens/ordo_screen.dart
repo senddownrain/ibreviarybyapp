@@ -1007,7 +1007,7 @@ class _DayDetail extends ConsumerWidget {
             storageKey: 'ordo-notes-${day.date}',
             children: [
               if (union.rows.any((row) => row.role == 'commemoration')) ...[
-                const _GroupHeading('Камемарацыі'),
+                const _GroupHeading('Неабавязковыя ўспаміны'),
                 for (final row in union.rows.where(
                   (row) => row.role == 'commemoration',
                 ))
@@ -1570,7 +1570,7 @@ class _CelebrationRow extends StatelessWidget {
     final role = switch (row.role) {
       'primary' => 'Асноўнае',
       'alternative' => 'Па выбары',
-      _ => 'Успамін (commemoratio)',
+      _ => 'Неабавязковы ўспамін',
     };
     final rank = heading && option.officeKind == 'all-souls'
         ? 'Успамін'
@@ -1632,8 +1632,10 @@ class _CelebrationRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   [
-                    if (rank.isNotEmpty) rank,
-                    if (row.role == 'commemoration') role,
+                    if (row.role == 'commemoration')
+                      role
+                    else if (rank.isNotEmpty)
+                      rank,
                   ].join(' · '),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 14,
