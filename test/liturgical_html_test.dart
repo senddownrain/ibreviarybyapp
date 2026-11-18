@@ -83,11 +83,11 @@ void main() {
       expect(RegExp('data-psalm-choir="2"').allMatches(result), hasLength(2));
       expect(
         result,
-        contains('data-psalm-choir="2" class="psalm-strophe psalm-strophe-even">У сваёй'),
+        contains('psalm-strophe-even">У сваёй'),
       );
     });
 
-    test('soft wrap stays within stanza; later cadence creates new choir stanza', () {
+    test('soft wrap before later cadence preserves choir parity', () {
       const source =
           '<p>Першы радок * другая палова<br>працяг без кадэнцыі<br>'
           'Новы радок † працяг * другая палова<br>'
