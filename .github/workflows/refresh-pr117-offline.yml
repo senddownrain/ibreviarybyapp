@@ -65,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           git clone --depth 1 https://github.com/senddownrain/mybrev.git ../mybrev
-          git -C ../mybrev fetch --depth 1 origin content/four-devotions-2026-11-18
+          git -C ../mybrev fetch --depth 60 origin content/four-devotions-2026-11-18
           git -C ../mybrev cat-file -e 1b4d121329f46a302fa30f064b4b3ec06ee7b3da^{commit}
           cd ../mybrev
           npm ci --ignore-scripts
