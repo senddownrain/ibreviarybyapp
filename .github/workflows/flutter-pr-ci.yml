@@ -91,6 +91,10 @@ jobs:
         run: dart format --output=none --set-exit-if-changed lib/utils/liturgical_alternatives.dart test/liturgical_alternatives_test.dart test/liturgical_screen_smoke_test.dart
       - name: Analyze
         run: flutter analyze --no-fatal-infos
+      - name: Psalm 50 soft breaks and choir parity
+        run: |
+          dart format --output=none --set-exit-if-changed lib/utils/liturgical_html.dart test/liturgical_html_test.dart
+          flutter test test/liturgical_html_test.dart test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart
       - name: Admin-only Songbook and contextual hint regressions
         run: flutter test test/songbook_test.dart test/discovery/p2_hints_test.dart test/juan_diego_optional_memorial_test.dart
       - name: Local rights and external Web documents
