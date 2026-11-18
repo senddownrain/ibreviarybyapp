@@ -26,7 +26,7 @@ String omitEchoedPsalmOpening(String psalmHtml, String? selectedAntiphonHtml) {
 
   dom.Node current = marker;
   while (!identical(current, paragraph)) {
-    final parent = current.parent;
+    final parent = current.parentNode;
     if (parent == null) return psalmHtml;
     for (final sibling in parent.nodes.take(parent.nodes.indexOf(current)).toList()) {
       sibling.remove();
@@ -60,7 +60,7 @@ String _textBefore(dom.Element paragraph, dom.Element marker) {
   dom.Node current = marker;
   var result = '';
   while (!identical(current, paragraph)) {
-    final parent = current.parent;
+    final parent = current.parentNode;
     if (parent == null) return '';
     result = parent.nodes
         .take(parent.nodes.indexOf(current))
