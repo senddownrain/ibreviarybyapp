@@ -85,7 +85,9 @@ class HomeScreen extends ConsumerWidget {
                               onPrevious: () => dayNavigation.moveBy(-1),
                               onNext: () => dayNavigation.moveBy(1),
                             ),
-                            const SizedBox(height: 16),
+                            // A little breathing room between the
+                            // interactive day and the list of Hours.
+                            const SizedBox(height: 24),
                             if (selection.selected != null) ...[
                               _HoursList(
                                 date: date,
