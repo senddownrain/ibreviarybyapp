@@ -75,7 +75,7 @@ void main() {
           ),
         );
         if (mode != PsalmodyMode.alternatingStanzas) {
-          for (final prefix in ['працяг $i', 'яшчэ $i', 'канец $i']) {
+          for (final prefix in ['† працяг $i', 'яшчэ $i', '† канец $i']) {
             final continuation = line(prefix);
             final paragraph = tester.renderObject<RenderParagraph>(
               continuation,
