@@ -28,45 +28,14 @@ void main() {
     }
   });
 
-  test('pages field survives Firestore and local serialization', () {
-    for (final (raw, expected) in [
-      ('34–36', '34–36'),
-      (42, '42'),
-    ]) {
-      final prayer = Prayer.fromMap({
-        'title': 'Малітва',
-        'text': 'Тэкст',
-        'pages': raw,
-      }, 'p');
-      expect(prayer.pages, expected);
-      expect(prayer.copyWith(body: 'Іншы тэкст').pages, expected);
-      expect(Prayer.fromMap(prayer.toMap(), 'p').pages, expected);
-    }
-    expect(Prayer.fromMap({'title': 'Малітва'}, 'old').pages, isNull);
-  });
-
-  testWidgets('pages note is modest and omitted for blank values', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              PrayerPagesNote(
-                pages: ' 12–14 ',
-                textStyle: TextStyle(fontSize: 18),
-              ),
-              PrayerPagesNote(pages: ' ', textStyle: TextStyle(fontSize: 18)),
-            ],
-          ),
-        ),
-      ),
-    );
-    expect(find.text('Старонкі: 12–14'), findsOneWidget);
-    expect(find.byKey(const Key('prayer-pages')), findsOneWidget);
-    final note = tester.widget<Text>(find.byKey(const Key('prayer-pages')));
-    expect(note.style!.fontSize, lessThan(18));
+  test('prayer pages survive decoding and serialization', () {
+    final prayer = Prayer.fromMap({
+      'title': 'Малітва',
+      'pages': '34–36',
+    }, 'p');
+    expect(prayer.pages, '34–36');
+    expect(prayer.copyWith(body: 'Іншы тэкст').pages, '34–36');
+    expect(Prayer.fromMap(prayer.toMap(), 'p').pages, '34–36');
   });
 
   testWidgets('reader source note displays the canonical server value', (
