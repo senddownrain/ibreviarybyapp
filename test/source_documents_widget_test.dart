@@ -197,7 +197,7 @@ void main() {
       expect(find.text('© Выдавецтва Пінскай дыяцэзіі, 2022'), findsOneWidget);
       expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2018)'), findsNothing);
       expect(
-        find.text('«Библия» (Синодальный перевод, на русском языке)'),
+        find.text('«Библия» (Синодальный перевод)'),
         findsOneWidget,
       );
       expect(
