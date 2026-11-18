@@ -2,6 +2,7 @@
 // used: the legacy run exercises the real old ContentService/Store/Updater.
 import 'dart:convert';
 import 'dart:io';
+import 'support/high_priest_update_baseline.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -80,6 +81,7 @@ void main() {
 
       try {
         await open();
+        await useHistoricalHighPriestUpdateBaseline();
         final before = Map<String, dynamic>.from(
           HiveService.daysBox.get(_id) as Map,
         );
