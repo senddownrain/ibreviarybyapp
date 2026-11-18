@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'support/high_priest_update_baseline.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -302,12 +303,12 @@ void main() {
       await directory.delete(recursive: true);
     });
 
-    test('28 May 2026 Pinsk: all three hours from the original bundle', () {
+    test('28 May 2026 Pinsk: all three hours from the published bundle', () {
       final actual = feast();
       final raw = Map<String, dynamic>.from(
         HiveService.daysBox.get(_id) as Map,
       );
-      expect(documentHash(raw), '702d908c1157bb74');
+      expect(documentHash(raw), 'a30440a58a95f9a3');
       expect(HiveService.daysBox.overlayLength, 0);
       final period = resolvePeriodDayAgainstPsalter(
         _day(
@@ -371,6 +372,7 @@ void main() {
     test(
       'safe patch is verified, survives restart, and later text wins',
       () async {
+        await useHistoricalHighPriestUpdateBaseline();
         final plan =
             jsonDecode(
                   File(

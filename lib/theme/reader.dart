@@ -147,16 +147,15 @@ class ReaderTheme {
   /// The shared document headings elsewhere retain their established scale.
   TextStyle hourSectionHeading(double bodySize) =>
       blockHeading(bodySize).copyWith(
+        fontStyle: FontStyle.normal,
         fontSize: bodySize * 1.12,
         letterSpacing: bodySize * 0.04,
       );
 
   /// Section label on the Mass readings page (108% of the body).
-  TextStyle readingsSectionHeading(double bodySize) =>
-      blockHeading(bodySize).copyWith(
-        fontSize: bodySize * 1.08,
-        letterSpacing: bodySize * 0.065,
-      );
+  TextStyle readingsSectionHeading(double bodySize) => blockHeading(
+    bodySize,
+  ).copyWith(fontSize: bodySize * 1.08, letterSpacing: bodySize * 0.065);
 
   /// The Scripture/Gospel introduction is prose, not an uppercase section.
   TextStyle readingIntroduction(TextStyle bodyStyle) => bodyStyle.copyWith(
@@ -173,7 +172,7 @@ class ReaderTheme {
       serviceHeading(
         bodySize,
         family: family,
-      ).copyWith(fontWeight: FontWeight.w500);
+      ).copyWith(fontWeight: FontWeight.normal, fontStyle: FontStyle.normal);
 
   TextStyle metadata(double bodySize, {bool italic = false, String? family}) =>
       body(bodySize * .88, family: family).copyWith(

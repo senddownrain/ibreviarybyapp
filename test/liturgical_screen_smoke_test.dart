@@ -763,7 +763,7 @@ void main() {
         await _captureSectionIfRequested(
           tester,
           '$captureName-laudes-transition',
-          find.text('Псалмодыя').last,
+          find.text('Псальмодыя').last,
         );
         await _captureSectionIfRequested(
           tester,

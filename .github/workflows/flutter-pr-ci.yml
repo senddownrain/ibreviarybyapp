@@ -147,7 +147,11 @@ jobs:
           if-no-files-found: warn
 
       - name: Office headings and compact responsory layout
-        run: flutter test test/office_responsory_formatting_test.dart test/office_responsory_repeats_test.dart test/office_collect_conclusion_test.dart test/liturgical_visual_contract_test.dart
+        run: >-
+          flutter test test/office_responsory_formatting_test.dart
+          test/office_responsory_repeats_test.dart test/office_collect_conclusion_test.dart
+          test/liturgical_visual_contract_test.dart test/office_reading_reference_test.dart
+          test/office_reference_layout_test.dart
 
       - name: Triduum and Compline regression
         run: flutter test test/triduum_compline_test.dart test/liturgical_titles_test.dart
@@ -155,7 +159,11 @@ jobs:
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression
-        run: flutter test test/content_offline_test.dart test/ordo_content_update_test.dart test/pr255_bundle_update_test.dart
+        run: >-
+          flutter test test/content_offline_test.dart test/ordo_content_update_test.dart
+          test/approved_calendar_update_test.dart test/pr255_bundle_update_test.dart
+          test/bundled_manifest_floor_test.dart test/pr255_test_client_safety_test.dart
+          test/pr117_offline_refresh_test.dart
       - name: Movable feast daytime prayer and delivery regression
         run: >-
           flutter test test/high_priest_daytime_test.dart

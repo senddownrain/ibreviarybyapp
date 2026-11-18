@@ -1318,7 +1318,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
 
     items.add(
       _OraItem.blockHeader(
-        'ПСАЛМОДЫЯ',
+        'ПСАЛЬМОДЫЯ',
         startsSection: items.isEmpty || items.last.type != _OraItemType.divider,
       ),
     );
@@ -1755,7 +1755,7 @@ class _OraItem {
 
 String _managedHeading(String value) => switch (value.toUpperCase()) {
   'ГІМН' => 'Гімн',
-  'ПСАЛМОДЫЯ' => 'Псалмодыя',
+  'ПСАЛЬМОДЫЯ' => 'Псальмодыя',
   'ПЕСНЯ З ЕВАНГЕЛЛЯ' => 'Песня з Евангелля',
   'АНТЫФОНЫ НА ЗАКАНЧЭННЕ ДА НАЙСВЯЦЕЙШАЙ ПАННЫ МАРЫІ' =>
     'Антыфоны на заканчэнне да Найсвяцейшай Панны Марыі',
@@ -1784,19 +1784,35 @@ class _LabeledSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = textStyle.fontSize ?? 16;
+    final header = alternativeKind == 'office-reading'
+        ? extractOfficeReadingReference(content)
+        : (reference: null, bodyHtml: content);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LiturgicalSectionHeading(
-          key: Key('liturgical-$alternativeKind-title'),
-          title: label,
-          bodySize: base,
-          startsSection: startsSection,
-        ),
+        if (header.reference != null)
+          Padding(
+            key: Key('liturgical-$alternativeKind-title'),
+            padding: EdgeInsets.only(
+              top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
+            ),
+            child: LiturgicalHeadingReferenceRow(
+              title: label,
+              reference: header.reference,
+              bodySize: base,
+            ),
+          )
+        else
+          LiturgicalSectionHeading(
+            key: Key('liturgical-$alternativeKind-title'),
+            title: label,
+            bodySize: base,
+            startsSection: startsSection,
+          ),
         KeyedSubtree(
           key: Key('liturgical-$alternativeKind-body'),
           child: _HtmlOrText(
-            content: content,
+            content: header.bodyHtml,
             textStyle: textStyle,
             alternativeKind: alternativeKind,
             pickerLabel: _OraItem._pickerLabel(alternativeKind),
@@ -1876,7 +1892,6 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
     };
     final metadata = <PsalmMetadataLine>[
       if (canticleCaption != null) ...[
-        const PsalmMetadataLine('ПЕСНЯ З ЕВАНГЕЛЛЯ', PsalmMetadataRole.service),
         PsalmMetadataLine(canticleCaption!, PsalmMetadataRole.subtitle),
       ],
       ...model.metadata,
@@ -1898,6 +1913,15 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
       key: const Key('liturgical-psalm-block'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (canticleCaption != null)
+          LiturgicalSectionHeading(
+            title:
+                RegExp(
+                  r'^Песня (Захарыі|Марыі|Сімяона)',
+                ).firstMatch(canticleCaption!)?.group(0) ??
+                'Песня з Евангелля',
+            bodySize: size,
+          ),
         if (model.leadingHtml.isNotEmpty)
           _HtmlOrText(content: model.leadingHtml, textStyle: textStyle),
         if (model.openingAntiphon case final opening?) ...[
@@ -1997,6 +2021,13 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
     );
   }
 }
+
+/// Shared production Office document surface, also used by isolated acceptance tools.
+Widget officeDocument({
+  required String html,
+  required TextStyle body,
+  String kind = 'reading',
+}) => _HtmlOrText(content: html, textStyle: body, alternativeKind: kind);
 
 class _HtmlOrText extends ConsumerWidget {
   final String content;
@@ -2113,9 +2144,7 @@ class _HtmlOrText extends ConsumerWidget {
       for (final selector in [
         '.liturgical-heading',
         '.liturgical-service-heading',
-        '.liturgical-reference',
         '.liturgical-subheading',
-        '.liturgical-reading-reference',
         '.office-reading-pericope-title',
         '.liturgical-rubric',
         '.responsory-turn',

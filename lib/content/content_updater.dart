@@ -247,6 +247,17 @@ class ContentUpdater {
       if (remote is! Map) continue;
       await _store.ensureLoaded([name]);
       final local = _store.collection(name);
+      // A fresh bundled snapshot can precede publication of its collection
+      // index. Never let an older index remove/replace those newer texts.
+      final bundledEntry =
+          (_store.bundleManifest?['collections'] as Map?)?[name];
+      final minimumRemoteVersion = bundledEntry is Map
+          ? (bundledEntry['minimumRemoteVersion'] as num?)?.toInt() ?? 0
+          : 0;
+      final remoteVersion = (remote['version'] as num?)?.toInt() ?? 0;
+      if (minimumRemoteVersion > 0 && remoteVersion < minimumRemoteVersion) {
+        continue;
+      }
       if (remote['digest'] == local.digest()) continue;
       final manifest = await _remote.fetchCollectionManifest(name);
       if (manifest == null || manifest['digest'] != remote['digest']) {

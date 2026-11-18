@@ -27,7 +27,7 @@ void main() {
     await directory.delete(recursive: true);
   });
 
-  for (final revision in [3, 4, 99]) {
+  for (final revision in [3, 4, 5, 99]) {
     test(
       'old installed overlay revision $revision with a future timestamp cannot replace approved bundle',
       () async {
@@ -104,7 +104,8 @@ void main() {
     'stale/same-revision and schema99 generations rejected; larger revision refreshes an already opened date and survives restart',
     () async {
       final before = OrdoRuntime.engine.resolve('2026-10-06');
-      for (final rev in [3, 4]) {
+      final baselineRevision = store.calendarRevision;
+      for (final rev in [3, baselineRevision]) {
         await expectLater(publish(rev), throwsStateError);
         expect(
           OrdoRuntime.engine.resolve('2026-10-06').option('sv-bruno')!.title,
@@ -112,12 +113,12 @@ void main() {
         );
       }
       await expectLater(publish(99, schema: 99), throwsStateError);
-      await publish(5);
+      await publish(baselineRevision + 1);
       expect(
         OrdoRuntime.engine.resolve('2026-10-06').option('sv-bruno')!.title,
         'New accepted title',
       );
-      await expectLater(publish(4), throwsStateError);
+      await expectLater(publish(baselineRevision), throwsStateError);
       await Hive.close();
       await open();
       expect(
