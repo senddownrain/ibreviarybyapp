@@ -28,7 +28,9 @@ void main() {
   });
 
   Map<String, dynamic> proper(String id) {
-    final stored = HiveService.content.collection('liturgicalProperTexts').get(id);
+    final stored = HiveService.content
+        .collection('liturgicalProperTexts')
+        .get(id);
     expect(stored, isA<Map>(), reason: 'Bundled Proper $id must exist');
     return Map<String, dynamic>.from(stored as Map);
   }
@@ -152,7 +154,11 @@ void main() {
         );
         for (final hour in [1, 2, 3]) {
           final field = 'sext${hour}Pr';
-          expect(assembled.data[field], currentDay[field], reason: '$choice $field');
+          expect(
+            assembled.data[field],
+            currentDay[field],
+            reason: '$choice $field',
+          );
           expect(assembled.provenance[field], kCurrentDayChoice);
         }
       }
