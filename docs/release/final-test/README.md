@@ -1,6 +1,6 @@
 # Single final test candidate — 2026-11-17
 
-Content version **1794938564491** (`2026-11-17T18:02:44.491Z`). Aggregate bundle SHA256 **19ed6b4b8247baa4d97e20a8404975b6f539a9531bf9061e1b063f73c9e9152c**. Manifest file SHA256 `ae51bd2db7207cfbddb2845519077e501e87f36d067887da9527caaaa2be32b6`.
+Content version **1794938564491** (`2026-11-17T18:02:44.491Z`). Aggregate bundle SHA256 **b0809b03da9b04cb21979b8d0d5fdbe999a52af1aa4451c5e156d2b896753e77**. Manifest file SHA256 `16860a876b94aaa375c13e27ec2510204a285896116be2070bfc3aa3e9875178`.
 
 One candidate for separate acceptance. No APK, Play upload or iOS binary/release was produced.
 
@@ -22,17 +22,23 @@ Includes 7,791 readback-verified fields in 749 days/templates documents, publish
 | compendium | 27 |
 | compendiumMeta | 1 |
 | liturgicalCalendarMeta | 1 |
-| liturgicalCelebrations | 241 |
-| liturgicalDioceseOverrides | 75 |
+| liturgicalCelebrations | 242 |
+| liturgicalDioceseOverrides | 77 |
 | liturgicalYearOverrides | 15 |
 | liturgicalOrdoNotes | 1,347 |
-| **Total** | **4,473** |
+| **Total** | **4,476** |
 
 bundle-report.json binds all file SHAs, collection digests, document hash/size maps and both snapshot manifests. Liturgical collections derive from actual readbacks and the transaction-fenced catalog. The remaining13 collections were captured once in a read-only transaction (3,430 reads). Protected/draft inclusion zero; existing priest-cache cleanup retained. Full source snapshots remain private and ignored.
 
 All17 files rebuilt byte-for-byte from the same inputs (reproducibility.json). No second candidate version was created. Rebuild uses scripts/build_final_test_bundle.mjs and pinned Web codec b2b85ba98371c1335168442e87c1c6c020e6813f.
 
-## Published manifest and quota blocker
+## Pending calendar/server parity
+
+The corrected candidate preserves the exact four accepted calendar assets from main#107 (bundled revision4); captured Firestore is revision3. Their server updateTimes all precede the accepted contentVersion. Twelve collections match the saved Firestore snapshot; calendar parity requires the existing guarded revision4 publication then the separately accepted two-entry revision5 patch. No revision5 publication is claimed. See calendar-preservation.json. The corrected candidate reproduced17 files byte-for-byte and its calendar/updater tests passed on2026-11-18.
+
+The old metadata plan below has been RETIRED by merged WebPR272 (07a658daa599bbff72e0148816cc6460bb80cbe7). Do not run it. A new exact plan must bind the final actually published state.
+
+## Historical manifest quota blocker
 
 **LITURGICAL FIRESTORE: 7791/7791 VERIFIED**. The original publication completed749 data writes +4 atomic manifest writes; current contentVersion1794938108754. Digests: days b80a2589e5651bd7/v7, templates a1d498c34dd96ab8/v4, Proper b23370f9d589fff1/v1.
 
@@ -42,7 +48,7 @@ Production run [44185030376](https://github.com/senddownrain/mybrev/actions/runs
 
 Parity with the captured document data is verified; full parity with a newly published16-collection manifest is **pending**. Four stale indexes cannot roll back this newer bundle: collection-specific minimumRemoteVersion floors are enforced/tested. Unobserved production edits after the saved snapshots are not claimed as verified.
 
-After quota recovery, use existing protected pr245-reviewed-content.yml: scope final-test-manifest, mode execute, batch_size25, release_authorization_path docs/releases/final-test-2026-11-17/plan.json, exact plan_sha256 above. The existing atomic transaction must freshly fence all4,473 IDs/updateTimes and read back17 manifests. If data changed, stop and reconcile only changed documents. Do not rerun source/liturgical migrations. No automatic retry.
+Continuation uses existing guarded calendar publisher/approved seals, then a newly SHA-bound coordinated manifest contract. The retired raw-calendar plan cannot execute or access credentials. Reuse verified readbacks and perform only the required metadata/changed-document checks.
 
 ## Presentation and validation
 

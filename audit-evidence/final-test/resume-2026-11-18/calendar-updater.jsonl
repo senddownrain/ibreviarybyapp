@@ -1,0 +1,348 @@
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.4.0 available)
+  archive 4.2.0 (4.7.1 available)
+  async 2.13.0 (2.13.1 available)
+  clock 1.1.2 (1.1.3 available)
+  cloud_firestore 5.6.12 (7.2.0 available)
+  cloud_firestore_platform_interface 6.6.12 (8.2.0 available)
+  cloud_firestore_web 4.4.12 (5.9.0 available)
+  connectivity_plus 6.1.5 (7.3.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  cupertino_icons 1.0.8 (2.0.0 available)
+  dbus 0.7.12 (0.8.0 available)
+  firebase_auth 5.7.0 (7.1.0 available)
+  firebase_auth_platform_interface 7.7.3 (9.2.0 available)
+  firebase_auth_web 5.15.3 (6.4.0 available)
+  firebase_core 3.15.2 (5.2.0 available)
+  firebase_core_platform_interface 6.0.2 (8.2.0 available)
+  firebase_core_web 2.24.1 (4.2.0 available)
+  flutter_riverpod 2.6.1 (3.5.0 available)
+  flutter_secure_storage 9.2.4 (11.2.0 available)
+  flutter_secure_storage_linux 1.2.3 (3.0.3 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.1.1 available)
+  flutter_secure_storage_web 1.2.1 (2.1.1 available)
+  flutter_secure_storage_windows 3.1.2 (4.2.2 available)
+  flutter_svg 2.3.4 (2.4.0 available)
+  go_router 14.8.1 (18.1.4 available)
+  google_fonts 6.3.3 (9.0.0 available)
+  html 0.15.6 (0.15.7 available)
+  intl 0.20.2 (0.20.3 available)
+  js 0.6.7 (0.7.2 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.17.0 (1.19.0 available)
+  mime 2.0.0 (2.1.0 available)
+  nm 0.5.0 (0.6.0 available)
+  package_info_plus 9.0.1 (10.2.2 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider 2.1.5 (2.1.6 available)
+  path_provider_android 2.2.22 (2.3.1 available)
+! path_provider_foundation 2.4.0 (overridden) (2.6.0 available)
+  path_provider_linux 2.2.1 (2.2.2 available)
+  path_provider_platform_interface 2.1.2 (2.1.3 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  posix 6.5.2 (6.5.4 available)
+  riverpod 2.6.1 (3.5.0 available)
+  share_plus 10.1.4 (13.3.1 available)
+  share_plus_platform_interface 5.0.2 (7.2.0 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.10 (0.7.15 available)
+  url_launcher 6.3.2 (6.3.3 available)
+  url_launcher_android 6.3.30 (6.3.35 available)
+  url_launcher_linux 3.2.2 (3.2.3 available)
+  url_launcher_windows 3.1.5 (3.1.6 available)
+  vector_math 2.2.0 (2.4.4 available)
+  vm_service 15.0.2 (15.4.0 available)
+  wakelock_plus 1.5.1 (1.8.2 available)
+  wakelock_plus_platform_interface 1.4.0 (1.7.0 available)
+  web 1.1.1 (1.1.2 available)
+  win32 5.15.0 (6.4.0 available)
+  xml 6.6.1 (7.1.0 available)
+Got dependencies!
+62 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+{"protocolVersion":"0.1.1","runnerVersion":null,"pid":622,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"/workspace/ibreviarybyapp/test/juan_diego_optional_memorial_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading /workspace/ibreviarybyapp/test/juan_diego_optional_memorial_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1}
+{"count":3,"time":6,"type":"allSuites"}
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":2313}
+{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":2316}
+{"test":{"id":3,"name":"approved BY PDF excludes Juan Diego from selection and retains its source and canonical alias","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":6,"column":3,"url":"file:///workspace/ibreviarybyapp/test/juan_diego_optional_memorial_test.dart"},"type":"testStart","time":2316}
+{"testID":3,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2641}
+{"suite":{"id":4,"platform":"vm","path":"/workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"suite","time":2651}
+{"test":{"id":5,"name":"loading /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart","suiteID":4,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":2651}
+{"testID":5,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3219}
+{"group":{"id":6,"suiteID":4,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":null,"column":null,"url":null},"type":"group","time":3220}
+{"test":{"id":7,"name":"old installed overlay revision 3 with a future timestamp cannot replace approved bundle","suiteID":4,"groupIDs":[6],"metadata":{"skip":false,"skipReason":null},"line":31,"column":5,"url":"file:///workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"testStart","time":3220}
+{"testID":7,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 18 ms","type":"print","time":3348}
+{"testID":7,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 67 ms","type":"print","time":3391}
+{"testID":7,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 46 ms","type":"print","time":3485}
+{"testID":7,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 62 ms","type":"print","time":3485}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 57 ms","type":"print","time":3485}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 56 ms","type":"print","time":3485}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 54 ms","type":"print","time":3485}
+{"testID":7,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 47 ms","type":"print","time":3489}
+{"testID":7,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 44 ms","type":"print","time":3489}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 61 ms","type":"print","time":3490}
+{"testID":7,"messageType":"print","message":"[ContentStore] songs: 447 docs in 71 ms","type":"print","time":3521}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 105 ms","type":"print","time":3524}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 114 ms","type":"print","time":3546}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 109 ms","type":"print","time":3565}
+{"testID":7,"messageType":"print","message":"[ContentStore] readings: 822 docs in 172 ms","type":"print","time":3587}
+{"testID":7,"messageType":"print","message":"[ContentStore] days: 736 docs in 279 ms","type":"print","time":3685}
+{"testID":7,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":3784}
+{"testID":7,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 47 ms","type":"print","time":3831}
+{"testID":7,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 9 ms","type":"print","time":3855}
+{"testID":7,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 12 ms","type":"print","time":3856}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 11 ms","type":"print","time":3856}
+{"testID":7,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 12 ms","type":"print","time":3856}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 33 ms","type":"print","time":3882}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 49 ms","type":"print","time":3890}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 49 ms","type":"print","time":3890}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 87 ms","type":"print","time":3931}
+{"testID":7,"messageType":"print","message":"[ContentStore] songs: 447 docs in 88 ms","type":"print","time":3932}
+{"testID":7,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 90 ms","type":"print","time":3933}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 93 ms","type":"print","time":3933}
+{"testID":7,"messageType":"print","message":"[ContentStore] readings: 822 docs in 178 ms","type":"print","time":4017}
+{"testID":7,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 176 ms","type":"print","time":4018}
+{"testID":7,"messageType":"print","message":"[ContentStore] days: 736 docs in 289 ms","type":"print","time":4126}
+{"testID":7,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4160}
+{"test":{"id":8,"name":"old installed overlay revision 4 with a future timestamp cannot replace approved bundle","suiteID":4,"groupIDs":[6],"metadata":{"skip":false,"skipReason":null},"line":31,"column":5,"url":"file:///workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"testStart","time":4160}
+{"testID":8,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":4191}
+{"testID":8,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 36 ms","type":"print","time":4226}
+{"testID":8,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 19 ms","type":"print","time":4262}
+{"testID":8,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 34 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 34 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 29 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 34 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 34 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] songs: 447 docs in 33 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 37 ms","type":"print","time":4280}
+{"testID":8,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 41 ms","type":"print","time":4287}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 93 ms","type":"print","time":4334}
+{"testID":8,"messageType":"print","message":"[ContentStore] readings: 822 docs in 98 ms","type":"print","time":4337}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 94 ms","type":"print","time":4343}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 111 ms","type":"print","time":4354}
+{"testID":8,"messageType":"print","message":"[ContentStore] days: 736 docs in 236 ms","type":"print","time":4466}
+{"testID":8,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":4519}
+{"testID":8,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 30 ms","type":"print","time":4548}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 16 ms","type":"print","time":4583}
+{"testID":8,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 28 ms","type":"print","time":4593}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 27 ms","type":"print","time":4593}
+{"testID":8,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 28 ms","type":"print","time":4594}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 28 ms","type":"print","time":4594}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 28 ms","type":"print","time":4594}
+{"testID":8,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 38 ms","type":"print","time":4614}
+{"testID":8,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 43 ms","type":"print","time":4638}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 65 ms","type":"print","time":4641}
+{"testID":8,"messageType":"print","message":"[ContentStore] songs: 447 docs in 67 ms","type":"print","time":4641}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 124 ms","type":"print","time":4682}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 132 ms","type":"print","time":4693}
+{"testID":8,"messageType":"print","message":"[ContentStore] readings: 822 docs in 156 ms","type":"print","time":4709}
+{"testID":8,"messageType":"print","message":"[ContentStore] days: 736 docs in 227 ms","type":"print","time":4778}
+{"testID":8,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4799}
+{"test":{"id":9,"name":"old installed overlay revision 99 with a future timestamp cannot replace approved bundle","suiteID":4,"groupIDs":[6],"metadata":{"skip":false,"skipReason":null},"line":31,"column":5,"url":"file:///workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"testStart","time":4800}
+{"testID":9,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 2 ms","type":"print","time":4832}
+{"testID":9,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 31 ms","type":"print","time":4860}
+{"testID":9,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 13 ms","type":"print","time":4884}
+{"testID":9,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 11 ms","type":"print","time":4884}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 11 ms","type":"print","time":4884}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 10 ms","type":"print","time":4884}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 14 ms","type":"print","time":4888}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 14 ms","type":"print","time":4888}
+{"testID":9,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 8 ms","type":"print","time":4888}
+{"testID":9,"messageType":"print","message":"[ContentStore] songs: 447 docs in 35 ms","type":"print","time":4914}
+{"testID":9,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 39 ms","type":"print","time":4920}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 64 ms","type":"print","time":4933}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 67 ms","type":"print","time":4945}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 95 ms","type":"print","time":4969}
+{"testID":9,"messageType":"print","message":"[ContentStore] readings: 822 docs in 162 ms","type":"print","time":5028}
+{"testID":9,"messageType":"print","message":"[ContentStore] days: 736 docs in 252 ms","type":"print","time":5116}
+{"testID":9,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":5165}
+{"testID":9,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 34 ms","type":"print","time":5198}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms","type":"print","time":5249}
+{"testID":9,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 46 ms","type":"print","time":5251}
+{"testID":9,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 43 ms","type":"print","time":5252}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 46 ms","type":"print","time":5252}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 46 ms","type":"print","time":5252}
+{"testID":9,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 48 ms","type":"print","time":5254}
+{"testID":9,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 45 ms","type":"print","time":5254}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 48 ms","type":"print","time":5254}
+{"testID":9,"messageType":"print","message":"[ContentStore] songs: 447 docs in 46 ms","type":"print","time":5254}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 61 ms","type":"print","time":5266}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 58 ms","type":"print","time":5266}
+{"testID":9,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 127 ms","type":"print","time":5334}
+{"testID":9,"messageType":"print","message":"[ContentStore] readings: 822 docs in 133 ms","type":"print","time":5336}
+{"testID":9,"messageType":"print","message":"[ContentStore] days: 736 docs in 235 ms","type":"print","time":5435}
+{"testID":9,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5453}
+{"test":{"id":10,"name":"stale/same-revision and schema99 generations rejected; larger revision refreshes an already opened date and survives restart","suiteID":4,"groupIDs":[6],"metadata":{"skip":false,"skipReason":null},"line":103,"column":3,"url":"file:///workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"testStart","time":5453}
+{"testID":10,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":5484}
+{"testID":10,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 32 ms","type":"print","time":5517}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 8 ms","type":"print","time":5566}
+{"testID":10,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 35 ms","type":"print","time":5566}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 33 ms","type":"print","time":5566}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 34 ms","type":"print","time":5566}
+{"testID":10,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 35 ms","type":"print","time":5566}
+{"testID":10,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 36 ms","type":"print","time":5572}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 46 ms","type":"print","time":5579}
+{"testID":10,"messageType":"print","message":"[ContentStore] songs: 447 docs in 47 ms","type":"print","time":5581}
+{"testID":10,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 53 ms","type":"print","time":5586}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 61 ms","type":"print","time":5586}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 92 ms","type":"print","time":5628}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 100 ms","type":"print","time":5628}
+{"testID":10,"messageType":"print","message":"[ContentStore] readings: 822 docs in 112 ms","type":"print","time":5633}
+{"testID":10,"messageType":"print","message":"[ContentStore] days: 736 docs in 241 ms","type":"print","time":5759}
+{"testID":10,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 1 ms","type":"print","time":5835}
+{"testID":10,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 33 ms","type":"print","time":5867}
+{"testID":10,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 13 ms","type":"print","time":5888}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 14 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 19 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 19 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 20 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 20 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 12 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] songs: 447 docs in 12 ms","type":"print","time":5895}
+{"testID":10,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 40 ms","type":"print","time":5924}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 78 ms","type":"print","time":5984}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 122 ms","type":"print","time":6000}
+{"testID":10,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 146 ms","type":"print","time":6022}
+{"testID":10,"messageType":"print","message":"[ContentStore] readings: 822 docs in 152 ms","type":"print","time":6024}
+{"testID":10,"messageType":"print","message":"[ContentStore] days: 736 docs in 256 ms","type":"print","time":6126}
+{"testID":10,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6142}
+{"test":{"id":11,"name":"removed saved option falls back to current primary; switching dioceses never reuses the other Office","suiteID":4,"groupIDs":[6],"metadata":{"skip":false,"skipReason":null},"line":130,"column":3,"url":"file:///workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"testStart","time":6142}
+{"testID":11,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 1 ms","type":"print","time":6179}
+{"testID":11,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 33 ms","type":"print","time":6210}
+{"testID":11,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 10 ms","type":"print","time":6237}
+{"testID":11,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 31 ms","type":"print","time":6254}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 31 ms","type":"print","time":6254}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 31 ms","type":"print","time":6254}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 31 ms","type":"print","time":6254}
+{"testID":11,"messageType":"print","message":"[ContentStore] songs: 447 docs in 29 ms","type":"print","time":6254}
+{"testID":11,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 30 ms","type":"print","time":6254}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 37 ms","type":"print","time":6256}
+{"testID":11,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 45 ms","type":"print","time":6268}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 55 ms","type":"print","time":6279}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 83 ms","type":"print","time":6303}
+{"testID":11,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 100 ms","type":"print","time":6321}
+{"testID":11,"messageType":"print","message":"[ContentStore] readings: 822 docs in 115 ms","type":"print","time":6333}
+{"testID":11,"messageType":"print","message":"[ContentStore] days: 736 docs in 215 ms","type":"print","time":6428}
+{"testID":11,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6545}
+{"test":{"id":12,"name":"startup never exposes old overlay before all bundled calendar layers are decoded","suiteID":4,"groupIDs":[6],"metadata":{"skip":false,"skipReason":null},"line":179,"column":3,"url":"file:///workspace/ibreviarybyapp/test/approved_calendar_update_test.dart"},"type":"testStart","time":6545}
+{"testID":12,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":6582}
+{"testID":12,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 31 ms","type":"print","time":6607}
+{"testID":12,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 6 ms","type":"print","time":6630}
+{"testID":12,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 6 ms","type":"print","time":6631}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 7 ms","type":"print","time":6631}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 6 ms","type":"print","time":6631}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 7 ms","type":"print","time":6631}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 20 ms","type":"print","time":6645}
+{"testID":12,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 22 ms","type":"print","time":6646}
+{"testID":12,"messageType":"print","message":"[ContentStore] songs: 447 docs in 42 ms","type":"print","time":6666}
+{"testID":12,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 45 ms","type":"print","time":6666}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 63 ms","type":"print","time":6684}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 77 ms","type":"print","time":6696}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 89 ms","type":"print","time":6709}
+{"testID":12,"messageType":"print","message":"[ContentStore] readings: 822 docs in 101 ms","type":"print","time":6718}
+{"testID":12,"messageType":"print","message":"[ContentStore] days: 736 docs in 224 ms","type":"print","time":6839}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 1 ms","type":"print","time":6867}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 2 ms","type":"print","time":6868}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 4 ms","type":"print","time":6872}
+{"testID":12,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 5 ms","type":"print","time":6872}
+{"testID":12,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6881}
+{"suite":{"id":13,"platform":"vm","path":"/workspace/ibreviarybyapp/test/pr255_bundle_update_test.dart"},"type":"suite","time":6893}
+{"test":{"id":14,"name":"loading /workspace/ibreviarybyapp/test/pr255_bundle_update_test.dart","suiteID":13,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":6893}
+{"testID":14,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":8357}
+{"group":{"id":15,"suiteID":13,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":8357}
+{"test":{"id":16,"name":"new bundle is current against its exact future publication","suiteID":13,"groupIDs":[15],"metadata":{"skip":false,"skipReason":null},"line":30,"column":3,"url":"file:///workspace/ibreviarybyapp/test/pr255_bundle_update_test.dart"},"type":"testStart","time":8357}
+{"testID":16,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 23 ms","type":"print","time":8485}
+{"testID":16,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 81 ms","type":"print","time":8534}
+{"testID":16,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 99 ms","type":"print","time":8691}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 103 ms","type":"print","time":8691}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 103 ms","type":"print","time":8691}
+{"testID":16,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 105 ms","type":"print","time":8691}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 105 ms","type":"print","time":8691}
+{"testID":16,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 85 ms","type":"print","time":8692}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 105 ms","type":"print","time":8692}
+{"testID":16,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 87 ms","type":"print","time":8692}
+{"testID":16,"messageType":"print","message":"[ContentStore] songs: 447 docs in 94 ms","type":"print","time":8698}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 203 ms","type":"print","time":8786}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 181 ms","type":"print","time":8802}
+{"testID":16,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 238 ms","type":"print","time":8826}
+{"testID":16,"messageType":"print","message":"[ContentStore] readings: 822 docs in 248 ms","type":"print","time":8826}
+{"testID":16,"messageType":"print","message":"[ContentStore] days: 736 docs in 344 ms","type":"print","time":8900}
+{"testID":16,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10099}
+{"test":{"id":17,"name":"real old hashes require app release; no documents downloaded","suiteID":13,"groupIDs":[15],"metadata":{"skip":false,"skipReason":null},"line":40,"column":3,"url":"file:///workspace/ibreviarybyapp/test/pr255_bundle_update_test.dart"},"type":"testStart","time":10100}
+{"testID":17,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":10134}
+{"testID":17,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 54 ms","type":"print","time":10183}
+{"testID":17,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 8 ms","type":"print","time":10226}
+{"testID":17,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 9 ms","type":"print","time":10226}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 9 ms","type":"print","time":10226}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 9 ms","type":"print","time":10226}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 9 ms","type":"print","time":10226}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 9 ms","type":"print","time":10226}
+{"testID":17,"messageType":"print","message":"[ContentStore] songs: 447 docs in 51 ms","type":"print","time":10278}
+{"testID":17,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 51 ms","type":"print","time":10278}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 76 ms","type":"print","time":10292}
+{"testID":17,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 70 ms","type":"print","time":10293}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 113 ms","type":"print","time":10338}
+{"testID":17,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 165 ms","type":"print","time":10385}
+{"testID":17,"messageType":"print","message":"[ContentStore] readings: 822 docs in 196 ms","type":"print","time":10402}
+{"testID":17,"messageType":"print","message":"[ContentStore] days: 736 docs in 298 ms","type":"print","time":10484}
+{"testID":17,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11728}
+{"test":{"id":18,"name":"apply refuses a manually supplied mass rebuild before network","suiteID":13,"groupIDs":[15],"metadata":{"skip":false,"skipReason":null},"line":72,"column":3,"url":"file:///workspace/ibreviarybyapp/test/pr255_bundle_update_test.dart"},"type":"testStart","time":11728}
+{"testID":18,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":11761}
+{"testID":18,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 31 ms","type":"print","time":11791}
+{"testID":18,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 36 ms","type":"print","time":11838}
+{"testID":18,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 40 ms","type":"print","time":11842}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 40 ms","type":"print","time":11842}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 40 ms","type":"print","time":11843}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms","type":"print","time":11843}
+{"testID":18,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 40 ms","type":"print","time":11844}
+{"testID":18,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 40 ms","type":"print","time":11844}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 43 ms","type":"print","time":11849}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 53 ms","type":"print","time":11850}
+{"testID":18,"messageType":"print","message":"[ContentStore] songs: 447 docs in 48 ms","type":"print","time":11852}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 51 ms","type":"print","time":11855}
+{"testID":18,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 97 ms","type":"print","time":11900}
+{"testID":18,"messageType":"print","message":"[ContentStore] readings: 822 docs in 137 ms","type":"print","time":11934}
+{"testID":18,"messageType":"print","message":"[ContentStore] days: 736 docs in 255 ms","type":"print","time":12048}
+{"testID":18,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12064}
+{"test":{"id":19,"name":"app upgrade drops old overlay and survives offline Hive restart","suiteID":13,"groupIDs":[15],"metadata":{"skip":false,"skipReason":null},"line":99,"column":3,"url":"file:///workspace/ibreviarybyapp/test/pr255_bundle_update_test.dart"},"type":"testStart","time":12064}
+{"testID":19,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":12107}
+{"testID":19,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 32 ms","type":"print","time":12138}
+{"testID":19,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 11 ms","type":"print","time":12163}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 23 ms","type":"print","time":12177}
+{"testID":19,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 24 ms","type":"print","time":12177}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 24 ms","type":"print","time":12177}
+{"testID":19,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 22 ms","type":"print","time":12177}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 26 ms","type":"print","time":12182}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 30 ms","type":"print","time":12182}
+{"testID":19,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 29 ms","type":"print","time":12182}
+{"testID":19,"messageType":"print","message":"[ContentStore] songs: 447 docs in 41 ms","type":"print","time":12194}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 84 ms","type":"print","time":12234}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 100 ms","type":"print","time":12254}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 133 ms","type":"print","time":12285}
+{"testID":19,"messageType":"print","message":"[ContentStore] readings: 822 docs in 155 ms","type":"print","time":12301}
+{"testID":19,"messageType":"print","message":"[ContentStore] days: 736 docs in 254 ms","type":"print","time":12397}
+{"testID":19,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 1 ms","type":"print","time":13494}
+{"testID":19,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 32 ms","type":"print","time":13525}
+{"testID":19,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 24 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 24 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 21 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 24 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 24 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 25 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 22 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 27 ms","type":"print","time":13558}
+{"testID":19,"messageType":"print","message":"[ContentStore] songs: 447 docs in 48 ms","type":"print","time":13589}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 56 ms","type":"print","time":13589}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 72 ms","type":"print","time":13603}
+{"testID":19,"messageType":"print","message":"[ContentStore] readings: 822 docs in 101 ms","type":"print","time":13630}
+{"testID":19,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 99 ms","type":"print","time":13630}
+{"testID":19,"messageType":"print","message":"[ContentStore] days: 736 docs in 236 ms","type":"print","time":13763}
+{"testID":19,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13774}
+{"success":true,"type":"done","time":13787}

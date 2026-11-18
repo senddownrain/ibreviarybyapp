@@ -1,5 +1,5 @@
 {
-  "status": "targeted-checks-passed; full-live-manifest-parity-blocked-by-quota",
+  "status": "corrected-calendar-local-tests-passed; final-server-parity-pending",
   "runs": [
     {
       "name": "flutter-final-office-tests",
@@ -42,6 +42,13 @@
       "failedInitially": 2,
       "resolvedBy": "flutter-final-devotional-actual",
       "path": "audit-evidence/final-test/initial-new-regressions-with-two-resolved-failures.jsonl.gz"
+    },
+    {
+      "name": "corrected-calendar-and-updater",
+      "passed": 11,
+      "failed": 0,
+      "path": "audit-evidence/final-test/resume-2026-11-18/calendar-updater.jsonl",
+      "sha256": "3316c900e78988638e7d7c21c96e06ccf13eaf44230d5607fc04e8290928cd42"
     }
   ],
   "analyze": {
@@ -65,5 +72,6 @@
   "nativeSmoke": "not-performed; required before mobile release",
   "mobileReleasePerformed": false,
   "firebaseReads": 0,
-  "firebaseWrites": 0
+  "firebaseWrites": 0,
+  "bundleSha256": "b0809b03da9b04cb21979b8d0d5fdbe999a52af1aa4451c5e156d2b896753e77"
 }

@@ -108,39 +108,43 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1794938564491,
-      "contentDate": "2026-11-17T18:02:44.491Z",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
       "count": 1,
-      "digest": "0be7c846a536b858",
-      "storedBytes": 139,
-      "bundleBytes": 205
+      "digest": "50c0b92f2b345128",
+      "storedBytes": 273,
+      "bundleBytes": 297,
+      "minimumRemoteVersion": 2
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
-      "contentVersion": 1794938564491,
-      "contentDate": "2026-11-17T18:02:44.491Z",
-      "count": 241,
-      "digest": "8fb0b75436b7f528",
-      "storedBytes": 132977,
-      "bundleBytes": 22628
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 242,
+      "digest": "b1ec5380202bf506",
+      "storedBytes": 127232,
+      "bundleBytes": 22683,
+      "minimumRemoteVersion": 2
     },
     "liturgicalDioceseOverrides": {
       "file": "liturgicalDioceseOverrides.json.gz",
-      "contentVersion": 1794938564491,
-      "contentDate": "2026-11-17T18:02:44.491Z",
-      "count": 75,
-      "digest": "d5f7d42724c985cb",
-      "storedBytes": 53212,
-      "bundleBytes": 7798
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
+      "count": 77,
+      "digest": "5e20e47ab78d3552",
+      "storedBytes": 53823,
+      "bundleBytes": 7996,
+      "minimumRemoteVersion": 2
     },
     "liturgicalYearOverrides": {
       "file": "liturgicalYearOverrides.json.gz",
-      "contentVersion": 1794938564491,
-      "contentDate": "2026-11-17T18:02:44.491Z",
+      "contentVersion": 1794176180000,
+      "contentDate": "2026-11-08T22:16:20.000Z",
       "count": 15,
-      "digest": "62198d0893b2a40f",
-      "storedBytes": 8111,
-      "bundleBytes": 1732
+      "digest": "679696243c3aa1c2",
+      "storedBytes": 8391,
+      "bundleBytes": 1772,
+      "minimumRemoteVersion": 2
     },
     "liturgicalOrdoNotes": {
       "file": "liturgicalOrdoNotes.json.gz",
