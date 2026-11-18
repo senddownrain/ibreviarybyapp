@@ -42,7 +42,7 @@ void main() {
     expect(find.byType(SwitchListTile), findsNothing);
     expect(
       tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
-      lessThanOrEqualTo(216),
+      inInclusiveRange(280, 360),
     );
 
     await tester.tap(find.text('Шрыфт'));
@@ -258,7 +258,7 @@ void main() {
     expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
     expect(
       tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
-      lessThanOrEqualTo(216),
+      inInclusiveRange(280, 360),
     );
     expect(
       tester.getTopLeft(find.text('Памылка')).dy,
