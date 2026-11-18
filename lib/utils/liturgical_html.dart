@@ -531,7 +531,7 @@ String preparePsalmChoirHtml(
         final index = siblings.indexOf(marker);
         if (index + 1 < siblings.length && siblings[index + 1] is dom.Text) {
           final next = siblings[index + 1] as dom.Text;
-          next.data = next.data.replaceFirst(RegExp(r'^[ \\t]+'), '\\u00a0');
+          next.data = next.data.replaceFirst(RegExp(r'^[ \t]+'), '\u00a0');
         }
       }
       // Preserve strophes, words and inline ancestors, but remove every source
