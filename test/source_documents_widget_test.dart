@@ -196,7 +196,10 @@ void main() {
       expect(find.text('«Біблія» (Мінск, 2017)'), findsOneWidget);
       expect(find.text('© Выдавецтва Пінскай дыяцэзіі, 2022'), findsOneWidget);
       expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2018)'), findsNothing);
-      expect(find.text('«Библия» (Синодальный перевод, на русском языке)'), findsOneWidget);
+      expect(
+        find.text('«Библия» (Синодальный перевод, на русском языке)'),
+        findsOneWidget,
+      );
       expect(
         find.text('Стары Запавет - на падставе рукапісаў кс. У. Чарняўскага'),
         findsOneWidget,
