@@ -21,9 +21,8 @@ Map<String, dynamic>? _delivery;
 Map<String, dynamic> lectionaryParityFixture() =>
     _parity ??= _gz('test/fixtures/lectionary_parity.json.gz');
 
-/// The delivery-chain fixture (`build_delivery_fixture.mjs`): the published
-/// manifest for `readings` and the documents the bundle lacks or has in an
-/// older version.
+/// The delivery-chain fixture (`build_delivery_fixture.mjs`) with the captured
+/// readings index, pending index if any, and documents needed for updates.
 Map<String, dynamic> lectionaryDeliveryFixture() =>
     _delivery ??= _gz('test/fixtures/lectionary_delivery.json.gz');
 
@@ -31,24 +30,36 @@ Map<String, dynamic> lectionaryDeliveryFixture() =>
 /// document (hashes and sizes of all documents) and the real documents the
 /// bundle does not have in this version — nothing else is served.
 class ProductionReadingsRemote implements ContentRemote {
-  ProductionReadingsRemote({this.failFetch = false, this.corrupt = const {}});
+  ProductionReadingsRemote({
+    this.failFetch = false,
+    this.corrupt = const {},
+    this.usePlannedIndex = false,
+  });
 
   final Map<String, dynamic> _fixture = lectionaryDeliveryFixture();
 
-  /// Every document download fails (offline in the middle of an update).
+  /// Lose connectivity partway through fetching the requested documents.
   final bool failFetch;
 
   /// Ids served with another text than the manifest hash promises.
   final Set<String> corrupt;
 
+  /// Serve the reviewed next index for pre-publication testing.
+  final bool usePlannedIndex;
+
   final List<String> fetched = [];
+  int indexReads = 0;
+
+  Map<String, dynamic> get _index =>
+      _fixture[usePlannedIndex ? 'planned' : 'manifest']
+          as Map<String, dynamic>;
 
   Map<String, dynamic> get _readings =>
-      (_fixture['manifest'] as Map)['readings'] as Map<String, dynamic>;
+      _index['readings'] as Map<String, dynamic>;
 
   @override
   Future<Map<String, dynamic>?> fetchCurrent() async {
-    final current = (_fixture['manifest'] as Map)['current'] as Map;
+    final current = _index['current'] as Map;
     return {
       'schemaVersion': current['schemaVersion'],
       'contentVersion': current['contentVersion'],
@@ -59,20 +70,21 @@ class ProductionReadingsRemote implements ContentRemote {
   @override
   Future<Map<String, dynamic>?> fetchCollectionManifest(
     String collection,
-  ) async => collection == 'readings'
-      ? {
-          'digest': _readings['digest'],
-          'hashes': _readings['hashes'],
-          'sizes': _readings['sizes'],
-        }
-      : null;
+  ) async {
+    if (collection != 'readings') return null;
+    indexReads++;
+    return _readings;
+  }
 
   @override
   Future<Map<String, Map<String, dynamic>>> fetchDocuments(
     String collection,
     List<String> ids,
   ) async {
-    if (failFetch) throw const SocketException('offline');
+    if (failFetch) {
+      fetched.addAll(ids.take(ids.length ~/ 2));
+      throw const SocketException('offline');
+    }
     fetched.addAll(ids);
     final documents = _fixture['documents'] as Map<String, dynamic>;
     return {
