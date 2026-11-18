@@ -247,7 +247,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(_location(router), '/prayers/sacraments');
-      expect(find.byKey(const Key('prayerbook-placeholder-title')), findsOneWidget);
+      expect(
+        find.byKey(const Key('prayerbook-placeholder-title')),
+        findsOneWidget,
+      );
       expect(find.text('Сакрамэнты'), findsOneWidget);
       expect(find.text('Раздзел у распрацоўцы'), findsOneWidget);
     });
