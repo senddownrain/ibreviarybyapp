@@ -47,13 +47,6 @@ class _PsalmodySettingsSectionState
           onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
         ),
         const SizedBox(height: 16),
-        Text(
-          'Прыклад',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 8),
         PsalmodyScope(
           controller: _choir,
           mode: settings.psalmodyMode,
