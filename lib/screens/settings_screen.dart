@@ -5,15 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/discovery/tour/discovery_settings_section.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/widgets/priest_access_settings_section.dart';
-import 'package:mybrev_flutter/widgets/admin_songbook_login_section.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
-import 'package:mybrev_flutter/review/app_review_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -373,11 +370,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                const DiscoverySettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-
                 DataSettingsSection(key: _dataKey),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -387,17 +379,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.chat_bubble_outline_rounded),
                   title: const Text('Зваротная сувязь'),
-                  subtitle: const Text(
-                    'Прапанова, пытанне або праблема з праграмай. Пра памылку ў тэксце — праз меню «⋯» на патрэбнай старонцы.',
-                  ),
+                  subtitle: const Text('Пытанні і прапановы'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/settings/feedback'),
                 ),
-                const AppReviewSettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-                const AdminSongbookLoginSection(),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
