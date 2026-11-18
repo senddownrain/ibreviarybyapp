@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mybrev_flutter/utils/office_responsory_repeats.dart';
 
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 
@@ -294,7 +295,8 @@ String normalizeOfficeHtml(String source, {bool officeReading = false}) {
       }
     }
   }
-  return fragment.outerHtml;
+  // Display-only: repeat existing starred words within this responsory.
+  return expandOfficeResponsoryRepeats(fragment.outerHtml);
 }
 
 /// Moves only a first reading's explicit Scripture citation into header metadata.

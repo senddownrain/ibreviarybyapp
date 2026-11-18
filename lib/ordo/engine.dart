@@ -305,6 +305,8 @@ class OrdoOptionDescriptor {
     required this.teDeum,
     required this.compline,
     required this.complineDay,
+    required this.complineChoice,
+    required this.complineSolemnityPrayer,
     required this.firstVespersByRight,
     required this.vespersType,
     required this.commemorations,
@@ -326,6 +328,8 @@ class OrdoOptionDescriptor {
   final bool teDeum;
   final String compline;
   final int complineDay;
+  final bool complineChoice;
+  final bool complineSolemnityPrayer;
   final bool firstVespersByRight;
   final String vespersType;
   final List<OrdoOption> commemorations;
@@ -337,9 +341,18 @@ class OrdoOptionDescriptor {
 OrdoOptionDescriptor optionDescriptor(OrdoDay day, OrdoOption option) {
   final office = day.office(option.id);
   final tomorrowWins = day.evening.vespersType == 'first';
-  final compline = tomorrowWins
+  final complineChoice = day.period == 'easter' && day.periodPhase == 'octave';
+  final compline = complineChoice
+      ? 'sunday-after-first-or-second-vespers'
+      : tomorrowWins
       ? day.evening.compline
       : (office?.compline ?? 'current-weekday');
+  final complineSolemnityPrayer =
+      !complineChoice &&
+      (option.officeKind == 'triduum' ||
+          (tomorrowWins
+              ? day.evening.complineSolemnityPrayer
+              : option.officeKind == 'solemnity' && day.dayOfWeek != 1));
   return OrdoOptionDescriptor(
     date: day.date,
     diocese: day.diocese,
@@ -355,6 +368,8 @@ OrdoOptionDescriptor optionDescriptor(OrdoDay day, OrdoOption option) {
     teDeum: office?.teDeum ?? false,
     compline: compline,
     complineDay: complineWeekday(compline, day.dayOfWeek),
+    complineChoice: complineChoice,
+    complineSolemnityPrayer: complineSolemnityPrayer,
     firstVespersByRight: office?.firstVespersByRight ?? false,
     vespersType: tomorrowWins
         ? 'first'

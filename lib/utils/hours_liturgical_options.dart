@@ -122,11 +122,23 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
   );
 }
 
-String completoriumRecordIdForDay(LiturgicalDay? day) {
+String completoriumRecordIdForDay(
+  LiturgicalDay? day, {
+  bool firstVespers = false,
+}) {
   if (day == null) return '';
   final period = (day.periodType ?? day.field('_periodType') ?? '').trim();
   final weekday =
       day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 0;
+  // The Ordo chooses Sunday I/II Compline for solemnities, the Triduum,
+  // and the octave. A weekday-only fallback loses that decision.
+  if (firstVespers && day.field('_ordoComplineChoice') == 'true') {
+    return completoriumId(period, 7);
+  }
+  final ordoDay = int.tryParse(day.field('_ordoComplineDay') ?? '');
+  if (ordoDay != null && ordoDay >= 1 && ordoDay <= 7) {
+    return completoriumId(period, ordoDay);
+  }
   return completoriumId(period, weekday, day);
 }
 

@@ -14,6 +14,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/liturgical_vespers.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
@@ -148,12 +149,16 @@ class _HoursList extends StatelessWidget {
         body: 'Для выбранага варыянту няма змесціва літургіі гадзінаў.',
       );
     }
+    final vespersTitle = vespersHourTitle(
+      selection.effectiveOption?.ordo?.vespersType,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var index = 0; index < available.length; index++) ...[
           _HourRow(
             hour: available[index],
+            label: available[index].type == 'vespers' ? vespersTitle : null,
             color: color,
             onTap: () {
               final dayId = selection.dayId;
@@ -181,10 +186,12 @@ class _HoursList extends StatelessWidget {
 class _HourRow extends StatelessWidget {
   const _HourRow({
     required this.hour,
+    this.label,
     required this.color,
     required this.onTap,
   });
   final HoraItem hour;
+  final String? label;
   final Color color;
   final VoidCallback onTap;
 
@@ -193,7 +200,7 @@ class _HourRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Semantics(
       button: true,
-      label: '${hour.label}, ${hour.subtitle}',
+      label: '${label ?? hour.label}, ${hour.subtitle}',
       child: InkWell(
         key: Key('hours-hour-${hour.type}'),
         onTap: onTap,
@@ -218,7 +225,7 @@ class _HourRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      hour.label,
+                      label ?? hour.label,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: cs.onSurface,
