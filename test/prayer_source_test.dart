@@ -28,6 +28,42 @@ void main() {
     }
   });
 
+  test('pages field survives Firestore and local serialization', () {
+    for (final (raw, expected) in [
+      ('34–36', '34–36'),
+      (42, '42'),
+    ]) {
+      final prayer = Prayer.fromMap({
+        'title': 'Малітва',
+        'text': 'Тэкст',
+        'pages': raw,
+      }, 'p');
+      expect(prayer.pages, expected);
+      expect(prayer.copyWith(body: 'Іншы тэкст').pages, expected);
+      expect(Prayer.fromMap(prayer.toMap(), 'p').pages, expected);
+    }
+    expect(Prayer.fromMap({'title': 'Малітва'}, 'old').pages, isNull);
+  });
+
+  testWidgets('pages note is modest and omitted for blank values', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              PrayerPagesNote(pages: ' 12–14 ', textStyle: TextStyle(fontSize: 18)),
+              PrayerPagesNote(pages: ' ', textStyle: TextStyle(fontSize: 18)),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Старонкі: 12–14'), findsOneWidget);
+    expect(find.byKey(const Key('prayer-pages')), findsOneWidget);
+    final note = tester.widget<Text>(find.byKey(const Key('prayer-pages')));
+    expect(note.style!.fontSize, lessThan(18));
+  });
+
   testWidgets('reader source note displays the canonical server value', (
     tester,
   ) async {
@@ -61,13 +97,14 @@ void main() {
   ) async {
     await tester.pumpWidget(
       DevotionalOfficeHarness(
-        prayers: const [sourceSmokePrayer],
+        prayers: [sourceSmokePrayer.copyWith(pages: '26–27')],
         initialId: sourceSmokePrayer.id,
         systemFonts: true,
       ),
     );
     await tester.pumpAndSettle();
     expect(find.text('Крыніца: Бог добры'), findsOneWidget);
+    expect(find.text('Старонкі: 26–27'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -82,7 +119,7 @@ void main() {
     final office = Prayer.fromMap(
       bundle.docs[sourceOfficeId]!,
       sourceOfficeId,
-    ).copyWith(source: 'Літургія гадзін');
+    ).copyWith(source: 'Літургія гадзін', pages: '78–80');
     await tester.pumpWidget(
       DevotionalOfficeHarness(
         prayers: [office],
@@ -92,6 +129,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Крыніца: Літургія гадзін'), findsOneWidget);
+    expect(find.text('Старонкі: 78–80'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
