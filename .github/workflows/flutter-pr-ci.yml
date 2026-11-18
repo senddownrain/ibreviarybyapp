@@ -181,7 +181,7 @@ jobs:
       - name: Psalmody bundle, alternatives and existing local data
         run: |
           dart format --output=show --set-exit-if-changed test/doxology_bundle_test.dart test/common_office_test.dart
-          flutter test test/doxology_bundle_test.dart test/common_office_test.dart test/content_offline_test.dart test/ordo_content_update_test.dart test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart
+          flutter test test/doxology_bundle_test.dart test/common_office_test.dart test/content_offline_test.dart test/ordo_content_update_test.dart test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart test/psalm_opening_test.dart
 
   analytics-tests:
     name: Analytics tests

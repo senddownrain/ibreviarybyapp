@@ -34,8 +34,8 @@ void main() {
       final root = parseFragment(output);
       final lines = root.querySelectorAll('.psalm-line');
       expect(lines, hasLength(3));
-      expect(lines[0].text.trim(), 'Пачатакслова †');
-      expect(lines[1].text.trim(), 'працяг *');
+      expect(lines[0].text.trim(), 'Пачатакслова');
+      expect(lines[1].text.trim(), '† працяг *');
       expect(lines[1].querySelector('em'), isNotNull);
       expect(lines[0].querySelector('br'), isNotNull);
       expect(
@@ -257,15 +257,15 @@ void main() {
             (widget) =>
                 widget is RichText && widget.text.toPlainText().trim() == text,
           );
-          expect(line('Божа, †'), findsOneWidget);
-          expect(line('працяг *'), findsOneWidget);
+          expect(line('Божа,'), findsOneWidget);
+          expect(line('† працяг *'), findsOneWidget);
           expect(
-            tester.getTopLeft(line('працяг *')).dy,
-            greaterThan(tester.getTopLeft(line('Божа, †')).dy),
+            tester.getTopLeft(line('† працяг *')).dy,
+            greaterThan(tester.getTopLeft(line('Божа,')).dy),
           );
           expect(
-            tester.getTopLeft(line('працяг *')).dx -
-                tester.getTopLeft(line('Божа, †')).dx,
+            tester.getTopLeft(line('† працяг *')).dx -
+                tester.getTopLeft(line('Божа,')).dx,
             closeTo(size * .75, .01),
           );
           expect(tester.takeException(), isNull);
