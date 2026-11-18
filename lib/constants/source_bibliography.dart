@@ -122,7 +122,7 @@ const kPublicSourceBibliography = <SourceBibliographyItem>[
   SourceBibliographyItem(
     id: 'biblia-synodal',
     section: 'Іншыя крыніцы',
-    title: '«Библия» (Синодальный перевод, на русском языке)',
+    title: '«Библия» (Синодальный перевод)',
     notices: [],
   ),
 ];
