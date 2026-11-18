@@ -45,13 +45,18 @@ void main() {
     expect(Prayer.fromMap({'title': 'Малітва'}, 'old').pages, isNull);
   });
 
-  testWidgets('pages note is modest and omitted for blank values', (tester) async {
+  testWidgets('pages note is modest and omitted for blank values', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
           body: Column(
             children: [
-              PrayerPagesNote(pages: ' 12–14 ', textStyle: TextStyle(fontSize: 18)),
+              PrayerPagesNote(
+                pages: ' 12–14 ',
+                textStyle: TextStyle(fontSize: 18),
+              ),
               PrayerPagesNote(pages: ' ', textStyle: TextStyle(fontSize: 18)),
             ],
           ),
