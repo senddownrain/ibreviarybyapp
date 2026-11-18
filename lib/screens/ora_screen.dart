@@ -40,6 +40,7 @@ import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/office_collect_conclusion.dart';
 import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
+import 'package:mybrev_flutter/utils/psalm_opening.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/pastors_hymn.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
@@ -1901,12 +1902,7 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
         if (model.bodyHtml.trim().isNotEmpty)
           KeyedSubtree(
             key: const Key('liturgical-psalm-body'),
-            child: PsalmChoirHtml(
-              html: model.bodyHtml,
-              style: styles,
-              textColor: textStyle.color ?? reader.ink,
-              rubricColor: reader.rubric,
-            ),
+            child: _psalmBody(model, styles, reader),
           ),
         if (model.repeatedAntiphon case final repeated?) ...[
           const SizedBox(height: LiturgicalSpacing.antiphonToPsalm),
@@ -1919,6 +1915,39 @@ class _LiturgicalPsalmBlock extends StatelessWidget {
           _HtmlOrText(content: model.trailingHtml, textStyle: textStyle),
       ],
     );
+  }
+
+  Widget _psalmBody(
+    LiturgicalPsalmModel model,
+    Map<String, Style> styles,
+    ReaderTheme reader,
+  ) {
+    Widget render(int selectedAntiphon) {
+      var html = model.bodyHtml;
+      if (model.openingAntiphon case final opening?) {
+        final choices = getLiturgicalAlternatives(
+          opening,
+          kind: canticleCaption == null ? 'psalm-antiphon' : 'gospel-antiphon',
+        );
+        if (selectedAntiphon >= 0 && selectedAntiphon < choices.length) {
+          html = omitEchoedPsalmOpening(html, choices[selectedAntiphon].html);
+        }
+      }
+      return PsalmChoirHtml(
+        html: html,
+        style: styles,
+        textColor: textStyle.color ?? reader.ink,
+        rubricColor: reader.rubric,
+      );
+    }
+
+    final controller = antiphonController;
+    return controller == null
+        ? render(0)
+        : ValueListenableBuilder<int>(
+            valueListenable: controller,
+            builder: (context, selected, child) => render(selected),
+          );
   }
 
   Widget _metadata(BuildContext context, PsalmMetadataLine line, double size) {
