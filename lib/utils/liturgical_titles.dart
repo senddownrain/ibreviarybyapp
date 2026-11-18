@@ -65,6 +65,8 @@ String formatLiturgicalPeriodTitle({
 
   if (dayOfWeek == 1 && week.isNotEmpty) {
     final title = switch (periodType) {
+      'ordinary' when periodWeek == 3 =>
+        '$week нядзеля звычайная · Нядзеля Божага Слова',
       'ordinary' => '$week нядзеля звычайная',
       'advent' => '$week нядзеля Адвэнту',
       'lent' => '$week нядзеля Вялікага посту',
@@ -122,6 +124,11 @@ String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {
   if (isOfficeForDead) {
     return day.feastName ?? day.title ?? 'Афіцый за памерлых';
   }
+  if (day.feast == 'feast-christking' ||
+      day.field('_celebrationId') == 'christ-king' ||
+      day.id == 'feast-christking') {
+    return 'Пана нашага Езуса Хрыста, Валадара Сусвету';
+  }
 
   final periodTitle = formatLiturgicalPeriodTitle(
     periodType: periodType,
@@ -132,7 +139,10 @@ String liturgicalDayDisplayTitle(LiturgicalDay day, DateTime date) {
   final isChristmasDateDay =
       periodType == 'christmas' &&
       (isSeasonalDateDocumentId(day.id) || !hasCelebration);
-  if ((periodType.isNotEmpty && !hasCelebration) || isChristmasDateDay) {
+  if ((periodType.isNotEmpty && !hasCelebration) ||
+      isChristmasDateDay ||
+      (day.field('_ordoOfficeKind') == 'sunday' &&
+          day.field('_ordoOptionId') == 'temporal:ordinary-w3-d1')) {
     return periodTitle;
   }
   return day.feastName ?? day.title ?? periodTitle;

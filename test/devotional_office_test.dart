@@ -80,7 +80,21 @@ void main() {
           isNull,
         );
         if (doc.profile == 'gadzinki') {
-          expect(doc.sections.map((s) => s.title), gadzinkiParts);
+          expect(doc.sections.map((s) => s.title), [
+            ...gadzinkiParts.take(6),
+            'Камплета',
+            gadzinkiParts.last,
+          ]);
+          final previous = parseDevotionalOffice(
+            prayer.copyWith(
+              body: prayer.displayText.replaceFirst(
+                '## Камплета',
+                '## Напрыканцы дня',
+              ),
+            ),
+          );
+          expect(previous, isNotNull);
+          expect(previous!.sections.elementAt(6).title, 'Напрыканцы дня');
           expect(doc.sections.expand((s) => doc.choices(s)), isEmpty);
           expect(
             doc.sections

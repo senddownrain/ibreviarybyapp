@@ -1,0 +1,149 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart
+00:00 +0: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: canonical source has three independent readings, antiphons and K/N
+00:00 +1: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: empty fields and stale references cannot destroy a supplied Proper
+00:00 +2: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: another movable feast shares Terce Proper and uses its Lauds collect
+00:00 +3: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: single antiphon in Sext/None never borrows Terce Ant2/Ant3
+00:00 +4: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: solemnities and movable memorials retain their previous semantics
+00:00 +5: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: legacy feast-type rank is used when the rank field is empty
+00:00 +6: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: daytime single-antiphon exclusions cannot change the other Hours
+00:00 +7: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: real offline bundle and ContentUpdater 28 May 2026 Pinsk: all three hours from the original bundle
+[ContentStore] prayerCategories: 5 docs in 112 ms
+[ContentStore] prayers: 115 docs in 327 ms
+[ContentStore] invitatoriums: 4 docs in 54 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 86 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 76 ms
+[ContentStore] completoriums: 35 docs in 92 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 77 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 299 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 316 ms
+[ContentStore] liturgicalTemplates: 16 docs in 685 ms
+[ContentStore] readings: 822 docs in 983 ms
+[ContentStore] days: 736 docs in 1789 ms
+[ContentStore] compendiumMeta: 1 docs in 42 ms
+[ContentStore] songs: 447 docs in 111 ms
+[ContentStore] compendium: 27 docs in 129 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 142 ms
+00:04 +8: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: real offline bundle and ContentUpdater movable date in every diocese, 2025–2035 (including 2027)
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 99 ms
+[ContentStore] invitatoriums: 4 docs in 102 ms
+[ContentStore] completoriums: 35 docs in 161 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 176 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 171 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 173 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 186 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 562 ms
+[ContentStore] liturgicalTemplates: 16 docs in 625 ms
+[ContentStore] readings: 822 docs in 986 ms
+[ContentStore] days: 736 docs in 1714 ms
+[ContentStore] compendiumMeta: 1 docs in 22 ms
+[ContentStore] songs: 447 docs in 196 ms
+[ContentStore] compendium: 27 docs in 198 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 197 ms
+00:12 +9: /workspace/ibreviarybyapp/test/high_priest_daytime_test.dart: real offline bundle and ContentUpdater safe patch is verified, survives restart, and later text wins
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 277 ms
+[ContentStore] invitatoriums: 4 docs in 117 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 56 ms
+[ContentStore] completoriums: 35 docs in 59 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 58 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 99 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 126 ms
+[ContentStore] liturgicalTemplates: 16 docs in 515 ms
+[ContentStore] readings: 822 docs in 738 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 1025 ms
+[ContentStore] days: 736 docs in 1792 ms
+[ContentStore] compendiumMeta: 1 docs in 27 ms
+[ContentStore] songs: 447 docs in 96 ms
+[ContentStore] compendium: 27 docs in 176 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 124 ms
+[ContentStore] prayerCategories: 5 docs in 4 ms
+[ContentStore] prayers: 115 docs in 196 ms
+[ContentStore] invitatoriums: 4 docs in 110 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 131 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 131 ms
+[ContentStore] completoriums: 35 docs in 172 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 147 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 148 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 409 ms
+[ContentStore] liturgicalTemplates: 16 docs in 651 ms
+[ContentStore] readings: 822 docs in 1024 ms
+[ContentStore] days: 736 docs in 2186 ms
+[ContentStore] compendiumMeta: 1 docs in 4 ms
+[ContentStore] songs: 447 docs in 41 ms
+[ContentStore] compendium: 27 docs in 43 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 48 ms
+01:09 +10: loading /workspace/ibreviarybyapp/test/high_priest_daytime_parity_test.dart
+01:14 +10: /workspace/ibreviarybyapp/test/high_priest_daytime_parity_test.dart: Web ↔ Flutter: all 27 daytime fields, 2025–2035 × four dioceses, original bundle and minimal reference-only patch
+[ContentStore] prayerCategories: 5 docs in 69 ms
+[ContentStore] prayers: 115 docs in 322 ms
+[ContentStore] completoriums: 35 docs in 87 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 87 ms
+[ContentStore] invitatoriums: 4 docs in 88 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 39 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 50 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 350 ms
+[ContentStore] liturgicalTemplates: 16 docs in 974 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 1156 ms
+[ContentStore] readings: 822 docs in 1498 ms
+[ContentStore] days: 736 docs in 1985 ms
+[ContentStore] compendiumMeta: 1 docs in 4687 ms
+[ContentStore] songs: 447 docs in 4692 ms
+[ContentStore] compendium: 27 docs in 4691 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 4687 ms
+01:23 +11: loading /workspace/ibreviarybyapp/test/high_priest_minimal_patch_test.dart
+01:26 +11: /workspace/ibreviarybyapp/test/high_priest_minimal_patch_test.dart: minimal 12-field patch: real service/updater, complete Proper, 44-date parity and offline restart (also runs on pre-PR Flutter)
+[ContentStore] prayerCategories: 5 docs in 80 ms
+[ContentStore] prayers: 115 docs in 303 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 93 ms
+[ContentStore] invitatoriums: 4 docs in 94 ms
+[ContentStore] completoriums: 35 docs in 100 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 97 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 365 ms
+[ContentStore] liturgicalTemplates: 16 docs in 398 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 482 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 865 ms
+[ContentStore] readings: 822 docs in 1184 ms
+[ContentStore] days: 736 docs in 1571 ms
+[ContentStore] compendiumMeta: 1 docs in 6 ms
+[ContentStore] songs: 447 docs in 82 ms
+[ContentStore] compendium: 27 docs in 118 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 120 ms
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 133 ms
+[ContentStore] invitatoriums: 4 docs in 29 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 29 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 29 ms
+[ContentStore] completoriums: 35 docs in 94 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 88 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 95 ms
+[ContentStore] liturgicalTemplates: 16 docs in 313 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 508 ms
+[ContentStore] readings: 822 docs in 739 ms
+[ContentStore] days: 736 docs in 1478 ms
+[ContentStore] compendiumMeta: 1 docs in 9 ms
+[ContentStore] compendium: 27 docs in 62 ms
+[ContentStore] songs: 447 docs in 67 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 80 ms
+01:48 +12: loading /workspace/ibreviarybyapp/test/approved_office_parity_test.dart
+01:50 +12: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 80 ms
+[ContentStore] prayers: 115 docs in 221 ms
+[ContentStore] invitatoriums: 4 docs in 293 ms
+[ContentStore] completoriums: 35 docs in 304 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 452 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 403 ms
+[ContentStore] compendiumMeta: 1 docs in 359 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 405 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 406 ms
+[ContentStore] liturgicalTemplates: 16 docs in 592 ms
+[ContentStore] songs: 447 docs in 497 ms
+[ContentStore] compendium: 27 docs in 490 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 640 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 637 ms
+[ContentStore] readings: 822 docs in 1055 ms
+[ContentStore] days: 736 docs in 2023 ms
+01:53 +12: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: reviewed Advent sources match the independent Web Office oracle
+01:58 +13: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: I Vespers keeps missing fields from the Proper and tonight's O antiphon
+01:58 +14: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: (tearDownAll)
+01:58 +14: All tests passed!

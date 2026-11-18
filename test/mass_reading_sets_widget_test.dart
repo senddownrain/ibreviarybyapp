@@ -421,9 +421,11 @@ void main() {
         'Сёмае чытанне',
         'Эпістала',
       ];
-      // The whole document is laid out (not lazy): the source order.
+      // Section headings render in uppercase; the whole document is laid out
+      // (not lazy): the source order.
       final positions = [
-        for (final label in labels) tester.getTopLeft(find.text(label)).dy,
+        for (final label in labels)
+          tester.getTopLeft(find.text(label.toUpperCase())).dy,
       ];
       for (var i = 1; i < positions.length; i++) {
         expect(positions[i], greaterThan(positions[i - 1]), reason: labels[i]);
@@ -443,7 +445,7 @@ void main() {
       final sequence = find.byKey(const Key('reading-sequence'));
       await _scrollTo(tester, sequence);
       expect(
-        find.descendant(of: sequence, matching: find.text('Секвенцыя')),
+        find.descendant(of: sequence, matching: find.text('СЕКВЕНЦЫЯ')),
         findsOneWidget,
       );
     });
@@ -477,7 +479,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('readings-mass-set-selector')), findsNothing);
       expect(find.byKey(const Key('mass-set-meta')), findsNothing);
-      expect(find.text('Чытанне'), findsOneWidget);
+      expect(find.text('ЧЫТАННЕ'), findsOneWidget);
     });
   });
 }

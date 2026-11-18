@@ -149,7 +149,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('reader-content-surface')), findsOneWidget);
-    expect(find.text('Чытанне'), findsOneWidget);
+    // Section headings are uppercase since the reader typography update.
+    expect(find.text('ЧЫТАННЕ'), findsOneWidget);
     expect(find.textContaining('Тэкст чытання'), findsWidgets);
     expect(
       find.byKey(const Key('readings-alternatives-control')),

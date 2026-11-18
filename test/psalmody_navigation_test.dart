@@ -47,7 +47,47 @@ void main() {
     },
   );
 
-  test('next hour skips unavailable entries and ends at Compline', () {
+  test('the footer follows the same explicit destinations as the Web reader', () {
+    final day = LiturgicalDay.fromMap({
+      'id': 'variant',
+      'title': 'Дзень',
+      'invitatoriumAnt': 'антыфона',
+      'officeOfReadingsHymn': 'гімн',
+      'laudesAnt1': 'антыфона',
+      'sext1Ant1': 'антыфона',
+      'sext2R': 'чытанне',
+      'sext3Ant1': 'антыфона',
+      'vesperAnt1': 'антыфона',
+    });
+    expect(kNextHourByType, {
+      'invitatorium': 'laudes',
+      'lectionis': 'laudes',
+      'laudes': 'terz',
+      'terz': 'sext',
+      'sext': 'non',
+      'non': 'vespers',
+      'vespers': 'completorium',
+    });
+    for (final entry in kNextHourByType.entries) {
+      expect(
+        nextAvailableHour(
+          day,
+          entry.key,
+          completoriumAvailable: true,
+        )?.type,
+        entry.value,
+        reason: 'footer after ${entry.key}',
+      );
+    }
+    expect(nextAvailableHour(day, 'morning', completoriumAvailable: true), isNull);
+    expect(
+      nextAvailableHour(day, 'completorium', completoriumAvailable: true),
+      isNull,
+    );
+    expect(nextAvailableHour(day, 'unknown', completoriumAvailable: true), isNull);
+  });
+
+  test('a missing next hour hides the button instead of skipping ahead', () {
     final day = LiturgicalDay.fromMap({
       'id': 'variant',
       'title': 'Дзень',
@@ -55,20 +95,20 @@ void main() {
       'vesperAnt1': 'антыфона',
     });
     expect(
-      nextAvailableHour(day, 'laudes', completoriumAvailable: true)?.type,
-      'vespers',
+      nextAvailableHour(day, 'laudes', completoriumAvailable: true),
+      isNull,
     );
     expect(
-      nextAvailableHour(day, 'vespers', completoriumAvailable: true)?.type,
-      'completorium',
+      nextAvailableHour(day, 'lectionis', completoriumAvailable: true)?.type,
+      'laudes',
     );
     expect(
       nextAvailableHour(day, 'vespers', completoriumAvailable: false),
       isNull,
     );
     expect(
-      nextAvailableHour(day, 'completorium', completoriumAvailable: true),
-      isNull,
+      nextAvailableHour(day, 'vespers', completoriumAvailable: true)?.type,
+      'completorium',
     );
   });
 

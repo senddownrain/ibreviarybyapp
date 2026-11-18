@@ -10,7 +10,8 @@ class PrayerAccessContent {
     return PrayerAccessContent(
       {
         for (final entry in prayers.entries)
-          if (!policy.prayerRestricted(entry.value)) entry.key: entry.value,
+          if (!policy.prayerRestricted(entry.value, id: entry.key))
+            entry.key: entry.value,
       },
       {
         for (final entry in categories.entries)

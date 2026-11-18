@@ -29,7 +29,7 @@ Future<void> main() async {
   final prayers = <Prayer>[];
   for (final id in devotionalOfficeProfiles.keys) {
     final data = collection.docs[id];
-    if (data == null || policy.prayerRestricted(data)) {
+    if (data == null || policy.prayerRestricted(data, id: id)) {
       throw StateError('Public bundled office unavailable: $id');
     }
     final prayer = Prayer.fromMap(data, id);

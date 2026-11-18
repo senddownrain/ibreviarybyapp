@@ -1,0 +1,9 @@
+00:00 +0: loading /workspace/flutter-categories-old/test/prayer_category_old_decoder_test.dart
+00:00 +0: OLD DECODER x NEW GZIP: schema, string table, hashes and old model
+00:00 +1: OLD ContentStore: bundle, update overlay, close/restart/reload
+[ContentStore] prayerCategories: 6 docs in 15 ms
+[ContentStore] prayers: 6 docs in 17 ms
+[ContentStore] prayers: 6 docs in 1 ms
+[ContentStore] prayerCategories: 6 docs in 2 ms
+00:00 +2: OLD category list UI accepts new documents without crashing
+00:00 +3: All tests passed!

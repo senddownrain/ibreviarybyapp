@@ -326,11 +326,26 @@ void main() {
         docs.fold(0, (n, d) => n + ((d['_commonBase'] as Map?)?.length ?? 0)),
         29,
       );
+      // A newer, outside-mask Proper was retained in the actual server readback.
+      // Bind this aggregate to the independent publication receipt; the
+      // already reviewed Common-field parity fixture remains unchanged.
+      final published =
+          jsonDecode(
+                File(
+                  'docs/release/final-test/firestore-liturgical-verified.json',
+                ).readAsStringSync(),
+              )
+              as Map;
+      expect(
+        published['receiptSha256'],
+        '8e65162f89ced4fef4bc5ef901ecc2c72d80e96962af6e3cce659d3c72876464',
+      );
       expect(
         store.collection('liturgicalProperTexts').digest(),
-        '60081a442fa9c4ed',
+        ((published['collections'] as Map)['liturgicalProperTexts']
+            as Map)['digest'],
       );
-      expect(HiveService.templatesBox.digest(), 'eb5361386d552f49');
+      expect(HiveService.templatesBox.digest(), 'a1d498c34dd96ab8');
       expect(
         HiveService.templates()['holy-women']!['_seasonalVariants'],
         isNotNull,

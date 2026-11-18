@@ -26,6 +26,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import zlib from 'node:zlib';
+import { resolveWeb } from '../lib/web_source.mjs';
 
 function parseArgs(argv) {
   const options = { web: null, snapshot: null, out: null, from: 2025, to: 2035 };
@@ -44,7 +45,8 @@ function parseArgs(argv) {
 }
 
 const options = parseArgs(process.argv.slice(2));
-const WEB = path.resolve(options.web);
+const source = resolveWeb(process.argv.slice(2));
+const WEB = source.web;
 const web = (rel) => import(pathToFileURL(path.join(WEB, rel)).href);
 
 const { openFirestoreSnapshot } = await web('scripts/lib/firestore-snapshot.mjs');
@@ -290,10 +292,10 @@ const fixture = {
   schema: 1,
   generatedAt: new Date().toISOString(),
   web: {
-    head: process.env.WEB_HEAD || null,
+    head: source.head,
     dataset: `readings@${digest}`,
     documents: readingsAll.length,
-    snapshot: snapshot.manifest.snapshotVersion,
+    snapshot: snapshot.manifest.snapshotVersion ?? String(Date.parse(snapshot.manifest.exportedAt)),
     exportedAt: snapshot.manifest.exportedAt,
   },
   years: [options.from, options.to],

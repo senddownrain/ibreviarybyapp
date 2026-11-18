@@ -1,0 +1,249 @@
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.4.0 available)
+  archive 4.2.0 (4.7.1 available)
+  async 2.13.0 (2.13.1 available)
+  clock 1.1.2 (1.1.3 available)
+  cloud_firestore 5.6.12 (7.2.0 available)
+  cloud_firestore_platform_interface 6.6.12 (8.2.0 available)
+  cloud_firestore_web 4.4.12 (5.9.0 available)
+  connectivity_plus 6.1.5 (7.3.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  cupertino_icons 1.0.8 (2.0.0 available)
+  dbus 0.7.12 (0.8.0 available)
+  firebase_auth 5.7.0 (7.1.0 available)
+  firebase_auth_platform_interface 7.7.3 (9.2.0 available)
+  firebase_auth_web 5.15.3 (6.4.0 available)
+  firebase_core 3.15.2 (5.2.0 available)
+  firebase_core_platform_interface 6.0.2 (8.2.0 available)
+  firebase_core_web 2.24.1 (4.2.0 available)
+  flutter_riverpod 2.6.1 (3.5.0 available)
+  flutter_secure_storage 9.2.4 (11.2.0 available)
+  flutter_secure_storage_linux 1.2.3 (3.0.3 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.1.1 available)
+  flutter_secure_storage_web 1.2.1 (2.1.1 available)
+  flutter_secure_storage_windows 3.1.2 (4.2.2 available)
+  flutter_svg 2.3.4 (2.4.0 available)
+  go_router 14.8.1 (18.1.4 available)
+  google_fonts 6.3.3 (9.0.0 available)
+  html 0.15.6 (0.15.7 available)
+  intl 0.20.2 (0.20.3 available)
+  js 0.6.7 (0.7.2 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.17.0 (1.19.0 available)
+  mime 2.0.0 (2.1.0 available)
+  nm 0.5.0 (0.6.0 available)
+  package_info_plus 9.0.1 (10.2.2 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider 2.1.5 (2.1.6 available)
+  path_provider_android 2.2.22 (2.3.1 available)
+! path_provider_foundation 2.4.0 (overridden) (2.6.0 available)
+  path_provider_linux 2.2.1 (2.2.2 available)
+  path_provider_platform_interface 2.1.2 (2.1.3 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  posix 6.5.2 (6.5.4 available)
+  riverpod 2.6.1 (3.5.0 available)
+  share_plus 10.1.4 (13.3.1 available)
+  share_plus_platform_interface 5.0.2 (7.2.0 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.10 (0.7.15 available)
+  url_launcher 6.3.2 (6.3.3 available)
+  url_launcher_android 6.3.30 (6.3.35 available)
+  url_launcher_linux 3.2.2 (3.2.3 available)
+  url_launcher_windows 3.1.5 (3.1.6 available)
+  vector_math 2.2.0 (2.4.4 available)
+  vm_service 15.0.2 (15.4.0 available)
+  wakelock_plus 1.5.1 (1.8.2 available)
+  wakelock_plus_platform_interface 1.4.0 (1.7.0 available)
+  web 1.1.1 (1.1.2 available)
+  win32 5.15.0 (6.4.0 available)
+  xml 6.6.1 (7.1.0 available)
+Got dependencies!
+62 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+{"protocolVersion":"0.1.1","runnerVersion":null,"pid":1289,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"/workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading /workspace/ibreviarybyapp/test/triduum_compline_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1}
+{"count":5,"time":4,"type":"allSuites"}
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3574}
+{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":null,"column":null,"url":null},"type":"group","time":3578}
+{"test":{"id":3,"name":"(setUpAll)","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":40,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":3578}
+{"testID":3,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 22 ms","type":"print","time":3725}
+{"testID":3,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 82 ms","type":"print","time":3778}
+{"testID":3,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 73 ms","type":"print","time":3898}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 102 ms","type":"print","time":3919}
+{"testID":3,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 115 ms","type":"print","time":3919}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 94 ms","type":"print","time":3920}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 104 ms","type":"print","time":3920}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 93 ms","type":"print","time":3920}
+{"testID":3,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 55 ms","type":"print","time":3921}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 123 ms","type":"print","time":3925}
+{"testID":3,"messageType":"print","message":"[ContentStore] songs: 447 docs in 80 ms","type":"print","time":3926}
+{"testID":3,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 73 ms","type":"print","time":3927}
+{"testID":3,"messageType":"print","message":"[ContentStore] readings: 822 docs in 175 ms","type":"print","time":3973}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 155 ms","type":"print","time":3984}
+{"testID":3,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 119 ms","type":"print","time":3985}
+{"testID":3,"messageType":"print","message":"[ContentStore] days: 736 docs in 280 ms","type":"print","time":4071}
+{"testID":3,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4073}
+{"test":{"id":4,"name":"three different Triduum antiphons match the printed breviary","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":63,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":4074}
+{"testID":4,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4080}
+{"test":{"id":5,"name":"Vespers and Compline rubrics occur only on their own days","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":74,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":4081}
+{"testID":5,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4083}
+{"test":{"id":6,"name":"Ordo Compline template weekday is preserved through the local day","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":91,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":4083}
+{"testID":6,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4086}
+{"test":{"id":7,"name":"non-Sunday solemnities and Triduum use prayer number two","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":105,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":4086}
+{"testID":7,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4088}
+{"test":{"id":8,"name":"both evenings of weekday solemnities load prayer 2 after cache restore","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":121,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":4088}
+{"testID":8,"messageType":"print","message":"[ContentStore] prayerCategories: 22 docs in 0 ms","type":"print","time":4133}
+{"testID":8,"messageType":"print","message":"[ContentStore] prayers: 393 docs in 33 ms","type":"print","time":4164}
+{"testID":8,"messageType":"print","message":"[ContentStore] completoriums: 35 docs in 12 ms","type":"print","time":4188}
+{"testID":8,"messageType":"print","message":"[ContentStore] invitatoriums: 4 docs in 13 ms","type":"print","time":4188}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalYearOverrides: 15 docs in 12 ms","type":"print","time":4191}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalCalendarMeta: 1 docs in 19 ms","type":"print","time":4201}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalDioceseOverrides: 77 docs in 22 ms","type":"print","time":4201}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalCelebrations: 242 docs in 22 ms","type":"print","time":4201}
+{"testID":8,"messageType":"print","message":"[ContentStore] compendiumMeta: 1 docs in 16 ms","type":"print","time":4201}
+{"testID":8,"messageType":"print","message":"[ContentStore] compendium: 27 docs in 45 ms","type":"print","time":4227}
+{"testID":8,"messageType":"print","message":"[ContentStore] songs: 447 docs in 53 ms","type":"print","time":4231}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalOrdoNotes: 1347 docs in 100 ms","type":"print","time":4283}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalTemplates: 16 docs in 119 ms","type":"print","time":4293}
+{"testID":8,"messageType":"print","message":"[ContentStore] liturgicalProperTexts: 291 docs in 118 ms","type":"print","time":4294}
+{"testID":8,"messageType":"print","message":"[ContentStore] readings: 822 docs in 157 ms","type":"print","time":4326}
+{"testID":8,"messageType":"print","message":"[ContentStore] days: 736 docs in 276 ms","type":"print","time":4443}
+{"testID":8,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5078}
+{"test":{"id":9,"name":"Triduum, octave and Word of God Sunday in all dioceses, 2026–2032","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":154,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":5079}
+{"testID":9,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7640}
+{"test":{"id":10,"name":"octave selector swaps the psalmody and prayer together","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":215,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":7641}
+{"testID":10,"messageType":"print","message":"[data] CACHE HIT  hour completorium legacy-copy","type":"print","time":7964}
+{"testID":10,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9205}
+{"test":{"id":11,"name":"(tearDownAll)","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":47,"column":3,"url":"file:///workspace/ibreviarybyapp/test/triduum_compline_test.dart"},"type":"testStart","time":9205}
+{"testID":11,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":9225}
+{"suite":{"id":12,"platform":"vm","path":"/workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart"},"type":"suite","time":9243}
+{"test":{"id":13,"name":"loading /workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart","suiteID":12,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":9243}
+{"testID":13,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":9730}
+{"group":{"id":14,"suiteID":12,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":null,"column":null,"url":null},"type":"group","time":9730}
+{"test":{"id":15,"name":"actual Office screenshots show full repeated responses","suiteID":12,"groupIDs":[14],"metadata":{"skip":false,"skipReason":null},"line":12,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart"},"type":"testStart","time":9731}
+{"testID":15,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10070}
+{"test":{"id":16,"name":"initial ў in asterisk repeat matches capital У, not inner occurrences","suiteID":12,"groupIDs":[14],"metadata":{"skip":false,"skipReason":null},"line":23,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart"},"type":"testStart","time":10070}
+{"testID":16,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10074}
+{"test":{"id":17,"name":"keeps separate variants and cannot invent mismatched completion","suiteID":12,"groupIDs":[14],"metadata":{"skip":false,"skipReason":null},"line":30,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart"},"type":"testStart","time":10074}
+{"testID":17,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10079}
+{"test":{"id":18,"name":"ambiguous, already full, absent star and rule boundary are unchanged","suiteID":12,"groupIDs":[14],"metadata":{"skip":false,"skipReason":null},"line":41,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart"},"type":"testStart","time":10079}
+{"testID":18,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10083}
+{"test":{"id":19,"name":"short response expands repeated text without changing doxology","suiteID":12,"groupIDs":[14],"metadata":{"skip":false,"skipReason":null},"line":51,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_responsory_repeats_test.dart"},"type":"testStart","time":10084}
+{"testID":19,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10089}
+{"suite":{"id":20,"platform":"vm","path":"/workspace/ibreviarybyapp/test/office_reading_reference_test.dart"},"type":"suite","time":10098}
+{"test":{"id":21,"name":"loading /workspace/ibreviarybyapp/test/office_reading_reference_test.dart","suiteID":20,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10098}
+{"testID":21,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":10590}
+{"group":{"id":22,"suiteID":20,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":10590}
+{"test":{"id":23,"name":"first reading citation separates from book introduction without uppercasing it","suiteID":20,"groupIDs":[22],"metadata":{"skip":false,"skipReason":null},"line":6,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_reading_reference_test.dart"},"type":"testStart","time":10590}
+{"testID":23,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10800}
+{"test":{"id":24,"name":"standalone Scripture reference keeps case and numbering; Patristic annotation stays in body","suiteID":20,"groupIDs":[22],"metadata":{"skip":false,"skipReason":null},"line":20,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_reading_reference_test.dart"},"type":"testStart","time":10801}
+{"testID":24,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10803}
+{"test":{"id":25,"name":"wrapper cannot pull a later verse out of reading content","suiteID":20,"groupIDs":[22],"metadata":{"skip":false,"skipReason":null},"line":35,"column":3,"url":"file:///workspace/ibreviarybyapp/test/office_reading_reference_test.dart"},"type":"testStart","time":10804}
+{"testID":25,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10808}
+{"suite":{"id":26,"platform":"vm","path":"/workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"suite","time":10818}
+{"test":{"id":27,"name":"loading /workspace/ibreviarybyapp/test/office_reference_layout_test.dart","suiteID":26,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10818}
+{"testID":27,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":11424}
+{"group":{"id":28,"suiteID":26,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":24,"line":null,"column":null,"url":null},"type":"group","time":11426}
+{"test":{"id":29,"name":"reading reference wraps right, normal weight at 320.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":11426}
+{"testID":29,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11881}
+{"test":{"id":30,"name":"reading reference wraps right, normal weight at 320.0/1.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":11881}
+{"testID":30,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11939}
+{"test":{"id":31,"name":"reading reference wraps right, normal weight at 320.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":11939}
+{"testID":31,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11962}
+{"test":{"id":32,"name":"reading reference wraps right, normal weight at 320.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":11962}
+{"testID":32,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11981}
+{"test":{"id":33,"name":"reading reference wraps right, normal weight at 320.0/2.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":11982}
+{"testID":33,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12001}
+{"test":{"id":34,"name":"reading reference wraps right, normal weight at 320.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12001}
+{"testID":34,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12018}
+{"test":{"id":35,"name":"reading reference wraps right, normal weight at 390.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12018}
+{"testID":35,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12040}
+{"test":{"id":36,"name":"reading reference wraps right, normal weight at 390.0/1.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12040}
+{"testID":36,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12058}
+{"test":{"id":37,"name":"reading reference wraps right, normal weight at 390.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12058}
+{"testID":37,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12083}
+{"test":{"id":38,"name":"reading reference wraps right, normal weight at 390.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12084}
+{"testID":38,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12102}
+{"test":{"id":39,"name":"reading reference wraps right, normal weight at 390.0/2.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12102}
+{"testID":39,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12119}
+{"test":{"id":40,"name":"reading reference wraps right, normal weight at 390.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12120}
+{"testID":40,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12138}
+{"test":{"id":41,"name":"reading reference wraps right, normal weight at 768.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12139}
+{"testID":41,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12158}
+{"test":{"id":42,"name":"reading reference wraps right, normal weight at 768.0/1.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12159}
+{"testID":42,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12174}
+{"test":{"id":43,"name":"reading reference wraps right, normal weight at 768.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12174}
+{"testID":43,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12190}
+{"test":{"id":44,"name":"reading reference wraps right, normal weight at 768.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12191}
+{"testID":44,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12208}
+{"test":{"id":45,"name":"reading reference wraps right, normal weight at 768.0/2.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12208}
+{"testID":45,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12226}
+{"test":{"id":46,"name":"reading reference wraps right, normal weight at 768.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12226}
+{"testID":46,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12241}
+{"test":{"id":47,"name":"reading reference wraps right, normal weight at 1440.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12241}
+{"testID":47,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12259}
+{"test":{"id":48,"name":"reading reference wraps right, normal weight at 1440.0/1.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12262}
+{"testID":48,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12279}
+{"test":{"id":49,"name":"reading reference wraps right, normal weight at 1440.0/1.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12280}
+{"testID":49,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12296}
+{"test":{"id":50,"name":"reading reference wraps right, normal weight at 1440.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12297}
+{"testID":50,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12310}
+{"test":{"id":51,"name":"reading reference wraps right, normal weight at 1440.0/2.0/Color(alpha: 1.0000, red: 0.9373, green: 0.5686, blue: 0.5333, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12311}
+{"testID":51,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12327}
+{"test":{"id":52,"name":"reading reference wraps right, normal weight at 1440.0/2.0/Color(alpha: 1.0000, red: 0.6078, green: 0.1882, blue: 0.1647, colorSpace: ColorSpace.sRGB)","suiteID":26,"groupIDs":[28],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":9,"root_url":"file:///workspace/ibreviarybyapp/test/office_reference_layout_test.dart"},"type":"testStart","time":12328}
+{"testID":52,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12344}
+{"suite":{"id":53,"platform":"vm","path":"/workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"suite","time":12358}
+{"test":{"id":54,"name":"loading /workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart","suiteID":53,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":12359}
+{"testID":54,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":13099}
+{"group":{"id":55,"suiteID":53,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":22,"line":null,"column":null,"url":null},"type":"group","time":13101}
+{"test":{"id":56,"name":"all common liturgical section titles display uppercase","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":15,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13101}
+{"testID":56,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13654}
+{"test":{"id":57,"name":"document role typography follows one reader contract","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":39,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13656}
+{"testID":57,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13695}
+{"test":{"id":58,"name":"short reading title and reference become distinct roles","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":81,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13695}
+{"testID":58,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13770}
+{"test":{"id":59,"name":"structured and legacy subtitle classes map to one role","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":95,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13771}
+{"testID":59,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13801}
+{"test":{"id":60,"name":"structured package keeps supplementary source text","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":112,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13801}
+{"testID":60,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13805}
+{"test":{"id":61,"name":"responsory turns use compact rhythm without shrinking text","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":124,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13805}
+{"testID":61,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13954}
+{"test":{"id":62,"name":"source variants have equal hymn, prayer and petition heights","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":190,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":13954}
+{"testID":62,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14072}
+{"test":{"id":63,"name":"first hymn stanza keeps the shared stanza gap","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":273,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14072}
+{"testID":63,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14097}
+{"test":{"id":64,"name":"trailing source break adds no antiphon gap","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":317,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14097}
+{"testID":64,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14131}
+{"test":{"id":65,"name":"short reading header fits 360.0 px and scaled text","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":370,"root_column":5,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14132}
+{"testID":65,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14164}
+{"test":{"id":66,"name":"short reading header fits 390.0 px and scaled text","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":370,"root_column":5,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14165}
+{"testID":66,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14184}
+{"test":{"id":67,"name":"short reading reference sits right on one line when it fits","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":400,"root_column":3,"root_url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14184}
+{"testID":67,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14206}
+{"test":{"id":68,"name":"bundled feast reading splits real legacy heading and turns","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":428,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14206}
+{"testID":68,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14693}
+{"test":{"id":69,"name":"responsory title, reference and speaker turns survive HTML and plain","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":449,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14693}
+{"testID":69,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14709}
+{"test":{"id":70,"name":"source breaks between responsory turns do not become blank lines","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":481,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14709}
+{"testID":70,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14714}
+{"test":{"id":71,"name":"office reading thematic title is red-role and loses source emphasis","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":497,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14714}
+{"testID":71,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14769}
+{"test":{"id":72,"name":"rubric block removes inherited source italics","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":531,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14772}
+{"testID":72,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14782}
+{"test":{"id":73,"name":"psalm subtitle has a distinct metadata role","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":545,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14782}
+{"testID":73,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14789}
+{"test":{"id":74,"name":"leading psalm subtitles recognize nested and styled italics only","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":559,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14789}
+{"testID":74,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14793}
+{"test":{"id":75,"name":"structured psalm package keeps antiphons outside psalm metadata","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":594,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14793}
+{"testID":75,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14796}
+{"test":{"id":76,"name":"responsory turns keep nested emphasis across lost spaces","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":614,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14796}
+{"testID":76,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14804}
+{"test":{"id":77,"name":"Hours use one psalm shell and fixed block gap","suiteID":53,"groupIDs":[55],"metadata":{"skip":false,"skipReason":null},"line":635,"column":3,"url":"file:///workspace/ibreviarybyapp/test/liturgical_visual_contract_test.dart"},"type":"testStart","time":14804}
+{"testID":77,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14815}
+{"success":true,"type":"done","time":14830}

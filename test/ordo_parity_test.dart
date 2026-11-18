@@ -157,7 +157,7 @@ void main() {
         })}\n',
       );
     }
-    expect(compared, greaterThan(11000));
+    expect(compared, 16068);
     expect(
       mismatches,
       isEmpty,

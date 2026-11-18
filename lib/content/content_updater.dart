@@ -247,6 +247,17 @@ class ContentUpdater {
       if (remote is! Map) continue;
       await _store.ensureLoaded([name]);
       final local = _store.collection(name);
+      // A fresh bundled snapshot can precede publication of its collection
+      // index. Never let an older index remove/replace those newer texts.
+      final bundledEntry =
+          (_store.bundleManifest?['collections'] as Map?)?[name];
+      final minimumRemoteVersion = bundledEntry is Map
+          ? (bundledEntry['minimumRemoteVersion'] as num?)?.toInt() ?? 0
+          : 0;
+      final remoteVersion = (remote['version'] as num?)?.toInt() ?? 0;
+      if (minimumRemoteVersion > 0 && remoteVersion < minimumRemoteVersion) {
+        continue;
+      }
       if (remote['digest'] == local.digest()) continue;
       final manifest = await _remote.fetchCollectionManifest(name);
       if (manifest == null || manifest['digest'] != remote['digest']) {
@@ -298,6 +309,11 @@ class ContentUpdater {
   /// [ContentUpdateRejected] (or a network error) without changing
   /// anything when any document is missing or does not match its hash.
   Future<void> apply(ContentUpdatePlan plan) async {
+    if (plan.isRebuildSized) {
+      throw const ContentUpdateRejected(
+        'A content rebuild requires a new bundled app release',
+      );
+    }
     final staged = <CollectionUpdate, Map<String, Map<String, dynamic>>>{};
     for (final update in plan.collections) {
       if (update.download.isEmpty) {
@@ -346,7 +362,9 @@ class ContentUpdater {
       final categories = effective('prayerCategories');
       final policy = PriestAccessPolicy(categories);
       if (categories.keys.any(policy.categoryRestricted) ||
-          effective('prayers').values.any(policy.prayerRestricted)) {
+          effective('prayers').entries.any(
+            (entry) => policy.prayerRestricted(entry.value, id: entry.key),
+          )) {
         throw const ContentUpdateRejected(
           'Protected content cannot enter the public cache',
         );

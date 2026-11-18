@@ -24,6 +24,7 @@ import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/services/liturgical_content_service.dart';
 import 'package:mybrev_flutter/providers/ordo_provider.dart';
 import 'package:mybrev_flutter/utils/hours_liturgical_options.dart';
+import 'package:mybrev_flutter/utils/day_options_union.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -489,7 +490,21 @@ class _DayDetail extends ConsumerWidget {
     final legal = union.rows
         .where((row) => row.role != 'commemoration')
         .toList();
-    final selectedOffice = ref.watch(hoursLiturgicalSelectionProvider).selected;
+    // Resolve this detail's date and dioceses, independently of the Hours
+    // root retained by the router. Watching the global Hours selection here
+    // can notify a hidden detail while HomeScreen is building after navigation.
+    final service = LiturgicalContentService();
+    final selectedOffice = resolveHoursLiturgicalSelection(
+      unionDayOptions([
+        for (final item in union.days)
+          (
+            item.diocese,
+            service.contentForDate(date, diocese: item.diocese).options,
+          ),
+      ], primary: contextDiocese),
+      selectedDayId: dayId,
+      primaryDiocese: contextDiocese,
+    ).selected;
     final chosen = legal.firstWhere(
       (row) =>
           row.option.id == selectedOffice?.optionId &&
@@ -992,7 +1007,7 @@ class _DayDetail extends ConsumerWidget {
             storageKey: 'ordo-notes-${day.date}',
             children: [
               if (union.rows.any((row) => row.role == 'commemoration')) ...[
-                const _GroupHeading('Камемарацыі'),
+                const _GroupHeading('Неабавязковыя ўспаміны'),
                 for (final row in union.rows.where(
                   (row) => row.role == 'commemoration',
                 ))
@@ -1555,7 +1570,7 @@ class _CelebrationRow extends StatelessWidget {
     final role = switch (row.role) {
       'primary' => 'Асноўнае',
       'alternative' => 'Па выбары',
-      _ => 'Успамін (commemoratio)',
+      _ => 'Неабавязковы ўспамін',
     };
     final rank = heading && option.officeKind == 'all-souls'
         ? 'Успамін'
@@ -1617,8 +1632,10 @@ class _CelebrationRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   [
-                    if (rank.isNotEmpty) rank,
-                    if (row.role == 'commemoration') role,
+                    if (row.role == 'commemoration')
+                      role
+                    else if (rank.isNotEmpty)
+                      rank,
                   ].join(' · '),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 14,

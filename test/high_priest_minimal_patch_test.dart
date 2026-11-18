@@ -2,6 +2,7 @@
 // used: the legacy run exercises the real old ContentService/Store/Updater.
 import 'dart:convert';
 import 'dart:io';
+import 'support/high_priest_update_baseline.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -19,7 +20,12 @@ final _referenceFields = {
     for (final s in ['Hymn', 'Ps1', 'Ps2', 'Ps3']) 'sext$h$s',
 };
 String _text(Object? html) => parseFragment(
-  html?.toString() ?? '',
+  // Keep paragraph/line boundaries when comparing historical Web HTML
+  // with the exact approved PR255 strings (their SHA checks are separate).
+  (html?.toString() ?? '').replaceAll(
+    RegExp(r'<(?:br\s*/?|/?p)(?:\s[^>]*)?>', caseSensitive: false),
+    ' ',
+  ),
 ).text!.replaceAll(RegExp(r'\s+'), ' ').trim();
 
 class _PatchRemote implements ContentRemote {
@@ -75,6 +81,7 @@ void main() {
 
       try {
         await open();
+        await useHistoricalHighPriestUpdateBaseline();
         final before = Map<String, dynamic>.from(
           HiveService.daysBox.get(_id) as Map,
         );

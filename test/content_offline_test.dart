@@ -63,7 +63,7 @@ class FakeRemote implements ContentRemote {
       'contentVersion': contentVersion,
       'collections': {
         for (final name in collections.keys)
-          name: {'digest': contentDigest(_hashes(name))},
+          name: {'digest': contentDigest(_hashes(name)), 'version': 999},
       },
     };
   }
@@ -134,6 +134,7 @@ void main() {
     final current = (await remote.fetchCurrent())!;
     expect((current['collections'] as Map)['days'], {
       'digest': contentDigest(expected),
+      'version': 999,
     });
     expect(remote.hashComputations, 2);
     for (var read = 0; read < 2; read++) {

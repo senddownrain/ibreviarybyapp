@@ -51,7 +51,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   void initState() {
     super.initState();
     _context = widget.context;
-    _category = widget.context == null
+    _category = widget.context == null || widget.context!.kind == 'other'
         ? FeedbackCategory.other
         : FeedbackCategory.textError;
     _service = widget.service;

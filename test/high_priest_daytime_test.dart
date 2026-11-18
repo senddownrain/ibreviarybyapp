@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'support/high_priest_update_baseline.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -44,7 +45,12 @@ LiturgicalDay _period() => _day({
     for (final s in _suffixes) 'sext$h$s': 'weekday:$h:$s',
 });
 String _text(Object? html) => parseFragment(
-  html?.toString() ?? '',
+  // PR255 separates headings and replies into paragraphs. Compare the words
+  // with the historical source, retaining boundaries of both p and br.
+  (html?.toString() ?? '').replaceAll(
+    RegExp(r'<(?:br\s*/?|/?p)(?:\s[^>]*)?>', caseSensitive: false),
+    ' ',
+  ),
 ).text!.replaceAll(RegExp(r'\s+'), ' ').trim();
 
 class _Remote implements ContentRemote {
@@ -297,12 +303,12 @@ void main() {
       await directory.delete(recursive: true);
     });
 
-    test('28 May 2026 Pinsk: all three hours from the original bundle', () {
+    test('28 May 2026 Pinsk: all three hours from the published bundle', () {
       final actual = feast();
       final raw = Map<String, dynamic>.from(
         HiveService.daysBox.get(_id) as Map,
       );
-      expect(documentHash(raw), 'c62263e79af628b2');
+      expect(documentHash(raw), 'a30440a58a95f9a3');
       expect(HiveService.daysBox.overlayLength, 0);
       final period = resolvePeriodDayAgainstPsalter(
         _day(
@@ -366,6 +372,7 @@ void main() {
     test(
       'safe patch is verified, survives restart, and later text wins',
       () async {
+        await useHistoricalHighPriestUpdateBaseline();
         final plan =
             jsonDecode(
                   File(

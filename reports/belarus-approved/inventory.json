@@ -1,0 +1,23 @@
+{
+  "sourceRows": 262,
+  "effectiveAssignments": 959,
+  "mismatches": 0,
+  "dioceses": {
+    "minsk-mohilev": {
+      "assignments": 238,
+      "fixed": 229
+    },
+    "grodno": {
+      "assignments": 244,
+      "fixed": 235
+    },
+    "pinsk": {
+      "assignments": 238,
+      "fixed": 229
+    },
+    "vitebsk": {
+      "assignments": 239,
+      "fixed": 230
+    }
+  }
+}

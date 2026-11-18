@@ -1,6 +1,7 @@
 // Real offline bundle + production router/OraScreen. No Firebase initialization.
 // flutter run -d chrome -t tool/doxology_smoke.dart --web-port 5241
 // Query: ?date=2026-11-12&dayId=...&hour=lectionis&theme=dark&scale=large
+import 'dart:convert';
 import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
@@ -62,12 +63,16 @@ Future<void> main() async {
   // This smoke-only bridge finds the real rendered paragraph so the browser
   // can reach it without changing OraScreen or adding production UI controls.
   _scrollBridge = ((JSString needle) => _scrollToText(needle.toDart).toJS).toJS;
+  _textCenterBridge = ((JSString needle) => _textCenter(needle.toDart).toJS).toJS;
 }
 
 @JS('highPriestScrollTo')
 external set _scrollBridge(JSFunction callback);
 
-Future<JSBoolean> _scrollToText(String needle) async {
+@JS('highPriestTextCenter')
+external set _textCenterBridge(JSFunction callback);
+
+Element? _findText(String needle) {
   final any = needle.startsWith('@any:');
   if (any) needle = needle.substring(5);
   Element? target;
@@ -96,9 +101,21 @@ Future<JSBoolean> _scrollToText(String needle) async {
   }
 
   WidgetsBinding.instance.rootElement?.visitChildElements(visit);
+  return target;
+}
+
+String _textCenter(String needle) {
+  final box = _findText(needle)?.findRenderObject();
+  if (box is! RenderBox || !box.hasSize) return '';
+  final point = box.localToGlobal(box.size.center(Offset.zero));
+  return jsonEncode([point.dx, point.dy]);
+}
+
+Future<JSBoolean> _scrollToText(String needle) async {
+  final target = _findText(needle);
   if (target == null) return false.toJS;
   await Scrollable.ensureVisible(
-    target!,
+    target,
     alignment: 0.15,
     duration: const Duration(milliseconds: 250),
   );

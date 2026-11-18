@@ -300,6 +300,7 @@ class OrdoEvening {
     required this.date,
     required this.title,
     required this.compline,
+    this.complineSolemnityPrayer = false,
     this.omittedFirstVespers,
     this.conflict,
   });
@@ -310,6 +311,7 @@ class OrdoEvening {
   final String date;
   final String title;
   final String compline;
+  final bool complineSolemnityPrayer;
   final String? omittedFirstVespers;
   final Json? conflict;
 }
@@ -330,8 +332,14 @@ OrdoEvening resolveEvening(
       tomorrowPrecedence == todayPrecedence &&
       tomorrowSeason.isSunday &&
       !todaySeason.isSunday;
+  // GNLYC 33, 39: Advent ends before Christmas I Vespers, even
+  // when 24 December is the fourth Sunday of Advent.
+  final christmasBoundary =
+      todaySeason.period == 'advent' &&
+      tomorrowPrimary['id'] == 'nativity-lord';
   final tomorrowWins =
-      tomorrowHasFirst && (tomorrowPrecedence < todayPrecedence || sundayTie);
+      tomorrowHasFirst &&
+      (tomorrowPrecedence < todayPrecedence || sundayTie || christmasBoundary);
   final todayKind = todayPrimary['officeKind'] as String;
   final todaySecond =
       todayKind == 'solemnity' ||
@@ -354,6 +362,8 @@ OrdoEvening resolveEvening(
           date: tomorrowSeason.date,
           title: '${tomorrowPrimary['title']}',
           compline: compline,
+          complineSolemnityPrayer:
+              tomorrowKind == 'solemnity' && !tomorrowSeason.isSunday,
           conflict: {
             'today': todayPrimary['id'],
             'tomorrow': tomorrowPrimary['id'],

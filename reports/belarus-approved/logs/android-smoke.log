@@ -1,0 +1,6 @@
+No supported devices found with name or id matching 'android'.
+
+The following devices were found:
+Linux (desktop) • linux  • linux-x64      • Debian GNU/Linux 13 (trixie) 6.18.57
+Chrome (web)    • chrome • web-javascript • Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)
+No devices are connected. Ensure that `flutter doctor` shows at least one connected device

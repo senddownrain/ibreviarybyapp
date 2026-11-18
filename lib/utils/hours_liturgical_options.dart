@@ -89,7 +89,17 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
       final matchingTemplate = option.templates
           .where((candidate) => candidate.answers(selectedDayId))
           .firstOrNull;
-      if (option.dayId == selectedDayId || matchingTemplate != null) {
+      final septemberAlias =
+          RegExp(
+            r'^08-09-(?:nativity-blessed-virgin-mary|our-lady-braslau-vitebsk)(?:--|$)',
+          ).hasMatch(selectedDayId) &&
+          [
+            'nativity-blessed-virgin-mary',
+            'our-lady-braslau',
+          ].contains(option.optionId);
+      if (option.dayId == selectedDayId ||
+          matchingTemplate != null ||
+          septemberAlias) {
         selected = option;
         template = matchingTemplate;
         break;
@@ -112,11 +122,23 @@ HoursLiturgicalSelection resolveHoursLiturgicalSelection(
   );
 }
 
-String completoriumRecordIdForDay(LiturgicalDay? day) {
+String completoriumRecordIdForDay(
+  LiturgicalDay? day, {
+  bool firstVespers = false,
+}) {
   if (day == null) return '';
   final period = (day.periodType ?? day.field('_periodType') ?? '').trim();
   final weekday =
       day.dayOfWeek ?? int.tryParse(day.field('_dayOfWeek') ?? '') ?? 0;
+  // The Ordo chooses Sunday I/II Compline for solemnities, the Triduum,
+  // and the octave. A weekday-only fallback loses that decision.
+  if (firstVespers && day.field('_ordoComplineChoice') == 'true') {
+    return completoriumId(period, 7);
+  }
+  final ordoDay = int.tryParse(day.field('_ordoComplineDay') ?? '');
+  if (ordoDay != null && ordoDay >= 1 && ordoDay <= 7) {
+    return completoriumId(period, ordoDay);
+  }
   return completoriumId(period, weekday, day);
 }
 
@@ -142,22 +164,35 @@ bool isHourAvailable(
   return hour.checkFields.any((field) => (day.field(field) ?? '').isNotEmpty);
 }
 
-/// The picker and the document footer share both ordering and availability.
+/// The footer follows an explicit reading sequence, independent of the hour
+/// picker order. The Invitatory and Office of Readings both lead to Lauds.
+/// The combined morning Office and Compline do not have a footer successor.
+const kNextHourByType = <String, String>{
+  'invitatorium': 'laudes',
+  'lectionis': 'laudes',
+  'laudes': 'terz',
+  'terz': 'sext',
+  'sext': 'non',
+  'non': 'vespers',
+  'vespers': 'completorium',
+};
+
+/// Never skip over the intended destination to an unrelated later hour.
+/// Hide the footer button if that specific hour has no available content.
 HoraItem? nextAvailableHour(
   LiturgicalDay day,
   String currentType, {
   bool? completoriumAvailable,
 }) {
-  final index = kHoraItems.indexWhere((hour) => hour.type == currentType);
-  if (index < 0) return null;
-  return kHoraItems
-      .skip(index + 1)
-      .where(
-        (hour) => isHourAvailable(
-          day,
-          hour,
-          completoriumAvailable: completoriumAvailable,
-        ),
-      )
-      .firstOrNull;
+  final nextType = kNextHourByType[currentType];
+  if (nextType == null) return null;
+  final next = kHoraItems.where((hour) => hour.type == nextType).firstOrNull;
+  return next != null &&
+          isHourAvailable(
+            day,
+            next,
+            completoriumAvailable: completoriumAvailable,
+          )
+      ? next
+      : null;
 }

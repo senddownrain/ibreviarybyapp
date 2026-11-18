@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_anchor_finder.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_steps.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
 
@@ -11,8 +13,12 @@ void main() {
     WidgetTester tester, {
     required LiturgicalDayPresentation presentation,
     String? metadata,
+    double width = 390,
+    String keyPrefix = 'hours',
+    VoidCallback? onVariants,
+    bool showVariants = true,
   }) async {
-    tester.view.physicalSize = const Size(390, 844);
+    tester.view.physicalSize = Size(width, 844);
     tester.view.devicePixelRatio = 1;
     await tester.pumpWidget(
       MaterialApp(
@@ -20,13 +26,14 @@ void main() {
           body: SingleChildScrollView(
             child: LiturgicalDayHeader(
               sectionTitle: 'Літургія гадзінаў',
-              keyPrefix: 'hours',
+              keyPrefix: keyPrefix,
               presentation: presentation,
               metadata: metadata,
               onDateTap: () {},
               onPrevious: () {},
               onNext: () {},
-              onVariants: () {},
+              onVariants: onVariants ?? () {},
+              showVariants: showVariants,
             ),
           ),
         ),
@@ -201,4 +208,154 @@ void main() {
     expect(text.textSpan!.toPlainText(), 'Нядзеля');
     tester.view.reset();
   });
+  testWidgets('whole liturgical day is a quiet tap target, not a button chip', (
+    tester,
+  ) async {
+    var taps = 0;
+    await showHeader(
+      tester,
+      presentation: sample(rank: 'Будні дзень'),
+      onVariants: () => taps++,
+    );
+    final action = find.byKey(const Key('hours-alternatives-control'));
+    final title = find.byKey(const Key('hours-celebration-title'));
+    final metadata = find.byKey(const Key('hours-day-metadata'));
+    final edit = find.byKey(const Key('hours-celebration-edit-icon'));
+    expect(action, findsOneWidget);
+    expect(find.text('Варыянты'), findsNothing);
+    expect(edit, findsOneWidget);
+    expect(tester.getRect(action).contains(tester.getCenter(title)), isTrue);
+    expect(tester.getRect(action).contains(tester.getCenter(metadata)), isTrue);
+    expect(
+      (tester.getRect(edit).center.dy - tester.getRect(metadata).center.dy).abs(),
+      lessThan(15),
+    );
+    final surface = tester.widget<Ink>(
+      find.descendant(of: action, matching: find.byType(Ink)),
+    );
+    final decoration = surface.decoration! as BoxDecoration;
+    expect(decoration.border, isNull);
+    expect(decoration.color!.a, closeTo(0.025, 0.0001));
+    final inkWell = tester.widget<InkWell>(action);
+    expect(inkWell.overlayColor!.resolve({WidgetState.pressed})!.a,
+        closeTo(0.08, 0.0001));
+    expect(inkWell.overlayColor!.resolve({WidgetState.hovered})!.a,
+        closeTo(0.04, 0.0001));
+    expect(inkWell.overlayColor!.resolve({}), isNull);
+    await tester.tap(title);
+    expect(taps, 1);
+    await tester.tap(edit);
+    expect(taps, 2);
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+
+  testWidgets('long feast and metadata fit at narrow width; tour targets full day', (
+    tester,
+  ) async {
+    await showHeader(
+      tester,
+      width: 280,
+      keyPrefix: 'readings',
+      presentation: sample(rank: 'Урачыстасць'),
+      metadata: 'Аўторак · Год II',
+    );
+    final action = find.byKey(const Key('readings-alternatives-control'));
+    final title = find.byKey(const Key('readings-celebration-title'));
+    final metadata = find.byKey(const Key('readings-day-metadata'));
+    expect(action, findsOneWidget);
+    expect(tester.getRect(action).contains(tester.getCenter(title)), isTrue);
+    expect(tester.getRect(action).contains(tester.getCenter(metadata)), isTrue);
+    expect(
+      tester.getRect(find.byKey(const Key('readings-celebration-edit-icon'))).right,
+      lessThanOrEqualTo(tester.view.physicalSize.width),
+    );
+    final tourVariants = defaultTourSteps.singleWhere(
+      (step) => step.id == 'tour.variants',
+    );
+    expect(tourVariants.anchors, hasLength(1));
+    expect(
+      tourVariants.anchors.single.test('readings-alternatives-control'),
+      isTrue,
+    );
+    expect(tourVariants.anchors.single.test('readings-celebration-title'),
+        isFalse);
+    final spotlight = resolveStepRect(
+      tester.element(find.byType(LiturgicalDayHeader)),
+      tourVariants,
+    );
+    expect(spotlight, tester.getRect(action),
+        reason: 'The tour must spotlight the WHOLE tappable day.');
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+
+  testWidgets('nonselectable celebration has no edit glyph or tap action', (
+    tester,
+  ) async {
+    var taps = 0;
+    await showHeader(
+      tester,
+      presentation: sample(rank: 'Будні дзень'),
+      showVariants: false,
+      onVariants: () => taps++,
+    );
+    expect(find.byKey(const Key('hours-alternatives-control')), findsNothing);
+    expect(find.byKey(const Key('hours-celebration-edit-icon')), findsNothing);
+    final tourVariants = defaultTourSteps.singleWhere(
+      (step) => step.id == 'tour.variants',
+    );
+    expect(
+      resolveStepRect(
+        tester.element(find.byType(LiturgicalDayHeader)),
+        tourVariants,
+      ),
+      isNull,
+      reason: 'An unavailable selector must not spotlight a dead title.',
+    );
+    await tester.tap(find.byKey(const Key('hours-celebration-title')));
+    expect(taps, 0);
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+  testWidgets('dark theme has a soft 3.5 percent selection surface', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(brightness: Brightness.dark),
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: LiturgicalDayHeader(
+              sectionTitle: 'Літургія гадзінаў',
+              keyPrefix: 'hours',
+              presentation: sample(rank: 'Будні дзень'),
+              onDateTap: () {},
+              onPrevious: () {},
+              onNext: () {},
+              onVariants: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final action = find.byKey(const Key('hours-alternatives-control'));
+    final ink = tester.widget<Ink>(
+      find.descendant(of: action, matching: find.byType(Ink)),
+    );
+    final decoration = ink.decoration! as BoxDecoration;
+    expect(decoration.border, isNull);
+    expect(decoration.color!.a, closeTo(0.035, 0.0001));
+    expect(
+      tester.widget<InkWell>(action)
+          .overlayColor!.resolve({WidgetState.pressed})!.a,
+      closeTo(0.08, 0.0001),
+    );
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+
 }

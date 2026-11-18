@@ -6,10 +6,15 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
+import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
+import 'package:mybrev_flutter/widgets/category_icon.dart';
+import 'package:mybrev_flutter/widgets/category_icon_picker.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
+import 'package:mybrev_flutter/services/prayer_category_tree.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
@@ -25,7 +30,8 @@ class PrayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritePrayersProvider);
-    final canSeeSongbook = ref.watch(adminSongbookAccessProvider).valueOrNull == true;
+    final canSeeSongbook =
+        ref.watch(adminSongbookAccessProvider).valueOrNull == true;
     final categories = ref.watch(prayerMenuCategoriesProvider);
     final catalog = ref.watch(prayerCatalogProvider);
     final massAvailable = catalog.any(
@@ -99,25 +105,18 @@ class PrayersScreen extends ConsumerWidget {
                     ),
                     if (canSeeSongbook)
                       PrayerbookSectionTile(
-                      key: const Key('songbook-destination'),
-                      title: 'Спеўнік',
-                      subtitle: 'Пілігрымковы',
-                      icon: PhosphorIconsRegular.playlist,
-                      onTap: () => context.push('/prayers/songs'),
-                    ),
+                        key: const Key('songbook-destination'),
+                        title: 'Спеўнік',
+                        subtitle: 'Пілігрымковы',
+                        icon: PhosphorIconsRegular.playlist,
+                        onTap: () => context.push('/prayers/songs'),
+                      ),
                     PrayerbookSectionTile(
                       key: const Key('catechism-destination'),
                       title: 'Катэхізіс',
                       subtitle: 'Кампендый',
                       icon: PhosphorIconsRegular.bookOpenText,
                       onTap: () => context.push('/prayers/compendium'),
-                    ),
-                    PrayerbookSectionTile(
-                      key: const Key('sacraments-destination'),
-                      title: 'Сакрамэнты',
-                      subtitle: 'Хутка',
-                      icon: PhosphorIconsRegular.cross,
-                      onTap: () => context.push('/prayers/sacraments'),
                     ),
                   ],
                 ),
@@ -144,11 +143,8 @@ class PrayersScreen extends ConsumerWidget {
                     child: Text('Катэгорый пакуль няма'),
                   )
                 else
-                  for (final category in categories)
-                    if (category.parentId == null ||
-                        category.parentId!.isEmpty ||
-                        !categories.any((c) => c.id == category.parentId))
-                      _CategoryRow(category: category),
+                  for (final node in buildPrayerCategoryTree(categories))
+                    _CategoryRow(category: node.category),
                 const SizedBox(height: 28),
                 const _SectionTitle(title: 'Усе малітвы'),
                 _DestinationRow(
@@ -317,18 +313,15 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final category = ref
-        .watch(prayerMenuCategoriesProvider)
-        .where((item) => item.id == widget.categoryId)
-        .firstOrNull;
+    final node = findPrayerCategoryNode(
+      buildPrayerCategoryTree(ref.watch(prayerMenuCategoriesProvider)),
+      widget.categoryId,
+    );
+    final category = node?.category;
     if (category == null) {
       return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
     }
     final settings = ref.watch(settingsProvider);
-    final children = ref
-        .watch(prayerMenuCategoriesProvider)
-        .where((item) => item.parentId == category.id)
-        .toList();
     final prayers = prayersForCategory(
       ref.watch(prayerCatalogProvider),
       category,
@@ -340,7 +333,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
       prayers: prayers,
-      categories: children,
+      categories: [for (final child in node!.children) child.category],
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
     );
   }
@@ -353,6 +346,7 @@ class PrayerCategoriesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final globals = ref.watch(globalPrayerCategoriesProvider);
+    final allowRestricted = ref.watch(priestAccessProvider).content != null;
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       body: Stack(
@@ -387,24 +381,24 @@ class PrayerCategoriesScreen extends ConsumerWidget {
                   data: (items) => Column(
                     children: [
                       for (final category in items)
-                        _ManageCategoryRow(
-                          key: ValueKey('manage-global-${category.id}'),
-                          category: category,
-                          hidden: settings.hiddenGlobalPrayerCategoryIds
-                              .contains(category.id),
-                          onVisibility: () {
-                            final notifier = ref.read(
-                              settingsProvider.notifier,
-                            );
-                            if (settings.hiddenGlobalPrayerCategoryIds.contains(
-                              category.id,
-                            )) {
-                              notifier.showGlobalPrayerCategory(category.id);
-                            } else {
-                              notifier.hideGlobalPrayerCategory(category.id);
-                            }
-                          },
-                        ),
+                        if (allowRestricted || !category.priestOnly)
+                          _ManageCategoryRow(
+                            key: ValueKey('manage-global-${category.id}'),
+                            category: category,
+                            hidden: settings.hiddenGlobalPrayerCategoryIds
+                                .contains(category.id),
+                            onVisibility: () {
+                              final notifier = ref.read(
+                                settingsProvider.notifier,
+                              );
+                              if (settings.hiddenGlobalPrayerCategoryIds
+                                  .contains(category.id)) {
+                                notifier.showGlobalPrayerCategory(category.id);
+                              } else {
+                                notifier.hideGlobalPrayerCategory(category.id);
+                              }
+                            },
+                          ),
                     ],
                   ),
                 ),
@@ -460,10 +454,19 @@ class PrayerCategoriesScreen extends ConsumerWidget {
     if (result == null || !context.mounted) return;
     final notifier = ref.read(settingsProvider.notifier);
     final id = existing == null
-        ? notifier.addCategory(result.name, result.tags)
+        ? notifier.addCategory(
+            result.name,
+            result.tags,
+            iconKey: result.iconKey,
+          )
         : existing.id;
     if (existing != null) {
-      notifier.updateCategory(id, result.name, result.tags);
+      notifier.updateCategory(
+        id,
+        result.name,
+        result.tags,
+        iconKey: result.iconKey,
+      );
     }
     for (final prayer in catalog) {
       notifier.setPrayerCategory(
@@ -622,7 +625,8 @@ class _PrayerListPage extends StatelessWidget {
                 const SizedBox(height: 18),
                 for (final category in categories)
                   _CategoryRow(category: category),
-                if (categories.isNotEmpty) const SizedBox(height: 18),
+                if (categories.isNotEmpty && prayers.isNotEmpty)
+                  const SizedBox(height: 18),
                 if (prayers.isEmpty && categories.isEmpty)
                   Padding(
                     key: const Key('prayer-list-empty'),
@@ -861,8 +865,9 @@ class _CategoryRow extends StatelessWidget {
   Widget build(BuildContext context) => _DestinationRow(
     key: ValueKey('category-${category.id}'),
     title: category.name,
-    icon: PhosphorIconsRegular.folder,
-    onTap: () => context.push('/prayers/category/${category.id}'),
+    leading: CategoryIcon(category.displayIconKey),
+    onTap: () =>
+        context.push('/prayers/category/${Uri.encodeComponent(category.id)}'),
   );
 }
 
@@ -870,20 +875,22 @@ class _DestinationRow extends StatelessWidget {
   const _DestinationRow({
     super.key,
     required this.title,
-    required this.icon,
+    this.icon,
+    this.leading,
     required this.onTap,
     this.subtitle,
-  });
+  }) : assert(icon != null || leading != null);
   final String title;
   final String? subtitle;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? leading;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => ListTile(
     contentPadding: EdgeInsets.zero,
     minTileHeight: 58,
-    leading: Icon(icon),
+    leading: leading ?? Icon(icon),
     title: Text(title),
     subtitle: subtitle == null ? null : Text(subtitle!),
     trailing: const Icon(Icons.chevron_right_rounded),
@@ -909,6 +916,7 @@ class _ManageCategoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListTile(
     contentPadding: EdgeInsets.zero,
+    leading: CategoryIcon(category.displayIconKey),
     title: Text(category.name),
     subtitle: Text(
       category.isGlobal ? 'Стандартная катэгорыя' : 'Ваша катэгорыя',
@@ -945,7 +953,8 @@ class _ManageCategoryRow extends StatelessWidget {
 }
 
 class _CategoryDraft {
-  const _CategoryDraft(this.name, this.tags, this.memberIds);
+  const _CategoryDraft(this.name, this.tags, this.memberIds, this.iconKey);
+  final String iconKey;
   final String name;
   final List<String> tags;
   final Set<String> memberIds;
@@ -973,6 +982,24 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
   );
   late final Set<String> _tags = {...?widget.existing?.tags};
   late final Set<String> _members = Set<String>.from(widget.memberIds);
+  late String _iconKey = widget.existing == null
+      ? kDefaultCategoryIconKey
+      : displayCategoryIconKey(
+          iconKey: widget.existing!.iconKey,
+          id: widget.existing!.id,
+          name: widget.existing!.name,
+          tags: widget.existing!.tags,
+        );
+  // While creating, the suggested icon follows the name until one is picked.
+  bool _iconPicked = false;
+
+  void _suggestIcon() {
+    if (widget.existing != null || _iconPicked) return;
+    final name = _name.text.trim();
+    _iconKey = name.isEmpty && _tags.isEmpty
+        ? kDefaultCategoryIconKey
+        : suggestCategoryIconKey(name: name, tags: _tags.toList());
+  }
 
   List<String> get _visibleTags => ({...widget.availableTags, ..._tags}.toList()
     ..sort((left, right) => left.toLowerCase().compareTo(right.toLowerCase())));
@@ -1006,7 +1033,7 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
     if (name.isEmpty) return;
     Navigator.pop(
       context,
-      _CategoryDraft(name, _tags.toList(growable: false), _members),
+      _CategoryDraft(name, _tags.toList(growable: false), _members, _iconKey),
     );
   }
 
@@ -1047,11 +1074,19 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
               textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _save(),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(_suggestIcon),
               decoration: const InputDecoration(
                 labelText: 'Назва катэгорыі',
                 hintText: 'Напрыклад, Малітвы на кожны дзень',
               ),
+            ),
+            const SizedBox(height: 16),
+            CategoryIconField(
+              iconKey: _iconKey,
+              onChanged: (key) => setState(() {
+                _iconKey = key;
+                _iconPicked = true;
+              }),
             ),
             const SizedBox(height: 28),
             Text(
@@ -1082,9 +1117,10 @@ class _CategoryEditorScreenState extends State<_CategoryEditorScreen> {
                       label: Text(tag),
                       selected: _tags.contains(tag),
                       showCheckmark: true,
-                      onSelected: (selected) => setState(
-                        () => selected ? _tags.add(tag) : _tags.remove(tag),
-                      ),
+                      onSelected: (selected) => setState(() {
+                        selected ? _tags.add(tag) : _tags.remove(tag);
+                        _suggestIcon();
+                      }),
                     ),
                 ],
               ),

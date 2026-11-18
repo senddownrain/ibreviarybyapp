@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/utils/approved_office_sources.dart';
 import 'package:mybrev_flutter/constants/liturgical.dart';
 import 'package:mybrev_flutter/models/day.dart';
 import 'package:mybrev_flutter/models/year_options.dart';
@@ -173,12 +174,29 @@ class LiturgicalDayContent {
   /// Every document of the date addressable by a route id (legacy links).
   final Map<String, LiturgicalDay> itemsDays;
 
+  DayOption? _septemberOption(String dayId) =>
+      RegExp(
+        r'^08-09-(?:nativity-blessed-virgin-mary|our-lady-braslau-vitebsk)(?:--|$)',
+      ).hasMatch(dayId)
+      ? options
+            .where(
+              (o) => [
+                'nativity-blessed-virgin-mary',
+                'our-lady-braslau',
+              ].contains(o.optionId),
+            )
+            .firstOrNull
+      : null;
+
   DayOption? optionOwning(String dayId) =>
+      _septemberOption(dayId) ??
       options.where((option) => option.ownsDayId(dayId)).firstOrNull;
 
   /// The document a route id opens: the option's resolved assembly first,
   /// then any document of the date.
   LiturgicalDay? dayById(String dayId) {
+    final september = _septemberOption(dayId);
+    if (september != null) return september.day;
     for (final option in options) {
       for (final template in option.templates) {
         if (template.answers(dayId)) {
@@ -273,10 +291,17 @@ class LiturgicalContentService {
     YearOptions? nextYearOpts,
     DynamicDates? dynamicDates, {
     String diocese = kDefaultDiocese,
+    bool forCompline = false,
   }) {
     if (!HiveService.content.isLoaded('days')) return null;
     final content = contentForDate(date, diocese: diocese);
-    final day = content.dayById(dayId) ?? _legacyDay(date, dayId, content);
+    var day = content.dayById(dayId) ?? _legacyDay(date, dayId, content);
+    if (forCompline && dayId != 'office-for-dead') {
+      final descriptor =
+          content.optionOwning(dayId)?.ordo ??
+          optionDescriptor(content.ordo, content.ordo.officeOptions.first);
+      day = _stamp(day ?? LiturgicalDay.fromMap({'id': dayId}), descriptor);
+    }
     if (day == null) return null;
     final data = day.toMap()
       ..['_periodType'] = content.ordo.period
@@ -387,7 +412,7 @@ class LiturgicalContentService {
     }
 
     final resolvedPeriodDay = withContext(
-      resolveDayAgainstPeriod(periodDay, null),
+      resolveDayAgainstPeriod(applyReviewedAdventVespers(periodDay), null),
     );
     final hasSeasonalException =
         isSeasonalDateException(date, period) && seasonalDay != null;
@@ -403,22 +428,22 @@ class LiturgicalContentService {
         ? 'advent'
         : 'christmas';
     final seasonal = hasSeasonalException
-        ? applySeasonalWeekdayAntiphons(
-            withContext(
-              period == 'christmas'
-                  ? resolveChristmasDateAgainstPeriod(
+        ? withContext(
+            period == 'christmas'
+                ? applySeasonalWeekdayAntiphons(
+                    resolveChristmasDateAgainstPeriod(
                       seasonalDay,
                       resolvedPeriodDay,
-                    )
-                  : resolveDayAgainstPeriod(
-                      seasonalDay,
-                      resolvedPeriodDay,
-                      fillMissing: true,
-                    ),
-              periodType: seasonalPeriodType,
-              periodWeek: week,
-            )!,
-            dayOfWeek,
+                    )!,
+                    dayOfWeek,
+                  )
+                : resolveAdventDateAgainstPeriod(
+                    applyReviewedAdventVespers(seasonalDay),
+                    resolvedPeriodDay,
+                    dayOfWeek,
+                  ),
+            periodType: seasonalPeriodType,
+            periodWeek: week,
           )
         : null;
     LiturgicalDay resolveFixed(LiturgicalDay item) => withContext(
@@ -440,11 +465,15 @@ class LiturgicalContentService {
     final dynamicDays = <String, List<LiturgicalDay>>{
       for (final entry in rawDynamicDays.entries)
         entry.key: [
-            for (final item in entry.value)
-              withContext(
-                resolveMovableFeastAgainstPeriod(item, resolvedPeriodDay, entry.key),
-              )!,
-          ],
+          for (final item in entry.value)
+            withContext(
+              resolveMovableFeastAgainstPeriod(
+                item,
+                resolvedPeriodDay,
+                entry.key,
+              ),
+            )!,
+        ],
     };
     return _DaysResult(
       properDays: [
@@ -494,9 +523,20 @@ class LiturgicalContentService {
     if (fallbackId.isEmpty || fallbackId == resolved.id) return resolved;
     final fallback = _dayById(fallbackId);
     if (fallback == null) return resolved;
-    return period == 'advent'
-        ? resolveDayAgainstPeriod(resolved, fallback, fillMissing: true)
-        : resolvePeriodDayAgainstPsalter(resolved, fallback);
+    if (period == 'advent') {
+      final data = resolveDayAgainstPeriod(
+        resolved,
+        fallback,
+        fillMissing: true,
+      )!.toMap();
+      if (dayOfWeek != 1) {
+        for (final field in ['vesperPs1', 'vesperPs2', 'vesperPs3']) {
+          data[field] = fallback.data[field] ?? '';
+        }
+      }
+      return LiturgicalDay.fromMap(data);
+    }
+    return resolvePeriodDayAgainstPsalter(resolved, fallback);
   }
 
   // ── options (port of buildOrdoDayOptions) ─────────────────────────────
@@ -626,7 +666,9 @@ class LiturgicalContentService {
             source: seasonal
                 ? LiturgicalOptionSource.fixed
                 : LiturgicalOptionSource.period,
-            title: _dayTitle(temporalDoc, date),
+            title: candidate.id == 'temporal:ordinary-w3-d1'
+                ? candidate.title
+                : _dayTitle(temporalDoc, date),
             subtitle: seasonal
                 ? _fixedSubtitle(temporalDoc.rank, temporalDoc, 1)
                 : 'Літургічны дзень',
@@ -658,15 +700,18 @@ class LiturgicalContentService {
         final effectiveTemplates = candidate.templates.isNotEmpty
             ? candidate.templates
             : candidate.id == 'immaculate-heart'
-                ? const ['blessed-virgin-mary']
-                : const <String>[];
+            ? const ['blessed-virgin-mary']
+            : const <String>[];
         if (!candidate.temporal &&
-            const {'memorial', 'optional-memorial'}.contains(candidate.officeKind) &&
+            const {
+              'memorial',
+              'optional-memorial',
+            }.contains(candidate.officeKind) &&
             effectiveTemplates.isNotEmpty &&
             currentDay != null) {
           final rawDocs = _dynamicDocuments(candidate, result, raw: true);
-          final raw = rawDocs.where(isSparseDay).firstOrNull ??
-              rawDocs.firstOrNull;
+          final raw =
+              rawDocs.where(isSparseDay).firstOrNull ?? rawDocs.firstOrNull;
           final base = raw?.toMap() ?? _scaffoldOf(candidate).toMap();
           final proper = LiturgicalDay.fromMap({
             ...base,
@@ -674,12 +719,15 @@ class LiturgicalContentService {
             '_feast': base['_feast'] ?? candidate.feastCode,
             '_feastName': base['_feastName'] ?? candidate.title,
             '_celebrationId': base['_celebrationId'] ?? candidate.id,
-            '_templates': (base['_templates'] is List &&
+            '_templates':
+                (base['_templates'] is List &&
                     (base['_templates'] as List).isNotEmpty)
                 ? base['_templates']
                 : effectiveTemplates,
-            '_defaultTemplate': base['_defaultTemplate'] ??
-                candidate.defaultTemplate ?? effectiveTemplates.first,
+            '_defaultTemplate':
+                base['_defaultTemplate'] ??
+                candidate.defaultTemplate ??
+                effectiveTemplates.first,
           });
           final variants = assembled(proper, candidate);
           if (raw == null) {
@@ -779,6 +827,9 @@ class LiturgicalContentService {
           : const [];
       var docs = select(properDocs);
       String? properSource = docs.isNotEmpty ? ProperSource.properTexts : null;
+      if (docs.isNotEmpty && candidate.id == 'our-lady-braslau') {
+        docs = select([...properDocs, ...fixedDocs]);
+      }
       if (docs.isEmpty) {
         docs = select(fixedDocs);
         if (docs.isNotEmpty) properSource = ProperSource.legacyDays;
@@ -837,10 +888,12 @@ class LiturgicalContentService {
           source: docs.first.field('_kind') == 'office-for-dead'
               ? LiturgicalOptionSource.officeForDead
               : LiturgicalOptionSource.fixed,
-          title: _dayTitle(day, date).isNotEmpty
-              ? _dayTitle(day, date)
-              : candidate.title,
-          subtitle: _fixedSubtitle(day.rank, day, groups.$2.length),
+          // Legacy documents may retain an obsolete optional-memorial rank.
+          // The Ordo candidate owns the legal title and rank.
+          title: candidate.title.isNotEmpty
+              ? candidate.title
+              : _dayTitle(day, date),
+          subtitle: _fixedSubtitle(candidate.rank, day, groups.$2.length),
           day: day,
           templates: groups.$2,
           order: 3,
@@ -891,16 +944,25 @@ class LiturgicalContentService {
   // ── helpers ───────────────────────────────────────────────────────────
 
   /// One colour for the card, its Office pages and its readings: the Ordo's.
-  LiturgicalDay _stamp(LiturgicalDay day, OrdoOptionDescriptor ordo) =>
-      LiturgicalDay.fromMap({
-        ...day.toMap(),
-        '_vestmentColor': ordo.color,
-        if (ordo.category.isNotEmpty) '_celebrationCategory': ordo.category,
-        if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
-        '_ordoOptionId': ordo.optionId,
-        '_ordoOfficeKind': ordo.officeKind,
-        '_contextPeriodType': ordo.date.isEmpty ? null : day.periodType,
-      });
+  LiturgicalDay _stamp(
+    LiturgicalDay day,
+    OrdoOptionDescriptor ordo,
+  ) => LiturgicalDay.fromMap({
+    ...day.toMap(),
+    if (ordo.celebrationId != null && ordo.rank.isNotEmpty) '_rank': ordo.rank,
+    // Keep authored feast titles: they can have specific case and style.
+    '_vestmentColor': ordo.color,
+    if (ordo.category.isNotEmpty) '_celebrationCategory': ordo.category,
+    if (ordo.rank.isNotEmpty) '_celebrationRank': ordo.rank,
+    '_ordoOptionId': ordo.optionId,
+    '_ordoOfficeKind': ordo.officeKind,
+    // Preserve the Ordo decision for the actual Compline template.
+    '_ordoCompline': ordo.compline,
+    '_ordoComplineDay': ordo.complineDay,
+    '_ordoComplineChoice': ordo.complineChoice,
+    '_ordoComplineSolemnityPrayer': ordo.complineSolemnityPrayer,
+    '_contextPeriodType': ordo.date.isEmpty ? null : day.periodType,
+  });
 
   List<LiturgicalDay> _dynamicDocuments(
     OrdoOption option,
@@ -1012,7 +1074,29 @@ class LiturgicalContentService {
 
     final ref = option.daysRef ?? const <String, dynamic>{};
     final own = byIds(ref['dayIds']);
-    if (own.isNotEmpty) return own;
+    if (own.isNotEmpty) {
+      if (option.id == 'our-lady-braslau') {
+        final inherited = byIds([
+          for (final fallback in option.fallbackDaysRefs)
+            ...?(fallback['dayIds'] as List?),
+        ]).firstOrNull;
+        if (inherited != null) {
+          return [
+            for (final doc in own)
+              LiturgicalDay.fromMap({
+                ...inherited.data,
+                ...doc.data,
+                'id': doc.id,
+                '_fieldRules': {
+                  ...?(inherited.data['_fieldRules'] as Map?),
+                  ...?(doc.data['_fieldRules'] as Map?),
+                },
+              }),
+          ];
+        }
+      }
+      return own;
+    }
     for (final fallback in option.fallbackDaysRefs) {
       final found = byIds(fallback['dayIds']);
       if (found.isNotEmpty) return found;

@@ -1,0 +1,252 @@
+00:00 +0: loading /workspace/ibreviarybyapp/test/belarus_approved_calendar_test.dart
+00:00 +0: /workspace/ibreviarybyapp/test/belarus_approved_calendar_test.dart: PDF exact inventory: 262 rows, 959 effective IDs/dates/ranks, no fixed extras
+00:00 +1: /workspace/ibreviarybyapp/test/belarus_approved_calendar_test.dart: 23 local assignments hidden; four manual moves stay disabled; texts retained
+00:00 +2: /workspace/ibreviarybyapp/test/belarus_approved_calendar_test.dart: December extras never appear in any calendar role, 2025–2035 × four dioceses
+00:01 +3: /workspace/ibreviarybyapp/test/belarus_approved_calendar_test.dart: approved diocesan spot checks, transfers and general collisions
+00:01 +4: /workspace/ibreviarybyapp/test/belarus_approved_calendar_test.dart: Newman validity and Christmas I Vespers follow Web for the full range
+00:01 +5: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: old installed overlay revision 3 with a future timestamp cannot replace approved bundle
+[ContentStore] prayerCategories: 5 docs in 24 ms
+[ContentStore] prayers: 115 docs in 99 ms
+[ContentStore] invitatoriums: 4 docs in 204 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 283 ms
+[ContentStore] completoriums: 35 docs in 346 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 376 ms
+[ContentStore] compendiumMeta: 1 docs in 286 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 377 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 379 ms
+[ContentStore] songs: 447 docs in 305 ms
+[ContentStore] compendium: 27 docs in 556 ms
+[ContentStore] liturgicalTemplates: 16 docs in 671 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 649 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 747 ms
+[ContentStore] readings: 822 docs in 831 ms
+[ContentStore] days: 736 docs in 1186 ms
+[ContentStore] prayerCategories: 5 docs in 13 ms
+[ContentStore] prayers: 115 docs in 72 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 358 ms
+[ContentStore] invitatoriums: 4 docs in 360 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 522 ms
+[ContentStore] completoriums: 35 docs in 559 ms
+[ContentStore] songs: 447 docs in 541 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 584 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 585 ms
+[ContentStore] compendium: 27 docs in 527 ms
+[ContentStore] compendiumMeta: 1 docs in 524 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 752 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 1123 ms
+[ContentStore] readings: 822 docs in 1150 ms
+[ContentStore] liturgicalTemplates: 16 docs in 1132 ms
+[ContentStore] days: 736 docs in 1470 ms
+00:04 +6: /workspace/ibreviarybyapp/test/juan_diego_optional_memorial_test.dart: approved BY PDF excludes Juan Diego from selection and retains its source and canonical alias
+00:05 +7: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: old installed overlay revision 4 with a future timestamp cannot replace approved bundle
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 106 ms
+[ContentStore] invitatoriums: 4 docs in 56 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 81 ms
+[ContentStore] completoriums: 35 docs in 109 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 102 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 103 ms
+[ContentStore] compendiumMeta: 1 docs in 88 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 106 ms
+[ContentStore] songs: 447 docs in 170 ms
+[ContentStore] compendium: 27 docs in 201 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 231 ms
+[ContentStore] liturgicalTemplates: 16 docs in 289 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 400 ms
+[ContentStore] readings: 822 docs in 509 ms
+[ContentStore] days: 736 docs in 878 ms
+[ContentStore] prayerCategories: 5 docs in 5 ms
+[ContentStore] prayers: 115 docs in 56 ms
+[ContentStore] invitatoriums: 4 docs in 120 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 125 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 133 ms
+[ContentStore] completoriums: 35 docs in 136 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 135 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 136 ms
+[ContentStore] compendiumMeta: 1 docs in 87 ms
+[ContentStore] songs: 447 docs in 198 ms
+[ContentStore] compendium: 27 docs in 210 ms
+[ContentStore] liturgicalTemplates: 16 docs in 270 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 314 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 455 ms
+[ContentStore] readings: 822 docs in 577 ms
+[ContentStore] days: 736 docs in 851 ms
+00:07 +8: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: old installed overlay revision 99 with a future timestamp cannot replace approved bundle
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 31 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 177 ms
+[ContentStore] invitatoriums: 4 docs in 178 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 178 ms
+[ContentStore] completoriums: 35 docs in 178 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 178 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 179 ms
+[ContentStore] compendiumMeta: 1 docs in 153 ms
+[ContentStore] songs: 447 docs in 267 ms
+[ContentStore] compendium: 27 docs in 285 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 445 ms
+[ContentStore] liturgicalTemplates: 16 docs in 505 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 784 ms
+[ContentStore] readings: 822 docs in 824 ms
+[ContentStore] days: 736 docs in 1249 ms
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 60 ms
+[ContentStore] invitatoriums: 4 docs in 16 ms
+[ContentStore] completoriums: 35 docs in 16 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 43 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 43 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 43 ms
+[ContentStore] compendiumMeta: 1 docs in 41 ms
+[ContentStore] songs: 447 docs in 225 ms
+[ContentStore] compendium: 27 docs in 229 ms
+[ContentStore] liturgicalTemplates: 16 docs in 327 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 299 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 340 ms
+[ContentStore] readings: 822 docs in 655 ms
+[ContentStore] days: 736 docs in 907 ms
+00:09 +9: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: search has no visible year control
+00:10 +9: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: stale/same-revision and schema99 generations rejected; larger revision refreshes an already opened date and survives restart
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 62 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 59 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 88 ms
+[ContentStore] completoriums: 35 docs in 103 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 95 ms
+[ContentStore] invitatoriums: 4 docs in 117 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 130 ms
+[ContentStore] compendiumMeta: 1 docs in 101 ms
+[ContentStore] compendium: 27 docs in 177 ms
+[ContentStore] songs: 447 docs in 179 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 269 ms
+[ContentStore] liturgicalTemplates: 16 docs in 419 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 425 ms
+[ContentStore] readings: 822 docs in 542 ms
+[ContentStore] days: 736 docs in 786 ms
+[ContentStore] prayerCategories: 5 docs in 3 ms
+[ContentStore] prayers: 115 docs in 67 ms
+[ContentStore] invitatoriums: 4 docs in 21 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 17 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 23 ms
+[ContentStore] compendium: 27 docs in 29 ms
+[ContentStore] compendiumMeta: 1 docs in 24 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 35 ms
+[ContentStore] completoriums: 35 docs in 48 ms
+[ContentStore] songs: 447 docs in 122 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 140 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 155 ms
+[ContentStore] liturgicalTemplates: 16 docs in 346 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 343 ms
+[ContentStore] readings: 822 docs in 514 ms
+00:12 +10: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: stale/same-revision and schema99 generations rejected; larger revision refreshes an already opened date and survives restart
+[ContentStore] days: 736 docs in 965 ms
+00:12 +11: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year text search finds the same diocesan variant in a legal year
+00:12 +11: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: removed saved option falls back to current primary; switching dioceses never reuses the other Office
+[ContentStore] prayerCategories: 5 docs in 2 ms
+[ContentStore] prayers: 115 docs in 128 ms
+[ContentStore] invitatoriums: 4 docs in 73 ms
+[ContentStore] completoriums: 35 docs in 73 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 154 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 157 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 157 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 158 ms
+[ContentStore] compendiumMeta: 1 docs in 99 ms
+[ContentStore] compendium: 27 docs in 114 ms
+[ContentStore] songs: 447 docs in 224 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 304 ms
+[ContentStore] liturgicalTemplates: 16 docs in 388 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 462 ms
+[ContentStore] readings: 822 docs in 802 ms
+00:13 +12: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: removed saved option falls back to current primary; switching dioceses never reuses the other Office
+[ContentStore] days: 736 docs in 1227 ms
+00:14 +13: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year text identity never substitutes another source or rank
+00:14 +14: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: startup never exposes old overlay before all bundled calendar layers are decoded
+00:14 +15: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: startup never exposes old overlay before all bundled calendar layers are decoded
+[ContentStore] prayerCategories: 5 docs in 1 ms
+[ContentStore] prayers: 115 docs in 50 ms
+[ContentStore] completoriums: 35 docs in 41 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 41 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 41 ms
+[ContentStore] invitatoriums: 4 docs in 42 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 42 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 42 ms
+00:14 +16: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: startup never exposes old overlay before all bundled calendar layers are decoded
+[ContentStore] compendiumMeta: 1 docs in 13 ms
+[ContentStore] songs: 447 docs in 55 ms
+[ContentStore] compendium: 27 docs in 100 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 145 ms
+[ContentStore] liturgicalTemplates: 16 docs in 281 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 345 ms
+[ContentStore] readings: 822 docs in 441 ms
+[ContentStore] days: 736 docs in 568 ms
+00:15 +17: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: startup never exposes old overlay before all bundled calendar layers are decoded
+[ContentStore] liturgicalCalendarMeta: 1 docs in 4 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 3 ms
+00:15 +18: /workspace/ibreviarybyapp/test/approved_calendar_update_test.dart: startup never exposes old overlay before all bundled calendar layers are decoded
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 6 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 13 ms
+00:15 +19: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 320.0, Brightness.dark, large text
+00:16 +19: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 45 ms
+[ContentStore] prayers: 115 docs in 133 ms
+[ContentStore] invitatoriums: 4 docs in 481 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 542 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 507 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 529 ms
+[ContentStore] completoriums: 35 docs in 581 ms
+[ContentStore] compendiumMeta: 1 docs in 311 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 570 ms
+[ContentStore] liturgicalTemplates: 16 docs in 595 ms
+[ContentStore] compendium: 27 docs in 372 ms
+[ContentStore] songs: 447 docs in 379 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 406 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 716 ms
+[ContentStore] readings: 822 docs in 887 ms
+[ContentStore] days: 736 docs in 1094 ms
+00:18 +19: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 320.0, Brightness.dark, large text
+00:18 +20: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: reviewed Advent sources and High Priest match the independent Web Office oracle
+00:19 +21: /workspace/ibreviarybyapp/test/approved_office_parity_test.dart: reviewed Advent sources and High Priest match the independent Web Office oracle
+00:20 +22: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.dark, large text
+00:20 +23: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.dark, large text
+00:21 +24: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 390.0, Brightness.light, large text
+00:22 +24: /workspace/ibreviarybyapp/test/hours_regression_test.dart: (setUpAll)
+[ContentStore] prayerCategories: 5 docs in 38 ms
+[ContentStore] prayers: 115 docs in 132 ms
+00:22 +25: /workspace/ibreviarybyapp/test/hours_regression_test.dart: (setUpAll)
+[ContentStore] invitatoriums: 4 docs in 105 ms
+[ContentStore] liturgicalCalendarMeta: 1 docs in 194 ms
+[ContentStore] liturgicalYearOverrides: 15 docs in 183 ms
+[ContentStore] compendiumMeta: 1 docs in 94 ms
+[ContentStore] completoriums: 35 docs in 212 ms
+[ContentStore] liturgicalDioceseOverrides: 77 docs in 221 ms
+[ContentStore] liturgicalCelebrations: 242 docs in 221 ms
+[ContentStore] compendium: 27 docs in 195 ms
+[ContentStore] songs: 447 docs in 215 ms
+[ContentStore] liturgicalOrdoNotes: 1337 docs in 385 ms
+[ContentStore] liturgicalTemplates: 16 docs in 512 ms
+[ContentStore] liturgicalProperTexts: 291 docs in 700 ms
+[ContentStore] readings: 822 docs in 862 ms
+[ContentStore] days: 736 docs in 1250 ms
+00:23 +25: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.dark, large text
+00:24 +26: /workspace/ibreviarybyapp/test/hours_regression_test.dart: Guardian Angels 02.10.2026: Proper antiphons, Lauds psalms of Sunday I, never the raw instruction
+00:24 +27: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:24 +28: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:24 +29: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:24 +30: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:24 +31: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:24 +32: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:25 +33: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:25 +34: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Святы» from the Ordo of the year impeded search at 430.0, Brightness.light, large text
+00:25 +35: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 17–24 December: weekday primary, memorials only commemorations
+00:25 +36: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 17–24 December: weekday primary, memorials only commemorations
+00:25 +37: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 17–24 December: weekday primary, memorials only commemorations
+00:25 +38: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 17–24 December: weekday primary, memorials only commemorations
+00:25 +39: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 17–24 December: weekday primary, memorials only commemorations
+00:25 +40: /workspace/ibreviarybyapp/test/ordo_picker_test.dart: «Перыяды»: exact dates by the engine Advent, 17–24 December, Christmas, Lent, Holy Week, Easter, Ordinary Time before and after Lent
+00:25 +41: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years 25 December – 12 January: octave, Mary Mother of God, Epiphany, Baptism of the Lord
+00:25 +42: /workspace/ibreviarybyapp/test/hours_regression_test.dart: seasons, several years Holy Week and the Easter octave
+00:26 +43: /workspace/ibreviarybyapp/test/hours_regression_test.dart: legacy fixed days are a fallback only: no tested date needs them
+00:26 +44: /workspace/ibreviarybyapp/test/hours_regression_test.dart: legacy fixed days are a fallback only: no tested date needs them
+00:26 +45: /workspace/ibreviarybyapp/test/hours_regression_test.dart: legacy fixed days are a fallback only: no tested date needs them
+00:26 +46: /workspace/ibreviarybyapp/test/hours_regression_test.dart: legacy fixed days are a fallback only: no tested date needs them
+00:29 +47: /workspace/ibreviarybyapp/test/hours_regression_test.dart: (tearDownAll)
+00:29 +47: All tests passed!

@@ -101,6 +101,9 @@ void main() {
                 tester.widget<PsalmodyModeSelector>(global).value,
                 PsalmodyMode.alternatingStanzas,
               );
+              // At large text the button sits below the 740 dp viewport.
+              await tester.ensureVisible(find.text('Aa'));
+              await tester.pumpAndSettle();
               await tester.tap(find.text('Aa'));
               await tester.pumpAndSettle();
               final panel = find.byKey(const Key('text-scale-psalmody-modes'));

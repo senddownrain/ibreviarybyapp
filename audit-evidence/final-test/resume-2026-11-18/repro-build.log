@@ -1,0 +1,51 @@
+days                   736 docs   52.15 MB stored → 2.22 MB  (2026-11-17)
+liturgicalTemplates     16 docs    2.89 MB stored → 0.29 MB  (2026-11-17)
+liturgicalProperTexts   291 docs    3.13 MB stored → 0.57 MB  (2026-11-17)
+readings               822 docs    4.59 MB stored → 0.86 MB  (2026-11-17)
+invitatoriums            4 docs    0.01 MB stored → 0.00 MB  (2026-11-17)
+completoriums           35 docs    0.31 MB stored → 0.01 MB  (2026-11-17)
+prayers                393 docs    3.28 MB stored → 0.60 MB  (2026-11-17)
+prayerCategories        22 docs    0.01 MB stored → 0.00 MB  (2026-11-17)
+songs                  447 docs    0.35 MB stored → 0.11 MB  (2026-11-17)
+compendium              27 docs    0.51 MB stored → 0.11 MB  (2026-11-17)
+compendiumMeta           1 docs    0.01 MB stored → 0.00 MB  (2026-11-17)
+liturgicalCalendarMeta     1 docs    0.00 MB stored → 0.00 MB  (2026-11-08)
+liturgicalCelebrations   242 docs    0.12 MB stored → 0.02 MB  (2026-11-08)
+liturgicalDioceseOverrides    77 docs    0.05 MB stored → 0.01 MB  (2026-11-08)
+liturgicalYearOverrides    15 docs    0.01 MB stored → 0.00 MB  (2026-11-08)
+liturgicalOrdoNotes   1347 docs    0.75 MB stored → 0.11 MB  (2026-11-17)
+{
+  "bundleSha256": "b0809b03da9b04cb21979b8d0d5fdbe999a52af1aa4451c5e156d2b896753e77",
+  "contentVersion": 1794938564491,
+  "counts": {
+    "days": 736,
+    "liturgicalTemplates": 16,
+    "liturgicalProperTexts": 291,
+    "readings": 822,
+    "invitatoriums": 4,
+    "completoriums": 35,
+    "prayers": 393,
+    "prayerCategories": 22,
+    "songs": 447,
+    "compendium": 27,
+    "compendiumMeta": 1,
+    "liturgicalCalendarMeta": 1,
+    "liturgicalCelebrations": 242,
+    "liturgicalDioceseOverrides": 77,
+    "liturgicalYearOverrides": 15,
+    "liturgicalOrdoNotes": 1347
+  },
+  "ahead": [
+    "readings",
+    "prayers",
+    "prayerCategories",
+    "songs",
+    "liturgicalCalendarMeta",
+    "liturgicalCelebrations",
+    "liturgicalDioceseOverrides",
+    "liturgicalYearOverrides"
+  ],
+  "metadataPlanSha256": "90c78bfdd348b96f37897be3ac0e6939876097f763b15dd76464a28b5a5cb3f4",
+  "sourceReads": 0,
+  "sourceWrites": 0
+}

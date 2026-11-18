@@ -1,0 +1,12 @@
+{
+  "base": "aacfd044546d6f2a8e1cc5eff2589fde6bd1ee99",
+  "clean_main_tracked_diff": [],
+  "hours_assertion_identical": true,
+  "hours_assertion_sha256": "9dfcc38c709687ab841b0ffc54d6a21dafae7802fad25c8b156fa9b2aeec1a5a",
+  "readings_assertion_identical": true,
+  "readings_assertion_sha256": "57aa4a801abda0bbc380695a8762e137651bf67ce464334d76d658c47789266f",
+  "readings_mismatches": 38,
+  "readings_by_kind": {
+    "route-day-id": 38
+  }
+}

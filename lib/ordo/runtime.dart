@@ -18,10 +18,16 @@ class OrdoRuntime {
   /// Number of rebuilds (diagnostics and tests).
   static int rebuilds = 0;
 
-  static Iterable<Json> _documents(ContentStore store, String name) sync* {
+  static Iterable<Json> _documents(
+    ContentStore store,
+    String name, {
+    bool baseline = false,
+  }) sync* {
     final collection = store.collection(name);
-    for (final key in collection.keys) {
-      final raw = collection.get(key);
+    for (final key in baseline ? collection.baselineKeys : collection.keys) {
+      final raw = baseline
+          ? collection.baselineDocument(key)
+          : collection.get(key);
       if (raw is Map) yield {...raw.cast<String, dynamic>(), 'id': key};
     }
   }
@@ -39,14 +45,34 @@ class OrdoRuntime {
     final stamp = _stamp(store);
     final cached = _engine;
     if (cached != null && stamp == _builtAt) return cached;
-    final meta = store.collection('liturgicalCalendarMeta').get('current');
+    final baseline = store.calendarUsesBaseline;
+    final metas = store.collection('liturgicalCalendarMeta');
+    final meta = baseline
+        ? metas.baselineDocument('current')
+        : metas.get('current');
     final engine = OrdoEngine(
-      OrdoDefinitions.fromDocuments(
-        celebrations: _documents(store, 'liturgicalCelebrations'),
-        dioceseOverrides: _documents(store, 'liturgicalDioceseOverrides'),
-        yearOverrides: _documents(store, 'liturgicalYearOverrides'),
-        revision: meta is Map ? ((meta['revision'] as num?)?.toInt() ?? 0) : 0,
-      ),
+      !store.areLoaded(kOrdoCalendarCollections)
+          ? OrdoDefinitions.empty
+          : OrdoDefinitions.fromDocuments(
+              celebrations: _documents(
+                store,
+                'liturgicalCelebrations',
+                baseline: baseline,
+              ),
+              dioceseOverrides: _documents(
+                store,
+                'liturgicalDioceseOverrides',
+                baseline: baseline,
+              ),
+              yearOverrides: _documents(
+                store,
+                'liturgicalYearOverrides',
+                baseline: baseline,
+              ),
+              revision: meta is Map
+                  ? ((meta['revision'] as num?)?.toInt() ?? 0)
+                  : 0,
+            ),
       notes: _documents(store, 'liturgicalOrdoNotes'),
     );
     _engine = engine;

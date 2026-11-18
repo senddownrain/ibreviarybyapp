@@ -50,6 +50,19 @@ jobs:
             build/ui_acceptance/*.png
             build/liturgy_smoke/reader-acceptance-03-readings-end.png
           if-no-files-found: warn
+      - name: Adaptive overflow menu screenshots and report routes
+        env:
+          OVERFLOW_MENU_IMAGES: '1'
+        run: |
+          flutter test test/menu_visual_preview_test.dart
+          flutter test test/feedback/overflow_report_test.dart
+      - name: Archive adaptive overflow screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-overflow-menu-320-390
+          path: build/overflow-menu-preview/*.png
+          if-no-files-found: warn
       - name: Reader UI, layout and offline font regressions
         run: >-
           flutter test
@@ -85,10 +98,15 @@ jobs:
           python3 scripts/check_web_source_import.py
           dart format --output=none --set-exit-if-changed lib/models/source_documents.dart lib/screens/source_documents_screen.dart test/source_documents_test.dart test/source_documents_widget_test.dart tool/source_documents_smoke.dart
           flutter test test/source_documents_test.dart test/source_documents_widget_test.dart test/bible_repository_test.dart test/source_footer_test.dart test/compendium_screens_test.dart test/router_architecture_test.dart test/stateful_shell_navigation_test.dart test/secondary_menu_test.dart test/privacy_policy_link_test.dart
+      - name: Guided tour and day variants discovery regression
+        run: flutter test test/discovery/tour_test.dart test/discovery/p0_hints_screens_test.dart
       - name: Daily Hours and Readings heading regressions
         run: >-
           flutter test test/liturgical_day_header_metadata_test.dart
-          test/hours_root_test.dart
+          test/hours_root_test.dart test/christ_king_genitive_test.dart
+
+      - name: Explicit next-hour footer routes
+        run: flutter test test/psalmody_navigation_test.dart
       - name: Josaphat alternatives deduplicate dioceses
         run: >-
           flutter test test/liturgical_header_flow_test.dart
@@ -110,6 +128,12 @@ jobs:
           if-no-files-found: warn
       - name: Unit regression
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
+      - name: Prayer category pages, membership and cache regression
+        run: >-
+          flutter test test/prayer_category_widget_test.dart
+          test/prayer_category_contract_test.dart test/prayer_category_security_test.dart
+          test/prayer_categories_provider_test.dart test/prayers_provider_test.dart
+          test/category_icons_test.dart
       - name: Sunday 32 Benedictus visual fixture
         env:
           LITURGY_SMOKE_IMAGES: '1'
@@ -124,10 +148,24 @@ jobs:
           path: build/liturgy_smoke/2026-11-08-benedictus-year-a-*.png
           if-no-files-found: warn
 
+      - name: Office headings and compact responsory layout
+        run: >-
+          flutter test test/office_responsory_formatting_test.dart
+          test/office_responsory_repeats_test.dart test/office_collect_conclusion_test.dart
+          test/liturgical_visual_contract_test.dart test/office_reading_reference_test.dart
+          test/office_reference_layout_test.dart
+
+      - name: Triduum and Compline regression
+        run: flutter test test/triduum_compline_test.dart test/liturgical_titles_test.dart
+
       - name: Immaculate Heart and Sunday I Vespers regression
         run: flutter test test/liturgical_vespers_test.dart test/hours_regression_test.dart
       - name: Offline content, atomic updates and calendar refresh regression
-        run: flutter test test/content_offline_test.dart test/ordo_content_update_test.dart
+        run: >-
+          flutter test test/content_offline_test.dart test/ordo_content_update_test.dart
+          test/approved_calendar_update_test.dart test/pr255_bundle_update_test.dart
+          test/bundled_manifest_floor_test.dart test/pr255_test_client_safety_test.dart
+          test/pr117_offline_refresh_test.dart
       - name: Movable feast daytime prayer and delivery regression
         run: >-
           flutter test test/high_priest_daytime_test.dart
@@ -140,6 +178,10 @@ jobs:
           lib/widgets/prayer_content.dart lib/screens/prayer_detail_screen.dart
           lib/dev/devotional_office_harness.dart tool/devotional_office_smoke.dart
           test/devotional_office_test.dart test/devotional_office_widget_test.dart
+      - name: Canonical prayer source contract and reader
+        run: |
+          dart format --output=none --set-exit-if-changed lib/models/prayer.dart test/prayer_source_test.dart tool/prayer_source_smoke.dart
+          flutter test test/prayer_source_test.dart
       - name: Devotional offices and reader regression
         run: >-
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
@@ -149,7 +191,7 @@ jobs:
       - name: Psalmody bundle, alternatives and existing local data
         run: |
           dart format --output=show --set-exit-if-changed test/doxology_bundle_test.dart test/common_office_test.dart
-          flutter test test/doxology_bundle_test.dart test/common_office_test.dart test/content_offline_test.dart test/ordo_content_update_test.dart test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart
+          flutter test test/doxology_bundle_test.dart test/common_office_test.dart test/content_offline_test.dart test/ordo_content_update_test.dart test/psalmody_html_modes_test.dart test/psalm_choir_html_test.dart test/psalm_opening_test.dart
 
   analytics-tests:
     name: Analytics tests
@@ -168,3 +210,31 @@ jobs:
         run: flutter test test/analytics
       - name: Analytics enabled fit and recording tests
         run: flutter test --dart-define=ANALYTICS_LOCAL=true test/analytics
+
+  triduum-visual:
+    name: Triduum and Compline in Chrome
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix /tmp/triduum-browser playwright-core@1.63.0
+      - name: Read both Compline formulas and the Triduum offices in Chrome
+        run: |
+          mkdir -p audit-evidence/triduum
+          flutter devices > audit-evidence/triduum/devices.txt
+          xvfb-run -a flutter run -d chrome -t tool/doxology_smoke.dart --web-port 5241 --web-browser-flag=--no-sandbox > audit-evidence/triduum/flutter-run.log 2>&1 &
+          NODE_PATH=/tmp/triduum-browser/node_modules node scripts/smoke_doxologies.cjs --triduum
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: flutter-triduum-visual
+          path: audit-evidence/triduum

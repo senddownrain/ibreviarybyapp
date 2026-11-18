@@ -1,0 +1,559 @@
+{
+  "browser": "157.0.8103.78",
+  "url": "http://localhost:5237/",
+  "headful": true,
+  "display": ":100",
+  "scenes": 78,
+  "cases": [
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 320,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "citation1-light-320-2.png"
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 390,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 768,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 768,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 1440,
+      "scale": 1,
+      "capture": "citation1-light-1440-1.png"
+    },
+    {
+      "case": "citation1",
+      "theme": "light",
+      "width": 1440,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 320,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "citation1-dark-320-2.png"
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 390,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 768,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 768,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 1440,
+      "scale": 1,
+      "capture": "citation1-dark-1440-1.png"
+    },
+    {
+      "case": "citation1",
+      "theme": "dark",
+      "width": 1440,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 320,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "citation1-marian-320-2.png"
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 390,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 768,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 768,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 1440,
+      "scale": 1,
+      "capture": "citation1-marian-1440-1.png"
+    },
+    {
+      "case": "citation1",
+      "theme": "marian",
+      "width": 1440,
+      "scale": 2,
+      "capture": null
+    },
+    {
+      "case": "citation2",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation2",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "citation2-light-320-2.png"
+    },
+    {
+      "case": "div",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "div",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "div-light-320-2.png"
+    },
+    {
+      "case": "laudes",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "laudes",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "laudes-light-320-2.png"
+    },
+    {
+      "case": "vesper",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "vesper",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "vesper-light-320-2.png"
+    },
+    {
+      "case": "sext",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "sext",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "sext-light-320-2.png"
+    },
+    {
+      "case": "first",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "first",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "first-light-320-2.png"
+    },
+    {
+      "case": "second",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "second",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "second-light-320-2.png"
+    },
+    {
+      "case": "headings",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "headings",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "headings-light-320-2.png"
+    },
+    {
+      "case": "gadzinki",
+      "theme": "light",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "gadzinki",
+      "theme": "light",
+      "width": 320,
+      "scale": 2,
+      "capture": "gadzinki-light-320-2.png"
+    },
+    {
+      "case": "citation2",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation2",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "citation2-dark-320-2.png"
+    },
+    {
+      "case": "div",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "div",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "div-dark-320-2.png"
+    },
+    {
+      "case": "laudes",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "laudes",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "laudes-dark-320-2.png"
+    },
+    {
+      "case": "vesper",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "vesper",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "vesper-dark-320-2.png"
+    },
+    {
+      "case": "sext",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "sext",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "sext-dark-320-2.png"
+    },
+    {
+      "case": "first",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "first",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "first-dark-320-2.png"
+    },
+    {
+      "case": "second",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "second",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "second-dark-320-2.png"
+    },
+    {
+      "case": "headings",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "headings",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "headings-dark-320-2.png"
+    },
+    {
+      "case": "gadzinki",
+      "theme": "dark",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "gadzinki",
+      "theme": "dark",
+      "width": 320,
+      "scale": 2,
+      "capture": "gadzinki-dark-320-2.png"
+    },
+    {
+      "case": "citation2",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "citation2",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "citation2-marian-320-2.png"
+    },
+    {
+      "case": "div",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "div",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "div-marian-320-2.png"
+    },
+    {
+      "case": "laudes",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "laudes",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "laudes-marian-320-2.png"
+    },
+    {
+      "case": "vesper",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "vesper",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "vesper-marian-320-2.png"
+    },
+    {
+      "case": "sext",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "sext",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "sext-marian-320-2.png"
+    },
+    {
+      "case": "first",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "first",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "first-marian-320-2.png"
+    },
+    {
+      "case": "second",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "second",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "second-marian-320-2.png"
+    },
+    {
+      "case": "headings",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "headings",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "headings-marian-320-2.png"
+    },
+    {
+      "case": "gadzinki",
+      "theme": "marian",
+      "width": 390,
+      "scale": 1,
+      "capture": null
+    },
+    {
+      "case": "gadzinki",
+      "theme": "marian",
+      "width": 320,
+      "scale": 2,
+      "capture": "gadzinki-marian-320-2.png"
+    }
+  ],
+  "errors": [],
+  "officialFontRequests": 2,
+  "externalRequestsBlocked": 0,
+  "firebaseWrites": 0
+}

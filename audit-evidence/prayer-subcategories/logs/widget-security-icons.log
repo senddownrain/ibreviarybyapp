@@ -1,0 +1,61 @@
+00:00 +0: loading /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart
+00:00 +0: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: accordion, keyboard/focus, direct-only list, leaf reader/back and scroll
+00:02 +1: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: revoke removes private lists, favorites/search, category management and deep links immediately
+00:03 +2: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: hidden root promotes middle and expansion survives root remount
+00:04 +3: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android light width=320.0 scale=1.0
+00:04 +4: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android light width=320.0 scale=2.0
+00:04 +5: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android light width=375.0 scale=1.0
+00:04 +6: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android light width=375.0 scale=2.0
+00:04 +7: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android light width=768.0 scale=1.0
+00:05 +8: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android light width=768.0 scale=2.0
+00:05 +9: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android dark width=320.0 scale=1.0
+00:05 +10: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android dark width=320.0 scale=2.0
+00:05 +11: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android dark width=375.0 scale=1.0
+00:05 +12: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android dark width=375.0 scale=2.0
+00:06 +13: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android dark width=768.0 scale=1.0
+00:06 +14: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android dark width=768.0 scale=2.0
+00:06 +15: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android marian width=320.0 scale=1.0
+00:06 +16: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android marian width=320.0 scale=2.0
+00:06 +17: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android marian width=375.0 scale=1.0
+00:06 +18: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android marian width=375.0 scale=2.0
+00:06 +19: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android marian width=768.0 scale=1.0
+00:07 +20: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree android marian width=768.0 scale=2.0
+00:07 +21: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS light width=320.0 scale=1.0
+00:07 +22: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS light width=320.0 scale=2.0
+00:07 +23: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS light width=375.0 scale=1.0
+00:07 +24: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS light width=375.0 scale=2.0
+00:07 +25: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS light width=768.0 scale=1.0
+00:07 +26: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS light width=768.0 scale=2.0
+00:07 +27: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS dark width=320.0 scale=1.0
+00:08 +28: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS dark width=320.0 scale=2.0
+00:08 +29: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS dark width=375.0 scale=1.0
+00:08 +30: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS dark width=375.0 scale=2.0
+00:08 +31: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS dark width=768.0 scale=1.0
+00:08 +32: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS dark width=768.0 scale=2.0
+00:08 +33: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS marian width=320.0 scale=1.0
+00:08 +34: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS marian width=320.0 scale=2.0
+00:08 +35: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS marian width=375.0 scale=1.0
+00:08 +36: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS marian width=375.0 scale=2.0
+00:09 +37: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS marian width=768.0 scale=1.0
+00:09 +38: /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart: expanded tree iOS marian width=768.0 scale=2.0
+00:09 +39: loading /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart
+00:10 +39: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: manual-only protection rejects keyed records without embedded id before writing
+00:10 +40: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: tree iconKey, parent/order/manual links survive public Hive restart together
+00:10 +41: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: grant/merge, background, offline, reopen, revoke: protected data stays off disk
+00:10 +42: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: public update overlay accepts opaque IDs, rejects restricted records atomically, and reloads
+00:10 +43: /workspace/flutter-prayer-subcategories/test/prayer_category_security_test.dart: legacy migration blocks manual restriction when neither document embeds its ID
+[ContentMigration] done, 0 newer documents kept
+00:10 +44: loading /workspace/flutter-prayer-subcategories/test/category_icons_test.dart
+00:11 +44: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) 48 keys, 12 per group, identical to the exported catalog.json
+00:11 +45: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) all 12 authored SVG assets exist, are 24x24 and use currentColor
+00:11 +46: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) suggestions match the shared vectors and are deterministic
+00:11 +47: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: catalog contract (shared with the web app) allowlist normaliser and display fallback
+00:11 +48: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: UserCategory legacy map without iconKey still loads; icon round-trips
+00:11 +49: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: settings storage old categories get a meaningful icon once and it is persisted
+00:11 +50: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: settings storage add and update keep the chosen icon, reject unknown keys
+00:12 +51: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: settings storage hide/restore global categories and memberships are untouched
+00:12 +52: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: global categories iconKey passes from bundle data; missing ones get a suggestion
+00:12 +53: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: rendering every one of the 48 icons renders real, non-empty artwork
+00:12 +54: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: rendering unknown or missing keys fall back without errors
+00:12 +55: /workspace/flutter-prayer-subcategories/test/category_icons_test.dart: rendering picker lists 48 icons; choosing changes, dismissing does not
+00:13 +56: All tests passed!

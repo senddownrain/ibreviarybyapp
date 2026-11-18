@@ -1,0 +1,50 @@
+[✓] Flutter (Channel stable, 3.41.4, on Debian GNU/Linux 13 (trixie) 6.18.57, locale C.UTF-8) [195ms]
+    • Flutter version 3.41.4 on channel stable at /workspace/toolchains/flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision ff37bef603 (9 months ago), 2026-03-03 16:03:22 -0800
+    • Engine revision e4b8dca3f1
+    • Dart version 3.11.1
+    • DevTools version 2.54.1
+    • Feature flags: enable-web, enable-linux-desktop, enable-macos-desktop, enable-windows-desktop, enable-android, enable-ios, cli-animations, enable-native-assets, omit-legacy-version-file, enable-lldb-debugging, enable-uiscene-migration
+
+[✗] Android toolchain - develop for Android devices [84ms]
+    ✗ Unable to locate Android SDK.
+      Install Android Studio from: https://developer.android.com/studio/index.html
+      On first launch it will assist you in installing the Android SDK components.
+      (or visit https://flutter.dev/to/linux-android-setup for detailed instructions).
+      If the Android SDK has been installed to a custom location, please use
+      `flutter config --android-sdk` to update to that location.
+
+
+[✓] Chrome - develop for the web [59ms]
+    • CHROME_EXECUTABLE = /usr/bin/chromium
+
+[✗] Linux toolchain - develop for Linux desktop [252ms]
+    ✗ clang++ is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install clang), or can be downloaded from https://releases.llvm.org/
+    ✗ CMake is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install cmake), or can be downloaded from https://cmake.org/download/
+    ✗ ninja is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install ninja-build), or can be downloaded from https://github.com/ninja-build/ninja/releases
+    • pkg-config version 1.8.1
+    ✗ GTK 3.0 development libraries are required for Linux development.
+      They are likely available from your distribution (e.g.: apt install libgtk-3-dev)
+    ! Unable to access driver information using 'eglinfo'.
+      It is likely available from your distribution (e.g.: apt install mesa-utils)
+
+[✓] Proxy Configuration [92ms]
+    • HTTP_PROXY is set
+    • NO_PROXY is localhost,127.0.0.1,::1
+    • NO_PROXY contains localhost
+    • NO_PROXY contains 127.0.0.1
+    • NO_PROXY contains ::1
+
+[✓] Connected device (2 available) [361ms]
+    • Linux (desktop) • linux  • linux-x64      • Debian GNU/Linux 13 (trixie) 6.18.57
+    • Chrome (web)    • chrome • web-javascript • Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)
+
+[!] Network resources [534ms]
+    ✗ An HTTP error occurred while checking "https://maven.google.com/": Proxy failed to establish tunnel (403 Forbidden)
+    ✗ An HTTP error occurred while checking "https://cocoapods.org/": Proxy failed to establish tunnel (403 Forbidden)
+
+! Doctor found issues in 3 categories.

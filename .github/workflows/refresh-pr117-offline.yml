@@ -1,0 +1,38 @@
+name: Verify PR117 bundle from approved public sources
+
+on:
+  push:
+    branches:
+      - prepare/final-test-candidate
+    paths:
+      - 'assets/content/**'
+      - 'docs/release/final-test/nov18-refresh-report.json'
+      - 'scripts/refresh_final_test_candidate_20261118.mjs'
+      - '.github/workflows/refresh-pr117-offline.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch reviewed Web revisions
+        run: |
+          git init ../mybrev
+          git -C ../mybrev remote add origin https://github.com/senddownrain/mybrev.git
+          git -C ../mybrev fetch --depth=1 origin \
+            d199022b7769c1c815351e1f0808f0573ef87623 1eef3a7485c139b4df50571c2e0a18cef7d7f793
+          git -C ../mybrev checkout --detach d199022b7769c1c815351e1f0808f0573ef87623
+      - name: Verify approved payloads and manifest in checked-in bundle
+        run: |
+          node scripts/refresh_final_test_candidate_20261118.mjs \
+            --web ../mybrev --assets assets/content --check

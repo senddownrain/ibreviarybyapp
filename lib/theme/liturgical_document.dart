@@ -65,10 +65,11 @@ Map<String, Style> liturgicalDocumentStyles({
       margin: Margins.only(bottom: LiturgicalSpacing.metadataToBody),
     ),
     '.liturgical-reference': Style(
+      textAlign: TextAlign.right,
       fontSize: FontSize(metadataSize),
       lineHeight: LineHeight(ReaderTheme.referenceHeight),
       color: reader.rubric,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.normal,
       fontStyle: FontStyle.normal,
       margin: Margins.only(bottom: LiturgicalSpacing.metadataToBody),
     ),
@@ -95,7 +96,8 @@ Map<String, Style> liturgicalDocumentStyles({
     '.liturgical-rubric': readerRubricHtmlStyle(reader: reader, body: body),
     '.liturgical-rubric-inline': Style(color: reader.rubric),
     '.liturgical-reading-reference': Style(
-      color: reference.color,
+      textAlign: TextAlign.right,
+      color: reader.rubric,
       fontFamily: body.fontFamily,
       fontSize: FontSize(reference.fontSize!),
       lineHeight: LineHeight(reference.height!),
@@ -112,7 +114,9 @@ Map<String, Style> liturgicalDocumentStyles({
     '.responsory-turn': Style(
       fontSize: FontSize(size),
       lineHeight: LineHeight(ReaderTheme.responsoryHeight),
-      margin: Margins.only(bottom: LiturgicalSpacing.responsoryTurnAfter),
+      // Reset both edges: a bottom-only margin retains HTML paragraph spacing.
+      margin: Margins.zero,
+      padding: HtmlPaddings.zero,
     ),
     '.intercessions__intro': Style(
       margin: Margins.only(bottom: LiturgicalSpacing.intercessionIntroAfter),
@@ -206,7 +210,10 @@ class LiturgicalSectionHeading extends StatelessWidget {
       top: startsSection ? LiturgicalSpacing.sectionBefore : 0,
       bottom: LiturgicalSpacing.sectionTitleToBody,
     ),
-    child: Text(title.toUpperCase(), style: ReaderTheme.of(context).hourSectionHeading(bodySize)),
+    child: Text(
+      title.toUpperCase(),
+      style: ReaderTheme.of(context).hourSectionHeading(bodySize),
+    ),
   );
 }
 
@@ -254,7 +261,9 @@ class LiturgicalHeadingReferenceRow extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final fits =
-              widthOf(displayTitle, titleStyle) + widthOf(ref, referenceStyle) + 12 <=
+              widthOf(displayTitle, titleStyle) +
+                  widthOf(ref, referenceStyle) +
+                  12 <=
               constraints.maxWidth;
           final titleWidget = Text(displayTitle, style: titleStyle);
           final referenceWidget = Text(

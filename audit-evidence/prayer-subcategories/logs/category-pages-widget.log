@@ -1,0 +1,42 @@
+00:00 +0: loading /workspace/flutter-prayer-subcategories/test/prayer_category_widget_test.dart
+00:00 +0: category pages: roots, keyboard, children before direct prayers, reader/back
+00:02 +1: category scroll survives child page and prayer reader Back
+00:02 +2: revoke removes private lists, favorites/search, category management and deep links immediately
+00:03 +3: hidden root promotes middle; personal categories remain separate pages
+00:03 +4: category page navigation android light width=320.0 scale=1.0
+00:03 +5: category page navigation android light width=320.0 scale=2.0
+00:03 +6: category page navigation android light width=375.0 scale=1.0
+00:03 +7: category page navigation android light width=375.0 scale=2.0
+00:04 +8: category page navigation android light width=768.0 scale=1.0
+00:04 +9: category page navigation android light width=768.0 scale=2.0
+00:04 +10: category page navigation android dark width=320.0 scale=1.0
+00:04 +11: category page navigation android dark width=320.0 scale=2.0
+00:04 +12: category page navigation android dark width=375.0 scale=1.0
+00:05 +13: category page navigation android dark width=375.0 scale=2.0
+00:05 +14: category page navigation android dark width=768.0 scale=1.0
+00:05 +15: category page navigation android dark width=768.0 scale=2.0
+00:05 +16: category page navigation android marian width=320.0 scale=1.0
+00:05 +17: category page navigation android marian width=320.0 scale=2.0
+00:05 +18: category page navigation android marian width=375.0 scale=1.0
+00:06 +19: category page navigation android marian width=375.0 scale=2.0
+00:06 +20: category page navigation android marian width=768.0 scale=1.0
+00:06 +21: category page navigation android marian width=768.0 scale=2.0
+00:06 +22: category page navigation iOS light width=320.0 scale=1.0
+00:06 +23: category page navigation iOS light width=320.0 scale=2.0
+00:06 +24: category page navigation iOS light width=375.0 scale=1.0
+00:07 +25: category page navigation iOS light width=375.0 scale=2.0
+00:07 +26: category page navigation iOS light width=768.0 scale=1.0
+00:07 +27: category page navigation iOS light width=768.0 scale=2.0
+00:07 +28: category page navigation iOS dark width=320.0 scale=1.0
+00:07 +29: category page navigation iOS dark width=320.0 scale=2.0
+00:07 +30: category page navigation iOS dark width=375.0 scale=1.0
+00:08 +31: category page navigation iOS dark width=375.0 scale=2.0
+00:08 +32: category page navigation iOS dark width=768.0 scale=1.0
+00:08 +33: category page navigation iOS dark width=768.0 scale=2.0
+00:08 +34: category page navigation iOS marian width=320.0 scale=1.0
+00:08 +35: category page navigation iOS marian width=320.0 scale=2.0
+00:08 +36: category page navigation iOS marian width=375.0 scale=1.0
+00:08 +37: category page navigation iOS marian width=375.0 scale=2.0
+00:09 +38: category page navigation iOS marian width=768.0 scale=1.0
+00:09 +39: category page navigation iOS marian width=768.0 scale=2.0
+00:09 +40: All tests passed!

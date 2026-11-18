@@ -1,0 +1,8 @@
+{
+  "state": "reviewed-manifest-blocked",
+  "reason": "Quota exceeded.",
+  "code": 8,
+  "schema": 1,
+  "project": "ibreviaryby",
+  "planSha256": "707e13042ed74996cf996aacbd9564c2dc3200448f05eca11946abe502d1e95a"
+}

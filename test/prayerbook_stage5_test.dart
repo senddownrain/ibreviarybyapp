@@ -450,16 +450,11 @@ void main() {
     await tester.tap(find.byKey(const Key('app-overflow-open')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Катэгорыі'), findsOneWidget);
+    // The menu no longer carries a «Катэгорыі» entry (removed in the compact
+    // universal popup); management lives on the Prayerbook root («Кіраваць»).
+    expect(find.text('Катэгорыі'), findsNothing);
     expect(find.text('Налады'), findsOneWidget);
     expect(find.text('Інфармацыя'), findsOneWidget);
-    await tester.tap(find.text('Катэгорыі'));
-    await tester.pumpAndSettle();
-    expect(find.text('categories-management-destination'), findsOneWidget);
-    expect(
-      router.routerDelegate.currentConfiguration.last.matchedLocation,
-      '/prayers/categories',
-    );
   });
 
   testWidgets('Prayerbook search keeps the shared overflow visible', (
@@ -528,6 +523,50 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Выдаліць'));
     await tester.pumpAndSettle();
     expect(notifier.current.userCategories, isEmpty);
+  });
+
+  testWidgets('category icon is chosen on create and survives edits', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 3200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final notifier = _TestSettingsNotifier();
+    await tester.pumpWidget(
+      _app(const PrayerCategoriesScreen(), settingsOverride: notifier),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('create-category-action')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('category-name-field')), 'Мая');
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('category-icon-field')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('category-icon-option-candle')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('save-category-action')));
+    await tester.pumpAndSettle();
+    expect(notifier.current.userCategories.single.iconKey, 'candle');
+
+    // Editing the name and tags keeps the icon; cancelling the picker changes nothing.
+    await tester.tap(find.byTooltip('Рэдагаваць'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('category-name-field')),
+      'Ружанец',
+    );
+    await tester.pump();
+    expect(find.text('Свечка'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('category-icon-field')));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('save-category-action')));
+    await tester.pumpAndSettle();
+    final saved = notifier.current.userCategories.single;
+    expect(saved.name, 'Ружанец');
+    expect(saved.iconKey, 'candle');
   });
 
   testWidgets('category editor supports quick tags and searchable prayers', (
@@ -830,24 +869,34 @@ class _TestSettingsNotifier extends SettingsNotifier {
   }
 
   @override
-  String addCategory(String name, List<String> tags) {
+  String addCategory(String name, List<String> tags, {String? iconKey}) {
     const id = 'created-category';
     state = state.copyWith(
       userCategories: [
         ...state.userCategories,
-        UserCategory(id: id, name: name, tags: tags),
+        UserCategory(id: id, name: name, tags: tags, iconKey: iconKey),
       ],
     );
     return id;
   }
 
   @override
-  void updateCategory(String id, String name, List<String> tags) {
+  void updateCategory(
+    String id,
+    String name,
+    List<String> tags, {
+    String? iconKey,
+  }) {
     state = state.copyWith(
       userCategories: [
         for (final category in state.userCategories)
           category.id == id
-              ? UserCategory(id: id, name: name, tags: tags)
+              ? UserCategory(
+                  id: id,
+                  name: name,
+                  tags: tags,
+                  iconKey: iconKey ?? category.iconKey,
+                )
               : category,
       ],
     );
