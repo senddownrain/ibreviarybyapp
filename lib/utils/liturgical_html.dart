@@ -522,18 +522,6 @@ String preparePsalmChoirHtml(
 
     final fragment = parseFragment(content);
     if (mode == PsalmodyMode.alternatingStanzas) {
-      // A flexa should never be stranded away from its following word.
-      // In the continuous mode bind them with a non-breaking space.
-      for (final marker in fragment.querySelectorAll('.psalm-marker')) {
-        if (marker.text.trim() != '†') continue;
-        final siblings = marker.parentNode?.nodes;
-        if (siblings == null) continue;
-        final index = siblings.indexOf(marker);
-        if (index + 1 < siblings.length && siblings[index + 1] is dom.Text) {
-          final next = siblings[index + 1] as dom.Text;
-          next.data = next.data.replaceFirst(RegExp(r'^[ \t]+'), '\u00a0');
-        }
-      }
       // Preserve strophes, words and inline ancestors, but remove every source
       // line break inside this strophe (including nested formatting).
       for (final br in fragment.querySelectorAll('br')) {
@@ -557,15 +545,12 @@ String preparePsalmChoirHtml(
       if (piece.isMarker) {
         flushLink();
         final cadence = parseFragment(piece.html).querySelector('.psalm-marker');
-        final isFlexa = cadence?.text.trim() == '†';
-        // A * finishes the previous line; † belongs visibly to the next
-        // phrase and must not be left on its own at the end of a line.
-        if (breakAfterMarker && isFlexa && rendered.isNotEmpty) {
-          segments.add(rendered.toString());
-          rendered.clear();
-        }
         rendered.write(piece.html);
-        if (breakAfterMarker && cadence != null && !isFlexa) {
+        // The ordinary † and * terminate their current line. Only the †
+        // inserted for a fully echoed first half-verse stays with that line.
+        if (breakAfterMarker &&
+            cadence != null &&
+            !cadence.classes.contains('psalm-opening-flexa')) {
           segments.add(rendered.toString());
           rendered.clear();
         }
@@ -580,8 +565,8 @@ String preparePsalmChoirHtml(
       }
       final lines = StringBuffer();
       for (var i = 0; i < segments.length; i++) {
-        // Source breaks inside a segment remain intact. A flexa begins its
-        // continuation while * remains on the preceding line.
+        // Ordinary cadence signs end a line. An echoed-opening dagger is
+        // exempt and remains at the start of the first psalm line.
         final segment = segments[i].replaceFirst(RegExp(r'^(\s|&nbsp;)+'), '');
         lines.write(
           '<span class="psalm-line${i == 0 ? '' : ' psalm-continuation'}">$segment</span>',
