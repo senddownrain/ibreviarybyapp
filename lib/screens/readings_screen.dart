@@ -890,9 +890,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
             : null,
         contextHeader: Padding(
           key: const Key('readings-context-header'),
-          padding: const EdgeInsets.fromLTRB(22, 8, 22, 22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 22),
+          child: Padding(
+            // Preserve the old margins for non-calendar reading screens.
+            padding: EdgeInsets.symmetric(horizontal: usesCalendar ? 0 : 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (usesCalendar)
                 LiturgicalDayHeader(
@@ -959,6 +962,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
                   label: const Text('Іншыя варыянты'),
                 ),
             ],
+            ),
           ),
         ),
         content: document,
