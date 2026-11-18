@@ -131,7 +131,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Office headings and compact responsory layout
-        run: flutter test test/office_responsory_formatting_test.dart test/office_responsory_repeats_test.dart test/liturgical_visual_contract_test.dart
+        run: flutter test test/office_responsory_formatting_test.dart test/office_responsory_repeats_test.dart test/office_collect_conclusion_test.dart test/liturgical_visual_contract_test.dart
 
       - name: Triduum and Compline regression
         run: flutter test test/triduum_compline_test.dart test/liturgical_titles_test.dart
