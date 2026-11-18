@@ -556,6 +556,29 @@ OfficeAssembly assembleOffice({
   }
 
   (Object?, String)? resolve(String field) {
+    final isDaytimeCollect = const {
+      'sext1Pr',
+      'sext2Pr',
+      'sext3Pr',
+    }.contains(field);
+    // GILH 200, 236: memorials retain the weekday's concluding prayer
+    // at all three daytime hours, even if a legacy Proper has one.
+    if (isDaytimeCollect && isMemorial) {
+      return fromSource(kCurrentDayChoice, field);
+    }
+    // Feasts and solemnities use their own Lauds collect before the
+    // selected Common's daytime prayer. Explicit Proper daytime prayers
+    // take priority; Lauds may itself refer to the Office of Readings.
+    final laudsRule = rules['laudesPr'];
+    if (isDaytimeCollect &&
+        (officeKind == 'feast' || officeKind == 'solemnity') &&
+        _blank(proper[field]) &&
+        (!_blank(proper['laudesPr']) ||
+            !_blank(proper['officeOfReadingsPr']) ||
+            (laudsRule is Map && laudsRule['ref'] != null))) {
+      refs.add((field, ['laudesPr', 'officeOfReadingsPr']));
+      return (null, 'pending');
+    }
     if (!_blank(proper[field])) return (proper[field], 'proper');
     final rule = rules[field];
     if (rule is Map && rule['omit'] == true) return ('', 'omit');
