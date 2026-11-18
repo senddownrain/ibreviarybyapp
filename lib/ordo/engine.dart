@@ -32,7 +32,7 @@ extension type OrdoOption(Json data) {
   // The installed offline bundle may still carry the older nominative label.
   // Match the approved canonical calendar title without changing the feast ID.
   String get title => id == 'holy-family'
-      ? 'Святой Сям’і: Езуса, Марыі і Юзафа'
+      ? kHolyFamilyGenitiveTitle
       : '${data['title'] ?? ''}';
   String get kind => '${data['kind'] ?? ''}';
   String get rank => '${data['rank'] ?? ''}';
