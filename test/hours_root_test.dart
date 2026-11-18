@@ -230,7 +230,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Варыянты'), findsOneWidget);
+    expect(find.byKey(const Key('hours-alternatives-control')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('hours-alternatives-control')));
     await tester.pumpAndSettle();
