@@ -149,7 +149,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Тэкст',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    subtitle: const Text('Шрыфт, памер і выраўноўванне'),
+                    subtitle: const Text('Шрыфт, памер, выраўноўванне і псальмодыя'),
                     tilePadding: EdgeInsets.zero,
                     childrenPadding: EdgeInsets.zero,
                     initiallyExpanded: true,
@@ -299,6 +299,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 24),
+                            const Divider(),
+                            const SizedBox(height: 16),
+                            const PsalmodySettingsSection(),
                           ],
                         ),
                       ),
@@ -309,10 +313,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                const PsalmodySettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
                 Text(
                   'Стартовы раздзел',
                   style: Theme.of(context).textTheme.titleMedium,
@@ -391,16 +391,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
+                ListTile(
+                  key: const Key('settings-about'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.info_outline_rounded),
+                  title: const Text('Інфармацыя'),
+                  subtitle: const Text('Пра дадатак, крыніцы і правы'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/about'),
+                ),
+                const SizedBox(height: 12),
                 FutureBuilder<PackageInfo>(
                   future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) =>
-                      Text('Версія ${snapshot.data?.version ?? '—'}'),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () => context.push('/about'),
-                    child: const Text('Інфармацыя'),
+                  builder: (context, snapshot) => Center(
+                    child: Text(
+                      'Версія ${snapshot.data?.version ?? '—'}',
+                      key: const Key('settings-version'),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
               ],
