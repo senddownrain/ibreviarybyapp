@@ -11,8 +11,11 @@ void main() {
     WidgetTester tester, {
     required LiturgicalDayPresentation presentation,
     String? metadata,
+    double width = 390,
+    String keyPrefix = 'hours',
+    VoidCallback? onVariants,
   }) async {
-    tester.view.physicalSize = const Size(390, 844);
+    tester.view.physicalSize = Size(width, 844);
     tester.view.devicePixelRatio = 1;
     await tester.pumpWidget(
       MaterialApp(
@@ -20,13 +23,13 @@ void main() {
           body: SingleChildScrollView(
             child: LiturgicalDayHeader(
               sectionTitle: 'Літургія гадзінаў',
-              keyPrefix: 'hours',
+              keyPrefix: keyPrefix,
               presentation: presentation,
               metadata: metadata,
               onDateTap: () {},
               onPrevious: () {},
               onNext: () {},
-              onVariants: () {},
+              onVariants: onVariants ?? () {},
             ),
           ),
         ),
@@ -201,4 +204,48 @@ void main() {
     expect(text.textSpan!.toPlainText(), 'Нядзеля');
     tester.view.reset();
   });
+  testWidgets('compact variants control stays beside an ordinary weekday', (
+    tester,
+  ) async {
+    var taps = 0;
+    await showHeader(
+      tester,
+      presentation: sample(rank: 'Будні дзень'),
+      onVariants: () => taps++,
+    );
+    final action = find.byKey(const Key('hours-alternatives-control'));
+    final metadata = find.byKey(const Key('hours-day-metadata'));
+    expect(action, findsOneWidget);
+    expect(find.text('Варыянты'), findsOneWidget);
+    expect(find.text('Іншыя варыянты'), findsNothing);
+    expect(tester.getRect(action).left, greaterThan(tester.getRect(metadata).left));
+    expect(
+      (tester.getRect(action).center.dy - tester.getRect(metadata).center.dy).abs(),
+      lessThan(12),
+    );
+    await tester.tap(action);
+    expect(taps, 1);
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+
+  testWidgets('long metadata wraps variants right without overflow', (
+    tester,
+  ) async {
+    await showHeader(
+      tester,
+      width: 280,
+      keyPrefix: 'readings',
+      presentation: sample(rank: 'Урачыстасць'),
+      metadata: 'Аўторак · Год II',
+    );
+    final action = find.byKey(const Key('readings-alternatives-control'));
+    final metadata = find.byKey(const Key('readings-day-metadata'));
+    expect(action, findsOneWidget);
+    expect(tester.getTopLeft(action).dy,
+        greaterThan(tester.getBottomLeft(metadata).dy));
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+
 }
