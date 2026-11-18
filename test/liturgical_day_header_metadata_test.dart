@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_anchor_finder.dart';
 import 'package:mybrev_flutter/discovery/tour/tour_steps.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
@@ -234,7 +235,13 @@ void main() {
     );
     final decoration = surface.decoration! as BoxDecoration;
     expect(decoration.border, isNull);
-    expect(decoration.color!.a, lessThan(0.025));
+    expect(decoration.color!.a, closeTo(0.025, 0.0001));
+    final inkWell = tester.widget<InkWell>(action);
+    expect(inkWell.overlayColor!.resolve({WidgetState.pressed})!.a,
+        closeTo(0.08, 0.0001));
+    expect(inkWell.overlayColor!.resolve({WidgetState.hovered})!.a,
+        closeTo(0.04, 0.0001));
+    expect(inkWell.overlayColor!.resolve({}), isNull);
     await tester.tap(title);
     expect(taps, 1);
     await tester.tap(edit);
@@ -266,12 +273,19 @@ void main() {
     final tourVariants = defaultTourSteps.singleWhere(
       (step) => step.id == 'tour.variants',
     );
+    expect(tourVariants.anchors, hasLength(1));
     expect(
-      tourVariants.anchors.any(
-        (anchor) => anchor.test('readings-alternatives-control'),
-      ),
+      tourVariants.anchors.single.test('readings-alternatives-control'),
       isTrue,
     );
+    expect(tourVariants.anchors.single.test('readings-celebration-title'),
+        isFalse);
+    final spotlight = resolveStepRect(
+      tester.element(find.byType(LiturgicalDayHeader)),
+      tourVariants,
+    );
+    expect(spotlight, tester.getRect(action),
+        reason: 'The tour must spotlight the WHOLE tappable day.');
     expect(tester.takeException(), isNull);
     tester.view.reset();
   });
@@ -288,9 +302,60 @@ void main() {
     );
     expect(find.byKey(const Key('hours-alternatives-control')), findsNothing);
     expect(find.byKey(const Key('hours-celebration-edit-icon')), findsNothing);
+    final tourVariants = defaultTourSteps.singleWhere(
+      (step) => step.id == 'tour.variants',
+    );
+    expect(
+      resolveStepRect(
+        tester.element(find.byType(LiturgicalDayHeader)),
+        tourVariants,
+      ),
+      isNull,
+      reason: 'An unavailable selector must not spotlight a dead title.',
+    );
     await tester.tap(find.byKey(const Key('hours-celebration-title')));
     expect(taps, 0);
     expect(tester.takeException(), isNull);
     tester.view.reset();
   });
+  testWidgets('dark theme has a soft 3.5 percent selection surface', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(brightness: Brightness.dark),
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: LiturgicalDayHeader(
+              sectionTitle: 'Літургія гадзінаў',
+              keyPrefix: 'hours',
+              presentation: sample(rank: 'Будні дзень'),
+              onDateTap: () {},
+              onPrevious: () {},
+              onNext: () {},
+              onVariants: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final action = find.byKey(const Key('hours-alternatives-control'));
+    final ink = tester.widget<Ink>(
+      find.descendant(of: action, matching: find.byType(Ink)),
+    );
+    final decoration = ink.decoration! as BoxDecoration;
+    expect(decoration.border, isNull);
+    expect(decoration.color!.a, closeTo(0.035, 0.0001));
+    expect(
+      tester.widget<InkWell>(action)
+          .overlayColor!.resolve({WidgetState.pressed})!.a,
+      closeTo(0.08, 0.0001),
+    );
+    expect(tester.takeException(), isNull);
+    tester.view.reset();
+  });
+
 }
