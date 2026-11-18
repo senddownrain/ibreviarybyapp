@@ -35,15 +35,9 @@ String omitEchoedPsalmOpening(String psalmHtml, String? selectedAntiphonHtml) {
   }
   marker.remove();
 
-  // Only presentation whitespace is removed. Never rewrite a surviving word
-  // or its inline formatting.
-  dom.Node? leading = paragraph.nodes.isEmpty ? null : paragraph.nodes.first;
-  while (leading is dom.Element && leading.nodes.isNotEmpty) {
-    leading = leading.nodes.first;
-  }
-  if (leading is dom.Text) {
-    leading.data = leading.data.replaceFirst(RegExp(r'^\s+'), '');
-  }
+  // Remove only empty leading inline wrappers and whitespace left by the
+  // hidden half-verse, without rewriting any surviving word or style.
+  _trimLeading(paragraph);
   if (_words(paragraph.text).isEmpty) {
     if (root.querySelectorAll('p.psalm-strophe').length <= 1) return psalmHtml;
     paragraph.remove();
@@ -69,4 +63,26 @@ String _textBefore(dom.Element paragraph, dom.Element marker) {
     current = parent;
   }
   return result;
+}
+
+void _trimLeading(dom.Node node) {
+  while (node.nodes.isNotEmpty) {
+    final child = node.nodes.first;
+    if (child is dom.Text) {
+      child.data = child.data.replaceFirst(RegExp(r'^\s+'), '');
+      if (child.data.isEmpty) {
+        child.remove();
+        continue;
+      }
+      return;
+    }
+    if (child is dom.Element) {
+      _trimLeading(child);
+      if (child.text.trim().isEmpty) {
+        child.remove();
+        continue;
+      }
+    }
+    return;
+  }
 }
