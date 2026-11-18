@@ -34,8 +34,8 @@ void main() {
       final root = parseFragment(output);
       final lines = root.querySelectorAll('.psalm-line');
       expect(lines, hasLength(3));
-      expect(lines[0].text.trim(), 'Пачатакслова †');
-      expect(lines[1].text.trim(), 'працяг *');
+      expect(lines[0].text.trim(), 'Пачатакслова');
+      expect(lines[1].text.trim(), '† працяг *');
       expect(lines[1].querySelector('em'), isNotNull);
       expect(lines[0].querySelector('br'), isNotNull);
       expect(
