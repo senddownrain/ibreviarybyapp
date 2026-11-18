@@ -316,9 +316,10 @@ class _MonthEntry extends StatelessWidget {
     final option = row.option;
     final secondary = row.role != 'primary';
     final metadata = [
-      if (!option.isTemporal || secondary) ordoRankLabel(option),
+      if (row.role != 'commemoration' && (!option.isTemporal || secondary))
+        ordoRankLabel(option),
       if (row.role == 'alternative') 'на выбар',
-      if (row.role == 'commemoration') 'успамін (commemoratio)',
+      if (row.role == 'commemoration') 'Неабавязковы ўспамін',
       ...row.badges,
     ].where((s) => s.isNotEmpty).join(' · ');
     return Padding(
