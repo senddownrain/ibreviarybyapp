@@ -188,7 +188,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                     ),
                   ),
                 ],
-            ),
+              ),
             ),
           ),
           if (showVariants) ...[
