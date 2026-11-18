@@ -42,6 +42,14 @@ const names=[
 const known=new Set(names.map(([id])=>id));
 const added=[...publicById.keys()].filter(id=>!priorIds.has(id)).sort();
 assert(added.length>=2&&added.length<=100,'Unexpectedly large public prayer delta');
+if(!names.every(([id])=>publicById.has(id))){
+ console.log('PUBLIC-ONLY DEVOTION MATCH DIAGNOSTIC',JSON.stringify({
+  missingIds:names.filter(([id])=>!publicById.has(id)).map(([id])=>id),
+  titleMatches:catalog.prayers.filter(p=>/вігілій|вячэр|працэс|выстаўлен|заканчэнне года/iu.test(p.title||''))
+    .map(p=>({id:p.id,title:p.title,source:p.source})),
+  newlyPublic:added.map(id=>({id,title:publicById.get(id)?.title,source:publicById.get(id)?.source}))
+ }));
+}
 assert(names.every(([id])=>publicById.has(id)),'Missing an approved devotion');
 assert(catalog.prayers.length===393+added.length,'Unexpected public catalog count');
 assert([...priorIds].every(id=>publicById.has(id)),'Published public prayer missing in Hosting snapshot');
