@@ -149,7 +149,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Тэкст',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    subtitle: const Text('Шрыфт, памер, выраўноўванне і псальмодыя'),
+                    subtitle: const Text('Шрыфт, памер і псальмодыя'),
                     tilePadding: EdgeInsets.zero,
                     childrenPadding: EdgeInsets.zero,
                     initiallyExpanded: true,
