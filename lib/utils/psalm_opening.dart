@@ -47,9 +47,9 @@ String omitEchoedPsalmOpening(String psalmHtml, String? selectedAntiphonHtml) {
     if (nextIndex < parent.nodes.length) {
       final next = parent.nodes[nextIndex];
       if (next is dom.Text) {
-        next.data = next.data.replaceFirst(RegExp(r'^[\\s\\u00a0]*'), '\\u00a0');
+        next.data = next.data.replaceFirst(RegExp(r'^[\s\u00a0]*'), '\u00a0');
       } else {
-        parent.nodes.insert(nextIndex, dom.Text('\\u00a0'));
+        parent.nodes.insert(nextIndex, dom.Text('\u00a0'));
       }
       break;
     }
