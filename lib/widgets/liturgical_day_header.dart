@@ -140,8 +140,8 @@ class LiturgicalDayHeader extends StatelessWidget {
                             .copyWith(color: cs.onSurface, height: 1.18),
                       ),
                       const SizedBox(height: 8),
-                      LayoutBuilder(
-                        builder: (context, metadataConstraints) {
+                      Builder(
+                        builder: (context) {
                           final metadataStyle = Theme.of(context)
                               .textTheme
                               .bodyMedium
@@ -227,7 +227,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                           // screens or with longer rank/year metadata, place it
                           // on the next line, still aligned to the right.
                           if (metadataWidth + 148 <=
-                              metadataConstraints.maxWidth) {
+                              constraints.maxWidth - 18) {
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
