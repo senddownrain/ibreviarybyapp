@@ -38,6 +38,7 @@ import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/office_collect_conclusion.dart';
 import 'package:mybrev_flutter/utils/liturgical_blocks.dart';
 import 'package:mybrev_flutter/utils/liturgical_alternatives.dart';
 import 'package:mybrev_flutter/utils/pastors_hymn.dart';
@@ -1193,7 +1194,7 @@ class _OraScreenState extends ConsumerState<OraScreen> {
       items.add(
         _OraItem.labeled(
           'Малітва',
-          prayer,
+          expandOfficeCollectConclusion(prayer),
           kind: 'prayer',
           startsSection: false,
         ),
