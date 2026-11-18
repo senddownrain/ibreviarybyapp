@@ -15,6 +15,9 @@ library;
 
 typedef Json = Map<String, dynamic>;
 
+/// Canonical genitive title shared by bundled and overlay calendar definitions.
+const kHolyFamilyGenitiveTitle = 'Святой Сям’і: Езуса, Марыі і Юзафа';
+
 const kMovableAnchors = [
   'easterSunday',
   'pentecost',
@@ -241,6 +244,8 @@ class OrdoDefinitions {
               ? {...doc, 'title': 'Св. Хуана Дыега Куаўтлатаацына'}
               : label == 'celebration' && doc['id'] == 'christ-king'
               ? {...doc, 'title': 'Пана нашага Езуса Хрыста, Валадара Сусвету'}
+              : label == 'celebration' && doc['id'] == 'holy-family'
+              ? {...doc, 'title': kHolyFamilyGenitiveTitle}
               : doc,
         );
       }
