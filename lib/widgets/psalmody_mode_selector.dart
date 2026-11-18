@@ -78,9 +78,9 @@ class PsalmodyModeSelector extends StatelessWidget {
             ),
           ),
         ),
-      );
-  
-    );  }
+      ),
+    );
+  }
 }
 
 class _PsalmodyIcon extends CustomPainter {
