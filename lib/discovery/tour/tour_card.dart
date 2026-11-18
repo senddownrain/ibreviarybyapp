@@ -182,12 +182,15 @@ class _SpotlightPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rrect = RRect.fromRectAndRadius(hole, const Radius.circular(14));
-    final path = Path.combine(
-      PathOperation.difference,
-      Path()..addRect(Offset.zero & size),
-      Path()..addRRect(rrect),
-    );
-    canvas.drawPath(path, Paint()..color = scrim);
+    final bounds = Offset.zero & size;
+    final scrimPath = Path()
+      ..fillType = PathFillType.evenOdd
+      ..addRect(bounds)
+      ..addRRect(rrect);
+    canvas.save();
+    canvas.clipRect(bounds);
+    canvas.drawPath(scrimPath, Paint()..color = scrim);
+    canvas.restore();
     canvas.drawRRect(
       rrect,
       Paint()
