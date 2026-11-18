@@ -84,29 +84,33 @@ class LiturgicalDayHeader extends StatelessWidget {
       builder: (context, constraints) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LiturgicalHeadingText(
-            sectionTitle,
-            style: ReaderTheme.of(context).documentTitle(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: LiturgicalHeadingText(
+              sectionTitle,
+              style: ReaderTheme.of(context).documentTitle(),
+            ),
           ),
           const SizedBox(height: 12),
-          LiturgicalDateNavigationRow(
-            date: p.date,
-            keyPrefix: keyPrefix,
-            onDateTap: onDateTap,
-            onPrevious: onPrevious,
-            onNext: onNext,
-            onToday: onToday,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: LiturgicalDateNavigationRow(
+              date: p.date,
+              keyPrefix: keyPrefix,
+              onDateTap: onDateTap,
+              onPrevious: onPrevious,
+              onNext: onNext,
+              onToday: onToday,
+            ),
           ),
-          ?dateHint,
+          if (dateHint != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: dateHint!,
+            ),
           const SizedBox(height: 12),
-          // Let only the contextual celebration surface reach 8 dp
-          // beyond the normal 22 dp page inset. The date and section title
-          // keep their established alignment and typography.
-          OverflowBox(
-            alignment: Alignment.center,
-            minWidth: constraints.maxWidth + 16,
-            maxWidth: constraints.maxWidth + 16,
-            child: _CelebrationSelectionSurface(
+          // Only the day grows to the wider page inset; date/title stay put.
+          _CelebrationSelectionSurface(
             keyPrefix: keyPrefix,
             enabled: showVariants,
             onTap: onVariants,
@@ -145,7 +149,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                         LiturgicalHeadingText(
                           p.title,
                           key: Key('$keyPrefix-celebration-title'),
-                          maxWidth: constraints.maxWidth - 18 + 16,
+                          maxWidth: constraints.maxWidth - 18,
                           style: ReaderTheme.of(context)
                               .displayTitle(29)
                               .copyWith(color: cs.onSurface, height: 1.18),
@@ -183,8 +187,6 @@ class LiturgicalDayHeader extends StatelessWidget {
                               // Not a separate button: the entire celebration
                               // surface opens the variants selector.
                               Padding(
-                                // The pencil is a hint, not a separate button.
-                                // Keep it clear of the wider surface's edge.
                                 padding: const EdgeInsets.only(right: 9),
                                 child: Icon(
                                   Icons.edit_outlined,
@@ -202,11 +204,12 @@ class LiturgicalDayHeader extends StatelessWidget {
                 ],
               ),
             ),
-            ),
           ),
-          if (showVariants) ...[
-            ?variantsHint,
-          ],
+          if (showVariants && variantsHint != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: variantsHint!,
+            ),
         ],
       ),
     );
