@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1794938564491,
-  "contentDate": "2026-11-17T18:02:44.491Z",
+  "contentVersion": 1795025405000,
+  "contentDate": "2026-11-18T18:10:05.000Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -60,13 +60,13 @@
     },
     "prayers": {
       "file": "prayers.json.gz",
-      "contentVersion": 1794938564491,
-      "contentDate": "2026-11-17T18:02:44.491Z",
-      "count": 393,
-      "digest": "73c8832f6f24ae93",
-      "storedBytes": 3442048,
-      "bundleBytes": 632372,
-      "minimumRemoteVersion": 5
+      "contentVersion": 1795025405000,
+      "contentDate": "2026-11-18T18:10:05.000Z",
+      "count": 394,
+      "digest": "ace6a693cc233dc8",
+      "storedBytes": 3431615,
+      "bundleBytes": 625308,
+      "minimumRemoteVersion": 6
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
@@ -108,20 +108,20 @@
     },
     "liturgicalCalendarMeta": {
       "file": "liturgicalCalendarMeta.json.gz",
-      "contentVersion": 1794176180000,
-      "contentDate": "2026-11-08T22:16:20.000Z",
+      "contentVersion": 1795025405000,
+      "contentDate": "2026-11-18T18:10:05.000Z",
       "count": 1,
-      "digest": "50c0b92f2b345128",
+      "digest": "7e00b2ae9492b922",
       "storedBytes": 273,
       "bundleBytes": 297,
       "minimumRemoteVersion": 2
     },
     "liturgicalCelebrations": {
       "file": "liturgicalCelebrations.json.gz",
-      "contentVersion": 1794176180000,
-      "contentDate": "2026-11-08T22:16:20.000Z",
+      "contentVersion": 1795025405000,
+      "contentDate": "2026-11-18T18:10:05.000Z",
       "count": 242,
-      "digest": "b1ec5380202bf506",
+      "digest": "bcfabb05c7239433",
       "storedBytes": 127232,
       "bundleBytes": 22683,
       "minimumRemoteVersion": 2

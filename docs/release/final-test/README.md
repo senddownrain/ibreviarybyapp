@@ -1,4 +1,18 @@
-# Single final test candidate — 2026-11-17
+# PR #117 single offline bundle — 2026-11-18
+
+Bundle content version **1795025405000** (`2026-11-18T18:10:05.000Z`), aggregate SHA256 **1d0066ead7e7b9f69cb83e8bc96e6346ce3a17111cc0e241233693240bbbf173**. Manifest file SHA256 `e776a6ddced8b0e6cbefd7ba0a02b86618371bd711b50cdd0e599ad7e3b33a2b`. [Per-file checksums, collection digests and approved source substitutions](nov18-refresh-report.json).
+
+The existing bundle holds **394 public prayers**. Three reviewed devotions were added, and the Eucharistic procession was updated under its production ID `Fd9rN0S9NU1mAmqb2isZ`. All four are in «Набажэнствы» via the category's existing tag. The saved public snapshot confirms two older bundled IDs were removed from production. The refresh applies **316** canonical edition-title substitutions from Web #278 and sets the existing procession’s source to the verified Agenda attribution. [Reviewed texts and publication evidence](https://github.com/senddownrain/mybrev/pull/288) · [Source policy](https://github.com/senddownrain/mybrev/pull/278).
+
+Calendar revision **6** includes the white (`albus`) dedication of the Roman basilicas of Saints Peter and Paul on November 18. The bundled December exclusions and all other calendar definitions are carried forward. [Calendar patch readback](https://github.com/senddownrain/mybrev/actions/runs/44342368712).
+
+The changed assets are prayers, celebrations, calendar metadata and the bundle manifest. The 13 other gzip files, including the 7,791 published corrections, are byte-for-byte identical to the preceding PR #117 candidate. The offline checker compares each changed payload with the reviewed inputs, verifies every file SHA256, and checks the manifest. The refresh used zero production reads and writes.
+
+Before the test APK, confirm the app version, build the signed candidate and run the Android native smoke. Browser and unit-test evidence is retained below.
+
+## Previous candidate and historical evidence
+
+### Bundle snapshot from 2026-11-17
 
 Content version **1794938564491** (`2026-11-17T18:02:44.491Z`). Aggregate bundle SHA256 **b0809b03da9b04cb21979b8d0d5fdbe999a52af1aa4451c5e156d2b896753e77**. Manifest file SHA256 `16860a876b94aaa375c13e27ec2510204a285896116be2070bfc3aa3e9875178`.
 

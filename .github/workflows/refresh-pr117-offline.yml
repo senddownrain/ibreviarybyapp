@@ -1,127 +1,38 @@
-name: Refresh existing PR117 bundle from approved public sources
+name: Verify PR117 bundle from approved public sources
 
 on:
   push:
     branches:
       - prepare/final-test-candidate
     paths:
-      - scripts/refresh_final_test_candidate_20261118.mjs
-      - .github/workflows/refresh-pr117-offline.yml
+      - 'assets/content/**'
+      - 'docs/release/final-test/nov18-refresh-report.json'
+      - 'scripts/refresh_final_test_candidate_20261118.mjs'
+      - '.github/workflows/refresh-pr117-offline.yml'
 
 permissions:
-  contents: write
-
-concurrency:
-  group: final-pr117-offline-refresh
-  cancel-in-progress: false
+  contents: read
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 10
     steps:
-      - name: Checkout existing candidate; no new bundle branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: prepare/final-test-candidate
           fetch-depth: 0
-          persist-credentials: true
-      - name: Merge latest Flutter main without discarding existing candidate
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git fetch origin main
-          if ! git merge --no-edit origin/main; then
-            conflicts="$(git diff --name-only --diff-filter=U)"
-            if [ "$conflicts" != ".github/workflows/flutter-pr-ci.yml" ]; then
-              echo "::error::Unexpected merge conflicts: $conflicts"
-              exit 1
-            fi
-            # Keep newer main CI and add PR117-only tests. Resolve only this file.
-            git checkout --theirs .github/workflows/flutter-pr-ci.yml
-            python3 - <<'PY'
-          from pathlib import Path
-          path=Path('.github/workflows/flutter-pr-ci.yml')
-          text=path.read_text()
-          old1='test/office_collect_conclusion_test.dart test/liturgical_visual_contract_test.dart'
-          new1='test/office_collect_conclusion_test.dart test/liturgical_visual_contract_test.dart test/office_reading_reference_test.dart test/office_reference_layout_test.dart'
-          old2='test/content_offline_test.dart test/ordo_content_update_test.dart test/pr255_bundle_update_test.dart'
-          new2='test/content_offline_test.dart test/ordo_content_update_test.dart test/pr255_bundle_update_test.dart test/bundled_manifest_floor_test.dart test/pr255_test_client_safety_test.dart'
-          assert old1 in text and old2 in text
-          text=text.replace(old1,new1).replace(old2,new2)
-          path.write_text(text)
-          PY
-            git add .github/workflows/flutter-pr-ci.yml
-            git commit --no-edit
-          fi
-      - name: Setup Node
-        uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Inspect script syntax
-        run: node --check scripts/refresh_final_test_candidate_20261118.mjs
-      - name: Checkout approved Web sources (public, no Firebase credentials)
+      - name: Fetch reviewed Web revisions
         run: |
-          set -euo pipefail
-          git clone --depth 1 https://github.com/senddownrain/mybrev.git ../mybrev
-          git -C ../mybrev fetch --depth 60 origin content/four-devotions-2026-11-18
-          git -C ../mybrev cat-file -e 1b4d121329f46a302fa30f064b4b3ec06ee7b3da^{commit}
-          cd ../mybrev
-          npm ci --ignore-scripts
-      - name: Download public Hosting catalog only (never Firestore)
-        run: |
-          set -euo pipefail
-          curl --fail --location --silent --show-error \
-            https://ibreviaryby.web.app/public-prayers-v1.json \
-            --output "$RUNNER_TEMP/public-prayers-v1.json"
-          test -s "$RUNNER_TEMP/public-prayers-v1.json"
-          sha256sum "$RUNNER_TEMP/public-prayers-v1.json"
-      - name: Update only existing PR117 assets and local report
+          git init ../mybrev
+          git -C ../mybrev remote add origin https://github.com/senddownrain/mybrev.git
+          git -C ../mybrev fetch --depth=1 origin \
+            d199022b7769c1c815351e1f0808f0573ef87623 1eef3a7485c139b4df50571c2e0a18cef7d7f793
+          git -C ../mybrev checkout --detach d199022b7769c1c815351e1f0808f0573ef87623
+      - name: Verify approved payloads and manifest in checked-in bundle
         run: |
           node scripts/refresh_final_test_candidate_20261118.mjs \
-            --web ../mybrev --catalog "$RUNNER_TEMP/public-prayers-v1.json" \
-            --assets assets/content
-          node scripts/refresh_final_test_candidate_20261118.mjs \
-            --web ../mybrev --catalog "$RUNNER_TEMP/public-prayers-v1.json" \
-            --assets assets/content --check
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.41.4
-          cache: true
-      - name: Verify offline content, updaters, calendar and current reader
-        run: |
-          flutter pub get --enforce-lockfile
-          flutter test test/content_offline_test.dart test/ordo_content_update_test.dart \
-            test/bundled_manifest_floor_test.dart test/pr255_bundle_update_test.dart
-          flutter analyze --no-fatal-infos
-      - name: Enforce exact data-file write scope
-        run: |
-          python3 - <<'PY'
-          import subprocess
-          files=subprocess.check_output(
-              ['git','diff','--name-only'],text=True
-          ).splitlines()
-          allowed={
-              'assets/content/prayers.json.gz',
-              'assets/content/prayerCategories.json.gz',
-              'assets/content/liturgicalCelebrations.json.gz',
-              'assets/content/liturgicalCalendarMeta.json.gz',
-              'assets/content/manifest.json'
-          }
-          assert set(files)==allowed, ('Unexpected output/missing changed file',files)
-          print('Exact scope:',files)
-          PY
-      - name: Commit into the SAME PR117 branch only
-        run: |
-          set -euo pipefail
-          git add assets/content/prayers.json.gz \
-            assets/content/prayerCategories.json.gz \
-            assets/content/liturgicalCelebrations.json.gz \
-            assets/content/liturgicalCalendarMeta.json.gz \
-            assets/content/manifest.json \
-            docs/release/final-test/nov18-refresh-report.json
-          git commit -m "Refresh PR117 offline bundle: four devotions, canonical sources, white basilicas/calendar6"
-          git push origin HEAD:refs/heads/prepare/final-test-candidate
+            --web ../mybrev --assets assets/content --check
