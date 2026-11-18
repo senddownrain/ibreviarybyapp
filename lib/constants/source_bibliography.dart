@@ -101,10 +101,10 @@ const kPublicSourceBibliography = <SourceBibliographyItem>[
     notices: ['© Выдавецтва «Про Хрысто», 2024'],
   ),
   SourceBibliographyItem(
-    id: 'bog-dobry-2018',
+    id: 'bog-dobry-2022',
     section: 'Касцёльныя крыніцы',
-    title: 'Малітоўнік «Бог Добры» (Пінск, 2018)',
-    notices: ['© Выдавецтва Пінскай дыяцэзіі, 2018'],
+    title: 'Малітоўнік «Бог Добры» (Пінск, 2022)',
+    notices: ['© Выдавецтва Пінскай дыяцэзіі, 2022'],
   ),
   SourceBibliographyItem(
     id: 'kab-paznali-tsiabe-2014',
@@ -122,7 +122,7 @@ const kPublicSourceBibliography = <SourceBibliographyItem>[
   SourceBibliographyItem(
     id: 'biblia-synodal',
     section: 'Іншыя крыніцы',
-    title: '«Біблія» Синодальный перевод',
+    title: '«Библия» (Синодальный перевод, на русском языке)',
     notices: [],
   ),
 ];
