@@ -78,7 +78,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Крыніца: Бог добры'), findsOneWidget);
-    expect(find.text('Старонкі: 26–27'), findsOneWidget);
+    expect(find.text('26–27'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -103,7 +103,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Крыніца: Літургія гадзін'), findsOneWidget);
-    expect(find.text('Старонкі: 78–80'), findsOneWidget);
+    expect(find.text('78–80'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
