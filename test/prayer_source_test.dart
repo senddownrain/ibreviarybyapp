@@ -21,21 +21,14 @@ void main() {
         'title': 'Малітва',
         'text': 'Пс 23, 1–6',
         'source': source,
+        'pages': '34–36',
       }, 'p');
       expect(prayer.copyWith(body: 'Тэкст').source, source);
       expect(Prayer.fromMap(prayer.toMap(), 'p').source, source);
       expect(prayer.displayText, 'Пс 23, 1–6');
+      expect(prayer.copyWith(body: 'Тэкст').pages, '34–36');
+      expect(Prayer.fromMap(prayer.toMap(), 'p').pages, '34–36');
     }
-  });
-
-  test('prayer pages survive decoding and serialization', () {
-    final prayer = Prayer.fromMap({
-      'title': 'Малітва',
-      'pages': '34–36',
-    }, 'p');
-    expect(prayer.pages, '34–36');
-    expect(prayer.copyWith(body: 'Іншы тэкст').pages, '34–36');
-    expect(Prayer.fromMap(prayer.toMap(), 'p').pages, '34–36');
   });
 
   testWidgets('reader source note displays the canonical server value', (
