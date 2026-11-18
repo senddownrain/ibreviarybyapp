@@ -355,6 +355,62 @@ void main() {
     },
   );
 
+  testWidgets(
+    'date control visual preview: wider day 19 November dark',
+    (tester) async {
+      final (router, _) = await start(
+        tester,
+        width: 390,
+        brightness: Brightness.dark,
+        date: DateTime(2026, 11, 19),
+      );
+      final date = tester.getRect(
+        find.byKey(const Key('hours-date-control')),
+      );
+      final day = tester.getRect(
+        find.byKey(const Key('hours-alternatives-control')),
+      );
+      final pencil = tester.getRect(
+        find.byKey(const Key('hours-celebration-edit-icon')),
+      );
+      expect(day.width, closeTo(date.width + 16, 0.1));
+      expect(day.left, closeTo(date.left - 8, 0.1));
+      expect(day.right, closeTo(date.right + 8, 0.1));
+      expect(day.right - pencil.right, greaterThanOrEqualTo(9));
+
+      final hours = find.byWidgetPredicate((widget) {
+        final key = widget.key;
+        return key is ValueKey<String> && key.value.startsWith('hours-hour-');
+      });
+      expect(hours, findsWidgets);
+      expect(
+        tester.getTopLeft(hours.first).dy - day.bottom,
+        greaterThanOrEqualTo(24),
+      );
+      await snapshot(tester, 'wider-day-hours-dark-2026-11-19');
+
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      final readingsDate = tester.getRect(
+        find.byKey(const Key('readings-date-control')),
+      );
+      final readingsDay = tester.getRect(
+        find.byKey(const Key('readings-alternatives-control')),
+      );
+      final readingsPencil = tester.getRect(
+        find.byKey(const Key('readings-celebration-edit-icon')),
+      );
+      expect(readingsDay.width, closeTo(readingsDate.width + 16, 0.1));
+      expect(readingsDay.left, closeTo(readingsDate.left - 8, 0.1));
+      expect(
+        readingsDay.right - readingsPencil.right,
+        greaterThanOrEqualTo(9),
+      );
+      await snapshot(tester, 'wider-day-readings-dark-2026-11-19');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('date control visual preview: light Readings', (
     tester,
   ) async {
