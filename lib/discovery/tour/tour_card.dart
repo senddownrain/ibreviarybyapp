@@ -149,7 +149,7 @@ class TourLayer extends StatelessWidget {
                     painter: rect == null
                         ? null
                         : _SpotlightPainter(
-                            rect.inflate(6),
+                            rect.inflate(session.current.spotlightPadding),
                             Colors.black.withValues(alpha: 0.38),
                             Theme.of(context).colorScheme.primary,
                           ),

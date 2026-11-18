@@ -85,13 +85,13 @@ class HomeScreen extends ConsumerWidget {
                               onPrevious: () => dayNavigation.moveBy(-1),
                               onNext: () => dayNavigation.moveBy(1),
                             ),
-                            // A little breathing room between the
-                            // interactive day and the list of Hours.
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 22),
                             if (selection.selected != null) ...[
                               // Keep Hour rows at their original 22 dp inset.
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
                                 child: _HoursList(
                                   date: date,
                                   selection: selection,

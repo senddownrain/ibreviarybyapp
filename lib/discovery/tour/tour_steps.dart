@@ -26,6 +26,7 @@ class TourStep {
     required this.anchors,
     this.branch,
     this.unionAll = false,
+    this.spotlightPadding = 6,
   });
 
   /// Stable identifier, for tests and logs.
@@ -41,6 +42,9 @@ class TourStep {
 
   /// Highlight every matching anchor together (two dock tabs).
   final bool unionAll;
+
+  /// Space between the anchor and the spotlight outline, in logical pixels.
+  final double spotlightPadding;
 }
 
 /// The tour of Stage 6. A step whose control is not on screen is dropped at
@@ -86,6 +90,7 @@ const List<TourStep> defaultTourSteps = [
     // Only highlight the real tappable area. When the selector is not
     // available, the tour must not point at an inactive title.
     anchors: [TourAnchor.suffix('-alternatives-control')],
+    spotlightPadding: 0,
     branch: AppBranch.readings,
   ),
   TourStep(

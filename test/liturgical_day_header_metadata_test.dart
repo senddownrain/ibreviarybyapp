@@ -246,6 +246,10 @@ void main() {
     expect(taps, 1);
     await tester.tap(edit);
     expect(taps, 2);
+    final card = tester.getRect(action);
+    await tester.tapAt(Offset(card.left + 3, card.center.dy));
+    await tester.tapAt(Offset(card.right - 3, card.center.dy));
+    expect(taps, 4);
     expect(tester.takeException(), isNull);
     tester.view.reset();
   });
@@ -274,6 +278,7 @@ void main() {
       (step) => step.id == 'tour.variants',
     );
     expect(tourVariants.anchors, hasLength(1));
+    expect(tourVariants.spotlightPadding, 0);
     expect(
       tourVariants.anchors.single.test('readings-alternatives-control'),
       isTrue,
@@ -284,6 +289,12 @@ void main() {
       tester.element(find.byType(LiturgicalDayHeader)),
       tourVariants,
     );
+    final heading = tester.widget<Text>(
+      find.descendant(of: title, matching: find.byType(Text)),
+    );
+    expect(heading.style!.fontSize, 29);
+    expect(heading.textScaler!.scale(29), 29);
+    expect(heading.maxLines, isNull);
     expect(spotlight, tester.getRect(action),
         reason: 'The tour must spotlight the WHOLE tappable day.');
     expect(tester.takeException(), isNull);

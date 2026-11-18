@@ -356,7 +356,7 @@ void main() {
   );
 
   testWidgets(
-    'date control visual preview: wider day 19 November dark',
+    'date control visual preview: celebration layout on 19 November dark',
     (tester) async {
       final (router, _) = await start(
         tester,
@@ -364,49 +364,46 @@ void main() {
         brightness: Brightness.dark,
         date: DateTime(2026, 11, 19),
       );
-      final date = tester.getRect(
-        find.byKey(const Key('hours-date-control')),
-      );
-      final day = tester.getRect(
-        find.byKey(const Key('hours-alternatives-control')),
-      );
-      final pencil = tester.getRect(
-        find.byKey(const Key('hours-celebration-edit-icon')),
-      );
-      expect(day.width, closeTo(date.width + 16, 0.1));
-      expect(day.left, closeTo(date.left - 8, 0.1));
-      expect(day.right, closeTo(date.right + 8, 0.1));
-      expect(day.right - pencil.right, greaterThanOrEqualTo(9));
 
+      Rect checkCelebration(String prefix) {
+        Rect bounds(String suffix) =>
+            tester.getRect(find.byKey(Key('$prefix-$suffix')));
+        final date = bounds('date-control');
+        final day = bounds('alternatives-control');
+        final accent = bounds('celebration-accent');
+        final pencil = bounds('celebration-edit-icon');
+        final metadata = bounds('day-metadata');
+
+        expect(day.left, lessThan(date.left));
+        expect(day.right, greaterThan(date.right));
+        expect(accent.left, closeTo(date.left, 0.1));
+        expect(accent.top, greaterThan(day.top));
+        expect(accent.bottom, lessThan(day.bottom));
+        expect(
+          day.right - pencil.right,
+          closeTo(day.bottom - pencil.bottom, 0.1),
+        );
+        expect(day.bottom - metadata.bottom, inInclusiveRange(8, 14));
+        return day;
+      }
+
+      final hoursDay = checkCelebration('hours');
       final hours = find.byWidgetPredicate((widget) {
         final key = widget.key;
         return key is ValueKey<String> && key.value.startsWith('hours-hour-');
       });
       expect(hours, findsWidgets);
       expect(
-        tester.getTopLeft(hours.first).dy - day.bottom,
-        greaterThanOrEqualTo(24),
+        tester.getTopLeft(hours.first).dy - hoursDay.bottom,
+        inInclusiveRange(20, 24),
       );
-      await snapshot(tester, 'wider-day-hours-dark-2026-11-19');
+      await snapshot(tester, 'liturgical-day-hours-dark-2026-11-19');
 
       router.go('/readings');
       await tester.pumpAndSettle();
-      final readingsDate = tester.getRect(
-        find.byKey(const Key('readings-date-control')),
-      );
-      final readingsDay = tester.getRect(
-        find.byKey(const Key('readings-alternatives-control')),
-      );
-      final readingsPencil = tester.getRect(
-        find.byKey(const Key('readings-celebration-edit-icon')),
-      );
-      expect(readingsDay.width, closeTo(readingsDate.width + 16, 0.1));
-      expect(readingsDay.left, closeTo(readingsDate.left - 8, 0.1));
-      expect(
-        readingsDay.right - readingsPencil.right,
-        greaterThanOrEqualTo(9),
-      );
-      await snapshot(tester, 'wider-day-readings-dark-2026-11-19');
+      final readingsDay = checkCelebration('readings');
+      expect(readingsDay.width, hoursDay.width);
+      await snapshot(tester, 'liturgical-day-readings-dark-2026-11-19');
       expect(tester.takeException(), isNull);
     },
   );

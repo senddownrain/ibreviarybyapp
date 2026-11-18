@@ -23,6 +23,8 @@ class LiturgicalDayHeader extends StatelessWidget {
     this.variantsHint,
   });
 
+  static const double _controlInset = 8;
+
   final String sectionTitle;
   final String keyPrefix;
   final LiturgicalDayPresentation presentation;
@@ -71,147 +73,155 @@ class LiturgicalDayHeader extends StatelessWidget {
     // Display local diocesan context in one quiet line ABOVE the celebration
     // title. Explicit union badges take precedence over _place (which may
     // describe a broader source); neither is shown for a common weekday.
-    final diocesanLabels = (p.badges.isNotEmpty
-            ? p.badges.map(_fullDioceseLabel)
-            : p.place
-                .split(',')
-                .map((label) => _fullDioceseLabel(label.trim())))
-        .where((label) => label.isNotEmpty)
-        .toSet()
-        .toList();
+    final diocesanLabels =
+        (p.badges.isNotEmpty
+                ? p.badges.map(_fullDioceseLabel)
+                : p.place
+                      .split(',')
+                      .map((label) => _fullDioceseLabel(label.trim())))
+            .where((label) => label.isNotEmpty)
+            .toSet()
+            .toList();
 
-    return LayoutBuilder(
-      builder: (context, constraints) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: LiturgicalHeadingText(
-              sectionTitle,
-              style: ReaderTheme.of(context).documentTitle(),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: _controlInset),
+          child: LiturgicalHeadingText(
+            sectionTitle,
+            style: ReaderTheme.of(context).documentTitle(),
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: LiturgicalDateNavigationRow(
-              date: p.date,
-              keyPrefix: keyPrefix,
-              onDateTap: onDateTap,
-              onPrevious: onPrevious,
-              onNext: onNext,
-              onToday: onToday,
-            ),
-          ),
-          if (dateHint != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: dateHint!,
-            ),
-          const SizedBox(height: 12),
-          // Only the day grows to the wider page inset; date/title stay put.
-          _CelebrationSelectionSurface(
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: _controlInset),
+          child: LiturgicalDateNavigationRow(
+            date: p.date,
             keyPrefix: keyPrefix,
-            enabled: showVariants,
-            onTap: onVariants,
-            semanticsLabel: 'Іншыя варыянты літургічнага дня: ${p.title}',
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AnimatedContainer(
-                    key: Key('$keyPrefix-celebration-accent'),
-                    duration: const Duration(milliseconds: 300),
-                    width: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 3),
-                    decoration: BoxDecoration(
-                      color: p.accent,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
+            onDateTap: onDateTap,
+            onPrevious: onPrevious,
+            onNext: onNext,
+            onToday: onToday,
+          ),
+        ),
+        if (dateHint != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _controlInset),
+            child: dateHint!,
+          ),
+        const SizedBox(height: 14),
+        _CelebrationSelectionSurface(
+          keyPrefix: keyPrefix,
+          enabled: showVariants,
+          onTap: onVariants,
+          semanticsLabel: 'Іншыя варыянты літургічнага дня: ${p.title}',
+          child: Stack(
+            children: [
+              // Let the rendered text set the height of the accent and card.
+              PositionedDirectional(
+                start: _controlInset,
+                top: 13,
+                bottom: 14,
+                width: 4,
+                child: AnimatedContainer(
+                  key: Key('$keyPrefix-celebration-accent'),
+                  duration: const Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    color: p.accent,
+                    borderRadius: BorderRadius.circular(99),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (diocesanLabels.isNotEmpty) ...[
-                          Text(
-                            diocesanLabels.join(' · '),
-                            key: Key('$keyPrefix-celebration-dioceses'),
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  fontSize: 12.5,
-                                  color: cs.onSurfaceVariant,
-                                ),
-                          ),
-                          const SizedBox(height: 6),
-                        ],
-                        LiturgicalHeadingText(
-                          p.title,
-                          key: Key('$keyPrefix-celebration-title'),
-                          maxWidth: constraints.maxWidth - 18,
-                          style: ReaderTheme.of(context)
-                              .displayTitle(29)
-                              .copyWith(color: cs.onSurface, height: 1.18),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(
+                  _controlInset + 12,
+                  10,
+                  _controlInset,
+                  11,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (diocesanLabels.isNotEmpty) ...[
+                      Text(
+                        diocesanLabels.join(' · '),
+                        key: Key('$keyPrefix-celebration-dioceses'),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: 12.5,
+                          color: cs.onSurfaceVariant,
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text.rich(
-                                key: Key('$keyPrefix-day-metadata'),
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: emphasizedMetadata,
-                                      style: Theme.of(context).textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: cs.onSurface,
-                                          ),
-                                    ),
-                                    TextSpan(text: metadataTail),
-                                  ],
+                      ),
+                      const SizedBox(height: 6),
+                    ],
+                    LiturgicalHeadingText(
+                      p.title,
+                      key: Key('$keyPrefix-celebration-title'),
+                      style: ReaderTheme.of(context)
+                          .displayTitle(29)
+                          .copyWith(color: cs.onSurface, height: 1.18),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Text.rich(
+                              key: Key('$keyPrefix-day-metadata'),
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: emphasizedMetadata,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: cs.onSurface,
+                                        ),
+                                  ),
+                                  TextSpan(text: metadataTail),
+                                ],
+                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontSize: 14.5,
+                                    color: cs.onSurfaceVariant,
+                                  ),
+                            ),
+                          ),
+                          if (showVariants) ...[
+                            const SizedBox(width: 12),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 3),
+                              child: Icon(
+                                Icons.edit_outlined,
+                                key: Key('$keyPrefix-celebration-edit-icon'),
+                                size: 18,
+                                color: cs.onSurfaceVariant.withValues(
+                                  alpha: 0.7,
                                 ),
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      fontSize: 14.5,
-                                      color: cs.onSurfaceVariant,
-                                    ),
                               ),
                             ),
-                            if (showVariants) ...[
-                              const SizedBox(width: 12),
-                              // Not a separate button: the entire celebration
-                              // surface opens the variants selector.
-                              Padding(
-                                padding: const EdgeInsets.only(right: 9),
-                                child: Icon(
-                                  Icons.edit_outlined,
-                                  key: Key('$keyPrefix-celebration-edit-icon'),
-                                  size: 20,
-                                  color: cs.onSurfaceVariant.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ],
                           ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-          if (showVariants && variantsHint != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: variantsHint!,
-            ),
-        ],
-      ),
+        ),
+        if (showVariants && variantsHint != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _controlInset),
+            child: variantsHint!,
+          ),
+      ],
     );
   }
 }
@@ -240,12 +250,14 @@ class _CelebrationSelectionSurface extends StatelessWidget {
     final theme = Theme.of(context);
     final ink = theme.colorScheme.onSurface;
     final dark = theme.brightness == Brightness.dark;
-    final radius = BorderRadius.circular(16);
+    final radius = BorderRadius.circular(14);
     return Semantics(
       button: true,
       label: semanticsLabel,
       child: Material(
         color: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: radius),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           key: Key('$keyPrefix-alternatives-control'),
           onTap: onTap,
@@ -267,7 +279,6 @@ class _CelebrationSelectionSurface extends StatelessWidget {
               color: ink.withValues(alpha: dark ? 0.035 : 0.025),
               borderRadius: radius,
             ),
-            padding: const EdgeInsets.symmetric(vertical: 7),
             child: child,
           ),
         ),
