@@ -59,9 +59,9 @@ class HomeScreen extends ConsumerWidget {
                       constraints: const BoxConstraints(maxWidth: 720),
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(
-                          22,
+                          14,
                           top + 8,
-                          22,
+                          14,
                           116 + MediaQuery.viewPaddingOf(context).bottom,
                         ),
                         child: Column(
@@ -89,10 +89,14 @@ class HomeScreen extends ConsumerWidget {
                             // interactive day and the list of Hours.
                             const SizedBox(height: 24),
                             if (selection.selected != null) ...[
-                              _HoursList(
-                                date: date,
-                                selection: selection,
-                                color: seasonColor,
+                              // Keep Hour rows at their original 22 dp inset.
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: _HoursList(
+                                  date: date,
+                                  selection: selection,
+                                  color: seasonColor,
+                                ),
                               ),
                             ] else if (loading) ...[
                               const _HoursLoading(),
