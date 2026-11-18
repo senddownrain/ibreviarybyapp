@@ -292,23 +292,7 @@ String? feedbackLocationForMenuUri(Uri uri) {
   return feedbackLocation(kind: 'other', title: title);
 }
 
-final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}
-
-/// Returns a Belarusian error text or null when valid.
-String? validateFeedbackBody(String value) {
-  final t = value.trim();
-  if (t.length < kFeedbackMinLength) return 'Напішыце хаця б некалькі слоў.';
-  if (t.length > kFeedbackMaxLength)
-    return 'Занадта доўга (максімум $kFeedbackMaxLength).';
-  return null;
-}
-
-String? validateFeedbackEmail(String value) {
-  final t = value.trim();
-  if (t.isEmpty) return null;
-  return t.length <= 254 && _email.hasMatch(t) ? null : 'Праверце адрас email.';
-}
-);
+final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
 
 /// Returns a Belarusian error text or null when valid.
 String? validateFeedbackBody(String value) {
