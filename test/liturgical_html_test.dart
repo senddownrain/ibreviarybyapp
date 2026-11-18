@@ -90,7 +90,7 @@ void main() {
     test('soft wrap stays within stanza; later cadence creates new choir stanza', () {
       const source =
           '<p>Першы радок * другая палова<br>працяг без кадэнцыі<br>'
-          'Новы радок † другая палова<br>'
+          'Новы радок † працяг * другая палова<br>'
           'Яшчэ адзін радок * завяршэнне.</p>';
       final result = formatPsalmHtml(source);
 
