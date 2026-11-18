@@ -73,6 +73,27 @@ void main() {
       (call) async => <String>['wifi'],
     );
     GoogleFonts.config.allowRuntimeFetching = false;
+    // Widget tests otherwise substitute Ahem squares for Android's Roboto:
+    // load a real installed sans font so Belarusian chrome can be reviewed.
+    if (Platform.isLinux) {
+      const candidates = [
+        '/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF/Roboto-Regular.ttf',
+        '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+        '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf',
+      ];
+      final path = candidates.firstWhere(
+        (candidate) => File(candidate).existsSync(),
+        orElse: () => '',
+      );
+      if (path.isEmpty) {
+        throw StateError('No installed Cyrillic sans font for visual QA');
+      }
+      await (FontLoader('Roboto')
+            ..addFont(Future.value(
+              File(path).readAsBytesSync().buffer.asByteData(),
+            )))
+          .load();
+    }
     for (final (family, asset) in [
       ('VisualPreview', 'assets/google_fonts/Literata-Regular.ttf'),
       (
@@ -109,10 +130,15 @@ void main() {
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: buildAppTheme(
-              AppPalette.scheme(Brightness.dark),
-              preference: AppThemePreference.dark,
-            ),
+            theme: (() {
+              final theme = buildAppTheme(
+                AppPalette.scheme(Brightness.dark),
+                preference: AppThemePreference.dark,
+              );
+              return theme.copyWith(
+                textTheme: theme.textTheme.apply(fontFamily: 'Roboto'),
+              );
+            })(),
             home: Scaffold(
               appBar: AppBar(title: const Text('Налады')),
               body: const SettingsScreen(),
