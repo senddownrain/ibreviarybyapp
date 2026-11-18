@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_steps.dart';
 import 'package:mybrev_flutter/providers/liturgical_day_presentation_provider.dart';
 import 'package:mybrev_flutter/widgets/liturgical_day_header.dart';
 
@@ -242,6 +243,15 @@ void main() {
     final action = find.byKey(const Key('readings-alternatives-control'));
     final metadata = find.byKey(const Key('readings-day-metadata'));
     expect(action, findsOneWidget);
+    final tourVariants = defaultTourSteps.singleWhere(
+      (step) => step.id == 'tour.variants',
+    );
+    expect(
+      tourVariants.anchors.any(
+        (anchor) => anchor.test('readings-alternatives-control'),
+      ),
+      isTrue,
+    );
     expect(tester.getTopLeft(action).dy,
         greaterThan(tester.getBottomLeft(metadata).dy));
     expect(tester.takeException(), isNull);
