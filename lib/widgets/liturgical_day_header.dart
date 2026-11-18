@@ -99,7 +99,14 @@ class LiturgicalDayHeader extends StatelessWidget {
           ),
           ?dateHint,
           const SizedBox(height: 12),
-          _CelebrationSelectionSurface(
+          // Let only the contextual celebration surface reach 8 dp
+          // beyond the normal 22 dp page inset. The date and section title
+          // keep their established alignment and typography.
+          OverflowBox(
+            alignment: Alignment.center,
+            minWidth: constraints.maxWidth + 16,
+            maxWidth: constraints.maxWidth + 16,
+            child: _CelebrationSelectionSurface(
             keyPrefix: keyPrefix,
             enabled: showVariants,
             onTap: onVariants,
@@ -138,7 +145,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                         LiturgicalHeadingText(
                           p.title,
                           key: Key('$keyPrefix-celebration-title'),
-                          maxWidth: constraints.maxWidth - 18,
+                          maxWidth: constraints.maxWidth - 18 + 16,
                           style: ReaderTheme.of(context)
                               .displayTitle(29)
                               .copyWith(color: cs.onSurface, height: 1.18),
@@ -175,11 +182,16 @@ class LiturgicalDayHeader extends StatelessWidget {
                               const SizedBox(width: 12),
                               // Not a separate button: the entire celebration
                               // surface opens the variants selector.
-                              Icon(
-                                Icons.edit_outlined,
-                                key: Key('$keyPrefix-celebration-edit-icon'),
-                                size: 19,
-                                color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                              Padding(
+                                // The pencil is a hint, not a separate button.
+                                // Keep it clear of the wider surface's edge.
+                                padding: const EdgeInsets.only(right: 9),
+                                child: Icon(
+                                  Icons.edit_outlined,
+                                  key: Key('$keyPrefix-celebration-edit-icon'),
+                                  size: 20,
+                                  color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                                ),
                               ),
                             ],
                           ],
@@ -189,6 +201,7 @@ class LiturgicalDayHeader extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
             ),
           ),
           if (showVariants) ...[
