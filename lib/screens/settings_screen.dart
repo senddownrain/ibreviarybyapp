@@ -314,6 +314,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                 const PsalmodySettingsSection(),
                 const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
                 Text(
                   'Стартовы раздзел',
                   style: Theme.of(context).textTheme.titleMedium,
