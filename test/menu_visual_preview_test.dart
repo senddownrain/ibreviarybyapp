@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -102,5 +103,91 @@ void main() {
         await capture('font-sheet');
       });
     }
+  }
+
+  for (final width in [320.0, 390.0]) {
+    testWidgets('roomy overflow with error action at ${width.toInt()} dp', (
+      tester,
+    ) async {
+      final height = width == 320 ? 720.0 : 844.0;
+      tester.view.physicalSize = Size(width, height);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final router = GoRouter(
+        initialLocation: '/hours/ora/2026-11-18/day-1/laudes',
+        routes: [
+          GoRoute(
+            path: '/hours/ora/:date/:dayId/:type',
+            builder: (context, state) => const ReaderScaffold(
+              showPsalmody: true,
+              contextHeader: ReaderContextHeader(
+                eyebrow: 'ЛІТУРГІЯ ГАДЗІНАЎ',
+                title: 'Ютрань',
+              ),
+              content: Text(
+                'Пане, пачуй маю малітву *\n'
+                'і няхай мой кліч дойдзе да Цябе.',
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/settings/feedback',
+            builder: (context, state) =>
+                const Scaffold(body: Text('Зваротная сувязь')),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [settingsProvider.overrideWith(_PreviewSettings.new)],
+          child: RepaintBoundary(
+            key: const Key('menu-report-capture'),
+            child: MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+              theme: ThemeData(
+                platform: TargetPlatform.android,
+                brightness: Brightness.dark,
+                fontFamily: 'PreviewText',
+              ),
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  padding: const EdgeInsets.only(top: 44, bottom: 34),
+                  viewPadding: const EdgeInsets.only(top: 44, bottom: 34),
+                ),
+                child: child!,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(const Key('app-overflow-open')));
+      await tester.pumpAndSettle();
+      expect(find.text('Памылка'), findsOneWidget);
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+      final menuWidth = tester
+          .getSize(find.byKey(const Key('app-overflow-content')))
+          .width;
+      expect(menuWidth, greaterThanOrEqualTo(width * 0.78));
+      expect(menuWidth, lessThanOrEqualTo(360));
+      expect(tester.takeException(), isNull);
+      if (Platform.environment['OVERFLOW_MENU_IMAGES'] == '1') {
+        final boundary = tester.renderObject<RenderRepaintBoundary>(
+          find.byKey(const Key('menu-report-capture')),
+        );
+        await tester.runAsync(() async {
+          final image = await boundary.toImage(pixelRatio: 2);
+          final data = await image.toByteData(format: ui.ImageByteFormat.png);
+          final directory = Directory('build/overflow-menu-preview')
+            ..createSync(recursive: true);
+          File(
+            '${directory.path}/android-dark-${width.toInt()}-report.png',
+          ).writeAsBytesSync(data!.buffer.asUint8List());
+          image.dispose();
+        });
+      }
+    });
   }
 }
