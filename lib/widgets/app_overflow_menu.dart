@@ -66,10 +66,14 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     // still knows the keyboard and the full display's safe area.
     final media = MediaQuery.of(navigator.overlay!.context);
     final textScale = media.textScaler.scale(1);
-    // Smaller than the former 360 dp popup; responsive for large text.
+    // Match a roomy, native-style overflow: around 80% of a phone screen,
+    // with sensible limits for narrow displays, tablets and large text.
     final width = math.min(
-      math.max(216.0, 200.0 * textScale),
       media.size.width - 24,
+      math.max(
+        280.0,
+        math.min(360.0, media.size.width * 0.80 + (textScale - 1) * 24),
+      ),
     );
     final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
     final bottom =
@@ -88,7 +92,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     final reportLocation =
         router == null || actions.any((a) => a.label == kReportErrorLabel)
         ? null
-        : feedbackLocationForUri(_visibleUri(router));
+        : feedbackLocationForMenuUri(_visibleUri(router));
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
