@@ -1,0 +1,105 @@
+name: Refresh existing PR117 bundle from approved public sources
+
+on:
+  push:
+    branches:
+      - prepare/final-test-candidate
+    paths:
+      - scripts/refresh_final_test_candidate_20261118.mjs
+      - .github/workflows/refresh-pr117-offline.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: final-pr117-offline-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout existing candidate; no new bundle branch
+        uses: actions/checkout@v4
+        with:
+          ref: prepare/final-test-candidate
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Merge latest Flutter main without discarding existing candidate
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git merge --no-edit origin/main
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect script syntax
+        run: node --check scripts/refresh_final_test_candidate_20261118.mjs
+      - name: Checkout approved Web sources (public, no Firebase credentials)
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/senddownrain/mybrev.git ../mybrev
+          git -C ../mybrev fetch --depth 1 origin content/four-devotions-2026-11-18
+          git -C ../mybrev cat-file -e 1b4d121329f46a302fa30f064b4b3ec06ee7b3da^{commit}
+          cd ../mybrev
+          npm ci --ignore-scripts
+      - name: Download public Hosting catalog only (never Firestore)
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error \
+            https://ibreviaryby.web.app/public-prayers-v1.json \
+            --output "$RUNNER_TEMP/public-prayers-v1.json"
+          test -s "$RUNNER_TEMP/public-prayers-v1.json"
+          sha256sum "$RUNNER_TEMP/public-prayers-v1.json"
+      - name: Update only existing PR117 assets and local report
+        run: |
+          node scripts/refresh_final_test_candidate_20261118.mjs \
+            --web ../mybrev --catalog "$RUNNER_TEMP/public-prayers-v1.json" \
+            --assets assets/content
+          node scripts/refresh_final_test_candidate_20261118.mjs \
+            --web ../mybrev --catalog "$RUNNER_TEMP/public-prayers-v1.json" \
+            --assets assets/content --check
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.4
+          cache: true
+      - name: Verify offline content, updaters, calendar and current reader
+        run: |
+          flutter pub get --enforce-lockfile
+          flutter test test/content_offline_test.dart test/ordo_content_update_test.dart \
+            test/bundled_manifest_floor_test.dart test/pr255_bundle_update_test.dart
+          flutter analyze --no-fatal-infos
+      - name: Enforce exact data-file write scope
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          files=subprocess.check_output(
+              ['git','diff','--name-only'],text=True
+          ).splitlines()
+          allowed={
+              'assets/content/prayers.json.gz',
+              'assets/content/prayerCategories.json.gz',
+              'assets/content/liturgicalCelebrations.json.gz',
+              'assets/content/liturgicalCalendarMeta.json.gz',
+              'assets/content/manifest.json'
+          }
+          assert set(files)==allowed, ('Unexpected output/missing changed file',files)
+          print('Exact scope:',files)
+          PY
+      - name: Commit into the SAME PR117 branch only
+        run: |
+          set -euo pipefail
+          git add assets/content/prayers.json.gz \
+            assets/content/prayerCategories.json.gz \
+            assets/content/liturgicalCelebrations.json.gz \
+            assets/content/liturgicalCalendarMeta.json.gz \
+            assets/content/manifest.json \
+            docs/release/final-test/nov18-refresh-report.json
+          git commit -m "Refresh PR117 offline bundle: four devotions, canonical sources, white basilicas/calendar6"
+          git push origin HEAD:refs/heads/prepare/final-test-candidate
