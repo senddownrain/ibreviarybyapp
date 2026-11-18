@@ -50,6 +50,19 @@ jobs:
             build/ui_acceptance/*.png
             build/liturgy_smoke/reader-acceptance-03-readings-end.png
           if-no-files-found: warn
+      - name: Adaptive overflow menu screenshots and report routes
+        env:
+          OVERFLOW_MENU_IMAGES: '1'
+        run: |
+          flutter test test/menu_visual_preview_test.dart
+          flutter test test/feedback/overflow_report_test.dart
+      - name: Archive adaptive overflow screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-overflow-menu-320-390
+          path: build/overflow-menu-preview/*.png
+          if-no-files-found: warn
       - name: Reader UI, layout and offline font regressions
         run: >-
           flutter test

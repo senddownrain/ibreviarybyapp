@@ -267,6 +267,31 @@ String? feedbackLocationForUri(Uri uri) {
   return null;
 }
 
+/// Menu-level feedback is available on lists and section roots too.
+/// A material keeps its precise validated ID, date and hour; other screens
+/// get only a public section name, never unvalidated route/query details.
+String? feedbackLocationForMenuUri(Uri uri) {
+  if (uri.path == '/settings/feedback') return null;
+  final material = feedbackLocationForUri(uri);
+  if (material != null) return material;
+  final parts = uri.pathSegments.where((part) => part.isNotEmpty).toList();
+  final section = parts.isEmpty ? '' : parts.first;
+  final title = switch (section) {
+    'hours' => parts.length > 1 && parts[1] == 'ordo'
+        ? 'Літургічны каляндар'
+        : 'Літургія гадзінаў',
+    'readings' || 'reading' => 'Чытанні',
+    'prayers' => parts.length > 1 && parts[1] == 'compendium'
+        ? 'Кампендый Катэхізіса'
+        : 'Малітоўнік',
+    'bible' => 'Біблія',
+    'settings' => 'Налады',
+    'about' => 'Інфармацыя',
+    _ => 'Праграма',
+  };
+  return feedbackLocation(kind: 'other', title: title);
+}
+
 final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
 
 /// Returns a Belarusian error text or null when valid.

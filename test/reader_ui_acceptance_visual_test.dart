@@ -212,7 +212,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('compact reading and prayer menus', (tester) async {
+  testWidgets('roomy reading and prayer menus', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -242,7 +242,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
-        lessThanOrEqualTo(216),
+        inInclusiveRange(280, 360),
       );
       expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
       expect(find.text('Катэгорыі'), findsNothing);
