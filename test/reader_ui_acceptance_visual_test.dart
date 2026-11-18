@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:mybrev_flutter/main.dart' show buildAppTheme;
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -14,6 +15,7 @@ import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/ib_colors.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
 import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
@@ -73,6 +75,13 @@ void main() {
       (call) async => <String>['wifi'],
     );
     GoogleFonts.config.allowRuntimeFetching = false;
+    PackageInfo.setMockInitialValues(
+      appName: 'Малітоўнік',
+      packageName: 'com.prayerbook.app',
+      version: '1.0.0',
+      buildNumber: '23',
+      buildSignature: '',
+    );
     // Widget tests otherwise substitute Ahem squares for Android's Roboto:
     // load a real installed sans font so Belarusian chrome can be reviewed.
     if (Platform.isLinux) {
@@ -127,6 +136,12 @@ void main() {
         child: ProviderScope(
           overrides: [
             settingsProvider.overrideWith(_DarkVisualSettings.new),
+            // Screenshot test: keep uninitialized device services from
+            // showing errors unrelated to the settings under review.
+            priestAccessProvider.overrideWith((ref) => PriestAccessController(
+              ref.read(priestAccessGatewayProvider),
+              ref.read(priestAccessStorageProvider),
+            )),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -245,6 +260,7 @@ void main() {
     expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
     expect(find.text('Пра дадатак, крыніцы і правы'), findsOneWidget);
     expect(find.byKey(const Key('settings-version')), findsOneWidget);
+    expect(find.text('Версія 1.0.0'), findsOneWidget);
     await _capture(tester, '03-settings-info-footer');
     expect(tester.takeException(), isNull);
   });
