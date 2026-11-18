@@ -43,7 +43,6 @@ class LiturgicalDayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = presentation;
     final cs = Theme.of(context).colorScheme;
-    final ink = cs.onSurface;
     // Reading-year metadata is supplied explicitly by ReadingsScreen. Do not
     // repeat the psalter week here: it belongs inside the individual Hour.
     final metadataSuffix = (metadata ?? '')
@@ -140,68 +139,74 @@ class LiturgicalDayHeader extends StatelessWidget {
                             .copyWith(color: cs.onSurface, height: 1.18),
                       ),
                       const SizedBox(height: 8),
-                      Text.rich(
-                        key: Key('$keyPrefix-day-metadata'),
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: emphasizedMetadata,
-                              style: Theme.of(context).textTheme.titleMedium
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text.rich(
+                              key: Key('$keyPrefix-day-metadata'),
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: emphasizedMetadata,
+                                    style: Theme.of(context).textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: cs.onSurface,
+                                        ),
+                                  ),
+                                  TextSpan(text: metadataTail),
+                                ],
+                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: cs.onSurface,
+                                    fontSize: 14.5,
+                                    color: cs.onSurfaceVariant,
                                   ),
                             ),
-                            TextSpan(text: metadataTail),
+                          ),
+                          if (showVariants) ...[
+                            const SizedBox(width: 8),
+                            OutlinedButton.icon(
+                              key: Key('$keyPrefix-alternatives-control'),
+                              onPressed: onVariants,
+                              icon: const Icon(Icons.layers_outlined, size: 16),
+                              label: const Text('Варыянты'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: cs.onSurfaceVariant,
+                                backgroundColor: cs.onSurface.withValues(
+                                  alpha: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? 0.055
+                                      : 0.035,
+                                ),
+                                side: BorderSide(
+                                  color: cs.outlineVariant.withValues(alpha: 0.55),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(11),
+                                ),
+                                textStyle: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                minimumSize: const Size(0, 44),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ),
                           ],
-                        ),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 14.5,
-                          color: cs.onSurfaceVariant,
-                        ),
+                        ],
                       ),
-
+                      ?variantsHint,
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          if (showVariants) ...[
-            const SizedBox(height: 8),
-            TextButton(
-              key: Key('$keyPrefix-alternatives-control'),
-              style: TextButton.styleFrom(
-                foregroundColor: ink,
-                // A quiet affordance, not a second prominent filled card.
-                backgroundColor: cs.onSurface.withValues(
-                  alpha: Theme.of(context).brightness == Brightness.dark
-                      ? 0.035
-                      : 0.018,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-                minimumSize: const Size(48, 48),
-              ),
-              onPressed: onVariants,
-              child: Row(
-                children: [
-                  Icon(Icons.layers_outlined, size: 18, color: cs.onSurfaceVariant),
-                  const SizedBox(width: 8),
-                  const Expanded(child: Text('Іншыя варыянты')),
-                  Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
-                ],
-              ),
-            ),
-            ?variantsHint,
-          ],
+
         ],
       ),
     );
