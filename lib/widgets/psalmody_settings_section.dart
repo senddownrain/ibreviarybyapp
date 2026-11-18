@@ -44,15 +44,16 @@ class _PsalmodySettingsSectionState
           builder: (context, constraints) {
             final title = Text(
               'Псальмодыя',
-              style: Theme.of(context).textTheme.titleSmall,
+              style: Theme.of(context).textTheme.titleMedium,
             );
             final selector = PsalmodyModeSelector(
               key: const Key('settings-psalmody-mode'),
               value: settings.psalmodyMode,
               onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
             );
-            // Keep the three modes next to the title on narrow phones.
-            // Only stack for very small available widths or enlarged text.
+            // Keep heading and three accessible 48dp actions on one row.
+            // For exceptionally narrow layouts or enlarged system text,
+            // stack rather than truncate the section heading.
             final inline =
                 constraints.maxWidth >= 254 &&
                 MediaQuery.textScalerOf(context).scale(1) <= 1.3;
@@ -72,26 +73,34 @@ class _PsalmodySettingsSectionState
           },
         ),
         const SizedBox(height: 16),
-        PsalmodyScope(
-          controller: _choir,
-          mode: settings.psalmodyMode,
-          child: IgnorePointer(
-            child: PsalmChoirHtml(
-              key: const Key('settings-psalmody-preview'),
-              html: formatPsalmHtml(_previewHtml),
-              style: {
-                'body': Style(
-                  fontFamily: body.fontFamily,
-                  fontSize: FontSize(body.fontSize ?? 16),
-                  color: body.color,
-                  lineHeight: LineHeight(body.height ?? ReaderTheme.bodyHeight),
-                  margin: Margins.zero,
-                  padding: HtmlPaddings.zero,
-                ),
-                'p': Style(margin: Margins.only(bottom: 8)),
-              },
-              textColor: reader.ink,
-              rubricColor: reader.rubric,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: PsalmodyScope(
+            controller: _choir,
+            mode: settings.psalmodyMode,
+            child: IgnorePointer(
+              child: PsalmChoirHtml(
+                key: const Key('settings-psalmody-preview'),
+                html: formatPsalmHtml(_previewHtml),
+                style: {
+                  'body': Style(
+                    fontFamily: body.fontFamily,
+                    fontSize: FontSize(body.fontSize ?? 16),
+                    color: body.color,
+                    lineHeight: LineHeight(body.height ?? ReaderTheme.bodyHeight),
+                    margin: Margins.zero,
+                    padding: HtmlPaddings.zero,
+                  ),
+                  'p': Style(margin: Margins.only(bottom: 8)),
+                },
+                textColor: reader.ink,
+                rubricColor: reader.rubric,
+              ),
             ),
           ),
         ),
