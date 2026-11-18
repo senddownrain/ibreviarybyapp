@@ -18,7 +18,7 @@ void main() {
     final root = parseFragment(result);
     final verses = root.querySelectorAll('.psalm-strophe');
     expect(verses, hasLength(2));
-    expect(verses.first.text.trim().startsWith('† далей паём'), isTrue);
+    expect(verses.first.text.trim().replaceAll('\u00a0', ' ').startsWith('† далей паём'), isTrue);
     expect(verses.first.querySelector('.psalm-opening-flexa'), isNotNull);
     expect(verses.first.text, isNot(contains('Слава нашаму Пану')));
     expect(verses.last.text, contains('Наступная страфа'));
@@ -80,7 +80,7 @@ void main() {
       final lines = parseFragment(
         preparePsalmChoirHtml(rendered, mode: mode),
       ).querySelectorAll('.psalm-line');
-      expect(lines.first.text.trim().startsWith('† працяг першай'), isTrue);
+      expect(lines.first.text.trim().replaceAll('\u00a0', ' ').startsWith('† працяг першай'), isTrue);
       expect(lines.first.querySelector('.psalm-opening-flexa'), isNotNull);
       expect(lines[1].text.trim(), 'канец.');
       expect(lines[2].text.trim(), 'Іншы верш †');
