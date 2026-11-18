@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mybrev_flutter/main.dart' show buildAppTheme;
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
@@ -16,6 +17,13 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/settings_screen.dart';
 import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
+
+class _DarkVisualSettings extends _VisualSettings {
+  @override
+  SettingsState build() => const SettingsState(
+    themePreference: AppThemePreference.dark,
+  );
+}
 
 class _VisualSettings extends SettingsNotifier {
   @override
@@ -65,6 +73,27 @@ void main() {
       (call) async => <String>['wifi'],
     );
     GoogleFonts.config.allowRuntimeFetching = false;
+    // Widget tests otherwise substitute Ahem squares for Android's Roboto:
+    // load a real installed sans font so Belarusian chrome can be reviewed.
+    if (Platform.isLinux) {
+      const candidates = [
+        '/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF/Roboto-Regular.ttf',
+        '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+        '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf',
+      ];
+      final path = candidates.firstWhere(
+        (candidate) => File(candidate).existsSync(),
+        orElse: () => '',
+      );
+      if (path.isEmpty) {
+        throw StateError('No installed Cyrillic sans font for visual QA');
+      }
+      await (FontLoader('Roboto')
+            ..addFont(Future.value(
+              File(path).readAsBytesSync().buffer.asByteData(),
+            )))
+          .load();
+    }
     for (final (family, asset) in [
       ('VisualPreview', 'assets/google_fonts/Literata-Regular.ttf'),
       (
@@ -96,16 +125,24 @@ void main() {
       RepaintBoundary(
         key: const Key('reader-acceptance-capture'),
         child: ProviderScope(
-          overrides: [settingsProvider.overrideWith(_VisualSettings.new)],
+          overrides: [
+            settingsProvider.overrideWith(_DarkVisualSettings.new),
+          ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              useMaterial3: true,
-              colorScheme: AppPalette.marianScheme,
-              extensions: const [IbColors.marian],
-              fontFamily: 'VisualPreview',
+            theme: (() {
+              final theme = buildAppTheme(
+                AppPalette.scheme(Brightness.dark),
+                preference: AppThemePreference.dark,
+              );
+              return theme.copyWith(
+                textTheme: theme.textTheme.apply(fontFamily: 'Roboto'),
+              );
+            })(),
+            home: Scaffold(
+              appBar: AppBar(title: const Text('Налады')),
+              body: const SettingsScreen(),
             ),
-            home: const Scaffold(body: SettingsScreen()),
           ),
         ),
       ),
@@ -116,9 +153,19 @@ void main() {
     expect(find.byTooltip('Па левым краі'), findsOneWidget);
     expect(find.byTooltip('Па шырыні'), findsOneWidget);
     expect(find.text('Прыклад'), findsNothing);
+    // Top-level sections share the same production chrome typography.
+    final sectionSize = tester.widget<Text>(find.text('Тэкст')).style?.fontSize;
+    expect(
+      tester.widget<Text>(find.text('Псальмодыя')).style?.fontSize,
+      sectionSize,
+    );
+    expect(
+      tester.widget<Text>(find.text('Стартовы раздзел')).style?.fontSize,
+      sectionSize,
+    );
     await Scrollable.ensureVisible(
-      tester.element(find.byKey(const Key('settings-reader-font'))),
-      alignment: 0.10,
+      tester.element(find.text('Тэкст')),
+      alignment: 0.06,
     );
     await tester.pumpAndSettle();
     await _capture(tester, '01-text-settings');
