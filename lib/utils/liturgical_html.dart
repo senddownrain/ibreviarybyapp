@@ -526,7 +526,7 @@ String preparePsalmChoirHtml(
       // In the continuous mode bind them with a non-breaking space.
       for (final marker in fragment.querySelectorAll('.psalm-marker')) {
         if (marker.text.trim() != '†') continue;
-        final siblings = marker.parent?.nodes;
+        final siblings = marker.parentNode?.nodes;
         if (siblings == null) continue;
         final index = siblings.indexOf(marker);
         if (index + 1 < siblings.length && siblings[index + 1] is dom.Text) {
