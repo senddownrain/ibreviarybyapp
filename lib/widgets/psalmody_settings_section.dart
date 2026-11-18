@@ -44,18 +44,18 @@ class _PsalmodySettingsSectionState
           builder: (context, constraints) {
             final title = Text(
               'Псальмодыя',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleSmall,
             );
             final selector = PsalmodyModeSelector(
               key: const Key('settings-psalmody-mode'),
               value: settings.psalmodyMode,
               onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
             );
-            // Keep heading and three accessible 48dp actions on one row.
-            // For exceptionally narrow layouts or enlarged system text,
-            // stack rather than truncate the section heading.
+            // Match the text-alignment control: shared 48dp height, 22dp icon
+            // scale, and a fully rounded segmented outline. Stack only
+            // when the label or controls would be cramped.
             final inline =
-                constraints.maxWidth >= 254 &&
+                constraints.maxWidth >= 260 &&
                 MediaQuery.textScalerOf(context).scale(1) <= 1.3;
             if (!inline) {
               return Column(
