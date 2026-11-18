@@ -234,10 +234,21 @@ class _CelebrationSelectionSurface extends StatelessWidget {
           key: Key('$keyPrefix-alternatives-control'),
           onTap: onTap,
           borderRadius: radius,
-          overlayColor: WidgetStatePropertyAll(ink.withValues(alpha: 0.055)),
+          // Make the entire day respond to a press, without turning the
+          // reading-style heading into a prominent outlined button.
+          overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return ink.withValues(alpha: 0.08);
+            }
+            if (states.contains(WidgetState.focused) ||
+                states.contains(WidgetState.hovered)) {
+              return ink.withValues(alpha: 0.04);
+            }
+            return null;
+          }),
           child: Ink(
             decoration: BoxDecoration(
-              color: ink.withValues(alpha: dark ? 0.018 : 0.010),
+              color: ink.withValues(alpha: dark ? 0.035 : 0.025),
               borderRadius: radius,
             ),
             padding: const EdgeInsets.symmetric(vertical: 7),
