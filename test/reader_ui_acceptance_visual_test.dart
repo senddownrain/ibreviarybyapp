@@ -153,6 +153,23 @@ void main() {
     expect(find.byTooltip('Па левым краі'), findsOneWidget);
     expect(find.byTooltip('Па шырыні'), findsOneWidget);
     expect(find.text('Прыклад'), findsNothing);
+    // Keep onboarding, rating controls and administrator login out of public
+    // settings without breaking feedback and priest-device activation.
+    for (final key in [
+      'settings-hints-enabled',
+      'settings-tour-start',
+      'settings-hints-reset',
+      'settings-rate-app',
+      'settings-review-optout',
+      'settings-admin-login',
+    ]) {
+      expect(find.byKey(Key(key)), findsNothing);
+    }
+    expect(find.text('Падказкі'), findsNothing);
+    expect(find.text('Адміністрацыйны доступ'), findsNothing);
+    expect(find.byKey(const Key('settings-feedback')), findsOneWidget);
+    expect(find.text('Пытанні і прапановы'), findsOneWidget);
+    expect(find.text('Доступ для святароў'), findsOneWidget);
     // Top-level sections share the same production chrome typography.
     final sectionSize = tester.widget<Text>(find.text('Тэкст')).style?.fontSize;
     expect(
