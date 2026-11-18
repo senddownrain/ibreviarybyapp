@@ -152,7 +152,7 @@ class PrayerPagesNote extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(top: topSpacing),
       child: Text(
-        'Старонкі: $value',
+        value,
         key: const Key('prayer-pages'),
         style: textStyle.copyWith(
           fontSize: ((textStyle.fontSize ?? 16) * 0.75)
