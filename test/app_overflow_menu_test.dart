@@ -38,8 +38,13 @@ void main() {
     await openMenu(tester);
     expect(find.text('Шрыфт'), findsOneWidget);
     expect(find.text('100%'), findsOneWidget);
-    expect(find.byKey(const Key('text-scale-inline-decrease')), findsOneWidget);
-    expect(find.byKey(const Key('text-scale-inline-increase')), findsOneWidget);
+    final fontLabel = tester.getCenter(find.text('Шрыфт'));
+    expect(tester.getCenter(find.text('100%')).dy, greaterThan(fontLabel.dy));
+    expect(tester.getCenter(find.text('A−')).dx, greaterThan(fontLabel.dx));
+    expect(
+      tester.getCenter(find.text('A+')).dx,
+      greaterThan(tester.getCenter(find.text('A−')).dx),
+    );
     expect(find.byType(Slider), findsNothing);
     expect(find.byType(PsalmodyModeSelector), findsNothing);
     expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);

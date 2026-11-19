@@ -237,8 +237,6 @@ class _OverflowContent extends StatelessWidget {
     ),
   );
 
-  // Keep the font control on a single, quiet row with two 44dp targets.
-  // The separate sheet has no role in the shared reader popup anymore.
   Widget _fontSizeRow() => Consumer(
     builder: (context, ref, _) {
       final fontSize = ref.watch(
@@ -255,10 +253,9 @@ class _OverflowContent extends StatelessWidget {
             const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
             const SizedBox(width: 10),
             Expanded(
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 0,
-                crossAxisAlignment: WrapCrossAlignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Шрыфт',
@@ -276,46 +273,28 @@ class _OverflowContent extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: cs.outlineVariant.withValues(alpha: 0.75),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _fontSizeButton(
-                    key: const Key('text-scale-inline-decrease'),
-                    label: 'Паменшыць шрыфт',
-                    fontSize: 15,
-                    onPressed: fontSize > kMinReaderFontSize + 0.01
-                        ? () {
-                            HapticFeedback.selectionClick();
-                            notifier.decreaseFontSize();
-                          }
-                        : null,
-                  ),
-                  Container(
-                    height: 23,
-                    width: 1,
-                    color: cs.outlineVariant.withValues(alpha: 0.7),
-                  ),
-                  _fontSizeButton(
-                    key: const Key('text-scale-inline-increase'),
-                    label: 'Павялічыць шрыфт',
-                    fontSize: 20,
-                    onPressed: fontSize < kMaxReaderFontSize - 0.01
-                        ? () {
-                            HapticFeedback.selectionClick();
-                            notifier.increaseFontSize();
-                          }
-                        : null,
-                  ),
-                ],
-              ),
+            _fontSizeButton(
+              key: const Key('text-scale-inline-decrease'),
+              label: 'Паменшыць шрыфт',
+              text: 'A−',
+              onPressed: fontSize > kMinReaderFontSize + 0.01
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      notifier.decreaseFontSize();
+                    }
+                  : null,
+            ),
+            const SizedBox(width: 6),
+            _fontSizeButton(
+              key: const Key('text-scale-inline-increase'),
+              label: 'Павялічыць шрыфт',
+              text: 'A+',
+              onPressed: fontSize < kMaxReaderFontSize - 0.01
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      notifier.increaseFontSize();
+                    }
+                  : null,
             ),
           ],
         ),
@@ -326,19 +305,24 @@ class _OverflowContent extends StatelessWidget {
   Widget _fontSizeButton({
     required Key key,
     required String label,
-    required double fontSize,
+    required String text,
     required VoidCallback? onPressed,
-  }) => IconButton(
+  }) => IconButton.outlined(
     key: key,
     tooltip: label,
     onPressed: onPressed,
-    icon: Text(
-      'A',
-      textScaler: TextScaler.noScaling,
-      style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
+    style: IconButton.styleFrom(
+      minimumSize: const Size.square(44),
+      fixedSize: const Size.square(44),
+      padding: EdgeInsets.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.standard,
     ),
-    padding: EdgeInsets.zero,
-    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+    icon: Text(
+      text,
+      textScaler: TextScaler.noScaling,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+    ),
   );
 
   Widget _item(String label, IconData icon, String value) => ListTile(
