@@ -45,8 +45,9 @@ class LiturgicalDay {
       id: data['id']?.toString() ?? data['_id']?.toString() ?? '',
       title: _asString(data['title']) ?? _asString(data['_title']),
       feastName: _asString(data['feastName']) ?? _asString(data['_feastName']),
-      feastComment:
-          _asString(data['feastComment']) ?? _asString(data['comment']),
+      feastComment: _asFeastComment(
+        data['feastComment'] ?? data['comment'],
+      ),
       periodType: _asString(data['_periodType']),
       periodWeekNumber: _asInt(data['_periodWeekNumber']),
       dayOfWeek: _asInt(data['_dayOfWeek']),
@@ -58,6 +59,54 @@ class LiturgicalDay {
   }
 
   Map<String, dynamic> toMap() => {..._raw, 'id': id};
+
+  /// A rank label repeated in the comment field is calendar metadata, not
+  /// an authored note. Keep substantive comments (even one-word comments).
+  static String? _asFeastComment(dynamic value) {
+    final text = _asString(value)?.trim();
+    if (text == null || text.isEmpty) return null;
+
+    final plainText = text
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll(
+          RegExp(r'&(?:nbsp|#160|#x0*a0);', caseSensitive: false),
+          ' ',
+        )
+        .replaceAll(RegExp(r'\\s+'), ' ')
+        .trim()
+        .replaceAll(RegExp(r'[.!]+
+    if (v == null) return null;
+    if (v is String) return v;
+    return v.toString();
+  }
+
+  static int? _asInt(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v);
+    return null;
+  }
+}
+), '')
+        .trim()
+        .toLowerCase();
+
+    const rankOnlyComments = {
+      'урачыстасць',
+      'ўрачыстасць',
+      'solemnitas',
+      'solemnity',
+      'свята',
+      'festum',
+      'feast',
+      'успамін',
+      'memoria',
+      'неабавязковы ўспамін',
+      'memoria ad libitum',
+    };
+    return rankOnlyComments.contains(plainText) ? null : text;
+  }
 
   static String? _asString(dynamic v) {
     if (v == null) return null;
