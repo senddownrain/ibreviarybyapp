@@ -113,6 +113,30 @@ const kPublicSourceBibliography = <SourceBibliographyItem>[
     notices: ['© Выдавецтва Гродзенскай дыяцэзіі, 2014'],
   ),
   SourceBibliographyItem(
+    id: 'roman-missal-english',
+    section: 'Касцёльныя крыніцы',
+    title: 'The Roman Missal — English translation (2010); Order of Mass compilation (2011)',
+    details: ['www.missal.org.uk'],
+    notices: [
+      '© 2010, International Commission on English in the Liturgy Corporation. All rights reserved.',
+      'Compilation & layout © 2011 Catholic Bishops’ Conference of England and Wales.',
+    ],
+  ),
+  SourceBibliographyItem(
+    id: 'catholic-by',
+    section: 'Касцёльныя крыніцы',
+    title: 'Catholic.by',
+    details: ['https://catholic.by'],
+    notices: [],
+  ),
+  SourceBibliographyItem(
+    id: 'ave-maria',
+    section: 'Касцёльныя крыніцы',
+    title: 'Ave Maria',
+    details: ['https://ave-maria.by'],
+    notices: [],
+  ),
+  SourceBibliographyItem(
     id: 'biblia-charniauski-2017',
     section: 'Іншыя крыніцы',
     title: '«Біблія» (Мінск, 2017)',
