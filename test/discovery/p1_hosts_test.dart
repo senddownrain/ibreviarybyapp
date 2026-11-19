@@ -10,16 +10,20 @@ import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/widgets/app_overflow_menu.dart';
 import 'package:mybrev_flutter/widgets/text_scale_control.dart';
 
-/// Stand-ins carry the very keys of the real controls; the hosts under test
-/// are the production ones from `p1_hint_hosts.dart`.
 const _hint = Key('discovery-hint');
 const _card = Key('discovery-hint-card');
 
 class _Settings extends SettingsNotifier {
   @override
   SettingsState build() => const SettingsState();
+
+  @override
+  void setFontSize(double value) {
+    state = state.copyWith(fontSize: normalizeReaderFontSize(value));
+  }
 
   @override
   Future<void> setPsalmodyMode(PsalmodyMode value) async {
@@ -52,25 +56,21 @@ Future<void> _wait(WidgetTester tester, [int seconds = 4]) async {
   }
 }
 
-Widget _hoursScreen({VoidCallback? onMenu, int lines = 80}) => HoursHintHost(
+Widget _hoursScreen() => HoursHintHost(
   child: Scaffold(
     appBar: AppBar(
       actions: [
-        SizedBox.square(
+        const SizedBox.square(
           dimension: 48,
-          key: const Key('reader-chrome-overflow'),
-          child: IconButton(
-            key: const Key('app-overflow-open'),
-            onPressed: onMenu ?? () {},
-            icon: const Icon(Icons.more_horiz),
-          ),
+          key: Key('reader-chrome-overflow'),
+          child: AppOverflowMenu(showTextScale: true),
         ),
       ],
     ),
     body: ListView(
       key: const Key('doc'),
       children: [
-        for (var i = 0; i < lines; i++) ListTile(title: Text('Радок $i')),
+        for (var i = 0; i < 80; i++) ListTile(title: Text('Радок $i')),
         OutlinedButton(
           key: const Key('ora-next-hour'),
           onPressed: () {},
@@ -97,7 +97,10 @@ void main() {
       expect(find.byKey(_hint), findsNothing);
       await _wait(tester);
       expect(find.byKey(_hint), findsOneWidget);
-      expect(find.text('Памер тэксту — у меню ⋯'), findsOneWidget);
+      expect(
+        find.text('Каб змяніць памер тэксту, націсніце A− або A+ у меню ⋯.'),
+        findsOneWidget,
+      );
       expect(find.text('Паказаць'), findsOneWidget);
       expect(find.text('Пазней'), findsOneWidget);
       expect(find.text('Не паказваць'), findsOneWidget);
@@ -113,15 +116,20 @@ void main() {
       tester,
     ) async {
       final storage = MemoryDiscoveryStorage();
-      var opened = 0;
-      await tester.pumpWidget(
-        _app(storage, _hoursScreen(onMenu: () => opened++)),
-      );
+      await tester.pumpWidget(_app(storage, _hoursScreen()));
       await _wait(tester);
       await tester.tap(find.byKey(const Key('discovery-hint-show')));
-      await tester.pump();
-      expect(opened, 1);
+      await tester.pumpAndSettle();
       expect(find.byKey(_hint), findsNothing);
+      expect(find.text('A−'), findsOneWidget);
+      expect(find.text('A+'), findsOneWidget);
+      expect(find.text('100%'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
+      await tester.pumpAndSettle();
+      expect(find.text('110%'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('text-scale-inline-decrease')));
+      await tester.pumpAndSettle();
+      expect(find.text('100%'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       // New launch with the same storage.
       await tester.pumpWidget(_app(storage, _hoursScreen()));

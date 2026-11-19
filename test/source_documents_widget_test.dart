@@ -207,7 +207,9 @@ void main() {
       expect(find.text('Касцёльныя крыніцы'), findsOneWidget);
       expect(find.text('Іншыя крыніцы'), findsOneWidget);
       expect(
-        find.text('The Roman Missal — English translation (2010); Order of Mass compilation (2011)'),
+        find.text(
+          'The Roman Missal — English translation (2010); Order of Mass compilation (2011)',
+        ),
         findsOneWidget,
       );
       expect(find.text('Catholic.by'), findsOneWidget);

@@ -5,12 +5,13 @@ import 'package:mybrev_flutter/discovery/tour/tour_steps.dart';
 /// [anchor], in tree order. Widgets of a section that is switched away
 /// (`Offstage`) or hidden (`Visibility`) are ignored.
 List<Rect> findTourAnchorRects(BuildContext root, TourAnchor anchor) {
+  final screen = Offset.zero & MediaQuery.sizeOf(root);
   final found = <Rect>[];
   void visit(Element element) {
     final key = element.widget.key;
     if (key is ValueKey<String> && anchor.test(key.value)) {
       final rect = _visibleRect(element);
-      if (rect != null) found.add(rect);
+      if (rect != null && screen.overlaps(rect)) found.add(rect);
       return;
     }
     element.visitChildren(visit);

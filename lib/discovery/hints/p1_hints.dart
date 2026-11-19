@@ -19,7 +19,7 @@ final List<HintDefinition> p1Hints = [
     priority: HintPriority.p1,
     screenId: 'hours',
     anchorId: 'display.font.button',
-    copyBe: 'Памер тэксту — у меню ⋯',
+    copyBe: 'Каб змяніць памер тэксту, націсніце A− або A+ у меню ⋯.',
     actionLabelBe: 'Паказаць',
     requirements: [FactRequirement.isTrue(kFactFontControlReady)],
   ),
