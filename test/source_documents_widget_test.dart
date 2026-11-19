@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mybrev_flutter/constants/legal_links.dart';
+import 'package:mybrev_flutter/constants/source_bibliography.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -93,6 +94,23 @@ void main() {
     );
   });
   setUp(rootBundle.clear);
+
+  test('Catholic sources end with the English Missal and two websites', () {
+    final church = kPublicSourceBibliography
+        .where((item) => item.section == 'Касцёльныя крыніцы')
+        .map((item) => item.id)
+        .toList();
+    expect(church.sublist(church.length - 3), [
+      'roman-missal-english',
+      'catholic-by',
+      'ave-maria',
+    ]);
+    final other = kPublicSourceBibliography
+        .where((item) => item.section == 'Іншыя крыніцы')
+        .map((item) => item.id)
+        .toList();
+    expect(other, ['biblia-charniauski-2017', 'biblia-synodal']);
+  });
 
   testWidgets('reader footers use verified registry rights and digital URLs', (
     tester,
@@ -188,6 +206,14 @@ void main() {
       expect(_path(router), sourcesRoute);
       expect(find.text('Касцёльныя крыніцы'), findsOneWidget);
       expect(find.text('Іншыя крыніцы'), findsOneWidget);
+      expect(
+        find.text('The Roman Missal — English translation (2010); Order of Mass compilation (2011)'),
+        findsOneWidget,
+      );
+      expect(find.text('Catholic.by'), findsOneWidget);
+      expect(find.text('https://catholic.by'), findsOneWidget);
+      expect(find.text('Ave Maria'), findsOneWidget);
+      expect(find.text('https://ave-maria.by'), findsOneWidget);
       expect(find.text('Малітоўнік «Бог Добры» (Пінск, 2022)'), findsOneWidget);
       expect(
         find.text('Малітоўнік «Каб пазналі Цябе» (Гродна, 2014)'),
