@@ -385,11 +385,11 @@ void main() {
         );
         final dayDecoration = daySurface.decoration as BoxDecoration;
 
-        expect(dateDecoration.border, isNull);
-        expect(dateDecoration.color, dayDecoration.color);
-        expect(day.left, lessThan(date.left));
-        expect(day.right, greaterThan(date.right));
-        expect(accent.left, closeTo(date.left, 0.1));
+        expect(dateDecoration.border, isNotNull);
+        expect(dateDecoration, dayDecoration);
+        expect(day.left, closeTo(date.left, 0.1));
+        expect(day.right, closeTo(date.right, 0.1));
+        expect(accent.left, greaterThan(day.left));
         expect(accent.top, greaterThan(day.top));
         expect(accent.bottom, lessThan(day.bottom));
         expect(
@@ -438,15 +438,14 @@ void main() {
     );
     final dateDecoration = dateBox.decoration as BoxDecoration;
     expect(dateDecoration.boxShadow, isNull);
-    expect(dateDecoration.border, isNull);
+    expect(dateDecoration.border, isNotNull);
     final action = find.byKey(const Key('readings-alternatives-control'));
     expect(tester.widget<InkWell>(action).onTap, isNotNull);
     final celebration = tester.widget<Ink>(
       find.descendant(of: action, matching: find.byType(Ink)),
     );
     final surfaceDecoration = celebration.decoration! as BoxDecoration;
-    expect(surfaceDecoration.border, isNull);
-    expect(dateDecoration.color, surfaceDecoration.color);
+    expect(surfaceDecoration, dateDecoration);
     expect(surfaceDecoration.color!.a, closeTo(0.025, 0.0001));
     expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
     expect(find.text('Варыянты'), findsNothing);
