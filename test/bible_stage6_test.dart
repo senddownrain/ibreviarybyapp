@@ -444,10 +444,9 @@ void main() {
       await _pumpBible(tester);
       await tester.tap(find.byKey(const Key('app-overflow-open')));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Шрыфт'));
-      await tester.pumpAndSettle();
+ 
       expect(find.text('Шрыфт'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('text-scale-increase')));
+      await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
       await tester.pump();
       expect(find.text('110%'), findsOneWidget);
       expect(find.byKey(const Key('settings-reader-font')), findsNothing);

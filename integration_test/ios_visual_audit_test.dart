@@ -328,9 +328,9 @@ class _Audit {
     await push('/prayers/prayer/$_massPrayerId');
     await shot('17-prayer-detail');
     if (await tapKey('app-overflow-open', '25-reader-menu')) {
-      await tester.tap(find.text('Шрыфт'));
+      await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
       await settle();
-      await shot('25-sheet-text-size');
+      await shot('25-inline-text-size');
       await back();
     }
     await scrollToEnd();

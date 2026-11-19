@@ -1124,18 +1124,22 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      // Exercise the actual Aa slider and settings rebuild at every supported
-      // step, including the minimum where absolute metadata floors regress.
+      // Exercise the shared inline font controls at every supported size.
+      // The popup stays visible while the document rebuilds below it.
       await tester.tap(find.byKey(const Key('app-overflow-open')));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Шрыфт'));
-      await tester.pumpAndSettle();
-      for (var step = 7; step <= 18; step++) {
-        final requestedSize = kDefaultReaderFontSize * step / 10;
-        tester
-            .widget<Slider>(find.byKey(const Key('text-scale-slider')))
-            .onChanged!(requestedSize);
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.byKey(const Key('text-scale-inline-decrease')));
         await tester.pumpAndSettle();
+      }
+      for (var step = 7; step <= 18; step++) {
+        if (step > 7) {
+          await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
+          await tester.pumpAndSettle();
+        }
+        final requestedSize = kDefaultReaderFontSize * step / 10;
+        expect(find.text('${step * 10}%'), findsOneWidget);
+        expect(find.byKey(const Key('app-overflow-content')), findsOneWidget);
         final reader = ReaderTheme.of(
           tester.element(find.byKey(const Key('reader-content-surface'))),
         );

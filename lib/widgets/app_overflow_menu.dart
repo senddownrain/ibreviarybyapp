@@ -1,12 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
 
@@ -93,6 +95,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
         router == null || actions.any((a) => a.label == kReportErrorLabel)
         ? null
         : feedbackLocationForMenuUri(_visibleUri(router));
+    if (widget.showTextScale) analyticsFeature('text_settings_open');
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -142,10 +145,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     _popupRoute = null;
     _open = false;
     if (!mounted || result == null) return;
-    if (result == 'font') {
-      analyticsFeature('text_settings_open');
-      await showTextScalePanel(context, showPsalmody: widget.showPsalmody);
-    } else if (result == 'settings' || result == 'about') {
+    if (result == 'settings' || result == 'about') {
       context.push('/$result');
     } else if (result == 'report') {
       context.push(reportLocation!);
@@ -214,8 +214,7 @@ class _OverflowContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showTextScale)
-            _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
+          if (showTextScale) _fontSizeRow(),
           for (var index = 0; index < actions.length; index++)
             if (actions[index].label != kReportErrorLabel)
               _item(actions[index].label, actions[index].icon, '$index'),
@@ -235,6 +234,94 @@ class _OverflowContent extends StatelessWidget {
           ],
         ],
       ),
+    ),
+  );
+
+  Widget _fontSizeRow() => Consumer(
+    builder: (context, ref, _) {
+      final fontSize = ref.watch(
+        settingsProvider.select((settings) => settings.fontSize),
+      );
+      final notifier = ref.read(settingsProvider.notifier);
+      final theme = Theme.of(context);
+      final cs = theme.colorScheme;
+      return Padding(
+        key: const Key('text-scale-inline'),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        child: Row(
+          children: [
+            const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Шрыфт',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '${readerFontScalePercent(fontSize)}%',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            _fontSizeButton(
+              key: const Key('text-scale-inline-decrease'),
+              label: 'Паменшыць шрыфт',
+              text: 'A−',
+              onPressed: fontSize > kMinReaderFontSize + 0.01
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      notifier.decreaseFontSize();
+                    }
+                  : null,
+            ),
+            const SizedBox(width: 6),
+            _fontSizeButton(
+              key: const Key('text-scale-inline-increase'),
+              label: 'Павялічыць шрыфт',
+              text: 'A+',
+              onPressed: fontSize < kMaxReaderFontSize - 0.01
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      notifier.increaseFontSize();
+                    }
+                  : null,
+            ),
+          ],
+        ),
+      );
+    },
+  );
+
+  Widget _fontSizeButton({
+    required Key key,
+    required String label,
+    required String text,
+    required VoidCallback? onPressed,
+  }) => IconButton.outlined(
+    key: key,
+    tooltip: label,
+    onPressed: onPressed,
+    style: IconButton.styleFrom(
+      minimumSize: const Size.square(44),
+      fixedSize: const Size.square(44),
+      padding: EdgeInsets.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.standard,
+    ),
+    icon: Text(
+      text,
+      textScaler: TextScaler.noScaling,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
     ),
   );
 
