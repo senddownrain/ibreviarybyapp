@@ -112,6 +112,71 @@ void main() {
     }
   }
 
+
+  testWidgets('normal light Android inline font menu at 390 dp', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [settingsProvider.overrideWith(_PreviewSettings.new)],
+        child: RepaintBoundary(
+          key: const Key('normal-menu-preview'),
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              platform: TargetPlatform.android,
+              brightness: Brightness.light,
+              fontFamily: 'PreviewText',
+            ),
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: const TextScaler.linear(1),
+                padding: const EdgeInsets.only(top: 32, bottom: 24),
+                viewPadding: const EdgeInsets.only(top: 32, bottom: 24),
+              ),
+              child: child!,
+            ),
+            home: const ReaderScaffold(
+              showPsalmody: true,
+              contextHeader: ReaderContextHeader(
+                eyebrow: 'ЛІТУРГІЯ ГАДЗІНАЎ',
+                title: 'Ютрань',
+              ),
+              content: Text(
+                'Пане, пачуй маю малітву *\n'
+                'і няхай мой кліч дойдзе да Цябе.\n\n'
+                'Бо Ты — мая надзея †\n'
+                'і мая абарона.',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const Key('app-overflow-open')));
+    await tester.pumpAndSettle();
+    expect(find.text('Шрыфт'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    if (Platform.environment['OVERFLOW_MENU_IMAGES'] == '1') {
+      final boundary = tester.renderObject<RenderRepaintBoundary>(
+        find.byKey(const Key('normal-menu-preview')),
+      );
+      await tester.runAsync(() async {
+        final image = await boundary.toImage(pixelRatio: 2);
+        final data = await image.toByteData(format: ui.ImageByteFormat.png);
+        final directory = Directory('build/overflow-menu-preview')
+          ..createSync(recursive: true);
+        File(
+          '${directory.path}/android-light-390-100-inline-open.png',
+        ).writeAsBytesSync(data!.buffer.asUint8List());
+        image.dispose();
+      });
+    }
+  });
+
   for (final width in [320.0, 390.0]) {
     testWidgets('roomy overflow with error action at ${width.toInt()} dp', (
       tester,
