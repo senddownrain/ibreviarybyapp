@@ -355,6 +355,59 @@ void main() {
     },
   );
 
+  testWidgets(
+    'date control visual preview: celebration layout on 19 November dark',
+    (tester) async {
+      final (router, _) = await start(
+        tester,
+        width: 390,
+        brightness: Brightness.dark,
+        date: DateTime(2026, 11, 19),
+      );
+
+      Rect checkCelebration(String prefix) {
+        Rect bounds(String suffix) =>
+            tester.getRect(find.byKey(Key('$prefix-$suffix')));
+        final date = bounds('date-control');
+        final day = bounds('alternatives-control');
+        final accent = bounds('celebration-accent');
+        final pencil = bounds('celebration-edit-icon');
+        final metadata = bounds('day-metadata');
+
+        expect(day.left, lessThan(date.left));
+        expect(day.right, greaterThan(date.right));
+        expect(accent.left, closeTo(date.left, 0.1));
+        expect(accent.top, greaterThan(day.top));
+        expect(accent.bottom, lessThan(day.bottom));
+        expect(
+          day.right - pencil.right,
+          closeTo(day.bottom - pencil.bottom, 0.1),
+        );
+        expect(day.bottom - metadata.bottom, inInclusiveRange(8, 14));
+        return day;
+      }
+
+      final hoursDay = checkCelebration('hours');
+      final hours = find.byWidgetPredicate((widget) {
+        final key = widget.key;
+        return key is ValueKey<String> && key.value.startsWith('hours-hour-');
+      });
+      expect(hours, findsWidgets);
+      expect(
+        tester.getTopLeft(hours.first).dy - hoursDay.bottom,
+        inInclusiveRange(20, 24),
+      );
+      await snapshot(tester, 'liturgical-day-hours-dark-2026-11-19');
+
+      router.go('/readings');
+      await tester.pumpAndSettle();
+      final readingsDay = checkCelebration('readings');
+      expect(readingsDay.width, hoursDay.width);
+      await snapshot(tester, 'liturgical-day-readings-dark-2026-11-19');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('date control visual preview: light Readings', (
     tester,
   ) async {
