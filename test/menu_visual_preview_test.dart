@@ -13,6 +13,12 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 class _PreviewSettings extends SettingsNotifier {
   @override
   SettingsState build() => const SettingsState();
+
+  // Preview has no Hive box: keep font interactions entirely in memory.
+  @override
+  void setFontSize(double size) {
+    state = state.copyWith(fontSize: normalizeReaderFontSize(size));
+  }
 }
 
 void main() {
