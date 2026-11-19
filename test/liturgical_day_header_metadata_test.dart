@@ -234,7 +234,7 @@ void main() {
       find.descendant(of: action, matching: find.byType(Ink)),
     );
     final decoration = surface.decoration! as BoxDecoration;
-    expect(decoration.border, isNull);
+    expect(decoration.border, isNotNull);
     expect(decoration.color!.a, closeTo(0.025, 0.0001));
     final inkWell = tester.widget<InkWell>(action);
     expect(inkWell.overlayColor!.resolve({WidgetState.pressed})!.a,
@@ -358,7 +358,7 @@ void main() {
       find.descendant(of: action, matching: find.byType(Ink)),
     );
     final decoration = ink.decoration! as BoxDecoration;
-    expect(decoration.border, isNull);
+    expect(decoration.border, isNotNull);
     expect(decoration.color!.a, closeTo(0.035, 0.0001));
     expect(
       tester.widget<InkWell>(action)

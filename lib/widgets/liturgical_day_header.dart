@@ -44,7 +44,17 @@ class LiturgicalDayHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = presentation;
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final dark = theme.brightness == Brightness.dark;
+    final surfaceDecoration = BoxDecoration(
+      color: cs.onSurface.withValues(alpha: dark ? 0.035 : 0.025),
+      border: Border.all(
+        color: cs.onSurface.withValues(alpha: dark ? 0.09 : 0.08),
+        width: 0.8,
+      ),
+      borderRadius: BorderRadius.circular(14),
+    );
     // Reading-year metadata is supplied explicitly by ReadingsScreen. Do not
     // repeat the psalter week here: it belongs inside the individual Hour.
     final metadataSuffix = (metadata ?? '')
@@ -94,16 +104,14 @@ class LiturgicalDayHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _controlInset),
-          child: LiturgicalDateNavigationRow(
-            date: p.date,
-            keyPrefix: keyPrefix,
-            onDateTap: onDateTap,
-            onPrevious: onPrevious,
-            onNext: onNext,
-            onToday: onToday,
-          ),
+        LiturgicalDateNavigationRow(
+          date: p.date,
+          keyPrefix: keyPrefix,
+          onDateTap: onDateTap,
+          onPrevious: onPrevious,
+          onNext: onNext,
+          onToday: onToday,
+          surfaceDecoration: surfaceDecoration,
         ),
         if (dateHint != null)
           Padding(
@@ -114,6 +122,7 @@ class LiturgicalDayHeader extends StatelessWidget {
         _CelebrationSelectionSurface(
           keyPrefix: keyPrefix,
           enabled: showVariants,
+          decoration: surfaceDecoration,
           onTap: onVariants,
           semanticsLabel: 'Іншыя варыянты літургічнага дня: ${p.title}',
           child: Stack(
@@ -233,6 +242,7 @@ class _CelebrationSelectionSurface extends StatelessWidget {
   const _CelebrationSelectionSurface({
     required this.keyPrefix,
     required this.enabled,
+    required this.decoration,
     required this.onTap,
     required this.semanticsLabel,
     required this.child,
@@ -240,6 +250,7 @@ class _CelebrationSelectionSurface extends StatelessWidget {
 
   final String keyPrefix;
   final bool enabled;
+  final BoxDecoration decoration;
   final VoidCallback onTap;
   final String semanticsLabel;
   final Widget child;
@@ -247,10 +258,8 @@ class _CelebrationSelectionSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
-    final theme = Theme.of(context);
-    final ink = theme.colorScheme.onSurface;
-    final dark = theme.brightness == Brightness.dark;
-    final radius = BorderRadius.circular(14);
+    final ink = Theme.of(context).colorScheme.onSurface;
+    final radius = decoration.borderRadius!.resolve(Directionality.of(context));
     return Semantics(
       button: true,
       label: semanticsLabel,
@@ -274,12 +283,13 @@ class _CelebrationSelectionSurface extends StatelessWidget {
             }
             return null;
           }),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: ink.withValues(alpha: dark ? 0.035 : 0.025),
-              borderRadius: radius,
-            ),
-            child: child,
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: [
+              // Paint the outline without adding its width to the layout.
+              Positioned.fill(child: Ink(decoration: decoration)),
+              child,
+            ],
           ),
         ),
       ),

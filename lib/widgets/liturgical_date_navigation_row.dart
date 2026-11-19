@@ -17,6 +17,7 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
     required this.onPrevious,
     required this.onNext,
     this.onToday,
+    this.surfaceDecoration,
   });
 
   final DateTime date;
@@ -25,6 +26,7 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
   final VoidCallback? onPrevious;
   final VoidCallback? onNext;
   final VoidCallback? onToday;
+  final BoxDecoration? surfaceDecoration;
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +49,16 @@ class LiturgicalDateNavigationRow extends StatelessWidget {
     // quiet, unified surface that stays below the celebration in hierarchy.
     return DecoratedBox(
       key: Key('$keyPrefix-date-control'),
-      decoration: BoxDecoration(
-        color: cs.onSurface.withValues(alpha: dark ? 0.025 : 0.015),
-        border: Border.all(
-          color: cs.onSurface.withValues(alpha: dark ? 0.09 : 0.08),
-          width: 0.8,
-        ),
-        borderRadius: BorderRadius.circular(18),
-      ),
+      decoration:
+          surfaceDecoration ??
+          BoxDecoration(
+            color: cs.onSurface.withValues(alpha: dark ? 0.025 : 0.015),
+            border: Border.all(
+              color: cs.onSurface.withValues(alpha: dark ? 0.09 : 0.08),
+              width: 0.8,
+            ),
+            borderRadius: BorderRadius.circular(18),
+          ),
       child: Padding(
         padding: const EdgeInsets.all(2),
         child: Row(
