@@ -244,18 +244,18 @@ void main() {
       ProviderScope(
         overrides: [settingsProvider.overrideWith(_Settings.new)],
         child: MaterialApp(
-        home: Scaffold(
-          body: AppOverflowMenu(
-            showTextScale: true,
-            actions: [
-              ReaderSecondaryAction(
-                label: 'Памылка',
-                icon: Icons.flag_outlined,
-                onSelected: () => reports++,
-              ),
-            ],
+          home: Scaffold(
+            body: AppOverflowMenu(
+              showTextScale: true,
+              actions: [
+                ReaderSecondaryAction(
+                  label: 'Памылка',
+                  icon: Icons.flag_outlined,
+                  onSelected: () => reports++,
+                ),
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
