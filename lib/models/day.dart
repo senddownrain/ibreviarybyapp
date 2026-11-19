@@ -72,7 +72,7 @@ class LiturgicalDay {
           RegExp(r'&(?:nbsp|#160|#x0*a0);', caseSensitive: false),
           ' ',
         )
-        .replaceAll(RegExp(r'\\s+'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
         .trim()
         .replaceAll(RegExp(r'[.!]+
     if (v == null) return null;
