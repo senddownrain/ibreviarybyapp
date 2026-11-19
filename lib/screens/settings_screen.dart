@@ -303,6 +303,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const Divider(),
                             const SizedBox(height: 16),
                             const PsalmodySettingsSection(),
+                            const SizedBox(height: 20),
+                            const Divider(),
+                            SwitchListTile.adaptive(
+                              key: const Key('settings-readings-color-highlighting'),
+                              contentPadding: EdgeInsets.zero,
+                              title: const Text('Каляровае вылучэнне чытанняў'),
+                              subtitle: const Text('Вылучаць сказы ў чытаннях чатырма колерамі'),
+                              value: settings.readingsColorHighlightEnabled,
+                              onChanged: (enabled) => ref
+                                  .read(settingsProvider.notifier)
+                                  .setReadingsColorHighlightEnabled(enabled),
+                            ),
                           ],
                         ),
                       ),
