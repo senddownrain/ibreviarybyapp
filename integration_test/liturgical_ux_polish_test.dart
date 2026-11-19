@@ -250,7 +250,7 @@ void main() {
         await settle();
         await tap(find.byKey(const Key('app-overflow-open')));
         await shot('$theme-hour-menu');
-        await tap(find.text('Шрыфт'));
+        await tap(find.byKey(const Key('text-scale-inline-increase')));
         await shot('$theme-hour-aa');
         await tester.binding.handlePopRoute();
         await settle();
