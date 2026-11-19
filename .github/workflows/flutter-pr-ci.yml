@@ -72,6 +72,7 @@ jobs:
           test/liturgical_date_navigation_row_test.dart
           test/liturgical_controls_test.dart
           test/liturgical_heading_text_test.dart
+          test/readings_stage4_test.dart
       - name: Actual date control screenshots (dark mode)
         env:
           HEADER_PREVIEW_FONT: assets/google_fonts/Literata-Regular.ttf
