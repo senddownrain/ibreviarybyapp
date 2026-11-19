@@ -1,14 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
-import 'package:mybrev_flutter/widgets/text_scale_control.dart';
-import 'package:mybrev_flutter/analytics/local_analytics.dart'
-    show analyticsFeature;
+import 'package:mybrev_flutter/providers/settings_provider.dart';
 
 class ReaderSecondaryAction {
   const ReaderSecondaryAction({
@@ -142,10 +142,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     _popupRoute = null;
     _open = false;
     if (!mounted || result == null) return;
-    if (result == 'font') {
-      analyticsFeature('text_settings_open');
-      await showTextScalePanel(context, showPsalmody: widget.showPsalmody);
-    } else if (result == 'settings' || result == 'about') {
+    if (result == 'settings' || result == 'about') {
       context.push('/$result');
     } else if (result == 'report') {
       context.push(reportLocation!);
@@ -214,8 +211,7 @@ class _OverflowContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showTextScale)
-            _item('Шрыфт', PhosphorIconsRegular.textAa, 'font'),
+          if (showTextScale) _fontSizeRow(),
           for (var index = 0; index < actions.length; index++)
             if (actions[index].label != kReportErrorLabel)
               _item(actions[index].label, actions[index].icon, '$index'),
@@ -236,6 +232,89 @@ class _OverflowContent extends StatelessWidget {
         ],
       ),
     ),
+  );
+
+  // Inline size controls are shared by every reader using AppOverflowMenu.
+  // Do not dismiss the popup: the text underneath updates immediately.
+  Widget _fontSizeRow() => Consumer(
+    builder: (context, ref, _) {
+      final fontSize = ref.watch(
+        settingsProvider.select((settings) => settings.fontSize),
+      );
+      final notifier = ref.read(settingsProvider.notifier);
+      final theme = Theme.of(context);
+      return Padding(
+        key: const Key('text-scale-inline'),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Row(
+          children: [
+            const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Шрыфт',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '${readerFontScalePercent(fontSize)}%',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            _fontSizeButton(
+              key: const Key('text-scale-inline-decrease'),
+              label: 'Паменшыць шрыфт',
+              glyph: 'A−',
+              onPressed: fontSize > kMinReaderFontSize + 0.01
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      notifier.decreaseFontSize();
+                    }
+                  : null,
+            ),
+            const SizedBox(width: 4),
+            _fontSizeButton(
+              key: const Key('text-scale-inline-increase'),
+              label: 'Павялічыць шрыфт',
+              glyph: 'A+',
+              onPressed: fontSize < kMaxReaderFontSize - 0.01
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      notifier.increaseFontSize();
+                    }
+                  : null,
+            ),
+          ],
+        ),
+      );
+    },
+  );
+
+  Widget _fontSizeButton({
+    required Key key,
+    required String label,
+    required String glyph,
+    required VoidCallback? onPressed,
+  }) => IconButton.filledTonal(
+    key: key,
+    tooltip: label,
+    onPressed: onPressed,
+    icon: Text(
+      glyph,
+      textScaler: TextScaler.noScaling,
+      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+    ),
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
   );
 
   Widget _item(String label, IconData icon, String value) => ListTile(
