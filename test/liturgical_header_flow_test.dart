@@ -373,7 +373,20 @@ void main() {
         final accent = bounds('celebration-accent');
         final pencil = bounds('celebration-edit-icon');
         final metadata = bounds('day-metadata');
+        final dateSurface = tester.widget<DecoratedBox>(
+          find.byKey(Key('$prefix-date-control')),
+        );
+        final dateDecoration = dateSurface.decoration as BoxDecoration;
+        final daySurface = tester.widget<Ink>(
+          find.descendant(
+            of: find.byKey(Key('$prefix-alternatives-control')),
+            matching: find.byType(Ink),
+          ),
+        );
+        final dayDecoration = daySurface.decoration as BoxDecoration;
 
+        expect(dateDecoration.border, isNull);
+        expect(dateDecoration.color, dayDecoration.color);
         expect(day.left, lessThan(date.left));
         expect(day.right, greaterThan(date.right));
         expect(accent.left, closeTo(date.left, 0.1));
@@ -420,13 +433,12 @@ void main() {
     router.go('/readings');
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('readings-today')), findsOneWidget);
-    // Both controls are quiet, but the celebration has no visible border.
     final dateBox = tester.widget<DecoratedBox>(
       find.byKey(const Key('readings-date-control')),
     );
     final dateDecoration = dateBox.decoration as BoxDecoration;
     expect(dateDecoration.boxShadow, isNull);
-    expect(dateDecoration.color!.a, lessThan(0.04));
+    expect(dateDecoration.border, isNull);
     final action = find.byKey(const Key('readings-alternatives-control'));
     expect(tester.widget<InkWell>(action).onTap, isNotNull);
     final celebration = tester.widget<Ink>(
@@ -434,6 +446,7 @@ void main() {
     );
     final surfaceDecoration = celebration.decoration! as BoxDecoration;
     expect(surfaceDecoration.border, isNull);
+    expect(dateDecoration.color, surfaceDecoration.color);
     expect(surfaceDecoration.color!.a, closeTo(0.025, 0.0001));
     expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
     expect(find.text('Варыянты'), findsNothing);

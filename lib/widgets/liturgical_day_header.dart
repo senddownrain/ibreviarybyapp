@@ -44,7 +44,11 @@ class LiturgicalDayHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = presentation;
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final surfaceColor = cs.onSurface.withValues(
+      alpha: theme.brightness == Brightness.dark ? 0.035 : 0.025,
+    );
     // Reading-year metadata is supplied explicitly by ReadingsScreen. Do not
     // repeat the psalter week here: it belongs inside the individual Hour.
     final metadataSuffix = (metadata ?? '')
@@ -103,6 +107,7 @@ class LiturgicalDayHeader extends StatelessWidget {
             onPrevious: onPrevious,
             onNext: onNext,
             onToday: onToday,
+            borderlessSurfaceColor: surfaceColor,
           ),
         ),
         if (dateHint != null)
@@ -114,6 +119,7 @@ class LiturgicalDayHeader extends StatelessWidget {
         _CelebrationSelectionSurface(
           keyPrefix: keyPrefix,
           enabled: showVariants,
+          surfaceColor: surfaceColor,
           onTap: onVariants,
           semanticsLabel: 'Іншыя варыянты літургічнага дня: ${p.title}',
           child: Stack(
@@ -233,6 +239,7 @@ class _CelebrationSelectionSurface extends StatelessWidget {
   const _CelebrationSelectionSurface({
     required this.keyPrefix,
     required this.enabled,
+    required this.surfaceColor,
     required this.onTap,
     required this.semanticsLabel,
     required this.child,
@@ -240,6 +247,7 @@ class _CelebrationSelectionSurface extends StatelessWidget {
 
   final String keyPrefix;
   final bool enabled;
+  final Color surfaceColor;
   final VoidCallback onTap;
   final String semanticsLabel;
   final Widget child;
@@ -247,9 +255,7 @@ class _CelebrationSelectionSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
-    final theme = Theme.of(context);
-    final ink = theme.colorScheme.onSurface;
-    final dark = theme.brightness == Brightness.dark;
+    final ink = Theme.of(context).colorScheme.onSurface;
     final radius = BorderRadius.circular(14);
     return Semantics(
       button: true,
@@ -276,7 +282,7 @@ class _CelebrationSelectionSurface extends StatelessWidget {
           }),
           child: Ink(
             decoration: BoxDecoration(
-              color: ink.withValues(alpha: dark ? 0.035 : 0.025),
+              color: surfaceColor,
               borderRadius: radius,
             ),
             child: child,
