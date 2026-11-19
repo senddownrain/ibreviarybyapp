@@ -1,19 +1,26 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 
+enum _TourAnchorMatch { exact, prefix, suffix }
+
 /// How a step finds the real control it points at. A step lists several
 /// matchers; the first one that is mounted and on screen wins.
 @immutable
 class TourAnchor {
-  const TourAnchor.exact(String key) : matches = null, exactKey = key;
+  const TourAnchor.exact(this._value) : _match = _TourAnchorMatch.exact;
 
-  const TourAnchor.suffix(String suffix) : exactKey = null, matches = suffix;
+  const TourAnchor.prefix(this._value) : _match = _TourAnchorMatch.prefix;
 
-  final String? exactKey;
-  final String? matches;
+  const TourAnchor.suffix(this._value) : _match = _TourAnchorMatch.suffix;
 
-  bool test(String key) =>
-      exactKey != null ? key == exactKey : key.endsWith(matches!);
+  final String _value;
+  final _TourAnchorMatch _match;
+
+  bool test(String key) => switch (_match) {
+    _TourAnchorMatch.exact => key == _value,
+    _TourAnchorMatch.prefix => key.startsWith(_value),
+    _TourAnchorMatch.suffix => key.endsWith(_value),
+  };
 }
 
 /// One stop of the product tour.
@@ -72,11 +79,14 @@ const List<TourStep> defaultTourSteps = [
   ),
   TourStep(
     id: 'tour.text',
-    titleBe: 'Памер тэксту і псалмы',
+    titleBe: 'Памер тэксту',
     bodyBe:
-        'У меню «···» можна змяніць памер тэксту, паказ псалмоў '
-        'і адкрыць налады.',
-    anchors: [TourAnchor.exact('app-overflow-open')],
+        'У тэксце гадзіны адкрыйце меню «⋯». У радку «Шрыфт» '
+        'націсніце A− або A+, каб змяніць памер тэксту.',
+    anchors: [
+      TourAnchor.exact('reader-chrome-overflow'),
+      TourAnchor.prefix('hours-hour-'),
+    ],
     branch: AppBranch.hours,
   ),
   TourStep(

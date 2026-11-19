@@ -284,7 +284,7 @@ class _OverflowContent extends StatelessWidget {
                     }
                   : null,
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             _fontSizeButton(
               key: const Key('text-scale-inline-increase'),
               label: 'Павялічыць шрыфт',
@@ -307,13 +307,14 @@ class _OverflowContent extends StatelessWidget {
     required String label,
     required String text,
     required VoidCallback? onPressed,
-  }) => IconButton.outlined(
+  }) => IconButton.filledTonal(
     key: key,
     tooltip: label,
     onPressed: onPressed,
     style: IconButton.styleFrom(
       minimumSize: const Size.square(44),
       fixedSize: const Size.square(44),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       padding: EdgeInsets.zero,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.standard,
@@ -321,7 +322,7 @@ class _OverflowContent extends StatelessWidget {
     icon: Text(
       text,
       textScaler: TextScaler.noScaling,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
     ),
   );
 

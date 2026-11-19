@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/discovery/discovery.dart';
 import 'package:mybrev_flutter/discovery/tour/discovery_settings_section.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_anchor_finder.dart';
 import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
 import 'package:mybrev_flutter/discovery/tour/tour_policy.dart';
 import 'package:mybrev_flutter/discovery/tour/tour_steps.dart';
@@ -73,6 +74,11 @@ class FakeApp extends StatelessWidget {
         children: [
           const Positioned.fill(child: Center(child: Text('Малітва'))),
           marker('hours-calendar-action', AppBranch.hours, Alignment.topLeft),
+          marker(
+            'hours-hour-laudes',
+            AppBranch.hours,
+            const Alignment(0, -0.4),
+          ),
           marker('app-overflow-open', null, Alignment.topRight),
           marker(
             'readings-alternatives-control',
@@ -422,8 +428,15 @@ void main() {
       await stepForward(tester);
       await tester.pump(kTourAnchorWaitInPlace);
       await tester.pump(const Duration(milliseconds: 100));
-      // The calendar button is absent: step 2 is the text/menu step.
-      expect(find.text('Памер тэксту і псалмы'), findsOneWidget);
+      // The calendar button is absent: step 2 points to the hour entry.
+      expect(find.text('Памер тэксту'), findsOneWidget);
+      final fontStep = defaultTourSteps.singleWhere(
+        (step) => step.id == 'tour.text',
+      );
+      expect(
+        resolveStepRect(tester.element(find.byType(TourHost)), fontStep),
+        tester.getRect(find.byKey(const Key('hours-hour-laudes'))),
+      );
       expect(progress(tester), '2 з 5');
       expect(tester.takeException(), isNull);
     });
@@ -435,6 +448,7 @@ void main() {
       final shell = FakeShell(
         missing: {
           'hours-calendar-action',
+          'hours-hour-laudes',
           'app-overflow-open',
           'readings-alternatives-control',
           'app-destination-Малітоўнік',
@@ -473,7 +487,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
       await tester.pump(kTourAnchorWaitInPlace);
       await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text('Памер тэксту і псалмы'), findsOneWidget);
+      expect(find.text('Памер тэксту'), findsOneWidget);
     });
 
     testWidgets('system back skips the tour instead of leaving', (
