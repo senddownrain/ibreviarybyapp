@@ -9,6 +9,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
+import 'package:mybrev_flutter/analytics/local_analytics.dart'
+    show analyticsFeature;
 
 class ReaderSecondaryAction {
   const ReaderSecondaryAction({
@@ -93,6 +95,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
         router == null || actions.any((a) => a.label == kReportErrorLabel)
         ? null
         : feedbackLocationForMenuUri(_visibleUri(router));
+    if (widget.showTextScale) analyticsFeature('text_settings_open');
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -234,8 +237,8 @@ class _OverflowContent extends StatelessWidget {
     ),
   );
 
-  // Inline size controls are shared by every reader using AppOverflowMenu.
-  // Do not dismiss the popup: the text underneath updates immediately.
+  // Keep the font control on a single, quiet row with two 44dp targets.
+  // The separate sheet has no role in the shared reader popup anymore.
   Widget _fontSizeRow() => Consumer(
     builder: (context, ref, _) {
       final fontSize = ref.watch(
@@ -243,19 +246,21 @@ class _OverflowContent extends StatelessWidget {
       );
       final notifier = ref.read(settingsProvider.notifier);
       final theme = Theme.of(context);
+      final cs = theme.colorScheme;
       return Padding(
         key: const Key('text-scale-inline'),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         child: Row(
           children: [
             const PhosphorIcon(PhosphorIconsRegular.textAa, size: 22),
             const SizedBox(width: 10),
             Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 0,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Шрыфт',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -263,35 +268,54 @@ class _OverflowContent extends StatelessWidget {
                   Text(
                     '${readerFontScalePercent(fontSize)}%',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: cs.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 6),
-            _fontSizeButton(
-              key: const Key('text-scale-inline-decrease'),
-              label: 'Паменшыць шрыфт',
-              glyph: 'A−',
-              onPressed: fontSize > kMinReaderFontSize + 0.01
-                  ? () {
-                      HapticFeedback.selectionClick();
-                      notifier.decreaseFontSize();
-                    }
-                  : null,
-            ),
-            const SizedBox(width: 4),
-            _fontSizeButton(
-              key: const Key('text-scale-inline-increase'),
-              label: 'Павялічыць шрыфт',
-              glyph: 'A+',
-              onPressed: fontSize < kMaxReaderFontSize - 0.01
-                  ? () {
-                      HapticFeedback.selectionClick();
-                      notifier.increaseFontSize();
-                    }
-                  : null,
+            const SizedBox(width: 8),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: cs.outlineVariant.withValues(alpha: 0.75),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _fontSizeButton(
+                    key: const Key('text-scale-inline-decrease'),
+                    label: 'Паменшыць шрыфт',
+                    fontSize: 15,
+                    onPressed: fontSize > kMinReaderFontSize + 0.01
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            notifier.decreaseFontSize();
+                          }
+                        : null,
+                  ),
+                  Container(
+                    height: 23,
+                    width: 1,
+                    color: cs.outlineVariant.withValues(alpha: 0.7),
+                  ),
+                  _fontSizeButton(
+                    key: const Key('text-scale-inline-increase'),
+                    label: 'Павялічыць шрыфт',
+                    fontSize: 20,
+                    onPressed: fontSize < kMaxReaderFontSize - 0.01
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            notifier.increaseFontSize();
+                          }
+                        : null,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -302,16 +326,16 @@ class _OverflowContent extends StatelessWidget {
   Widget _fontSizeButton({
     required Key key,
     required String label,
-    required String glyph,
+    required double fontSize,
     required VoidCallback? onPressed,
-  }) => IconButton.filledTonal(
+  }) => IconButton(
     key: key,
     tooltip: label,
     onPressed: onPressed,
     icon: Text(
-      glyph,
+      'A',
       textScaler: TextScaler.noScaling,
-      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+      style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
     ),
     padding: EdgeInsets.zero,
     constraints: const BoxConstraints.tightFor(width: 44, height: 44),
