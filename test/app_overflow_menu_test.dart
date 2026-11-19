@@ -14,7 +14,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('Ora popup is compact and one psalmody mode survives reopening', (
+  testWidgets('reader popup changes font size without opening a sheet', (
     tester,
   ) async {
     final container = ProviderContainer(
@@ -37,38 +37,32 @@ void main() {
 
     await openMenu(tester);
     expect(find.text('Шрыфт'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
+    expect(find.byKey(const Key('text-scale-inline-decrease')), findsOneWidget);
+    expect(find.byKey(const Key('text-scale-inline-increase')), findsOneWidget);
+    expect(find.byType(Slider), findsNothing);
+    expect(find.byType(PsalmodyModeSelector), findsNothing);
     expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
-    expect(find.byType(FilterChip), findsNothing);
-    expect(find.byType(SwitchListTile), findsNothing);
     expect(
       tester.getSize(find.byKey(const Key('app-overflow-content'))).width,
       inInclusiveRange(280, 360),
     );
 
-    await tester.tap(find.text('Шрыфт'));
+    await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('app-overflow-content')), findsNothing);
-    expect(find.text('Псальмодыя'), findsOneWidget);
-    expect(find.byType(FilterChip), findsNothing);
-    final selector = find.byType(PsalmodyModeSelector);
-    for (final mode in PsalmodyMode.values) {
-      await tester.tap(find.byKey(ValueKey('psalmody-mode-${mode.name}')));
-      await tester.pumpAndSettle();
-      expect(container.read(settingsProvider).psalmodyMode, mode);
-      expect(tester.widget<PsalmodyModeSelector>(selector).value, mode);
-    }
-    await tester.tap(find.byTooltip('Закрыць'));
+    expect(find.text('110%'), findsOneWidget);
+    expect(container.read(settingsProvider).fontSize, closeTo(17.6, .001));
+    expect(find.byKey(const Key('app-overflow-content')), findsOneWidget);
+    expect(find.byKey(const Key('text-scale-slider')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('text-scale-inline-decrease')));
     await tester.pumpAndSettle();
-    await openMenu(tester);
-    await tester.tap(find.text('Шрыфт'));
-    await tester.pumpAndSettle();
-    expect(
-      tester.widget<PsalmodyModeSelector>(selector).value,
-      PsalmodyMode.alternatingStanzas,
-    );
+    expect(find.text('100%'), findsOneWidget);
+    expect(container.read(settingsProvider).fontSize, closeTo(16.0, .001));
+    expect(tester.takeException(), isNull);
   });
 
-  testWidgets('font sheet keeps its size slider and separate Ora options', (
+  testWidgets('inline font buttons respect limits and keep the popup open', (
     tester,
   ) async {
     final container = ProviderContainer(
@@ -86,16 +80,26 @@ void main() {
       ),
     );
     await openMenu(tester);
-    await tester.tap(find.text('Шрыфт'));
+    container.read(settingsProvider.notifier).setFontSize(kMaxReaderFontSize);
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('app-overflow-content')), findsNothing);
-    expect(find.byType(SwitchListTile), findsNothing);
-    expect(find.byType(PsalmodyModeSelector), findsOneWidget);
-    expect(find.byKey(const Key('text-scale-slider')), findsOneWidget);
-    await tester.tap(find.byKey(const Key('text-scale-increase')));
+    expect(find.text('180%'), findsOneWidget);
+    expect(
+      tester.widget<IconButton>(
+        find.byKey(const Key('text-scale-inline-increase')),
+      ).onPressed,
+      isNull,
+    );
+    container.read(settingsProvider.notifier).setFontSize(kMinReaderFontSize);
     await tester.pumpAndSettle();
-    expect(find.text('110%'), findsOneWidget);
-    expect(container.read(settingsProvider).fontSize, closeTo(17.6, .001));
+    expect(find.text('70%'), findsOneWidget);
+    expect(
+      tester.widget<IconButton>(
+        find.byKey(const Key('text-scale-inline-decrease')),
+      ).onPressed,
+      isNull,
+    );
+    expect(find.byKey(const Key('app-overflow-content')), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
@@ -237,7 +241,9 @@ void main() {
   ) async {
     var reports = 0;
     await tester.pumpWidget(
-      MaterialApp(
+      ProviderScope(
+        overrides: [settingsProvider.overrideWith(_Settings.new)],
+        child: MaterialApp(
         home: Scaffold(
           body: AppOverflowMenu(
             showTextScale: true,
@@ -249,6 +255,7 @@ void main() {
               ),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -318,14 +325,10 @@ void main() {
       scroll.jumpTo(400);
       await tester.pumpAndSettle();
       await openMenu(tester);
-      await tester.tap(find.text('Шрыфт'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('psalmody-mode-leftBreakIndent')));
+      await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
       await tester.pumpAndSettle();
       expect(scroll.offset, 400);
-      await tester.tap(find.byTooltip('Закрыць'));
-      await tester.pumpAndSettle();
-      await openMenu(tester);
+      expect(find.byKey(const Key('app-overflow-content')), findsOneWidget);
       mode.value = ReaderChromeMode.hidden;
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('app-overflow-open')), findsNothing);
