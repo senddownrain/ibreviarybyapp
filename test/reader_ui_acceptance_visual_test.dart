@@ -185,6 +185,21 @@ void main() {
     expect(find.byKey(const Key('settings-feedback')), findsOneWidget);
     expect(find.text('Пытанні і прапановы'), findsOneWidget);
     expect(find.text('Доступ для святароў'), findsOneWidget);
+    expect(
+      find.ancestor(
+        of: find.text('Каляровае вылучэнне чытанняў'),
+        matching: find.byKey(const Key('settings-text-section')),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('settings-readings-color-highlighting')),
+          )
+          .value,
+      isFalse,
+    );
     // Top-level sections share the same production chrome typography.
     final sectionSize = tester.widget<Text>(find.text('Тэкст')).style?.fontSize;
     expect(
@@ -240,6 +255,14 @@ void main() {
       48,
     );
     await _capture(tester, '02-psalmody-example');
+    await Scrollable.ensureVisible(
+      tester.element(
+        find.byKey(const Key('settings-readings-color-highlighting')),
+      ),
+      alignment: 0.42,
+    );
+    await tester.pumpAndSettle();
+    await _capture(tester, '02c-readings-highlight-toggle');
 
     tester.view.physicalSize = const Size(320, 800);
     await tester.pumpAndSettle();
