@@ -5,15 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/discovery/tour/discovery_settings_section.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/widgets/priest_access_settings_section.dart';
-import 'package:mybrev_flutter/widgets/admin_songbook_login_section.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
-import 'package:mybrev_flutter/review/app_review_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -152,7 +149,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Тэкст',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    subtitle: const Text('Шрыфт, памер і выраўноўванне'),
+                    subtitle: const Text('Шрыфт, памер і псальмодыя'),
                     tilePadding: EdgeInsets.zero,
                     childrenPadding: EdgeInsets.zero,
                     initiallyExpanded: true,
@@ -302,6 +299,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 24),
+                            const Divider(),
+                            const SizedBox(height: 16),
+                            const PsalmodySettingsSection(),
+                            const SizedBox(height: 20),
+                            const Divider(),
+                            SwitchListTile.adaptive(
+                              key: const Key('settings-readings-color-highlighting'),
+                              contentPadding: EdgeInsets.zero,
+                              title: const Text('Каляровае вылучэнне чытанняў'),
+                              subtitle: const Text('Вылучаць сказы ў чытаннях чатырма колерамі'),
+                              value: settings.readingsColorHighlightEnabled,
+                              onChanged: (enabled) => ref
+                                  .read(settingsProvider.notifier)
+                                  .setReadingsColorHighlightEnabled(enabled),
+                            ),
                           ],
                         ),
                       ),
@@ -312,10 +325,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                const PsalmodySettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
                 Text(
                   'Стартовы раздзел',
                   style: Theme.of(context).textTheme.titleMedium,
@@ -373,11 +382,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                const DiscoverySettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-
                 DataSettingsSection(key: _dataKey),
                 const SizedBox(height: 24),
                 const Divider(),
@@ -387,17 +391,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.chat_bubble_outline_rounded),
                   title: const Text('Зваротная сувязь'),
-                  subtitle: const Text(
-                    'Прапанова, пытанне або праблема з праграмай. Пра памылку ў тэксце — праз меню «⋯» на патрэбнай старонцы.',
-                  ),
+                  subtitle: const Text('Пытанні і прапановы'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/settings/feedback'),
                 ),
-                const AppReviewSettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-                const AdminSongbookLoginSection(),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -406,16 +403,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
+                ListTile(
+                  key: const Key('settings-about'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.info_outline_rounded),
+                  title: const Text('Інфармацыя'),
+                  subtitle: const Text('Пра дадатак, крыніцы і правы'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/about'),
+                ),
+                const SizedBox(height: 12),
                 FutureBuilder<PackageInfo>(
                   future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) =>
-                      Text('Версія ${snapshot.data?.version ?? '—'}'),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () => context.push('/about'),
-                    child: const Text('Інфармацыя'),
+                  builder: (context, snapshot) => Center(
+                    child: Text(
+                      'Версія ${snapshot.data?.version ?? '—'}',
+                      key: const Key('settings-version'),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
               ],

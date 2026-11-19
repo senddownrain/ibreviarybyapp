@@ -158,6 +158,9 @@ class SettingsState {
   final String lastSection;
   final PsalmodyMode psalmodyMode;
 
+  /// Opt-in, persists independently of per-reading saved color annotations.
+  final bool readingsColorHighlightEnabled;
+
   /// Prayer ID mapped to a set of category IDs.
   final Map<String, Set<String>> prayerCategoryMap;
 
@@ -174,6 +177,7 @@ class SettingsState {
     this.startSection = 'hours',
     this.lastSection = 'hours',
     this.psalmodyMode = PsalmodyMode.leftBreak,
+    this.readingsColorHighlightEnabled = false,
     this.prayerCategoryMap = const {},
   });
 
@@ -197,6 +201,7 @@ class SettingsState {
     String? startSection,
     String? lastSection,
     PsalmodyMode? psalmodyMode,
+    bool? readingsColorHighlightEnabled,
     Map<String, Set<String>>? prayerCategoryMap,
   }) => SettingsState(
     themePreference: themePreference ?? this.themePreference,
@@ -212,6 +217,8 @@ class SettingsState {
     startSection: startSection ?? this.startSection,
     lastSection: lastSection ?? this.lastSection,
     psalmodyMode: psalmodyMode ?? this.psalmodyMode,
+    readingsColorHighlightEnabled:
+        readingsColorHighlightEnabled ?? this.readingsColorHighlightEnabled,
     prayerCategoryMap: prayerCategoryMap ?? this.prayerCategoryMap,
   );
 }
@@ -249,6 +256,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
     return SettingsState(
       themePreference: preference,
       psalmodyMode: psalmodyMode,
+      readingsColorHighlightEnabled:
+          _box.get('readingsColorHighlightEnabled', defaultValue: false) == true,
       fontSize: normalizeReaderFontSize(
         (_box.get('fontSize', defaultValue: kDefaultReaderFontSize) as num)
             .toDouble(),
@@ -387,6 +396,13 @@ class SettingsNotifier extends Notifier<SettingsState> {
     if (state.keepScreenOn != value) analyticsFeature('keep_screen_on_toggle');
     state = state.copyWith(keepScreenOn: value);
     _save();
+  }
+
+  Future<void> setReadingsColorHighlightEnabled(bool enabled) async {
+    if (state.readingsColorHighlightEnabled == enabled) return;
+    state = state.copyWith(readingsColorHighlightEnabled: enabled);
+    await _box.put('readingsColorHighlightEnabled', enabled);
+    await _box.flush();
   }
 
   Future<void> setPsalmodyMode(PsalmodyMode value) async {

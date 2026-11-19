@@ -15,54 +15,57 @@ class PsalmodyModeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final radius = BorderRadius.circular(10);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: cs.outlineVariant),
-        borderRadius: radius,
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Material(
-          color: Colors.transparent,
-          child: Row(
-            children: [
-              for (final mode in PsalmodyMode.values)
-                Expanded(
-                  child: Semantics(
-                    key: ValueKey('psalmody-mode-${mode.name}'),
-                    label: mode.label,
-                    button: true,
-                    selected: value == mode,
-                    inMutuallyExclusiveGroup: true,
-                    onTap: () => onChanged(mode),
-                    child: Tooltip(
-                      message: mode.label,
-                      excludeFromSemantics: true,
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          color: value == mode
-                              ? cs.primary.withValues(alpha: .12)
-                              : Colors.transparent,
-                          border: mode == PsalmodyMode.leftBreak
-                              ? null
-                              : Border(
-                                  left: BorderSide(color: cs.outlineVariant),
-                                ),
-                        ),
-                        child: InkWell(
-                          excludeFromSemantics: true,
-                          onTap: () => onChanged(mode),
-                          child: SizedBox(
-                            height: 48,
-                            child: Center(
-                              child: CustomPaint(
-                                size: const Size(40, 30),
-                                painter: _PsalmodyIcon(
-                                  mode,
-                                  value == mode
-                                      ? cs.primary
-                                      : cs.onSurfaceVariant,
+    final radius = BorderRadius.circular(24);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: cs.outlineVariant),
+          borderRadius: radius,
+        ),
+        child: ClipRRect(
+          borderRadius: radius,
+          child: Material(
+            color: Colors.transparent,
+            child: Row(
+              children: [
+                for (final mode in PsalmodyMode.values)
+                  Expanded(
+                    child: Semantics(
+                      key: ValueKey('psalmody-mode-${mode.name}'),
+                      label: mode.label,
+                      button: true,
+                      selected: value == mode,
+                      inMutuallyExclusiveGroup: true,
+                      onTap: () => onChanged(mode),
+                      child: Tooltip(
+                        message: mode.label,
+                        excludeFromSemantics: true,
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            color: value == mode
+                                ? cs.onSurface.withValues(alpha: .10)
+                                : Colors.transparent,
+                            border: mode == PsalmodyMode.leftBreak
+                                ? null
+                                : Border(
+                                    left: BorderSide(color: cs.outlineVariant),
+                                  ),
+                          ),
+                          child: InkWell(
+                            excludeFromSemantics: true,
+                            onTap: () => onChanged(mode),
+                            child: SizedBox(
+                              height: 40,
+                              child: Center(
+                                child: CustomPaint(
+                                  size: const Size(27, 22),
+                                  painter: _PsalmodyIcon(
+                                    mode,
+                                    value == mode
+                                        ? cs.onSurface
+                                        : cs.onSurfaceVariant,
+                                  ),
                                 ),
                               ),
                             ),
@@ -71,8 +74,8 @@ class PsalmodyModeSelector extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -89,15 +92,15 @@ class _PsalmodyIcon extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..strokeWidth = 2
+      ..strokeWidth = 1.9
       ..strokeCap = StrokeCap.round;
     for (var i = 0; i < 6; i++) {
       final continuation = mode == PsalmodyMode.leftBreakIndent && i.isOdd;
       final shiftedStrophe =
           mode == PsalmodyMode.alternatingStanzas && (i == 2 || i == 3);
-      final left = continuation || shiftedStrophe ? 9.0 : 2.0;
-      final top = 3.0 + i * 4 + (i ~/ 2) * 2;
-      final width = i.isOdd ? 23.0 : 28.0;
+      final left = continuation || shiftedStrophe ? 7.0 : 2.0;
+      final top = 3.0 + i * 3.2;
+      final width = i.isOdd ? 16.0 : 22.0;
       canvas.drawLine(Offset(left, top), Offset(left + width, top), paint);
     }
   }

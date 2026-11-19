@@ -940,8 +940,10 @@ double _maxScrollExtent(WidgetTester tester) => tester
     .maxScrollExtent;
 
 class _LabSettingsNotifier extends SettingsNotifier {
+  // Layout-lab palette fixtures deliberately opt in.
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() =>
+      const SettingsState(readingsColorHighlightEnabled: true);
 }
 
 class _LabLocalPrayersNotifier extends LocalPrayersNotifier {

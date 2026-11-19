@@ -403,6 +403,95 @@ void main() {
     expect(800 - paletteBottom, closeTo(16, 0.01));
   });
 
+  testWidgets(
+    'reading sentence colors are disabled by default, enable live and persist',
+    (tester) async {
+      final box = Hive.box('settings');
+      await box.delete('readingsColorHighlightEnabled');
+      const reading = ParsedReading(
+        id: 'sentence-highlight-opt-in',
+        title: 'Чытанне для налад',
+        reading: ParsedSection(text: 'Першы сказ. Другі сказ.'),
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            liturgicalSeasonColorProvider.overrideWithValue(Colors.green),
+            readingsLoaderProvider.overrideWithValue(_loader([reading])),
+          ],
+          child: const MaterialApp(
+            home: ReadingsScreen(dateStr: '2026-09-09'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(ReadingsScreen)),
+      );
+      expect(
+        container.read(settingsProvider).readingsColorHighlightEnabled,
+        isFalse,
+      );
+
+      Future<void> tapFirstSentence() async {
+        final text = find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              (widget.textSpan?.toPlainText() ?? widget.data ?? '')
+                  .contains('Першы сказ. Другі сказ.'),
+        );
+        final rich = find.descendant(
+          of: text,
+          matching: find.byType(RichText),
+        );
+        final paragraph = tester.renderObject<RenderParagraph>(rich.first);
+        final glyphs = paragraph.getBoxesForSelection(
+          const TextSelection(baseOffset: 0, extentOffset: 5),
+        );
+        await tester.tapAt(
+          paragraph.localToGlobal(glyphs.first.toRect().center),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      await tapFirstSentence();
+      expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
+
+      await container
+          .read(settingsProvider.notifier)
+          .setReadingsColorHighlightEnabled(true);
+      await tester.pumpAndSettle();
+      expect(box.get('readingsColorHighlightEnabled'), isTrue);
+      await tapFirstSentence();
+      expect(find.byKey(const Key('readings-highlight-palette')), findsOneWidget);
+
+      // Disabling while the palette is open immediately closes it and
+      // removes the sentence tap recognizers, without touching color records.
+      await container
+          .read(settingsProvider.notifier)
+          .setReadingsColorHighlightEnabled(false);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
+      await tapFirstSentence();
+      expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
+      expect(box.get('readingsColorHighlightEnabled'), isFalse);
+
+      await container
+          .read(settingsProvider.notifier)
+          .setReadingsColorHighlightEnabled(true);
+      await tester.pumpAndSettle();
+      await tapFirstSentence();
+      expect(find.byKey(const Key('readings-highlight-palette')), findsOneWidget);
+
+      final reloaded = ProviderContainer();
+      addTearDown(reloaded.dispose);
+      expect(
+        reloaded.read(settingsProvider).readingsColorHighlightEnabled,
+        isTrue,
+      );
+    },
+  );
+
   testWidgets('options separate groups and expose only selectable cycles', (
     tester,
   ) async {
@@ -628,8 +717,10 @@ void main() {
 }
 
 class _TestSettingsNotifier extends SettingsNotifier {
+  // Existing palette regression cases explicitly opt in to the feature.
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() =>
+      const SettingsState(readingsColorHighlightEnabled: true);
 }
 
 final _presentationOverride = liturgicalDayPresentationProvider
