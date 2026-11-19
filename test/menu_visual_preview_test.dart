@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,11 +95,13 @@ void main() {
         }
 
         await capture('open');
-        await tester.tap(find.text('Шрыфт'));
+        await tester.tap(find.byKey(const Key('text-scale-inline-increase')));
         await tester.pumpAndSettle();
-        expect(find.byType(PsalmodyModeSelector), findsOneWidget);
+        expect(find.text('110%'), findsOneWidget);
+        expect(find.byKey(const Key('app-overflow-content')), findsOneWidget);
+        expect(find.byType(Slider), findsNothing);
         expect(tester.takeException(), isNull);
-        await capture('font-sheet');
+        await capture('inline-increased');
       });
     }
   }
