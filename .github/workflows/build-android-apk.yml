@@ -2,38 +2,42 @@ name: Build Android APK for Direct Sharing
 
 on:
   workflow_dispatch:
+  push:
+    branches: ['apk/**']
 
 permissions:
   contents: read
 
 env:
-  # Google Play build 26, confirmed in Actions run 44581798577.
-  RELEASE_SHA: 54b4fec00a0987ca3c5b36129808f4be22785799
   PACKAGE_ID: by.mybrev.playtest2026
-  VERSION_NAME: '1.0.0'
-  VERSION_CODE: '26'
   APK_PATH: build/app/outputs/flutter-apk/app-release.apk
-  ARTIFACT_APK: Malitounik-v1.0.0-26.apk
 
 jobs:
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Require main
+      - name: Require main or a dedicated APK branch
         run: |
-          if [[ "$GITHUB_REF" != refs/heads/main ]]; then
-            echo "::error::Run this workflow from main."
+          if [[ "$GITHUB_REF" != refs/heads/main && "$GITHUB_REF" != refs/heads/apk/* ]]; then
+            echo "::error::Run this workflow from main or an apk/ branch."
             exit 1
           fi
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_SHA }}
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Verify source commit
+      - name: Verify source commit and read the app version
         run: |
-          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
-          echo "Building $RELEASE_SHA"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          version=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' pubspec.yaml)
+          if [[ ! "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\+([1-9][0-9]*)$ ]]; then
+            echo "::error::Expected version name and Android build number in pubspec.yaml."
+            exit 1
+          fi
+          printf 'VERSION_NAME=%s\nVERSION_CODE=%s\nARTIFACT_APK=Malitounik-v%s-%s.apk\n' \
+            "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" >> "$GITHUB_ENV"
+          echo "Building $GITHUB_SHA ($version)"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -109,12 +113,12 @@ jobs:
           fi
           cp "$APK_PATH" "$ARTIFACT_APK"
           printf 'Source commit `%s`\n\nPackage `%s`\n\nVersion `%s (%s)`\n\nAPK `%s`\n\nUpload certificate SHA-256 `%s`\n' \
-            "$RELEASE_SHA" "$PACKAGE_ID" "$VERSION_NAME" "$VERSION_CODE" "$ARTIFACT_APK" "$expected_digest" >> "$GITHUB_STEP_SUMMARY"
+            "$GITHUB_SHA" "$PACKAGE_ID" "$VERSION_NAME" "$VERSION_CODE" "$ARTIFACT_APK" "$expected_digest" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload only the verified APK
         uses: actions/upload-artifact@v4
         with:
-          name: Malitounik-Android-v26-APK
-          path: Malitounik-v1.0.0-26.apk
+          name: Malitounik-Android-v${{ env.VERSION_CODE }}-APK
+          path: ${{ env.ARTIFACT_APK }}
           if-no-files-found: error
       - name: Enable KVM for the Android installation check
         run: |

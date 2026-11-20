@@ -5,15 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:mybrev_flutter/discovery/tour/discovery_settings_section.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/widgets/data_settings_section.dart';
 import 'package:mybrev_flutter/widgets/priest_access_settings_section.dart';
-import 'package:mybrev_flutter/widgets/admin_songbook_login_section.dart';
 import 'package:mybrev_flutter/widgets/liturgical_calendar_settings_section.dart';
-import 'package:mybrev_flutter/review/app_review_settings_section.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/app_theme_preference.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
@@ -95,6 +92,7 @@ class SettingsThemeControl extends StatelessWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _dataKey = GlobalKey();
+  late final _packageInfo = PackageInfo.fromPlatform();
 
   @override
   void initState() {
@@ -116,6 +114,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
+    final theme = Theme.of(context);
 
     return AmbientWash(
       seasonColor: GlassTokens.of(context).ambientBase,
@@ -373,49 +372,45 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                const DiscoverySettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-
                 DataSettingsSection(key: _dataKey),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
-                ListTile(
-                  key: const Key('settings-feedback'),
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.chat_bubble_outline_rounded),
-                  title: const Text('Зваротная сувязь'),
-                  subtitle: const Text(
-                    'Прапанова, пытанне або праблема з праграмай. Пра памылку ў тэксце — праз меню «⋯» на патрэбнай старонцы.',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/settings/feedback'),
-                ),
-                const AppReviewSettingsSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-                const AdminSongbookLoginSection(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
                 const PriestAccessSettingsSection(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 const Divider(),
-                const SizedBox(height: 16),
-
-                FutureBuilder<PackageInfo>(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) =>
-                      Text('Версія ${snapshot.data?.version ?? '—'}'),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () => context.push('/about'),
-                    child: const Text('Інфармацыя'),
+                ListTileTheme.merge(
+                  contentPadding: EdgeInsets.zero,
+                  minLeadingWidth: 24,
+                  horizontalTitleGap: 12,
+                  titleTextStyle: theme.textTheme.titleSmall,
+                  subtitleTextStyle: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        key: const Key('settings-feedback'),
+                        leading: const Icon(Icons.chat_bubble_outline_rounded),
+                        title: const Text('Зваротная сувязь'),
+                        subtitle: const Text(
+                          'Знайшлі памылку або маеце прапанову? Напішыце нам',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/settings/feedback'),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.info_outline_rounded),
+                        title: const Text('Інфармацыя'),
+                        subtitle: FutureBuilder<PackageInfo>(
+                          future: _packageInfo,
+                          builder: (context, snapshot) =>
+                              Text('Версія ${snapshot.data?.version ?? '—'}'),
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/about'),
+                      ),
+                    ],
                   ),
                 ),
               ],
