@@ -1,0 +1,136 @@
+name: Build Android APK for Direct Sharing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Google Play build 26, confirmed in Actions run 44581798577.
+  RELEASE_SHA: 54b4fec00a0987ca3c5b36129808f4be22785799
+  PACKAGE_ID: by.mybrev.playtest2026
+  VERSION_NAME: '1.0.0'
+  VERSION_CODE: '26'
+  APK_PATH: build/app/outputs/flutter-apk/app-release.apk
+  ARTIFACT_APK: Malitounik-v1.0.0-26.apk
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Require main
+        run: |
+          if [[ "$GITHUB_REF" != refs/heads/main ]]; then
+            echo "::error::Run this workflow from main."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+          persist-credentials: false
+      - name: Verify source commit
+        run: |
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          echo "Building $RELEASE_SHA"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.41.4'
+          cache: true
+      - name: Resolve locked dependencies and prepare Android build tools
+        run: |
+          flutter pub get --enforce-lockfile
+          if [[ ! -x "$ANDROID_HOME/build-tools/36.0.0/apksigner" ]]; then
+            sdkmanager --install 'build-tools;36.0.0'
+          fi
+      - name: Build and verify the signed release APK
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for secret in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ -z "${!secret}" ]]; then
+              echo "::error::Missing GitHub Actions secret $secret"
+              exit 1
+            fi
+          done
+
+          umask 077
+          signing_dir=$(mktemp -d "$RUNNER_TEMP/apk-signing.XXXXXX")
+          trap 'rm -rf -- "$signing_dir"' EXIT
+          export ANDROID_KEYSTORE_PATH="$signing_dir/upload.jks"
+          if ! printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is invalid."
+            exit 1
+          fi
+          unset ANDROID_KEYSTORE_BASE64
+
+          cert="$signing_dir/upload.der"
+          if ! keytool -exportcert -keystore "$ANDROID_KEYSTORE_PATH" \
+            -storepass:env ANDROID_KEYSTORE_PASSWORD -alias "$ANDROID_KEY_ALIAS" > "$cert" 2>/dev/null; then
+            echo "::error::Unable to open the Android upload keystore or export its certificate."
+            exit 1
+          fi
+          subject=$(openssl x509 -inform DER -in "$cert" -noout -subject)
+          if [[ "${subject,,}" == *"android debug"* ]]; then
+            echo "::error::The upload keystore contains an Android debug certificate."
+            exit 1
+          fi
+          expected_digest=$(sha256sum "$cert" | cut -d ' ' -f 1)
+
+          flutter build apk --release --no-pub --build-name="$VERSION_NAME" --build-number="$VERSION_CODE"
+          unset ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD
+          test -s "$APK_PATH"
+
+          build_tools="$ANDROID_HOME/build-tools/36.0.0"
+          signature=$("$build_tools/apksigner" verify --print-certs "$APK_PATH")
+          actual_digest=$(sed -nE 's/^Signer #[0-9]+ certificate SHA-256 digest: ([[:xdigit:]]+)$/\1/p' <<< "$signature")
+          if [[ "${actual_digest,,}" != "$expected_digest" ]]; then
+            echo "::error::The APK must have exactly one signer matching the upload certificate."
+            exit 1
+          fi
+
+          badging=$("$build_tools/aapt" dump badging "$APK_PATH")
+          expected_package="package: name='$PACKAGE_ID' versionCode='$VERSION_CODE' versionName='$VERSION_NAME'"
+          if [[ "$badging" != "$expected_package"* ]]; then
+            echo "::error::APK package or version does not match the expected release."
+            exit 1
+          fi
+          cp "$APK_PATH" "$ARTIFACT_APK"
+          printf 'Source commit `%s`\n\nPackage `%s`\n\nVersion `%s (%s)`\n\nAPK `%s`\n\nUpload certificate SHA-256 `%s`\n' \
+            "$RELEASE_SHA" "$PACKAGE_ID" "$VERSION_NAME" "$VERSION_CODE" "$ARTIFACT_APK" "$expected_digest" >> "$GITHUB_STEP_SUMMARY"
+      - name: Enable KVM for the Android installation check
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and launch the APK on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: |
+            adb install "$ARTIFACT_APK"
+            adb shell am start -W -n "$PACKAGE_ID/com.example.mybrev_flutter.MainActivity" | tee "$RUNNER_TEMP/apk-launch.txt"
+            rg -q '^Status: ok' "$RUNNER_TEMP/apk-launch.txt"
+            sleep 3
+            adb shell pidof "$PACKAGE_ID"
+            echo 'Installed and launched on an Android API 35 emulator.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload only the verified APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Malitounik-Android-v26-APK
+          path: Malitounik-v1.0.0-26.apk
+          if-no-files-found: error
