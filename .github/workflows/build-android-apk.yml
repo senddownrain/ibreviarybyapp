@@ -88,7 +88,8 @@ jobs:
           fi
           expected_digest=$(sha256sum "$cert" | cut -d ' ' -f 1)
 
-          flutter build apk --release --no-pub --build-name="$VERSION_NAME" --build-number="$VERSION_CODE"
+          # Flutter regenerates the plugin registrant for release when pub is enabled.
+          flutter build apk --release --build-name="$VERSION_NAME" --build-number="$VERSION_CODE"
           unset ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD
           test -s "$APK_PATH"
 
