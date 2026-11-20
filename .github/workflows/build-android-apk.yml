@@ -110,6 +110,12 @@ jobs:
           cp "$APK_PATH" "$ARTIFACT_APK"
           printf 'Source commit `%s`\n\nPackage `%s`\n\nVersion `%s (%s)`\n\nAPK `%s`\n\nUpload certificate SHA-256 `%s`\n' \
             "$RELEASE_SHA" "$PACKAGE_ID" "$VERSION_NAME" "$VERSION_CODE" "$ARTIFACT_APK" "$expected_digest" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload only the verified APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Malitounik-Android-v26-APK
+          path: Malitounik-v1.0.0-26.apk
+          if-no-files-found: error
       - name: Enable KVM for the Android installation check
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
@@ -124,14 +130,9 @@ jobs:
           disable-animations: true
           script: |
             adb install "$ARTIFACT_APK"
-            adb shell am start -W -n "$PACKAGE_ID/com.example.mybrev_flutter.MainActivity" | tee "$RUNNER_TEMP/apk-launch.txt"
-            rg -q '^Status: ok' "$RUNNER_TEMP/apk-launch.txt"
+            adb shell am start -W -n "$PACKAGE_ID/com.example.mybrev_flutter.MainActivity" > "$RUNNER_TEMP/apk-launch.txt"
+            cat "$RUNNER_TEMP/apk-launch.txt"
+            grep -q '^Status: ok' "$RUNNER_TEMP/apk-launch.txt"
             sleep 3
             adb shell pidof "$PACKAGE_ID"
             echo 'Installed and launched on an Android API 35 emulator.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Upload only the verified APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Malitounik-Android-v26-APK
-          path: Malitounik-v1.0.0-26.apk
-          if-no-files-found: error
