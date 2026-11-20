@@ -1,0 +1,31 @@
+name: Dispatch the corrected Malitounik APK build once
+
+on:
+  push:
+    branches: [codex/dispatch-malitounik-v26-apk]
+    paths: [.github/workflows/dispatch-malitounik-v26-once.yml]
+
+permissions: {}
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      WORKFLOW_SHA: a17be901c9a1cd23355c60180efd0b3d7bf40963
+    steps:
+      - name: Start the manual APK workflow if needed
+        shell: bash
+        run: |
+          existing=$(gh run list --workflow build-android-apk.yml --branch main \
+            --event workflow_dispatch --commit "$WORKFLOW_SHA" --limit 10 \
+            --json status,conclusion --jq 'any(.[]; .status != "completed" or .conclusion == "success")')
+          if [[ "$existing" == true ]]; then
+            echo 'The corrected APK workflow was already started.'
+            exit 0
+          fi
+          gh workflow run build-android-apk.yml --ref main
