@@ -46,10 +46,14 @@ Console и порядок включения Enforcement описаны в
    локальные данные или идентификатор установки.
 4. Если прямой APK недоступен с требованиями для смешанного канала
    (`PLAY_RECOGNIZED`), оставьте Firestore в режиме наблюдения. Согласуйте
-   с владельцем либо перевод этих пользователей на поддерживаемый Play-выпуск
-   с сохранением доступа, либо отдельно проверенный канал аттестации
-   sideload. Изменение требований Play Integrity для общего Firebase App
-   затронет оба Android-канала. [Play Integrity][play]
+   с владельцем перевод этих пользователей на поддерживаемый Play-выпуск
+   или самостоятельный sideload-пакет с отдельным Firebase App ID, с
+   проверенным рецептом Firebase для off-Play и планом переноса доступа.
+   Если сохранять один App ID, вариант с отсутствием требований
+   `PLAY_RECOGNIZED` и `LICENSED` и с обязательным
+   `MEETS_DEVICE_INTEGRITY` нужно отдельно согласовать и проверить
+   в обоих каналах. Изменение требований для общего Firebase App
+   затронет всех Android-пользователей. [Play Integrity][play]
 
 ### iOS
 
@@ -76,6 +80,7 @@ Console и порядок включения Enforcement описаны в
 flutter build web --dart-define=FIREBASE_APP_CHECK_SITE_KEY=<public-site-key>
 flutter test test/services/firebase_app_check_test.dart
 flutter test --dart-define=PRIEST_USE_EMULATORS=true test/services/firebase_app_check_test.dart
+flutter test --platform chrome --dart-define=FIREBASE_APP_CHECK_SITE_KEY=test-key test/services/firebase_app_check_test.dart
 ```
 
 Указывайте ключ из регистрации именно этого Firebase Web App и
@@ -109,7 +114,7 @@ bundle ID и профиль. Так staging-запросы не попадут �
 каналах. Симуляторы и сборки без App Check не подтверждают готовность
 реального канала.
 
-[web-guide]: https://github.com/senddownrain/mybrev/blob/codex/firebase-app-check-web/docs/firebase-app-check.md
+[web-guide]: https://github.com/senddownrain/mybrev/blob/main/docs/firebase-app-check.md
 [play]: https://firebase.google.com/docs/app-check/android/play-integrity-provider
 [attest]: https://firebase.google.com/docs/app-check/ios/app-attest-provider
 [devicecheck]: https://firebase.google.com/docs/app-check/ios/devicecheck-provider

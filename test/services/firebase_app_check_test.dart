@@ -34,6 +34,9 @@ class _AppCheckPlatform extends FirebaseAppCheckPlatform {
     AppleProvider? appleProvider,
   }) async {
     calls.add((app, androidProvider, appleProvider));
+    if (webProvider != null) {
+      calls.add((webProvider.runtimeType, webProvider.siteKey));
+    }
   }
 
   @override
@@ -62,15 +65,32 @@ void main() {
     );
   });
 
-  if (const bool.fromEnvironment('PRIEST_USE_EMULATORS') || kIsWeb) {
-    test(
-      'skips attestation on emulators and Web builds without a key',
-      () async {
-        await activateFirebaseAppCheck(_App('[DEFAULT]'));
-        await activateFirebaseAppCheck(_App('mybrev-priest'));
-        expect(calls, isEmpty);
-      },
-    );
+  if (const bool.fromEnvironment('PRIEST_USE_EMULATORS')) {
+    test('skips attestation in the local Firebase mode', () async {
+      await activateFirebaseAppCheck(_App('[DEFAULT]'));
+      await activateFirebaseAppCheck(_App('mybrev-priest'));
+      expect(calls, isEmpty);
+    });
+    return;
+  }
+
+  if (kIsWeb) {
+    test('uses an Enterprise provider only when the Web key is set', () async {
+      final app = _App('[DEFAULT]');
+      const key = String.fromEnvironment('FIREBASE_APP_CHECK_SITE_KEY');
+      await activateFirebaseAppCheck(app);
+      expect(calls, [
+        if (key.trim().isNotEmpty) ...[
+          (
+            app,
+            AndroidProvider.playIntegrity,
+            AppleProvider.appAttestWithDeviceCheckFallback,
+          ),
+          (ReCaptchaEnterpriseProvider, key.trim()),
+          (app, true),
+        ],
+      ]);
+    });
     return;
   }
 

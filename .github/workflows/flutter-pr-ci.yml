@@ -235,6 +235,8 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
+      - name: Flutter Web App Check provider with a synthetic key
+        run: flutter test --no-pub --platform chrome --dart-define=FIREBASE_APP_CHECK_SITE_KEY=test-key test/services/firebase_app_check_test.dart
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
