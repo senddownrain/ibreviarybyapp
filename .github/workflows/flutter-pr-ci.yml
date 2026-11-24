@@ -34,6 +34,10 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
+      - name: App Check platform selection and emulator bypass
+        run: |
+          flutter test --no-pub test/services/firebase_app_check_test.dart
+          flutter test --no-pub --dart-define=PRIEST_USE_EMULATORS=true test/services/firebase_app_check_test.dart
       - name: Five Flutter visual acceptance screenshots
         env:
           READER_UI_ACCEPTANCE_IMAGES: '1'

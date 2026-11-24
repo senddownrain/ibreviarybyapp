@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,7 @@ import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/review/app_review_storage.dart';
 import 'package:mybrev_flutter/router/discovery_navigation.dart';
 import 'package:mybrev_flutter/router/router.dart';
+import 'package:mybrev_flutter/services/firebase_app_check.dart';
 import 'package:mybrev_flutter/services/firebase_bootstrap.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
@@ -33,6 +36,7 @@ void main() async {
   await ensureFirebaseInitialized(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await activateFirebaseAppCheck(Firebase.app());
   if (!kIsWeb) {
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
@@ -48,6 +52,13 @@ void main() async {
     FirebaseFirestore.instance.useFirestoreEmulator(
       host,
       const int.fromEnvironment('FIRESTORE_EMULATOR_PORT', defaultValue: 8089),
+    );
+    await FirebaseAuth.instance.useAuthEmulator(
+      host,
+      const int.fromEnvironment(
+        'FIREBASE_AUTH_EMULATOR_PORT',
+        defaultValue: 9099,
+      ),
     );
   }
   await HiveService.init();
