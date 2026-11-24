@@ -61,8 +61,9 @@ Console и порядок включения Enforcement описаны в
 2. Используйте одобренный [TestFlight-процесс](RELEASE_BETA.md) или
    `ios-testflight` из `codemagic.yaml` и новый build number.
    Реальную аттестацию проверяйте на физическом iPhone через TestFlight/
-   App Store. Simulator build подтверждает сборку плагина и entitlement,
-   но для выдачи токена оба Apple-провайдера требуют подходящего устройства.
+   App Store. Отдельная проверка CocoaPods в CI подтверждает разрешение
+   зависимостей. Для выдачи токена и проверки подписанного entitlement
+   нужна реальная подписанная сборка и подходящее устройство.
 3. Проверьте App Attest на поддерживаемом устройстве и отдельно готовность
    DeviceCheck в Firebase. SDK выбирает DeviceCheck, когда iOS сообщает,
    что App Attest недоступен. Ошибки App Attest на поддерживаемом устройстве
@@ -83,7 +84,11 @@ flutter test --dart-define=PRIEST_USE_EMULATORS=true test/services/firebase_app_
 debug-сборку и локальный `FIREBASE_EMULATOR_HOST`. Auth и Firestore
 перенаправляются в emulators, App Check не активируется. Для настоящей
 аттестации нужна отдельно зарегистрированная staging-конфигурация с
-синтетическими данными.
+синтетическими данными. Для Flutter Web подставьте staging FirebaseOptions
+в изолированном рабочем дереве. Для проверки Play Integrity из Google
+Play staging-сборке нужны зарегистрированный тестовый пакет и Play app,
+связанный со staging-проектом. Для iOS staging применяйте соответствующий
+bundle ID и профиль. Так staging-запросы не попадут в `ibreviaryby`.
 
 ### Приёмка и старые версии
 
