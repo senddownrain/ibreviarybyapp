@@ -27,3 +27,7 @@ jobs:
       - name: Install locked iOS pods
         working-directory: ios
         run: pod install --deployment
+      - name: Compile iOS release for physical devices without signing
+        run: |
+          flutter build ios --release --no-codesign --no-pub
+          git diff --exit-code -- ios/Podfile.lock
