@@ -69,6 +69,8 @@ flutter:
     - assets/category_icons/
     - assets/compendium/compendium_search_aliases.json
     - assets/legal/sources.json
+    # Belarusian hyphenation patterns (hyph-utf8 `hyph-be`, MIT, M. Salau).
+    - assets/hyphenation/hyph-be.tex
     # Book faces used by ReaderTheme, bundled so the first launch without a
     # network has the right typography (google_fonts reads these first).
     - assets/google_fonts/

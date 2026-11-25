@@ -13,6 +13,7 @@ import 'package:mybrev_flutter/discovery/discovery.dart';
 import 'package:mybrev_flutter/discovery/discovery_qa_mode.dart';
 import 'package:mybrev_flutter/dev/discovery_qa_flags.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
+import 'package:mybrev_flutter/hyphenation/hyphenation_service.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/review/app_review_storage.dart';
@@ -30,6 +31,9 @@ import 'package:mybrev_flutter/widgets/priest_access_lifecycle.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Bundled Belarusian hyphenation patterns (no network); prose falls back to
+  // the adaptive alignment until they are loaded.
+  unawaited(BelarusianHyphenation.ensureLoaded());
   await ensureFirebaseInitialized(
     options: DefaultFirebaseOptions.currentPlatform,
   );
