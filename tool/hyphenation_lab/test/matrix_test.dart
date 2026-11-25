@@ -12,6 +12,7 @@ import 'package:hyphenation_lab/lab_scene.dart';
 
 import 'support.dart';
 
+const matrixModes = [Mode.a, Mode.b1, Mode.b2, Mode.c, Mode.d];
 late BelarusianHyphenator hyph;
 final rows = <Map<String, Object?>>[];
 
@@ -61,7 +62,7 @@ Widget sheet({
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final m in Mode.values) ...[col(m), const SizedBox(width: 6)],
+        for (final m in matrixModes) ...[col(m), const SizedBox(width: 6)],
       ],
     ),
   );
@@ -158,7 +159,11 @@ Map<Mode, LabMetrics> collect(
           // flutter_html wraps text in placeholder-only paragraphs: skip those
           // and measure only the paragraphs that carry letters (once each).
           if (!seen.add(ro)) return;
-          final m = measureRender(ro, justified: justified, base: base);
+          final m = measureRender(
+            ro,
+            justified: ro.textAlign == TextAlign.justify,
+            base: base,
+          );
           all.addAll(m.lines);
           sw = m.spaceWidth;
           innerW = ro.size.width;

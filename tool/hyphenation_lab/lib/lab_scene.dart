@@ -17,6 +17,9 @@ class LabReading extends StatelessWidget {
     required this.scale,
     required this.palette,
     required this.hyphenator,
+    this.plainText,
+    this.htmlText,
+    this.title,
   });
 
   final Mode mode;
@@ -26,15 +29,20 @@ class LabReading extends StatelessWidget {
   final LabPalette palette;
   final BelarusianHyphenator hyphenator;
 
-  TextAlign get _align => mode == Mode.c || mode == Mode.d ? TextAlign.left : TextAlign.justify;
+  /// Real reading text (plain/HTML) instead of the built-in fixtures.
+  final String? plainText;
+  final String? htmlText;
+
+  /// Heading above the text (defaults to the fixture's "Тыт 2, 1–5").
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     final base = bodyStyle(family, scale, palette);
-    final title = Padding(
+    final heading = Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
-        fixtureTitle,
+        title ?? fixtureTitle,
         style: base.copyWith(
           color: palette.rubric,
           fontWeight: FontWeight.w600,
@@ -42,46 +50,64 @@ class LabReading extends StatelessWidget {
         ),
       ),
     );
-    final Widget body = scenario == Scenario.html ? _html(base) : _plain(base);
     return Container(
       color: palette.bg,
       padding: const EdgeInsets.symmetric(horizontal: gutter, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [title, body],
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final align = switch (mode) {
+            Mode.c || Mode.d => TextAlign.left,
+            Mode.ad => adaptiveAlignment(c.maxWidth, base),
+            _ => TextAlign.justify,
+          };
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              heading,
+              scenario == Scenario.html
+                  ? _html(context, base, align)
+                  : _plain(context, base, align),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _plain(TextStyle base) {
+  Widget _plain(BuildContext context, TextStyle base, TextAlign align) {
     var span = buildPlainSpan(
       base,
       palette,
       highlight: scenario == Scenario.highlight,
+      text: plainText,
     );
     switch (mode) {
       case Mode.a:
       case Mode.c:
-        return Text.rich(span, textAlign: _align);
+      case Mode.ad:
+        return Text.rich(span, textAlign: align);
       case Mode.b1:
         span =
             mapSpanText(span, (t) => insertSoftHyphens(t, hyphenator))
                 as TextSpan;
-        return Text.rich(span, textAlign: _align);
+        return Text.rich(span, textAlign: align);
       case Mode.b2:
       case Mode.d:
         return HyphenatedJustifiedText(
           text: span,
           hyphenator: hyphenator,
           justify: mode == Mode.b2,
+          textScaler:
+              MediaQuery.maybeTextScalerOf(context) ?? TextScaler.noScaling,
         );
     }
   }
 
-  Widget _html(TextStyle base) {
+  Widget _html(BuildContext context, TextStyle base, TextAlign align) {
+    final html = htmlText ?? htmlFixture;
     if (mode == Mode.b2 || mode == Mode.d) {
-      final paras = htmlToParagraphSpans(htmlFixture, base, palette);
+      final paras = htmlToParagraphSpans(html, base, palette);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -93,14 +119,17 @@ class LabReading extends StatelessWidget {
                 text: paras[i],
                 hyphenator: hyphenator,
                 justify: mode == Mode.b2,
+                textScaler:
+                    MediaQuery.maybeTextScalerOf(context) ??
+                    TextScaler.noScaling,
               ),
             ),
         ],
       );
     }
     final data = mode == Mode.b1
-        ? insertSoftHyphensInHtml(htmlFixture, hyphenator)
-        : htmlFixture;
+        ? insertSoftHyphensInHtml(html, hyphenator)
+        : html;
     return Html(
       data: data,
       style: {
@@ -111,9 +140,9 @@ class LabReading extends StatelessWidget {
           fontSize: FontSize(base.fontSize!),
           lineHeight: LineHeight(bodyHeight),
           color: palette.ink,
-          textAlign: _align,
+          textAlign: align,
         ),
-        'p': Style(margin: Margins.only(bottom: 8), textAlign: _align),
+        'p': Style(margin: Margins.only(bottom: 8), textAlign: align),
         'a': Style(
           color: palette.dark
               ? const Color(0xFF8FB8D4)

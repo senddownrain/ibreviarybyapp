@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 import 'be_hyphenator.dart';
@@ -35,6 +36,7 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
     this.minRight = 3,
     this.minLeft = 2,
     this.shrink = 0.0,
+    this.textScaler = TextScaler.noScaling,
   });
 
   final TextSpan text;
@@ -48,17 +50,23 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
   /// rejected. 0 = never shrink (safe for sacred text readability).
   final double shrink;
 
+  /// System/reader text scale (pass `MediaQuery.textScalerOf(context)`).
+  final TextScaler textScaler;
+
   @override
   RenderHyphenatedJustifiedText createRenderObject(BuildContext context) =>
       RenderHyphenatedJustifiedText(
-        text: text,
-        hyphenator: hyphenator,
-        justify: justify,
-        hyphenate: hyphenate,
-        minLeft: minLeft,
-        minRight: minRight,
-        shrink: shrink,
-      );
+          text: text,
+          hyphenator: hyphenator,
+          justify: justify,
+          hyphenate: hyphenate,
+          minLeft: minLeft,
+          minRight: minRight,
+          shrink: shrink,
+          textScaler: textScaler,
+        )
+        ..registrar = SelectionContainer.maybeOf(context)
+        ..selectionColor = DefaultSelectionStyle.of(context).selectionColor;
 
   @override
   void updateRenderObject(
@@ -72,7 +80,10 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
       ..hyphenate = hyphenate
       ..minLeft = minLeft
       ..minRight = minRight
-      ..shrink = shrink;
+      ..shrink = shrink
+      ..textScaler = textScaler
+      ..registrar = SelectionContainer.maybeOf(context)
+      ..selectionColor = DefaultSelectionStyle.of(context).selectionColor;
   }
 }
 
@@ -115,13 +126,28 @@ class _Chunk {
   final GestureRecognizer? recognizer;
 }
 
+class _Metric {
+  _Metric(this.painter, this.width, this.baseline, this.height);
+  final TextPainter painter;
+  final double width;
+  final double baseline;
+  final double height;
+}
+
 class _Seg {
-  _Seg(this.text, this.style, this.recognizer, this.painter, this.width);
+  _Seg(this.start, this.text, this.style, this.recognizer, this.metric);
+
+  /// Offset of this segment's first character in the paragraph's plain text
+  /// (-1 for the painted hyphen, which is not part of the text).
+  final int start;
   final String text;
   final TextStyle style;
   final GestureRecognizer? recognizer;
-  final TextPainter painter;
-  final double width;
+  final _Metric metric;
+  TextPainter get painter => metric.painter;
+  double get width => metric.width;
+  double get baseline => metric.baseline;
+  double get height => metric.height;
 }
 
 class _Piece {
@@ -138,13 +164,25 @@ class _Piece {
   String get text => segs.map((s) => s.text).join();
   int firstOfWord = 0;
   bool forcedBreakAfter = false; // paragraph newline follows
+
+  /// The space after this piece may not become a line break (one-letter
+  /// prepositions, abbreviations, "Мц 5"-style references, a following dash).
+  bool glue = false;
+
+  /// Kerning between this piece and the next piece of the same word (applies
+  /// only when the word is NOT broken there), so an unbroken word keeps the
+  /// exact width and shape the stock engine gives it.
+  double joint = 0;
 }
 
 class _PlacedSeg {
-  _PlacedSeg(this.seg, this.x, this.width);
+  _PlacedSeg(this.seg, this.x, this.width, [this.dy = 0]);
   final _Seg seg;
   final double x;
   final double width;
+
+  /// Vertical shift that puts every segment's baseline on the line baseline.
+  double dy;
 }
 
 class _Line {
@@ -154,9 +192,16 @@ class _Line {
   final HyphLine info;
   double y = 0;
   _PlacedSeg? hyphen;
+  double baseline = 0;
+
+  /// Source-text range covered by this line (without the painted hyphen).
+  int get start => placed.isEmpty ? 0 : placed.first.seg.start;
+  int get end =>
+      placed.isEmpty ? 0 : placed.last.seg.start + placed.last.seg.text.length;
 }
 
-class RenderHyphenatedJustifiedText extends RenderBox {
+class RenderHyphenatedJustifiedText extends RenderBox
+    with Selectable, SelectionRegistrant {
   RenderHyphenatedJustifiedText({
     required TextSpan text,
     required BelarusianHyphenator? hyphenator,
@@ -165,13 +210,15 @@ class RenderHyphenatedJustifiedText extends RenderBox {
     required int minLeft,
     required int minRight,
     required double shrink,
+    TextScaler textScaler = TextScaler.noScaling,
   }) : _text = text,
        _hyphenator = hyphenator,
        _justify = justify,
        _hyphenate = hyphenate,
        _minLeft = minLeft,
        _minRight = minRight,
-       _shrink = shrink;
+       _shrink = shrink,
+       _textScaler = textScaler;
 
   TextSpan _text;
   BelarusianHyphenator? _hyphenator;
@@ -180,6 +227,13 @@ class RenderHyphenatedJustifiedText extends RenderBox {
   int _minLeft;
   int _minRight;
   double _shrink;
+  TextScaler _textScaler;
+
+  set textScaler(TextScaler v) {
+    if (_textScaler == v) return;
+    _textScaler = v;
+    _invalidate();
+  }
 
   set text(TextSpan v) {
     if (_text == v) return;
@@ -225,14 +279,13 @@ class RenderHyphenatedJustifiedText extends RenderBox {
 
   List<_Line> _lines = const [];
   String _plain = '';
-  final Map<(String, TextStyle), _Seg> _segCache = {};
 
   /// The original, unmodified text (what copy/semantics would expose).
   String get plainText => _plain;
   List<HyphLine> get lines => [for (final l in _lines) l.info];
 
   void _invalidate() {
-    _segCache.clear();
+    _metricCache.clear();
     _laidOutWidth = null;
     markNeedsLayout();
     markNeedsSemanticsUpdate();
@@ -263,18 +316,36 @@ class RenderHyphenatedJustifiedText extends RenderBox {
     return chunks;
   }
 
-  _Seg _measure(String text, TextStyle style, GestureRecognizer? rec) {
-    final key = (text, style);
-    return _segCache.putIfAbsent(key, () {
+  final Map<(String, TextStyle), _Metric> _metricCache = {};
+
+  _Seg _measure(
+    String text,
+    TextStyle style,
+    GestureRecognizer? rec, [
+    int start = -1,
+  ]) {
+    final m = _metricCache.putIfAbsent((text, style), () {
       final tp = TextPainter(
         text: TextSpan(
           text: text,
-          style: style.copyWith(backgroundColor: const Color(0x00000000)),
+          // Backgrounds and underlines are drawn by this render object (so
+          // that they also cover the stretched gaps between words).
+          style: style.copyWith(
+            backgroundColor: const Color(0x00000000),
+            decoration: TextDecoration.none,
+          ),
         ),
         textDirection: TextDirection.ltr,
+        textScaler: _textScaler,
       )..layout();
-      return _Seg(text, style, rec, tp, tp.width);
+      return _Metric(
+        tp,
+        tp.width,
+        tp.computeDistanceToActualBaseline(TextBaseline.alphabetic),
+        tp.height,
+      );
     });
+    return _Seg(start, text, style, rec, m);
   }
 
   // ---- tokenising -----------------------------------------------------
@@ -296,7 +367,7 @@ class RenderHyphenatedJustifiedText extends RenderBox {
         if (c.end <= from) continue;
         final a = math.max(from, c.start);
         final b = math.min(to, c.end);
-        segs.add(_measure(plain.substring(a, b), c.style, c.recognizer));
+        segs.add(_measure(plain.substring(a, b), c.style, c.recognizer, a));
       }
       return segs;
     }
@@ -313,24 +384,68 @@ class RenderHyphenatedJustifiedText extends RenderBox {
 
     // Words are separated by ' ' and '\n'. NBSP (U+00A0) glues words.
     final splitter = RegExp(r'[ \n]');
+    final tokens = <(int, int, bool)>[];
     var pos = 0;
     while (pos <= plain.length) {
       var end = plain.indexOf(splitter, pos);
       if (end < 0) end = plain.length;
+      final newline = end < plain.length && plain[end] == '\n';
       if (end > pos) {
-        final newlineFollows = end < plain.length && plain[end] == '\n';
-        pieces.addAll(
-          _wordPieces(plain, pos, end, make, maxWidth, newlineFollows),
-        );
-      } else if (end < plain.length && plain[end] == '\n') {
-        // Empty line: represent with a forced-break empty piece.
-        final p = _Piece([], 0, true, false, null)..forcedBreakAfter = true;
-        pieces.add(p);
+        tokens.add((pos, end, newline));
+      } else if (newline) {
+        tokens.add((pos, pos, true)); // empty line
       }
       if (end >= plain.length) break;
       pos = end + 1;
     }
+    for (var t = 0; t < tokens.length; t++) {
+      final (a, b, newline) = tokens[t];
+      if (b == a) {
+        pieces.add(_Piece([], 0, true, false, null)..forcedBreakAfter = true);
+        continue;
+      }
+      final wp = _wordPieces(plain, a, b, make, maxWidth, newline);
+      if (wp.isNotEmpty && !newline && t + 1 < tokens.length) {
+        final (na, nb, _) = tokens[t + 1];
+        if (nb > na &&
+            glueAfter(plain.substring(a, b), plain.substring(na, nb))) {
+          wp.last.glue = true;
+        }
+      }
+      pieces.addAll(wp);
+    }
     return pieces;
+  }
+
+  static final _abbreviation = RegExp(
+    r'^(гл|ст|с|пар|рыс|напр|тт|т|тыс|гг|г|н|п|ч|пр|тзв|гэт|англ|рус|лац)\.$',
+    caseSensitive: false,
+  );
+
+  /// Typographic "no line break after this word" rules (Belarusian prose):
+  /// a one-letter word (ў, у, і, а, з, к…) is never left at the end of a line;
+  /// an abbreviation with a dot stays with what it abbreviates; a word before a
+  /// number stays with it ("Мц 5, 3–12"); a lone dash or a rubric marker
+  /// (`*`, `†`) never starts a line.
+  static bool glueAfter(String word, String next) {
+    final core = word.replaceAll(
+      RegExp(r'^[^А-Яа-яЁёІіЎў0-9]+|[^А-Яа-яЁёІіЎў0-9]+$'),
+      '',
+    );
+    if (core.length == 1 && RegExp(r'[А-Яа-яЁёІіЎў]').hasMatch(core))
+      return true;
+    if (_abbreviation.hasMatch(word)) return true;
+    if (RegExp(r'^[0-9]').hasMatch(next)) return true;
+    if (RegExp(r'^[—–*†]$').hasMatch(next)) return true;
+    return false;
+  }
+
+  static bool _isSentenceStart(String plain, int start) {
+    var i = start - 1;
+    while (i >= 0 && ' «“"(\u00A0'.contains(plain[i])) {
+      i--;
+    }
+    return i < 0 || '.!?…:\n'.contains(plain[i]);
   }
 
   List<_Piece> _wordPieces(
@@ -348,7 +463,12 @@ class RenderHyphenatedJustifiedText extends RenderBox {
     if (_hyphenate && h != null) {
       // Hyphenate only the pure-letter core, leaving punctuation outside.
       final m = _core.firstMatch(word);
-      if (m != null && m.group(0)!.length >= 6) {
+      // Proper names (capitalised words inside a sentence) are never split.
+      final properName =
+          m != null &&
+          m.group(0)![0] != m.group(0)![0].toLowerCase() &&
+          !_isSentenceStart(plain, start);
+      if (m != null && !properName && m.group(0)!.length >= 6) {
         // The whole token must be "core + punctuation" with a single core run.
         final rest = word.substring(0, m.start) + word.substring(m.end);
         if (!RegExp(r'[А-Яа-яЁёІіЎў0-9A-Za-z]').hasMatch(rest)) {
@@ -379,6 +499,15 @@ class RenderHyphenatedJustifiedText extends RenderBox {
       piece.firstOfWord = i;
       if (last && newlineFollows) piece.forcedBreakAfter = true;
       out.add(piece);
+    }
+    for (var i = 0; i < out.length - 1; i++) {
+      final a = out[i], b = out[i + 1];
+      if (a.segs.length == 1 &&
+          b.segs.length == 1 &&
+          a.segs.first.style == b.segs.first.style) {
+        final both = _measure(a.text + b.text, a.segs.first.style, null);
+        a.joint = both.width - a.width - b.width;
+      }
     }
     // Emergency: a single piece wider than the box is split by characters so
     // nothing is ever clipped (visible hyphen after each cut).
@@ -442,8 +571,14 @@ class RenderHyphenatedJustifiedText extends RenderBox {
   void performLayout() {
     final maxWidth = constraints.maxWidth;
     assert(maxWidth.isFinite, 'HyphenatedJustifiedText needs a bounded width');
+    final changed = _laidOutWidth != maxWidth;
     _ensureLayout(maxWidth);
     size = constraints.constrain(Size(maxWidth, _height));
+    if (changed && _hasSelection) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (attached) _publishSelection();
+      });
+    }
   }
 
   List<_Line> _breakParagraphs(List<_Piece> all, double w) {
@@ -461,14 +596,14 @@ class RenderHyphenatedJustifiedText extends RenderBox {
     return result;
   }
 
-  List<_Line> _breakParagraph(List<_Piece> items, double w) {
+  List<_Line> _breakParagraph(
+    List<_Piece> items,
+    double w, {
+    bool honorGlue = true,
+  }) {
     final n = items.length;
     if (n == 0 || (n == 1 && items[0].segs.isEmpty)) {
-      final lh = _measure(
-        'Ay',
-        _text.style ?? const TextStyle(),
-        null,
-      ).painter.height;
+      final lh = _measure('Ay', _text.style ?? const TextStyle(), null).height;
       return [
         _Line(
           [],
@@ -506,6 +641,7 @@ class RenderHyphenatedJustifiedText extends RenderBox {
             spaces++;
             natural += _spaceWidth;
           }
+          if (j > i && !items[j - 1].endsWord) natural += items[j - 1].joint;
           natural += items[j].width;
           final isEndOfPara = j == n - 1;
           final hyphenBreak = !items[j].endsWord;
@@ -537,7 +673,9 @@ class RenderHyphenatedJustifiedText extends RenderBox {
             double badness;
             if (!_justify) {
               // Ragged right: only the slack at the end of the line matters.
-              badness = 100 * math.pow(((w - lineW) / w * 4).clamp(0.0, 4.0), 3) as double;
+              badness =
+                  100 * math.pow(((w - lineW) / w * 4).clamp(0.0, 4.0), 3)
+                      as double;
             } else if (spaces == 0) {
               // A one-word line cannot be justified: always at least as bad
               // as the worst stretched line (cap 10000), worse the shorter it is.
@@ -559,6 +697,8 @@ class RenderHyphenatedJustifiedText extends RenderBox {
           }
           // At most 3 hyphenated lines in a row (state 3 = three already).
           if (hyphenBreak && ph >= 3) continue;
+          // Breaking at a glued space is allowed only when unavoidable.
+          if (honorGlue && items[j].glue && !isEndOfPara) demerits += 5e8;
           final h = hyphenBreak ? ph + 1 : 0;
           final total = base + demerits;
           if (total < best[j + 1][h]) {
@@ -575,7 +715,8 @@ class RenderHyphenatedJustifiedText extends RenderBox {
       if (best[n][q] < best[n][h]) h = q;
     }
     if (best[n][h] == inf) {
-      // Cannot happen after the emergency split, but never throw in layout.
+      // Glue made the paragraph unbreakable: retry without it; never throw.
+      if (honorGlue) return _breakParagraph(items, w, honorGlue: false);
       return [_greedy(items, 0, n, w, true)];
     }
     final ranges = <(int, int)>[];
@@ -601,6 +742,7 @@ class RenderHyphenatedJustifiedText extends RenderBox {
         spaces++;
         natural += _spaceWidth;
       }
+      if (j > a && !items[j - 1].endsWord) natural += items[j - 1].joint;
       natural += items[j].width;
     }
     final lastPiece = items[b - 1];
@@ -612,22 +754,37 @@ class RenderHyphenatedJustifiedText extends RenderBox {
         ? math.max(w - lineNatural, -spaces * _spaceWidth * _shrink) / spaces
         : 0.0;
     var x = 0.0;
-    var height = 0.0;
     final text = StringBuffer();
+    // Common baseline: segments of different sizes/styles (italic, rubric,
+    // smaller reference text) sit on one line like in the stock renderer.
+    var maxBase = 0.0;
+    for (var j = a; j < b; j++) {
+      for (final s in items[j].segs) {
+        maxBase = math.max(maxBase, s.baseline);
+      }
+    }
+    if (showHyphen && lastPiece.hyphenSeg != null) {
+      maxBase = math.max(maxBase, lastPiece.hyphenSeg!.baseline);
+    }
+    var height = 0.0;
     for (var j = a; j < b; j++) {
       if (j > a && items[j - 1].endsWord) {
         x += _spaceWidth + extra;
         text.write(' ');
+      } else if (j > a) {
+        x += items[j - 1].joint;
       }
       for (final s in items[j].segs) {
-        placed.add(_PlacedSeg(s, x, s.width));
+        final dy = maxBase - s.baseline;
+        placed.add(_PlacedSeg(s, x, s.width, dy));
         x += s.width;
-        height = math.max(height, s.painter.height);
+        height = math.max(height, dy + s.height);
       }
       text.write(items[j].text);
     }
-    if (height == 0)
-      height = lastPiece.segs.isEmpty ? 0 : lastPiece.segs.last.painter.height;
+    if (height == 0) {
+      height = lastPiece.segs.isEmpty ? 0 : lastPiece.segs.last.height;
+    }
     final info = HyphLine(
       text: text.toString(),
       naturalWidth: lineNatural,
@@ -638,10 +795,10 @@ class RenderHyphenatedJustifiedText extends RenderBox {
       isLast: isLast,
       pieceCount: b - a,
     );
-    final line = _Line(placed, height, info);
+    final line = _Line(placed, height, info)..baseline = maxBase;
     if (showHyphen) {
       final hs = lastPiece.hyphenSeg!;
-      line.hyphen = _PlacedSeg(hs, x, hs.width);
+      line.hyphen = _PlacedSeg(hs, x, hs.width, maxBase - hs.baseline);
     }
     return line;
   }
@@ -651,9 +808,11 @@ class RenderHyphenatedJustifiedText extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
+    paintSelectionAndHandles(context, offset);
     for (final line in _lines) {
       final y = offset.dy + line.y;
-      // Backgrounds first, joining consecutive same-colour segments.
+      // Backgrounds and underlines first; consecutive segments with the same
+      // style are joined so they also cover the stretched gap between words.
       _PlacedSeg? prev;
       for (final p in line.placed) {
         final bg = p.seg.style.backgroundColor;
@@ -672,14 +831,40 @@ class RenderHyphenatedJustifiedText extends RenderBox {
             Paint()..color = bg,
           );
         }
+        final deco = p.seg.style.decoration;
+        if (deco != null && deco.contains(TextDecoration.underline)) {
+          var left = offset.dx + p.x;
+          final prevDeco = prev?.seg.style.decoration;
+          if (prev != null &&
+              prevDeco != null &&
+              prevDeco.contains(TextDecoration.underline) &&
+              prev.seg.style.decorationColor == p.seg.style.decorationColor) {
+            left = offset.dx + prev.x + prev.width;
+          }
+          final size = p.seg.style.fontSize ?? 14;
+          final thickness =
+              (p.seg.style.decorationThickness ?? 1.0) *
+              math.max(1.0, size / 14);
+          final ly = y + line.baseline + size * 0.12 + thickness / 2;
+          canvas.drawLine(
+            Offset(left, ly),
+            Offset(offset.dx + p.x + p.width, ly),
+            Paint()
+              ..color =
+                  p.seg.style.decorationColor ??
+                  p.seg.style.color ??
+                  const Color(0xFF000000)
+              ..strokeWidth = thickness,
+          );
+        }
         prev = p;
       }
       for (final p in line.placed) {
-        p.seg.painter.paint(canvas, Offset(offset.dx + p.x, y));
+        p.seg.painter.paint(canvas, Offset(offset.dx + p.x, y + p.dy));
       }
       final hy = line.hyphen;
       if (hy != null) {
-        hy.seg.painter.paint(canvas, Offset(offset.dx + hy.x, y));
+        hy.seg.painter.paint(canvas, Offset(offset.dx + hy.x, y + hy.dy));
       }
     }
   }
@@ -706,6 +891,299 @@ class RenderHyphenatedJustifiedText extends RenderBox {
       }
       best?.seg.recognizer?.addPointer(event);
       return;
+    }
+  }
+
+  // ---- selection / copy -----------------------------------------------
+  //
+  // Selection works on the ORIGINAL text offsets, so copying yields exactly the
+  // source string: no painted hyphen, no line breaks that were not in the
+  // source, original hyphens and paragraph breaks preserved.
+
+  final Set<VoidCallback> _listeners = <VoidCallback>{};
+  int? _selStart; // text offsets of the two selection edges
+  int? _selEnd;
+  LayerLink? _startHandle;
+  LayerLink? _endHandle;
+  Color? selectionColor;
+
+  @override
+  void addListener(VoidCallback listener) => _listeners.add(listener);
+
+  @override
+  void removeListener(VoidCallback listener) => _listeners.remove(listener);
+
+  SelectionGeometry _value = const SelectionGeometry(
+    status: SelectionStatus.none,
+    hasContent: true,
+  );
+
+  @override
+  SelectionGeometry get value => _value;
+
+  set _geometry(SelectionGeometry v) {
+    if (v == _value) return;
+    _value = v;
+    for (final l in List.of(_listeners)) {
+      l();
+    }
+  }
+
+  @override
+  int get contentLength => _plain.length;
+
+  @override
+  List<Rect> get boundingBoxes => [Offset.zero & size];
+
+  @override
+  void pushHandleLayers(LayerLink? startHandle, LayerLink? endHandle) {
+    if (_startHandle == startHandle && _endHandle == endHandle) return;
+    _startHandle = startHandle;
+    _endHandle = endHandle;
+    // Called while the selection container removes a disposed selectable.
+    if (attached) markNeedsPaint();
+  }
+
+  int get _lo => math.min(_selStart ?? 0, _selEnd ?? 0);
+  int get _hi => math.max(_selStart ?? 0, _selEnd ?? 0);
+  bool get _hasSelection => _selStart != null && _selEnd != null;
+
+  @override
+  SelectedContent? getSelectedContent() {
+    if (!_hasSelection || _lo == _hi) return null;
+    return SelectedContent(plainText: _plain.substring(_lo, _hi));
+  }
+
+  @override
+  SelectedContentRange? getSelection() {
+    if (!_hasSelection) return null;
+    return SelectedContentRange(startOffset: _selStart!, endOffset: _selEnd!);
+  }
+
+  @override
+  SelectionResult dispatchSelectionEvent(SelectionEvent event) {
+    switch (event.type) {
+      case SelectionEventType.selectAll:
+        _selStart = 0;
+        _selEnd = _plain.length;
+        _publishSelection();
+        return SelectionResult.none;
+      case SelectionEventType.clear:
+        _selStart = _selEnd = null;
+        _publishSelection();
+        return SelectionResult.none;
+      case SelectionEventType.selectWord:
+        final e = event as SelectWordSelectionEvent;
+        final at = _indexAt(globalToLocal(e.globalPosition));
+        final word = _wordAt(at);
+        _selStart = word.$1;
+        _selEnd = word.$2;
+        _publishSelection();
+        return SelectionResult.end;
+      case SelectionEventType.selectParagraph:
+        final e = event as SelectParagraphSelectionEvent;
+        final at = _indexAt(globalToLocal(e.globalPosition));
+        var a = _plain.lastIndexOf('\n', math.max(0, at - 1));
+        a = a < 0 ? 0 : a + 1;
+        var b = _plain.indexOf('\n', at);
+        if (b < 0) b = _plain.length;
+        _selStart = a;
+        _selEnd = b;
+        _publishSelection();
+        return SelectionResult.end;
+      case SelectionEventType.startEdgeUpdate:
+      case SelectionEventType.endEdgeUpdate:
+        final e = event as SelectionEdgeUpdateEvent;
+        final local = globalToLocal(e.globalPosition);
+        final result = SelectionUtils.getResultBasedOnRect(
+          Offset.zero & size,
+          local,
+        );
+        var idx = _indexAt(local);
+        if (result == SelectionResult.previous) idx = 0;
+        if (result == SelectionResult.next) idx = _plain.length;
+        if (event.type == SelectionEventType.startEdgeUpdate) {
+          _selStart = idx;
+          _selEnd ??= idx;
+        } else {
+          _selEnd = idx;
+          _selStart ??= idx;
+        }
+        _publishSelection();
+        return result;
+      case SelectionEventType.granularlyExtendSelection:
+      case SelectionEventType.directionallyExtendSelection:
+        // Keyboard extension is not part of the prototype.
+        return SelectionResult.end;
+    }
+  }
+
+  (int, int) _wordAt(int at) {
+    final isWord = RegExp(r"[\p{L}\p{N}'’ʼ\-]", unicode: true);
+    var a = at.clamp(0, _plain.length);
+    var b = a;
+    while (a > 0 && isWord.hasMatch(_plain[a - 1])) {
+      a--;
+    }
+    while (b < _plain.length && isWord.hasMatch(_plain[b])) {
+      b++;
+    }
+    return (a, b);
+  }
+
+  _Line? _lineAtY(double y) {
+    if (_lines.isEmpty) return null;
+    for (final l in _lines) {
+      if (y < l.y + l.height) return l;
+    }
+    return _lines.last;
+  }
+
+  int _indexAt(Offset p) {
+    final line = _lineAtY(p.dy);
+    if (line == null || line.placed.isEmpty) return line?.start ?? 0;
+    final first = line.placed.first;
+    final last = line.placed.last;
+    if (p.dx <= first.x) return line.start;
+    if (p.dx >= last.x + last.width) return line.end;
+    for (var k = 0; k < line.placed.length; k++) {
+      final pl = line.placed[k];
+      if (p.dx >= pl.x && p.dx <= pl.x + pl.width) {
+        final pos = pl.seg.painter.getPositionForOffset(
+          Offset(p.dx - pl.x, pl.seg.height / 2),
+        );
+        return pl.seg.start + pos.offset;
+      }
+      if (k + 1 < line.placed.length) {
+        final next = line.placed[k + 1];
+        if (p.dx > pl.x + pl.width && p.dx < next.x) {
+          final prevEnd = pl.seg.start + pl.seg.text.length;
+          return (p.dx - (pl.x + pl.width)) < (next.x - p.dx)
+              ? prevEnd
+              : next.seg.start;
+        }
+      }
+    }
+    return line.end;
+  }
+
+  /// X of the caret before text offset [i] on [l] (gaps between words
+  /// included: the space belongs to the gap, so highlights stay continuous).
+  double _xAt(_Line l, int i) {
+    if (l.placed.isEmpty) return 0;
+    if (i <= l.start) return l.placed.first.x;
+    if (i >= l.end) {
+      final last = l.placed.last;
+      return last.x + last.width;
+    }
+    for (var k = 0; k < l.placed.length; k++) {
+      final p = l.placed[k];
+      final s = p.seg;
+      final end = s.start + s.text.length;
+      if (i >= s.start && i <= end) {
+        return p.x +
+            s.painter
+                .getOffsetForCaret(TextPosition(offset: i - s.start), Rect.zero)
+                .dx;
+      }
+      if (k + 1 < l.placed.length) {
+        final n = l.placed[k + 1];
+        if (i > end && i <= n.seg.start) {
+          return i == n.seg.start ? n.x : p.x + p.width;
+        }
+      }
+    }
+    final last = l.placed.last;
+    return last.x + last.width;
+  }
+
+  List<Rect> _selectionRects() {
+    if (!_hasSelection || _lo == _hi) return const [];
+    final rects = <Rect>[];
+    for (final l in _lines) {
+      final a = math.max(_lo, l.start);
+      final b = math.min(_hi, l.end);
+      // A selection that continues past the line end also covers the gap to
+      // the right edge only when the line is justified; keep it to the text.
+      if (b <= a && !(_lo < l.start && _hi > l.end)) continue;
+      final x1 = _xAt(l, a);
+      final x2 = _xAt(l, b);
+      if (x2 > x1) rects.add(Rect.fromLTRB(x1, l.y, x2, l.y + l.height));
+    }
+    return rects;
+  }
+
+  void _publishSelection() {
+    if (attached) markNeedsPaint();
+    if (!_hasSelection) {
+      _geometry = const SelectionGeometry(
+        status: SelectionStatus.none,
+        hasContent: true,
+      );
+      return;
+    }
+    final lo = _lo, hi = _hi;
+    final startLine = _lineAtLeft(lo);
+    final endLine = _lineAtRight(hi);
+    if (startLine == null || endLine == null) return;
+    _geometry = SelectionGeometry(
+      status: lo == hi
+          ? SelectionStatus.collapsed
+          : SelectionStatus.uncollapsed,
+      hasContent: true,
+      startSelectionPoint: SelectionPoint(
+        localPosition: Offset(
+          _xAt(startLine, lo),
+          startLine.y + startLine.height,
+        ),
+        lineHeight: startLine.height,
+        handleType: TextSelectionHandleType.left,
+      ),
+      endSelectionPoint: SelectionPoint(
+        localPosition: Offset(_xAt(endLine, hi), endLine.y + endLine.height),
+        lineHeight: endLine.height,
+        handleType: TextSelectionHandleType.right,
+      ),
+      selectionRects: _selectionRects(),
+    );
+  }
+
+  _Line? _lineAtLeft(int i) {
+    for (final l in _lines) {
+      if (i < l.end || (i == l.end && l == _lines.last)) return l;
+    }
+    return _lines.isEmpty ? null : _lines.last;
+  }
+
+  _Line? _lineAtRight(int i) {
+    for (final l in _lines) {
+      if (i <= l.end) return l;
+    }
+    return _lines.isEmpty ? null : _lines.last;
+  }
+
+  void paintSelectionAndHandles(PaintingContext context, Offset offset) {
+    if (!_hasSelection || _lo == _hi) return;
+    final color = selectionColor ?? const Color(0x663F6E8C);
+    for (final r in _selectionRects()) {
+      context.canvas.drawRect(r.shift(offset), Paint()..color = color);
+    }
+    final v = _value;
+    final sp = v.startSelectionPoint;
+    final ep = v.endSelectionPoint;
+    if (_startHandle != null && sp != null) {
+      context.pushLayer(
+        LeaderLayer(link: _startHandle!, offset: offset + sp.localPosition),
+        (_, _) {},
+        Offset.zero,
+      );
+    }
+    if (_endHandle != null && ep != null) {
+      context.pushLayer(
+        LeaderLayer(link: _endHandle!, offset: offset + ep.localPosition),
+        (_, _) {},
+        Offset.zero,
+      );
     }
   }
 

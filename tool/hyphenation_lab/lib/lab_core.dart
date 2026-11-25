@@ -8,6 +8,8 @@ import 'be_hyphenator.dart';
 import 'fixtures.dart';
 
 /// A: stock Flutter justify, no hyphenation (control = today's app).
+/// AD: the safe app change — stock renderer, justify only while the line holds
+///     at least [kJustifyMinCharsPerLine] characters, otherwise left.
 /// B1: stock Flutter + U+00AD soft hyphens inserted from be patterns.
 /// B2: alternative single-paragraph renderer (own line breaking + painted
 ///     hyphens), source text untouched.
@@ -17,7 +19,8 @@ enum Mode {
   b1('B1', 'justify + U+00AD (стандартны рэндэрар)'),
   b2('B2', 'justify + пераносы (свой рэндэрар)'),
   c('C', 'left · без пераносаў (кантроль)'),
-  d('D', 'left + пераносы (свой рэндэрар)');
+  d('D', 'left + пераносы (свой рэндэрар)'),
+  ad('AD', 'адаптыўнае: justify, а на вузкім — left (стандартны)');
 
   const Mode(this.tag, this.label);
   final String tag;
@@ -25,6 +28,14 @@ enum Mode {
 }
 
 enum Scenario { plain, highlight, html }
+
+/// Same constant/rule as lib/utils/reading_alignment.dart in the app.
+const kJustifyMinCharsPerLine = 36.0;
+
+TextAlign adaptiveAlignment(double innerWidth, TextStyle style) =>
+    innerWidth / averageAdvance(style) >= kJustifyMinCharsPerLine
+    ? TextAlign.justify
+    : TextAlign.left;
 
 const readerFonts = ['Literata', 'SourceSerif4', 'OldStandardTT', 'Kurale'];
 
@@ -108,8 +119,9 @@ TextSpan buildPlainSpan(
   LabPalette p, {
   bool highlight = false,
   List<GestureRecognizer>? recognizers,
+  String? text,
 }) {
-  final text = plainParagraphs.join('\n');
+  text ??= plainParagraphs.join('\n');
   final sentences = splitSentences(text);
   return TextSpan(
     style: base,
@@ -291,9 +303,12 @@ class LabMetrics {
       : (width - l.natural) / (l.spaces * spaceWidth);
 
   int get lineCount => lines.length;
-  int get loose => justified ? body.where((l) => stretch(l) > 1.0).length : 0;
-  int get veryLoose =>
-      justified ? body.where((l) => stretch(l) > 2.0).length : 0;
+  int get loose => justified
+      ? body.where((l) => l.spaces > 0 && stretch(l) > 1.0).length
+      : 0;
+  int get veryLoose => justified
+      ? body.where((l) => l.spaces > 0 && stretch(l) > 2.0).length
+      : 0;
   int get singleWord =>
       body.where((l) => l.spaces == 0 && l.natural < width * 0.8).length;
   int get hyphenLines => lines.where((l) => l.hyphen).length;
@@ -324,9 +339,39 @@ class LabMetrics {
   int get shortRagged =>
       body.where((l) => (width - l.natural) / width > 0.25).length;
 
-  /// "Bad lines": justified → loose (>1 extra space) or one-word lines that
-  /// are not full; left → lines that fall short by more than 25 %.
-  int get bad => justified ? loose + singleWord : shortRagged;
+  /// ONE bad-line flag per line (never summed from overlapping categories):
+  /// justified → the gap is more than 2× a normal space (stretch > 1) or the
+  /// line is a lone word that does not fill the measure; left → the line is
+  /// short by more than 25 % of the measure. Counts are only comparable
+  /// *within* the same alignment family (justify: A vs B2; left: C vs D).
+  /// Stretch (in normal spaces) above which a justified gap counts as bad:
+  /// 2.0 = the gap is 3× a normal space (≈ 0.6 em in these fonts). `loose`
+  /// (> 1.0, gap 2×) is reported separately as a softer signal.
+  static const badStretch = 2.0;
+
+  bool isBad(LineStat l) => justified
+      ? (l.spaces == 0 ? l.natural < width * 0.8 : stretch(l) > badStretch)
+      : (width - l.natural) / width > 0.25;
+
+  int get bad => body.where(isBad).length;
+
+  double get looseShare => !justified || body.isEmpty ? 0 : loose / body.length;
+
+  /// Fraction of non-final lines that are bad (0 when there are none).
+  double get badShare => body.isEmpty ? 0 : bad / body.length;
+}
+
+/// Average advance of one Belarusian letter (incl. spaces) in [style], used to
+/// express a column width as "characters per line" independently of font/scale.
+double averageAdvance(TextStyle style) {
+  const sample =
+      'Умілаваныя, цяпер мы дзеці Божыя, але яшчэ не выявілася, чым будзем. '
+      'Ведаем, што калі адкрыецца, мы будзем падобныя да Яго.';
+  final tp = TextPainter(
+    text: TextSpan(text: sample, style: style),
+    textDirection: TextDirection.ltr,
+  )..layout();
+  return tp.width / sample.length;
 }
 
 LabMetrics measureStock(
@@ -402,7 +447,12 @@ LabMetrics measureLines({
   )..layout();
   final lines = <LineStat>[];
   var start = 0;
-  for (var i = 0; i < lineCount && start < plain.length; i++) {
+  for (var guard = 0; start < plain.length && guard < 100000; guard++) {
+    // A hard '\n' is not part of any line: skip it (empty lines add nothing).
+    if (plain[start] == '\n') {
+      start++;
+      continue;
+    }
     final end = lineBoundary(start);
     if (end <= start) break;
     var trimmed = end;
@@ -428,7 +478,8 @@ LabMetrics measureLines({
       }
       firstWord = false;
     }
-    final isLast = end >= plain.length || plain[end - 1] == '\n';
+    final isLast =
+        end >= plain.length || plain[end] == '\n' || plain[end - 1] == '\n';
     lines.add(LineStat(raw, nat, spaces, isLast, raw.endsWith(softHyphen)));
     start = end;
   }
