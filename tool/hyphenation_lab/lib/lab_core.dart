@@ -16,7 +16,8 @@ enum Mode {
   a('A', 'justify · без пераносаў (кантроль)'),
   b1('B1', 'justify + U+00AD (стандартны рэндэрар)'),
   b2('B2', 'justify + пераносы (свой рэндэрар)'),
-  c('C', 'left · без пераносаў (кантроль)');
+  c('C', 'left · без пераносаў (кантроль)'),
+  d('D', 'left + пераносы (свой рэндэрар)');
 
   const Mode(this.tag, this.label);
   final String tag;

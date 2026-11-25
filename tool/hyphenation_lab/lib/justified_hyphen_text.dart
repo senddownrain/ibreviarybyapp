@@ -535,7 +535,10 @@ class RenderHyphenatedJustifiedText extends RenderBox {
               }
             }
             double badness;
-            if (spaces == 0) {
+            if (!_justify) {
+              // Ragged right: only the slack at the end of the line matters.
+              badness = 100 * math.pow(((w - lineW) / w * 4).clamp(0.0, 4.0), 3) as double;
+            } else if (spaces == 0) {
               // A one-word line cannot be justified: always at least as bad
               // as the worst stretched line (cap 10000), worse the shorter it is.
               badness = 10000 + 10000 * ((w - lineW) / w).clamp(0.0, 1.0);

@@ -9,7 +9,7 @@ def tab(f,title):
         c['lines']+=x['lines'];c['bad']+=x['bad'];c['veryLoose']+=x['veryLoose'];c['singleWord']+=x['singleWord'];c['hyph']+=x['hyphenLines'];c['consec']+=x['consecutiveHyphen'];c['cfgs']+=1;c['short']+=x['shortRagged']
         mx[k]=max(mx[k],x['maxStretch'])
     print(title)
-    for k in ['A','B1','B2','C']:
+    for k in ['A','B1','B2','C','D']:
         c=d[k]; print(f"  {k}: configs={c['cfgs']} lines={c['lines']} bad={c['bad']} ({100*c['bad']/max(c['lines'],1):.0f}%) veryLoose(>2 spaces extra)={c['veryLoose']} single={c['singleWord']} shortRagged={c['short']} hyphLines={c['hyph']} consec={c['consec']} maxStretch={mx[k]:.1f}")
 tab(lambda x:x['id'].startswith('sweep_plain'),'PLAIN all')
 tab(lambda x:x['id'].startswith('sweep_html'),'HTML all')

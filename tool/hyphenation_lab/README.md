@@ -9,6 +9,6 @@ cd tool/hyphenation_lab
 flutter pub get
 flutter test                       # 131 тест, перегенерирует out/*.png и out/metrics.json
 python3 summarize_metrics.py       # сводка метрик
-flutter run -d chrome              # интерактивный стенд (режимы A/B1/B2/C, шрифт, масштаб, ширина, тема)
+flutter run -d chrome              # интерактивный стенд (режимы A/B1/B2/C/D, шрифт, масштаб, ширина, тема)
 ./compare_sdk.sh 3.41.4            # изолированная проверка U+00AD на другой версии Flutter
 ```

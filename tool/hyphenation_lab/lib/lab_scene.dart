@@ -26,7 +26,7 @@ class LabReading extends StatelessWidget {
   final LabPalette palette;
   final BelarusianHyphenator hyphenator;
 
-  TextAlign get _align => mode == Mode.c ? TextAlign.left : TextAlign.justify;
+  TextAlign get _align => mode == Mode.c || mode == Mode.d ? TextAlign.left : TextAlign.justify;
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +70,17 @@ class LabReading extends StatelessWidget {
                 as TextSpan;
         return Text.rich(span, textAlign: _align);
       case Mode.b2:
-        return HyphenatedJustifiedText(text: span, hyphenator: hyphenator);
+      case Mode.d:
+        return HyphenatedJustifiedText(
+          text: span,
+          hyphenator: hyphenator,
+          justify: mode == Mode.b2,
+        );
     }
   }
 
   Widget _html(TextStyle base) {
-    if (mode == Mode.b2) {
+    if (mode == Mode.b2 || mode == Mode.d) {
       final paras = htmlToParagraphSpans(htmlFixture, base, palette);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -87,6 +92,7 @@ class LabReading extends StatelessWidget {
               child: HyphenatedJustifiedText(
                 text: paras[i],
                 hyphenator: hyphenator,
+                justify: mode == Mode.b2,
               ),
             ),
         ],

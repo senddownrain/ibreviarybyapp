@@ -83,8 +83,8 @@ Map<Mode, LabMetrics> collect(
     final stats = <LineStat>[];
     double? spaceW;
     var innerW = width - 2 * gutter;
-    var justified = w.mode != Mode.c;
-    if (w.mode == Mode.b2) {
+    var justified = w.mode != Mode.c && w.mode != Mode.d;
+    if (w.mode == Mode.b2 || w.mode == Mode.d) {
       void visit(Element e) {
         final ro = e.renderObject;
         if (ro is RenderHyphenatedJustifiedText) {
@@ -144,7 +144,7 @@ Map<Mode, LabMetrics> collect(
         width: innerW,
         spaceWidth: spaceW ?? 1,
         lines: stats,
-        justified: true,
+        justified: justified,
       );
     } else {
       // Every RichText in this reading (plain: one; html: one per paragraph).
@@ -244,7 +244,7 @@ void main() {
       dark: dark,
     );
     final wrapped = MediaQuery(
-      data: MediaQueryData(size: Size(width * 4, 4000)),
+      data: MediaQueryData(size: Size(width * 5, 4000)),
       child: w,
     );
     if (png) {
@@ -252,11 +252,11 @@ void main() {
         tester,
         wrapped,
         'out/$id.png',
-        width: width * 4 + 60,
+        width: width * 5 + 70,
         pixelRatio: 1.5,
       );
     } else {
-      tester.view.physicalSize = Size(width * 4 + 60, 4000);
+      tester.view.physicalSize = Size(width * 5 + 70, 4000);
       tester.view.devicePixelRatio = 1;
       await tester.pumpWidget(
         Directionality(
