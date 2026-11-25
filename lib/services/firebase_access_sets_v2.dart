@@ -5,7 +5,6 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
   _FirebaseAccessSetsV2(this._owner);
 
   final FirebasePriestAccess _owner;
-  static const _server = FirebasePriestAccess._server;
   static const _timeout = FirebasePriestAccess._timeout;
   bool _s1Confirmed = false;
 
@@ -68,7 +67,7 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
   Future<AccessSetsMode?> readMode(String uid) => _owner._run(() async {
     _owner._own(uid);
     try {
-      final mode = _modeData(_data(await _mode.get(_server)));
+      final mode = _modeData(_data(await _owner._get('auth.mode', _mode)));
       _s1Confirmed = true;
       return mode;
     } on FirebaseException catch (error) {
@@ -76,7 +75,7 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
       // Both owner-readable paths are denied by the pre-S1 rules. Preserve
       // legacy reads while those rules remain deployed.
       try {
-        await _grant(uid).get(_server);
+        await _owner._get('auth.v2Grant', _grant(uid));
       } on FirebaseException catch (grantError) {
         if (grantError.code == 'permission-denied') return null;
         rethrow;
@@ -88,7 +87,10 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
   @override
   Future<AccessV2Grant?> readGrant(String uid) => _owner._run(() async {
     _owner._own(uid);
-    return _grantData(_data(await _grant(uid).get(_server)), uid);
+    return _grantData(
+      _data(await _owner._get('auth.v2Grant', _grant(uid))),
+      uid,
+    );
   }, readingGrant: true);
 
   @override
@@ -100,16 +102,17 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
     if (!grant.active) return null;
     try {
       final code = _data(
-        await _db
-            .doc('accessCodesV2/${grant.codeId}/client/profile')
-            .get(_server),
+        await _owner._get(
+          'auth.codeProfile',
+          _db.doc('accessCodesV2/${grant.codeId}/client/profile'),
+        ),
       );
       final profile = code?['profileId'];
       if (profile is! String || !accessSetId.hasMatch(profile)) {
         throw const PriestAccessException('SERVICE_UNAVAILABLE');
       }
       return _entitlementData(
-        _data(await _entitlements(profile).get(_server)),
+        _data(await _owner._get('auth.entitlements', _entitlements(profile))),
         profile,
       );
     } on FirebaseException catch (error) {
@@ -219,7 +222,7 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
         ])
         .limit(pageSize);
     if (after != null) query = query.startAfter([after]);
-    final page = await query.get(_server);
+    final page = await _owner._query('index.${kind.name}', query);
     if (page.metadata.isFromCache || page.metadata.hasPendingWrites) {
       throw const PriestAccessException('OFFLINE');
     }
@@ -235,7 +238,10 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
     if (id.isEmpty || id.contains('/')) return null;
     try {
       final data = _data(
-        await _db.collection(kind.collection).doc(id).get(_server),
+        await _owner._get(
+          'payload.${kind.name}',
+          _db.collection(kind.collection).doc(id),
+        ),
       );
       return data == null
           ? null
@@ -267,7 +273,7 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
       events.addError(
         PriestAccessException(switch (code) {
           'permission-denied' => 'ACCESS_REQUIRED',
-          'resource-exhausted' => 'TOO_MANY_ATTEMPTS',
+          'resource-exhausted' => 'QUOTA_EXHAUSTED',
           _ => 'OFFLINE',
         }),
         trace,
@@ -275,6 +281,7 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
     }
 
     void listen(
+      String operation,
       platform.DocumentReferencePlatform reference,
       bool Function(Map<String, dynamic>?) matches,
     ) {
@@ -288,7 +295,9 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
             .listen((snapshot) {
               if (snapshot.metadata.isFromCache && !serverSeen) return;
               try {
-                if (!matches(_data(snapshot))) events.add(null);
+                final data = _data(snapshot);
+                _owner._audit(operation, snapshot.exists ? 1 : 0);
+                if (!matches(data)) events.add(null);
                 serverSeen = true;
               } catch (error, trace) {
                 failure(error, trace);
@@ -299,11 +308,16 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
 
     events = StreamController<void>(
       onListen: () {
-        listen(_mode, (data) => _modeData(data) == mode);
-        listen(_grant(uid), (data) => _grantData(data, uid) == grant);
+        listen('watch.mode', _mode, (data) => _modeData(data) == mode);
+        listen(
+          'watch.v2Grant',
+          _grant(uid),
+          (data) => _grantData(data, uid) == grant,
+        );
         if (entitlements != null) {
           final profileId = entitlements.profileId;
           listen(
+            'watch.entitlements',
             _entitlements(profileId),
             (data) => entitlements.matches(_entitlementData(data, profileId)),
           );

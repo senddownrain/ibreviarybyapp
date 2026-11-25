@@ -14,7 +14,7 @@ const syntheticCode = 'MARI-20261124-ABCDEFGHJKLMNPQR-STUVWXYZ23456789ABCDEFGH';
 const privateMarker = 'S7 synthetic private text';
 
 class TestAccessSets implements AccessSetsV2Gateway {
-  AccessSetsMode mode = AccessSetsMode.canonical;
+  AccessSetsMode? mode = AccessSetsMode.canonical;
   AccessV2Grant? grant;
   AccessEntitlements? profile = AccessEntitlements('example', ['marian'], 1);
   final events = StreamController<void>.broadcast();
@@ -22,6 +22,8 @@ class TestAccessSets implements AccessSetsV2Gateway {
   final reads = <(AccessContentKind, String)>[];
   Completer<void>? pauseRead;
   bool canRevoke = true;
+  bool quotaOnPayload = false;
+  int accessReads = 0;
   String? revokedUid;
   String? activatedUid;
   final indexes = <String, List<String>>{
@@ -30,7 +32,11 @@ class TestAccessSets implements AccessSetsV2Gateway {
   };
 
   @override
-  Future<AccessSetsMode?> readMode(String uid) async => mode;
+  Future<AccessSetsMode?> readMode(String uid) async {
+    accessReads++;
+    return mode;
+  }
+
   @override
   Future<AccessV2Grant?> readGrant(String uid) async => grant;
   @override
@@ -82,6 +88,7 @@ class TestAccessSets implements AccessSetsV2Gateway {
       return (ids: <String>[], cursor: null);
     }
     final ids = indexes[setId]!;
+    if (ids.length > 2) return (ids: ids, cursor: null);
     // Force a cursor on a small synthetic catalog.
     return after == null
         ? (ids: ids.take(1).toList(), cursor: ids.first)
@@ -94,12 +101,75 @@ class TestAccessSets implements AccessSetsV2Gateway {
     String id,
   ) async {
     reads.add((kind, id));
+    if (quotaOnPayload) {
+      throw const PriestAccessException('QUOTA_EXHAUSTED');
+    }
     await pauseRead?.future;
-    return {'id': id, 'title': id, 'text': privateMarker};
+    final effective = indexes.entries
+        .where((entry) => entry.value.contains(id))
+        .map((entry) => entry.key)
+        .toList();
+    if (effective.isEmpty) return null;
+    return {
+      'id': id,
+      'title': id,
+      'text': privateMarker,
+      'accessSchemaVersion': 2,
+      'accessSets': effective,
+      'effectiveAccessSets': effective,
+      'contentHash': '0' * 64,
+    };
   }
 }
 
 void main() {
+  test('quota stops the payload queue and disables automatic retry', () async {
+    final legacy = SparkGateway();
+    final v2 = TestAccessSets();
+    final controller = PriestAccessController(
+      legacy,
+      MemoryStorage(),
+      accessSets: v2,
+    );
+    addTearDown(() async {
+      controller.dispose();
+      await v2.events.close();
+      await legacy.close();
+    });
+    var timers = 0;
+    await runZoned(
+      () async {
+        await controller.activate(syntheticCode, 'Device');
+        v2.indexes['marian'] = [for (var i = 0; i < 20; i++) 'quota-$i'];
+        v2.quotaOnPayload = true;
+        await controller.loadCatalog();
+        expect(controller.state.quotaBlocked, true);
+        expect(controller.state.content, isNull);
+        expect(v2.reads.length, inInclusiveRange(1, 4));
+        final attempts = (v2.accessReads, v2.pages.length, v2.reads.length);
+        controller.suspend(foreground: false);
+        await controller.resume(foreground: true);
+        await controller.loadCatalog();
+        await controller.readPrayer('quota-0');
+        expect((v2.accessReads, v2.pages.length, v2.reads.length), attempts);
+        expect(timers, 0);
+
+        v2.quotaOnPayload = false;
+        await controller.retryAfterQuota();
+        expect(controller.state.canLoadCatalog, true);
+        expect(controller.state.content, isNull);
+        await controller.loadCatalog();
+        expect(controller.state.content?.prayers.containsKey('quota-0'), true);
+      },
+      zoneSpecification: ZoneSpecification(
+        createTimer: (self, parent, zone, duration, callback) {
+          timers++;
+          return parent.createTimer(zone, duration, callback);
+        },
+      ),
+    );
+  });
+
   test('every pinned S1 JavaScript/Dart code vector', () {
     final vectors =
         jsonDecode(
@@ -145,12 +215,84 @@ void main() {
   });
 
   test(
+    'startup, resume and a deep link never request a catalog page',
+    () async {
+      await controller.activate(syntheticCode, 'Device');
+      expect(controller.state.canLoadCatalog, true);
+      expect(controller.state.content, isNull);
+      expect(v2.pages, isEmpty);
+      expect(v2.reads, isEmpty);
+      expect(
+        (await controller.readPrayer('marian-one'))?['text'],
+        privateMarker,
+      );
+      expect(v2.pages, isEmpty);
+      expect(v2.reads, [(AccessContentKind.prayers, 'marian-one')]);
+
+      await Future.wait([controller.loadCatalog(), controller.loadCatalog()]);
+      final pageCount = v2.pages.length;
+      final payloadCount = v2.reads.length;
+      expect(pageCount, 3);
+      expect(payloadCount, 2);
+      await controller.loadCatalog();
+      await controller.readPrayer('shared');
+      expect(v2.pages, hasLength(pageCount));
+      expect(v2.reads, hasLength(payloadCount));
+
+      controller.suspend(foreground: false);
+      await controller.resume(foreground: true);
+      expect(controller.state.canLoadCatalog, true);
+      expect(controller.state.content, isNull);
+      expect(v2.pages, hasLength(pageCount));
+      expect(v2.reads, hasLength(payloadCount));
+      expect(
+        (await controller.readPrayer('marian-one'))?['text'],
+        privateMarker,
+      );
+      expect(v2.pages, hasLength(pageCount));
+      expect(v2.reads, hasLength(payloadCount + 1));
+    },
+  );
+
+  test(
+    'pre-S1 disable revokes legacy and completes without a V2 registry',
+    () async {
+      v2.mode = null;
+      await controller.activate(validCode, 'Device');
+      expect(controller.state.canLoadCatalog, true);
+      expect(storage.record['v2RulesUid'], isNull);
+      await controller.disable();
+      expect(legacy.active, false);
+      expect(legacy.uid, isNull);
+      expect(controller.state.pendingDisable, false);
+      expect(v2.revokedUid, isNull);
+    },
+  );
+
+  test(
+    'a previously observed S1 registry cannot be skipped on rollback',
+    () async {
+      await controller.activate(validCode, 'Device');
+      await controller.activate(syntheticCode, 'Device');
+      final uid = legacy.uid;
+      v2.mode = null;
+      await controller.disable();
+      expect(legacy.active, false);
+      expect(v2.grant?.active, true);
+      expect(legacy.uid, uid);
+      expect(storage.record['pendingDisableUid'], uid);
+      expect(controller.state.pendingDisable, true);
+    },
+  );
+
+  test(
     'guest and marian-only never use the legacy mirror or persist private data',
     () async {
       expect(legacy.signups, 0);
       expect(controller.state.content, isNull);
       expect(await controller.readPrayer('marian-one'), isNull);
       await controller.activate(syntheticCode, 'Device');
+      await controller.loadCatalog();
       expect(controller.state.allowedSets, {'marian'});
       expect(controller.state.profileRevision, 1);
       expect(controller.state.content!.prayers.keys, {
@@ -167,7 +309,10 @@ void main() {
       expect(persisted.expand((snapshot) => snapshot.prayers.keys).toSet(), {
         'public',
       });
-      expect(storage.record.keys, ['verifiedUid']);
+      expect(
+        storage.record.keys,
+        unorderedEquals(['verifiedUid', 'v2RulesUid']),
+      );
       controller.suspend(online: false);
       expect(controller.state.content, isNull);
       expect(controller.state.publicContent!.prayers.keys, ['public']);
@@ -183,11 +328,13 @@ void main() {
     () async {
       v2.mode = AccessSetsMode.legacy;
       await controller.activate(validCode, 'Device');
+      await controller.loadCatalog();
       final uid = legacy.uid;
       expect(controller.state.content!.prayers.keys, contains('single'));
       final mirrorReads = legacy.reads;
       v2.mode = AccessSetsMode.canonical;
       await controller.refresh();
+      await controller.loadCatalog();
       expect(controller.state.allowedSets, {'priest'});
       expect(controller.state.canAddCode, true);
       expect(controller.state.content!.prayers.keys, isNot(contains('single')));
@@ -198,6 +345,7 @@ void main() {
       ], 3);
       v2.reads.clear();
       await controller.activate(syntheticCode, 'Device');
+      await controller.loadCatalog();
       expect(v2.activatedUid, uid);
       expect(legacy.signups, 1);
       expect(legacy.reads, mirrorReads);
@@ -210,6 +358,7 @@ void main() {
       expect(v2.reads.where((entry) => entry.$2 == 'shared'), hasLength(1));
       v2.profile = null;
       await controller.refresh();
+      await controller.loadCatalog();
       expect(controller.state.allowedSets, {'priest'});
       expect(
         controller.state.content!.prayers.containsKey('marian-one'),
@@ -222,6 +371,7 @@ void main() {
       expect(controller.state.registered, true);
       v2.mode = AccessSetsMode.legacy;
       await controller.refresh();
+      await controller.loadCatalog();
       expect(controller.state.content!.prayers.keys, contains('single'));
     },
   );
@@ -233,6 +383,7 @@ void main() {
       await controller.activate(syntheticCode, 'Device');
       final pause = v2.pauseRead = Completer<void>();
       final reader = controller.readPrayer('marian-one');
+      await Future<void>.delayed(Duration.zero);
       v2.grant = (codeId: v2.grant!.codeId, active: false);
       v2.events.add(null);
       await Future<void>.delayed(Duration.zero);
@@ -244,6 +395,7 @@ void main() {
       pause.complete();
       expect(await reader, isNull);
       await Future<void>.delayed(Duration.zero);
+      await controller.loadCatalog();
       expect(controller.state.allowedSets, {'priest'});
       expect(
         controller.state.content!.prayers.keys,
@@ -257,6 +409,7 @@ void main() {
     () async {
       await controller.activate(validCode, 'Device');
       await controller.activate(syntheticCode, 'Device');
+      await controller.loadCatalog();
       final uid = legacy.uid;
       v2.canRevoke = false;
       await controller.disable();

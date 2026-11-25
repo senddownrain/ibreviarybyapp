@@ -113,7 +113,7 @@ void main() {
           'effectiveAccessSets': [set],
           'accessSets': [set],
           'accessSchemaVersion': 2,
-          'contentHash': 'synthetic',
+          'contentHash': '0' * 64,
         });
       }
 
@@ -125,6 +125,7 @@ void main() {
       await controller.initialize();
       expect(await gateway.restoreSession(), isNull);
       await controller.activate(_legacy, 'S7 synthetic device');
+      await controller.loadCatalog();
       expect(controller.state.content?.prayers.keys, contains('s7-mirror'));
       final uid = (await gateway.restoreSession())!;
 
@@ -145,6 +146,7 @@ void main() {
       );
       // A blank optional name is sent as the non-empty S1 client default.
       await controller.activate(_v2, '');
+      await controller.loadCatalog();
       expect(controller.state.allowedSets, {'priest', _set});
       expect(await gateway.restoreSession() == uid, true);
 

@@ -227,22 +227,13 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
     final localPrayers = ref.watch(localPrayersProvider);
     final settings = ref.watch(settingsProvider);
 
-    final Prayer? prayer;
-    try {
-      prayer = [
-        ...prayers,
-        ...localPrayers,
-      ].firstWhere((p) => p.id == _readerPrayerId);
-    } catch (_) {
-      return ReaderScaffold(
-        semanticLabel: 'Малітва не знойдзена',
-        content: const Center(child: Text('Малітва не знойдзена')),
-      );
-    }
-
-    var p = prayer;
-    if (p.priestOnly) {
-      final checked = ref.watch(protectedPrayerProvider(p.id));
+    final prayer = [
+      ...prayers,
+      ...localPrayers,
+    ].where((p) => p.id == _readerPrayerId).firstOrNull;
+    final Prayer p;
+    if (prayer?.priestOnly != false) {
+      final checked = ref.watch(protectedPrayerProvider(_readerPrayerId));
       if (checked.isLoading) {
         return const ReaderScaffold(
           semanticLabel: 'Праверка доступу',
@@ -251,14 +242,26 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
       }
       final document = checked.value;
       if (document == null) {
-        return const ReaderScaffold(
-          semanticLabel: 'Малітва недаступная',
-          content: Center(
-            child: Text('Малітва недаступная. Праверце доступ і злучэнне.'),
-          ),
-        );
+        return prayer == null
+            ? const ReaderScaffold(
+                semanticLabel: 'Малітва не знойдзена',
+                content: Center(child: Text('Малітва не знойдзена')),
+              )
+            : const ReaderScaffold(
+                semanticLabel: 'Малітва недаступная',
+                content: Center(
+                  child: Text(
+                    'Малітва недаступная. Праверце доступ і злучэнне.',
+                  ),
+                ),
+              );
       }
-      p = Prayer.fromMap({...document, 'effectivePriestOnly': true}, p.id);
+      p = Prayer.fromMap({
+        ...document,
+        'effectivePriestOnly': true,
+      }, _readerPrayerId);
+    } else {
+      p = prayer!;
     }
     final isFav = settings.favoriteIds.contains(p.id);
     final variant = _isMass ? kMassRitual.variant(_massLanguage) : null;

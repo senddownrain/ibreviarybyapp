@@ -9,6 +9,7 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/widgets/adaptive_app_bar.dart';
+import 'package:mybrev_flutter/widgets/protected_catalog_control.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -31,49 +32,62 @@ class FavoritesScreen extends ConsumerWidget {
       body: AmbientWash(
         seasonColor: GlassTokens.of(context).ambientBase,
         height: kToolbarHeight + 100,
-        child: favorites.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PhosphorIcon(
-                      PhosphorIconsLight.heart,
-                      size: 56,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Няма абраных малітваў',
-                      style: TextStyle(color: cs.onSurfaceVariant),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Дадайце малітву ў абраныя\nнацісканнем на іконку сэрца',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: cs.onSurfaceVariant,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : ListView.builder(
-                padding: EdgeInsets.only(
-                  top:
-                      MediaQuery.paddingOf(context).top +
-                      kFloatingAppBarContentInset,
-                  bottom: 16,
-                ),
-                itemCount: favorites.length,
-                itemBuilder: (context, index) {
-                  final prayer = favorites[index];
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 9),
-                    child: _FavoriteTile(prayer: prayer),
-                  );
-                },
+        child: Column(
+          children: [
+            ProtectedCatalogControl(
+              padding: EdgeInsets.only(
+                top:
+                    MediaQuery.paddingOf(context).top +
+                    kFloatingAppBarContentInset,
               ),
+            ),
+            Expanded(
+              child: favorites.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PhosphorIcon(
+                            PhosphorIconsLight.heart,
+                            size: 56,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Няма абраных малітваў',
+                            style: TextStyle(color: cs.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Дадайце малітву ў абраныя\nнацісканнем на іконку сэрца',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: cs.onSurfaceVariant,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.only(
+                        top:
+                            MediaQuery.paddingOf(context).top +
+                            kFloatingAppBarContentInset,
+                        bottom: 16,
+                      ),
+                      itemCount: favorites.length,
+                      itemBuilder: (context, index) {
+                        final prayer = favorites[index];
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 9),
+                          child: _FavoriteTile(prayer: prayer),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

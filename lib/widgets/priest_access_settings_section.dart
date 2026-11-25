@@ -99,7 +99,7 @@ class _PriestAccessSettingsSectionState
           ),
           const SizedBox(height: 12),
           FilledButton(
-            onPressed: access.busy
+            onPressed: access.busy || access.quotaBlocked
                 ? null
                 : () async {
                     FocusScope.of(context).unfocus();
@@ -122,6 +122,11 @@ class _PriestAccessSettingsSectionState
           ],
         ],
         if (access.busy) const LinearProgressIndicator(),
+        if (access.quotaBlocked)
+          TextButton(
+            onPressed: ref.read(priestAccessProvider.notifier).retryAfterQuota,
+            child: const Text('Паўтарыць праверку доступу'),
+          ),
         if (access.error != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),

@@ -26,6 +26,10 @@ class PriestAccessState {
     this.profileRevision,
     this.pendingDisable = false,
     this.canAddCode = false,
+    this.canLoadCatalog = false,
+    this.catalogLoading = false,
+    this.quotaBlocked = false,
+    this.generation = 0,
   });
   final bool registered;
   final bool busy;
@@ -40,6 +44,10 @@ class PriestAccessState {
   final int? profileRevision;
   final bool pendingDisable;
   final bool canAddCode;
+  final bool canLoadCatalog;
+  final bool catalogLoading;
+  final bool quotaBlocked;
+  final int generation;
 }
 
 final priestAccessGatewayProvider = Provider<PriestAccessGateway>((ref) {
@@ -145,7 +153,14 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   String? _uid;
   _AccessCheck? _confirmed;
   int _generation = 0;
+  int _visibilityEpoch = 0;
   bool _online = true, _foreground = true, _ready = false;
+  bool _quotaBlocked = false;
+  bool _helpLoaded = false;
+  AccessSetsMode? _publicMode;
+  AccessSetsCatalogSession? _catalogSession;
+  Future<void>? _catalogRequest;
+  Future<void>? _checking;
   Future<void>? _initializing;
   Future<void>? _activation;
   Future<void>? _revocation;
@@ -163,6 +178,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     if (!mounted ||
         !_online ||
         !_foreground ||
+        _quotaBlocked ||
         (_uid == null && _record['verifiedUid'] == null && _pending == null) ||
         _retry?.isActive == true) {
       return;
@@ -188,6 +204,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     PrayerAccessContent? publicContent,
     String? error,
     String? helpText,
+    bool catalogLoading = false,
   }) {
     if (!mounted) return;
     final access = _confirmed;
@@ -204,6 +221,15 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       allowedSets: access == null ? const {} : _allowedSets(access),
       profileRevision: access?.entitlements?.revision,
       pendingDisable: _pending != null,
+      catalogLoading: catalogLoading,
+      quotaBlocked: _quotaBlocked,
+      generation: _generation,
+      canLoadCatalog:
+          access != null &&
+          access.mode != AccessSetsMode.suspended &&
+          (access.mode == AccessSetsMode.canonical
+              ? _allowedSets(access).isNotEmpty
+              : access.legacy?.active == true),
       canAddCode:
           access?.mode == AccessSetsMode.canonical &&
           (access?.legacy == null || access?.grant == null),
@@ -240,7 +266,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       if (_uid != pending) throw const PriestAccessException('REVOKED');
       await Future.wait([
         gateway.disable(pending),
-        if (_accessSets != null) _accessSets.revokeOwn(pending),
+        if (_accessSets != null) _revokeV2(pending),
       ]);
       _record['confirmedDisableUid'] = pending;
       // Keep the readback result across a crash between sign-out and cleanup.
@@ -257,7 +283,24 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     _record.remove('pendingDisableUid');
     _record.remove('confirmedDisableUid');
     _record.remove('verifiedUid');
+    _record.remove('v2RulesUid');
     await _save();
+  }
+
+  Future<void> _revokeV2(String uid) async {
+    final mode = await _accessSets!.readMode(uid);
+    if (mode != null) {
+      if (_record['v2RulesUid'] != uid) {
+        _record['v2RulesUid'] = uid;
+        await _save();
+      }
+      await _accessSets.revokeOwn(uid);
+    } else if (_record['v2RulesUid'] == uid) {
+      // A rollback or partial outage may hide an already accessible registry.
+      throw const PriestAccessException('GRANT_UNREADABLE');
+    }
+    // With two owner reads denied and no prior S1 observation for this UID,
+    // only the legacy registry is present in the deployed contract.
   }
 
   Future<void> _stopWatching() async {
@@ -283,7 +326,14 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   void _invalidate({String? error, bool busy = false}) {
     ++_generation;
     _confirmed = null;
-    _set(error: error, busy: busy);
+    _catalogSession = null;
+    _catalogRequest = null;
+    _set(
+      error: _quotaBlocked
+          ? const PriestAccessException('QUOTA_EXHAUSTED').message
+          : error,
+      busy: busy,
+    );
   }
 
   Future<_AccessCheck> _check(String uid) async {
@@ -302,18 +352,30 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     );
   }
 
-  bool _matches(_AccessCheck expected, _AccessCheck observed) =>
-      expected.mode == observed.mode &&
-      expected.legacy?.active == observed.legacy?.active &&
-      expected.grant == observed.grant &&
-      (expected.entitlements?.matches(observed.entitlements) ??
-          (observed.entitlements == null));
+  void _blockQuota(Object error) {
+    if (error is PriestAccessException && error.quotaExhausted) {
+      _quotaBlocked = true;
+      _retry?.cancel();
+    }
+  }
+
+  Future<void> _failRead(Object error) async {
+    _blockQuota(error);
+    _invalidate(
+      error: error is PriestAccessException
+          ? error.message
+          : const PriestAccessException('SERVICE_UNAVAILABLE').message,
+    );
+    await _clearMemory();
+    _scheduleRetry();
+  }
 
   void _watchAccess(String uid, _AccessCheck access, int generation) {
     if (access.mode == null && access.legacy?.active != true) return;
 
     void changed({Object? error}) {
       if (!_current(generation)) return;
+      if (error != null) _blockQuota(error);
       final message = error is PriestAccessException ? error.message : null;
       _invalidate(error: message);
       unawaited(
@@ -353,14 +415,20 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
 
   Future<void> refresh() => _refresh();
 
-  Future<void> _refresh({String? activationError}) async {
+  Future<void> _refresh({String? activationError}) =>
+      _checking ??= _confirmAccess(
+        activationError: activationError,
+      ).whenComplete(() => _checking = null);
+
+  Future<void> _confirmAccess({String? activationError}) async {
     if (!mounted ||
         !_ready ||
         state.busy ||
         _activation != null ||
         _revocation != null ||
         !_online ||
-        !_foreground) {
+        !_foreground ||
+        _quotaBlocked) {
       return;
     }
     final hadPrivateContent = state.content != null;
@@ -382,42 +450,18 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       final uid = _uid;
       final access = uid == null ? null : await _check(uid);
       if (!_current(generation)) return;
-      final public = await gateway.publicContent();
-      if (!_current(generation)) return;
-
-      PrayerAccessContent? private;
-      if (access != null && uid != null) {
-        final sets = _allowedSets(access);
-        switch (access.mode ?? AccessSetsMode.legacy) {
-          case AccessSetsMode.canonical:
-            if (sets.isNotEmpty) {
-              private = await _canonical!.load(
-                sets,
-                () => _current(generation),
-              );
-            }
-          case AccessSetsMode.legacy:
-            if (access.legacy?.active == true) {
-              private = await gateway.protectedContent(uid);
-            }
-          case AccessSetsMode.suspended:
-            break;
-        }
+      if (access?.mode != null) _record['v2RulesUid'] = uid;
+      // Keep the existing physical public refresh once per process and again
+      // at a rollout change. Resume never reads either protected collection.
+      var public = state.publicContent;
+      final mode = access?.mode ?? AccessSetsMode.legacy;
+      if (public == null || mode != _publicMode) {
+        public = (await gateway.publicContent()).publicOnly;
         if (!_current(generation)) return;
-        if (!_matches(access, await _check(uid))) {
-          if (_current(generation)) {
-            _invalidate();
-            await _clearMemory();
-            _scheduleRetry();
-          }
-          return;
-        }
+        await persistPublic?.call(public);
+        if (!_current(generation)) return;
+        _publicMode = mode;
       }
-      if (!_current(generation)) return;
-      final merged = private == null ? null : public.mergeProtected(private);
-      final safePublic = merged?.publicOnly ?? public.publicOnly;
-      await persistPublic?.call(safePublic);
-      if (!_current(generation)) return;
 
       final registered =
           access?.legacy?.active == true || access?.grant?.active == true;
@@ -434,6 +478,12 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       if (!_current(generation)) return;
       _confirmed = access;
       if (uid != null && access != null) _watchAccess(uid, access, generation);
+      if (access?.mode == AccessSetsMode.canonical) {
+        _catalogSession = _canonical!.open(
+          _allowedSets(access!),
+          () => _current(generation) && !_quotaBlocked,
+        );
+      }
       final revoked =
           access?.legacy?.active == false || access?.grant?.active == false;
       final projectionDenied =
@@ -442,8 +492,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
           access?.entitlements == null;
       _set(
         registered: registered,
-        content: private == null ? null : safePublic.mergeProtected(private),
-        publicContent: safePublic,
+        publicContent: public,
         error:
             activationError ??
             (!registered && revoked
@@ -465,26 +514,94 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
           access?.legacy?.active == true &&
           lastActive != null &&
           DateTime.now().difference(lastActive) >= const Duration(hours: 1)) {
-        unawaited(gateway.recordActivity(uid).catchError((Object _) {}));
+        unawaited(
+          gateway.recordActivity(uid).catchError((Object error) {
+            if (_current(generation) &&
+                error is PriestAccessException &&
+                error.quotaExhausted) {
+              return _failRead(error);
+            }
+          }),
+        );
       }
       try {
+        if (_helpLoaded) return;
         final help = await gateway.help();
         if (_current(generation)) {
-          _set(content: state.content, helpText: help, error: state.error);
+          _helpLoaded = true;
+          _set(
+            content: state.content,
+            helpText: help,
+            error: state.error,
+            catalogLoading: state.catalogLoading,
+          );
         }
-      } catch (_) {
-        // Contact information is optional.
+      } catch (error) {
+        if (_current(generation) &&
+            error is PriestAccessException &&
+            error.quotaExhausted) {
+          await _failRead(error);
+        }
       }
     } catch (error) {
       if (!_current(generation)) return;
-      _invalidate(
-        error: error is PriestAccessException
-            ? error.message
-            : const PriestAccessException('SERVICE_UNAVAILABLE').message,
-      );
-      await _clearMemory();
-      _scheduleRetry();
+      await _failRead(error);
     }
+  }
+
+  /// A navigation edge or an explicit user action requests a full catalog.
+  /// Concurrent routes reuse one result for the current authorization session.
+  Future<void> loadCatalog() async {
+    final visibilityEpoch = _visibilityEpoch;
+    await initialize();
+    await _checking;
+    if (!mounted ||
+        visibilityEpoch != _visibilityEpoch ||
+        !_online ||
+        !_foreground ||
+        !state.canLoadCatalog ||
+        _quotaBlocked ||
+        state.content != null) {
+      return;
+    }
+    final request = _catalogRequest ??= _loadConfirmedCatalog();
+    try {
+      await request;
+    } finally {
+      if (identical(_catalogRequest, request)) _catalogRequest = null;
+    }
+  }
+
+  Future<void> _loadConfirmedCatalog() async {
+    final uid = _uid!;
+    final generation = _generation;
+    _set(error: state.error, catalogLoading: true);
+    try {
+      final public = state.publicContent!;
+      final private = _catalogSession == null
+          ? await gateway.protectedContent(uid)
+          : await _catalogSession!.load(public);
+      if (!_current(generation)) return;
+      final safePublic = public.mergeProtected(private).publicOnly;
+      if (safePublic.prayers.length != public.prayers.length ||
+          safePublic.categories.length != public.categories.length) {
+        await persistPublic?.call(safePublic);
+      }
+      if (!_current(generation)) return;
+      _set(
+        content: safePublic.mergeProtected(private),
+        publicContent: safePublic,
+        error: state.error,
+      );
+    } catch (error) {
+      if (_current(generation)) await _failRead(error);
+    }
+  }
+
+  Future<void> retryAfterQuota() async {
+    if (!_quotaBlocked || !_online || !_foreground || !mounted) return;
+    _quotaBlocked = false;
+    await refresh();
   }
 
   Future<void> activate(String input, String deviceName) async {
@@ -493,7 +610,8 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         !_ready ||
         state.busy ||
         _pending != null ||
-        _activation != null) {
+        _activation != null ||
+        _quotaBlocked) {
       return;
     }
     final code = parseAccessSetsV2Code(input);
@@ -525,6 +643,9 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
           throw const PriestAccessException('INVALID_CODE');
         }
         if (!_current(generation)) return;
+        _record['v2RulesUid'] = uid;
+        await _save();
+        if (!_current(generation)) return;
         await _accessSets.activate(uid, code, name);
       } else {
         final existing = await gateway.grant(uid);
@@ -544,11 +665,16 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     try {
       await operation;
     } catch (failure) {
+      _blockQuota(failure);
       error = failure is PriestAccessException
           ? failure.message
           : const PriestAccessException('SERVICE_UNAVAILABLE').message;
     } finally {
       _activation = null;
+    }
+    if (_quotaBlocked) {
+      await _failRead(const PriestAccessException('QUOTA_EXHAUSTED'));
+      return;
     }
     if (!_current(generation)) {
       if (mounted && _pending == null) _scheduleRetry();
@@ -591,12 +717,16 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       }
       await _clearMemory();
       if (!_current(generation)) throw const PriestAccessException('OFFLINE');
+      if (_quotaBlocked) throw const PriestAccessException('QUOTA_EXHAUSTED');
       await _flushRevocation();
       _set(registered: false);
-    } catch (_) {
+    } catch (error) {
+      _blockQuota(error);
       _set(
         registered: false,
-        error: durable
+        error: _quotaBlocked
+            ? const PriestAccessException('QUOTA_EXHAUSTED').message
+            : durable
             ? 'Доступ выключаны на гэтай прыладзе. Адкліканне будзе паўторана пры злучэнні.'
             : 'Не атрымалася захаваць адкліканне. Доступ выключаны; папрасіце адміністратара праверыць дазвол прылады.',
       );
@@ -606,6 +736,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   }
 
   void suspend({bool? online, bool? foreground}) {
+    ++_visibilityEpoch;
     _retry?.cancel();
     if (online != null) _online = online;
     if (foreground != null) _foreground = foreground;
@@ -614,9 +745,15 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   }
 
   Future<void> resume({bool? online, bool? foreground}) async {
+    final changed =
+        (online != null && online != _online) ||
+        (foreground != null && foreground != _foreground);
     if (online != null) _online = online;
     if (foreground != null) _foreground = foreground;
-    await refresh();
+    if (changed && _online && _foreground) {
+      await _checking;
+      if (_confirmed == null) await refresh();
+    }
   }
 
   Future<Map<String, dynamic>?> readPrayer(String id) async {
@@ -627,29 +764,20 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         access == null ||
         _pending != null ||
         !_current(generation) ||
-        state.content?.prayers.containsKey(id) != true) {
+        !state.canLoadCatalog ||
+        _quotaBlocked ||
+        id.isEmpty ||
+        id.contains('/')) {
       return null;
     }
     try {
       final prayer = access.mode == AccessSetsMode.canonical
-          ? await _canonical!.readPrayer(id)
+          ? await _catalogSession!.readPrayer(id, state.publicContent!)
           : await gateway.readProtectedPrayer(uid, id);
-      if (!_current(generation)) return null;
-      final observed = await _check(uid);
-      if (!_current(generation)) return null;
-      if (_matches(access, observed) && prayer != null) return prayer;
-      _invalidate();
-      await _clearMemory();
-      await refresh();
+      return _current(generation) ? prayer : null;
     } catch (error) {
       if (_current(generation)) {
-        _invalidate(
-          error: error is PriestAccessException
-              ? error.message
-              : const PriestAccessException('SERVICE_UNAVAILABLE').message,
-        );
-        await _clearMemory();
-        _scheduleRetry();
+        await _failRead(error);
       }
     }
     return null;
@@ -666,6 +794,10 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
 
 final protectedPrayerProvider = FutureProvider.autoDispose
     .family<Map<String, dynamic>?, String>((ref, id) {
-      ref.watch(priestAccessProvider.select((state) => state.content));
+      ref.watch(
+        priestAccessProvider.select(
+          (state) => (state.generation, state.canLoadCatalog),
+        ),
+      );
       return ref.read(priestAccessProvider.notifier).readPrayer(id);
     });

@@ -18,6 +18,10 @@ class FirebasePriestAccess implements PriestAccessGateway {
   static const appName = 'mybrev-priest';
   static const _server = GetOptions(source: Source.server);
   static const _timeout = Duration(seconds: 15);
+  static const _auditReads =
+      kDebugMode &&
+      bool.fromEnvironment('PRIEST_USE_EMULATORS') &&
+      bool.fromEnvironment('PRIEST_AUDIT_READS');
   FirebaseApp? _app;
   FirebaseAuth? _auth;
   platform.FirebaseFirestorePlatform? _privateDb;
@@ -25,6 +29,48 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<void> _clearing = Future<void>.value();
   bool _closed = false;
   late final AccessSetsV2Gateway accessSetsV2 = _FirebaseAccessSetsV2(this);
+
+  // Emulator-only measurement of SDK deliveries. This contains no paths,
+  // data or identifiers. Rules dependency reads and retries are separate.
+  void _audit(String operation, int? documents) {
+    if (_auditReads) {
+      debugPrint('[PriestRead] $operation ${documents ?? 'failed'}');
+    }
+  }
+
+  Future<T> _serverRead<T>(
+    String operation,
+    Future<T> Function() read,
+    int Function(T) documents,
+  ) async {
+    if (!_auditReads) return read();
+    try {
+      final result = await read();
+      _audit(operation, documents(result));
+      return result;
+    } catch (_) {
+      _audit(operation, null);
+      rethrow;
+    }
+  }
+
+  Future<platform.DocumentSnapshotPlatform> _get(
+    String operation,
+    platform.DocumentReferencePlatform ref,
+  ) => _serverRead(
+    operation,
+    () => ref.get(_server),
+    (result) => result.exists ? 1 : 0,
+  );
+
+  Future<platform.QuerySnapshotPlatform> _query(
+    String operation,
+    platform.QueryPlatform ref,
+  ) => _serverRead(
+    operation,
+    () => ref.get(_server),
+    (result) => result.docs.length,
+  );
 
   Future<void> _initialize() async {
     await _clearing;
@@ -127,7 +173,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
               : 'ACCESS_REQUIRED',
         'unauthenticated' => 'ACCESS_REQUIRED',
         'unavailable' || 'deadline-exceeded' => 'OFFLINE',
-        'resource-exhausted' => 'TOO_MANY_ATTEMPTS',
+        'resource-exhausted' => 'QUOTA_EXHAUSTED',
         _ => 'SERVICE_UNAVAILABLE',
       });
     } catch (error) {
@@ -178,7 +224,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
   @override
   Future<PriestDeviceGrant?> grant(String uid) => _run(() async {
     _own(uid);
-    return _grantData(await _grant(uid).get(_server));
+    return _grantData(await _get('auth.legacyGrant', _grant(uid)));
   }, readingGrant: true);
   @override
   Stream<PriestDeviceGrant?> watchGrant(String uid) {
@@ -202,17 +248,19 @@ class FirebasePriestAccess implements PriestAccessGateway {
               if (!snapshot.metadata.isFromCache) serverSeen = true;
               if (!snapshot.metadata.isFromCache &&
                   !snapshot.metadata.hasPendingWrites) {
+                _audit('watch.legacyGrant', snapshot.exists ? 1 : 0);
                 sink.add(_grantData(snapshot));
               }
             },
             handleError: (Object error, StackTrace trace, sink) {
               sink.addError(
-                PriestAccessException(
-                  error is FirebaseException &&
-                          error.code == 'permission-denied'
-                      ? 'GRANT_UNREADABLE'
-                      : 'OFFLINE',
-                ),
+                PriestAccessException(switch (error) {
+                  FirebaseException(code: 'permission-denied') =>
+                    'GRANT_UNREADABLE',
+                  FirebaseException(code: 'resource-exhausted') =>
+                    'QUOTA_EXHAUSTED',
+                  _ => 'OFFLINE',
+                }),
                 trace,
               );
             },
@@ -269,13 +317,14 @@ class FirebasePriestAccess implements PriestAccessGateway {
   @override
   Future<void> disable(String uid) => _run(() async {
     _own(uid);
-    final snapshot = await _grant(uid).get(_server);
+    final snapshot = await _get('auth.legacyGrant', _grant(uid));
     if (_grantData(snapshot)?.active == true) {
       await _grant(uid).update({
         FieldPath(['status']): 'revoked',
         FieldPath(['revokedAt']): FieldValue.serverTimestamp(),
       });
-      if (_grantData(await _grant(uid).get(_server))?.active != false) {
+      if (_grantData(await _get('auth.legacyGrant', _grant(uid)))?.active !=
+          false) {
         throw const PriestAccessException('SERVICE_UNAVAILABLE');
       }
     }
@@ -292,12 +341,10 @@ class FirebasePriestAccess implements PriestAccessGateway {
   @override
   Future<String> help() => _run(
     () async =>
-        (await _privateDb!
-                .collection('priestAccessPublic')
-                .doc('help')
-                .get(_server))
-            .data()?['helpText']
-            ?.toString() ??
+        (await _get(
+          'public.help',
+          _privateDb!.doc('priestAccessPublic/help'),
+        )).data()?['helpText']?.toString() ??
         '',
   );
   Map<String, Map<String, dynamic>> _documents(
@@ -323,8 +370,16 @@ class FirebasePriestAccess implements PriestAccessGateway {
       // Ordinary readers do not need Anonymous Authentication.
       final db = FirebaseFirestore.instance;
       final snapshots = await Future.wait([
-        db.collection('prayers').get(_server),
-        db.collection('prayerCategories').get(_server),
+        _serverRead(
+          'public.prayers',
+          () => db.collection('prayers').get(_server),
+          (result) => result.docs.length,
+        ),
+        _serverRead(
+          'public.categories',
+          () => db.collection('prayerCategories').get(_server),
+          (result) => result.docs.length,
+        ),
       ]).timeout(_timeout);
       if (snapshots.any(
         (snapshot) =>
@@ -344,8 +399,10 @@ class FirebasePriestAccess implements PriestAccessGateway {
       ).publicOnly;
     } on TimeoutException {
       throw const PriestAccessException('OFFLINE');
-    } on FirebaseException {
-      throw const PriestAccessException('OFFLINE');
+    } on FirebaseException catch (error) {
+      throw PriestAccessException(
+        error.code == 'resource-exhausted' ? 'QUOTA_EXHAUSTED' : 'OFFLINE',
+      );
     }
   }
 
@@ -353,8 +410,14 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<PrayerAccessContent> protectedContent(String uid) => _run(() async {
     _own(uid);
     final snapshots = await Future.wait([
-      _privateDb!.collection('priestProtectedPrayers').get(_server),
-      _privateDb!.collection('priestProtectedCategories').get(_server),
+      _query(
+        'legacy.prayers',
+        _privateDb!.collection('priestProtectedPrayers'),
+      ),
+      _query(
+        'legacy.categories',
+        _privateDb!.collection('priestProtectedCategories'),
+      ),
     ]);
     return PrayerAccessContent(
       _documents(snapshots[0], protected: true),
@@ -365,10 +428,10 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<Map<String, dynamic>?> readProtectedPrayer(String uid, String id) =>
       _run(() async {
         _own(uid);
-        final snapshot = await _privateDb!
-            .collection('priestProtectedPrayers')
-            .doc(id)
-            .get(_server);
+        final snapshot = await _get(
+          'legacy.prayer',
+          _privateDb!.collection('priestProtectedPrayers').doc(id),
+        );
         if (snapshot.metadata.isFromCache ||
             snapshot.metadata.hasPendingWrites) {
           throw const PriestAccessException('OFFLINE');

@@ -203,6 +203,7 @@ void main() {
       if (restart) {
         // The lifecycle widget rechecks connectivity after its first frame.
         // Wait for that server check rather than inspecting its transient state.
+        await controller.loadCatalog();
         await waitFor(() => controller.state.content != null);
         expect(controller.state.registered, true);
         expect(await gateway.restoreSession(), previous['verifiedUid']);
@@ -302,6 +303,7 @@ void main() {
       await expectNoCachedClaim(rejectedUid);
       expect(await gateway.grant(rejectedUid), null);
       await controller.activate(code, 'Pixel 7 Spark');
+      await controller.loadCatalog();
       await waitFor(() => controller.state.content != null);
       final uid = await gateway.restoreSession();
       expect(uid, isNotNull);
@@ -358,6 +360,7 @@ void main() {
         'helpText': '',
       });
       await controller.refresh();
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       controller.suspend(online: false);
       await tester.pump();
@@ -375,6 +378,7 @@ void main() {
       expect(await controller.readPrayer('spark-single'), null);
       await controller.resume(online: true);
       expect(await gateway.restoreSession(), uid);
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       await screen('restored');
       await seed('priestDeviceGrants/$uid', {
@@ -390,6 +394,7 @@ void main() {
       await screen('revoked');
       await gateway.signOut();
       await controller.activate(nextCode, 'Second installation');
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       final secondUid = await gateway.restoreSession();
       controller.suspend(online: false);
@@ -400,6 +405,7 @@ void main() {
       expect((await storage.read())['pendingDisableUid'], null);
       expect(await gateway.restoreSession(), null);
       await controller.activate(nextCode, 'Restart installation');
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       router.go('/settings');
       await tester.pumpAndSettle();

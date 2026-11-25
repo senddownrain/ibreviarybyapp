@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +14,7 @@ import 'package:mybrev_flutter/widgets/category_icon_picker.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
+import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/prayer_category_tree.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
@@ -20,6 +23,7 @@ import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/prayerbook_section_tiles.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
+import 'package:mybrev_flutter/widgets/protected_catalog_control.dart';
 
 const _kMassOrderPrayerId = 'eMmCtxwyJ75ogmL5rwye';
 
@@ -65,6 +69,7 @@ class PrayersScreen extends ConsumerWidget {
                   key: const Key('prayerbook-title'),
                   style: ReaderTheme.of(context).displayTitle(36),
                 ),
+                const ProtectedCatalogControl(),
                 const SizedBox(height: 22),
                 const _SectionTitle(title: 'Абраныя'),
                 if (favorites.isEmpty)
@@ -260,6 +265,7 @@ class _PrayerCatalogScreenState extends ConsumerState<PrayerCatalogScreen> {
         selectedFilterCount: filter.selectedTags.length,
         onChanged: (value) {
           ref.read(prayersFilterProvider.notifier).setSearch(value);
+          unawaited(ref.read(priestAccessProvider.notifier).loadCatalog());
           setState(() {});
         },
         onSubmitted: ref.read(prayersFilterProvider.notifier).setSearch,
@@ -370,6 +376,7 @@ class PrayerCategoriesScreen extends ConsumerWidget {
                   'Стандартныя можна схаваць, асабістыя — змяняць і выдаляць.',
                   style: TextStyle(color: cs.onSurfaceVariant),
                 ),
+                const ProtectedCatalogControl(),
                 const SizedBox(height: 24),
                 globals.when(
                   loading: () => const AppProgressLine(),
@@ -613,6 +620,7 @@ class _PrayerListPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
+                const ProtectedCatalogControl(),
                 const SizedBox(height: 18),
                 for (final category in categories)
                   _CategoryRow(category: category),
@@ -1318,6 +1326,11 @@ class _MissingPrayerbookPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Малітоўнік')),
-    body: Center(child: Text(title)),
+    body: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [Text(title), const ProtectedCatalogControl()],
+      ),
+    ),
   );
 }
