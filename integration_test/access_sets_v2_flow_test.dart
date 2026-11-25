@@ -141,7 +141,8 @@ void main() {
         controller.state.content?.prayers.keys,
         isNot(contains('s7-mirror')),
       );
-      await controller.activate(_v2, 'S7 synthetic device');
+      // A blank optional name is sent as the non-empty S1 client default.
+      await controller.activate(_v2, '');
       expect(controller.state.allowedSets, {'priest', 'marian'});
       expect(await gateway.restoreSession() == uid, true);
 
