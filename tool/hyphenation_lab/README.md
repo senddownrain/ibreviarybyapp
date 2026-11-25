@@ -2,7 +2,7 @@
 
 Не часть приложения: свой `pubspec.yaml`, **без Firebase, без сети, без google_fonts**.
 Шрифты — копии из `assets/google_fonts/` (OFL), паттерны — `assets/patterns/hyph-be.tex` (MIT).
-Полный отчёт: [REPORT.md](REPORT.md). Скриншоты и метрики: `out/`.
+Для выбора варианта: [COMPARE.md](COMPARE.md). Полный отчёт: [REPORT.md](REPORT.md). Скриншоты и метрики: `out/`.
 
 ```bash
 cd tool/hyphenation_lab
