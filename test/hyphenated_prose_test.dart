@@ -361,6 +361,28 @@ void main() {
       },
     );
 
+    testWidgets(
+      'patterns not loaded → exactly the old single Html (nothing split)',
+      (t) async {
+        BelarusianHyphenation.debugSet(null);
+        const html =
+            '<p>$prose</p><p>Божа, мой Божа, Цябе шукаю, *<br />Цябе прагне душа мая.</p>';
+        await t.pumpWidget(
+          host(
+            HyphenatedHtml(
+              data: html,
+              style: styles,
+              selected: TextAlign.justify,
+            ),
+            400,
+          ),
+        );
+        expect(hyphRenders(t), isEmpty);
+        expect(find.byType(Html), findsOneWidget);
+        expect(t.widget<Html>(find.byType(Html)).data, html);
+      },
+    );
+
     testWidgets('no prose paragraph → exactly the old single Html', (t) async {
       const html =
           '<p class="liturgical-rubric">ПЕРШАЕ ЧЫТАННЕ</p><p>Божа, мой Божа, Цябе шукаю, *<br />Цябе прагне душа мая.</p>';

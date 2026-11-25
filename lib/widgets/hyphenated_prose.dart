@@ -117,7 +117,16 @@ class HyphenatedHtml extends StatelessWidget {
   final OnTap? onLinkTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<BelarusianHyphenator?>(
+        valueListenable: BelarusianHyphenation.notifier,
+        builder: (context, hyphenator, _) => hyphenator == null
+            // Patterns not loaded (yet): exactly the pre-hyphenation widget.
+            ? _stock(data, selected)
+            : _blocks(context),
+      );
+
+  Widget _blocks(BuildContext context) {
     final blocks = splitProseBlocks(data);
     // Nothing to hyphenate → identical to the old widget.
     if (!blocks.any((b) => b.prose != null)) {
