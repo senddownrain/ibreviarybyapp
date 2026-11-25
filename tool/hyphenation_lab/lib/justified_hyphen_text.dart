@@ -280,6 +280,9 @@ class RenderHyphenatedJustifiedText extends RenderBox
   List<_Line> _lines = const [];
   String _plain = '';
 
+  /// True for B2 (justified), false for D (ragged right).
+  bool get justify => _justify;
+
   /// The original, unmodified text (what copy/semantics would expose).
   String get plainText => _plain;
   List<HyphLine> get lines => [for (final l in _lines) l.info];

@@ -48,3 +48,78 @@ List<RealReading> sampleReadings({int step = 12, int minLen = 150}) {
       .toList();
   return [for (var i = 0; i < all.length; i += step) all[i]];
 }
+
+// ---- other real texts from the same offline bundle (read-only) -------------
+
+List<String> loadBundleStrings(String name) {
+  final raw =
+      jsonDecode(
+            utf8.decode(
+              gzip.decode(
+                File('../../assets/content/$name.json.gz').readAsBytesSync(),
+              ),
+            ),
+          )
+          as Map<String, dynamic>;
+  return (raw['strings'] as List).whereType<String>().toList();
+}
+
+/// A real Hours/Mass HTML reading with a red rubric, an <em> title, a long
+/// prose paragraph and psalmody lines (shortest match, deterministic).
+String pickMixedHtml() {
+  bool isProse(String p) =>
+      !p.contains('<br') &&
+      !p.contains('*') &&
+      p.replaceAll(RegExp(r'<[^>]+>'), '').length > 350;
+  final c = loadBundleStrings('liturgicalProperTexts').where((t) {
+    if (!t.contains('#ff0000') || !t.contains('<em>') || t.length >= 3500)
+      return false;
+    final ps = RegExp(
+      r'<p[^>]*>(.*?)</p>',
+      dotAll: true,
+    ).allMatches(t).map((m) => m.group(1)!);
+    return ps.any(isProse);
+  }).toList()..sort((a, b) => a.length.compareTo(b.length));
+  return c.first;
+}
+
+/// A real psalm (HTML, `*<br />` cadences, red rubric heading).
+String pickPsalmHtml() {
+  final c =
+      loadBundleStrings('liturgicalProperTexts')
+          .where(
+            (t) =>
+                t.contains('Псальм') &&
+                t.contains('*<br') &&
+                t.contains('#ff0000') &&
+                t.length < 2500,
+          )
+          .toList()
+        ..sort((a, b) => a.length.compareTo(b.length));
+  return c.first;
+}
+
+/// A real Belarusian prayer (mybrev-markdown) by title.
+(String, String) pickPrayer(String titlePart) {
+  final raw =
+      jsonDecode(
+            utf8.decode(
+              gzip.decode(
+                File('../../assets/content/prayers.json.gz').readAsBytesSync(),
+              ),
+            ),
+          )
+          as Map<String, dynamic>;
+  final strings = (raw['strings'] as List).cast<String>();
+  String? r(Object? v) => v is String && v.startsWith('\u0001')
+      ? strings[int.parse(v.substring(1))]
+      : (v as String?);
+  for (final doc in (raw['docs'] as Map<String, dynamic>).values) {
+    final d = doc as Map<String, dynamic>;
+    final title = r((d['titleVersions'] as Map?)?['be']);
+    final text = r((d['textVersions'] as Map?)?['be']);
+    if (title != null && text != null && title.contains(titlePart))
+      return (title, text);
+  }
+  throw StateError('prayer not found: $titlePart');
+}
