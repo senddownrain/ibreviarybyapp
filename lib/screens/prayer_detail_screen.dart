@@ -314,7 +314,11 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
             label: kReportErrorLabel,
             icon: Icons.flag_outlined,
             onSelected: () => context.push(
-              feedbackLocation(kind: 'prayer', id: p.id, title: title),
+              feedbackLocation(
+                kind: 'prayer',
+                id: p.id,
+                title: p.priestOnly ? null : title,
+              ),
             ),
           ),
         ],

@@ -4,6 +4,8 @@ import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/models/priest_access_content.dart';
+import 'package:mybrev_flutter/services/access_sets_v2_code.dart';
+import 'package:mybrev_flutter/services/access_sets_v2_gateway.dart';
 import 'package:mybrev_flutter/services/firebase_priest_access.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
 import 'package:mybrev_flutter/services/priest_access_policy.dart';
@@ -19,6 +21,11 @@ class PriestAccessState {
     this.publicContent,
     this.error,
     this.helpText = '',
+    this.mode = AccessSetsMode.suspended,
+    this.allowedSets = const {},
+    this.profileRevision,
+    this.pendingDisable = false,
+    this.canAddCode = false,
   });
   final bool registered;
   final bool busy;
@@ -28,6 +35,11 @@ class PriestAccessState {
   final PrayerAccessContent? publicContent;
   final String? error;
   final String helpText;
+  final AccessSetsMode mode;
+  final Set<String> allowedSets;
+  final int? profileRevision;
+  final bool pendingDisable;
+  final bool canAddCode;
 }
 
 final priestAccessGatewayProvider = Provider<PriestAccessGateway>((ref) {
@@ -101,30 +113,57 @@ final priestAccessProvider =
       return controller;
     });
 
+typedef _AccessCheck = ({
+  AccessSetsMode? mode,
+  PriestDeviceGrant? legacy,
+  AccessV2Grant? grant,
+  AccessEntitlements? entitlements,
+});
+
 class PriestAccessController extends StateNotifier<PriestAccessState> {
-  PriestAccessController(this.gateway, this.storage, {this.persistPublic})
-    : super(const PriestAccessState());
+  PriestAccessController(
+    this.gateway,
+    this.storage, {
+    this.persistPublic,
+    AccessSetsV2Gateway? accessSets,
+    AccessSetsCatalog? catalog,
+  }) : _accessSets =
+           accessSets ??
+           (gateway is FirebasePriestAccess ? gateway.accessSetsV2 : null),
+       _catalog = catalog,
+       super(const PriestAccessState());
+
   final PriestAccessGateway gateway;
   final PriestAccessStorage storage;
   final Future<void> Function(PrayerAccessContent)? persistPublic;
+  final AccessSetsV2Gateway? _accessSets;
+  final AccessSetsCatalog? _catalog;
+  late final AccessSetsCatalog? _canonical =
+      _catalog ??
+      (_accessSets == null ? null : IndexedAccessSetsCatalog(_accessSets));
   Map<String, dynamic> _record = {};
   String? _uid;
+  _AccessCheck? _confirmed;
   int _generation = 0;
   bool _online = true, _foreground = true, _ready = false;
   Future<void>? _initializing;
+  Future<void>? _activation;
+  Future<void>? _revocation;
   Future<void> _writes = Future<void>.value();
   Future<void> _clearing = Future<void>.value();
-  StreamSubscription<PriestDeviceGrant?>? _watch;
+  final _watches = <StreamSubscription<dynamic>>[];
   Timer? _retry;
   int _retrySeconds = 5;
+
+  String? get _pending => _record['pendingDisableUid'] as String?;
+  bool _current(int generation) =>
+      mounted && generation == _generation && _online && _foreground;
 
   void _scheduleRetry() {
     if (!mounted ||
         !_online ||
         !_foreground ||
-        (_uid == null &&
-            _record['verifiedUid'] == null &&
-            _record['pendingDisableUid'] == null) ||
+        (_uid == null && _record['verifiedUid'] == null && _pending == null) ||
         _retry?.isActive == true) {
       return;
     }
@@ -151,6 +190,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     String? helpText,
   }) {
     if (!mounted) return;
+    final access = _confirmed;
     state = PriestAccessState(
       registered: registered ?? state.registered,
       busy: busy,
@@ -158,21 +198,31 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       publicContent: publicContent ?? state.publicContent,
       error: error,
       helpText: helpText ?? state.helpText,
+      mode: access == null
+          ? AccessSetsMode.suspended
+          : access.mode ?? AccessSetsMode.legacy,
+      allowedSets: access == null ? const {} : _allowedSets(access),
+      profileRevision: access?.entitlements?.revision,
+      pendingDisable: _pending != null,
+      canAddCode:
+          access?.mode == AccessSetsMode.canonical &&
+          (access?.legacy == null || access?.grant == null),
     );
   }
 
-  bool _current(int generation) =>
-      mounted && generation == _generation && _online && _foreground;
+  Set<String> _allowedSets(_AccessCheck access) => Set.unmodifiable({
+    if (access.legacy?.active == true) 'priest',
+    ...?access.entitlements?.allowedSets,
+  });
+
   Future<void> initialize() => _initializing ??= _initialize();
+
   Future<void> _initialize() async {
     try {
       _record = await storage.read();
+      if (!mounted) return;
       _ready = true;
-      _set(
-        registered:
-            _record['verifiedUid'] is String &&
-            _record['pendingDisableUid'] == null,
-      );
+      _set(registered: _record['verifiedUid'] is String && _pending == null);
       await refresh();
     } catch (_) {
       _set(error: const PriestAccessException('STORAGE').message);
@@ -180,262 +230,386 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     }
   }
 
-  Future<void> _flushRevocation() async {
-    final pending = _record['pendingDisableUid'] as String?;
+  Future<void> _flushRevocation() =>
+      _revocation ??= _revoke().whenComplete(() => _revocation = null);
+
+  Future<void> _revoke() async {
+    final pending = _pending;
     if (pending == null) return;
-    // Keep the Auth session until the server has acknowledged revocation.
-    // If the session was lost, a UID alone cannot revoke the old installation.
-    if (_uid != pending) throw const PriestAccessException('REVOKED');
-    await gateway.disable(pending);
-    await gateway.signOut();
-    _uid = null;
+    if (_record['confirmedDisableUid'] != pending) {
+      if (_uid != pending) throw const PriestAccessException('REVOKED');
+      await Future.wait([
+        gateway.disable(pending),
+        if (_accessSets != null) _accessSets.revokeOwn(pending),
+      ]);
+      _record['confirmedDisableUid'] = pending;
+      // Keep the readback result across a crash between sign-out and cleanup.
+      try {
+        await _save();
+      } catch (_) {
+        // Both grants are already revoked on the server.
+      }
+    }
+    if (_uid == pending) {
+      await gateway.signOut();
+      _uid = null;
+    }
     _record.remove('pendingDisableUid');
+    _record.remove('confirmedDisableUid');
     _record.remove('verifiedUid');
     await _save();
   }
 
-  Future<void> _clearMemory() async {
-    final watch = _watch;
-    _watch = null;
-    _clearing = _clearing.catchError((Object _) {}).then((_) async {
-      await watch?.cancel();
-      await gateway.clearProtectedMemory();
-    });
-    try {
-      await _clearing;
-    } catch (_) {
-      /* next entry retries initialization */
-    }
+  Future<void> _stopWatching() async {
+    final watches = _watches.toList();
+    _watches.clear();
+    await Future.wait(watches.map((watch) => watch.cancel()));
   }
 
-  void _watchGrant(String uid) {
-    if (_watch != null) return;
-    _watch = gateway
-        .watchGrant(uid)
-        .listen(
-          (grant) {
-            if (!mounted || _uid != uid || !_online || !_foreground) return;
-            if (grant?.active != true) unawaited(_revoked());
-          },
-          onError: (Object error) {
-            if (!mounted || _uid != uid) return;
-            if (error is PriestAccessException && error.revoked) {
-              unawaited(_revoked());
-            } else {
-              ++_generation;
-              _set(
-                error: error is PriestAccessException
-                    ? error.message
-                    : const PriestAccessException('OFFLINE').message,
-              );
-              unawaited(_clearMemory().whenComplete(_scheduleRetry));
-            }
-          },
-        );
+  Future<void> _clearMemory() {
+    final stopping = _stopWatching();
+    return _clearing = _clearing
+        .catchError((Object _) {})
+        .then((_) async {
+          try {
+            await stopping;
+          } finally {
+            await gateway.clearProtectedMemory();
+          }
+        })
+        .catchError((Object _) {});
   }
 
-  Future<void> _revoked() async {
-    _retry?.cancel();
+  void _invalidate({String? error, bool busy = false}) {
     ++_generation;
-    _record.remove('verifiedUid');
-    _set(
-      registered: false,
-      error: const PriestAccessException('ACCESS_REQUIRED').message,
-    );
-    try {
-      await _save();
-    } catch (_) {
-      /* server remains authoritative */
-    }
-    await _clearMemory();
+    _confirmed = null;
+    _set(error: error, busy: busy);
   }
 
-  Future<void> refresh() async {
-    if (!mounted || !_ready || state.busy || !_online || !_foreground) return;
+  Future<_AccessCheck> _check(String uid) async {
+    final legacy = await gateway.grant(uid);
+    final mode = await _accessSets?.readMode(uid);
+    final grant = mode == null ? null : await _accessSets!.readGrant(uid);
+    final entitlements =
+        mode == AccessSetsMode.canonical && grant?.active == true
+        ? await _accessSets!.readEntitlements(uid, grant!)
+        : null;
+    return (
+      mode: mode,
+      legacy: legacy,
+      grant: grant,
+      entitlements: entitlements,
+    );
+  }
+
+  bool _matches(_AccessCheck expected, _AccessCheck observed) =>
+      expected.mode == observed.mode &&
+      expected.legacy?.active == observed.legacy?.active &&
+      expected.grant == observed.grant &&
+      (expected.entitlements?.matches(observed.entitlements) ??
+          (observed.entitlements == null));
+
+  void _watchAccess(String uid, _AccessCheck access, int generation) {
+    if (access.mode == null && access.legacy?.active != true) return;
+
+    void changed({Object? error}) {
+      if (!_current(generation)) return;
+      final message = error is PriestAccessException ? error.message : null;
+      _invalidate(error: message);
+      unawaited(
+        _clearMemory().then((_) {
+          if (error == null ||
+              (error is PriestAccessException && error.revoked)) {
+            return refresh();
+          }
+          _scheduleRetry();
+        }),
+      );
+    }
+
+    // The legacy listener is safe for missing own grants too. It can detect
+    // a second branch being added or removed by another tab on the same UID.
+    _watches.add(
+      gateway.watchGrant(uid).listen((grant) {
+        if (grant?.active != access.legacy?.active) changed();
+      }, onError: (Object error) => changed(error: error)),
+    );
+    if (access.mode case final mode?) {
+      _watches.add(
+        _accessSets!
+            .watch(
+              uid,
+              mode: mode,
+              grant: access.grant,
+              entitlements: access.entitlements,
+            )
+            .listen(
+              (_) => changed(),
+              onError: (Object error) => changed(error: error),
+            ),
+      );
+    }
+  }
+
+  Future<void> refresh() => _refresh();
+
+  Future<void> _refresh({String? activationError}) async {
+    if (!mounted ||
+        !_ready ||
+        state.busy ||
+        _activation != null ||
+        _revocation != null ||
+        !_online ||
+        !_foreground) {
+      return;
+    }
+    final hadPrivateContent = state.content != null;
+    _invalidate(busy: true);
     final generation = _generation;
-    _set(busy: true, content: state.content);
     try {
+      if (hadPrivateContent) {
+        await _clearMemory();
+      } else {
+        await _stopWatching();
+      }
       await _clearing;
       if (!_current(generation)) return;
-      _uid = await gateway.restoreSession();
+      final restoredUid = await gateway.restoreSession();
+      if (!_current(generation)) return;
+      _uid = restoredUid;
       await _flushRevocation();
+      if (!_current(generation)) return;
       final uid = _uid;
-      final grant = uid == null ? null : await gateway.grant(uid);
+      final access = uid == null ? null : await _check(uid);
       if (!_current(generation)) return;
-      if (grant != null && !grant.active) {
-        await _revoked();
-        return;
-      }
-      if (grant?.active != true) _record.remove('verifiedUid');
       final public = await gateway.publicContent();
-      final private = grant?.active == true
-          ? await gateway.protectedContent(uid!)
-          : null;
       if (!_current(generation)) return;
-      // Confirm again after downloading; never expose a response racing revoke.
-      if (private != null && (await gateway.grant(uid!))?.active != true) {
-        await _revoked();
-        return;
+
+      PrayerAccessContent? private;
+      if (access != null && uid != null) {
+        final sets = _allowedSets(access);
+        switch (access.mode ?? AccessSetsMode.legacy) {
+          case AccessSetsMode.canonical:
+            if (sets.isNotEmpty) {
+              private = await _canonical!.load(
+                sets,
+                () => _current(generation),
+              );
+            }
+          case AccessSetsMode.legacy:
+            if (access.legacy?.active == true) {
+              private = await gateway.protectedContent(uid);
+            }
+          case AccessSetsMode.suspended:
+            break;
+        }
+        if (!_current(generation)) return;
+        if (!_matches(access, await _check(uid))) {
+          if (_current(generation)) {
+            _invalidate();
+            await _clearMemory();
+            _scheduleRetry();
+          }
+          return;
+        }
       }
       if (!_current(generation)) return;
       final merged = private == null ? null : public.mergeProtected(private);
       final safePublic = merged?.publicOnly ?? public.publicOnly;
       await persistPublic?.call(safePublic);
       if (!_current(generation)) return;
-      if (private != null) _record['verifiedUid'] = uid;
-      await _save();
+
+      final registered =
+          access?.legacy?.active == true || access?.grant?.active == true;
+      if (registered) {
+        _record['verifiedUid'] = uid;
+      } else {
+        _record.remove('verifiedUid');
+      }
+      try {
+        await _save();
+      } catch (_) {
+        // This field is a UI hint. Confirmed server rights remain authoritative.
+      }
       if (!_current(generation)) return;
+      _confirmed = access;
+      if (uid != null && access != null) _watchAccess(uid, access, generation);
+      final revoked =
+          access?.legacy?.active == false || access?.grant?.active == false;
+      final projectionDenied =
+          access?.mode == AccessSetsMode.canonical &&
+          access?.grant?.active == true &&
+          access?.entitlements == null;
       _set(
-        registered: private != null,
-        content: merged,
+        registered: registered,
+        content: private == null ? null : safePublic.mergeProtected(private),
         publicContent: safePublic,
+        error:
+            activationError ??
+            (!registered && revoked
+                ? const PriestAccessException('ACCESS_REQUIRED').message
+                : projectionDenied ||
+                      (registered && access?.mode == AccessSetsMode.suspended)
+                ? const PriestAccessException('SERVICE_UNAVAILABLE').message
+                : null),
       );
       _retry?.cancel();
-      _retrySeconds = 5;
-      if (private != null) {
-        _watchGrant(uid!);
-        if (grant!.lastActiveAt != null &&
-            DateTime.now().difference(grant.lastActiveAt!) >=
-                const Duration(hours: 1)) {
-          unawaited(gateway.recordActivity(uid).catchError((Object _) {}));
-        }
+      if (projectionDenied) {
+        // Its projection listener cannot stay subscribed while Rules deny it.
+        _scheduleRetry();
+      } else {
+        _retrySeconds = 5;
+      }
+      final lastActive = access?.legacy?.lastActiveAt;
+      if (uid != null &&
+          access?.legacy?.active == true &&
+          lastActive != null &&
+          DateTime.now().difference(lastActive) >= const Duration(hours: 1)) {
+        unawaited(gateway.recordActivity(uid).catchError((Object _) {}));
       }
       try {
         final help = await gateway.help();
-        if (_current(generation)) _set(content: state.content, helpText: help);
+        if (_current(generation)) {
+          _set(content: state.content, helpText: help, error: state.error);
+        }
       } catch (_) {
-        /* contact is optional */
+        // Contact information is optional.
       }
-    } on PriestAccessException catch (error) {
+    } catch (error) {
       if (!_current(generation)) return;
-      if (error.revoked) {
-        await _revoked();
-        return;
-      }
-      _set(error: error.message);
-      await _clearMemory();
-      _scheduleRetry();
-    } catch (_) {
-      if (_current(generation)) {
-        _set(error: const PriestAccessException('SERVICE_UNAVAILABLE').message);
-      }
+      _invalidate(
+        error: error is PriestAccessException
+            ? error.message
+            : const PriestAccessException('SERVICE_UNAVAILABLE').message,
+      );
       await _clearMemory();
       _scheduleRetry();
     }
   }
 
-  Future<void> activate(String code, String deviceName) async {
+  Future<void> activate(String input, String deviceName) async {
     await initialize();
-    if (!_ready || state.busy || state.registered) return;
-    final proof = priestCodeProof(code);
-    if (proof == null) {
-      _set(error: const PriestAccessException('INVALID_CODE').message);
+    if (!mounted ||
+        !_ready ||
+        state.busy ||
+        _pending != null ||
+        _activation != null) {
+      return;
+    }
+    final code = parseAccessSetsV2Code(input);
+    final legacyProof = code == null ? priestCodeProof(input) : null;
+    if ((code == null && legacyProof == null) ||
+        (code != null && _accessSets == null)) {
+      _set(
+        content: state.content,
+        error: const PriestAccessException('INVALID_CODE').message,
+      );
       return;
     }
     if (!_online || !_foreground) {
       _set(error: const PriestAccessException('OFFLINE').message);
       return;
     }
-    final generation = ++_generation;
-    _set(busy: true);
-    try {
-      _uid = await gateway.restoreSession();
-      await _flushRevocation();
+    _invalidate(busy: true);
+    final generation = _generation;
+    String? error;
+    final operation = () async {
+      await _stopWatching();
+      await _clearing;
+      if (!_current(generation)) return;
       final uid = _uid = await gateway.ensureAnonymousSession();
-      final existing = await gateway.grant(uid);
-      if (existing != null && !existing.active) {
-        throw const PriestAccessException('REVOKED');
-      }
       if (!_current(generation)) return;
-      if (existing == null) {
-        await gateway.createGrant(
-          uid,
-          proof,
-          deviceName.trim().substring(
-            0,
-            deviceName.trim().length.clamp(0, 120),
-          ),
-        );
-      }
-      if (!_current(generation)) {
-        // Disable during an in-flight registration also revokes a late grant.
-        if (_record['pendingDisableUid'] == uid) {
-          try {
-            await gateway.disable(uid);
-          } catch (_) {
-            /* durable intent retries */
-          }
+      final name = String.fromCharCodes(deviceName.trim().runes.take(120));
+      if (code != null) {
+        if (await _accessSets!.readMode(uid) != AccessSetsMode.canonical) {
+          throw const PriestAccessException('INVALID_CODE');
         }
-        return;
-      }
-      if ((await gateway.grant(uid))?.active != true) {
-        throw const PriestAccessException('ACCESS_REQUIRED');
-      }
-      _record['verifiedUid'] = uid;
-      await _save();
-      if (!_current(generation)) return;
-      _set(registered: true);
-      await refresh();
-    } on PriestAccessException catch (error) {
-      if (_current(generation)) {
-        _set(error: error.message);
-        if (error.code == 'OFFLINE' ||
-            error.code == 'SERVICE_UNAVAILABLE' ||
-            error.code == 'GRANT_UNREADABLE') {
-          _scheduleRetry();
+        if (!_current(generation)) return;
+        await _accessSets.activate(uid, code, name);
+      } else {
+        final existing = await gateway.grant(uid);
+        if (existing != null && !existing.active) {
+          throw const PriestAccessException('REVOKED');
+        }
+        if (!_current(generation)) return;
+        if (existing == null) {
+          await gateway.createGrant(uid, legacyProof!, name);
+        }
+        if ((await gateway.grant(uid))?.active != true) {
+          throw const PriestAccessException('ACCESS_REQUIRED');
         }
       }
-    } catch (_) {
-      if (_current(generation)) {
-        _set(error: const PriestAccessException('STORAGE').message);
-      }
+    }();
+    _activation = operation;
+    try {
+      await operation;
+    } catch (failure) {
+      error = failure is PriestAccessException
+          ? failure.message
+          : const PriestAccessException('SERVICE_UNAVAILABLE').message;
+    } finally {
+      _activation = null;
     }
+    if (!_current(generation)) {
+      if (mounted && _pending == null) _scheduleRetry();
+      return;
+    }
+    _set(error: error);
+    await _refresh(activationError: error);
   }
 
   Future<void> disable() async {
     await initialize();
-    ++_generation;
-    _record.remove('verifiedUid');
-    if (_uid != null) _record['pendingDisableUid'] = _uid;
-    _set(registered: false, busy: true);
-    await _watch?.cancel();
-    _watch = null;
+    if (!mounted || !_ready || _pending != null) return;
+    _retry?.cancel();
+    _invalidate(busy: true);
+    final generation = _generation;
+    final activation = _activation;
     var durable = false;
     try {
-      await _save();
-      durable = true;
-      if (!_online) throw const PriestAccessException('OFFLINE');
+      if (_uid == null && activation != null) {
+        // An in-flight sign-in may be the only source of the pending UID.
+        try {
+          await activation;
+        } catch (_) {}
+      }
+      if (!mounted) return;
+      final uid = _uid ?? _record['verifiedUid'] as String?;
+      _record.remove('verifiedUid');
+      if (uid != null) _record['pendingDisableUid'] = uid;
+      _set(registered: false, busy: true);
+      try {
+        await _save();
+        durable = true;
+      } catch (_) {
+        // Try delivering the revoke even if writing the local intent fails.
+      }
+      if (activation != null) {
+        try {
+          await activation;
+        } catch (_) {}
+      }
+      await _clearMemory();
+      if (!_current(generation)) throw const PriestAccessException('OFFLINE');
       await _flushRevocation();
       _set(registered: false);
     } catch (_) {
-      if (!durable) {
-        // Never let a failed secure-storage write silently restore this grant
-        // on restart. Losing the Auth secret also prevents local resurrection.
-        try {
-          if (_uid != null && _online) await gateway.disable(_uid!);
-        } catch (_) {}
-        try {
-          await gateway.signOut();
-          _uid = null;
-        } catch (_) {}
-      }
       _set(
         registered: false,
         error: durable
             ? 'Доступ выключаны на гэтай прыладзе. Адкліканне будзе паўторана пры злучэнні.'
             : 'Не атрымалася захаваць адкліканне. Доступ выключаны; папрасіце адміністратара праверыць дазвол прылады.',
       );
+      await _clearMemory();
+      if (_pending != null) _scheduleRetry();
     }
-    await _clearMemory();
-    if (_record['pendingDisableUid'] != null) _scheduleRetry();
   }
 
   void suspend({bool? online, bool? foreground}) {
     _retry?.cancel();
     if (online != null) _online = online;
     if (foreground != null) _foreground = foreground;
-    ++_generation;
-    _set();
+    _invalidate();
     unawaited(_clearMemory());
   }
 
@@ -447,43 +621,45 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
 
   Future<Map<String, dynamic>?> readPrayer(String id) async {
     final uid = _uid;
-    if (uid == null ||
-        state.content == null ||
-        _record['pendingDisableUid'] != null ||
-        !_online ||
-        !_foreground) {
-      return null;
-    }
+    final access = _confirmed;
     final generation = _generation;
-    try {
-      final prayer = await gateway.readProtectedPrayer(uid, id);
-      final grant = await gateway.grant(uid);
-      if (!_current(generation)) return null;
-      if (grant?.active != true) {
-        await _revoked();
-        return null;
-      }
-      return prayer;
-    } on PriestAccessException catch (error) {
-      if (_current(generation)) {
-        if (error.revoked) {
-          await _revoked();
-        } else {
-          ++_generation;
-          _set(error: error.message);
-          await _clearMemory();
-          _scheduleRetry();
-        }
-      }
+    if (uid == null ||
+        access == null ||
+        _pending != null ||
+        !_current(generation) ||
+        state.content?.prayers.containsKey(id) != true) {
       return null;
     }
+    try {
+      final prayer = access.mode == AccessSetsMode.canonical
+          ? await _canonical!.readPrayer(id)
+          : await gateway.readProtectedPrayer(uid, id);
+      if (!_current(generation)) return null;
+      final observed = await _check(uid);
+      if (!_current(generation)) return null;
+      if (_matches(access, observed) && prayer != null) return prayer;
+      _invalidate();
+      await _clearMemory();
+      await refresh();
+    } catch (error) {
+      if (_current(generation)) {
+        _invalidate(
+          error: error is PriestAccessException
+              ? error.message
+              : const PriestAccessException('SERVICE_UNAVAILABLE').message,
+        );
+        await _clearMemory();
+        _scheduleRetry();
+      }
+    }
+    return null;
   }
 
   @override
   void dispose() {
     _retry?.cancel();
     ++_generation;
-    unawaited(_watch?.cancel());
+    unawaited(_stopWatching());
     super.dispose();
   }
 }

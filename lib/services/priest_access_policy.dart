@@ -10,6 +10,15 @@ class PriestAccessPolicy {
   final Map<String, bool> _restricted = {};
   final Map<String, bool> _valid = {};
 
+  bool _markedRestricted(Map document) =>
+      document['priestOnly'] == true ||
+      document['effectivePriestOnly'] == true ||
+      document['accessSchemaVersion'] == 2 ||
+      (document['accessSets'] is List &&
+          (document['accessSets'] as List).isNotEmpty) ||
+      (document['effectiveAccessSets'] is List &&
+          (document['effectiveAccessSets'] as List).isNotEmpty);
+
   bool categoryValid(String id) {
     if (_valid.containsKey(id)) return _valid[id]!;
     final seen = <String>{};
@@ -33,8 +42,7 @@ class PriestAccessPolicy {
     var current = id;
     while (true) {
       final category = categories[current]!;
-      if (category['priestOnly'] == true ||
-          category['effectivePriestOnly'] == true) {
+      if (_markedRestricted(category)) {
         return _restricted[id] = true;
       }
       final parent = category['parentId']?.toString();
@@ -44,7 +52,7 @@ class PriestAccessPolicy {
   }
 
   bool prayerRestricted(Map prayer, {String? id}) {
-    if (prayer['priestOnly'] == true || prayer['effectivePriestOnly'] == true) {
+    if (_markedRestricted(prayer)) {
       return true;
     }
     final prayerId = id ?? prayer['id']?.toString() ?? '';

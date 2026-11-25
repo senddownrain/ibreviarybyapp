@@ -6,8 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mybrev_flutter/models/priest_access_content.dart';
+import 'package:mybrev_flutter/services/access_sets_v2_code.dart';
+import 'package:mybrev_flutter/services/access_sets_v2_gateway.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
+
+part 'firebase_access_sets_v2.dart';
 
 /// Shared Spark claim/grant batch contract from mybrev, no Functions/HTTP API.
 class FirebasePriestAccess implements PriestAccessGateway {
@@ -20,6 +24,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
   Future<void>? _initializing;
   Future<void> _clearing = Future<void>.value();
   bool _closed = false;
+  late final AccessSetsV2Gateway accessSetsV2 = _FirebaseAccessSetsV2(this);
 
   Future<void> _initialize() async {
     await _clearing;
@@ -35,6 +40,15 @@ class FirebasePriestAccess implements PriestAccessGateway {
   }
 
   Future<void> _create() async {
+    const host = String.fromEnvironment('FIREBASE_EMULATOR_HOST');
+    const useEmulators = bool.fromEnvironment('PRIEST_USE_EMULATORS');
+    if ((useEmulators || host.isNotEmpty) &&
+        (!kDebugMode ||
+            !useEmulators ||
+            !['localhost', '127.0.0.1', '10.0.2.2'].contains(host) ||
+            Firebase.app().options.projectId != 'demo-rules')) {
+      throw const PriestAccessException('SERVICE_UNAVAILABLE');
+    }
     _app =
         Firebase.apps.where((app) => app.name == appName).firstOrNull ??
         await Firebase.initializeApp(
@@ -44,22 +58,16 @@ class FirebasePriestAccess implements PriestAccessGateway {
     _auth = FirebaseAuth.instanceFor(app: _app!);
     // A fresh delegate is required after terminate: cloud_firestore caches its
     // high-level wrapper by app name, including a terminated web delegate.
-    _privateDb = platform.FirebaseFirestorePlatform.instanceFor(
+    final db = platform.FirebaseFirestorePlatform.instanceFor(
       app: _app!,
       databaseId: '(default)',
     );
     // Must precede every grant/text read. Default public Firestore is untouched.
-    _privateDb!.settings = const Settings(persistenceEnabled: false);
+    db.settings = const Settings(persistenceEnabled: false);
     // FlutterFire Web maps false to setLogLevel('silent'). Failed SDK writes
     // must not print their full activation payload/proof, even in debug builds.
     await FirebaseFirestore.setLoggingEnabled(false);
-    const host = String.fromEnvironment('FIREBASE_EMULATOR_HOST');
-    if (host.isNotEmpty) {
-      if (!kDebugMode ||
-          !['localhost', '127.0.0.1', '10.0.2.2'].contains(host) ||
-          !const bool.fromEnvironment('PRIEST_USE_EMULATORS')) {
-        throw const PriestAccessException('SERVICE_UNAVAILABLE');
-      }
+    if (useEmulators) {
       await _auth!.useAuthEmulator(
         host,
         const int.fromEnvironment(
@@ -72,9 +80,9 @@ class FirebasePriestAccess implements PriestAccessGateway {
         defaultValue: 8089,
       );
       if (kIsWeb) {
-        _privateDb!.useEmulator(host, port);
+        db.useEmulator(host, port);
       } else {
-        _privateDb!.settings = _privateDb!.settings.copyWith(
+        db.settings = db.settings.copyWith(
           host: '$host:$port',
           sslEnabled: false,
         );
@@ -82,6 +90,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
     }
     if (kIsWeb) await _auth!.setPersistence(Persistence.LOCAL);
     await _auth!.authStateChanges().first.timeout(_timeout);
+    _privateDb = db;
   }
 
   Future<T> _run<T>(
@@ -118,6 +127,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
               : 'ACCESS_REQUIRED',
         'unauthenticated' => 'ACCESS_REQUIRED',
         'unavailable' || 'deadline-exceeded' => 'OFFLINE',
+        'resource-exhausted' => 'TOO_MANY_ATTEMPTS',
         _ => 'SERVICE_UNAVAILABLE',
       });
     } catch (error) {
@@ -265,6 +275,9 @@ class FirebasePriestAccess implements PriestAccessGateway {
         FieldPath(['status']): 'revoked',
         FieldPath(['revokedAt']): FieldValue.serverTimestamp(),
       });
+      if (_grantData(await _grant(uid).get(_server))?.active != false) {
+        throw const PriestAccessException('SERVICE_UNAVAILABLE');
+      }
     }
   }, readingGrant: true);
   @override
