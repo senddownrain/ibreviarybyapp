@@ -146,7 +146,7 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
           'uid': uid,
           'codeId': code.codeId,
           'status': 'active',
-        'deviceName': deviceName.isEmpty ? 'Flutter' : deviceName,
+          'deviceName': deviceName.isEmpty ? 'Flutter' : deviceName,
           'client': 'Flutter',
           'platform': kIsWeb ? 'Web' : defaultTargetPlatform.name,
           'label': '',
