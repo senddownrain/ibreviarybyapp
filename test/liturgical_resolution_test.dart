@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/models/day.dart';
+import 'package:mybrev_flutter/utils/approved_office_sources.dart';
 import 'package:mybrev_flutter/utils/liturgical_day_resolution.dart';
 import 'package:mybrev_flutter/utils/liturgical_office.dart';
 import 'package:mybrev_flutter/utils/liturgical_psalter.dart';
@@ -59,6 +60,63 @@ void main() {
     expect(resolved.field('laudesAnt1'), '<p>A</p>');
     expect(resolved.field('laudesAnt3'), '<p>C</p>');
     expect(resolved.field('vesperAnt2'), '<p>B</p>');
+  });
+
+  test(
+    'ADV-12: a dated document keeps its own antiphons over the weekday set',
+    () {
+      const weekdaySet = '<p>1 ант. W</p><p>2 ант. W</p><p>3 ант. W</p>';
+      final own = applySeasonalWeekdayAntiphons(
+        day({
+          'id': 'advent-24-12',
+          'laudesAnt1': '<p>1 ант. Ты, Бэтлеем</p>',
+          'laudesAnt2': '<p>2 ант. Падыміце</p>',
+          'laudesAnt3': '<p>3 ант. Заўтра</p>',
+          'thursday': weekdaySet,
+        }),
+        5,
+        ownDay: day({
+          'id': 'advent-24-12',
+          'laudesAnt1': '<p>1 ант. Ты, Бэтлеем</p>',
+        }),
+      );
+      expect(own.field('laudesAnt1'), contains('Ты, Бэтлеем'));
+      final plain = applySeasonalWeekdayAntiphons(
+        day({'id': 'advent-19-12', 'thursday': weekdaySet}),
+        5,
+        ownDay: day({'id': 'advent-19-12', 'thursday': weekdaySet}),
+      );
+      expect(plain.field('laudesAnt1'), contains('W'));
+      expect(plain.field('vesperAnt2'), contains('W'));
+    },
+  );
+
+  test('ADV-10: Sunday IV takes verse and readings from the calendar date', () {
+    final sunday = day({
+      'id': 'advent-w4-d1',
+      'officeOfReadingsHymn': '<p>Гімн нядзелі</p>',
+      'officeOfReadingsVers': '<p>Верш 21</p>',
+      'officeOfReadingsR1': '<p>Чытанне 21.12</p>',
+      'officeOfReadingsR2': '<p>Чытанне 2 21.12</p>',
+    });
+    final dated = day({
+      'id': 'advent-20-12',
+      'officeOfReadingsHymn': '<p>Гімн даты</p>',
+      'officeOfReadingsVers': '<p>Верш 20</p>',
+      'officeOfReadingsR1': '<p>Чытанне 20.12</p>',
+      'officeOfReadingsR2': '<p>Чытанне 2 20.12</p>',
+    });
+    final resolved = resolveAdventDateAgainstPeriod(dated, sunday, 1)!;
+    expect(resolved.field('officeOfReadingsR1'), '<p>Чытанне 20.12</p>');
+    expect(resolved.field('officeOfReadingsR2'), '<p>Чытанне 2 20.12</p>');
+    expect(resolved.field('officeOfReadingsVers'), '<p>Верш 20</p>');
+    expect(resolved.field('officeOfReadingsHymn'), '<p>Гімн нядзелі</p>');
+    final fallback = resolveAdventDateAgainstPeriod(
+      day({'id': 'advent-20-12'}),
+      sunday,
+      1,
+    )!;
+    expect(fallback.field('officeOfReadingsR1'), '<p>Чытанне 21.12</p>');
   });
 
   test(

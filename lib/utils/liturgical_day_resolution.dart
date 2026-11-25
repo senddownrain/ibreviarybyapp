@@ -286,7 +286,14 @@ String daytimeHourField(LiturgicalDay day, int hour, String suffix) {
       : fallback.toString().trim();
 }
 
-LiturgicalDay applySeasonalWeekdayAntiphons(LiturgicalDay day, int dayOfWeek) {
+/// [ownDay]: the dated document itself. An Hour for which it carries its own
+/// antiphons (24 December: «Ты, Бэтлеем…») keeps them; the weekday set is only
+/// the 17–23 December default.
+LiturgicalDay applySeasonalWeekdayAntiphons(
+  LiturgicalDay day,
+  int dayOfWeek, {
+  LiturgicalDay? ownDay,
+}) {
   const weekdayFields = {
     1: 'sunday',
     2: 'monday',
@@ -304,6 +311,8 @@ LiturgicalDay applySeasonalWeekdayAntiphons(LiturgicalDay day, int dayOfWeek) {
   if (antiphons.length < 3) return day;
   final data = day.toMap();
   for (final office in ['laudes', 'vesper']) {
+    final own = ownDay?.field('${office}Ant1');
+    if (own != null && !_missing(own) && !isFromDayReference(own)) continue;
     for (var i = 0; i < 3; i++) {
       data['${office}Ant${i + 1}'] = antiphons[i];
     }
