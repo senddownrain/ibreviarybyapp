@@ -21,6 +21,7 @@ const _port = int.fromEnvironment(
 const _legacy = 'A2B3-C4D5-E6F7-G8H9-J2K3-L4M5';
 const _v2 = 'PRST-20240229-23456789ABCDEFGH-JKLMNPQRSTUVWXYZ23456789';
 const _id = '23456789ABCDEFGH';
+const _set = 's7-native-marian';
 
 Object _field(Object? value) => switch (value) {
   null => {'nullValue': null},
@@ -75,12 +76,12 @@ void main() {
       await _seed('accessProfilesV2/s7-native', {
         'name': 'Synthetic native',
         'status': 'active',
-        'allowedSets': ['marian'],
+        'allowedSets': [_set],
         'revision': 1,
         'updatedAt': DateTime.now(),
       });
       await _seed('accessProfilesV2/s7-native/client/entitlements', {
-        'allowedSets': ['marian'],
+        'allowedSets': [_set],
         'revision': 1,
       });
       final issued = DateTime.now();
@@ -98,14 +99,15 @@ void main() {
       await _seed('accessCodesV2/$_id/client/profile', {
         'profileId': 's7-native',
       });
-      for (final set in ['priest', 'marian']) {
+      for (final set in ['priest', _set]) {
+        final prayerId = set == _set ? 's7-native-marian' : 's7-native-priest';
         await _seed('accessSetsV2/$set', {
           'status': 'active',
           'name': 'Synthetic $set set',
           'updatedAt': DateTime.now(),
         });
-        await _seed('accessSetsV2/$set/prayers/s7-native-$set', {});
-        await _seed('protectedPrayers/s7-native-$set', {
+        await _seed('accessSetsV2/$set/prayers/$prayerId', {});
+        await _seed('protectedPrayers/$prayerId', {
           'title': 'Synthetic $set',
           'text': 'Synthetic canonical $set',
           'effectiveAccessSets': [set],
@@ -143,13 +145,13 @@ void main() {
       );
       // A blank optional name is sent as the non-empty S1 client default.
       await controller.activate(_v2, '');
-      expect(controller.state.allowedSets, {'priest', 'marian'});
+      expect(controller.state.allowedSets, {'priest', _set});
       expect(await gateway.restoreSession() == uid, true);
 
       final v2 = gateway.accessSetsV2;
       final firstPage = await v2.listIds(
         AccessContentKind.prayers,
-        'marian',
+        _set,
         pageSize: 1,
       );
       expect(firstPage.ids, ['s7-native-marian']);
@@ -157,7 +159,7 @@ void main() {
       expect(
         (await v2.listIds(
           AccessContentKind.prayers,
-          'marian',
+          _set,
           pageSize: 1,
           after: firstPage.cursor,
         )).ids,
@@ -166,10 +168,10 @@ void main() {
 
       await seedCode(active: false);
       await controller.refresh();
-      expect(controller.state.allowedSets, {'priest', 'marian'});
+      expect(controller.state.allowedSets, {'priest', _set});
       expect(
         (await controller.readPrayer('s7-native-marian'))?['text'],
-        'Synthetic canonical marian',
+        'Synthetic canonical $_set',
       );
 
       controller.suspend(online: false);
