@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -261,6 +262,76 @@ void main() {
         await t.pump();
         expect(hyphRenders(t), hasLength(1));
       },
+    );
+
+    // Found on the iOS simulator: with touch selection handles the whole text
+    // vanished, because the handle layers were pushed before the glyphs were
+    // painted onto the (by then ended) canvas.
+    testWidgets(
+      'text stays painted while a touch selection shows its handles',
+      (t) async {
+        final key = GlobalKey();
+        await t.pumpWidget(
+          host(
+            RepaintBoundary(
+              key: key,
+              child: ColoredBox(
+                color: Colors.white,
+                child: SelectionArea(
+                  child: HyphenatedProse(
+                    span: TextSpan(
+                      text: prose,
+                      style: _style.copyWith(color: Colors.black),
+                    ),
+                    selected: TextAlign.justify,
+                    style: _style,
+                  ),
+                ),
+              ),
+            ),
+            400,
+          ),
+        );
+        Future<int> darkPixels() async {
+          var count = 0;
+          await t.runAsync(() async {
+            final boundary =
+                key.currentContext!.findRenderObject()!
+                    as RenderRepaintBoundary;
+            final data = (await (await boundary.toImage()).toByteData(
+              format: ui.ImageByteFormat.rawRgba,
+            ))!;
+            for (var i = 0; i < data.lengthInBytes; i += 4) {
+              if (data.getUint8(i) < 90 &&
+                  data.getUint8(i + 1) < 90 &&
+                  data.getUint8(i + 2) < 90) {
+                count++;
+              }
+            }
+          });
+          return count;
+        }
+
+        final before = await darkPixels();
+        expect(before, greaterThan(500));
+        await t.longPressAt(
+          t.getTopLeft(find.byType(HyphenatedJustifiedText)) +
+              const Offset(25, 6),
+        );
+        await t.pumpAndSettle();
+        expect(
+          hyphRenders(t).single.getSelectedContent(),
+          isNotNull,
+          reason: 'a word is selected',
+        );
+        final after = await darkPixels();
+        expect(
+          after,
+          greaterThan(before ~/ 2),
+          reason: 'glyphs vanished: $before dark pixels before, $after after',
+        );
+      },
+      variant: TargetPlatformVariant.only(TargetPlatform.iOS),
     );
 
     testWidgets(

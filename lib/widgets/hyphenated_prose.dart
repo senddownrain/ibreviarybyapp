@@ -174,8 +174,14 @@ class HyphenatedHtml extends StatelessWidget {
         textScaler: MediaQuery.textScalerOf(context),
       );
       final styles = {...style};
-      styles['body'] = (styles['body'] ?? Style())..textAlign = shown;
-      styles['p'] = (styles['p'] ?? Style())..textAlign = shown;
+      // Only replace an alignment the caller already set: otherwise inline
+      // `text-align` (centred rubric titles) must keep winning.
+      if (styles['body']?.textAlign != null) {
+        styles['body']!.textAlign = shown;
+      }
+      if (styles['p']?.textAlign != null) {
+        styles['p']!.textAlign = shown;
+      }
       return Html(data: html, style: styles, onLinkTap: onLinkTap);
     },
   );
