@@ -49,3 +49,7 @@ abstract class PriestAccessGateway {
   Future<void> clearProtectedMemory();
   Future<void> close();
 }
+
+abstract interface class PriestSessionChanges {
+  Stream<String?> watchSession();
+}

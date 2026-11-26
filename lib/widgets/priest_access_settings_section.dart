@@ -24,22 +24,26 @@ class _PriestAccessSettingsSectionState
   @override
   Widget build(BuildContext context) {
     final access = ref.watch(priestAccessProvider);
+    final nativeOffline = ref.watch(protectedCatalogStorageProvider) != null;
     final showForm =
         !access.pendingDisable &&
         (!access.registered || (access.canAddCode && _addingCode));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Доступ для святароў',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text('Асаблівы доступ', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         if (access.pendingDisable)
           const Text('Чакаем пацвярджэння выключэння доступу.'),
         if (access.registered) ...[
           const Text('Доступ актываваны'),
           const Text('Паўторна ўводзіць код не трэба.'),
+          if (nativeOffline && access.catalogLoading) ...[
+            const SizedBox(height: 8),
+            const Text('Спампоўваем малітвы…'),
+            const LinearProgressIndicator(),
+          ] else if (access.offlineReady)
+            const Text('Малітвы даступныя афлайн'),
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: access.busy
@@ -137,7 +141,9 @@ class _PriestAccessSettingsSectionState
           ),
         const SizedBox(height: 8),
         Text(
-          'Дадатковыя малітвы даступныя пры злучэнні з інтэрнэтам.',
+          nativeOffline
+              ? 'Пасля спампоўвання малітвы даступныя без інтэрнэту.'
+              : 'Дадатковыя малітвы даступныя пры злучэнні з інтэрнэтам.',
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],

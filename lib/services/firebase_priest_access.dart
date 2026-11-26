@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart'
     as platform;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:mybrev_flutter/models/priest_access_content.dart';
 import 'package:mybrev_flutter/services/access_sets_v2_code.dart';
 import 'package:mybrev_flutter/services/access_sets_v2_gateway.dart';
@@ -13,8 +15,9 @@ import 'package:mybrev_flutter/utils/firestore_cache.dart';
 
 part 'firebase_access_sets_v2.dart';
 
-/// Shared Spark claim/grant batch contract from mybrev, no Functions/HTTP API.
-class FirebasePriestAccess implements PriestAccessGateway {
+/// Shared claim/grant batch contract and owner-scoped reads from mybrev.
+class FirebasePriestAccess
+    implements PriestAccessGateway, PriestSessionChanges {
   static const appName = 'mybrev-priest';
   static const _server = GetOptions(source: Source.server);
   static const _timeout = Duration(seconds: 15);
@@ -24,6 +27,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
       bool.fromEnvironment('PRIEST_AUDIT_READS');
   FirebaseApp? _app;
   FirebaseAuth? _auth;
+  final _catalogHttp = http.Client();
   platform.FirebaseFirestorePlatform? _privateDb;
   Future<void>? _initializing;
   Future<void> _clearing = Future<void>.value();
@@ -193,6 +197,10 @@ class FirebasePriestAccess implements PriestAccessGateway {
 
   @override
   Future<String?> restoreSession() => _run(() async => _auth!.currentUser?.uid);
+
+  @override
+  Stream<String?> watchSession() =>
+      _auth!.authStateChanges().map((user) => user?.uid).distinct();
   @override
   Future<String> ensureAnonymousSession() => _run(() async {
     final user = _auth!.currentUser ?? (await _auth!.signInAnonymously()).user;
@@ -467,6 +475,7 @@ class FirebasePriestAccess implements PriestAccessGateway {
   @override
   Future<void> close() async {
     _closed = true;
+    _catalogHttp.close();
     await clearProtectedMemory();
   }
 }

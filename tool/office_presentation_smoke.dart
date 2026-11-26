@@ -24,7 +24,8 @@ external set officeSmokeState(JSString value);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
-  await HiveService.init();
+  // A harness is not a first launch: no welcome screen over its route.
+  await HiveService.init(detectFirstLaunch: false);
   await ContentStore.instance.ensureLoaded(['days', 'prayers']);
   await HiveService.settingsBox.put(
     'textAlignment',

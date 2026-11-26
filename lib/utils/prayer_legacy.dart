@@ -26,11 +26,12 @@ const prayerRoles = {
   'Ц.': 'celebrant',
   'V.': 'versicle',
   'R.': 'response',
+  'У.': 'all',
   'Усе:': 'all',
   'Цэлебрант:': 'celebrant',
 };
 final _prefix = RegExp(
-  r'^( {0,3})([КСНДЛЦVR]\.:?|Усе:|Цэлебрант:)(?=[ \t]+\S)',
+  r'^( {0,3})([КСНДЛЦУVR]\.:?|Усе:|Цэлебрант:)(?=[ \t]+\S)',
 );
 final _initial = RegExp(r'^\p{Lu}\.', unicode: true);
 final _name = RegExp(r'^\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+)*$', unicode: true);
@@ -39,16 +40,17 @@ final _attribution = RegExp(
   unicode: true,
 );
 
-String? prayerPrefix(String line) {
+String? prayerPrefix(String line, {bool pairedInvocation = false}) {
   final match = _prefix.firstMatch(line);
   if (match == null) return null;
   final label = match[2]!;
   final rest = line.substring(match.end).trim();
   if (label.contains('.') &&
-      (_initial.hasMatch(rest) || _name.hasMatch(rest))) {
+      (_initial.hasMatch(rest) ||
+          (!pairedInvocation && _name.hasMatch(rest)))) {
     return null;
   }
-  if (RegExp(r'^[КСНДЛЦ]').hasMatch(label) &&
+  if (RegExp(r'^[КСНДЛЦУ]').hasMatch(label) &&
       _attribution.hasMatch(rest) &&
       !RegExp(r'^(?:Молімся|Памолімся):').hasMatch(rest)) {
     return null;
@@ -79,7 +81,12 @@ class _Candidate {
   String get canonical => label.replaceFirst(RegExp(r'\.:$'), '.');
 }
 
-_Candidate? _legacyLine(String line, String paragraph, md.Document document) {
+_Candidate? _legacyLine(
+  String line,
+  String paragraph,
+  md.Document document, {
+  bool pairedInvocation = false,
+}) {
   final named = RegExp(
     r'^([*_]{0,6})[КСНДЛЦ]\.[ \t]+\p{Lu}[\p{Ll}\p{M}-]+(?:[ \t]+\p{Lu}[\p{Ll}\p{M}-]+)*:\1(?:\s|$)',
     unicode: true,
@@ -89,7 +96,7 @@ _Candidate? _legacyLine(String line, String paragraph, md.Document document) {
     return null;
   }
   final label = RegExp(
-    r'^( {0,3})([*_]{0,6})([КСНДЛЦVR]\.:?|Усе:|Цэлебрант:)([*_]{0,6})(:)?(?=[ \t]+|$)',
+    r'^( {0,3})([*_]{0,6})([КСНДЛЦУVR]\.:?|Усе:|Цэлебрант:)([*_]{0,6})(:)?(?=[ \t]+|$)',
   ).firstMatch(line);
   if (label != null && !(label[3]!.endsWith(':') && label[5] != null)) {
     final visible = '${label[3]}${label[5] ?? ''}';
@@ -97,7 +104,9 @@ _Candidate? _legacyLine(String line, String paragraph, md.Document document) {
     final parsed = document.parseInline(raw);
     if (_labelMarkup(parsed) && prayerInlineText(parsed) == visible) {
       final body = line.substring(label.end).trimLeft();
-      if (body.isNotEmpty && prayerPrefix('$visible $body') == null) {
+      if (body.isNotEmpty &&
+          prayerPrefix('$visible $body', pairedInvocation: pairedInvocation) ==
+              null) {
         return null;
       }
       return _Candidate(
@@ -108,11 +117,11 @@ _Candidate? _legacyLine(String line, String paragraph, md.Document document) {
     }
   }
   final whole = RegExp(
-    r'^( {0,3})(\*\*|__|\*|_)([КСНДЛЦVR]\.:?|Усе:|Цэлебрант:)([ \t]+)(.+)\2[ \t]*$',
+    r'^( {0,3})(\*\*|__|\*|_)([КСНДЛЦУVR]\.:?|Усе:|Цэлебрант:)([ \t]+)(.+)\2[ \t]*$',
   ).firstMatch(line);
   if (whole == null && paragraph.contains('\n')) {
     final partial = RegExp(
-      r'^( {0,3})(\*\*|__|\*|_)([КСНДЛЦVR]\.:?|Усе:|Цэлебрант:)([ \t]+)(\S.*)$',
+      r'^( {0,3})(\*\*|__|\*|_)([КСНДЛЦУVR]\.:?|Усе:|Цэлебрант:)([ \t]+)(\S.*)$',
     ).firstMatch(line);
     final parsed =
         partial == null || !paragraph.trimLeft().startsWith(line.trimLeft())
@@ -169,7 +178,19 @@ _Candidate? _legacyLine(String line, String paragraph, md.Document document) {
 ) {
   final lines = source.split('\n');
   final candidates = [
-    for (final line in lines) _legacyLine(line, source, document),
+    for (var i = 0; i < lines.length; i++)
+      _legacyLine(
+        lines[i],
+        source,
+        document,
+        pairedInvocation:
+            RegExp(r'^ {0,3}Л\.[ \t]').hasMatch(lines[i]) &&
+            i + 1 < lines.length &&
+            prayerRoles[prayerPrefix(
+                  lines[i + 1],
+                )?.replaceFirst(RegExp(r'\.:$'), '.')] ==
+                'all',
+      ),
   ];
   final labels = <int, String>{};
   final projected = [...lines];

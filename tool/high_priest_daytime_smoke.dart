@@ -20,7 +20,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
   await initializeDateFormatting('be');
-  await HiveService.init();
+  // A harness is not a first launch: no welcome screen over its route.
+  await HiveService.init(detectFirstLaunch: false);
   await HiveService.content.ensureLoaded(kLiturgicalCollections);
   final params = Uri.base.queryParameters;
   final hour = const {'terz', 'sext', 'none'}.contains(params['hour'])

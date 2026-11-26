@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/widgets/category_icon.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'prayer_category_contract_test.dart' show fixtureContent;
 
@@ -249,6 +250,82 @@ void main() {
     await tester.pumpAndSettle();
     expect(offset(), closeTo(beforeReader, 1));
   });
+
+  testWidgets(
+    'protected collections use existing category rows and stay out of the menu',
+    (tester) async {
+      final content = fixtureContent();
+      content.categories['closed']!['name'] = 'Для святара';
+      content.categories['marian'] = {
+        'name': 'Для марыянаў',
+        'effectiveAccessSets': ['marian'],
+        'order': 2,
+        'prayerIds': ['marian-example'],
+      };
+      content.prayers['marian-example'] = {
+        'title': 'Synthetic Marian title',
+        'text': 'Synthetic Marian body',
+        'effectiveAccessSets': ['marian'],
+      };
+      await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+      await tester.pumpAndSettle();
+      final marian = find.byKey(const ValueKey('category-marian'));
+      final priest = find.byKey(const ValueKey('category-closed'));
+      expect(marian, findsNothing);
+      expect(priest, findsNothing);
+      await tester.tap(find.byTooltip('Grant'));
+      await tester.pumpAndSettle();
+      await reveal(tester, marian);
+      expect(find.text('Для марыянаў'), findsOneWidget);
+      final tile = tester.widget<ListTile>(
+        find.descendant(of: marian, matching: find.byType(ListTile)),
+      );
+      final lock = tester.widget<PhosphorIcon>(
+        find.descendant(
+          of: marian,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is PhosphorIcon &&
+                widget.icon == PhosphorIconsRegular.lockSimple,
+          ),
+        ),
+      );
+      expect(lock.icon, PhosphorIconsRegular.lockSimple);
+      expect(tile.minTileHeight, 58);
+      expect((tile.title! as Text).style?.color, lock.color);
+
+      await tester.tap(find.byTooltip('Меню'));
+      await tester.pumpAndSettle();
+      final popup = find.byKey(const Key('app-overflow-content'));
+      expect(
+        find.descendant(of: popup, matching: find.text('Налады')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: popup, matching: find.text('Для марыянаў')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: popup, matching: find.text('Для святароў')),
+        findsNothing,
+      );
+      Navigator.of(tester.element(popup)).pop();
+      await tester.pumpAndSettle();
+
+      await reveal(tester, priest);
+      expect(find.text('Для святароў'), findsOneWidget);
+      await tester.ensureVisible(marian);
+      await tester.tap(marian);
+      await tester.pumpAndSettle();
+      expect(find.text('Synthetic Marian title'), findsOneWidget);
+      await tester.tap(find.text('Synthetic Marian title'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Synthetic Marian body', findRichText: true),
+        findsWidgets,
+      );
+    },
+  );
 
   testWidgets(
     'revoke removes private lists, favorites/search, category management and deep links immediately',
