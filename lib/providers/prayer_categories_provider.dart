@@ -57,7 +57,7 @@ final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
 final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
   final settings = ref.watch(settingsProvider);
   final globalCategories =
-      ref.watch(globalPrayerCategoriesProvider).value ?? [];
+      ref.watch(visibleGlobalPrayerCategoriesProvider).value ?? [];
   return buildPrayerCategoryMenu(
     globalCategories,
     settings.userCategories,
@@ -67,6 +67,22 @@ final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
     allowRestricted: ref.watch(priestAccessProvider).content != null,
   );
 });
+
+// Riverpod retains the previous stream value while a new catalog is emitted.
+// Gate that value against today's access before any screen can render it.
+final visibleGlobalPrayerCategoriesProvider =
+    Provider<AsyncValue<List<PrayerMenuCategory>>>((ref) {
+      final access = ref.watch(priestAccessProvider);
+      final categories = ref.watch(globalPrayerCategoriesProvider);
+      return categories.whenData(
+        (items) => [
+          for (final item in items)
+            if (!item.priestOnly ||
+                access.content?.categories.containsKey(item.id) == true)
+              item,
+        ],
+      );
+    });
 
 List<PrayerMenuCategory> buildPrayerCategoryMenu(
   List<PrayerMenuCategory> globalCategories,

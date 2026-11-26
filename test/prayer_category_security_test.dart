@@ -128,6 +128,7 @@ void main() {
           contains('shared-private'),
         );
         await controller.activate(validCode, 'Synthetic device');
+        await controller.loadCatalog();
         expect(controller.state.content!.prayers, contains('shared-private'));
         expect(controller.state.content!.categories['closed']!['prayerIds'], [
           'shared-private',
@@ -141,12 +142,14 @@ void main() {
         expect(controller.state.content, isNull);
         expect(await controller.readPrayer('shared-private'), isNull);
         await controller.resume(foreground: true);
+        await controller.loadCatalog();
         expect(controller.state.content, isNotNull);
         gateway.offline = true;
         await controller.refresh();
         expect(controller.state.content, isNull);
         gateway.offline = false;
         await controller.refresh();
+        await controller.loadCatalog();
         expect(controller.state.content, isNotNull);
         gateway.active = false;
         gateway.events.add(PriestDeviceGrant(gateway.uid!, false));
