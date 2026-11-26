@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
@@ -11,6 +13,7 @@ import 'package:mybrev_flutter/services/priest_access_gateway.dart';
 import 'package:mybrev_flutter/services/priest_access_policy.dart';
 import 'package:mybrev_flutter/services/priest_access_storage.dart';
 import 'package:mybrev_flutter/services/priest_code.dart';
+import 'package:mybrev_flutter/services/protected_catalog_storage.dart';
 export 'package:mybrev_flutter/models/priest_access_content.dart';
 
 class PriestAccessState {
@@ -28,13 +31,14 @@ class PriestAccessState {
     this.canAddCode = false,
     this.canLoadCatalog = false,
     this.catalogLoading = false,
+    this.offlineReady = false,
     this.quotaBlocked = false,
     this.generation = 0,
   });
   final bool registered;
   final bool busy;
 
-  /// Only an online, server-verified grant may populate this view.
+  /// Server-verified session or a device-bound, last-confirmed native snapshot.
   final PrayerAccessContent? content;
   final PrayerAccessContent? publicContent;
   final String? error;
@@ -46,6 +50,7 @@ class PriestAccessState {
   final bool canAddCode;
   final bool canLoadCatalog;
   final bool catalogLoading;
+  final bool offlineReady;
   final bool quotaBlocked;
   final int generation;
 }
@@ -58,6 +63,27 @@ final priestAccessGatewayProvider = Provider<PriestAccessGateway>((ref) {
 final priestAccessStorageProvider = Provider<PriestAccessStorage>(
   (ref) => SecurePriestAccessStorage(),
 );
+final protectedCatalogStorageProvider = Provider<ProtectedCatalogStorage?>(
+  (ref) => SealedProtectedCatalogStorage.forPlatform(),
+);
+
+Future<PrayerAccessContent> _bundledPublicPrayers() async {
+  final store = ContentStore.instance;
+  await store.ensureLoaded(['prayers', 'prayerCategories']);
+  Map<String, Map<String, dynamic>> rows(String name) {
+    final collection = store.collection(name);
+    return {
+      for (final id in collection.keys)
+        if (collection.get(id) case final Map data)
+          id: Map<String, dynamic>.from(data),
+    };
+  }
+
+  return PrayerAccessContent(
+    rows('prayers'),
+    rows('prayerCategories'),
+  ).publicOnly;
+}
 
 /// Only physical PUBLIC snapshots enter the existing Hive content store.
 /// Tombstones and compaction remove documents moved out of public storage.
@@ -116,6 +142,8 @@ final priestAccessProvider =
         ref.watch(priestAccessGatewayProvider),
         ref.watch(priestAccessStorageProvider),
         persistPublic: persistPublicPrayerContent,
+        offlineStorage: ref.watch(protectedCatalogStorageProvider),
+        localPublic: _bundledPublicPrayers,
       );
       unawaited(controller.initialize());
       return controller;
@@ -133,6 +161,8 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     this.gateway,
     this.storage, {
     this.persistPublic,
+    this.offlineStorage,
+    this.localPublic,
     AccessSetsV2Gateway? accessSets,
     AccessSetsCatalog? catalog,
   }) : _accessSets =
@@ -144,6 +174,8 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   final PriestAccessGateway gateway;
   final PriestAccessStorage storage;
   final Future<void> Function(PrayerAccessContent)? persistPublic;
+  final ProtectedCatalogStorage? offlineStorage;
+  final Future<PrayerAccessContent> Function()? localPublic;
   final AccessSetsV2Gateway? _accessSets;
   final AccessSetsCatalog? _catalog;
   late final AccessSetsCatalog? _canonical =
@@ -165,12 +197,24 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   Future<void>? _activation;
   Future<void>? _revocation;
   Future<void> _writes = Future<void>.value();
+  Future<void> _cacheWrites = Future<void>.value();
   Future<void> _clearing = Future<void>.value();
   final _watches = <StreamSubscription<dynamic>>[];
+  StreamSubscription<String?>? _sessionWatch;
+  ProtectedCatalogSnapshot? _offlineSnapshot;
+  bool _cacheVisible = false;
+  bool _syncRequired = true;
   Timer? _retry;
   int _retrySeconds = 5;
 
   String? get _pending => _record['pendingDisableUid'] as String?;
+  ProtectedCatalogSnapshot? get _displayableCache {
+    final snapshot = _offlineSnapshot;
+    return _cacheVisible && _pending == null && snapshot?.uid == _uid
+        ? snapshot
+        : null;
+  }
+
   bool _current(int generation) =>
       mounted && generation == _generation && _online && _foreground;
 
@@ -197,6 +241,49 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         .then((_) => storage.write(snapshot));
   }
 
+  Future<void> _cacheWrite(Future<void> Function() action) => _cacheWrites =
+      _cacheWrites.catchError((Object _) {}).then((_) => action());
+
+  Future<void> _discardOffline() async {
+    final store = offlineStorage;
+    if (store == null) return;
+    _cacheVisible = false;
+    _offlineSnapshot = null;
+    _syncRequired = true;
+    await _cacheWrite(() => store.delete());
+  }
+
+  void _watchSession() {
+    final client = gateway;
+    if (offlineStorage == null ||
+        client is! PriestSessionChanges ||
+        _sessionWatch != null) {
+      return;
+    }
+    _sessionWatch = (client as PriestSessionChanges).watchSession().listen((
+      uid,
+    ) {
+      if (!mounted ||
+          uid == _uid ||
+          _activation != null ||
+          _revocation != null) {
+        return;
+      }
+      _uid = uid;
+      _cacheVisible = false;
+      _invalidate();
+      unawaited(
+        _discardOffline().catchError((Object _) {}).then((_) async {
+          await _clearMemory();
+          if (mounted) {
+            await _checking;
+            await refresh();
+          }
+        }),
+      );
+    }, onError: (Object _) {});
+  }
+
   void _set({
     bool? registered,
     bool busy = false,
@@ -208,20 +295,27 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   }) {
     if (!mounted) return;
     final access = _confirmed;
+    final cache = _displayableCache;
+    final public = publicContent ?? state.publicContent;
     state = PriestAccessState(
       registered: registered ?? state.registered,
       busy: busy,
-      content: content,
-      publicContent: publicContent ?? state.publicContent,
+      content:
+          content ??
+          (cache == null ? null : public?.mergeProtected(cache.content)),
+      publicContent: public,
       error: error,
       helpText: helpText ?? state.helpText,
       mode: access == null
           ? AccessSetsMode.suspended
           : access.mode ?? AccessSetsMode.legacy,
-      allowedSets: access == null ? const {} : _allowedSets(access),
+      allowedSets: access == null
+          ? cache?.sets ?? const {}
+          : _allowedSets(access),
       profileRevision: access?.entitlements?.revision,
       pendingDisable: _pending != null,
       catalogLoading: catalogLoading,
+      offlineReady: cache != null && public != null,
       quotaBlocked: _quotaBlocked,
       generation: _generation,
       canLoadCatalog:
@@ -241,6 +335,115 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     ...?access.entitlements?.allowedSets,
   });
 
+  Set<String> _readableSets(_AccessCheck? access) {
+    if (access == null || access.mode == AccessSetsMode.suspended) {
+      return const {};
+    }
+    return _allowedSets(access);
+  }
+
+  String _cacheScope(_AccessCheck access) => jsonEncode([
+    (access.mode ?? AccessSetsMode.legacy).name,
+    access.entitlements?.profileId,
+    access.entitlements?.revision,
+    access.legacy?.active == true,
+  ]);
+
+  Future<void> _restoreOffline() async {
+    final store = offlineStorage!;
+    // The secure record's UID is only a hint. Use Firebase Auth's session,
+    // which can restore locally without looking up a grant over the network.
+    final uid = _uid = await gateway.restoreSession();
+    if (!mounted) return;
+    _watchSession();
+    final snapshot = await store.read();
+    if (uid == null ||
+        _pending != null ||
+        (snapshot != null && snapshot.uid != uid)) {
+      await _discardOffline();
+      return;
+    }
+    if (snapshot == null || snapshot.sets.isEmpty || uid != _uid || !mounted) {
+      return;
+    }
+    final public =
+        await localPublic?.call() ?? const PrayerAccessContent({}, {});
+    if (!mounted || uid != _uid || _pending != null) return;
+    _offlineSnapshot = snapshot;
+    _cacheVisible = !_online && _record['cacheRecheckUid'] != uid;
+    _set(registered: true, publicContent: public);
+  }
+
+  bool _retainedRow(Map<String, dynamic> row, Set<String> sets) {
+    if (row['effectiveAccessSets'] case final List effective) {
+      return effective.any(sets.contains);
+    }
+    return sets.contains('priest') &&
+        (row['effectivePriestOnly'] == true || row['priestOnly'] == true);
+  }
+
+  Future<void> _reconcileOffline(
+    String? uid,
+    _AccessCheck? access,
+    PrayerAccessContent public,
+    int generation,
+  ) async {
+    final store = offlineStorage;
+    if (store == null) return;
+    final sets = _readableSets(access);
+    final previous = _offlineSnapshot;
+    if (uid == null ||
+        sets.isEmpty ||
+        (previous != null && previous.uid != uid)) {
+      await _discardOffline();
+      return;
+    }
+    if (previous == null) return;
+    final scope = _cacheScope(access!);
+    if (!setEquals(sets, previous.sets) || scope != previous.scope) {
+      final categories = {
+        for (final item in previous.content.categories.entries)
+          if (_retainedRow(item.value, sets)) item.key: item.value,
+      };
+      final policy = PriestAccessPolicy({...public.categories, ...categories});
+      final selected = PrayerAccessContent(
+        {
+          for (final item in previous.content.prayers.entries)
+            if (_retainedRow(item.value, sets) &&
+                [
+                      item.value['categoryId'],
+                      ...?item.value['categoryIds'] as List?,
+                    ]
+                    .whereType<String>()
+                    .where((id) => id.isNotEmpty)
+                    .every(policy.categoryValid))
+              item.key: item.value,
+        },
+        {
+          for (final item in categories.entries)
+            if (policy.categoryValid(item.key)) item.key: item.value,
+        },
+      );
+      _cacheVisible = false;
+      _offlineSnapshot = null;
+      _syncRequired = true;
+      _set(busy: true);
+      // Revoke the old sealed snapshot before any new downloads. A staged
+      // transfer for another set/revision must never survive this change.
+      final current = ProtectedCatalogSnapshot(uid, sets, scope, selected);
+      await _cacheWrite(() async {
+        await store.delete();
+        if (_current(generation) && _pending == null) {
+          await store.write(current);
+        }
+      });
+      if (!_current(generation) || _pending != null) return;
+      _offlineSnapshot = current;
+    }
+    _cacheVisible = true;
+    _record.remove('cacheRecheckUid');
+  }
+
   Future<void> initialize() => _initializing ??= _initialize();
 
   Future<void> _initialize() async {
@@ -249,6 +452,13 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       if (!mounted) return;
       _ready = true;
       _set(registered: _record['verifiedUid'] is String && _pending == null);
+      if (offlineStorage != null) {
+        try {
+          await _restoreOffline();
+        } catch (_) {
+          _set(error: const PriestAccessException('STORAGE').message);
+        }
+      }
       await refresh();
     } catch (_) {
       _set(error: const PriestAccessException('STORAGE').message);
@@ -311,11 +521,14 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
 
   Future<void> _clearMemory() {
     final stopping = _stopWatching();
+    final stoppingSession = _sessionWatch?.cancel();
+    _sessionWatch = null;
     return _clearing = _clearing
         .catchError((Object _) {})
         .then((_) async {
           try {
             await stopping;
+            await stoppingSession;
           } finally {
             await gateway.clearProtectedMemory();
           }
@@ -361,12 +574,27 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
 
   Future<void> _failRead(Object error) async {
     _blockQuota(error);
+    final revoked =
+        error is PriestAccessException &&
+        (error.revoked || error.code == 'REVOKED');
+    if (revoked) {
+      _cacheVisible = false;
+    } else if (_offlineSnapshot?.uid == _uid &&
+        _record['cacheRecheckUid'] != _uid) {
+      _cacheVisible = true;
+    }
     _invalidate(
       error: error is PriestAccessException
           ? error.message
           : const PriestAccessException('SERVICE_UNAVAILABLE').message,
     );
-    await _clearMemory();
+    if (revoked) await _discardOffline().catchError((Object _) {});
+    if (_displayableCache == null) {
+      await _clearMemory();
+    } else {
+      // Keep the local Firebase Auth observer alive while using saved content.
+      await _stopWatching();
+    }
     _scheduleRetry();
   }
 
@@ -376,17 +604,36 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     void changed({Object? error}) {
       if (!_current(generation)) return;
       if (error != null) _blockQuota(error);
+      final requiresCheck =
+          error == null || (error is PriestAccessException && error.revoked);
+      if (requiresCheck && _offlineSnapshot != null) {
+        _cacheVisible = false;
+        _record['cacheRecheckUid'] = uid;
+        _syncRequired = true;
+      }
       final message = error is PriestAccessException ? error.message : null;
       _invalidate(error: message);
-      unawaited(
-        _clearMemory().then((_) {
-          if (error == null ||
-              (error is PriestAccessException && error.revoked)) {
-            return refresh();
+      unawaited(() async {
+        if (requiresCheck && _record['cacheRecheckUid'] == uid) {
+          try {
+            await _save();
+          } catch (_) {
+            await _discardOffline().catchError((Object _) {});
           }
-          _scheduleRetry();
-        }),
-      );
+        }
+        if (_displayableCache == null) {
+          await _clearMemory();
+        } else {
+          await _stopWatching();
+        }
+        if (!mounted) return;
+        if (requiresCheck) {
+          await _checking;
+          await refresh();
+          return;
+        }
+        _scheduleRetry();
+      }());
     }
 
     // The legacy listener is safe for missing own grants too. It can detect
@@ -431,7 +678,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         _quotaBlocked) {
       return;
     }
-    final hadPrivateContent = state.content != null;
+    final hadPrivateContent = state.content != null && offlineStorage == null;
     _invalidate(busy: true);
     final generation = _generation;
     try {
@@ -444,11 +691,25 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
       if (!_current(generation)) return;
       final restoredUid = await gateway.restoreSession();
       if (!_current(generation)) return;
+      if (offlineStorage != null && _uid != restoredUid) {
+        _cacheVisible = false;
+        _set(busy: true);
+        await _discardOffline();
+        if (!_current(generation)) return;
+      }
       _uid = restoredUid;
+      _watchSession();
       await _flushRevocation();
       if (!_current(generation)) return;
       final uid = _uid;
       final access = uid == null ? null : await _check(uid);
+      if (!_current(generation)) return;
+      await _reconcileOffline(
+        uid,
+        access,
+        state.publicContent ?? const PrayerAccessContent({}, {}),
+        generation,
+      );
       if (!_current(generation)) return;
       if (access?.mode != null) _record['v2RulesUid'] = uid;
       // Keep the existing physical public refresh once per process and again
@@ -502,6 +763,9 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
                 ? const PriestAccessException('SERVICE_UNAVAILABLE').message
                 : null),
       );
+      if (offlineStorage != null && _syncRequired && state.canLoadCatalog) {
+        unawaited(_startCatalog());
+      }
       _retry?.cancel();
       if (projectionDenied) {
         // Its projection listener cannot stay subscribed while Rules deny it.
@@ -561,9 +825,13 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         !_foreground ||
         !state.canLoadCatalog ||
         _quotaBlocked ||
-        state.content != null) {
+        (state.content != null && (offlineStorage == null || !_syncRequired))) {
       return;
     }
+    await _startCatalog();
+  }
+
+  Future<void> _startCatalog() async {
     final request = _catalogRequest ??= _loadConfirmedCatalog();
     try {
       await request;
@@ -578,9 +846,62 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     _set(error: state.error, catalogLoading: true);
     try {
       final public = state.publicContent!;
-      final private = _catalogSession == null
+      final access = _confirmed!;
+      final store = offlineStorage;
+      final session = _catalogSession;
+      final scope = _cacheScope(access);
+      final sets = _readableSets(access);
+      final committed = _offlineSnapshot;
+      var staging = const PrayerAccessContent({}, {});
+      if (store != null && session is IncrementalAccessCatalogSession) {
+        final candidate = await store.read(staging: true);
+        if (candidate?.uid == uid &&
+            candidate?.scope == scope &&
+            setEquals(candidate?.sets, sets)) {
+          staging = candidate!.content;
+        }
+      }
+      if (!_current(generation)) return;
+      final previous = PrayerAccessContent(
+        {...?committed?.content.prayers, ...staging.prayers},
+        {...?committed?.content.categories, ...staging.categories},
+      );
+      Future<void> checkpoint(PrayerAccessContent rows) async {
+        if (!_current(generation) || _pending != null) return;
+        final changed =
+            rows.prayers.entries.any(
+              (row) => !identical(previous.prayers[row.key], row.value),
+            ) ||
+            rows.categories.entries.any(
+              (row) => !identical(previous.categories[row.key], row.value),
+            );
+        if (!changed) return;
+        staging = PrayerAccessContent(
+          {...staging.prayers, ...rows.prayers},
+          {...staging.categories, ...rows.categories},
+        );
+        final snapshot = ProtectedCatalogSnapshot(uid, sets, scope, staging);
+        try {
+          await _cacheWrite(() async {
+            if (_current(generation) && _pending == null) {
+              await store!.write(snapshot, staging: true);
+            }
+          });
+        } catch (_) {
+          // A final atomic write can still succeed if a checkpoint fails.
+        }
+      }
+
+      final private =
+          store != null && session is IncrementalAccessCatalogSession
+          ? await (session as IncrementalAccessCatalogSession).synchronize(
+              public,
+              previous,
+              checkpoint,
+            )
+          : session == null
           ? await gateway.protectedContent(uid)
-          : await _catalogSession!.load(public);
+          : await session.load(public);
       if (!_current(generation)) return;
       final safePublic = public.mergeProtected(private).publicOnly;
       if (safePublic.prayers.length != public.prayers.length ||
@@ -588,10 +909,38 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         await persistPublic?.call(safePublic);
       }
       if (!_current(generation)) return;
+      var cacheError = false;
+      if (store != null) {
+        final snapshot = ProtectedCatalogSnapshot(uid, sets, scope, private);
+        try {
+          await _cacheWrite(() async {
+            if (!_current(generation) || _pending != null) return;
+            if (committed == null ||
+                committed.scope != scope ||
+                !mapEquals(committed.content.prayers, private.prayers) ||
+                !mapEquals(committed.content.categories, private.categories)) {
+              await store.write(snapshot);
+            }
+            await store.delete(stagingOnly: true);
+          });
+          if (!_current(generation) || _pending != null) return;
+          _offlineSnapshot = snapshot;
+          _cacheVisible = true;
+          if (_record.remove('cacheRecheckUid') != null) {
+            await _save();
+          }
+        } catch (_) {
+          cacheError = true;
+        }
+      }
+      if (!_current(generation)) return;
+      _syncRequired = cacheError;
       _set(
         content: safePublic.mergeProtected(private),
         publicContent: safePublic,
-        error: state.error,
+        error: cacheError
+            ? const PriestAccessException('STORAGE').message
+            : state.error,
       );
     } catch (error) {
       if (_current(generation)) await _failRead(error);
@@ -688,6 +1037,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     await initialize();
     if (!mounted || !_ready || _pending != null) return;
     _retry?.cancel();
+    _cacheVisible = false;
     _invalidate(busy: true);
     final generation = _generation;
     final activation = _activation;
@@ -709,6 +1059,11 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
         durable = true;
       } catch (_) {
         // Try delivering the revoke even if writing the local intent fails.
+      }
+      try {
+        await _discardOffline();
+      } catch (_) {
+        // Still attempt server revocation when local storage is unavailable.
       }
       if (activation != null) {
         try {
@@ -736,12 +1091,28 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   }
 
   void suspend({bool? online, bool? foreground}) {
+    if ((online == null || online == _online) &&
+        (foreground == null || foreground == _foreground)) {
+      return;
+    }
     ++_visibilityEpoch;
     _retry?.cancel();
     if (online != null) _online = online;
     if (foreground != null) _foreground = foreground;
     _invalidate();
-    unawaited(_clearMemory());
+    if (offlineStorage == null) {
+      unawaited(_clearMemory());
+    } else {
+      if (!_online) {
+        _syncRequired = true;
+        if (_offlineSnapshot?.uid == _uid &&
+            _record['cacheRecheckUid'] != _uid) {
+          _cacheVisible = true;
+          _set();
+        }
+      }
+      unawaited(_stopWatching().catchError((Object _) {}));
+    }
   }
 
   Future<void> resume({bool? online, bool? foreground}) async {
@@ -757,6 +1128,8 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
   }
 
   Future<Map<String, dynamic>?> readPrayer(String id) async {
+    final cached = state.content?.prayers[id];
+    if (cached != null && _pending == null) return cached;
     final uid = _uid;
     final access = _confirmed;
     final generation = _generation;
@@ -788,6 +1161,7 @@ class PriestAccessController extends StateNotifier<PriestAccessState> {
     _retry?.cancel();
     ++_generation;
     unawaited(_stopWatching());
+    unawaited(_sessionWatch?.cancel());
     super.dispose();
   }
 }

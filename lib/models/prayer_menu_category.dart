@@ -7,6 +7,7 @@ class PrayerMenuCategory {
   final List<String> tags;
   final bool isGlobal;
   final bool priestOnly;
+  final List<String> effectiveAccessSets;
   final String? parentId;
   final List<String> prayerIds;
   final double? order;
@@ -22,6 +23,7 @@ class PrayerMenuCategory {
     required this.tags,
     required this.isGlobal,
     this.priestOnly = false,
+    this.effectiveAccessSets = const [],
     this.parentId,
     this.prayerIds = const [],
     this.order,
@@ -35,6 +37,18 @@ class PrayerMenuCategory {
   String get displayIconKey =>
       displayCategoryIconKey(iconKey: iconKey, id: id, name: name, tags: tags);
 
+  bool get isProtected => priestOnly || effectiveAccessSets.isNotEmpty;
+
+  String get readerName =>
+      isProtected &&
+          (parentId == null || parentId!.isEmpty) &&
+          name == 'Для святара' &&
+          (effectiveAccessSets.isEmpty ||
+              (effectiveAccessSets.length == 1 &&
+                  effectiveAccessSets.single == 'priest'))
+      ? 'Для святароў'
+      : name;
+
   factory PrayerMenuCategory.global(String id, Map data) {
     return PrayerMenuCategory(
       id: id,
@@ -43,6 +57,7 @@ class PrayerMenuCategory {
       isGlobal: true,
       priestOnly:
           data['priestOnly'] == true || data['effectivePriestOnly'] == true,
+      effectiveAccessSets: _cleanTags(data['effectiveAccessSets']),
       parentId: data['parentId']?.toString(),
       prayerIds: _cleanTags(data['prayerIds']),
       order: data['order'] is num && (data['order'] as num).isFinite

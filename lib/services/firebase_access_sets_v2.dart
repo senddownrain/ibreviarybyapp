@@ -1,7 +1,8 @@
 part of 'firebase_priest_access.dart';
 
 /// Uses the same named Auth and disposable Firestore memory delegate as legacy.
-class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
+class _FirebaseAccessSetsV2
+    implements AccessSetsV2Gateway, AccessCatalogFingerprints {
   _FirebaseAccessSetsV2(this._owner);
 
   final FirebasePriestAccess _owner;
@@ -256,6 +257,76 @@ class _FirebaseAccessSetsV2 implements AccessSetsV2Gateway {
       if (error.code == 'permission-denied') return null;
       rethrow;
     }
+  });
+
+  // The existing ID-only indexes have no revision and the global writer
+  // version is admin-only. Masked gets use the same owner token and per-doc
+  // Rules, without transferring an unchanged prayer's text.
+  @override
+  Future<AccessContentFingerprint?> readFingerprint(
+    AccessContentKind kind,
+    String id,
+  ) => _owner._run(() async {
+    if (const bool.fromEnvironment('PRIEST_USE_EMULATORS')) return null;
+    final user = _owner._auth?.currentUser;
+    final token = await user?.getIdToken();
+    if (user == null || token == null) {
+      throw const PriestAccessException('ACCESS_REQUIRED');
+    }
+    _owner._own(user.uid);
+    final project = _owner._app!.options.projectId;
+    final uri = Uri(
+      scheme: 'https',
+      host: 'firestore.googleapis.com',
+      pathSegments: [
+        'v1',
+        'projects',
+        project,
+        'databases',
+        '(default)',
+        'documents',
+        kind.collection,
+        id,
+      ],
+      queryParameters: {
+        'mask.fieldPaths': ['contentHash', 'accessSets', 'effectiveAccessSets'],
+      },
+    );
+    final http.Response response;
+    try {
+      response = await _owner._catalogHttp.get(
+        uri,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } on http.ClientException {
+      throw const PriestAccessException('OFFLINE');
+    }
+    _owner._own(user.uid);
+    if (response.statusCode == 429) {
+      throw const PriestAccessException('QUOTA_EXHAUSTED');
+    }
+    // Projects enforcing attestation can deny REST. In that case the
+    // existing SDK remains the authority and no cached hash is trusted.
+    if ([401, 403, 404].contains(response.statusCode)) return null;
+    if (response.statusCode != 200) {
+      throw const PriestAccessException('SERVICE_UNAVAILABLE');
+    }
+    final fields = (jsonDecode(response.body) as Map)['fields'] as Map?;
+    final hash = (fields?['contentHash'] as Map?)?['stringValue'];
+    Set<String> sets(String key) {
+      final array = (fields?[key] as Map?)?['arrayValue'] as Map?;
+      final values = (array?['values'] as List?) ?? const [];
+      return values
+          .map((value) => (value as Map)['stringValue'] as String)
+          .toSet();
+    }
+
+    if (hash is! String) return null;
+    return (
+      hash: hash,
+      ownSets: sets('accessSets'),
+      effectiveSets: sets('effectiveAccessSets'),
+    );
   });
 
   @override

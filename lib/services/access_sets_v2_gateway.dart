@@ -76,6 +76,27 @@ abstract interface class AccessSetsCatalogSession {
   );
 }
 
+typedef AccessContentFingerprint = ({
+  String hash,
+  Set<String> ownSets,
+  Set<String> effectiveSets,
+});
+
+abstract interface class AccessCatalogFingerprints {
+  Future<AccessContentFingerprint?> readFingerprint(
+    AccessContentKind kind,
+    String id,
+  );
+}
+
+abstract interface class IncrementalAccessCatalogSession {
+  Future<PrayerAccessContent> synchronize(
+    PrayerAccessContent public,
+    PrayerAccessContent previous,
+    Future<void> Function(PrayerAccessContent) checkpoint,
+  );
+}
+
 class IndexedAccessSetsCatalog implements AccessSetsCatalog {
   const IndexedAccessSetsCatalog(this.gateway);
   final AccessSetsV2Gateway gateway;
@@ -85,7 +106,8 @@ class IndexedAccessSetsCatalog implements AccessSetsCatalog {
       _IndexedCatalogSession(gateway, sets, isCurrent);
 }
 
-class _IndexedCatalogSession implements AccessSetsCatalogSession {
+class _IndexedCatalogSession
+    implements AccessSetsCatalogSession, IncrementalAccessCatalogSession {
   _IndexedCatalogSession(this.gateway, this.sets, this.isCurrent);
 
   static const _pageSize = 25;
@@ -155,16 +177,44 @@ class _IndexedCatalogSession implements AccessSetsCatalogSession {
         );
   }
 
-  Future<Map<String, dynamic>?> _row(AccessContentKind kind, String id) {
+  Future<Map<String, dynamic>?> _row(
+    AccessContentKind kind,
+    String id, [
+    Map<String, dynamic>? cached,
+  ]) {
     if (!_validId(id)) return Future.value(null);
     return _rows.putIfAbsent((kind, id), () async {
-      final row = await _request(() => gateway.readContent(kind, id));
+      final row = await _request(() async {
+        final remote = gateway;
+        if (cached != null &&
+            _permitted(cached, id) &&
+            remote is AccessCatalogFingerprints) {
+          final fingerprint = await (remote as AccessCatalogFingerprints)
+              .readFingerprint(kind, id);
+          if (fingerprint != null &&
+              cached['contentHash'] == fingerprint.hash &&
+              setEquals(
+                _setList(cached['accessSets'])!.toSet(),
+                fingerprint.ownSets,
+              ) &&
+              setEquals(
+                _effective(cached).toSet(),
+                fingerprint.effectiveSets,
+              )) {
+            return cached;
+          }
+          if (!isCurrent()) throw _expired;
+        }
+        return gateway.readContent(kind, id);
+      });
       return row != null && _permitted(row, id) ? row : null;
     });
   }
 
   Future<Map<String, Map<String, dynamic>>> _loadKind(
     AccessContentKind kind,
+    Map<String, Map<String, dynamic>> previous,
+    Future<void> Function(Map<String, Map<String, dynamic>>)? checkpoint,
   ) async {
     final accepted = <String, Map<String, dynamic>>{};
     final orderedSets = sets.toList()..sort();
@@ -184,7 +234,7 @@ class _IndexedCatalogSession implements AccessSetsCatalogSession {
         final rows = await Future.wait(
           page.ids
               .where((id) => !accepted.containsKey(id))
-              .map((id) => _row(kind, id)),
+              .map((id) => _row(kind, id, previous[id])),
           eagerError: true,
         );
         for (final row in rows.whereType<Map<String, dynamic>>()) {
@@ -192,6 +242,7 @@ class _IndexedCatalogSession implements AccessSetsCatalogSession {
             accepted[row['id'] as String] = row;
           }
         }
+        if (rows.isNotEmpty) await checkpoint?.call(Map.of(accepted));
         cursor = page.cursor;
       } while (cursor != null);
     }
@@ -252,10 +303,36 @@ class _IndexedCatalogSession implements AccessSetsCatalogSession {
   }
 
   @override
-  Future<PrayerAccessContent> load(PrayerAccessContent public) async {
-    final categories = await _loadKind(AccessContentKind.categories);
+  Future<PrayerAccessContent> load(PrayerAccessContent public) =>
+      _load(public, const PrayerAccessContent({}, {}), null);
+
+  @override
+  Future<PrayerAccessContent> synchronize(
+    PrayerAccessContent public,
+    PrayerAccessContent previous,
+    Future<void> Function(PrayerAccessContent) checkpoint,
+  ) => _load(public, previous, checkpoint);
+
+  Future<PrayerAccessContent> _load(
+    PrayerAccessContent public,
+    PrayerAccessContent previous,
+    Future<void> Function(PrayerAccessContent)? checkpoint,
+  ) async {
+    final categories = await _loadKind(
+      AccessContentKind.categories,
+      previous.categories,
+      checkpoint == null
+          ? null
+          : (rows) => checkpoint(PrayerAccessContent({}, rows)),
+    );
     final combined = {...public.categories, ...categories};
-    final prayers = await _loadKind(AccessContentKind.prayers);
+    final prayers = await _loadKind(
+      AccessContentKind.prayers,
+      previous.prayers,
+      checkpoint == null
+          ? null
+          : (rows) => checkpoint(PrayerAccessContent(rows, categories)),
+    );
     return PrayerAccessContent(
       {
         for (final entry in prayers.entries)
