@@ -201,6 +201,7 @@ class CategorySmokeAccess extends PriestAccessController {
   void setGranted(bool value) => state = PriestAccessState(
     publicContent: fixture.publicOnly,
     content: value ? fixture : null,
+    generation: state.generation + 1,
   );
 }
 

@@ -127,7 +127,8 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
   };
   final visible = <String>{};
   for (final category in byId.values) {
-    if (prayersForCategory(permittedPrayers, category, settings).isEmpty) {
+    if (category.comment == null &&
+        prayersForCategory(permittedPrayers, category, settings).isEmpty) {
       continue;
     }
     var current = category;

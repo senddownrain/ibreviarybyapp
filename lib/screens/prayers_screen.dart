@@ -19,8 +19,10 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/prayer_category_tree.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
+import 'package:mybrev_flutter/utils/prayer_link.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
+import 'package:mybrev_flutter/widgets/prayer_category_comment.dart';
 import 'package:mybrev_flutter/widgets/prayerbook_section_tiles.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/protected_catalog_control.dart';
@@ -322,10 +324,11 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       buildPrayerCategoryTree(ref.watch(prayerMenuCategoriesProvider)),
       widget.categoryId,
     );
-    final category = node?.category;
-    if (category == null) {
+    if (node == null) {
       return const _MissingPrayerbookPage(title: 'Катэгорыя не знойдзена');
     }
+    final category = node.category;
+    final comment = category.comment;
     final settings = ref.watch(settingsProvider);
     final prayers = prayersForCategory(
       ref.watch(prayerCatalogProvider),
@@ -334,12 +337,31 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
     );
     return _PrayerListPage(
       title: category.name,
-      subtitle: 'Малітвы гэтай катэгорыі',
+      subtitle: comment != null && prayers.isEmpty && node.children.isEmpty
+          ? null
+          : 'Малітвы гэтай катэгорыі',
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
       prayers: prayers,
-      categories: [for (final child in node!.children) child.category],
+      categories: [for (final child in node.children) child.category],
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
+      commentSection: comment == null
+          ? null
+          : PrayerCategoryCommentSection(
+              key: ValueKey((
+                category.id,
+                category.priestOnly
+                    ? ref.watch(
+                        priestAccessProvider.select((a) => a.generation),
+                      )
+                    : null,
+              )),
+              comment: comment,
+              onLinkTap: (url, _, _) {
+                final location = prayerLinkLocation(url);
+                if (location != null) context.push(location);
+              },
+            ),
     );
   }
 }
@@ -581,16 +603,18 @@ class _PrayerListPage extends StatelessWidget {
     required this.scrollKey,
     this.searchDock,
     this.categories = const [],
+    this.commentSection,
   });
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final List<Prayer> prayers;
   final String emptyTitle;
   final ScrollController scrollController;
   final PageStorageKey<String> scrollKey;
   final Widget? searchDock;
   final List<PrayerMenuCategory> categories;
+  final Widget? commentSection;
 
   @override
   Widget build(BuildContext context) {
@@ -618,22 +642,29 @@ class _PrayerListPage extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
+                if (subtitle case final subtitle?) ...[
+                  const SizedBox(height: 6),
+                  Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
+                ],
                 const ProtectedCatalogControl(),
                 const SizedBox(height: 18),
+                if (commentSection case final comment?) ...[
+                  comment,
+                  const SizedBox(height: 12),
+                ],
                 for (final category in categories)
                   _CategoryRow(category: category),
                 if (categories.isNotEmpty && prayers.isNotEmpty)
                   const SizedBox(height: 18),
-                if (prayers.isEmpty && categories.isEmpty)
+                if (prayers.isEmpty &&
+                    categories.isEmpty &&
+                    commentSection == null)
                   Padding(
                     key: const Key('prayer-list-empty'),
                     padding: const EdgeInsets.symmetric(vertical: 42),
                     child: Text(emptyTitle, textAlign: TextAlign.center),
-                  )
-                else
-                  for (final prayer in prayers) PrayerListRow(prayer: prayer),
+                  ),
+                for (final prayer in prayers) PrayerListRow(prayer: prayer),
               ],
             ),
           ),

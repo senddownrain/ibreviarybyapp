@@ -10,7 +10,7 @@ import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 
 /// One document surface for ordinary prayer reading and local editor preview.
 /// Access checks belong to the containing screen, before constructing this.
-class PrayerContent extends ConsumerWidget {
+class PrayerContent extends StatelessWidget {
   const PrayerContent({
     super.key,
     required this.prayer,
@@ -26,23 +26,18 @@ class PrayerContent extends ConsumerWidget {
   final bool wrapInSelectionArea;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final alignment = ref.watch(
-      settingsProvider.select((s) => s.textAlignment),
-    );
-    final html = prayer.isMarkdown
-        ? prayerMarkdownToHtml(prayer.displayText)
-        : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
-    final body = Html(
-      data: html,
-      style: prayerDocumentStyles(context, textStyle, textAlignment: alignment),
-      onLinkTap: onLinkTap,
-    );
+  Widget build(BuildContext context) {
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        body,
+        PrayerDocumentBody(
+          markdown: prayer.isMarkdown
+              ? prayer.displayText
+              : prayerLegacyHtmlToMarkdown(prayer.displayText),
+          textStyle: textStyle,
+          onLinkTap: onLinkTap,
+        ),
         PrayerSourceNote(source: prayer.source, textStyle: textStyle),
         PrayerPagesNote(
           pages: prayer.pages,
@@ -52,6 +47,32 @@ class PrayerContent extends ConsumerWidget {
       ],
     );
     return wrapInSelectionArea ? SelectionArea(child: content) : content;
+  }
+}
+
+/// Shared safe Markdown renderer for prayerbook documents.
+class PrayerDocumentBody extends ConsumerWidget {
+  const PrayerDocumentBody({
+    super.key,
+    required this.markdown,
+    required this.textStyle,
+    this.onLinkTap,
+  });
+
+  final String markdown;
+  final TextStyle textStyle;
+  final OnTap? onLinkTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final alignment = ref.watch(
+      settingsProvider.select((s) => s.textAlignment),
+    );
+    return Html(
+      data: prayerMarkdownToHtml(markdown),
+      style: prayerDocumentStyles(context, textStyle, textAlignment: alignment),
+      onLinkTap: onLinkTap,
+    );
   }
 }
 

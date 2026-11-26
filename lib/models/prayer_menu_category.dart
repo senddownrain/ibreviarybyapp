@@ -12,6 +12,7 @@ class PrayerMenuCategory {
   final double? order;
   final String? icon;
   final String? iconId;
+  final PrayerCategoryComment? comment;
 
   /// Stored icon key (may be null or unknown); draw with [displayIconKey].
   final String? iconKey;
@@ -28,6 +29,7 @@ class PrayerMenuCategory {
     this.icon,
     this.iconId,
     this.iconKey,
+    this.comment,
   });
 
   /// The key to draw: the stored one, or a deterministic suggestion until the
@@ -51,6 +53,7 @@ class PrayerMenuCategory {
       icon: data['icon']?.toString(),
       iconId: data['iconId']?.toString(),
       iconKey: data['iconKey'] is String ? data['iconKey'] as String : null,
+      comment: PrayerCategoryComment.fromCategory(data),
     );
   }
 
@@ -62,6 +65,46 @@ class PrayerMenuCategory {
         isGlobal: false,
         iconKey: category.iconKey,
       );
+}
+
+class PrayerCategoryComment {
+  const PrayerCategoryComment({
+    required this.content,
+    this.title,
+    this.sourceId,
+  });
+
+  final String content;
+  final String? title;
+  final String? sourceId;
+
+  static PrayerCategoryComment? fromCategory(Map category) {
+    final raw = category['comment'];
+    if (raw is! Map || _unpublished(category) || _unpublished(raw)) return null;
+    final content = raw['content'];
+    if (content is! String || content.trim().isEmpty) return null;
+    return PrayerCategoryComment(
+      content: content,
+      title: _nonblankString(raw['title']),
+      sourceId: _nonblankString(raw['sourceId']),
+    );
+  }
+
+  static bool _unpublished(Map document) =>
+      document['published'] == false ||
+      const {
+        'draft',
+        'pending',
+        'review',
+        'rejected',
+        'archived',
+      }.contains(_nonblankString(document['status'])?.toLowerCase());
+
+  static String? _nonblankString(Object? value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
 }
 
 List<String> _cleanTags(dynamic value) {

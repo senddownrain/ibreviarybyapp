@@ -28,6 +28,89 @@ Future<void> reveal(WidgetTester tester, Finder finder) async {
 
 void main() {
   testWidgets(
+    'comment-only leaf makes ancestors visible and reopens collapsed',
+    (tester) async {
+      final content = fixtureContent();
+      content.categories['comment-parent'] = {'name': 'Comment parent'};
+      content.categories['comment-leaf'] = {
+        'name': 'Comment leaf',
+        'parentId': 'comment-parent',
+        'comment': {
+          'content': 'Leaf fixture text',
+          'sourceId': 'unknown-source',
+        },
+      };
+      await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+      await tester.pumpAndSettle();
+      final parent = find.byKey(const ValueKey('category-comment-parent'));
+      final leaf = find.byKey(const ValueKey('category-comment-leaf'));
+      final comment = find.text('Пра гэты раздзел');
+      final body = find.text('Leaf fixture text', findRichText: true);
+      await reveal(tester, parent);
+      expect(leaf, findsNothing);
+      await tester.tap(parent);
+      await tester.pumpAndSettle();
+      final router = GoRouter.of(tester.element(leaf));
+      await tester.tap(leaf);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('prayer-list-empty')), findsNothing);
+      expect(find.text('Малітвы гэтай катэгорыі'), findsNothing);
+      expect(find.byType(PrayerListRow), findsNothing);
+      expect(body, findsNothing);
+      await tester.tap(comment);
+      await tester.pumpAndSettle();
+      expect(body, findsOneWidget);
+      expect(find.byKey(const Key('prayer-source')), findsNothing);
+      router.pop();
+      await tester.pumpAndSettle();
+      await tester.tap(leaf);
+      await tester.pumpAndSettle();
+      expect(comment, findsOneWidget);
+      expect(body, findsNothing);
+    },
+  );
+
+  testWidgets('expanded restricted comment disappears when the grant expires', (
+    tester,
+  ) async {
+    final content = fixtureContent();
+    content.categories['closed-comment'] = {
+      'name': 'Restricted comment-only child',
+      'parentId': 'closed',
+      'comment': {'content': 'Synthetic restricted comment text'},
+    };
+    await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+    await tester.pumpAndSettle();
+    final element = tester.element(find.byType(PrayersScreen));
+    final router = GoRouter.of(element);
+    final controller =
+        ProviderScope.containerOf(element).read(priestAccessProvider.notifier)
+            as CategorySmokeAccess;
+    router.go('/prayers/category/closed-comment');
+    await tester.pumpAndSettle();
+    expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
+    controller.setGranted(true);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.pumpAndSettle();
+    final text = find.text(
+      'Synthetic restricted comment text',
+      findRichText: true,
+    );
+    expect(text, findsOneWidget);
+    controller.setGranted(true);
+    await tester.pumpAndSettle();
+    expect(text, findsNothing);
+    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.pumpAndSettle();
+    expect(text, findsOneWidget);
+    controller.setGranted(false);
+    await tester.pump();
+    expect(text, findsNothing);
+    expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
+  });
+
+  testWidgets(
     'category pages: roots, keyboard, children before direct prayers, reader/back',
     (tester) async {
       final semantics = tester.ensureSemantics();

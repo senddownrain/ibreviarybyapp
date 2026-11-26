@@ -46,6 +46,24 @@ void main() {
         'prayerIds': ['manual', 'both', 'shared-private'],
         'order': 10,
         'iconKey': 'virgin-mary',
+        'comment': {
+          'title': 'Тлумачэнне',
+          'content':
+              '''Гэта **сінтэтычны тэкст** для праверкі адлюстравання.
+
+> Прыклад аформленай цытаты.
+
+:::rubric
+Прыклад аформленай рубрыкі.
+:::
+
+[Адкрыць прыклад малітвы](/prayer/manual)
+
+${List.filled(8, 'Доўгі каментарый пракручваецца разам са спісам катэгорый і малітваў.').join('\n\n')}
+
+Канец сінтэтычнага каментарыя.''',
+          'sourceId': 'ojcha-nash-2022',
+        },
       },
       'middle': {
         'name': 'Малітвы на кожны дзень',
@@ -63,6 +81,12 @@ void main() {
         'iconKey': 'candle',
       },
       'legacy': {'name': 'Іншыя малітвы', 'tags': [], 'order': 20},
+      'comment-only': {
+        'name': 'Раздзел з каментарыем',
+        'parentId': 'root',
+        'order': 30,
+        'comment': {'content': 'Тэкст раздзела без асобных запісаў.'},
+      },
       'folder': {'name': 'Empty fixture folder', 'tags': [], 'order': 30},
       'closed': {
         'name': 'PRIVATE CATEGORY FIXTURE',
