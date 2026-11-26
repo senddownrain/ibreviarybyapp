@@ -11,6 +11,7 @@ import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart';
 import 'package:mybrev_flutter/discovery/discovery.dart';
 import 'package:mybrev_flutter/discovery/discovery_qa_mode.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
 import 'package:mybrev_flutter/dev/discovery_qa_flags.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -104,7 +105,10 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
-        ...discoveryAppOverrides(),
+        if (discoveryQaActive)
+          ...discoveryAppOverrides()
+        else
+          tourEnabledProvider.overrideWithValue(false),
         discoveryRouteOpenerProvider.overrideWithValue(openDiscoveryRoute),
       ],
       child: const MyBrevApp(),
