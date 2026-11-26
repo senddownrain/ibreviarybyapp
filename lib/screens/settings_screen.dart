@@ -317,7 +317,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 const SizedBox(height: 16),
                 Text(
-                  'Стартовы раздзел',
+                  'Пачатковая старонка',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
@@ -333,7 +333,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       value: 'hours',
                       child: Text('Літургія гадзінаў'),
                     ),
-                    DropdownMenuItem(value: 'readings', child: Text('Чытанні')),
+                    DropdownMenuItem(
+                      value: 'readings',
+                      child: Text('Чытанні дня'),
+                    ),
                     DropdownMenuItem(
                       value: 'prayerbook',
                       child: Text('Малітоўнік'),

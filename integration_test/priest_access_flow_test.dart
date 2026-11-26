@@ -111,7 +111,7 @@ void main() {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       FirebaseFirestore.instance.useFirestoreEmulator(host, port);
-      await HiveService.init();
+      await HiveService.init(detectFirstLaunch: false);
       final gateway = FirebasePriestAccess(),
           storage = SecurePriestAccessStorage();
       final previous = await storage.read();

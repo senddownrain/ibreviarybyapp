@@ -66,7 +66,8 @@ Future<void> main() async {
       : TargetPlatform.android;
   GoogleFonts.config.allowRuntimeFetching = false;
   await initializeDateFormatting('be');
-  await HiveService.init();
+  // A harness is not a first launch: no welcome screen over its route.
+  await HiveService.init(detectFirstLaunch: false);
   await HiveService.content.ensureLoaded(kLiturgicalCollections);
   _container = ProviderContainer(
     overrides: [
