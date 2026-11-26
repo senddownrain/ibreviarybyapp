@@ -629,7 +629,7 @@ void main() {
 
 class _TestSettingsNotifier extends SettingsNotifier {
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() => const SettingsState(readingsHighlightEnabled: true);
 }
 
 final _presentationOverride = liturgicalDayPresentationProvider
