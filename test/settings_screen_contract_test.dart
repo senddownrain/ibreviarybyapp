@@ -218,6 +218,32 @@ void main() {
     router.go('/settings?section=sync');
     await tester.pumpAndSettle();
     expect(find.text('Дадзеныя афлайн').hitTestable(), findsOneWidget);
+
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 800);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    router.go('/settings');
+    await tester.pumpAndSettle();
+    final startField = keyed('settings-start-section');
+    await tester.ensureVisible(startField);
+    await tester.pumpAndSettle();
+    final activeLabel = find.descendant(
+      of: startField,
+      matching: find.text('Літургія гадзінаў'),
+    );
+    expect(activeLabel.hitTestable(), findsOneWidget);
+    expect(tester.getSize(activeLabel).height, greaterThan(48));
+    expect(
+      tester.getRect(startField).bottom,
+      greaterThan(tester.getRect(activeLabel).bottom),
+    );
+    expect(
+      tester.widget<DropdownButtonFormField<String>>(startField).initialValue,
+      'hours',
+    );
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });

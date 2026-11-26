@@ -914,72 +914,72 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
             padding: EdgeInsets.symmetric(horizontal: usesCalendar ? 0 : 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (usesCalendar)
-                  LiturgicalDayHeader(
-                    sectionTitle: 'Чытанні дня',
-                    keyPrefix: 'readings',
-                    presentation: sharedPresentation,
-                    onDateTap: _showDateActions,
-                    // Proper festal readings can be year-independent and
-                    // therefore have no document cycle. The calendar year
-                    // remains visible as context even for those readings.
-                    metadata: [
-                      sharedPresentation.weekday,
-                      'Год ${cycleLabel ?? _cycleLabel(getCycleForDate(sharedPresentation.date))}',
-                    ].join(' · '),
-                    onToday: () => ref
-                        .read(liturgicalNavigationControllerProvider)
-                        .openDate(DateTime.now()),
-                    onVariants: _showOptions,
-                    onPrevious: () => _openRelativeDate(-1),
-                    onNext: () => _openRelativeDate(1),
-                    dateHint: DiscoveryHintSlot(
-                      anchorIds: const ['calendar.date.button'],
-                      onShow: _showDateActions,
-                    ),
-                    variantsHint: DiscoveryHintSlot(
-                      anchorIds: const [
-                        'readings.day_variants.button',
-                        'readings.cycle.button',
-                      ],
-                      onShow: _showOptions,
-                    ),
-                  )
-                else ...[
-                  Text(
-                    'Чытанні дня',
-                    style: ReaderTheme.of(context).displayTitle(36),
+            children: [
+              if (usesCalendar)
+                LiturgicalDayHeader(
+                  sectionTitle: 'Чытанні дня',
+                  keyPrefix: 'readings',
+                  presentation: sharedPresentation,
+                  onDateTap: _showDateActions,
+                  // Proper festal readings can be year-independent and
+                  // therefore have no document cycle. The calendar year
+                  // remains visible as context even for those readings.
+                  metadata: [
+                    sharedPresentation.weekday,
+                    'Год ${cycleLabel ?? _cycleLabel(getCycleForDate(sharedPresentation.date))}',
+                  ].join(' · '),
+                  onToday: () => ref
+                      .read(liturgicalNavigationControllerProvider)
+                      .openDate(DateTime.now()),
+                  onVariants: _showOptions,
+                  onPrevious: () => _openRelativeDate(-1),
+                  onNext: () => _openRelativeDate(1),
+                  dateHint: DiscoveryHintSlot(
+                    anchorIds: const ['calendar.date.button'],
+                    onShow: _showDateActions,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    contextTitle,
-                    style: ReaderTheme.of(context).displayTitle(29),
+                  variantsHint: DiscoveryHintSlot(
+                    anchorIds: const [
+                      'readings.day_variants.button',
+                      'readings.cycle.button',
+                    ],
+                    onShow: _showOptions,
                   ),
-                  TextButton(
-                    onPressed: _showDateActions,
-                    child: const Text('Выбраць дату'),
-                  ),
-                ],
-                if (cycleMetadata != null &&
-                    (!usesCalendar || manualGroup || _manualCycle != null)) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    cycleMetadata,
-                    key: const Key('readings-cycle-metadata'),
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-                if (!usesCalendar && !_loading && _error == null && _hasOptions)
-                  TextButton.icon(
-                    key: const Key('readings-options-action'),
-                    onPressed: _showOptions,
-                    icon: const Icon(Icons.tune_rounded, size: 18),
-                    label: const Text('Іншыя варыянты'),
-                  ),
+                )
+              else ...[
+                Text(
+                  'Чытанні дня',
+                  style: ReaderTheme.of(context).displayTitle(36),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  contextTitle,
+                  style: ReaderTheme.of(context).displayTitle(29),
+                ),
+                TextButton(
+                  onPressed: _showDateActions,
+                  child: const Text('Выбраць дату'),
+                ),
               ],
+              if (cycleMetadata != null &&
+                  (!usesCalendar || manualGroup || _manualCycle != null)) ...[
+                const SizedBox(height: 10),
+                Text(
+                  cycleMetadata,
+                  key: const Key('readings-cycle-metadata'),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              if (!usesCalendar && !_loading && _error == null && _hasOptions)
+                TextButton.icon(
+                  key: const Key('readings-options-action'),
+                  onPressed: _showOptions,
+                  icon: const Icon(Icons.tune_rounded, size: 18),
+                  label: const Text('Іншыя варыянты'),
+                ),
+            ],
             ),
           ),
         ),
@@ -2026,10 +2026,7 @@ class _SectionLabel extends StatelessWidget {
         top: LiturgicalSpacing.sectionBefore,
         bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
-      child: Text(
-        _readingLabel(text).toUpperCase(),
-        style: rubric.readingsSectionHeading(base),
-      ),
+      child: Text(_readingLabel(text).toUpperCase(), style: rubric.readingsSectionHeading(base)),
     );
   }
 }
@@ -2132,10 +2129,8 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
         style: {
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
           if (widget.isProse) ...{
-            'body': liturgicalDocumentStyles(
-              reader: reader,
-              body: widget.textStyle,
-            )['body']!..textAlign = alignment,
+            'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
+              ..textAlign = alignment,
             'p': Style(
               textAlign: alignment,
               margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),

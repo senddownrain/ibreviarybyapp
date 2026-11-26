@@ -163,6 +163,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         key: const Key('settings-start-section'),
                         initialValue: settings.startSection,
                         isExpanded: true,
+                        isDense:
+                            MediaQuery.textScalerOf(context).scale(1) <= 1.3,
+                        itemHeight: null,
                         items: const [
                           DropdownMenuItem(
                             value: 'last',
@@ -296,6 +299,8 @@ class _TextSection extends ConsumerWidget {
             key: const Key('settings-reader-font'),
             initialValue: settings.fontFamily,
             isExpanded: true,
+            isDense: MediaQuery.textScalerOf(context).scale(1) <= 1.3,
+            itemHeight: null,
             selectedItemBuilder: (context) => [
               for (final option in kAvailableReaderFonts) Text(option.label),
             ],

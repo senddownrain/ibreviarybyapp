@@ -20,14 +20,16 @@ import 'package:mybrev_flutter/widgets/reader/reader_scaffold.dart';
 
 class _DarkVisualSettings extends _VisualSettings {
   @override
-  SettingsState build() =>
-      const SettingsState(themePreference: AppThemePreference.dark);
+  SettingsState build() => const SettingsState(
+    themePreference: AppThemePreference.dark,
+  );
 }
 
 class _VisualSettings extends SettingsNotifier {
   @override
-  SettingsState build() =>
-      const SettingsState(themePreference: AppThemePreference.marian);
+  SettingsState build() => const SettingsState(
+    themePreference: AppThemePreference.marian,
+  );
 
   @override
   void setFontSize(double size) {
@@ -48,11 +50,9 @@ Future<void> _capture(WidgetTester tester, String name) async {
   await tester.runAsync(() async {
     final image = await boundary.toImage(pixelRatio: 1);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    final directory = Directory('build/ui_acceptance')
-      ..createSync(recursive: true);
-    File(
-      '${directory.path}/$name.png',
-    ).writeAsBytesSync(bytes!.buffer.asUint8List());
+    final directory = Directory('build/ui_acceptance')..createSync(recursive: true);
+    File('${directory.path}/$name.png')
+        .writeAsBytesSync(bytes!.buffer.asUint8List());
     image.dispose();
   });
 }
@@ -88,9 +88,10 @@ void main() {
       if (path.isEmpty) {
         throw StateError('No installed Cyrillic sans font for visual QA');
       }
-      await (FontLoader('Roboto')..addFont(
-            Future.value(File(path).readAsBytesSync().buffer.asByteData()),
-          ))
+      await (FontLoader('Roboto')
+            ..addFont(Future.value(
+              File(path).readAsBytesSync().buffer.asByteData(),
+            )))
           .load();
     }
     for (final (family, asset) in [
@@ -124,7 +125,9 @@ void main() {
       RepaintBoundary(
         key: const Key('reader-acceptance-capture'),
         child: ProviderScope(
-          overrides: [settingsProvider.overrideWith(_DarkVisualSettings.new)],
+          overrides: [
+            settingsProvider.overrideWith(_DarkVisualSettings.new),
+          ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: (() {
@@ -195,10 +198,7 @@ void main() {
 
     tester.view.physicalSize = const Size(320, 800);
     await tester.pumpAndSettle();
-    await Scrollable.ensureVisible(
-      tester.element(psalmSelector),
-      alignment: 0.12,
-    );
+    await Scrollable.ensureVisible(tester.element(psalmSelector), alignment: 0.12);
     await tester.pumpAndSettle();
     expect(
       (tester.getCenter(psalmTitle).dy - tester.getCenter(psalmSelector).dy)
@@ -227,11 +227,11 @@ void main() {
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
-                useMaterial3: true,
-                colorScheme: AppPalette.marianScheme,
-                extensions: const [IbColors.marian],
-                fontFamily: 'VisualPreview',
-              ),
+              useMaterial3: true,
+              colorScheme: AppPalette.marianScheme,
+              extensions: const [IbColors.marian],
+              fontFamily: 'VisualPreview',
+            ),
               home: reader,
             ),
           ),
