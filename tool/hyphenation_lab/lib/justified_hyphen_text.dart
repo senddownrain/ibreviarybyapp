@@ -810,8 +810,8 @@ class RenderHyphenatedJustifiedText extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    _paintSelectionHighlight(context.canvas, offset);
     final canvas = context.canvas;
-    paintSelectionAndHandles(context, offset);
     for (final line in _lines) {
       final y = offset.dy + line.y;
       // Backgrounds and underlines first; consecutive segments with the same
@@ -870,6 +870,7 @@ class RenderHyphenatedJustifiedText extends RenderBox
         hy.seg.painter.paint(canvas, Offset(offset.dx + hy.x, y + hy.dy));
       }
     }
+    _pushHandleAnchors(context, offset);
   }
 
   @override
@@ -1165,15 +1166,24 @@ class RenderHyphenatedJustifiedText extends RenderBox
     return _lines.isEmpty ? null : _lines.last;
   }
 
-  void paintSelectionAndHandles(PaintingContext context, Offset offset) {
-    if (!_hasSelection || _lo == _hi) return;
+  void _paintSelectionHighlight(Canvas canvas, Offset offset) {
+    if (!_hasSelection || _lo == _hi) {
+      return;
+    }
     final color = selectionColor ?? const Color(0x663F6E8C);
     for (final r in _selectionRects()) {
-      context.canvas.drawRect(r.shift(offset), Paint()..color = color);
+      canvas.drawRect(r.shift(offset), Paint()..color = color);
     }
-    final v = _value;
-    final sp = v.startSelectionPoint;
-    final ep = v.endSelectionPoint;
+  }
+
+  /// Anchors for the touch selection handles. Pushing a layer ends the current
+  /// canvas recording, so this MUST run after all text has been painted.
+  void _pushHandleAnchors(PaintingContext context, Offset offset) {
+    if (!_hasSelection || _lo == _hi) {
+      return;
+    }
+    final sp = _value.startSelectionPoint;
+    final ep = _value.endSelectionPoint;
     if (_startHandle != null && sp != null) {
       context.pushLayer(
         LeaderLayer(link: _startHandle!, offset: offset + sp.localPosition),
