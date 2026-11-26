@@ -48,7 +48,20 @@ List<Prayer> prayersForCategory(
   List<Prayer> prayers,
   PrayerMenuCategory category,
   SettingsState settings,
-) => {
-  for (final prayer in prayers)
-    if (prayerBelongsToCategory(prayer, category, settings)) prayer.id: prayer,
-}.values.toList(growable: false);
+) {
+  final direct = {
+    for (final prayer in prayers)
+      if (prayerBelongsToCategory(prayer, category, settings))
+        prayer.id: prayer,
+  };
+  if (category.isProtected &&
+      (category.parentId == null || category.parentId!.isEmpty) &&
+      category.prayerIds.isNotEmpty &&
+      direct.keys.every(category.prayerIds.contains)) {
+    return category.prayerIds
+        .map((id) => direct[id])
+        .whereType<Prayer>()
+        .toList(growable: false);
+  }
+  return direct.values.toList(growable: false);
+}

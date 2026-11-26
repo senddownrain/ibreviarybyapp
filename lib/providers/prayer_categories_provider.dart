@@ -57,7 +57,7 @@ final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
 final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
   final settings = ref.watch(settingsProvider);
   final globalCategories =
-      ref.watch(globalPrayerCategoriesProvider).value ?? [];
+      ref.watch(visibleGlobalPrayerCategoriesProvider).value ?? [];
   return buildPrayerCategoryMenu(
     globalCategories,
     settings.userCategories,
@@ -67,6 +67,23 @@ final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
     allowRestricted: ref.watch(priestAccessProvider).content != null,
   );
 });
+
+// Riverpod retains the previous stream value while a new catalog is emitted.
+// Gate that value against today's access before any screen can render it.
+final visibleGlobalPrayerCategoriesProvider =
+    Provider<AsyncValue<List<PrayerMenuCategory>>>((ref) {
+      final access = ref.watch(priestAccessProvider);
+      final categories = ref.watch(globalPrayerCategoriesProvider);
+      return categories.whenData(
+        (items) => [
+          for (final item in items)
+            if (!item.isProtected)
+              item
+            else if (access.content?.categories[item.id] case final row?)
+              PrayerMenuCategory.global(item.id, row),
+        ],
+      );
+    });
 
 List<PrayerMenuCategory> buildPrayerCategoryMenu(
   List<PrayerMenuCategory> globalCategories,
@@ -83,7 +100,7 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
     for (final category in globalCategories)
       category.id: {
         'parentId': category.parentId,
-        'priestOnly': category.priestOnly,
+        'priestOnly': category.isProtected,
       },
   });
 
@@ -111,7 +128,8 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
   };
   final visible = <String>{};
   for (final category in byId.values) {
-    if (prayersForCategory(permittedPrayers, category, settings).isEmpty) {
+    if (!category.isProtected &&
+        prayersForCategory(permittedPrayers, category, settings).isEmpty) {
       continue;
     }
     var current = category;

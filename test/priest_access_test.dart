@@ -264,6 +264,8 @@ void main() {
       expect(gateway.active, false);
       await controller.activate(validCode, 'Phone');
       expect(controller.state.registered, true);
+      expect(gateway.reads, 0);
+      await controller.loadCatalog();
       expect(controller.state.content!.prayers.length, 4);
       final uid = gateway.uid;
       expect(jsonEncode(storage.record), isNot(contains(validCode)));
@@ -276,6 +278,8 @@ void main() {
       controller.dispose();
       controller = PriestAccessController(gateway, storage);
       await controller.initialize();
+      expect(controller.state.content, isNull);
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       expect(gateway.uid, uid);
       expect(gateway.signups, 1);
@@ -296,9 +300,13 @@ void main() {
       expect(controller.state.content, null);
       expect(await controller.readPrayer('single'), null);
       await controller.resume(online: true);
+      expect(controller.state.content, isNull);
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       controller.suspend(foreground: false);
       await controller.resume(foreground: true);
+      expect(controller.state.content, isNull);
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       expect(gateway.signups, 1);
       gateway.offline = true;
@@ -307,6 +315,7 @@ void main() {
       expect(controller.state.registered, true);
       gateway.offline = false;
       await controller.refresh();
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       controller.dispose();
       await gateway.close();
@@ -339,6 +348,8 @@ void main() {
     expect(controller.state.content, null);
     gateway.offline = false;
     await Future<void>.delayed(const Duration(seconds: 6));
+    expect(controller.state.canLoadCatalog, true);
+    await controller.loadCatalog();
     expect(controller.state.content, isNotNull);
     expect(gateway.signups, 1);
     controller.dispose();
@@ -362,6 +373,7 @@ void main() {
       await controller.initialize();
       gateway.unreadable = false;
       await controller.refresh();
+      await controller.loadCatalog();
       expect(controller.state.content, isNotNull);
       expect(gateway.uid, uid);
       expect(gateway.signups, 1);
@@ -407,7 +419,7 @@ void main() {
     gateway.pauseReader = Completer<void>();
     gateway.pauseContent = Completer<void>();
     final reader = controller.readPrayer('single'),
-        refresh = controller.refresh();
+        refresh = controller.loadCatalog();
     await Future<void>.delayed(Duration.zero);
     await controller.disable();
     gateway.pauseReader!.complete();

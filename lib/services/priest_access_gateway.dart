@@ -4,6 +4,7 @@ class PriestAccessException implements Exception {
   const PriestAccessException(this.code);
   final String code;
   bool get revoked => code == 'ACCESS_REQUIRED';
+  bool get quotaExhausted => code == 'QUOTA_EXHAUSTED';
   String get message => switch (code) {
     'INVALID_CODE' => 'Няправільны код актывацыі.',
     'OFFLINE' => 'Няма злучэння з інтэрнэтам. Паспрабуйце пазней.',
@@ -14,6 +15,7 @@ class PriestAccessException implements Exception {
     'AUTH_DISABLED' =>
       'Ананімная аўтарызацыя выключана. Паведаміце адміністратару.',
     'TOO_MANY_ATTEMPTS' => 'Зашмат спроб. Паспрабуйце пазней.',
+    'QUOTA_EXHAUSTED' => 'Ліміт чытання вычарпаны. Паспрабуйце пазней.',
     'STORAGE' =>
       'Не атрымалася бяспечна захаваць стан доступу. Паспрабуйце яшчэ раз.',
     _ => 'Сэрвіс доступу часова недаступны. Паспрабуйце пазней.',
@@ -46,4 +48,8 @@ abstract class PriestAccessGateway {
   Future<Map<String, dynamic>?> readProtectedPrayer(String uid, String id);
   Future<void> clearProtectedMemory();
   Future<void> close();
+}
+
+abstract interface class PriestSessionChanges {
+  Stream<String?> watchSession();
 }

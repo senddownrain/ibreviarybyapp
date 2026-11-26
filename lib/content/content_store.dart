@@ -79,11 +79,16 @@ class ContentStore {
       Future.wait([for (final name in names) _ensure(name)]);
 
   Future<void> _ensure(String name) {
+    // The baseline can be in memory while its stale overlay is still being
+    // removed. Consumers must wait for both before reading the collection.
+    if (_loading[name] case final pending?) return pending;
     final item = collection(name);
     if (item.isLoaded) return Future.value();
-    return _loading[name] ??= _load(item).whenComplete(() {
-      if (!item.isLoaded) _loading.remove(name);
+    late final Future<void> request;
+    request = _load(item).whenComplete(() {
+      if (identical(_loading[name], request)) _loading.remove(name);
     });
+    return _loading[name] = request;
   }
 
   Future<void> _load(ContentCollection item) async {
