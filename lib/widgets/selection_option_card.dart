@@ -13,6 +13,8 @@ class SelectionOptionCard extends StatelessWidget {
     this.accentColor,
     this.compact = false,
     this.dense = false,
+    this.titleFontSize,
+    this.subtitleFontSize,
   });
 
   final String title;
@@ -23,6 +25,10 @@ class SelectionOptionCard extends StatelessWidget {
   final Color? accentColor;
   final bool compact;
   final bool dense;
+
+  /// Larger text for prominent choices; null keeps the theme sizes.
+  final double? titleFontSize;
+  final double? subtitleFontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +123,7 @@ class SelectionOptionCard extends StatelessWidget {
                                 title,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   color: colors.onSurface,
+                                  fontSize: titleFontSize,
                                   fontWeight: selected
                                       ? FontWeight.w700
                                       : FontWeight.w500,
@@ -128,6 +135,7 @@ class SelectionOptionCard extends StatelessWidget {
                                   subtitle,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: colors.onSurfaceVariant,
+                                    fontSize: subtitleFontSize,
                                   ),
                                 ),
                               ],

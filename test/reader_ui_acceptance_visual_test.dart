@@ -160,7 +160,7 @@ void main() {
       sectionSize,
     );
     expect(
-      tester.widget<Text>(find.text('Стартовы раздзел')).style?.fontSize,
+      tester.widget<Text>(find.text('Пачатковая старонка')).style?.fontSize,
       sectionSize,
     );
     await Scrollable.ensureVisible(

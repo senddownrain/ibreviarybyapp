@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -507,6 +508,30 @@ class SettingsNotifier extends Notifier<SettingsState> {
   void setStartSection(String section) {
     state = state.copyWith(startSection: _validStartSection(section));
     _save();
+  }
+
+  /// Stores the welcome-screen choice. Throws if it could not be written, and
+  /// the welcome screen then stays pending.
+  Future<void> completeOnboarding(String section) async {
+    final valid = _validLastSection(section);
+    try {
+      // The choice goes first: a write cut short leaves the marker pending.
+      await _box.putAll({
+        'startSection': valid,
+        HiveService.onboardingKey: HiveService.onboardingDone,
+      });
+      await _box.flush();
+    } catch (_) {
+      if (_box.isOpen &&
+          _box.get(HiveService.onboardingKey) == HiveService.onboardingDone) {
+        await _box.put(
+          HiveService.onboardingKey,
+          HiveService.onboardingPending,
+        );
+      }
+      rethrow;
+    }
+    state = state.copyWith(startSection: valid);
   }
 
   void rememberLastSection(String section) {

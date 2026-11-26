@@ -35,6 +35,7 @@ import 'package:mybrev_flutter/screens/feedback_screen.dart';
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/screens/song_detail_screen.dart';
 import 'package:mybrev_flutter/screens/songbook_screen.dart';
+import 'package:mybrev_flutter/screens/welcome_screen.dart';
 import 'package:mybrev_flutter/widgets/admin_songbook_guard.dart';
 import 'package:mybrev_flutter/widgets/app_shell.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
@@ -227,7 +228,31 @@ final router = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: _initialLocation(),
   restorationScopeId: 'ibreviary-router',
+  // Covers deep links and restored locations, not only the initial one.
+  redirect: (_, state) =>
+      onboardingRedirect(state.uri.path, pending: HiveService.needsOnboarding),
   routes: [
+    // Outside the shell: no sections, update checks or tour behind it.
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: welcomeRoute,
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: Consumer(
+          builder: (context, ref, _) => WelcomeScreen(
+            onStart: (section) async {
+              await ref
+                  .read(settingsProvider.notifier)
+                  .completeOnboarding(section);
+              // `go` replaces the stack: Back does not return here.
+              if (context.mounted) {
+                context.go(startSectionLocation(section, section));
+              }
+            },
+          ),
+        ),
+      ),
+    ),
     StatefulShellRoute.indexedStack(
       restorationScopeId: 'ibreviary-shell',
       builder: (context, state, navigationShell) => AppShell(
@@ -798,6 +823,15 @@ final router = GoRouter(
     ),
   ],
 );
+
+const welcomeRoute = '/welcome';
+
+/// While the welcome screen is [pending] everything leads to it; afterwards
+/// it is no longer reachable.
+String? onboardingRedirect(String path, {required bool pending}) {
+  if (pending) return path == welcomeRoute ? null : welcomeRoute;
+  return path == welcomeRoute ? _initialLocation() : null;
+}
 
 String _initialLocation() {
   if (bottomNavigationLabEnabled) return bottomNavigationLabRoute;
