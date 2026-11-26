@@ -41,8 +41,10 @@ class _Idle extends ContentUpdatesNotifier {
 }
 
 class _Settings extends SettingsNotifier {
+  // Navigation tests that exercise the palette explicitly enable it.
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() =>
+      const SettingsState(readingsColorHighlightEnabled: true);
   @override
   void rememberLastSection(String section) {}
 }

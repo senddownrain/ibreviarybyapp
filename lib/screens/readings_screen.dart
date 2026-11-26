@@ -371,6 +371,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _toggleSentence(String sentenceId) {
+    if (!ref.read(settingsProvider).readingsColorHighlightEnabled) return;
     ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
     setState(() {
       _selectedSentenceId = _selectedSentenceId == sentenceId
@@ -773,6 +774,14 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         if (mounted) _load();
       });
     });
+    ref.listen<bool>(
+      settingsProvider.select((s) => s.readingsColorHighlightEnabled),
+      (previous, enabled) {
+        if (!enabled && _selectedSentenceId != null) {
+          setState(() => _clearSentenceSelection());
+        }
+      },
+    );
     final sharedPresentation = ref.watch(liturgicalDayPresentationProvider);
     final usesCalendar = widget.liturgicalKey == null;
     final seasonColor = usesCalendar
@@ -1021,6 +1030,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     Color seasonColor,
   ) {
     _loadHighlights(reading.id);
+    final enabled = ref.watch(
+      settingsProvider.select((s) => s.readingsColorHighlightEnabled),
+    );
     final body = _ReadingBody(
       key: ValueKey(
         'reading-document-${reading.id}-'
@@ -1029,9 +1041,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       ),
       reading: reading,
       massSet: massSet,
-      highlights: Map.unmodifiable(_highlights),
-      selectedSentenceId: _selectedSentenceId,
-      onSentenceTap: _toggleSentence,
+      highlights: enabled ? Map.unmodifiable(_highlights) : const {},
+      selectedSentenceId: enabled ? _selectedSentenceId : null,
+      onSentenceTap: enabled ? _toggleSentence : null,
     );
     return body;
   }
@@ -1373,7 +1385,7 @@ class _ReadingBody extends ConsumerWidget {
   final MassSetSelection? massSet;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
   const _ReadingBody({
     super.key,
     required this.reading,
@@ -1566,7 +1578,7 @@ class _MassSetContent extends StatelessWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2127,7 +2139,7 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
     final plainText =
         (widget.isPsalm ? formatReadingPsalmText(widget.text) : widget.text)
             .replaceAll(RegExp(r'\r?\n[ \t]*\r?\n+'), '\n');
-    final sentences = namespace == null
+    final sentences = namespace == null || widget.onSentenceTap == null
         ? <_SentencePart>[_SentencePart(plainText, 0)]
         : _splitReadingSentences(plainText);
     return Text.rich(
@@ -2142,7 +2154,7 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
                 ))
                   TextSpan(
                     text: piece,
-                    recognizer: namespace == null
+                    recognizer: namespace == null || widget.onSentenceTap == null
                         ? null
                         : _recognizerFor('$namespace:${sentence.index}'),
                     style: piece == '*' || piece == '†'
@@ -2219,7 +2231,7 @@ class _ReadingSection extends StatefulWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   /// Gospel (closing «Гэта слова Пана.»); by default from the label.
   final bool? gospel;
