@@ -31,26 +31,38 @@ final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
             if (box.get(key) case final Map data)
               key: Map<String, dynamic>.from(data),
         };
-    final policy = PriestAccessPolicy(source);
-    final documents = [
-      for (final entry in source.entries)
-        if (policy.categoryValid(entry.key) &&
-            (access.content != null || !policy.categoryRestricted(entry.key)))
-          (
-            entry.key,
-            {
-              ...entry.value,
-              'effectivePriestOnly': policy.categoryRestricted(entry.key),
-            },
-          ),
-    ];
-    yield documents
-        .map((item) => PrayerMenuCategory.global(item.$1, item.$2))
-        .where((category) => category.name.isNotEmpty)
-        .toList(growable: false)
-      ..sort(comparePrayerCategories);
+    yield projectPrayerCategories(
+      source,
+      allowRestricted: access.content != null,
+    );
   },
 );
+
+List<PrayerMenuCategory> projectPrayerCategories(
+  Map<String, Map<String, dynamic>> source, {
+  required bool allowRestricted,
+}) {
+  final policy = PriestAccessPolicy(source);
+  return [
+    for (final id in source.keys)
+      if (_projectCategory(policy, id, allowRestricted) case final item?) item,
+  ]..sort(comparePrayerCategories);
+}
+
+PrayerMenuCategory? _projectCategory(
+  PriestAccessPolicy policy,
+  String id,
+  bool allowRestricted,
+) {
+  if (!policy.categoryPublished(id)) return null;
+  final restricted = policy.categoryRestricted(id);
+  if (restricted && !allowRestricted) return null;
+  final category = PrayerMenuCategory.global(id, {
+    ...policy.categories[id]!,
+    'effectivePriestOnly': restricted,
+  });
+  return category.name.isEmpty ? null : category;
+}
 
 /// Combines database-managed defaults with local user customizations.
 /// Global categories win on duplicate names, matching the web application.
@@ -74,13 +86,20 @@ final visibleGlobalPrayerCategoriesProvider =
     Provider<AsyncValue<List<PrayerMenuCategory>>>((ref) {
       final access = ref.watch(priestAccessProvider);
       final categories = ref.watch(globalPrayerCategoriesProvider);
+      final source = (access.content ?? access.publicContent)?.categories;
+      final policy = source == null ? null : PriestAccessPolicy(source);
       return categories.whenData(
         (items) => [
           for (final item in items)
-            if (!item.isProtected)
+            if (policy == null) ...[
+              if (!item.isProtected) item,
+            ] else if (!item.isProtected &&
+                policy.categoryPublished(item.id) &&
+                !policy.categoryRestricted(item.id))
               item
-            else if (access.content?.categories[item.id] case final row?)
-              PrayerMenuCategory.global(item.id, row),
+            else if (_projectCategory(policy, item.id, access.content != null)
+                case final current?)
+              current,
         ],
       );
     });

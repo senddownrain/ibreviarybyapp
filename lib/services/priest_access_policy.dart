@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/prayer_menu_category.dart';
 import 'package:mybrev_flutter/services/prayer_category_membership.dart';
 
 const kMaxPrayerCategoryDepth = 64;
@@ -49,6 +50,17 @@ class PriestAccessPolicy {
       if (parent == null || parent.isEmpty) return _restricted[id] = false;
       current = parent;
     }
+  }
+
+  bool categoryPublished(String id) {
+    if (!categoryValid(id)) return false;
+    String? current = id;
+    while (current != null && current.isNotEmpty) {
+      final category = categories[current]!;
+      if (!isPublishedPrayerCategory(category)) return false;
+      current = category['parentId']?.toString();
+    }
+    return true;
   }
 
   bool prayerRestricted(Map prayer, {String? id}) {

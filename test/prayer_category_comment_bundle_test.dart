@@ -87,7 +87,7 @@ void main() {
         await store.ensureLoaded(const ['prayers', _categories]);
       }
 
-      Future<void> verify({required bool hasComment}) async {
+      Future<void> verify(String? expectedContent) async {
         final container = ProviderContainer(
           overrides: [
             priestAccessProvider.overrideWith(
@@ -102,7 +102,7 @@ void main() {
           final root = categories.singleWhere(
             (category) => category.id == 'root',
           );
-          expect(root.comment != null, hasComment);
+          expect(root.comment?.content, expectedContent);
           expect(container.read(settingsProvider).favoriteIds, ['manual']);
           expect(container.read(settingsProvider).fontSize, 24);
         } finally {
@@ -115,11 +115,14 @@ void main() {
         await Hive.box(
           'settings',
         ).putAll({'favoriteIds': '["manual"]', 'fontSize': 24.0});
-        await verify(hasComment: false);
+        await verify(null);
 
         final next = decodeContentCollection(
           File('$_newFixture/$_categories.json.gz').readAsBytesSync(),
         );
+        final original = next.docs['root']!;
+        final originalComment =
+            (original['comment'] as Map)['content'] as String;
         final remote = FakeRemote({
           _categories: next.docs,
         }, contentVersion: 2000);
@@ -137,12 +140,35 @@ void main() {
 
         await Hive.close();
         await open(fixtureDirectory);
-        await verify(hasComment: true);
+        await verify(originalComment);
 
         await Hive.close();
         await open(_newFixture);
         expect(Hive.box('content_$_categories'), isEmpty);
-        await verify(hasComment: true);
+        await verify(originalComment);
+
+        final updated = {
+          ...original,
+          'comment': {'content': 'Updated text'},
+        };
+        final cleared = {...original}..remove('comment');
+        expect(documentHash(updated), isNot(documentHash(original)));
+        expect(documentHash(cleared), isNot(documentHash(updated)));
+        for (final (version, row, expected) in [
+          (3000, updated, 'Updated text'),
+          (4000, cleared, null),
+        ]) {
+          final remote = FakeRemote({
+            _categories: {...next.docs, 'root': row},
+          }, contentVersion: version);
+          final updater = ContentUpdater(remote: remote);
+          await updater.apply((await updater.check()).plan!);
+          expect(remote.fetched, ['$_categories/root']);
+          await Hive.close();
+          await open(_newFixture);
+          await verify(expected);
+          expect(store.collection(_categories).get('root'), row);
+        }
       } finally {
         await store.idle();
         await gateway.close();

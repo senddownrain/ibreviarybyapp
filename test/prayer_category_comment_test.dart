@@ -6,6 +6,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mybrev_flutter/models/prayer_menu_category.dart';
+import 'package:mybrev_flutter/providers/prayer_categories_provider.dart'
+    show projectPrayerCategories;
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/prayer_category_comment.dart';
@@ -16,6 +18,42 @@ class _Settings extends SettingsNotifier {
 }
 
 void main() {
+  test('category projection removes unpublished and invalid branches', () {
+    final rows = <String, Map<String, dynamic>>{
+      'public': {'name': 'Public'},
+      'unpublished': {'name': 'Hidden', 'published': false},
+      'child': {
+        'name': 'Child',
+        'parentId': 'unpublished',
+        'comment': {'content': 'Unpublished ancestor'},
+      },
+      'orphan': {
+        'name': 'Orphan',
+        'parentId': 'missing',
+        'comment': {'content': 'Invalid ancestor'},
+      },
+      'canonical': {
+        'name': 'Archive',
+        'status': ' ARCHIVED ',
+        'effectiveAccessSets': ['marian'],
+      },
+      'canonical-child': {
+        'name': 'Hidden child',
+        'parentId': 'canonical',
+        'comment': {'content': 'Unpublished protected ancestor'},
+      },
+    };
+    for (final allowRestricted in [false, true]) {
+      expect(
+        projectPrayerCategories(
+          rows,
+          allowRestricted: allowRestricted,
+        ).map((row) => row.id),
+        ['public'],
+      );
+    }
+  });
+
   test(
     'optional category comment uses strict types and respects publication',
     () {

@@ -9,10 +9,12 @@ class PrayerCategoryCommentSection extends StatefulWidget {
   const PrayerCategoryCommentSection({
     super.key,
     required this.comment,
+    this.resetOnChange = false,
     this.onLinkTap,
   });
 
   final PrayerCategoryComment comment;
+  final bool resetOnChange;
   final OnTap? onLinkTap;
 
   @override
@@ -27,6 +29,21 @@ class _PrayerCategoryCommentSectionState
 
   @override
   bool get wantKeepAlive => _expanded;
+
+  @override
+  void didUpdateWidget(PrayerCategoryCommentSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final previous = oldWidget.comment;
+    final current = widget.comment;
+    if (_expanded &&
+        widget.resetOnChange &&
+        (previous.content != current.content ||
+            previous.title != current.title ||
+            previous.sourceId != current.sourceId)) {
+      _expanded = false;
+      updateKeepAlive();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -110,6 +110,10 @@ void main() {
     'grant/merge, background, offline, reopen, revoke: protected data stays off disk',
     () async {
       final gateway = _CategoryGateway();
+      const privateComment = 'PRIVATE LEGACY CATEGORY COMMENT';
+      gateway.fixture.categories['closed-child']!['comment'] = {
+        'content': privateComment,
+      };
       final storage = MemoryStorage();
       final controller = PriestAccessController(
         gateway,
@@ -133,6 +137,12 @@ void main() {
         expect(controller.state.content!.categories['closed']!['prayerIds'], [
           'shared-private',
         ]);
+        final child = controller.state.content!.categories['closed-child']!;
+        expect(
+          PrayerMenuCategory.global('closed-child', child).comment?.content,
+          privateComment,
+        );
+        expect(HiveService.prayerCategoriesBox.get('closed-child'), isNull);
         expect(
           (await controller.readPrayer('shared-private'))!['title'],
           'PRIVATE SHARED FIXTURE',

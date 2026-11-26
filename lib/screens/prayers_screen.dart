@@ -357,6 +357,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
                     : null,
               )),
               comment: comment,
+              resetOnChange: category.isProtected,
               onLinkTap: (url, _, _) {
                 final location = prayerLinkLocation(url);
                 if (location != null) context.push(location);

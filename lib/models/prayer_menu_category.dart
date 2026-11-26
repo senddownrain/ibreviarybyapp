@@ -95,7 +95,11 @@ class PrayerCategoryComment {
 
   static PrayerCategoryComment? fromCategory(Map category) {
     final raw = category['comment'];
-    if (raw is! Map || _unpublished(category) || _unpublished(raw)) return null;
+    if (raw is! Map ||
+        !isPublishedPrayerCategory(category) ||
+        !isPublishedPrayerCategory(raw)) {
+      return null;
+    }
     final content = raw['content'];
     if (content is! String || content.trim().isEmpty) return null;
     return PrayerCategoryComment(
@@ -105,22 +109,21 @@ class PrayerCategoryComment {
     );
   }
 
-  static bool _unpublished(Map document) =>
-      document['published'] == false ||
-      const {
-        'draft',
-        'pending',
-        'review',
-        'rejected',
-        'archived',
-      }.contains(_nonblankString(document['status'])?.toLowerCase());
-
   static String? _nonblankString(Object? value) {
     if (value is! String) return null;
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed;
   }
 }
+
+bool isPublishedPrayerCategory(Map document) =>
+    document['published'] != false &&
+    !const {'draft', 'pending', 'review', 'rejected', 'archived'}.contains(
+      switch (document['status']) {
+        final String status => status.trim().toLowerCase(),
+        _ => null,
+      },
+    );
 
 List<String> _cleanTags(dynamic value) {
   if (value is! Iterable) return const [];

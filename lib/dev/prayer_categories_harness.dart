@@ -12,7 +12,6 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
-import 'package:mybrev_flutter/services/priest_access_policy.dart';
 import 'package:mybrev_flutter/services/priest_access_storage.dart';
 import 'package:mybrev_flutter/theme/app_theme.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
@@ -123,16 +122,12 @@ class _HarnessState extends State<PrayerCategoriesHarness> {
       globalPrayerCategoriesProvider.overrideWith((ref) {
         final current = ref.watch(priestAccessProvider);
         final source = current.content ?? current.publicContent!;
-        final policy = PriestAccessPolicy(source.categories);
-        return Stream.value([
-          for (final e in source.categories.entries)
-            if (policy.categoryValid(e.key) &&
-                (current.content != null || !policy.categoryRestricted(e.key)))
-              PrayerMenuCategory.global(e.key, {
-                ...e.value,
-                'effectivePriestOnly': policy.categoryRestricted(e.key),
-              }),
-        ]);
+        return Stream.value(
+          projectPrayerCategories(
+            source.categories,
+            allowRestricted: current.content != null,
+          ),
+        );
       }),
       protectedPrayerProvider.overrideWith(
         (ref, id) async => ref.watch(priestAccessProvider).content?.prayers[id],
@@ -203,6 +198,13 @@ class CategorySmokeAccess extends PriestAccessController {
     content: value ? fixture : null,
     generation: state.generation + 1,
   );
+
+  void replaceAuthorized(PrayerAccessContent content) =>
+      state = PriestAccessState(
+        publicContent: content.publicOnly,
+        content: content,
+        generation: state.generation,
+      );
 }
 
 class _NoGateway implements PriestAccessGateway {

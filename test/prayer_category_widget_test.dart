@@ -68,6 +68,12 @@ void main() {
       await tester.pumpAndSettle();
       expect(comment, findsOneWidget);
       expect(body, findsNothing);
+      final settings = ProviderScope.containerOf(
+        tester.element(comment),
+      ).read(settingsProvider.notifier);
+      settings.hideGlobalPrayerCategory('comment-leaf');
+      await tester.pumpAndSettle();
+      expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
     },
   );
 
@@ -105,9 +111,29 @@ void main() {
     await tester.tap(find.text('Пра гэты раздзел'));
     await tester.pumpAndSettle();
     expect(text, findsOneWidget);
+    final updated = PrayerAccessContent(content.prayers, {
+      ...content.categories,
+      'closed-comment': {
+        ...content.categories['closed-comment']!,
+        'comment': {'content': 'Updated synthetic restricted comment'},
+      },
+    });
+    controller.replaceAuthorized(updated);
+    await tester.pump();
+    final updatedText = find.text(
+      'Updated synthetic restricted comment',
+      findRichText: true,
+    );
+    expect(text, findsNothing);
+    expect(updatedText, findsNothing);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.pumpAndSettle();
+    expect(updatedText, findsOneWidget);
     controller.setGranted(false);
     await tester.pump();
     expect(text, findsNothing);
+    expect(updatedText, findsNothing);
     expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
   });
 
