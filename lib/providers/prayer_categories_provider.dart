@@ -45,7 +45,7 @@ List<PrayerMenuCategory> projectPrayerCategories(
   final policy = PriestAccessPolicy(source);
   return [
     for (final id in source.keys)
-      if (_projectCategory(policy, id, allowRestricted) case final item?) item,
+      ?_projectCategory(policy, id, allowRestricted),
   ]..sort(comparePrayerCategories);
 }
 
@@ -88,18 +88,20 @@ final visibleGlobalPrayerCategoriesProvider =
       final categories = ref.watch(globalPrayerCategoriesProvider);
       final source = (access.content ?? access.publicContent)?.categories;
       final policy = source == null ? null : PriestAccessPolicy(source);
+      if (policy == null) {
+        return categories.whenData(
+          (items) => items.where((item) => !item.isProtected).toList(),
+        );
+      }
       return categories.whenData(
         (items) => [
           for (final item in items)
-            if (policy == null) ...[
-              if (!item.isProtected) item,
-            ] else if (!item.isProtected &&
+            if (!item.isProtected &&
                 policy.categoryPublished(item.id) &&
                 !policy.categoryRestricted(item.id))
               item
-            else if (_projectCategory(policy, item.id, access.content != null)
-                case final current?)
-              current,
+            else
+              ?_projectCategory(policy, item.id, access.content != null),
         ],
       );
     });

@@ -28,7 +28,7 @@ Map<String, dynamic> _category(
   'accessSets': sets,
   'effectiveAccessSets': sets,
   'contentHash': '0' * 64,
-  if (parent != null) 'parentId': parent,
+  'parentId': ?parent,
   'comment': {'content': _privateComment},
 };
 
@@ -94,7 +94,7 @@ class _UpdatingGateway extends TestAccessSets
       reads.add((kind, id));
       await pauseRead?.future;
       if (categories[id] case final row?) {
-        return {...row, if (hashes[id] case final hash?) 'contentHash': hash};
+        return {...row, 'contentHash': ?hashes[id]};
       }
       return null;
     }
