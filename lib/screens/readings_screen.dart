@@ -47,6 +47,7 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/reading_alignment.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
@@ -2089,9 +2090,18 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
 
   @override
   Widget build(BuildContext context) {
-    final alignment = widget.isProse
-        ? ref.watch(settingsProvider.select((s) => s.textAlignment))
-        : TextAlign.left;
+    if (!widget.isProse) return _buildContent(context, TextAlign.left);
+    // The saved choice is only read here; narrow columns / large type draw
+    // justified prose left-aligned without touching the setting.
+    final selected = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    return AdaptiveProseAlignment(
+      selected: selected,
+      style: widget.textStyle,
+      builder: _buildContent,
+    );
+  }
+
+  Widget _buildContent(BuildContext context, TextAlign alignment) {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
       return Html(

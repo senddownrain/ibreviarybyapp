@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/reading_alignment.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
 
@@ -116,7 +117,21 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   }
 
   Widget _buildRendered(String text, TextStyle textStyle) {
-    final alignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    final selected = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    return AdaptiveProseAlignment(
+      selected: selected,
+      style: textStyle,
+      builder: (context, alignment) =>
+          _renderProse(context, text, textStyle, alignment),
+    );
+  }
+
+  Widget _renderProse(
+    BuildContext context,
+    String text,
+    TextStyle textStyle,
+    TextAlign alignment,
+  ) {
     if (text.contains('<') && text.contains('>')) {
       final reader = ReaderTheme.of(context);
       final styles = liturgicalDocumentStyles(reader: reader, body: textStyle);
