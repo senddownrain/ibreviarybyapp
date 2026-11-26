@@ -1,0 +1,31 @@
+name: Flutter PR CI
+
+on:
+  pull_request:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  settings-contract:
+    name: Flutter Settings contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read Flutter version
+        id: flutter
+        run: echo "version=$(tool/release/flutter_version.sh)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter.outputs.version }}
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: >-
+          flutter test --no-pub
+          test/settings_screen_contract_test.dart
+          test/platform_design_test.dart
+          test/ordo_day_flow_test.dart

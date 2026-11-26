@@ -371,6 +371,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _toggleSentence(String sentenceId) {
+    if (!ref.read(settingsProvider).readingsHighlightEnabled) return;
     ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
     setState(() {
       _selectedSentenceId = _selectedSentenceId == sentenceId
@@ -767,6 +768,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final highlightEnabled = ref.watch(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+    );
+    ref.listen(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+      (_, enabled) {
+        if (!enabled && _selectedSentenceId != null) {
+          setState(() => _clearSentenceSelection());
+        }
+      },
+    );
     _refreshOptionsAfterFrame();
     ref.listen(dioceseSelectionProvider, (previous, next) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -829,7 +841,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReadingBody(reading, selection.massSet, seasonColor),
+                _buildReadingBody(
+                  reading,
+                  selection.massSet,
+                  seasonColor,
+                  highlightEnabled,
+                ),
                 // Attribution is available in the app's dedicated Sources page.
                 const SizedBox(key: Key('readings-document-end')),
               ],
@@ -897,72 +914,72 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
             padding: EdgeInsets.symmetric(horizontal: usesCalendar ? 0 : 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (usesCalendar)
-                LiturgicalDayHeader(
-                  sectionTitle: 'Чытанні дня',
-                  keyPrefix: 'readings',
-                  presentation: sharedPresentation,
-                  onDateTap: _showDateActions,
-                  // Proper festal readings can be year-independent and
-                  // therefore have no document cycle. The calendar year
-                  // remains visible as context even for those readings.
-                  metadata: [
-                    sharedPresentation.weekday,
-                    'Год ${cycleLabel ?? _cycleLabel(getCycleForDate(sharedPresentation.date))}',
-                  ].join(' · '),
-                  onToday: () => ref
-                      .read(liturgicalNavigationControllerProvider)
-                      .openDate(DateTime.now()),
-                  onVariants: _showOptions,
-                  onPrevious: () => _openRelativeDate(-1),
-                  onNext: () => _openRelativeDate(1),
-                  dateHint: DiscoveryHintSlot(
-                    anchorIds: const ['calendar.date.button'],
-                    onShow: _showDateActions,
+              children: [
+                if (usesCalendar)
+                  LiturgicalDayHeader(
+                    sectionTitle: 'Чытанні дня',
+                    keyPrefix: 'readings',
+                    presentation: sharedPresentation,
+                    onDateTap: _showDateActions,
+                    // Proper festal readings can be year-independent and
+                    // therefore have no document cycle. The calendar year
+                    // remains visible as context even for those readings.
+                    metadata: [
+                      sharedPresentation.weekday,
+                      'Год ${cycleLabel ?? _cycleLabel(getCycleForDate(sharedPresentation.date))}',
+                    ].join(' · '),
+                    onToday: () => ref
+                        .read(liturgicalNavigationControllerProvider)
+                        .openDate(DateTime.now()),
+                    onVariants: _showOptions,
+                    onPrevious: () => _openRelativeDate(-1),
+                    onNext: () => _openRelativeDate(1),
+                    dateHint: DiscoveryHintSlot(
+                      anchorIds: const ['calendar.date.button'],
+                      onShow: _showDateActions,
+                    ),
+                    variantsHint: DiscoveryHintSlot(
+                      anchorIds: const [
+                        'readings.day_variants.button',
+                        'readings.cycle.button',
+                      ],
+                      onShow: _showOptions,
+                    ),
+                  )
+                else ...[
+                  Text(
+                    'Чытанні дня',
+                    style: ReaderTheme.of(context).displayTitle(36),
                   ),
-                  variantsHint: DiscoveryHintSlot(
-                    anchorIds: const [
-                      'readings.day_variants.button',
-                      'readings.cycle.button',
-                    ],
-                    onShow: _showOptions,
+                  const SizedBox(height: 16),
+                  Text(
+                    contextTitle,
+                    style: ReaderTheme.of(context).displayTitle(29),
                   ),
-                )
-              else ...[
-                Text(
-                  'Чытанні дня',
-                  style: ReaderTheme.of(context).displayTitle(36),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  contextTitle,
-                  style: ReaderTheme.of(context).displayTitle(29),
-                ),
-                TextButton(
-                  onPressed: _showDateActions,
-                  child: const Text('Выбраць дату'),
-                ),
+                  TextButton(
+                    onPressed: _showDateActions,
+                    child: const Text('Выбраць дату'),
+                  ),
+                ],
+                if (cycleMetadata != null &&
+                    (!usesCalendar || manualGroup || _manualCycle != null)) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    cycleMetadata,
+                    key: const Key('readings-cycle-metadata'),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+                if (!usesCalendar && !_loading && _error == null && _hasOptions)
+                  TextButton.icon(
+                    key: const Key('readings-options-action'),
+                    onPressed: _showOptions,
+                    icon: const Icon(Icons.tune_rounded, size: 18),
+                    label: const Text('Іншыя варыянты'),
+                  ),
               ],
-              if (cycleMetadata != null &&
-                  (!usesCalendar || manualGroup || _manualCycle != null)) ...[
-                const SizedBox(height: 10),
-                Text(
-                  cycleMetadata,
-                  key: const Key('readings-cycle-metadata'),
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-              if (!usesCalendar && !_loading && _error == null && _hasOptions)
-                TextButton.icon(
-                  key: const Key('readings-options-action'),
-                  onPressed: _showOptions,
-                  icon: const Icon(Icons.tune_rounded, size: 18),
-                  label: const Text('Іншыя варыянты'),
-                ),
-            ],
             ),
           ),
         ),
@@ -1019,6 +1036,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     ParsedReading reading,
     MassSetSelection? massSet,
     Color seasonColor,
+    bool highlightEnabled,
   ) {
     _loadHighlights(reading.id);
     final body = _ReadingBody(
@@ -1029,9 +1047,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       ),
       reading: reading,
       massSet: massSet,
-      highlights: Map.unmodifiable(_highlights),
-      selectedSentenceId: _selectedSentenceId,
-      onSentenceTap: _toggleSentence,
+      highlights: highlightEnabled ? Map.unmodifiable(_highlights) : const {},
+      selectedSentenceId: highlightEnabled ? _selectedSentenceId : null,
+      onSentenceTap: highlightEnabled ? _toggleSentence : null,
     );
     return body;
   }
@@ -1373,7 +1391,7 @@ class _ReadingBody extends ConsumerWidget {
   final MassSetSelection? massSet;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
   const _ReadingBody({
     super.key,
     required this.reading,
@@ -1566,7 +1584,7 @@ class _MassSetContent extends StatelessWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2008,7 +2026,10 @@ class _SectionLabel extends StatelessWidget {
         top: LiturgicalSpacing.sectionBefore,
         bottom: LiturgicalSpacing.sectionTitleToBody,
       ),
-      child: Text(_readingLabel(text).toUpperCase(), style: rubric.readingsSectionHeading(base)),
+      child: Text(
+        _readingLabel(text).toUpperCase(),
+        style: rubric.readingsSectionHeading(base),
+      ),
     );
   }
 }
@@ -2111,8 +2132,10 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
         style: {
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
           if (widget.isProse) ...{
-            'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
-              ..textAlign = alignment,
+            'body': liturgicalDocumentStyles(
+              reader: reader,
+              body: widget.textStyle,
+            )['body']!..textAlign = alignment,
             'p': Style(
               textAlign: alignment,
               margin: Margins.only(bottom: LiturgicalSpacing.paragraphAfter),
@@ -2142,7 +2165,8 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
                 ))
                   TextSpan(
                     text: piece,
-                    recognizer: namespace == null
+                    recognizer:
+                        namespace == null || widget.onSentenceTap == null
                         ? null
                         : _recognizerFor('$namespace:${sentence.index}'),
                     style: piece == '*' || piece == '†'
@@ -2219,7 +2243,7 @@ class _ReadingSection extends StatefulWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   /// Gospel (closing «Гэта слова Пана.»); by default from the label.
   final bool? gospel;
