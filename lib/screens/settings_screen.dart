@@ -302,7 +302,11 @@ class _TextSection extends ConsumerWidget {
             isDense: MediaQuery.textScalerOf(context).scale(1) <= 1.3,
             itemHeight: null,
             selectedItemBuilder: (context) => [
-              for (final option in kAvailableReaderFonts) Text(option.label),
+              for (final option in kAvailableReaderFonts)
+                if (option.id == settings.fontFamily)
+                  Text(option.label)
+                else
+                  const SizedBox.shrink(),
             ],
             items: [
               for (final option in kAvailableReaderFonts)
