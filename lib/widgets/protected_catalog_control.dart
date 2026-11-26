@@ -39,7 +39,21 @@ class _ProtectedCatalogControlState
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(priestAccessProvider.select((value) => value.canLoadCatalog), (
+      _,
+      canLoad,
+    ) {
+      if (_visible && canLoad) {
+        unawaited(ref.read(priestAccessProvider.notifier).loadCatalog());
+      }
+    });
     final state = ref.watch(priestAccessProvider);
+    if (state.catalogLoading && !state.offlineReady) {
+      return Padding(
+        padding: widget.padding,
+        child: const LinearProgressIndicator(),
+      );
+    }
     if (!state.quotaBlocked &&
         (!state.canLoadCatalog || state.content != null)) {
       return const SizedBox.shrink();
@@ -47,18 +61,16 @@ class _ProtectedCatalogControlState
     final access = ref.read(priestAccessProvider.notifier);
     return Padding(
       padding: widget.padding,
-      child: state.catalogLoading
-          ? const LinearProgressIndicator()
-          : TextButton(
-              onPressed: state.quotaBlocked
-                  ? access.retryAfterQuota
-                  : access.loadCatalog,
-              child: Text(
-                state.quotaBlocked
-                    ? 'Паўтарыць праверку доступу'
-                    : 'Паказаць дадатковыя малітвы',
-              ),
-            ),
+      child: TextButton(
+        onPressed: state.quotaBlocked
+            ? access.retryAfterQuota
+            : access.loadCatalog,
+        child: Text(
+          state.quotaBlocked
+              ? 'Паўтарыць праверку доступу'
+              : 'Паказаць дадатковыя малітвы',
+        ),
+      ),
     );
   }
 }

@@ -77,9 +77,10 @@ final visibleGlobalPrayerCategoriesProvider =
       return categories.whenData(
         (items) => [
           for (final item in items)
-            if (!item.priestOnly ||
-                access.content?.categories.containsKey(item.id) == true)
-              item,
+            if (!item.isProtected)
+              item
+            else if (access.content?.categories[item.id] case final row?)
+              PrayerMenuCategory.global(item.id, row),
         ],
       );
     });
@@ -99,7 +100,7 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
     for (final category in globalCategories)
       category.id: {
         'parentId': category.parentId,
-        'priestOnly': category.priestOnly,
+        'priestOnly': category.isProtected,
       },
   });
 
@@ -127,7 +128,8 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
   };
   final visible = <String>{};
   for (final category in byId.values) {
-    if (prayersForCategory(permittedPrayers, category, settings).isEmpty) {
+    if (!category.isProtected &&
+        prayersForCategory(permittedPrayers, category, settings).isEmpty) {
       continue;
     }
     var current = category;

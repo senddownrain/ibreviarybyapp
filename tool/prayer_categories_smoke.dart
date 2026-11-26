@@ -38,6 +38,13 @@ void main() {
         'title': 'PRIVATE SHARED FIXTURE',
         'text': 'PRIVATE TEXT FIXTURE',
       },
+      'marian-fixture': {
+        'title': 'Малітва для праверкі рубрык',
+        'textFormat': 'mybrev-markdown',
+        'text':
+            ':::rubric\nРубрыка для праверкі\n:::\n\nЛ. За нашую краіну\nУ. Пане, пачуй нас.\n\n_(аўтар)_',
+        'effectiveAccessSets': ['marian'],
+      },
     },
     {
       'root': {
@@ -65,9 +72,15 @@ void main() {
       'legacy': {'name': 'Іншыя малітвы', 'tags': [], 'order': 20},
       'folder': {'name': 'Empty fixture folder', 'tags': [], 'order': 30},
       'closed': {
-        'name': 'PRIVATE CATEGORY FIXTURE',
+        'name': 'Для святара',
         'priestOnly': true,
         'prayerIds': ['shared-private'],
+      },
+      'marian-fixture': {
+        'name': 'Для марыянаў',
+        'effectiveAccessSets': ['marian'],
+        'iconKey': 'virgin-mary',
+        'prayerIds': ['marian-fixture'],
       },
     },
   );

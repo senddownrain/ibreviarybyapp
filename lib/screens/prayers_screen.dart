@@ -333,7 +333,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       settings,
     );
     return _PrayerListPage(
-      title: category.name,
+      title: category.readerName,
       subtitle: 'Малітвы гэтай катэгорыі',
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
@@ -861,13 +861,32 @@ class _CategoryRow extends StatelessWidget {
   final PrayerMenuCategory category;
 
   @override
-  Widget build(BuildContext context) => _DestinationRow(
-    key: ValueKey('category-${category.id}'),
-    title: category.name,
-    leading: CategoryIcon(category.displayIconKey),
-    onTap: () =>
-        context.push('/prayers/category/${Uri.encodeComponent(category.id)}'),
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final accent = category.isProtected
+        ? Color.lerp(colors.onSurfaceVariant, colors.primary, 0.42)
+        : null;
+    return _DestinationRow(
+      key: ValueKey('category-${category.id}'),
+      title: category.readerName,
+      titleColor: accent,
+      leading: CategoryIcon(category.displayIconKey, color: accent),
+      trailing: accent == null
+          ? null
+          : SizedBox.square(
+              dimension: 24,
+              child: Center(
+                child: PhosphorIcon(
+                  PhosphorIconsRegular.lockSimple,
+                  size: 15,
+                  color: accent,
+                ),
+              ),
+            ),
+      onTap: () =>
+          context.push('/prayers/category/${Uri.encodeComponent(category.id)}'),
+    );
+  }
 }
 
 class _DestinationRow extends StatelessWidget {
@@ -876,6 +895,8 @@ class _DestinationRow extends StatelessWidget {
     required this.title,
     this.icon,
     this.leading,
+    this.trailing,
+    this.titleColor,
     required this.onTap,
     this.subtitle,
   }) : assert(icon != null || leading != null);
@@ -883,6 +904,8 @@ class _DestinationRow extends StatelessWidget {
   final String? subtitle;
   final IconData? icon;
   final Widget? leading;
+  final Widget? trailing;
+  final Color? titleColor;
   final VoidCallback onTap;
 
   @override
@@ -890,9 +913,12 @@ class _DestinationRow extends StatelessWidget {
     contentPadding: EdgeInsets.zero,
     minTileHeight: 58,
     leading: leading ?? Icon(icon),
-    title: Text(title),
+    title: Text(
+      title,
+      style: titleColor == null ? null : TextStyle(color: titleColor),
+    ),
     subtitle: subtitle == null ? null : Text(subtitle!),
-    trailing: const Icon(Icons.chevron_right_rounded),
+    trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
     onTap: onTap,
   );
 }
@@ -916,7 +942,7 @@ class _ManageCategoryRow extends StatelessWidget {
   Widget build(BuildContext context) => ListTile(
     contentPadding: EdgeInsets.zero,
     leading: CategoryIcon(category.displayIconKey),
-    title: Text(category.name),
+    title: Text(category.readerName),
     subtitle: Text(
       category.isGlobal ? 'Стандартная катэгорыя' : 'Ваша катэгорыя',
     ),
