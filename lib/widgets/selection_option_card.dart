@@ -15,6 +15,7 @@ class SelectionOptionCard extends StatelessWidget {
     this.dense = false,
     this.titleFontSize,
     this.subtitleFontSize,
+    this.padding,
   });
 
   final String title;
@@ -29,6 +30,9 @@ class SelectionOptionCard extends StatelessWidget {
   /// Larger text for prominent choices; null keeps the theme sizes.
   final double? titleFontSize;
   final double? subtitleFontSize;
+
+  /// Overrides the inner padding for tightly fitted lists.
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +77,12 @@ class SelectionOptionCard extends StatelessWidget {
             onTap: onTap,
             borderRadius: radius,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: compact ? 4 : 16,
-                vertical: compact || dense ? 10 : 14,
-              ),
+              padding:
+                  padding ??
+                  EdgeInsets.symmetric(
+                    horizontal: compact ? 4 : 16,
+                    vertical: compact || dense ? 10 : 14,
+                  ),
               child: compact
                   ? Column(
                       mainAxisSize: MainAxisSize.min,

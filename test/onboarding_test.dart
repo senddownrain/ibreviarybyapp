@@ -89,7 +89,10 @@ void main() {
         'startSection': section,
         HiveService.onboardingKey: HiveService.onboardingDone,
       });
-      expect(onboardingRedirect(welcomeRoute, pending: false), location);
+      expect(
+        onboardingRedirect(Uri.parse(welcomeRoute), pending: false),
+        location,
+      );
     });
   }
 
@@ -118,10 +121,29 @@ void main() {
   });
 
   test('every location leads to the welcome screen while pending', () {
-    for (final path in ['/', '/hours', '/bible', '/settings', '/about']) {
-      expect(onboardingRedirect(path, pending: true), welcomeRoute);
-      expect(onboardingRedirect(path, pending: false), isNull);
+    for (final path in ['/hours', '/bible', '/settings', '/about']) {
+      final target = onboardingRedirect(Uri.parse(path), pending: true)!;
+      expect(Uri.parse(target).path, welcomeRoute);
+      expect(onboardingRedirect(Uri.parse(target), pending: true), isNull);
+      expect(onboardingRedirect(Uri.parse(path), pending: false), isNull);
     }
-    expect(onboardingRedirect(welcomeRoute, pending: true), isNull);
+    expect(onboardingRedirect(Uri.parse('/'), pending: true), welcomeRoute);
+  });
+
+  test('a deep link survives the welcome screen with its query', () {
+    const link = '/readings?date=2026-12-25&diocese=pinsk';
+    final welcome = Uri.parse(
+      onboardingRedirect(Uri.parse(link), pending: true)!,
+    );
+    expect(welcomeDeepLink(welcome), link);
+    // A reload after the choice goes where the link pointed.
+    expect(onboardingRedirect(welcome, pending: false), link);
+  });
+
+  test('only in-app locations are accepted as a deep link', () {
+    for (final from in ['https://x.test/a', '//x.test/a', 'a', '/welcome']) {
+      final welcome = Uri(path: welcomeRoute, queryParameters: {'from': from});
+      expect(welcomeDeepLink(welcome), isNull, reason: from);
+    }
   });
 }

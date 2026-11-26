@@ -105,11 +105,21 @@ void main() {
     }
   }
 
-  testWidgets('at normal text size everything fits a standard phone', (
-    tester,
-  ) async {
-    await _pump(tester);
-    final scroll = tester.state<ScrollableState>(find.byType(Scrollable));
-    expect(scroll.position.maxScrollExtent, 0);
-  });
+  for (final (size, top, bottom) in const [
+    (Size(320, 568), 20.0, 0.0),
+    (Size(360, 640), 24.0, 0.0),
+    (Size(375, 667), 20.0, 0.0),
+    (Size(390, 844), 47.0, 34.0),
+  ]) {
+    testWidgets('at normal text size everything fits $size', (tester) async {
+      tester.view.padding = FakeViewPadding(top: top, bottom: bottom);
+      await _pump(tester, size: size);
+      final scroll = tester.state<ScrollableState>(find.byType(Scrollable));
+      expect(scroll.position.maxScrollExtent, 0);
+      expect(
+        tester.getSize(find.byKey(const Key('welcome-option-bible'))).height,
+        greaterThanOrEqualTo(48),
+      );
+    });
+  }
 }

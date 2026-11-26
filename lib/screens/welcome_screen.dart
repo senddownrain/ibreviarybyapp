@@ -71,19 +71,59 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final muted = theme.colorScheme.onSurfaceVariant;
+    final textScale = MediaQuery.textScalerOf(context).scale(10) / 10;
     return Scaffold(
       body: AmbientBackdrop(
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final short = constraints.maxHeight < 700;
-              final gap = short ? 12.0 : 20.0;
+              // Small phones: the icon moves beside the name and the spacing
+              // tightens, so that the button is visible without scrolling.
+              final small = constraints.maxHeight < 620;
+              final medium = !small && constraints.maxHeight < 740;
+              final gap = small
+                  ? 8.0
+                  : medium
+                  ? 14.0
+                  : 20.0;
               // Narrow screen with large text: drop the decorative icons so
               // that words are not broken in the middle.
-              final icons =
-                  constraints.maxWidth /
-                      (MediaQuery.textScalerOf(context).scale(10) / 10) >=
-                  250;
+              final icons = constraints.maxWidth / textScale >= 250;
+              final mark = Image.asset(
+                'assets/brand_mark.png',
+                width: small
+                    ? 48
+                    : medium
+                    ? 64
+                    : 88,
+                height: small
+                    ? 48
+                    : medium
+                    ? 64
+                    : 88,
+                filterQuality: FilterQuality.medium,
+                excludeFromSemantics: true,
+              );
+              final name = Semantics(
+                header: true,
+                // One word: shrink rather than break it.
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Малітоўнік',
+                    style:
+                        (small
+                                ? theme.textTheme.headlineSmall
+                                : theme.textTheme.headlineMedium)
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              );
+              final tagline = Text(
+                'Малітва і Божае слова на кожны дзень',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(color: muted),
+              );
               return SingleChildScrollView(
                 key: const Key('welcome-scroll'),
                 child: ConstrainedBox(
@@ -93,71 +133,65 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       constraints: const BoxConstraints(maxWidth: 520),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: short ? 12 : 24,
+                          horizontal: small ? 16 : 20,
+                          vertical: small ? 6 : 16,
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Center(
-                              child: Image.asset(
-                                'assets/brand_mark.png',
-                                width: short ? 64 : 96,
-                                height: short ? 64 : 96,
-                                filterQuality: FilterQuality.medium,
-                                excludeFromSemantics: true,
+                            if (small && textScale <= 1.3) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  mark,
+                                  const SizedBox(width: 12),
+                                  Flexible(child: name),
+                                ],
                               ),
-                            ),
-                            SizedBox(height: short ? 8 : 12),
-                            Semantics(
-                              header: true,
-                              // One word: shrink rather than break it.
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  'Малітоўнік',
-                                  style: theme.textTheme.headlineMedium
-                                      ?.copyWith(fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Малітва і Божае слова на кожны дзень',
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: muted,
-                              ),
-                            ),
+                              const SizedBox(height: 4),
+                            ] else ...[
+                              Center(child: mark),
+                              const SizedBox(height: 8),
+                              name,
+                              const SizedBox(height: 4),
+                            ],
+                            tagline,
                             SizedBox(height: gap),
                             Text(
                               'З чаго жадаеце пачынаць?',
                               textAlign: TextAlign.center,
                               style: theme.textTheme.titleMedium,
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: small ? 6 : 12),
                             for (final section in kWelcomeSections)
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
+                                padding: EdgeInsets.only(bottom: small ? 6 : 8),
                                 child: SelectionOptionCard(
                                   key: Key('welcome-option-${section.id}'),
                                   title: section.title,
                                   subtitle: section.description,
                                   titleFontSize: 18,
                                   subtitleFontSize: 14,
-                                  dense: short,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: small ? 12 : 16,
+                                    vertical: small
+                                        ? 6
+                                        : medium
+                                        ? 9
+                                        : 14,
+                                  ),
                                   leading: icons ? Icon(section.icon) : null,
                                   selected: _selected == section.id,
                                   onTap: () =>
                                       setState(() => _selected = section.id),
                                 ),
                               ),
-                            SizedBox(height: gap - 8),
+                            SizedBox(height: small ? 0 : gap - 8),
                             FilledButton(
                               key: const Key('welcome-start'),
                               style: FilledButton.styleFrom(
-                                minimumSize: const Size.fromHeight(52),
+                                minimumSize: Size.fromHeight(small ? 48 : 52),
                                 textStyle: theme.textTheme.titleMedium,
                               ),
                               onPressed: _selected == null || _saving
@@ -165,7 +199,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   : _start,
                               child: const Text('Пачаць'),
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: small ? 6 : 10),
                             Text(
                               'Пачатковую старонку можна змяніць у наладах.',
                               textAlign: TextAlign.center,

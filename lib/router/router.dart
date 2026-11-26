@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
+import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
 import 'package:mybrev_flutter/discovery/ui/p1_hint_hosts.dart';
 import 'package:mybrev_flutter/discovery/ui/p2_hint_hosts.dart';
 import 'package:mybrev_flutter/models/mass_ritual.dart';
@@ -226,11 +227,14 @@ final appShellState = AppShellState(
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: _initialLocation(),
+  // A deep link from the platform replaces this and is kept by [redirect].
+  initialLocation: HiveService.needsOnboarding
+      ? welcomeRoute
+      : _initialLocation(),
   restorationScopeId: 'ibreviary-router',
   // Covers deep links and restored locations, not only the initial one.
   redirect: (_, state) =>
-      onboardingRedirect(state.uri.path, pending: HiveService.needsOnboarding),
+      onboardingRedirect(state.uri, pending: HiveService.needsOnboarding),
   routes: [
     // Outside the shell: no sections, update checks or tour behind it.
     GoRoute(
@@ -244,10 +248,14 @@ final router = GoRouter(
               await ref
                   .read(settingsProvider.notifier)
                   .completeOnboarding(section);
+              if (!context.mounted) return;
+              // The tour is not offered right on top of the welcome screen.
+              ref.read(tourInviteDeferredProvider.notifier).state = true;
               // `go` replaces the stack: Back does not return here.
-              if (context.mounted) {
-                context.go(startSectionLocation(section, section));
-              }
+              context.go(
+                welcomeDeepLink(state.uri) ??
+                    startSectionLocation(section, section),
+              );
             },
           ),
         ),
@@ -826,11 +834,28 @@ final router = GoRouter(
 
 const welcomeRoute = '/welcome';
 
-/// While the welcome screen is [pending] everything leads to it; afterwards
-/// it is no longer reachable.
-String? onboardingRedirect(String path, {required bool pending}) {
-  if (pending) return path == welcomeRoute ? null : welcomeRoute;
-  return path == welcomeRoute ? _initialLocation() : null;
+/// While the welcome screen is [pending] everything leads to it, and the
+/// requested location travels along in `from`; afterwards it is not reachable.
+String? onboardingRedirect(Uri uri, {required bool pending}) {
+  if (uri.path == welcomeRoute) {
+    return pending ? null : welcomeDeepLink(uri) ?? _initialLocation();
+  }
+  if (!pending) return null;
+  if (uri.path.isEmpty || uri.path == '/') return welcomeRoute;
+  final from = Uri(path: uri.path, query: uri.hasQuery ? uri.query : null);
+  return Uri(
+    path: welcomeRoute,
+    queryParameters: {'from': from.toString()},
+  ).toString();
+}
+
+/// The in-app location that was asked for before the welcome screen.
+String? welcomeDeepLink(Uri welcome) {
+  final from = welcome.queryParameters['from'];
+  final uri = from == null ? null : Uri.tryParse(from);
+  if (uri == null || uri.hasScheme || uri.hasAuthority) return null;
+  if (!uri.path.startsWith('/') || uri.path == welcomeRoute) return null;
+  return from;
 }
 
 String _initialLocation() {
