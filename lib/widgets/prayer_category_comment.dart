@@ -43,16 +43,19 @@ class _PrayerCategoryCommentSectionState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Semantics(
-            button: true,
-            expanded: _expanded,
-            child: ListTile(
-              title: Text(comment.title ?? 'Пра гэты раздзел'),
-              trailing: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
-              onTap: () {
-                setState(() => _expanded = !_expanded);
-                updateKeepAlive();
-              },
+          MergeSemantics(
+            child: Semantics(
+              expanded: _expanded,
+              child: ListTile(
+                title: Text(comment.title ?? 'Пра гэты раздзел'),
+                trailing: Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                ),
+                onTap: () {
+                  setState(() => _expanded = !_expanded);
+                  updateKeepAlive();
+                },
+              ),
             ),
           ),
           if (_expanded)

@@ -1,4 +1,4 @@
-import 'dart:ui' show Tristate;
+import 'dart:ui' show SemanticsAction, Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -89,18 +89,16 @@ void main() {
     );
     final tile = find.ancestor(
       of: find.byType(ListTile),
-      matching: find.byWidgetPredicate(
-        (widget) => widget is Semantics && widget.properties.expanded != null,
-      ),
+      matching: find.byType(MergeSemantics),
     );
     final body = find.byType(Html);
     final source = find.text('Крыніца: Малітоўнік «Ойча наш» (Мінск, 2022)');
     expect(body, findsNothing);
     expect(source, findsNothing);
-    expect(
-      tester.getSemantics(tile).flagsCollection.isExpanded,
-      Tristate.isFalse,
-    );
+    final collapsed = tester.getSemantics(tile).getSemanticsData();
+    expect(collapsed.flagsCollection.isExpanded, Tristate.isFalse);
+    expect(collapsed.flagsCollection.isButton, isTrue);
+    expect(collapsed.hasAction(SemanticsAction.tap), isTrue);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
