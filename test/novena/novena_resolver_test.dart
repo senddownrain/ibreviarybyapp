@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/novena/novena_definition.dart';
 
 import 'support.dart';
@@ -60,6 +61,30 @@ void main() {
           data['novenaId'],
     ];
     expect(unsupported, isEmpty);
+  });
+
+  test('all ready definitions assemble the way the app reads prayers', () {
+    // The app hands over parsed Prayer models, not the raw documents.
+    final prayers = {
+      for (final MapEntry(:key, :value) in bundledDocs('prayers').entries)
+        if (Prayer.fromMap(value, key) case final prayer
+            when !prayer.priestOnly)
+          key: NovenaPrayer(
+            id: key,
+            title: prayer.title,
+            text: prayer.displayText,
+          ),
+    };
+    final raw = bundledPrayers();
+    for (final data in readyDefinitions()) {
+      final definition = NovenaDefinition.tryParse(data)!;
+      List<String>? texts(Map<String, NovenaPrayer> from) => definition
+          .resolveAll(from)
+          ?.expand((day) => day.map((block) => block.markdown))
+          .toList();
+      expect(texts(prayers), isNotNull, reason: definition.title);
+      expect(texts(prayers), texts(raw), reason: definition.title);
+    }
   });
 
   test('a missing or closed prayer makes the whole novena unsupported', () {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/analytics/route_mapper.dart';
 import 'package:mybrev_flutter/dev/novena_harness.dart';
 import 'package:mybrev_flutter/models/priest_access_content.dart';
+import 'package:mybrev_flutter/novena/novena_definition.dart';
 import 'package:mybrev_flutter/novena/novena_store.dart';
 import 'package:mybrev_flutter/novena/ui/novena_routes.dart';
 import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
@@ -79,6 +81,38 @@ void main() {
   const start = Key('novena-start');
   const pray = Key('novena-pray');
   const mark = Key('novena-mark');
+
+  testWidgets('no dead undo on a finished novena that was started again', (
+    tester,
+  ) async {
+    final store = NovenaStore(box);
+    final definition = NovenaDefinition.tryParse(
+      definitions.firstWhere((item) => item['novenaId'] == _joseph),
+    )!;
+    final days = definition.resolveAll(bundledPrayers())!;
+    final finished = await store.start(definition, days, '2027-03-01');
+    for (var day = 1; day <= 9; day++) {
+      await store.setDay(finished.sessionId, day, true, '2027-03-09');
+    }
+    await pump(tester);
+
+    Future<void> openDay() async {
+      GoRouter.of(tester.element(find.byType(PrayerDetailScreen))).push(
+        novenaDayLocation,
+        extra: <String, Object>{'session': finished.sessionId, 'day': 9},
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await openDay();
+    expect(find.byKey(const Key('novena-unmark')), findsOneWidget);
+
+    await store.start(definition, days, '2027-03-10');
+    await pump(tester);
+    await openDay();
+    expect(find.byKey(const Key('novena-marked')), findsOneWidget);
+    expect(find.byKey(const Key('novena-unmark')), findsNothing);
+  });
 
   testWidgets('start, pray, mark, undo, restart of the app', (tester) async {
     final app = await pump(tester);

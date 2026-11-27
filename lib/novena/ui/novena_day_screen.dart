@@ -160,6 +160,15 @@ class _DayContent extends ConsumerWidget {
     final theme = Theme.of(context);
     final done = session.completedDays.contains(day);
     final canMark = session.canMark(day, today);
+    // A finished novena that was started again keeps its marks: undoing one
+    // would make a second active session, which the store refuses.
+    final canUndo =
+        session.isActive ||
+        ref.watch(
+          novenaProvider.select(
+            (state) => state.activeFor(session.novenaId) == null,
+          ),
+        );
     Future<void> mark(bool value) => runNovenaChange(
       context,
       () => ref
@@ -198,13 +207,14 @@ class _DayContent extends ConsumerWidget {
             icon: const Icon(Icons.check_rounded),
             label: const Text('Малітва завершана'),
           ),
-          Center(
-            child: TextButton(
-              key: const Key('novena-unmark'),
-              onPressed: () => mark(false),
-              child: const Text('Скасаваць адзнаку'),
+          if (canUndo)
+            Center(
+              child: TextButton(
+                key: const Key('novena-unmark'),
+                onPressed: () => mark(false),
+                child: const Text('Скасаваць адзнаку'),
+              ),
             ),
-          ),
         ] else if (canMark)
           FilledButton.icon(
             key: const Key('novena-mark'),
