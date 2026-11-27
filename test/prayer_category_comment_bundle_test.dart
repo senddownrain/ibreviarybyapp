@@ -7,6 +7,8 @@ import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/content/content_updater.dart';
+import 'package:mybrev_flutter/models/prayer_menu_category.dart'
+    show isPublishedPrayerCategory;
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -53,11 +55,14 @@ void main() {
       expect(documentHash(entry.value), bundle.hashes[entry.key]);
       final category = PrayerMenuCategory.global(entry.key, entry.value);
       final raw = entry.value['comment'];
-      if (raw == null) {
+      if (raw is Map &&
+          isPublishedPrayerCategory(entry.value) &&
+          isPublishedPrayerCategory(raw) &&
+          raw['content'] is String &&
+          (raw['content'] as String).trim().isNotEmpty) {
+        expect(category.comment?.content, raw['content'], reason: entry.key);
+      } else {
         expect(category.comment, isNull, reason: entry.key);
-      } else if (category.comment != null) {
-        expect(raw, isA<Map>());
-        expect(category.comment!.content, (raw as Map)['content']);
       }
     }
   });
