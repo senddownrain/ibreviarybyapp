@@ -31,7 +31,17 @@ class _FixtureBundle extends CachingAssetBundle {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('shipped bundle still decodes categories without comments', () async {
+  test('legacy bundle still decodes categories without comments', () {
+    final bundle = decodeContentCollection(
+      File('$fixtureDirectory/$_categories.json.gz').readAsBytesSync(),
+    );
+    expect(bundle.docs, isNotEmpty);
+    for (final entry in bundle.docs.entries) {
+      expect(PrayerMenuCategory.global(entry.key, entry.value).comment, isNull);
+    }
+  });
+
+  test('shipped bundle decodes categories and preserves comments', () async {
     final data = await rootBundle.load(
       '$kContentAssetDir/$_categories.json.gz',
     );
@@ -40,7 +50,15 @@ void main() {
     );
     expect(bundle.docs, isNotEmpty);
     for (final entry in bundle.docs.entries) {
-      expect(PrayerMenuCategory.global(entry.key, entry.value).comment, isNull);
+      expect(documentHash(entry.value), bundle.hashes[entry.key]);
+      final category = PrayerMenuCategory.global(entry.key, entry.value);
+      final raw = entry.value['comment'];
+      if (raw == null) {
+        expect(category.comment, isNull, reason: entry.key);
+      } else if (category.comment != null) {
+        expect(raw, isA<Map>());
+        expect(category.comment!.content, (raw as Map)['content']);
+      }
     }
   });
 
