@@ -48,6 +48,7 @@ import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/reading_alignment.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
@@ -2115,18 +2116,18 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
     return AdaptiveProseAlignment(
       selected: selected,
       style: widget.textStyle,
-      builder: _buildContent,
+      builder: (context, alignment) => _buildContent(context, alignment, selected),
     );
   }
 
-  Widget _buildContent(BuildContext context, TextAlign alignment) {
+  Widget _buildContent(
+    BuildContext context,
+    TextAlign alignment, [
+    TextAlign selected = TextAlign.left,
+  ]) {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
-      return Html(
-        data: widget.isPsalm
-            ? formatReadingPsalmHtml(widget.text)
-            : formatLiturgicalHtml(widget.text),
-        style: {
+      final htmlStyles = <String, Style>{
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
           if (widget.isProse) ...{
             'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
@@ -2137,8 +2138,20 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
             ),
           },
           '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
-        },
-      );
+      };
+      final formatted = widget.isPsalm
+          ? formatReadingPsalmHtml(widget.text)
+          : formatLiturgicalHtml(widget.text);
+      // Prose paragraphs get Belarusian hyphenation (B2/D); psalms, verses,
+      // rubrics and everything else keep the existing renderer.
+      if (widget.isProse && !widget.isPsalm) {
+        return HyphenatedHtml(
+          data: formatted,
+          style: htmlStyles,
+          selected: selected,
+        );
+      }
+      return Html(data: formatted, style: htmlStyles);
     }
     final reader = ReaderTheme.of(context);
     final namespace = widget.highlightNamespace;
@@ -2148,36 +2161,43 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
     final sentences = namespace == null
         ? <_SentencePart>[_SentencePart(plainText, 0)]
         : _splitReadingSentences(plainText);
-    return Text.rich(
-      TextSpan(
-        children: [
-          for (final sentence in sentences)
-            TextSpan(
-              style: _sentenceStyle(context, '$namespace:${sentence.index}'),
-              children: [
-                for (final piece in sentence.text.split(
-                  RegExp(r'(?=[*†])|(?<=[*†])'),
-                ))
-                  TextSpan(
-                    text: piece,
-                    recognizer:
-                        namespace == null || widget.onSentenceTap == null
-                        ? null
-                        : _recognizerFor('$namespace:${sentence.index}'),
-                    style: piece == '*' || piece == '†'
-                        ? widget.textStyle.copyWith(
-                            height: ReaderTheme.bodyHeight,
-                            color: reader.rubric,
-                            fontWeight: FontWeight.w600,
-                          )
-                        : null,
-                  ),
-              ],
-            ),
-        ],
-      ),
-      textAlign: alignment,
+    final span = TextSpan(
+      style: widget.textStyle.copyWith(height: ReaderTheme.bodyHeight),
+      children: [
+        for (final sentence in sentences)
+          TextSpan(
+            style: _sentenceStyle(context, '$namespace:${sentence.index}'),
+            children: [
+              for (final piece in sentence.text.split(
+                RegExp(r'(?=[*†])|(?<=[*†])'),
+              ))
+                TextSpan(
+                  text: piece,
+                  recognizer:
+                      namespace == null || widget.onSentenceTap == null
+                      ? null
+                      : _recognizerFor('$namespace:${sentence.index}'),
+                  style: piece == '*' || piece == '†'
+                      ? widget.textStyle.copyWith(
+                          height: ReaderTheme.bodyHeight,
+                          color: reader.rubric,
+                          fontWeight: FontWeight.w600,
+                        )
+                      : null,
+                ),
+            ],
+          ),
+      ],
     );
+    // Rubric marks (`*`, `†`) and psalmody keep the existing renderer.
+    if (widget.isProse && !widget.isPsalm && !plainText.contains(RegExp(r'[*†]'))) {
+      return HyphenatedProse(
+        span: span,
+        selected: selected,
+        style: widget.textStyle.copyWith(height: ReaderTheme.bodyHeight),
+      );
+    }
+    return Text.rich(span, textAlign: alignment);
   }
 
   TextStyle _sentenceStyle(BuildContext context, String sentenceId) {
