@@ -6,12 +6,11 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/widgets/psalm_choir_html.dart';
 import 'package:mybrev_flutter/widgets/psalmody_mode_selector.dart';
+import 'package:mybrev_flutter/widgets/settings_reader_controls.dart';
 
-// The exact same excerpt as Web src/constants/psalmodyPreview.js.
 const _previewHtml =
-    '<p>Божа, мой Божа, Цябе шукаю, *<br />Цябе прагне душа мая.</p>'
-    '<p>Маё цела па Табе тужыць *<br />у зямлі пустыннай, засохлай і бязводнай.</p>'
-    '<p>Так, у святыні я ўглядаюся ў Цябе, *<br />каб убачыць Тваю сілу і славу.</p>';
+    '<p>Божа, Ты Бог мой, *<br />Цябе шукаю.</p>'
+    '<p>Цябе прагне душа мая, *<br />па Табе тужыць цела маё.</p>';
 
 class PsalmodySettingsSection extends ConsumerStatefulWidget {
   const PsalmodySettingsSection({super.key});
@@ -40,46 +39,18 @@ class _PsalmodySettingsSectionState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final title = Text(
-              'Псальмодыя',
-              style: Theme.of(context).textTheme.titleMedium,
-            );
-            final selector = PsalmodyModeSelector(
-              key: const Key('settings-psalmody-mode'),
-              value: settings.psalmodyMode,
-              onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
-            );
-            // Keep heading and three accessible 48dp actions on one row.
-            // For exceptionally narrow layouts or enlarged system text,
-            // stack rather than truncate the section heading.
-            final inline =
-                constraints.maxWidth >= 254 &&
-                MediaQuery.textScalerOf(context).scale(1) <= 1.3;
-            if (!inline) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [title, const SizedBox(height: 8), selector],
-              );
-            }
-            return Row(
-              children: [
-                Expanded(child: title),
-                const SizedBox(width: 8),
-                SizedBox(width: 144, child: selector),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(14),
+        SettingsReaderRow(
+          label: 'Псальмодыя',
+          controlWidth: 168,
+          inlineWidth: 254,
+          control: PsalmodyModeSelector(
+            key: const Key('settings-psalmody-mode'),
+            value: settings.psalmodyMode,
+            onChanged: ref.read(settingsProvider.notifier).setPsalmodyMode,
           ),
+        ),
+        const SizedBox(height: 8),
+        SettingsReaderPreview(
           child: PsalmodyScope(
             controller: _choir,
             mode: settings.psalmodyMode,
@@ -92,7 +63,9 @@ class _PsalmodySettingsSectionState
                     fontFamily: body.fontFamily,
                     fontSize: FontSize(body.fontSize ?? 16),
                     color: body.color,
-                    lineHeight: LineHeight(body.height ?? ReaderTheme.bodyHeight),
+                    lineHeight: LineHeight(
+                      body.height ?? ReaderTheme.bodyHeight,
+                    ),
                     margin: Margins.zero,
                     padding: HtmlPaddings.zero,
                   ),
