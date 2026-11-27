@@ -151,6 +151,7 @@ class SettingsState {
   final String fontFamily;
   final TextAlign textAlignment;
   final bool keepScreenOn;
+  final bool readingsHighlightEnabled;
   final List<UserCategory> userCategories;
   final List<String> hiddenGlobalPrayerCategoryIds;
   final List<String> favoriteIds;
@@ -167,7 +168,8 @@ class SettingsState {
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
     this.textAlignment = TextAlign.justify,
-    this.keepScreenOn = false,
+    this.keepScreenOn = true,
+    this.readingsHighlightEnabled = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
     this.favoriteIds = const [],
@@ -191,6 +193,7 @@ class SettingsState {
     String? fontFamily,
     TextAlign? textAlignment,
     bool? keepScreenOn,
+    bool? readingsHighlightEnabled,
     List<UserCategory>? userCategories,
     List<String>? hiddenGlobalPrayerCategoryIds,
     List<String>? favoriteIds,
@@ -205,6 +208,8 @@ class SettingsState {
     fontFamily: fontFamily ?? this.fontFamily,
     textAlignment: textAlignment ?? this.textAlignment,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
+    readingsHighlightEnabled:
+        readingsHighlightEnabled ?? this.readingsHighlightEnabled,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
         hiddenGlobalPrayerCategoryIds ?? this.hiddenGlobalPrayerCategoryIds,
@@ -259,7 +264,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
             as String,
       ),
       textAlignment: normalizeTextAlignment(_box.get('textAlignment')),
-      keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
+      keepScreenOn: _box.get('keepScreenOn', defaultValue: true) as bool,
+      readingsHighlightEnabled:
+          _box.get('readingsHighlightEnabled', defaultValue: false) as bool,
       userCategories: _migratedUserCategories(cats),
       hiddenGlobalPrayerCategoryIds: List<String>.from(
         jsonDecode(hiddenCategories) as List,
@@ -313,7 +320,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
     await _box.put('textAlignment', state.textAlignment.name);
-    await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
       jsonEncode(state.userCategories.map((c) => c.toMap()).toList()),
@@ -384,10 +390,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _box.put('textAlignment', alignment.name);
   }
 
-  void setKeepScreenOn(bool value) {
+  Future<void> setReadingsHighlightEnabled(bool value) async {
+    state = state.copyWith(readingsHighlightEnabled: value);
+    await _box.put('readingsHighlightEnabled', value);
+  }
+
+  Future<void> setKeepScreenOn(bool value) async {
     if (state.keepScreenOn != value) analyticsFeature('keep_screen_on_toggle');
     state = state.copyWith(keepScreenOn: value);
-    _save();
+    await _box.put('keepScreenOn', value);
   }
 
   Future<void> setPsalmodyMode(PsalmodyMode value) async {

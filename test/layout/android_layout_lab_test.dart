@@ -941,7 +941,7 @@ double _maxScrollExtent(WidgetTester tester) => tester
 
 class _LabSettingsNotifier extends SettingsNotifier {
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() => const SettingsState(readingsHighlightEnabled: true);
 }
 
 class _LabLocalPrayersNotifier extends LocalPrayersNotifier {
