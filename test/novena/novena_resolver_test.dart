@@ -53,7 +53,7 @@ void main() {
   test('all ready definitions assemble from the bundled public prayers', () {
     final prayers = bundledPrayers();
     final ready = readyDefinitions();
-    expect(ready, hasLength(42));
+    expect(ready, hasLength(55));
     final unsupported = [
       for (final data in ready)
         if (NovenaDefinition.tryParse(data)!.resolveAll(prayers) == null)

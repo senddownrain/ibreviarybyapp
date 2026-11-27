@@ -74,7 +74,7 @@ void main() {
     final check = await updater.check();
     expect(check.kind, ContentCheckKind.patch);
     await updater.apply(check.plan!);
-    expect(collection.length, 42);
+    expect(collection.length, 55);
 
     var now = DateTime(2027, 5, 7);
     final container = ProviderContainer(
@@ -85,7 +85,7 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
-    expect(container.read(novenaDefinitionsProvider), hasLength(42));
+    expect(container.read(novenaDefinitionsProvider), hasLength(55));
     final subscription = container.listen(novenaSuggestionsProvider, (_, _) {});
     for (var i = 0; i < 100 && subscription.read().length < 2; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
