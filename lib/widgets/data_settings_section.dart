@@ -58,7 +58,7 @@ String formatContentVersion(DateTime date) =>
   }
 }
 
-/// Settings → «Даныя і афлайн»: only what the reader needs to know.
+/// Settings → «Дадзеныя афлайн»: only what the reader needs to know.
 ///
 /// The texts ship with the app; updates are small and arrive by themselves
 /// on any network. Nothing here is about Wi-Fi, sizes, periods or storage.
@@ -77,7 +77,7 @@ class DataSettingsSection extends ConsumerWidget {
       key: const Key('data-settings'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Даныя і афлайн', style: text.titleMedium),
+        Text('Дадзеныя афлайн', style: text.titleMedium),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -85,7 +85,7 @@ class DataSettingsSection extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Тэксты даступныя без сеткі',
+                'Тэксты даступныя афлайн',
                 key: const Key('data-offline-status'),
                 style: text.titleSmall,
               ),

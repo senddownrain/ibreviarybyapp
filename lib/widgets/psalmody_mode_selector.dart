@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+import 'package:mybrev_flutter/widgets/reader_icon_segments.dart';
 
 /// The same compact control is used in settings and in the existing Aa panel.
 class PsalmodyModeSelector extends StatelessWidget {
@@ -13,71 +14,17 @@ class PsalmodyModeSelector extends StatelessWidget {
   final ValueChanged<PsalmodyMode> onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final radius = BorderRadius.circular(10);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: cs.outlineVariant),
-        borderRadius: radius,
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Material(
-          color: Colors.transparent,
-          child: Row(
-            children: [
-              for (final mode in PsalmodyMode.values)
-                Expanded(
-                  child: Semantics(
-                    key: ValueKey('psalmody-mode-${mode.name}'),
-                    label: mode.label,
-                    button: true,
-                    selected: value == mode,
-                    inMutuallyExclusiveGroup: true,
-                    onTap: () => onChanged(mode),
-                    child: Tooltip(
-                      message: mode.label,
-                      excludeFromSemantics: true,
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          color: value == mode
-                              ? cs.primary.withValues(alpha: .12)
-                              : Colors.transparent,
-                          border: mode == PsalmodyMode.leftBreak
-                              ? null
-                              : Border(
-                                  left: BorderSide(color: cs.outlineVariant),
-                                ),
-                        ),
-                        child: InkWell(
-                          excludeFromSemantics: true,
-                          onTap: () => onChanged(mode),
-                          child: SizedBox(
-                            height: 48,
-                            child: Center(
-                              child: CustomPaint(
-                                size: const Size(40, 30),
-                                painter: _PsalmodyIcon(
-                                  mode,
-                                  value == mode
-                                      ? cs.primary
-                                      : cs.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ReaderIconSegments<PsalmodyMode>(
+    value: value,
+    choices: PsalmodyMode.values,
+    label: (mode) => mode.label,
+    onChanged: onChanged,
+    segmentKey: (mode) => ValueKey('psalmody-mode-${mode.name}'),
+    content: (context, mode) => CustomPaint(
+      size: const Size(40, 30),
+      painter: _PsalmodyIcon(mode, IconTheme.of(context).color!),
+    ),
+  );
 }
 
 class _PsalmodyIcon extends CustomPainter {

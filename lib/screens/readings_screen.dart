@@ -372,6 +372,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _toggleSentence(String sentenceId) {
+    if (!ref.read(settingsProvider).readingsHighlightEnabled) return;
     ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
     setState(() {
       _selectedSentenceId = _selectedSentenceId == sentenceId
@@ -768,6 +769,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final highlightEnabled = ref.watch(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+    );
+    ref.listen(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+      (_, enabled) {
+        if (!enabled && _selectedSentenceId != null) {
+          setState(() => _clearSentenceSelection());
+        }
+      },
+    );
     _refreshOptionsAfterFrame();
     ref.listen(dioceseSelectionProvider, (previous, next) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -830,7 +842,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReadingBody(reading, selection.massSet, seasonColor),
+                _buildReadingBody(
+                  reading,
+                  selection.massSet,
+                  seasonColor,
+                  highlightEnabled,
+                ),
                 // Attribution is available in the app's dedicated Sources page.
                 const SizedBox(key: Key('readings-document-end')),
               ],
@@ -1020,6 +1037,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     ParsedReading reading,
     MassSetSelection? massSet,
     Color seasonColor,
+    bool highlightEnabled,
   ) {
     _loadHighlights(reading.id);
     final body = _ReadingBody(
@@ -1030,9 +1048,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       ),
       reading: reading,
       massSet: massSet,
-      highlights: Map.unmodifiable(_highlights),
-      selectedSentenceId: _selectedSentenceId,
-      onSentenceTap: _toggleSentence,
+      highlights: highlightEnabled ? Map.unmodifiable(_highlights) : const {},
+      selectedSentenceId: highlightEnabled ? _selectedSentenceId : null,
+      onSentenceTap: highlightEnabled ? _toggleSentence : null,
     );
     return body;
   }
@@ -1374,7 +1392,7 @@ class _ReadingBody extends ConsumerWidget {
   final MassSetSelection? massSet;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
   const _ReadingBody({
     super.key,
     required this.reading,
@@ -1567,7 +1585,7 @@ class _MassSetContent extends StatelessWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2155,7 +2173,8 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
               ))
                 TextSpan(
                   text: piece,
-                  recognizer: namespace == null
+                  recognizer:
+                      namespace == null || widget.onSentenceTap == null
                       ? null
                       : _recognizerFor('$namespace:${sentence.index}'),
                   style: piece == '*' || piece == '†'
@@ -2239,7 +2258,7 @@ class _ReadingSection extends StatefulWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   /// Gospel (closing «Гэта слова Пана.»); by default from the label.
   final bool? gospel;

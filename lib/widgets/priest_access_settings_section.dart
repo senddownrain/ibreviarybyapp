@@ -32,7 +32,12 @@ class _PriestAccessSettingsSectionState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text('Асаблівы доступ', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
+        Text(
+          'Для святароў і кансэкраваных асобаў',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 12),
         if (access.pendingDisable)
           const Text('Чакаем пацвярджэння выключэння доступу.'),
         if (access.registered) ...[
@@ -84,8 +89,6 @@ class _PriestAccessSettingsSectionState
             ),
         ],
         if (showForm) ...[
-          const Text('Увядзіце код, каб адкрыць дадатковыя малітвы і абрады.'),
-          const SizedBox(height: 12),
           TextField(
             key: const Key('priest-code'),
             controller: _code,
