@@ -82,6 +82,35 @@ void main() {
   const pray = Key('novena-pray');
   const mark = Key('novena-mark');
 
+  testWidgets('the whole prayer opened from the list returns to the list', (
+    tester,
+  ) async {
+    final definition = NovenaDefinition.tryParse(
+      definitions.firstWhere((item) => item['novenaId'] == _joseph),
+    )!;
+    await NovenaStore(
+      box,
+    ).start(definition, definition.resolveAll(bundledPrayers())!, '2027-03-10');
+    await pump(tester, location: novenasLocation);
+
+    await tap(tester, find.byKey(const Key('novena-whole-prayer')));
+    expect(find.byType(PrayerDetailScreen), findsOneWidget);
+    // The tracker of the prayer page still opens the day above it.
+    await tap(tester, find.byKey(pray));
+    expect(find.byKey(const Key('novena-day-reader')), findsOneWidget);
+
+    final navigator = tester.state<NavigatorState>(
+      find.byType(Navigator).first,
+    );
+    navigator.pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(PrayerDetailScreen), findsOneWidget);
+    navigator.pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(PrayerDetailScreen), findsNothing);
+    expect(find.byKey(const Key('novena-list')), findsOneWidget);
+  });
+
   testWidgets('no dead undo on a finished novena that was started again', (
     tester,
   ) async {

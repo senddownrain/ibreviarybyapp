@@ -5,6 +5,7 @@ import 'package:mybrev_flutter/novena/novena_providers.dart';
 import 'package:mybrev_flutter/novena/novena_session.dart';
 import 'package:mybrev_flutter/novena/novena_strings.dart';
 import 'package:mybrev_flutter/novena/ui/novena_actions.dart';
+import 'package:mybrev_flutter/novena/ui/novena_routes.dart';
 import 'package:mybrev_flutter/novena/ui/novena_session_card.dart';
 
 /// «Мае навэнны»: the active sessions (the choice when there are several),
@@ -61,8 +62,11 @@ class NovenaListScreen extends ConsumerWidget {
                     title: session.title,
                     footer: Center(
                       child: TextButton(
-                        onPressed: () =>
-                            openNovenaPrayer(context, session.novenaId),
+                        key: const Key('novena-whole-prayer'),
+                        onPressed: () => context.push(
+                          novenaPrayerLocation,
+                          extra: session.novenaId,
+                        ),
                         child: const Text('Уся малітва'),
                       ),
                     ),

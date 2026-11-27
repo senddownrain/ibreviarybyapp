@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/novena/ui/novena_day_screen.dart';
 import 'package:mybrev_flutter/novena/ui/novena_list_screen.dart';
+import 'package:mybrev_flutter/screens/prayer_detail_screen.dart';
 import 'package:mybrev_flutter/widgets/branch_hosts.dart';
 
 const novenasLocation = '/novenas';
 const novenaDayLocation = '/novenas/day';
+
+/// The whole prayer opened from «Мае навэнны», so that Back returns there.
+const novenaPrayerLocation = '/novenas/prayer';
 
 /// Root pages above the shell. Their addresses carry no novena or session id
 /// (nothing for analytics, crash reports or feedback context to pick up).
@@ -32,6 +36,22 @@ List<RouteBase> novenaRoutes(GlobalKey<NavigatorState> navigator) => [
         key: state.pageKey,
         child: session is String
             ? NovenaDayScreen(sessionId: session, day: day is int ? day : 1)
+            : const SecondaryPageScaffold(
+                title: 'Мае навэнны',
+                child: NovenaListScreen(),
+              ),
+      );
+    },
+  ),
+  GoRoute(
+    parentNavigatorKey: navigator,
+    path: novenaPrayerLocation,
+    pageBuilder: (context, state) {
+      final id = state.extra;
+      return MaterialPage<void>(
+        key: state.pageKey,
+        child: id is String
+            ? Scaffold(body: PrayerDetailScreen(prayerId: id))
             : const SecondaryPageScaffold(
                 title: 'Мае навэнны',
                 child: NovenaListScreen(),
