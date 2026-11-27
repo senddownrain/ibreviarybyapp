@@ -7,9 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' show parseFragment;
+import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/hyphenation/be_hyphenator.dart';
 import 'package:mybrev_flutter/hyphenation/hyphenation_service.dart';
 import 'package:mybrev_flutter/hyphenation/justified_hyphen_text.dart';
+import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:mybrev_flutter/utils/reading_alignment.dart';
 import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 
@@ -489,5 +491,286 @@ void main() {
       final ro = hyphRenders(t).single;
       expect(ro.plainText.startsWith('Умілаваныя, рубрыка тут'), isTrue);
     });
+  });
+
+  group('formatting and links are never traded for hyphenation', () {
+    final styles = <String, Style>{
+      'body': Style(
+        fontSize: FontSize(10),
+        lineHeight: LineHeight(1.5),
+        margin: Margins.zero,
+      ),
+      'p': Style(margin: Margins.only(bottom: 8)),
+      'a': Style(color: const Color(0xFF2F5F7E)),
+      '.liturgical-rubric-inline': Style(color: const Color(0xFF9B302A)),
+      '.boxed': Style(backgroundColor: const Color(0xFFEEEEEE)),
+    };
+    bool qualifies(String html) =>
+        isProseParagraph(parseFragment(html).children.first, styles);
+
+    test('anything that cannot be reproduced keeps the stock renderer', () {
+      expect(qualifies('<p>$prose</p>'), isTrue);
+      expect(
+        qualifies(
+          '<p style="text-align: justify;">$prose <em>курсіў</em> <strong>тоўсты</strong></p>',
+        ),
+        isTrue,
+      );
+      expect(
+        qualifies(
+          '<p>$prose <span class="liturgical-rubric-inline">рубрыка</span></p>',
+        ),
+        isTrue,
+      );
+      for (final html in [
+        '<p>$prose <a href="https://example.invalid/x">спасылка</a></p>',
+        '<p>$prose<sup>1</sup></p>',
+        '<p>$prose<sub>2</sub></p>',
+        '<p>$prose <span style="color: #ff00ff;">колер</span></p>',
+        '<p>$prose <em style="font-size: 20px">курсіў</em></p>',
+        '<p>$prose <span class="unknown">клас</span></p>',
+        '<p>$prose <span class="boxed">фон</span></p>',
+        '<p style="color: red;">$prose</p>',
+        '<p style="margin-left: 20px;">$prose</p>',
+        '<p dir="rtl">$prose</p>',
+        '<p>$prose<br>другі радок</p>',
+      ]) {
+        expect(qualifies(html), isFalse, reason: html);
+      }
+    });
+
+    test(
+      'hymns, psalms, canticles, antiphons and dialogues are not re-wrapped',
+      () {
+        List<bool> prosePattern(String html) => [
+          for (final b in splitProseBlocks(html, styles)) b.prose != null,
+        ];
+        for (final heading in [
+          'Гімн',
+          'Псальмодыя',
+          'Псальм 63',
+          'Песня Захарыі',
+          'Кантык',
+          'Антыфона Багародзіцы',
+        ]) {
+          expect(
+            prosePattern('<h2>$heading</h2><p>$prose</p>').contains(true),
+            isFalse,
+            reason: heading,
+          );
+        }
+        // the next ordinary heading ends the verse section
+        expect(
+          prosePattern(
+            '<h2>Гімн</h2><p>$prose</p><h2>Кароткае чытанне і рэспансорый</h2><p>$prose</p>',
+          ),
+          [false, true],
+        );
+        for (final start in [
+          'Ант. ',
+          '1 ант. ',
+          'Антыфона: ',
+          'К. ',
+          'Н.: ',
+          'С. ',
+          '℟ ',
+        ]) {
+          expect(qualifies('<p>$start$prose</p>'), isFalse, reason: start);
+        }
+        expect(
+          qualifies('<p><span class="prayer-speaker">Ц.:</span> $prose</p>'),
+          isFalse,
+        );
+      },
+    );
+
+    testWidgets(
+      'a paragraph with a link stays Html and the link is really tappable',
+      (t) async {
+        final taps = <String?>[];
+        await t.pumpWidget(
+          host(
+            HyphenatedHtml(
+              data:
+                  '<p>$prose</p><p>Глядзі <a href="https://example.invalid/tyt">спасылку на Пісанне</a> і далей чытай тэкст гэтай малітвы цалкам.</p>',
+              style: styles,
+              selected: TextAlign.justify,
+              onLinkTap: (url, attributes, element) => taps.add(url),
+            ),
+            400,
+          ),
+        );
+        await t.pumpAndSettle();
+        expect(
+          hyphRenders(t),
+          hasLength(1),
+          reason: 'only the plain paragraph is hyphenated',
+        );
+        await t.tapOnText(find.textRange.ofSubstring('спасылку'));
+        await t.pumpAndSettle();
+        expect(taps, ['https://example.invalid/tyt']);
+      },
+    );
+
+    testWidgets(
+      'italic, bold and rubric colour survive inside a hyphenated paragraph',
+      (t) async {
+        await t.pumpWidget(
+          host(
+            HyphenatedHtml(
+              data:
+                  '<p>$prose <em>курсіў</em> <strong>тоўсты</strong> <span class="liturgical-rubric-inline">рубрыка</span></p>',
+              style: styles,
+              selected: TextAlign.justify,
+            ),
+            400,
+          ),
+        );
+        final seen = <String, TextStyle>{};
+        void walk(InlineSpan span, TextStyle inherited) {
+          if (span is! TextSpan) return;
+          final merged = inherited.merge(span.style);
+          if (span.text != null) seen[span.text!.trim()] = merged;
+          span.children?.forEach((c) => walk(c, merged));
+        }
+
+        walk(
+          t
+              .widget<HyphenatedJustifiedText>(
+                find.byType(HyphenatedJustifiedText),
+              )
+              .text,
+          const TextStyle(),
+        );
+        expect(seen['курсіў']!.fontStyle, FontStyle.italic);
+        expect(seen['тоўсты']!.fontWeight, FontWeight.w700);
+        expect(seen['рубрыка']!.color, const Color(0xFF9B302A));
+      },
+    );
+
+    test(
+      'every bundled prayer keeps its text exactly when a paragraph is hyphenated',
+      () {
+        final bundle = decodeContentCollection(
+          File('assets/content/prayers.json.gz').readAsBytesSync(),
+        );
+        String flat(String s) =>
+            s.replaceAll(RegExp(r'[ \t\r\n]+'), ' ').trim();
+        var checked = 0;
+        for (final doc in bundle.docs.values) {
+          final text = (doc['textVersions'] as Map?)?['be'] ?? doc['text'];
+          if (text is! String) continue;
+          for (final block in splitProseBlocks(
+            prayerMarkdownToHtml(text),
+            styles,
+          )) {
+            final p = block.prose;
+            if (p == null) continue;
+            checked++;
+            expect(
+              flat(proseSpan(p, styles, _style).toPlainText()),
+              flat(p.text),
+            );
+            expect(p.querySelector('a, sup, sub, br'), isNull);
+          }
+        }
+        expect(checked, greaterThan(500));
+      },
+    );
+  });
+
+  group('selection details', () {
+    testWidgets('the highlight covers the painted hyphen', (t) async {
+      await t.pumpWidget(
+        host(
+          SelectionArea(
+            child: HyphenatedProse(
+              span: const TextSpan(text: prose, style: _style),
+              selected: TextAlign.justify,
+              style: _style,
+            ),
+          ),
+          400,
+        ),
+      );
+      t.state<SelectableRegionState>(find.byType(SelectableRegion)).selectAll();
+      await t.pump();
+      final render = hyphRenders(t).single;
+      final rects = render.value.selectionRects;
+      var hyphenLines = 0;
+      for (var i = 0; i < render.lines.length; i++) {
+        if (render.lines[i].endsWithHyphen) {
+          hyphenLines++;
+          expect(
+            rects[i].right,
+            closeTo(400, 0.6),
+            reason: 'line $i: ${render.lines[i].text}',
+          );
+        }
+      }
+      expect(hyphenLines, greaterThan(0));
+    });
+
+    testWidgets('a selection is dropped when the text changes', (t) async {
+      Widget view(String text) => host(
+        SelectionArea(
+          child: HyphenatedProse(
+            span: TextSpan(text: text, style: _style),
+            selected: TextAlign.justify,
+            style: _style,
+          ),
+        ),
+        400,
+      );
+      await t.pumpWidget(view(prose));
+      t.state<SelectableRegionState>(find.byType(SelectableRegion)).selectAll();
+      await t.pump();
+      expect(hyphRenders(t).single.getSelectedContent(), isNotNull);
+      await t.pumpWidget(
+        view(
+          'Зусім іншы тэкст малітвы, які паказваецца пасля першага і не выдзелены нікім.',
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(hyphRenders(t).single.getSelectedContent(), isNull);
+      expect(hyphRenders(t).single.value.selectionRects, isEmpty);
+    });
+  });
+
+  // Found in the Chrome smoke of the real Hours screen: the reader face loads
+  // asynchronously, and the renderer kept the fallback face for ever.
+  testWidgets('re-lays out when the reader font finishes loading', (t) async {
+    const family = 'LateReaderFace';
+    const style = TextStyle(fontFamily: family, fontSize: 10, height: 1.5);
+    await t.pumpWidget(
+      host(
+        const HyphenatedProse(
+          span: TextSpan(text: prose, style: style),
+          selected: TextAlign.left,
+          style: style,
+        ),
+        400,
+      ),
+    );
+    double firstLine() => hyphRenders(t).single.lines.first.naturalWidth;
+    final linesBefore = hyphRenders(t).single.lines.length;
+    final widthBefore = firstLine();
+    await t.runAsync(() async {
+      final loader = FontLoader(family)
+        ..addFont(
+          File(
+            'assets/google_fonts/Literata-Regular.ttf',
+          ).readAsBytes().then((b) => ByteData.sublistView(b)),
+        );
+      await loader.load();
+    });
+    await t.pumpAndSettle();
+    final render = hyphRenders(t).single;
+    expect(
+      render.lines.length != linesBefore || firstLine() != widthBefore,
+      isTrue,
+      reason:
+          'still measured with the fallback face: $linesBefore lines, $widthBefore',
+    );
   });
 }

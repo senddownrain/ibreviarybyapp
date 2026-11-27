@@ -201,7 +201,16 @@ class _Line {
 }
 
 class RenderHyphenatedJustifiedText extends RenderBox
-    with Selectable, SelectionRegistrant {
+    with RelayoutWhenSystemFontsChangeMixin, Selectable, SelectionRegistrant {
+  /// Reader faces load asynchronously: everything measured with the fallback
+  /// face must be thrown away when the real one arrives.
+  @override
+  void systemFontsDidChange() {
+    _metricCache.clear();
+    _laidOutWidth = null;
+    super.systemFontsDidChange();
+  }
+
   RenderHyphenatedJustifiedText({
     required TextSpan text,
     required BelarusianHyphenator? hyphenator,
@@ -240,6 +249,17 @@ class RenderHyphenatedJustifiedText extends RenderBox
   set text(TextSpan v) {
     if (_text == v) {
       return;
+    }
+    // A selection belongs to the text it was made on: never carry it over.
+    if (_hasSelection &&
+        _text.toPlainText(includeSemanticsLabels: false) !=
+            v.toPlainText(includeSemanticsLabels: false)) {
+      _selStart = _selEnd = null;
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (attached) {
+          _publishSelection();
+        }
+      });
     }
     _text = v;
     _invalidate();
@@ -1183,7 +1203,13 @@ class RenderHyphenatedJustifiedText extends RenderBox
         continue;
       }
       final x1 = _xAt(l, a);
-      final x2 = _xAt(l, b);
+      var x2 = _xAt(l, b);
+      // The painted hyphen belongs to the broken word: highlight it too when
+      // the selection continues on the next line.
+      final hyphen = l.hyphen;
+      if (hyphen != null && b == l.end && _hi > l.end) {
+        x2 = math.max(x2, hyphen.x + hyphen.width);
+      }
       if (x2 > x1) rects.add(Rect.fromLTRB(x1, l.y, x2, l.y + l.height));
     }
     return rects;
