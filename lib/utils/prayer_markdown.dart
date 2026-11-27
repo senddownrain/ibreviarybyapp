@@ -121,7 +121,7 @@ void _markSpeakers(
       if (start && node is md.Text && line < lines.length) {
         final label = labels != null ? labels[line] : prayerPrefix(lines[line]);
         if (label != null &&
-            (labels != null || RegExp(r'^[КСНДЛЦVR]\.').hasMatch(label))) {
+            (labels != null || RegExp(r'^[КСНДЛЦУVR]\.').hasMatch(label))) {
           final indent = RegExp(r'^ {0,3}').firstMatch(lines[line])![0]!;
           if (node.text.startsWith('$indent$label')) {
             final span = md.Element.text('span', label)

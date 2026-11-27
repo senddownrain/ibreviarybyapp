@@ -110,6 +110,10 @@ void main() {
     'grant/merge, background, offline, reopen, revoke: protected data stays off disk',
     () async {
       final gateway = _CategoryGateway();
+      const privateComment = 'PRIVATE LEGACY CATEGORY COMMENT';
+      gateway.fixture.categories['closed-child']!['comment'] = {
+        'content': privateComment,
+      };
       final storage = MemoryStorage();
       final controller = PriestAccessController(
         gateway,
@@ -128,10 +132,17 @@ void main() {
           contains('shared-private'),
         );
         await controller.activate(validCode, 'Synthetic device');
+        await controller.loadCatalog();
         expect(controller.state.content!.prayers, contains('shared-private'));
         expect(controller.state.content!.categories['closed']!['prayerIds'], [
           'shared-private',
         ]);
+        final child = controller.state.content!.categories['closed-child']!;
+        expect(
+          PrayerMenuCategory.global('closed-child', child).comment?.content,
+          privateComment,
+        );
+        expect(HiveService.prayerCategoriesBox.get('closed-child'), isNull);
         expect(
           (await controller.readPrayer('shared-private'))!['title'],
           'PRIVATE SHARED FIXTURE',
@@ -141,12 +152,14 @@ void main() {
         expect(controller.state.content, isNull);
         expect(await controller.readPrayer('shared-private'), isNull);
         await controller.resume(foreground: true);
+        await controller.loadCatalog();
         expect(controller.state.content, isNotNull);
         gateway.offline = true;
         await controller.refresh();
         expect(controller.state.content, isNull);
         gateway.offline = false;
         await controller.refresh();
+        await controller.loadCatalog();
         expect(controller.state.content, isNotNull);
         gateway.active = false;
         gateway.events.add(PriestDeviceGrant(gateway.uid!, false));

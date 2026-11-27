@@ -19,3 +19,4 @@ test/app_shell_state_test.dart
 test/ordo_content_update_test.dart
 test/ordo_day_flow_test.dart
 test/reading_references_parity_test.dart
+test/native_offline_catalog_test.dart

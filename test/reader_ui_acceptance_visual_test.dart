@@ -157,7 +157,7 @@ void main() {
     final sectionSize = tester.widget<Text>(find.text('Тэкст')).style?.fontSize;
     expect(
       tester.widget<Text>(find.text('Псальмодыя')).style?.fontSize,
-      sectionSize,
+      tester.widget<Text>(find.text('Выраўноўванне тэксту')).style?.fontSize,
     );
     expect(
       tester.widget<Text>(find.text('Стартовы раздзел')).style?.fontSize,

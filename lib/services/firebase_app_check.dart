@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 const _appleAttestation = MethodChannel('by.mybrev/app_attest');
 
-/// Installs the provider before Auth or Firestore is used on this Firebase app.
+/// Registers the provider for this Firebase app without fetching a token.
 Future<void> activateFirebaseAppCheck(FirebaseApp app) async {
   if (const bool.fromEnvironment('PRIEST_USE_EMULATORS')) return;
 

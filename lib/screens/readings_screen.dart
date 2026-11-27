@@ -47,6 +47,8 @@ import 'package:mybrev_flutter/utils/liturgical_theme.dart';
 import 'package:mybrev_flutter/utils/liturgical_titles.dart';
 import 'package:mybrev_flutter/utils/liturgical_cycle.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/reading_alignment.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
@@ -370,6 +372,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
   }
 
   void _toggleSentence(String sentenceId) {
+    if (!ref.read(settingsProvider).readingsHighlightEnabled) return;
     ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
     setState(() {
       _selectedSentenceId = _selectedSentenceId == sentenceId
@@ -766,6 +769,17 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final highlightEnabled = ref.watch(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+    );
+    ref.listen(
+      settingsProvider.select((settings) => settings.readingsHighlightEnabled),
+      (_, enabled) {
+        if (!enabled && _selectedSentenceId != null) {
+          setState(() => _clearSentenceSelection());
+        }
+      },
+    );
     _refreshOptionsAfterFrame();
     ref.listen(dioceseSelectionProvider, (previous, next) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -828,7 +842,12 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReadingBody(reading, selection.massSet, seasonColor),
+                _buildReadingBody(
+                  reading,
+                  selection.massSet,
+                  seasonColor,
+                  highlightEnabled,
+                ),
                 // Attribution is available in the app's dedicated Sources page.
                 const SizedBox(key: Key('readings-document-end')),
               ],
@@ -1018,6 +1037,7 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
     ParsedReading reading,
     MassSetSelection? massSet,
     Color seasonColor,
+    bool highlightEnabled,
   ) {
     _loadHighlights(reading.id);
     final body = _ReadingBody(
@@ -1028,9 +1048,9 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
       ),
       reading: reading,
       massSet: massSet,
-      highlights: Map.unmodifiable(_highlights),
-      selectedSentenceId: _selectedSentenceId,
-      onSentenceTap: _toggleSentence,
+      highlights: highlightEnabled ? Map.unmodifiable(_highlights) : const {},
+      selectedSentenceId: highlightEnabled ? _selectedSentenceId : null,
+      onSentenceTap: highlightEnabled ? _toggleSentence : null,
     );
     return body;
   }
@@ -1372,7 +1392,7 @@ class _ReadingBody extends ConsumerWidget {
   final MassSetSelection? massSet;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
   const _ReadingBody({
     super.key,
     required this.reading,
@@ -1565,7 +1585,7 @@ class _MassSetContent extends StatelessWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2089,16 +2109,25 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
 
   @override
   Widget build(BuildContext context) {
-    final alignment = widget.isProse
-        ? ref.watch(settingsProvider.select((s) => s.textAlignment))
-        : TextAlign.left;
+    if (!widget.isProse) return _buildContent(context, TextAlign.left);
+    // The saved choice is only read here; narrow columns / large type draw
+    // justified prose left-aligned without touching the setting.
+    final selected = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    return AdaptiveProseAlignment(
+      selected: selected,
+      style: widget.textStyle,
+      builder: (context, alignment) => _buildContent(context, alignment, selected),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    TextAlign alignment, [
+    TextAlign selected = TextAlign.left,
+  ]) {
     if (RegExp(r'<[a-z][\s\S]*>', caseSensitive: false).hasMatch(widget.text)) {
       final reader = ReaderTheme.of(context);
-      return Html(
-        data: widget.isPsalm
-            ? formatReadingPsalmHtml(widget.text)
-            : formatLiturgicalHtml(widget.text),
-        style: {
+      final htmlStyles = <String, Style>{
           ...liturgicalDocumentStyles(reader: reader, body: widget.textStyle),
           if (widget.isProse) ...{
             'body': liturgicalDocumentStyles(reader: reader, body: widget.textStyle)['body']!
@@ -2109,8 +2138,20 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
             ),
           },
           '.psalm-strophe-even': Style(margin: Margins.only(bottom: 14)),
-        },
-      );
+      };
+      final formatted = widget.isPsalm
+          ? formatReadingPsalmHtml(widget.text)
+          : formatLiturgicalHtml(widget.text);
+      // Prose paragraphs get Belarusian hyphenation (B2/D); psalms, verses,
+      // rubrics and everything else keep the existing renderer.
+      if (widget.isProse && !widget.isPsalm) {
+        return HyphenatedHtml(
+          data: formatted,
+          style: htmlStyles,
+          selected: selected,
+        );
+      }
+      return Html(data: formatted, style: htmlStyles);
     }
     final reader = ReaderTheme.of(context);
     final namespace = widget.highlightNamespace;
@@ -2120,35 +2161,43 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
     final sentences = namespace == null
         ? <_SentencePart>[_SentencePart(plainText, 0)]
         : _splitReadingSentences(plainText);
-    return Text.rich(
-      TextSpan(
-        children: [
-          for (final sentence in sentences)
-            TextSpan(
-              style: _sentenceStyle(context, '$namespace:${sentence.index}'),
-              children: [
-                for (final piece in sentence.text.split(
-                  RegExp(r'(?=[*†])|(?<=[*†])'),
-                ))
-                  TextSpan(
-                    text: piece,
-                    recognizer: namespace == null
-                        ? null
-                        : _recognizerFor('$namespace:${sentence.index}'),
-                    style: piece == '*' || piece == '†'
-                        ? widget.textStyle.copyWith(
-                            height: ReaderTheme.bodyHeight,
-                            color: reader.rubric,
-                            fontWeight: FontWeight.w600,
-                          )
-                        : null,
-                  ),
-              ],
-            ),
-        ],
-      ),
-      textAlign: alignment,
+    final span = TextSpan(
+      style: widget.textStyle.copyWith(height: ReaderTheme.bodyHeight),
+      children: [
+        for (final sentence in sentences)
+          TextSpan(
+            style: _sentenceStyle(context, '$namespace:${sentence.index}'),
+            children: [
+              for (final piece in sentence.text.split(
+                RegExp(r'(?=[*†])|(?<=[*†])'),
+              ))
+                TextSpan(
+                  text: piece,
+                  recognizer:
+                      namespace == null || widget.onSentenceTap == null
+                      ? null
+                      : _recognizerFor('$namespace:${sentence.index}'),
+                  style: piece == '*' || piece == '†'
+                      ? widget.textStyle.copyWith(
+                          height: ReaderTheme.bodyHeight,
+                          color: reader.rubric,
+                          fontWeight: FontWeight.w600,
+                        )
+                      : null,
+                ),
+            ],
+          ),
+      ],
     );
+    // Rubric marks (`*`, `†`) and psalmody keep the existing renderer.
+    if (widget.isProse && !widget.isPsalm && !plainText.contains(RegExp(r'[*†]'))) {
+      return HyphenatedProse(
+        span: span,
+        selected: selected,
+        style: widget.textStyle.copyWith(height: ReaderTheme.bodyHeight),
+      );
+    }
+    return Text.rich(span, textAlign: alignment);
   }
 
   TextStyle _sentenceStyle(BuildContext context, String sentenceId) {
@@ -2209,7 +2258,7 @@ class _ReadingSection extends StatefulWidget {
   final ReaderTheme reader;
   final Map<String, String> highlights;
   final String? selectedSentenceId;
-  final ValueChanged<String> onSentenceTap;
+  final ValueChanged<String>? onSentenceTap;
 
   /// Gospel (closing «Гэта слова Пана.»); by default from the label.
   final bool? gospel;

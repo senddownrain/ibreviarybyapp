@@ -27,7 +27,8 @@ void main() {
     );
     expect(category.name, 'Набажэнствы');
     expect(category.priestOnly, isFalse);
-    expect(docs, hasLength(report['prayerCount'] as int));
+    // The historical report covers reviewed devotions, not the size of
+    // the evolving prayer catalog. Verify their identities and hashes below.
     final listed = prayersForCategory(
       [for (final doc in docs.entries) Prayer.fromMap(doc.value, doc.key)],
       category,

@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/screens/prayers_screen.dart';
 import 'package:mybrev_flutter/widgets/category_icon.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'prayer_category_contract_test.dart' show fixtureContent;
 
@@ -27,6 +28,115 @@ Future<void> reveal(WidgetTester tester, Finder finder) async {
 }
 
 void main() {
+  testWidgets(
+    'comment-only leaf makes ancestors visible and reopens collapsed',
+    (tester) async {
+      final content = fixtureContent();
+      content.categories['comment-parent'] = {'name': 'Comment parent'};
+      content.categories['comment-leaf'] = {
+        'name': 'Comment leaf',
+        'parentId': 'comment-parent',
+        'comment': {
+          'content': 'Leaf fixture text',
+          'sourceId': 'unknown-source',
+        },
+      };
+      await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+      await tester.pumpAndSettle();
+      final parent = find.byKey(const ValueKey('category-comment-parent'));
+      final leaf = find.byKey(const ValueKey('category-comment-leaf'));
+      final comment = find.text('Пра гэты раздзел');
+      final body = find.text('Leaf fixture text', findRichText: true);
+      await reveal(tester, parent);
+      expect(leaf, findsNothing);
+      await tester.tap(parent);
+      await tester.pumpAndSettle();
+      final router = GoRouter.of(tester.element(leaf));
+      await tester.tap(leaf);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('prayer-list-empty')), findsNothing);
+      expect(find.text('Малітвы гэтай катэгорыі'), findsNothing);
+      expect(find.byType(PrayerListRow), findsNothing);
+      expect(body, findsNothing);
+      await tester.tap(comment);
+      await tester.pumpAndSettle();
+      expect(body, findsOneWidget);
+      expect(find.byKey(const Key('prayer-source')), findsNothing);
+      router.pop();
+      await tester.pumpAndSettle();
+      await tester.tap(leaf);
+      await tester.pumpAndSettle();
+      expect(comment, findsOneWidget);
+      expect(body, findsNothing);
+      final settings = ProviderScope.containerOf(
+        tester.element(comment),
+      ).read(settingsProvider.notifier);
+      settings.hideGlobalPrayerCategory('comment-leaf');
+      await tester.pumpAndSettle();
+      expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
+    },
+  );
+
+  testWidgets('expanded restricted comment disappears when the grant expires', (
+    tester,
+  ) async {
+    final content = fixtureContent();
+    content.categories['closed-comment'] = {
+      'name': 'Restricted comment-only child',
+      'parentId': 'closed',
+      'comment': {'content': 'Synthetic restricted comment text'},
+    };
+    await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+    await tester.pumpAndSettle();
+    final element = tester.element(find.byType(PrayersScreen));
+    final router = GoRouter.of(element);
+    final controller =
+        ProviderScope.containerOf(element).read(priestAccessProvider.notifier)
+            as CategorySmokeAccess;
+    router.go('/prayers/category/closed-comment');
+    await tester.pumpAndSettle();
+    expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
+    controller.setGranted(true);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.pumpAndSettle();
+    final text = find.text(
+      'Synthetic restricted comment text',
+      findRichText: true,
+    );
+    expect(text, findsOneWidget);
+    controller.setGranted(true);
+    await tester.pumpAndSettle();
+    expect(text, findsNothing);
+    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.pumpAndSettle();
+    expect(text, findsOneWidget);
+    final updated = PrayerAccessContent(content.prayers, {
+      ...content.categories,
+      'closed-comment': {
+        ...content.categories['closed-comment']!,
+        'comment': {'content': 'Updated synthetic restricted comment'},
+      },
+    });
+    controller.replaceAuthorized(updated);
+    await tester.pump();
+    final updatedText = find.text(
+      'Updated synthetic restricted comment',
+      findRichText: true,
+    );
+    expect(text, findsNothing);
+    expect(updatedText, findsNothing);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.pumpAndSettle();
+    expect(updatedText, findsOneWidget);
+    controller.setGranted(false);
+    await tester.pump();
+    expect(text, findsNothing);
+    expect(updatedText, findsNothing);
+    expect(find.text('Катэгорыя не знойдзена'), findsOneWidget);
+  });
+
   testWidgets(
     'category pages: roots, keyboard, children before direct prayers, reader/back',
     (tester) async {
@@ -166,6 +276,82 @@ void main() {
     await tester.pumpAndSettle();
     expect(offset(), closeTo(beforeReader, 1));
   });
+
+  testWidgets(
+    'protected collections use existing category rows and stay out of the menu',
+    (tester) async {
+      final content = fixtureContent();
+      content.categories['closed']!['name'] = 'Для святара';
+      content.categories['marian'] = {
+        'name': 'Для марыянаў',
+        'effectiveAccessSets': ['marian'],
+        'order': 2,
+        'prayerIds': ['marian-example'],
+      };
+      content.prayers['marian-example'] = {
+        'title': 'Synthetic Marian title',
+        'text': 'Synthetic Marian body',
+        'effectiveAccessSets': ['marian'],
+      };
+      await tester.pumpWidget(PrayerCategoriesHarness(content: content));
+      await tester.pumpAndSettle();
+      final marian = find.byKey(const ValueKey('category-marian'));
+      final priest = find.byKey(const ValueKey('category-closed'));
+      expect(marian, findsNothing);
+      expect(priest, findsNothing);
+      await tester.tap(find.byTooltip('Grant'));
+      await tester.pumpAndSettle();
+      await reveal(tester, marian);
+      expect(find.text('Для марыянаў'), findsOneWidget);
+      final tile = tester.widget<ListTile>(
+        find.descendant(of: marian, matching: find.byType(ListTile)),
+      );
+      final lock = tester.widget<PhosphorIcon>(
+        find.descendant(
+          of: marian,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is PhosphorIcon &&
+                widget.icon == PhosphorIconsRegular.lockSimple,
+          ),
+        ),
+      );
+      expect(lock.icon, PhosphorIconsRegular.lockSimple);
+      expect(tile.minTileHeight, 58);
+      expect((tile.title! as Text).style?.color, lock.color);
+
+      await tester.tap(find.byTooltip('Меню'));
+      await tester.pumpAndSettle();
+      final popup = find.byKey(const Key('app-overflow-content'));
+      expect(
+        find.descendant(of: popup, matching: find.text('Налады')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: popup, matching: find.text('Для марыянаў')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: popup, matching: find.text('Для святароў')),
+        findsNothing,
+      );
+      Navigator.of(tester.element(popup)).pop();
+      await tester.pumpAndSettle();
+
+      await reveal(tester, priest);
+      expect(find.text('Для святароў'), findsOneWidget);
+      await tester.ensureVisible(marian);
+      await tester.tap(marian);
+      await tester.pumpAndSettle();
+      expect(find.text('Synthetic Marian title'), findsOneWidget);
+      await tester.tap(find.text('Synthetic Marian title'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Synthetic Marian body', findRichText: true),
+        findsWidgets,
+      );
+    },
+  );
 
   testWidgets(
     'revoke removes private lists, favorites/search, category management and deep links immediately',

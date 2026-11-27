@@ -142,7 +142,8 @@ jobs:
         run: flutter test test/liturgical_alternatives_test.dart test/pastors_hymn_test.dart
       - name: Prayer category pages, membership and cache regression
         run: >-
-          flutter test test/prayer_category_widget_test.dart
+          flutter test test/prayer_category_widget_test.dart test/native_offline_catalog_test.dart
+          test/prayer_category_comment_test.dart test/prayer_category_comment_bundle_test.dart
           test/prayer_category_contract_test.dart test/prayer_category_security_test.dart
           test/prayer_categories_provider_test.dart test/prayers_provider_test.dart
           test/category_icons_test.dart
@@ -199,6 +200,9 @@ jobs:
           flutter test test/devotional_office_test.dart test/devotional_office_widget_test.dart
           test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
           test/reader_alignment_test.dart
+
+      - name: Belarusian hyphenation, links, formatting and selection
+        run: flutter test test/hyphenated_prose_test.dart test/reading_alignment_test.dart
 
       - name: Psalmody bundle, alternatives and existing local data
         run: |

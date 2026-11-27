@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1795025405000,
-  "contentDate": "2026-11-18T18:10:05.000Z",
+  "contentVersion": 1795766373541,
+  "contentDate": "2026-11-27T07:59:33.541Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -60,22 +60,22 @@
     },
     "prayers": {
       "file": "prayers.json.gz",
-      "contentVersion": 1795025405000,
-      "contentDate": "2026-11-18T18:10:05.000Z",
-      "count": 394,
-      "digest": "ace6a693cc233dc8",
-      "storedBytes": 3431615,
-      "bundleBytes": 625308,
+      "contentVersion": 1795766373541,
+      "contentDate": "2026-11-27T07:59:33.541Z",
+      "count": 418,
+      "digest": "69bc96d23d4f95f4",
+      "storedBytes": 3512819,
+      "bundleBytes": 648179,
       "minimumRemoteVersion": 6
     },
     "prayerCategories": {
       "file": "prayerCategories.json.gz",
-      "contentVersion": 1794938564491,
-      "contentDate": "2026-11-17T18:02:44.491Z",
-      "count": 22,
-      "digest": "74bfbc42f0252bf4",
-      "storedBytes": 7340,
-      "bundleBytes": 3246,
+      "contentVersion": 1795766373541,
+      "contentDate": "2026-11-27T07:59:33.541Z",
+      "count": 30,
+      "digest": "1182b3d7c79d6aa3",
+      "storedBytes": 35330,
+      "bundleBytes": 12085,
       "minimumRemoteVersion": 3
     },
     "songs": {

@@ -35,6 +35,10 @@ final tourEnabledProvider = Provider<bool>(
   (ref) => HiveService.isSettingsReady,
 );
 
+/// Set for the rest of the app run in which the welcome screen was answered:
+/// no invitation then. The next launch offers it as before.
+final tourInviteDeferredProvider = StateProvider<bool>((ref) => false);
+
 /// «Як карыстацца дадаткам» bumps this; the host starts a manual tour.
 final tourRequestProvider = StateProvider<int>((ref) => 0);
 
@@ -180,6 +184,7 @@ class _TourHostState extends ConsumerState<TourHost>
   void _scheduleInvitation() {
     _settle?.cancel();
     if (_phase != _Phase.idle || !ref.read(tourEnabledProvider)) return;
+    if (ref.read(tourInviteDeferredProvider)) return;
     final state = ref.read(discoveryStateProvider).valueOrNull;
     if (state == null) return;
     _settleStaleRun(state);

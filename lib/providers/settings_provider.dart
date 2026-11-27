@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
 import 'package:mybrev_flutter/models/psalmody_preferences.dart';
+import 'package:mybrev_flutter/services/hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -150,6 +151,7 @@ class SettingsState {
   final String fontFamily;
   final TextAlign textAlignment;
   final bool keepScreenOn;
+  final bool readingsHighlightEnabled;
   final List<UserCategory> userCategories;
   final List<String> hiddenGlobalPrayerCategoryIds;
   final List<String> favoriteIds;
@@ -166,7 +168,8 @@ class SettingsState {
     this.fontSize = kDefaultReaderFontSize,
     this.fontFamily = ReaderFontFamily.literata,
     this.textAlignment = TextAlign.justify,
-    this.keepScreenOn = false,
+    this.keepScreenOn = true,
+    this.readingsHighlightEnabled = false,
     this.userCategories = const [],
     this.hiddenGlobalPrayerCategoryIds = const [],
     this.favoriteIds = const [],
@@ -190,6 +193,7 @@ class SettingsState {
     String? fontFamily,
     TextAlign? textAlignment,
     bool? keepScreenOn,
+    bool? readingsHighlightEnabled,
     List<UserCategory>? userCategories,
     List<String>? hiddenGlobalPrayerCategoryIds,
     List<String>? favoriteIds,
@@ -204,6 +208,8 @@ class SettingsState {
     fontFamily: fontFamily ?? this.fontFamily,
     textAlignment: textAlignment ?? this.textAlignment,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
+    readingsHighlightEnabled:
+        readingsHighlightEnabled ?? this.readingsHighlightEnabled,
     userCategories: userCategories ?? this.userCategories,
     hiddenGlobalPrayerCategoryIds:
         hiddenGlobalPrayerCategoryIds ?? this.hiddenGlobalPrayerCategoryIds,
@@ -258,7 +264,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
             as String,
       ),
       textAlignment: normalizeTextAlignment(_box.get('textAlignment')),
-      keepScreenOn: _box.get('keepScreenOn', defaultValue: false) as bool,
+      keepScreenOn: _box.get('keepScreenOn', defaultValue: true) as bool,
+      readingsHighlightEnabled:
+          _box.get('readingsHighlightEnabled', defaultValue: false) as bool,
       userCategories: _migratedUserCategories(cats),
       hiddenGlobalPrayerCategoryIds: List<String>.from(
         jsonDecode(hiddenCategories) as List,
@@ -312,7 +320,6 @@ class SettingsNotifier extends Notifier<SettingsState> {
     await _box.put('fontSize', state.fontSize);
     await _box.put('fontFamily', state.fontFamily);
     await _box.put('textAlignment', state.textAlignment.name);
-    await _box.put('keepScreenOn', state.keepScreenOn);
     await _box.put(
       'userCategories',
       jsonEncode(state.userCategories.map((c) => c.toMap()).toList()),
@@ -383,10 +390,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
     _box.put('textAlignment', alignment.name);
   }
 
-  void setKeepScreenOn(bool value) {
+  Future<void> setReadingsHighlightEnabled(bool value) async {
+    state = state.copyWith(readingsHighlightEnabled: value);
+    await _box.put('readingsHighlightEnabled', value);
+  }
+
+  Future<void> setKeepScreenOn(bool value) async {
     if (state.keepScreenOn != value) analyticsFeature('keep_screen_on_toggle');
     state = state.copyWith(keepScreenOn: value);
-    _save();
+    await _box.put('keepScreenOn', value);
   }
 
   Future<void> setPsalmodyMode(PsalmodyMode value) async {
@@ -507,6 +519,30 @@ class SettingsNotifier extends Notifier<SettingsState> {
   void setStartSection(String section) {
     state = state.copyWith(startSection: _validStartSection(section));
     _save();
+  }
+
+  /// Stores the welcome-screen choice. Throws if it could not be written, and
+  /// the welcome screen then stays pending.
+  Future<void> completeOnboarding(String section) async {
+    final valid = _validLastSection(section);
+    try {
+      // The choice goes first: a write cut short leaves the marker pending.
+      await _box.putAll({
+        'startSection': valid,
+        HiveService.onboardingKey: HiveService.onboardingDone,
+      });
+      await _box.flush();
+    } catch (_) {
+      if (_box.isOpen &&
+          _box.get(HiveService.onboardingKey) == HiveService.onboardingDone) {
+        await _box.put(
+          HiveService.onboardingKey,
+          HiveService.onboardingPending,
+        );
+      }
+      rethrow;
+    }
+    state = state.copyWith(startSection: valid);
   }
 
   void rememberLastSection(String section) {

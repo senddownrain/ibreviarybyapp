@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/models/prayer_menu_category.dart';
 import 'package:mybrev_flutter/services/prayer_category_membership.dart';
 
 const kMaxPrayerCategoryDepth = 64;
@@ -9,6 +10,15 @@ class PriestAccessPolicy {
   final Map<String, Map<String, dynamic>> categories;
   final Map<String, bool> _restricted = {};
   final Map<String, bool> _valid = {};
+
+  bool _markedRestricted(Map document) =>
+      document['priestOnly'] == true ||
+      document['effectivePriestOnly'] == true ||
+      document['accessSchemaVersion'] == 2 ||
+      (document['accessSets'] is List &&
+          (document['accessSets'] as List).isNotEmpty) ||
+      (document['effectiveAccessSets'] is List &&
+          (document['effectiveAccessSets'] as List).isNotEmpty);
 
   bool categoryValid(String id) {
     if (_valid.containsKey(id)) return _valid[id]!;
@@ -33,8 +43,7 @@ class PriestAccessPolicy {
     var current = id;
     while (true) {
       final category = categories[current]!;
-      if (category['priestOnly'] == true ||
-          category['effectivePriestOnly'] == true) {
+      if (_markedRestricted(category)) {
         return _restricted[id] = true;
       }
       final parent = category['parentId']?.toString();
@@ -43,8 +52,19 @@ class PriestAccessPolicy {
     }
   }
 
+  bool categoryPublished(String id) {
+    if (!categoryValid(id)) return false;
+    String? current = id;
+    while (current != null && current.isNotEmpty) {
+      final category = categories[current]!;
+      if (!isPublishedPrayerCategory(category)) return false;
+      current = category['parentId']?.toString();
+    }
+    return true;
+  }
+
   bool prayerRestricted(Map prayer, {String? id}) {
-    if (prayer['priestOnly'] == true || prayer['effectivePriestOnly'] == true) {
+    if (_markedRestricted(prayer)) {
       return true;
     }
     final prayerId = id ?? prayer['id']?.toString() ?? '';

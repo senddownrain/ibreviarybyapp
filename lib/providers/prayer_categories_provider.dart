@@ -31,33 +31,45 @@ final globalPrayerCategoriesProvider = StreamProvider<List<PrayerMenuCategory>>(
             if (box.get(key) case final Map data)
               key: Map<String, dynamic>.from(data),
         };
-    final policy = PriestAccessPolicy(source);
-    final documents = [
-      for (final entry in source.entries)
-        if (policy.categoryValid(entry.key) &&
-            (access.content != null || !policy.categoryRestricted(entry.key)))
-          (
-            entry.key,
-            {
-              ...entry.value,
-              'effectivePriestOnly': policy.categoryRestricted(entry.key),
-            },
-          ),
-    ];
-    yield documents
-        .map((item) => PrayerMenuCategory.global(item.$1, item.$2))
-        .where((category) => category.name.isNotEmpty)
-        .toList(growable: false)
-      ..sort(comparePrayerCategories);
+    yield projectPrayerCategories(
+      source,
+      allowRestricted: access.content != null,
+    );
   },
 );
+
+List<PrayerMenuCategory> projectPrayerCategories(
+  Map<String, Map<String, dynamic>> source, {
+  required bool allowRestricted,
+}) {
+  final policy = PriestAccessPolicy(source);
+  return [
+    for (final id in source.keys)
+      ?_projectCategory(policy, id, allowRestricted),
+  ]..sort(comparePrayerCategories);
+}
+
+PrayerMenuCategory? _projectCategory(
+  PriestAccessPolicy policy,
+  String id,
+  bool allowRestricted,
+) {
+  if (!policy.categoryPublished(id)) return null;
+  final restricted = policy.categoryRestricted(id);
+  if (restricted && !allowRestricted) return null;
+  final category = PrayerMenuCategory.global(id, {
+    ...policy.categories[id]!,
+    'effectivePriestOnly': restricted,
+  });
+  return category.name.isEmpty ? null : category;
+}
 
 /// Combines database-managed defaults with local user customizations.
 /// Global categories win on duplicate names, matching the web application.
 final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
   final settings = ref.watch(settingsProvider);
   final globalCategories =
-      ref.watch(globalPrayerCategoriesProvider).value ?? [];
+      ref.watch(visibleGlobalPrayerCategoriesProvider).value ?? [];
   return buildPrayerCategoryMenu(
     globalCategories,
     settings.userCategories,
@@ -67,6 +79,32 @@ final prayerMenuCategoriesProvider = Provider<List<PrayerMenuCategory>>((ref) {
     allowRestricted: ref.watch(priestAccessProvider).content != null,
   );
 });
+
+// Riverpod retains the previous stream value while a new catalog is emitted.
+// Gate that value against today's access before any screen can render it.
+final visibleGlobalPrayerCategoriesProvider =
+    Provider<AsyncValue<List<PrayerMenuCategory>>>((ref) {
+      final access = ref.watch(priestAccessProvider);
+      final categories = ref.watch(globalPrayerCategoriesProvider);
+      final source = (access.content ?? access.publicContent)?.categories;
+      final policy = source == null ? null : PriestAccessPolicy(source);
+      if (policy == null) {
+        return categories.whenData(
+          (items) => items.where((item) => !item.isProtected).toList(),
+        );
+      }
+      return categories.whenData(
+        (items) => [
+          for (final item in items)
+            if (!item.isProtected &&
+                policy.categoryPublished(item.id) &&
+                !policy.categoryRestricted(item.id))
+              item
+            else
+              ?_projectCategory(policy, item.id, access.content != null),
+        ],
+      );
+    });
 
 List<PrayerMenuCategory> buildPrayerCategoryMenu(
   List<PrayerMenuCategory> globalCategories,
@@ -83,7 +121,7 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
     for (final category in globalCategories)
       category.id: {
         'parentId': category.parentId,
-        'priestOnly': category.priestOnly,
+        'priestOnly': category.isProtected,
       },
   });
 
@@ -111,7 +149,9 @@ List<PrayerMenuCategory> buildPrayerCategoryMenu(
   };
   final visible = <String>{};
   for (final category in byId.values) {
-    if (prayersForCategory(permittedPrayers, category, settings).isEmpty) {
+    if (!category.isProtected &&
+        category.comment == null &&
+        prayersForCategory(permittedPrayers, category, settings).isEmpty) {
       continue;
     }
     var current = category;

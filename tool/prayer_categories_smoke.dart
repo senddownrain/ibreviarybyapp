@@ -38,6 +38,13 @@ void main() {
         'title': 'PRIVATE SHARED FIXTURE',
         'text': 'PRIVATE TEXT FIXTURE',
       },
+      'marian-fixture': {
+        'title': 'Малітва для праверкі рубрык',
+        'textFormat': 'mybrev-markdown',
+        'text':
+            ':::rubric\nРубрыка для праверкі\n:::\n\nЛ. За нашую краіну\nУ. Пане, пачуй нас.\n\n_(аўтар)_',
+        'effectiveAccessSets': ['marian'],
+      },
     },
     {
       'root': {
@@ -46,6 +53,29 @@ void main() {
         'prayerIds': ['manual', 'both', 'shared-private'],
         'order': 10,
         'iconKey': 'virgin-mary',
+        'comment': {
+          'title': 'Тлумачэнне',
+          'content':
+              '''## Перад чытаннем
+
+Гэта **сінтэтычны тэкст** для праверкі адлюстравання.
+
+> Прыклад аформленай цытаты.
+
+- Першы пункт спіса.
+- Другі пункт з _вылучэннем_.
+
+:::rubric
+Прыклад аформленай рубрыкі.
+:::
+
+[Адкрыць прыклад малітвы](/prayer/manual)
+
+${List.filled(8, 'Доўгі каментарый пракручваецца разам са спісам катэгорый і малітваў.').join('\n\n')}
+
+Канец сінтэтычнага каментарыя.''',
+          'sourceId': 'ojcha-nash-2022',
+        },
       },
       'middle': {
         'name': 'Малітвы на кожны дзень',
@@ -63,11 +93,24 @@ void main() {
         'iconKey': 'candle',
       },
       'legacy': {'name': 'Іншыя малітвы', 'tags': [], 'order': 20},
+      'comment-only': {
+        'name': 'Раздзел з каментарыем',
+        'parentId': 'root',
+        'order': 30,
+        'comment': {'content': 'Тэкст раздзела без асобных запісаў.'},
+      },
       'folder': {'name': 'Empty fixture folder', 'tags': [], 'order': 30},
       'closed': {
-        'name': 'PRIVATE CATEGORY FIXTURE',
+        'name': 'Для святара',
         'priestOnly': true,
         'prayerIds': ['shared-private'],
+      },
+      'marian-fixture': {
+        'name': 'Для марыянаў',
+        'effectiveAccessSets': ['marian'],
+        'iconKey': 'virgin-mary',
+        'prayerIds': ['marian-fixture'],
+        'comment': {'content': 'Сінтэтычны каментарый закрытага зборніка.'},
       },
     },
   );

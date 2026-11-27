@@ -126,10 +126,13 @@ final allPrayersProvider = Provider<List<Prayer>>((ref) {
 /// The full Prayerbook catalog. Built-in and local prayers deliberately share
 /// one source so favorite state and list actions cannot drift between screens.
 final prayerCatalogProvider = Provider<List<Prayer>>((ref) {
-  final prayers = [
-    ...ref.watch(allPrayersProvider),
-    ...ref.watch(localPrayersProvider),
-  ];
+  final prayers = {
+    for (final prayer in [
+      ...ref.watch(localPrayersProvider),
+      ...ref.watch(allPrayersProvider),
+    ])
+      prayer.id: prayer,
+  }.values.toList();
   prayers.sort((a, b) => _comparePrayerTitles(a.displayTitle, b.displayTitle));
   return prayers;
 });

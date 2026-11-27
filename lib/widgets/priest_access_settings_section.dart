@@ -13,6 +13,7 @@ class _PriestAccessSettingsSectionState
     extends ConsumerState<PriestAccessSettingsSection> {
   final _code = TextEditingController();
   final _name = TextEditingController();
+  bool _addingCode = false;
   @override
   void dispose() {
     _code.dispose();
@@ -23,17 +24,31 @@ class _PriestAccessSettingsSectionState
   @override
   Widget build(BuildContext context) {
     final access = ref.watch(priestAccessProvider);
+    final nativeOffline = ref.watch(protectedCatalogStorageProvider) != null;
+    final showForm =
+        !access.pendingDisable &&
+        (!access.registered || (access.canAddCode && _addingCode));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Text('Асаблівы доступ', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
         Text(
-          'Доступ для святароў',
-          style: Theme.of(context).textTheme.titleMedium,
+          'Для святароў і кансэкраваных асобаў',
+          style: Theme.of(context).textTheme.bodySmall,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
+        if (access.pendingDisable)
+          const Text('Чакаем пацвярджэння выключэння доступу.'),
         if (access.registered) ...[
           const Text('Доступ актываваны'),
           const Text('Паўторна ўводзіць код не трэба.'),
+          if (nativeOffline && access.catalogLoading) ...[
+            const SizedBox(height: 8),
+            const Text('Спампоўваем малітвы…'),
+            const LinearProgressIndicator(),
+          ] else if (access.offlineReady)
+            const Text('Малітвы даступныя афлайн'),
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: access.busy
@@ -65,11 +80,15 @@ class _PriestAccessSettingsSectionState
                   },
             child: const Text('Выключыць доступ'),
           ),
-        ] else ...[
-          const Text(
-            'Увядзіце код адзін раз, каб атрымаць доступ да малітваў і абрадаў для святароў.',
-          ),
-          const SizedBox(height: 12),
+          if (access.canAddCode && !_addingCode)
+            TextButton(
+              onPressed: access.busy
+                  ? null
+                  : () => setState(() => _addingCode = true),
+              child: const Text('Увесці яшчэ адзін код'),
+            ),
+        ],
+        if (showForm) ...[
           TextField(
             key: const Key('priest-code'),
             controller: _code,
@@ -87,17 +106,18 @@ class _PriestAccessSettingsSectionState
           ),
           const SizedBox(height: 12),
           FilledButton(
-            onPressed: access.busy
+            onPressed: access.busy || access.quotaBlocked
                 ? null
                 : () async {
                     FocusScope.of(context).unfocus();
                     final submittedCode = _code.text;
+                    _code.clear();
                     final controller = ref.read(priestAccessProvider.notifier);
                     await controller.activate(submittedCode, _name.text);
                     if (mounted &&
                         ref.read(priestAccessProvider).registered &&
-                        _code.text == submittedCode) {
-                      _code.clear();
+                        ref.read(priestAccessProvider).error == null) {
+                      setState(() => _addingCode = false);
                     }
                   },
             child: const Text('Адкрыць доступ'),
@@ -109,6 +129,11 @@ class _PriestAccessSettingsSectionState
           ],
         ],
         if (access.busy) const LinearProgressIndicator(),
+        if (access.quotaBlocked)
+          TextButton(
+            onPressed: ref.read(priestAccessProvider.notifier).retryAfterQuota,
+            child: const Text('Паўтарыць праверку доступу'),
+          ),
         if (access.error != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -119,7 +144,9 @@ class _PriestAccessSettingsSectionState
           ),
         const SizedBox(height: 8),
         Text(
-          'Малітвы для святароў даступныя пры злучэнні з інтэрнэтам.',
+          nativeOffline
+              ? 'Пасля спампоўвання малітвы даступныя без інтэрнэту.'
+              : 'Дадатковыя малітвы даступныя пры злучэнні з інтэрнэтам.',
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],

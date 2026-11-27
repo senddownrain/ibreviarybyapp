@@ -1,3 +1,4 @@
+import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 import 'package:mybrev_flutter/utils/picked_feast_readings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -2207,12 +2208,30 @@ class _HtmlOrText extends ConsumerWidget {
     if (alternativeKind == 'reading' ||
         alternativeKind == 'office-reading' ||
         alternativeKind == 'responsory') {
-      return _renderOfficeHtml(semanticBody, styles);
+      return _renderOfficeHtml(semanticBody, styles, textAlignment);
     }
-    return Html(data: formatLiturgicalHtml(semanticBody), style: styles);
+    final formatted = formatLiturgicalHtml(semanticBody);
+    // Only the final prayer is prose here; hymns, antiphons, intercessions,
+    // psalmody and responsories keep the stock renderer.
+    if (alternativeKind == 'prayer') {
+      return HyphenatedHtml(
+        data: formatted,
+        style: styles,
+        selected: textAlignment,
+      );
+    }
+    return Html(data: formatted, style: styles);
   }
 
-  Widget _renderOfficeHtml(String html, Map<String, Style> styles) {
+  Widget _renderOfficeHtml(
+    String html,
+    Map<String, Style> styles,
+    TextAlign textAlignment,
+  ) {
+    final hyphenate = alternativeKind != 'responsory';
+    Widget htmlBlock(String data) => hyphenate
+        ? HyphenatedHtml(data: data, style: styles, selected: textAlignment)
+        : Html(data: data, style: styles);
     final formatted = formatLiturgicalHtml(html);
     final root = parseFragment(formatted);
     final parts =
@@ -2275,7 +2294,7 @@ class _HtmlOrText extends ConsumerWidget {
     }
     flush();
     if (!parts.any((part) => part.turns || part.title != null)) {
-      return Html(data: formatted, style: styles);
+      return htmlBlock(formatted);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2295,7 +2314,7 @@ class _HtmlOrText extends ConsumerWidget {
           else
             part.turns
                 ? LiturgicalResponsoryBlock(html: part.html, style: styles)
-                : Html(data: part.html, style: styles),
+                : htmlBlock(part.html),
       ],
     );
   }

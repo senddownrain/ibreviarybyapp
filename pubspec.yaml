@@ -61,6 +61,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logo.png
+    # The approved app icon without its background (from brand_splash_icon).
+    - assets/brand_mark.png
     - assets/mary.png
     - assets/bible_seed_bel.json.gz
     - assets/bible_seed_ru.json.gz
@@ -71,6 +73,8 @@ flutter:
     - assets/category_icons/
     - assets/compendium/compendium_search_aliases.json
     - assets/legal/sources.json
+    # Belarusian hyphenation patterns (hyph-utf8 `hyph-be`, MIT, M. Salau).
+    - assets/hyphenation/hyph-be.tex
     # Book faces used by ReaderTheme, bundled so the first launch without a
     # network has the right typography (google_fonts reads these first).
     - assets/google_fonts/

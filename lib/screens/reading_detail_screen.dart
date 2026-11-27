@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/models/reading.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -12,6 +11,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/liturgical_html.dart';
+import 'package:mybrev_flutter/utils/reading_alignment.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
 
@@ -116,13 +117,48 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
   }
 
   Widget _buildRendered(String text, TextStyle textStyle) {
-    final alignment = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    final selected = ref.watch(settingsProvider.select((s) => s.textAlignment));
+    return AdaptiveProseAlignment(
+      selected: selected,
+      style: textStyle,
+      builder: (context, alignment) =>
+          _renderProse(context, text, textStyle, alignment, selected),
+    );
+  }
+
+  Widget _renderProse(
+    BuildContext context,
+    String text,
+    TextStyle textStyle,
+    TextAlign alignment,
+    TextAlign selected,
+  ) {
     if (text.contains('<') && text.contains('>')) {
       final reader = ReaderTheme.of(context);
       final styles = liturgicalDocumentStyles(reader: reader, body: textStyle);
       styles['body']!.textAlign = alignment;
       styles['p']!.textAlign = alignment;
-      return Html(data: formatLiturgicalHtml(text), style: styles);
+      // Keyed by the text, so a selection never carries over to another one.
+      return SelectionArea(
+        key: ValueKey(text),
+        child: HyphenatedHtml(
+          data: formatLiturgicalHtml(text),
+          style: styles,
+          selected: selected,
+        ),
+      );
+    }
+    // Running prose without rubric marks gets hyphenation; psalm-style text
+    // with `*` / `†` keeps the stock selectable renderer.
+    if (!text.contains(RegExp(r'[*†]'))) {
+      return SelectionArea(
+        key: ValueKey(text),
+        child: HyphenatedProse(
+          span: TextSpan(text: text, style: textStyle),
+          selected: selected,
+          style: textStyle,
+        ),
+      );
     }
     final rubric = ReaderTheme.of(context).rubric;
     return SelectableText.rich(

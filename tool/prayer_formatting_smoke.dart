@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mybrev_flutter/hyphenation/hyphenation_service.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
@@ -11,6 +12,7 @@ import 'package:mybrev_flutter/dev/prayer_formatting_harness.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
+  await BelarusianHyphenation.ensureLoaded();
   final prayers = decodeContentCollection(
     (await rootBundle.load(
       'assets/content/prayers.json.gz',
