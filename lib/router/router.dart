@@ -10,6 +10,7 @@ import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/source_documents.dart';
 import 'package:mybrev_flutter/screens/source_documents_screen.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/novena/ui/novena_routes.dart';
 import 'package:mybrev_flutter/providers/diocese_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/hive_service.dart';
@@ -768,6 +769,7 @@ final router = GoRouter(
         state,
       ),
     ),
+    ...novenaRoutes(rootNavigatorKey),
     GoRoute(
       parentNavigatorKey: rootNavigatorKey,
       path: '/settings',

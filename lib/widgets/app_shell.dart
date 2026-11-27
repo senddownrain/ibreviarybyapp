@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
 import 'package:mybrev_flutter/navigation/app_navigation.dart';
+import 'package:mybrev_flutter/novena/ui/novena_day_watcher.dart';
 import 'package:mybrev_flutter/providers/liturgical_provider.dart';
 import 'package:mybrev_flutter/providers/liturgical_navigation_sync_provider.dart';
 import 'package:mybrev_flutter/providers/readings_navigation_provider.dart';
@@ -191,6 +192,11 @@ class _AppShellState extends ConsumerState<AppShell> with RestorationMixin {
                         width: 0,
                         height: 0,
                         child: AppReviewHost(child: SizedBox.shrink()),
+                      ),
+                      const Positioned(
+                        width: 0,
+                        height: 0,
+                        child: NovenaDayWatcher(child: SizedBox.shrink()),
                       ),
                       Positioned.fill(
                         child: descriptor.reserveShellTopInset

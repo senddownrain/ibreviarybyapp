@@ -154,6 +154,15 @@
       "digest": "7dbc652d7cbcc5fb",
       "storedBytes": 787749,
       "bundleBytes": 113533
+    },
+    "novenaDefinitions": {
+      "file": "novenaDefinitions.json.gz",
+      "contentVersion": 0,
+      "contentDate": "1970-01-01T00:00:00.000Z",
+      "count": 0,
+      "digest": "e3b0c44298fc1c14",
+      "storedBytes": 0,
+      "bundleBytes": 105
     }
   },
   "priestCacheCleanup": {
