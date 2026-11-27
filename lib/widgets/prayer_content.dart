@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/prayer_legacy_html.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 
 /// One document surface for ordinary prayer reading and local editor preview.
 /// Access checks belong to the containing screen, before constructing this.
@@ -68,9 +69,11 @@ class PrayerDocumentBody extends ConsumerWidget {
     final alignment = ref.watch(
       settingsProvider.select((s) => s.textAlignment),
     );
-    return Html(
+    // Running-text paragraphs inherit the reader's adaptive alignment.
+    return HyphenatedHtml(
       data: prayerMarkdownToHtml(markdown),
       style: prayerDocumentStyles(context, textStyle, textAlignment: alignment),
+      selected: alignment,
       onLinkTap: onLinkTap,
     );
   }

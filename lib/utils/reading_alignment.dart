@@ -16,9 +16,16 @@ const _sample =
     'Ведаем, што калі адкрыецца, мы будзем падобныя да Яго.';
 
 final _advanceCache = <_AdvanceKey, double>{};
+bool _watchingFonts = false;
 
 class _AdvanceKey {
-  const _AdvanceKey(this.family, this.size, this.weight, this.italic, this.spacing);
+  const _AdvanceKey(
+    this.family,
+    this.size,
+    this.weight,
+    this.italic,
+    this.spacing,
+  );
   final String? family;
   final double size;
   final FontWeight? weight;
@@ -44,6 +51,11 @@ double averageCharAdvance(
   TextStyle style, {
   TextScaler textScaler = TextScaler.noScaling,
 }) {
+  if (!_watchingFonts) {
+    // A face that loads later has different advances: measure again.
+    _watchingFonts = true;
+    PaintingBinding.instance.systemFonts.addListener(_advanceCache.clear);
+  }
   final size = textScaler.scale(style.fontSize ?? 16);
   final key = _AdvanceKey(
     style.fontFamily,
@@ -54,7 +66,10 @@ double averageCharAdvance(
   );
   return _advanceCache.putIfAbsent(key, () {
     final painter = TextPainter(
-      text: TextSpan(text: _sample, style: style.copyWith(fontSize: size)),
+      text: TextSpan(
+        text: _sample,
+        style: style.copyWith(fontSize: size),
+      ),
       textDirection: TextDirection.ltr,
     )..layout();
     final advance = painter.width / _sample.length;
