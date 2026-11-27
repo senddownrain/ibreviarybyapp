@@ -4,12 +4,14 @@ import 'package:flutter/widgets.dart';
 /// word gaps (hyphenation is not available in the stock Flutter renderer), so
 /// the paragraph is shown left-aligned instead.
 ///
-/// Chosen from measurements on 152 real readings of `assets/content`
+/// The original threshold of 36 was chosen from 152 real readings of `assets/content`
 /// (4 reader fonts × scales 0.7–1.8 × widths 288–680 dp, see
 /// `tool/hyphenation_lab/REPORT.md`): at ≥ 36 characters per line 5 % of the
 /// kept paragraphs still have > 40 % loose lines and only 4 % of the
 /// paragraphs switched to left would have looked good justified.
-const double kJustifyMinCharsPerLine = 36;
+/// With the Belarusian hyphenating renderer, trial 28 for book-like prose.
+/// The new threshold is a product choice pending visual acceptance.
+const double kJustifyMinCharsPerLine = 28;
 
 const _sample =
     'Умілаваныя, цяпер мы дзеці Божыя, але яшчэ не выявілася, чым будзем. '

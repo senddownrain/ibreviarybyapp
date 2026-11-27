@@ -13,7 +13,7 @@ void main() {
       expect(
         effectiveProseAlignment(
           selected: TextAlign.justify,
-          maxWidth: 360, // 36 characters
+          maxWidth: 280, // 28 characters
           style: _style,
         ),
         TextAlign.justify,
@@ -24,7 +24,7 @@ void main() {
       expect(
         effectiveProseAlignment(
           selected: TextAlign.justify,
-          maxWidth: 359, // 35.9 characters
+          maxWidth: 279, // 27.9 characters
           style: _style,
         ),
         TextAlign.left,
@@ -51,7 +51,8 @@ void main() {
         style: TextStyle(fontSize: size),
       );
       expect(at(10), TextAlign.justify); // 40 characters
-      expect(at(12), TextAlign.left); // 33 characters
+      expect(at(12), TextAlign.justify); // 33 characters
+      expect(at(15), TextAlign.left); // 26.7 characters
       expect(at(10), TextAlign.justify); // back again: no hidden state
     });
 
@@ -121,9 +122,9 @@ void main() {
     }
 
     testWidgets('reacts to the width it is given and recovers', (tester) async {
-      expect(await pumpAt(tester, width: 300), TextAlign.left);
+      expect(await pumpAt(tester, width: 270), TextAlign.left);
       expect(await pumpAt(tester, width: 420), TextAlign.justify);
-      expect(await pumpAt(tester, width: 300), TextAlign.left);
+      expect(await pumpAt(tester, width: 270), TextAlign.left);
     });
 
     testWidgets('explicit left is never turned into justify', (tester) async {
