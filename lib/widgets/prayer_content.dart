@@ -7,6 +7,7 @@ import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/theme/liturgical_document.dart';
 import 'package:mybrev_flutter/utils/prayer_legacy_html.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
+import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
 
 /// One document surface for ordinary prayer reading and local editor preview.
 /// Access checks belong to the containing screen, before constructing this.
@@ -33,9 +34,12 @@ class PrayerContent extends ConsumerWidget {
     final html = prayer.isMarkdown
         ? prayerMarkdownToHtml(prayer.displayText)
         : prayerMarkdownToHtml(prayerLegacyHtmlToMarkdown(prayer.displayText));
-    final body = Html(
+    // Running-text paragraphs get Belarusian hyphenation (B2/D, adaptive);
+    // headings, lists, quotes, rubrics and verse stay with the stock renderer.
+    final body = HyphenatedHtml(
       data: html,
       style: prayerDocumentStyles(context, textStyle, textAlignment: alignment),
+      selected: alignment,
       onLinkTap: onLinkTap,
     );
     final content = Column(

@@ -715,8 +715,8 @@ void main() {
       tester,
     ) async {
       await pump(tester, ContentUpdateState(lastCheck: DateTime.now()));
-      expect(find.text('Даныя і афлайн'), findsOneWidget);
-      expect(find.text('Тэксты даступныя без сеткі'), findsOneWidget);
+      expect(find.text('Дадзеныя афлайн'), findsOneWidget);
+      expect(find.text('Тэксты даступныя афлайн'), findsOneWidget);
       expect(find.text('Актуальныя'), findsOneWidget);
       expect(find.textContaining('Праверана сёння'), findsOneWidget);
       expect(find.text('Праверыць абнаўленні'), findsOneWidget);

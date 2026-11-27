@@ -118,8 +118,15 @@ class FormattingSettings extends SettingsNotifier {
   void setFontFamily(String family) =>
       state = state.copyWith(fontFamily: normalizeReaderFontFamily(family));
   @override
-  void setKeepScreenOn(bool value) =>
-      state = state.copyWith(keepScreenOn: value);
+  Future<void> setKeepScreenOn(bool value) async {
+    state = state.copyWith(keepScreenOn: value);
+  }
+
+  @override
+  Future<void> setReadingsHighlightEnabled(bool value) async {
+    state = state.copyWith(readingsHighlightEnabled: value);
+  }
+
   @override
   Future<void> toggleFavorite(String id) async => state = state.copyWith(
     favoriteIds: state.favoriteIds.contains(id) ? [] : [id],

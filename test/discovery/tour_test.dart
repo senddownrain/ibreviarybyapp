@@ -246,6 +246,29 @@ void main() {
       expect(find.byKey(const Key('tour-invitation')), findsNothing);
     });
 
+    testWidgets('not offered in the run that answered the welcome screen, '
+        'offered on the next launch', (tester) async {
+      final storage = MemoryDiscoveryStorage();
+      final shell = FakeShell();
+      await tester.pumpWidget(
+        app(
+          shell,
+          storage,
+          overrides: [tourInviteDeferredProvider.overrideWith((ref) => true)],
+        ),
+      );
+      await settle(tester);
+      shell.touch();
+      await settle(tester);
+      expect(find.byKey(const Key('tour-invitation')), findsNothing);
+      expect(saved(storage).tourStatus, TourStatus.notOffered);
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpWidget(app(shell, storage));
+      await settle(tester);
+      expect(find.byKey(const Key('tour-invitation')), findsOneWidget);
+    });
+
     testWidgets('ignoring the card and restarting does not bring it back', (
       tester,
     ) async {

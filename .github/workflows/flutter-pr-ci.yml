@@ -196,6 +196,9 @@ jobs:
           test/prayer_formatting_widget_test.dart test/prayer_markdown_test.dart test/mass_reader_test.dart
           test/reader_alignment_test.dart
 
+      - name: Belarusian hyphenation, links, formatting and selection
+        run: flutter test test/hyphenated_prose_test.dart
+
       - name: Psalmody bundle, alternatives and existing local data
         run: |
           dart format --output=show --set-exit-if-changed test/doxology_bundle_test.dart test/common_office_test.dart

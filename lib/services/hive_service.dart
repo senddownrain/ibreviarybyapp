@@ -22,6 +22,13 @@ class HiveService {
   static const _localPrayersBoxName = 'localPrayers';
   static const _settingsBoxName = 'settings';
 
+  /// `settings` key of the first-launch choice: [onboardingPending] on a new
+  /// installation, [onboardingDone] after it. Installations older than the
+  /// welcome screen have no key and never see it.
+  static const onboardingKey = 'onboarding';
+  static const onboardingPending = 'pending';
+  static const onboardingDone = 'done';
+
   static late Box _meta;
   static late Box _localPrayers;
   static Box? _settings;
@@ -51,6 +58,10 @@ class HiveService {
       (_settings?.isOpen ?? false) || Hive.isBoxOpen(_settingsBoxName);
   static Box get settingsBox => _settings ?? Hive.box(_settingsBoxName);
 
+  /// The welcome screen still has to be answered.
+  static bool get needsOnboarding =>
+      isSettingsReady && settingsBox.get(onboardingKey) == onboardingPending;
+
   /// `liturgicalTemplates` by id (a handful of documents).
   static Map<String, Map<String, dynamic>> templates() => {
     for (final key in templatesBox.keys)
@@ -66,17 +77,20 @@ class HiveService {
       Hive.box(box).delete(key);
 
   /// Opens storage. [loadBundle] false (tests): the content starts empty
-  /// and is seeded through the collections' `put`.
+  /// and is seeded through the collections' `put`. [detectFirstLaunch] is on
+  /// in the app and off for tests with their own [path], unless asked for.
   static Future<void> init({
     String? path,
     AssetBundle? bundle,
     bool? loadBundle,
+    bool? detectFirstLaunch,
   }) async {
     if (path == null) {
       await Hive.initFlutter();
     } else {
       Hive.init(path);
     }
+    if (detectFirstLaunch ?? path == null) await _markFirstLaunch();
     _meta = await Hive.openBox(_metaBox);
     _localPrayers = await Hive.openBox(_localPrayersBoxName);
     _settings = await Hive.openBox(_settingsBoxName);
@@ -152,6 +166,18 @@ class HiveService {
       // Tests start on the current model.
       await _meta.put(kContentModelKey, kContentModel);
     }
+  }
+
+  /// Every version so far opened the `meta` box on each launch, so its absence
+  /// means a new installation, even when no setting was ever changed. Must run
+  /// before `meta` is opened: the durable marker then survives a launch that is
+  /// interrupted before the person answers.
+  static Future<void> _markFirstLaunch() async {
+    if (await Hive.boxExists(_metaBox)) return;
+    final settings = await Hive.openBox(_settingsBoxName);
+    if (settings.isNotEmpty) return;
+    await settings.put(onboardingKey, onboardingPending);
+    await settings.flush();
   }
 
   /// The former download cache is read once and removed — after the first

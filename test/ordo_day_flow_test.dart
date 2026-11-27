@@ -42,9 +42,14 @@ class _Idle extends ContentUpdatesNotifier {
 
 class _Settings extends SettingsNotifier {
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() => const SettingsState(readingsHighlightEnabled: true);
   @override
   void rememberLastSection(String section) {}
+
+  @override
+  Future<void> setReadingsHighlightEnabled(bool value) async {
+    state = state.copyWith(readingsHighlightEnabled: value);
+  }
 }
 
 class _AllDioceses extends DioceseSelectionNotifier {
@@ -1183,7 +1188,7 @@ void main() {
   testWidgets(
     'production route tree hides dock and hit-tests readings palette',
     (tester) async {
-      final (router, _) = await start(
+      final (router, container) = await start(
         tester,
         location: '/readings?date=2026-10-07',
       );
@@ -1194,6 +1199,13 @@ void main() {
             widget.text is TextSpan &&
             _tapIn(widget.text) != null,
       );
+      final settings = container.read(settingsProvider.notifier);
+      await settings.setReadingsHighlightEnabled(false);
+      await tester.pumpAndSettle();
+      expect(text, findsNothing);
+      expect(find.byKey(const Key('readings-highlight-palette')), findsNothing);
+      await settings.setReadingsHighlightEnabled(true);
+      await tester.pumpAndSettle();
       await Scrollable.ensureVisible(
         tester.element(text.first),
         alignment: 0.5,
@@ -1233,6 +1245,23 @@ void main() {
         ),
         isTrue,
       );
+      _tapIn(tester.widget<RichText>(text.first).text)!.onTap!();
+      await tester.pumpAndSettle();
+      await settings.setReadingsHighlightEnabled(false);
+      await tester.pumpAndSettle();
+      expect(text, findsNothing);
+      expect(palette, findsNothing);
+      expect(find.byKey(const Key('app-dock-android')), findsOneWidget);
+      expect(
+        saved.any(
+          (key) => (HiveService.settingsBox.get(key) as Map).values.contains(
+            'amber',
+          ),
+        ),
+        true,
+      );
+      await settings.setReadingsHighlightEnabled(true);
+      await tester.pumpAndSettle();
       _tapIn(tester.widget<RichText>(text.first).text)!.onTap!();
       await tester.pumpAndSettle();
       await tester.binding.handlePopRoute();
