@@ -1,13 +1,11 @@
-import 'dart:ui' show SemanticsAction, Tristate;
+import 'dart:ui' show SemanticsAction;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mybrev_flutter/models/prayer_menu_category.dart';
-import 'package:mybrev_flutter/providers/prayer_categories_provider.dart'
-    show projectPrayerCategories;
+import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
 import 'package:mybrev_flutter/widgets/prayer_category_comment.dart';
@@ -99,63 +97,94 @@ void main() {
     },
   );
 
-  testWidgets('comment is collapsed, keyboard accessible and uses reader text', (
+  testWidgets('comment opens a full-screen keyboard-accessible reader', (
     tester,
   ) async {
+    final category = PrayerMenuCategory.global('sample', {
+      'name': 'Прыклад катэгорыі',
+      'comment': {
+        'content':
+            'Тэкст **каментарыя**. [Спасылка](/prayer/example)\n\n'
+            ':::rubric\nПрыклад рубрыкі.\n:::\n\n'
+            '[Небяспечная спасылка](javascript:alert%281%29)\n\n'
+            "${List.filled(12, 'Доўгі тэкст для пракруткі.').join('\n\n')}",
+        'sourceId': 'ojcha-nash-2022',
+      },
+    });
+    String? openedPrayer;
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final semantics = tester.ensureSemantics();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [settingsProvider.overrideWith(_Settings.new)],
-        child: const ReaderTypographyScope(
+        overrides: [
+          settingsProvider.overrideWith(_Settings.new),
+          prayerMenuCategoriesProvider.overrideWithValue([category]),
+        ],
+        child: ReaderTypographyScope(
           useSystemFonts: true,
           child: MaterialApp(
+            theme: ThemeData.dark(),
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(1.8)),
+              child: child!,
+            ),
             home: Scaffold(
-              body: SingleChildScrollView(
-                child: PrayerCategoryCommentSection(
-                  comment: PrayerCategoryComment(
-                    content:
-                        'Тэкст **каментарыя**. [Спасылка](/prayer/example)\n\n'
-                        ':::rubric\nПрыклад рубрыкі.\n:::\n\n'
-                        '[Небяспечная спасылка](javascript:alert%281%29)',
-                    sourceId: 'ojcha-nash-2022',
-                  ),
-                ),
+              body: PrayerCategoryCommentButton(
+                category: category,
+                onOpenPrayer: (location) => openedPrayer = location,
               ),
             ),
           ),
         ),
       ),
     );
-    final tile = find.ancestor(
-      of: find.byType(ListTile),
-      matching: find.byType(MergeSemantics),
-    );
-    final body = find.byType(Html);
+    final chip = find.widgetWithText(TextButton, 'Пра гэты раздзел');
     final source = find.text('Крыніца: Малітоўнік «Ойча наш» (Мінск, 2022)');
+    final body = find.byType(Html);
+    final close = find.byTooltip('Закрыць');
     expect(body, findsNothing);
-    expect(source, findsNothing);
-    final collapsed = tester.getSemantics(tile).getSemanticsData();
-    expect(collapsed.flagsCollection.isExpanded, Tristate.isFalse);
-    expect(collapsed.flagsCollection.isButton, isTrue);
-    expect(collapsed.hasAction(SemanticsAction.tap), isTrue);
+    final control = tester.getSemantics(chip).getSemanticsData();
+    expect(control.flagsCollection.isButton, isTrue);
+    expect(control.hasAction(SemanticsAction.tap), isTrue);
+    semantics.dispose();
+    expect(tester.getSize(chip).height, greaterThanOrEqualTo(48));
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
-    expect(
-      tester.getSemantics(tile).flagsCollection.isExpanded,
-      Tristate.isTrue,
-    );
-    final html = tester.widget<Html>(body);
+    expect(close, findsOneWidget);
+    expect(find.text('Прыклад катэгорыі'), findsOneWidget);
+    final html = tester.widget<Html>(body.first);
     expect(html.data, contains('<strong>каментарыя</strong>'));
     expect(html.data, contains('href="/prayer/example"'));
     expect(html.data, contains('class="prayer-rubric"'));
     expect(html.data, isNot(contains('href="javascript:')));
     expect(html.style['body']!.fontSize!.value, 24);
+    final viewport = find.byKey(const Key('category-comment-reader-scroll'));
+    final scroll = tester.state<ScrollableState>(
+      find.descendant(of: viewport, matching: find.byType(Scrollable)).first,
+    );
+    await tester.drag(viewport, const Offset(0, -450));
+    await tester.pumpAndSettle();
+    expect(scroll.position.pixels, greaterThan(0));
     expect(source, findsOneWidget);
+    expect(close.hitTestable(), findsOneWidget);
 
-    await tester.tap(find.text('Пра гэты раздзел'));
+    await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(body, findsNothing);
-    expect(source, findsNothing);
+    expect(chip, findsOneWidget);
+
+    await tester.tap(chip);
+    await tester.pumpAndSettle();
+    tester.widget<Html>(body.first).onLinkTap!('/prayer/example', {}, null);
+    await tester.pumpAndSettle();
+    expect(close, findsNothing);
+    expect(openedPrayer, '/prayers/prayer/example');
   });
 }
