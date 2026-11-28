@@ -49,7 +49,7 @@ class NovenaBlock {
     prayerId: data['prayerId'] as String?,
   );
 
-  /// `text`, `rubric`, `prayer` or `section`.
+  /// `text`, `rubric`, `prayer`, `section` or `part` (always folded).
   final String kind;
   final String? title;
   final String markdown;
@@ -168,6 +168,26 @@ class NovenaDefinition {
     required this.days,
     required this.schedule,
   });
+
+  /// A tracker whose days the app assembles itself (no document, no
+  /// recommended date): only its identity and length are used.
+  factory NovenaDefinition.builtIn({
+    required String novenaId,
+    required String title,
+    required int durationDays,
+  }) => NovenaDefinition._(
+    schemaVersion: kNovenaSchemaVersion,
+    novenaId: novenaId,
+    sourcePrayerId: novenaId,
+    title: title,
+    contentVersion: 1,
+    durationDays: durationDays,
+    status: 'published',
+    trackerEnabled: true,
+    template: const [],
+    days: const [],
+    schedule: const {},
+  );
 
   /// Null when the document does not have the shape of a definition.
   static NovenaDefinition? tryParse(Map data) {

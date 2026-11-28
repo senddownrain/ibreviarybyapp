@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mybrev_flutter/novena/novena_providers.dart';
 import 'package:mybrev_flutter/novena/novena_session.dart';
 import 'package:mybrev_flutter/novena/novena_strings.dart';
+import 'package:mybrev_flutter/novena/pompeii.dart';
 import 'package:mybrev_flutter/novena/ui/novena_actions.dart';
 import 'package:mybrev_flutter/novena/ui/novena_day_strip.dart';
 
@@ -56,6 +57,7 @@ class NovenaSessionCard extends ConsumerWidget {
         ? 'Пачатак ${novenaDate(session.startDate)}'
         : novenaDayOf(day, session.durationDays);
     final doneToday = day >= 1 && session.completedDays.contains(day);
+    final pompeii = session.novenaId == kPompeiiNovenaId;
     return NovenaCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,11 +103,27 @@ class NovenaSessionCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 8),
-          NovenaDayStrip(
-            session: session,
-            today: today,
-            onSelect: (day) => openNovenaDay(context, session, day),
-          ),
+          if (pompeii && title != null) ...[
+            // The list: no 54 circles, the phase and one quiet line.
+            Text(
+              pompeiiPhaseTitle(day.clamp(1, kPompeiiDays)),
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 6),
+            LinearProgressIndicator(
+              key: const Key('novena-bar'),
+              value: session.completedCount / session.durationDays,
+              semanticsLabel: novenaDoneOf(
+                session.completedCount,
+                session.durationDays,
+              ),
+            ),
+          ] else
+            NovenaDayStrip(
+              session: session,
+              today: today,
+              onSelect: (day) => openNovenaDay(context, session, day),
+            ),
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,

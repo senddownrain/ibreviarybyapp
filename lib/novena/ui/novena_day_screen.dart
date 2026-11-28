@@ -5,6 +5,8 @@ import 'package:mybrev_flutter/novena/novena_definition.dart';
 import 'package:mybrev_flutter/novena/novena_providers.dart';
 import 'package:mybrev_flutter/novena/novena_session.dart';
 import 'package:mybrev_flutter/novena/novena_strings.dart';
+import 'package:mybrev_flutter/novena/pompeii.dart';
+import 'package:mybrev_flutter/novena/ui/novena_pompeii.dart';
 import 'package:mybrev_flutter/novena/ui/novena_actions.dart';
 import 'package:mybrev_flutter/novena/ui/novena_day_strip.dart';
 import 'package:mybrev_flutter/novena/ui/novena_markdown.dart';
@@ -29,6 +31,9 @@ class NovenaDayScreen extends ConsumerStatefulWidget {
 class _NovenaDayScreenState extends ConsumerState<NovenaDayScreen> {
   final _scroll = ScrollController();
   late int _day = widget.day;
+
+  /// A 54-day novena: the grouped grid of all days instead of one row.
+  bool _allDays = false;
   late final List<List<NovenaBlock>>? _snapshot = ref
       .read(novenaStoreProvider)
       .snapshot(widget.sessionId);
@@ -70,6 +75,7 @@ class _NovenaDayScreenState extends ConsumerState<NovenaDayScreen> {
     final day = _day.clamp(1, days.length);
     final compact = state.compact;
     final cs = Theme.of(context).colorScheme;
+    final pompeii = session.novenaId == kPompeiiNovenaId;
 
     return ReadingScaffold(
       builder: (context, textStyle) => ReaderScaffold(
@@ -81,18 +87,41 @@ class _NovenaDayScreenState extends ConsumerState<NovenaDayScreen> {
         contextHeader: ReaderContextHeader(
           eyebrow:
               '${novenaDate(session.dateOfDay(day))} · '
-              '${novenaDayOf(day, session.durationDays)}',
+              '${novenaDayOf(day, session.durationDays)}'
+              '${pompeii ? ' · ${pompeiiPhaseTitle(day).toUpperCase()}' : ''}',
           title: session.title,
           accentColor: cs.tertiary,
           details: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (pompeii) ...[
+                Text(
+                  '${novenaDoneOf(session.completedCount, session.durationDays)}'
+                  ' · ${novenaRemaining(session.remainingCount).toLowerCase()}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+              ],
+              // One row of nine like any novena; all 54 are one tap away.
               NovenaDayStrip(
                 session: session,
                 today: today,
                 selected: day,
                 onSelect: _select,
+                cycleOfDay: pompeii && !_allDays ? day : null,
               ),
+              if (pompeii)
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    TextButton(
+                      key: const Key('novena-all-days'),
+                      onPressed: () => setState(() => _allDays = !_allDays),
+                      child: Text(_allDays ? 'Схаваць дні' : 'Усе 54 дні'),
+                    ),
+                    const PompeiiOrderLink(prayerId: kPompeiiNovenaId),
+                  ],
+                ),
               const SizedBox(height: 10),
               SegmentedButton<bool>(
                 key: const Key('novena-reading-mode'),
@@ -284,12 +313,14 @@ class _NovenaBlockViewState extends State<NovenaBlockView> {
       padding: const EdgeInsets.only(bottom: 8),
       child: body,
     );
-    if (block.kind != 'prayer' || title.isEmpty) return padded;
+    final part = block.kind == 'part';
+    if ((block.kind != 'prayer' && !part) || title.isEmpty) return padded;
     final reader = ReaderTheme.of(context);
     final heading = reader
         .blockHeading(widget.textStyle.fontSize ?? 16)
         .copyWith(color: reader.rubric);
-    if (!widget.compact || !block.collapsible) {
+    // A part of the Rosary is opened when it is prayed, in both modes.
+    if (!part && (!widget.compact || !block.collapsible)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

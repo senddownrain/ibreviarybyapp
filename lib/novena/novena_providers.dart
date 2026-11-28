@@ -6,6 +6,7 @@ import 'package:mybrev_flutter/novena/novena_definition.dart';
 import 'package:mybrev_flutter/novena/novena_schedule.dart';
 import 'package:mybrev_flutter/novena/novena_session.dart';
 import 'package:mybrev_flutter/novena/novena_store.dart';
+import 'package:mybrev_flutter/novena/pompeii.dart';
 import 'package:mybrev_flutter/ordo/dates.dart';
 import 'package:mybrev_flutter/ordo/runtime.dart';
 import 'package:mybrev_flutter/providers/cache_epoch_provider.dart';
@@ -157,6 +158,21 @@ final supportedNovenaProvider = Provider.family<SupportedNovena?, String>((
   ref,
   prayerId,
 ) {
+  if (prayerId == kPompeiiNovenaId) {
+    final prayers = ref.watch(novenaPublicPrayersProvider);
+    if (prayers == null) return null;
+    final days = pompeiiDays(prayers);
+    return days == null
+        ? null
+        : SupportedNovena(
+            NovenaDefinition.builtIn(
+              novenaId: kPompeiiNovenaId,
+              title: prayers[kPompeiiNovenaId]!.title,
+              durationDays: kPompeiiDays,
+            ),
+            days,
+          );
+  }
   final definition = ref.watch(
     novenaDefinitionsProvider.select(
       (all) => all.values

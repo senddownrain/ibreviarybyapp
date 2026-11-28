@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/novena/novena_providers.dart';
 import 'package:mybrev_flutter/novena/novena_strings.dart';
+import 'package:mybrev_flutter/novena/pompeii.dart';
+import 'package:mybrev_flutter/novena/ui/novena_pompeii.dart';
 import 'package:mybrev_flutter/novena/ui/novena_actions.dart';
 import 'package:mybrev_flutter/novena/ui/novena_routes.dart';
 import 'package:mybrev_flutter/novena/ui/novena_session_card.dart';
@@ -37,7 +39,17 @@ class NovenaPrayerPanel extends ConsumerWidget {
       // Application text inside the reader surface, not prayer text.
       child: SelectionContainer.disabled(
         child: session != null
-            ? NovenaSessionCard(session: session, footer: historyLink)
+            ? NovenaSessionCard(
+                session: session,
+                footer: prayerId == kPompeiiNovenaId
+                    ? Column(
+                        children: [
+                          PompeiiOrderLink(prayerId: prayerId),
+                          historyLink,
+                        ],
+                      )
+                    : historyLink,
+              )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -49,6 +61,11 @@ class NovenaPrayerPanel extends ConsumerWidget {
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: 8),
+                    if (prayerId == kPompeiiNovenaId) ...[
+                      const PompeiiPhasesCard(),
+                      PompeiiOrderLink(prayerId: prayerId),
+                      const SizedBox(height: 4),
+                    ],
                     FilledButton(
                       key: const Key('novena-start'),
                       onPressed: () => runNovenaChange(

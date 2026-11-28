@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybrev_flutter/novena/novena_providers.dart';
 import 'package:mybrev_flutter/novena/novena_session.dart';
+import 'package:mybrev_flutter/novena/pompeii.dart';
 import 'package:mybrev_flutter/novena/novena_strings.dart';
 import 'package:mybrev_flutter/novena/ui/novena_actions.dart';
 import 'package:mybrev_flutter/novena/ui/novena_routes.dart';
@@ -151,10 +152,14 @@ class _NovenaChoice extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prayers = ref.watch(novenaPublicPrayersProvider);
     final all = ref.watch(novenaDefinitionsProvider).values;
+    final pompeii = ref.watch(supportedNovenaProvider(kPompeiiNovenaId));
     final items = [
       if (prayers != null)
         for (final definition in all)
-          if (prayers.containsKey(definition.sourcePrayerId)) definition,
+          if (prayers.containsKey(definition.sourcePrayerId) &&
+              definition.sourcePrayerId != kPompeiiNovenaId)
+            definition,
+      if (pompeii != null) pompeii.definition,
     ]..sort((a, b) => a.title.compareTo(b.title));
     if (items.isEmpty) {
       return const Padding(

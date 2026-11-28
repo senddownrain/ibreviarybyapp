@@ -151,10 +151,17 @@ class NovenaStore {
     final data = _decode('$_snapshot$sessionId');
     if (data == null) return null;
     try {
-      return [
+      final days = [
         for (final day in data['days'] as List)
           [for (final block in day as List) NovenaBlock.fromMap(block as Map)],
       ];
+      // A long novena stores each different day once and the order of days.
+      final order = data['order'] as List?;
+      return order == null
+          ? days
+          : [for (final index in order) days[index as int]];
+    } on RangeError {
+      return null;
     } on TypeError {
       return null;
     }
@@ -195,12 +202,23 @@ class NovenaStore {
       durationDays: definition.durationDays,
     );
     // The texts first: a session record never lacks its snapshot.
+    final distinct = <List<NovenaBlock>>[];
+    final order = <int>[];
+    for (final day in days) {
+      var index = distinct.indexWhere((other) => identical(other, day));
+      if (index < 0) {
+        index = distinct.length;
+        distinct.add(day);
+      }
+      order.add(index);
+    }
     await box.write(
       '$_snapshot$id',
       jsonEncode({
         'days': [
-          for (final day in days) [for (final block in day) block.toMap()],
+          for (final day in distinct) [for (final block in day) block.toMap()],
         ],
+        if (distinct.length != days.length) 'order': order,
       }),
     );
     await _put(session);
