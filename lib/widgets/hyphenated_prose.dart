@@ -135,12 +135,12 @@ class HyphenatedHtml extends StatelessWidget {
   Widget _blocks(BuildContext context) {
     // A paragraph style we cannot reproduce keeps the whole document stock.
     if (!isReproducibleParagraphStyle(style['p'])) {
-      return _stock(data, selected);
+      return _stock(alignUnsupportedProse(data), selected);
     }
     final blocks = splitProseBlocks(data, style);
-    // Nothing to hyphenate → identical to the old widget.
+    // Nothing to hyphenate → one `Html`, as before.
     if (!blocks.any((b) => b.prose != null)) {
-      return _stock(data, selected);
+      return _stock(alignUnsupportedProse(data), selected);
     }
     final base = proseBaseStyle(style);
     final children = <Widget>[];
@@ -194,6 +194,8 @@ class HyphenatedHtml extends StatelessWidget {
       if (styles['p']?.textAlign != null) {
         styles['p']!.textAlign = shown;
       }
+      // Running text we cannot hyphenate is never justified (no huge gaps).
+      styles['.$proseLeftClass'] = Style(textAlign: TextAlign.left);
       return Html(data: html, style: styles, onLinkTap: onLinkTap);
     },
   );
@@ -230,9 +232,69 @@ final _verseSection = RegExp(
 
 /// Antiphons and versicle/response dialogues ("1 ант.", "К.", "Н.:", "℟").
 final _antiphonOrDialogue = RegExp(
-  r'^\s*((\d+\s*)?(ант\.|ант\s|антыфона)|[КНСЦВVR]\s*[.:]|[℣℟])',
+  r'^\s*((\d+\s*)?(ант\.|ант\s|антыфона)'
+  r'|(усе|народ|цэлебрант|святар|дыякан|біскуп|вядучы|лектар|кантар|хор|кіруючы)'
+  r'(\s+[а-яёіў]+){0,4}\s*:'
+  r'|[КНСЦЖМВVRC]\s*[.:]|[℣℟])',
   caseSensitive: false,
 );
+
+/// Marks running text that stays with the stock renderer: it is drawn
+/// left-aligned.
+const proseLeftClass = 'prose-left';
+
+final _responsorySection = RegExp('рэспансорый', caseSensitive: false);
+
+/// Left-aligns what we cannot hyphenate but would otherwise be stretched:
+/// liturgical dialogues ("Цэлебрант:", "Усе:", "К.", "Н.") and running
+/// paragraphs / list items with links or other unsupported markup. Verses,
+/// psalmody (`*`, `†`), rubrics, headings, classed, centred and right-aligned
+/// text and responsory sections are not touched.
+void _alignLeftIfRunningText(
+  dom.Element root, {
+  required bool verseSection,
+  required bool responsorySection,
+}) {
+  final candidates = [
+    if (root.localName == 'p' || root.localName == 'li') root,
+    ...root.querySelectorAll('p, li'),
+  ];
+  for (final e in candidates) {
+    if (e.classes.any((c) => !_allowedPClasses.contains(c)) ||
+        e.text.contains('*') ||
+        e.text.contains('†')) {
+      continue;
+    }
+    final style = (e.attributes['style'] ?? '').replaceAll(RegExp(r'\s'), '');
+    if (style.contains('text-align:center') ||
+        style.contains('text-align:right')) {
+      continue;
+    }
+    final dialogue =
+        e.querySelector('.prayer-speaker') != null ||
+        _antiphonOrDialogue.hasMatch(e.text);
+    final verse = verseSection || e.querySelector('br') != null;
+    if (dialogue ? responsorySection : verse) {
+      continue;
+    }
+    e.classes.add(proseLeftClass);
+    // An inline `text-align` would beat the class rule.
+    final rest = (e.attributes['style'] ?? '')
+        .split(';')
+        .where((d) => d.trim().isNotEmpty && !d.contains('text-align'))
+        .join(';');
+    if (rest.isEmpty) {
+      e.attributes.remove('style');
+    } else {
+      e.attributes['style'] = rest;
+    }
+  }
+}
+
+/// The whole document with [_alignLeftIfRunningText] applied, still as one
+/// piece (used when nothing in it is hyphenated).
+String alignUnsupportedProse(String html) =>
+    splitProseBlocks(html, const {}, false).map((b) => b.html ?? '').join();
 
 bool? _opensVerseSection(dom.Element e) {
   final heading =
@@ -255,11 +317,13 @@ bool? _opensVerseSection(dom.Element e) {
 List<ProseBlock> splitProseBlocks(
   String html, [
   Map<String, Style> styles = const {},
+  bool hyphenate = true,
 ]) {
   final fragment = parseFragment(html);
   final out = <ProseBlock>[];
   final other = StringBuffer();
   var verseSection = false;
+  var responsorySection = false;
   void flush() {
     if (other.toString().trim().isNotEmpty) {
       out.add(ProseBlock.other(other.toString()));
@@ -269,12 +333,21 @@ List<ProseBlock> splitProseBlocks(
 
   for (final node in fragment.nodes) {
     if (node is dom.Element) {
-      verseSection = _opensVerseSection(node) ?? verseSection;
-      if (!verseSection && isProseParagraph(node, styles)) {
+      final verse = _opensVerseSection(node);
+      if (verse != null) {
+        verseSection = verse;
+        responsorySection = _responsorySection.hasMatch(node.text);
+      }
+      if (hyphenate && !verseSection && isProseParagraph(node, styles)) {
         flush();
         out.add(ProseBlock.prose(node));
         continue;
       }
+      _alignLeftIfRunningText(
+        node,
+        verseSection: verseSection,
+        responsorySection: responsorySection,
+      );
     }
     other.write(node is dom.Element ? node.outerHtml : node.text ?? '');
   }
@@ -344,8 +417,13 @@ bool isProseParagraph(dom.Element p, [Map<String, Style> styles = const {}]) {
       .split(';')
       .map((d) => d.replaceAll(RegExp(r'\s'), '').toLowerCase())
       .where((d) => d.isNotEmpty);
+  // `text-indent` is ignored by the stock renderer too (flutter_html has no
+  // support for it), and Office readings carry it on almost every paragraph.
   if (declarations.any(
-    (d) => d != 'text-align:justify' && d != 'text-align:left',
+    (d) =>
+        d != 'text-align:justify' &&
+        d != 'text-align:left' &&
+        !d.startsWith('text-indent:'),
   )) {
     return false;
   }
