@@ -20,7 +20,6 @@ import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/services/prayer_category_tree.dart';
 import 'package:mybrev_flutter/theme/glass.dart';
 import 'package:mybrev_flutter/theme/reader.dart';
-import 'package:mybrev_flutter/utils/prayer_link.dart';
 import 'package:mybrev_flutter/utils/system_insets.dart';
 import 'package:mybrev_flutter/widgets/floating_top_actions.dart';
 import 'package:mybrev_flutter/widgets/prayer_category_comment.dart';
@@ -339,9 +338,7 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
     );
     return _PrayerListPage(
       title: category.readerName,
-      subtitle: comment != null && prayers.isEmpty && node.children.isEmpty
-          ? null
-          : 'Малітвы гэтай катэгорыі',
+      subtitle: null,
       scrollController: _scrollController,
       scrollKey: PageStorageKey('prayer-category-${category.id}-scroll'),
       prayers: prayers,
@@ -349,21 +346,12 @@ class _PrayerCategoryScreenState extends ConsumerState<PrayerCategoryScreen> {
       emptyTitle: 'У гэтай катэгорыі няма малітваў',
       commentSection: comment == null
           ? null
-          : PrayerCategoryCommentSection(
-              key: ValueKey((
-                category.id,
-                category.isProtected
-                    ? ref.watch(
-                        priestAccessProvider.select((a) => a.generation),
-                      )
-                    : null,
-              )),
-              comment: comment,
-              resetOnChange: category.isProtected,
-              onLinkTap: (url, _, _) {
-                final location = prayerLinkLocation(url);
-                if (location != null) context.push(location);
-              },
+          : PrayerCategoryCommentButton(
+              category: category,
+              accessGeneration: category.isProtected
+                  ? ref.watch(priestAccessProvider.select((a) => a.generation))
+                  : null,
+              onOpenPrayer: (location) => context.push(location),
             ),
     );
   }
@@ -649,12 +637,12 @@ class _PrayerListPage extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(subtitle, style: TextStyle(color: cs.onSurfaceVariant)),
                 ],
+                if (commentSection case final comment?) ...[
+                  const SizedBox(height: 8),
+                  comment,
+                ],
                 const ProtectedCatalogControl(),
                 const SizedBox(height: 18),
-                if (commentSection case final comment?) ...[
-                  comment,
-                  const SizedBox(height: 12),
-                ],
                 for (final category in categories)
                   _CategoryRow(category: category),
                 if (categories.isNotEmpty && prayers.isNotEmpty)

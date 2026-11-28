@@ -104,5 +104,7 @@ Debug APK создаётся в `build/app/outputs/flutter-apk/app-debug.apk`.
 
 ## iOS
 
+Провайдеры App Check и проверки подписанных релизов описаны в [инструкции](docs/firebase-app-check.md).
+
 Проект содержит iOS-конфигурацию, однако собирать и запускать iPhone-версию
 нужно на macOS с Xcode.

@@ -60,7 +60,7 @@ void main() {
   setUp(() => BelarusianHyphenation.debugSet(hyph));
   tearDown(() => BelarusianHyphenation.debugSet(null));
 
-  group('proseLayoutFor (same ≥36 rule as the shipped adaptive alignment)', () {
+  group('proseLayoutFor (same ≥28 rule as the shipped adaptive alignment)', () {
     ProseLayout at(
       double w, {
       TextAlign saved = TextAlign.justify,
@@ -75,24 +75,25 @@ void main() {
     );
 
     test('B2 / D / fallback', () {
-      expect(at(360), ProseLayout.b2);
-      expect(at(359), ProseLayout.d);
+      expect(at(280), ProseLayout.b2);
+      expect(at(300), ProseLayout.b2);
+      expect(at(279), ProseLayout.d);
       expect(at(1000, saved: TextAlign.left), ProseLayout.d);
       expect(
-        at(360, h: null),
+        at(280, h: null),
         ProseLayout.b2,
       ); // `h ?? hyph`; explicit null below
       expect(
         proseLayoutFor(
           selected: TextAlign.justify,
-          maxWidth: 360,
+          maxWidth: 280,
           style: _style,
           textScaler: TextScaler.noScaling,
           hyphenator: null,
         ),
         ProseLayout.fallback,
       );
-      expect(at(360, s: const TextScaler.linear(1.5)), ProseLayout.d);
+      expect(at(400, s: const TextScaler.linear(1.5)), ProseLayout.d);
     });
 
     test('agrees with effectiveProseAlignment for many widths and scales', () {
@@ -189,7 +190,7 @@ void main() {
               selected: TextAlign.justify,
               style: _style,
             ),
-            300,
+            270,
           ),
         );
         expect(hyphRenders(t).single.justify, isFalse);
@@ -234,7 +235,7 @@ void main() {
               selected: TextAlign.justify,
               style: _style,
             ),
-            300,
+            270,
           ),
         );
         expect(

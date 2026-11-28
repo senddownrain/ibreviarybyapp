@@ -7,6 +7,8 @@ import 'package:hive/hive.dart';
 import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/content/content_store.dart';
 import 'package:mybrev_flutter/content/content_updater.dart';
+import 'package:mybrev_flutter/models/prayer_menu_category.dart'
+    show isPublishedPrayerCategory;
 import 'package:mybrev_flutter/providers/prayer_categories_provider.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
@@ -31,7 +33,17 @@ class _FixtureBundle extends CachingAssetBundle {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('shipped bundle still decodes categories without comments', () async {
+  test('legacy bundle still decodes categories without comments', () {
+    final bundle = decodeContentCollection(
+      File('$fixtureDirectory/$_categories.json.gz').readAsBytesSync(),
+    );
+    expect(bundle.docs, isNotEmpty);
+    for (final entry in bundle.docs.entries) {
+      expect(PrayerMenuCategory.global(entry.key, entry.value).comment, isNull);
+    }
+  });
+
+  test('shipped bundle decodes categories and preserves comments', () async {
     final data = await rootBundle.load(
       '$kContentAssetDir/$_categories.json.gz',
     );
@@ -40,7 +52,18 @@ void main() {
     );
     expect(bundle.docs, isNotEmpty);
     for (final entry in bundle.docs.entries) {
-      expect(PrayerMenuCategory.global(entry.key, entry.value).comment, isNull);
+      expect(documentHash(entry.value), bundle.hashes[entry.key]);
+      final category = PrayerMenuCategory.global(entry.key, entry.value);
+      final raw = entry.value['comment'];
+      if (raw is Map &&
+          isPublishedPrayerCategory(entry.value) &&
+          isPublishedPrayerCategory(raw) &&
+          raw['content'] is String &&
+          (raw['content'] as String).trim().isNotEmpty) {
+        expect(category.comment?.content, raw['content'], reason: entry.key);
+      } else {
+        expect(category.comment, isNull, reason: entry.key);
+      }
     }
   });
 

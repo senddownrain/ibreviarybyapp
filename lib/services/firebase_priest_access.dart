@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:mybrev_flutter/models/priest_access_content.dart';
 import 'package:mybrev_flutter/services/access_sets_v2_code.dart';
 import 'package:mybrev_flutter/services/access_sets_v2_gateway.dart';
+import 'package:mybrev_flutter/services/firebase_app_check.dart';
 import 'package:mybrev_flutter/services/priest_access_gateway.dart';
 import 'package:mybrev_flutter/utils/firestore_cache.dart';
 
@@ -105,6 +106,7 @@ class FirebasePriestAccess
           name: appName,
           options: Firebase.app().options,
         );
+    await activateFirebaseAppCheck(_app!);
     _auth = FirebaseAuth.instanceFor(app: _app!);
     // A fresh delegate is required after terminate: cloud_firestore caches its
     // high-level wrapper by app name, including a terminated web delegate.
