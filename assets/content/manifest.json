@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1795766373541,
-  "contentDate": "2026-11-27T07:59:33.541Z",
+  "contentVersion": 1795850430096,
+  "contentDate": "2026-11-28T07:20:30.096Z",
   "collections": {
     "days": {
       "file": "days.json.gz",
@@ -154,6 +154,15 @@
       "digest": "7dbc652d7cbcc5fb",
       "storedBytes": 787749,
       "bundleBytes": 113533
+    },
+    "novenaDefinitions": {
+      "file": "novenaDefinitions.json.gz",
+      "contentVersion": 1795850430096,
+      "contentDate": "2026-11-28T07:20:30.096Z",
+      "count": 55,
+      "digest": "077f4686b8d32840",
+      "storedBytes": 127042,
+      "bundleBytes": 18025
     }
   },
   "priestCacheCleanup": {

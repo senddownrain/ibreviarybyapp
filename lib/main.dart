@@ -17,6 +17,7 @@ import 'package:mybrev_flutter/discovery/tour/tour_host.dart';
 import 'package:mybrev_flutter/dev/discovery_qa_flags.dart';
 import 'package:mybrev_flutter/firebase_options.dart';
 import 'package:mybrev_flutter/hyphenation/hyphenation_service.dart';
+import 'package:mybrev_flutter/novena/novena_store.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/discovery/p2_navigation.dart';
 import 'package:mybrev_flutter/review/app_review_storage.dart';
@@ -116,6 +117,13 @@ void main() async {
     await Hive.openBox<String>(HiveAppReviewStorage.defaultBoxName);
   } catch (error) {
     debugPrint('[Review] box unavailable: $error');
+  }
+
+  // Novena progress stays on this device.
+  try {
+    await NovenaStore.open();
+  } catch (_) {
+    debugPrint('[Novena] storage unavailable');
   }
 
   runApp(

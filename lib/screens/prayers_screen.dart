@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:mybrev_flutter/novena/ui/novena_suggestion_card.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
 import 'package:mybrev_flutter/providers/admin_songbook_access_provider.dart';
 import 'package:mybrev_flutter/constants/prayer_category_icons.dart';
@@ -71,6 +72,7 @@ class PrayersScreen extends ConsumerWidget {
                   style: ReaderTheme.of(context).displayTitle(36),
                 ),
                 const ProtectedCatalogControl(),
+                const NovenaSuggestionSlot(),
                 const SizedBox(height: 22),
                 const _SectionTitle(title: 'Абраныя'),
                 if (favorites.isEmpty)

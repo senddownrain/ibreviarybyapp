@@ -66,6 +66,8 @@ const kContentCollections = [
   ...kOrdoCalendarCollections,
   'liturgicalProperTexts',
   ...kOrdoNotesCollections,
+  // Published novena structures of the tracker (contract: lib/novena).
+  'novenaDefinitions',
 ];
 
 /// The calendar definitions the Ordo engine is built from. One publication

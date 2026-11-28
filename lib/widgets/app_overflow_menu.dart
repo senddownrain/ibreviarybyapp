@@ -8,6 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:mybrev_flutter/feedback/feedback_models.dart';
 import 'package:mybrev_flutter/theme/platform_design.dart';
+import 'package:mybrev_flutter/novena/ui/novena_menu.dart';
 import 'package:mybrev_flutter/providers/settings_provider.dart';
 import 'package:mybrev_flutter/analytics/local_analytics.dart'
     show analyticsFeature;
@@ -96,6 +97,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
         ? null
         : feedbackLocationForMenuUri(_visibleUri(router));
     if (widget.showTextScale) analyticsFeature('text_settings_open');
+    final showNovenas = router != null && novenaMenuHasActive(context);
     final result = await showMenu<String>(
       context: context,
       useRootNavigator: true,
@@ -132,6 +134,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
               return _OverflowContent(
                 showTextScale: widget.showTextScale,
                 actions: actions,
+                showNovenas: showNovenas,
                 showReport: reportLocation != null,
                 onSelected: (value) => Navigator.pop(popupContext, value),
               );
@@ -145,7 +148,7 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
     _popupRoute = null;
     _open = false;
     if (!mounted || result == null) return;
-    if (result == 'settings' || result == 'about') {
+    if (result == 'settings' || result == 'about' || result == 'novenas') {
       context.push('/$result');
     } else if (result == 'report') {
       context.push(reportLocation!);
@@ -157,14 +160,16 @@ class _AppOverflowMenuState extends State<AppOverflowMenu> {
   @override
   Widget build(BuildContext context) => SizedBox.square(
     dimension: 48,
-    child: AdaptiveChromeSurface(
-      role: ChromeSurfaceRole.control,
-      borderRadius: BorderRadius.circular(24),
-      child: IconButton(
-        key: const Key('app-overflow-open'),
-        tooltip: 'Меню',
-        onPressed: _showMenu,
-        icon: const Icon(Icons.more_horiz_rounded, size: 24),
+    child: NovenaMenuBadge(
+      child: AdaptiveChromeSurface(
+        role: ChromeSurfaceRole.control,
+        borderRadius: BorderRadius.circular(24),
+        child: IconButton(
+          key: const Key('app-overflow-open'),
+          tooltip: 'Меню',
+          onPressed: _showMenu,
+          icon: const Icon(Icons.more_horiz_rounded, size: 24),
+        ),
       ),
     ),
   );
@@ -196,12 +201,14 @@ class _OverflowContent extends StatelessWidget {
   const _OverflowContent({
     required this.showTextScale,
     required this.actions,
+    required this.showNovenas,
     required this.showReport,
     required this.onSelected,
   });
 
   final bool showTextScale;
   final List<ReaderSecondaryAction> actions;
+  final bool showNovenas;
   final bool showReport;
   final ValueChanged<String> onSelected;
 
@@ -221,6 +228,8 @@ class _OverflowContent extends StatelessWidget {
           if (showTextScale ||
               actions.any((action) => action.label != kReportErrorLabel))
             const Divider(height: 16),
+          if (showNovenas)
+            _item('Мае навэнны', PhosphorIconsRegular.calendarCheck, 'novenas'),
           _item('Налады', PhosphorIconsRegular.gear, 'settings'),
           _item('Інфармацыя', PhosphorIconsRegular.info, 'about'),
           for (var index = 0; index < actions.length; index++)

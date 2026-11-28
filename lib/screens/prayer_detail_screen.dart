@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:mybrev_flutter/models/mass_ritual.dart';
 import 'package:mybrev_flutter/models/prayer.dart';
+import 'package:mybrev_flutter/novena/ui/novena_panel.dart';
 import 'package:mybrev_flutter/providers/mass_ritual_provider.dart';
 import 'package:mybrev_flutter/providers/prayers_provider.dart';
 import 'package:mybrev_flutter/providers/priest_access_provider.dart';
@@ -336,16 +337,32 @@ class _PrayerDetailScreenState extends ConsumerState<PrayerDetailScreen> {
                 padding: EdgeInsets.only(top: 48),
                 child: Center(child: CircularProgressIndicator()),
               )
-            : _buildContent(
-                context,
-                textPrayer,
-                textStyle,
-                massVariant: variant,
-                office: office,
+            : _withNovena(
+                p,
+                _buildContent(
+                  context,
+                  textPrayer,
+                  textStyle,
+                  massVariant: variant,
+                  office: office,
+                ),
               ),
       ),
     );
   }
+
+  /// The tracker block of a public novena, above the unchanged prayer.
+  Widget _withNovena(Prayer prayer, Widget content) =>
+      _isMass || prayer.isLocal || prayer.priestOnly
+      ? content
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            NovenaPrayerPanel(prayerId: prayer.id),
+            content,
+          ],
+        );
 
   /// The prayer holding a variant's text: the Mass prayer itself, a synced
   /// variant document, or the bundled fallback asset (null while loading).

@@ -18,6 +18,7 @@ import 'package:mybrev_flutter/utils/liturgical_vespers.dart';
 import 'package:mybrev_flutter/widgets/data_loading_notice.dart';
 import 'package:mybrev_flutter/widgets/loading/app_load_states.dart';
 import 'package:mybrev_flutter/widgets/horizontal_swipe_navigation.dart';
+import 'package:mybrev_flutter/novena/ui/novena_suggestion_card.dart';
 import 'package:mybrev_flutter/widgets/reader/reader_navigation.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -85,6 +86,7 @@ class HomeScreen extends ConsumerWidget {
                               onPrevious: () => dayNavigation.moveBy(-1),
                               onNext: () => dayNavigation.moveBy(1),
                             ),
+                            const NovenaSuggestionSlot(),
                             const SizedBox(height: 22),
                             if (selection.selected != null) ...[
                               // Keep Hour rows at their original 22 dp inset.
