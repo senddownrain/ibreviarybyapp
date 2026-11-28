@@ -46,8 +46,8 @@ class _Remote implements ContentRemote {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('the bundle ships it empty; a publication reaches the providers and '
-      'the calendar suggests on the start date', () async {
+  test('the bundle ships the published novenas; a later publication patches '
+      'them and the calendar suggests on the start date', () async {
     final directory = await Directory.systemTemp.createTemp('novena-content-');
     addTearDown(() async {
       await ContentStore.instance.idle();
@@ -58,23 +58,32 @@ void main() {
     await ContentStore.instance.idle();
     final collection = ContentStore.instance.collection(kNovenaCollection);
     expect(collection.isLoaded, isTrue);
-    expect(collection.length, 0);
+    expect(collection.length, 55);
 
-    // Every ready definition at once is still a patch, not a new release.
+    // What ships is published and assembles from the shipped public prayers.
+    final prayers = bundledPrayers();
+    for (final doc in bundledDocs(kNovenaCollection).values) {
+      final definition = NovenaDefinition.tryParse(doc)!;
+      expect(definition.isPublished, isTrue, reason: definition.title);
+      expect(
+        definition.resolveAll(prayers),
+        isNotNull,
+        reason: definition.title,
+      );
+    }
+
+    final docs = bundledDocs(kNovenaCollection);
+    final first = docs.keys.first;
     final remote = _Remote({
-      for (final data in readyDefinitions())
-        data['novenaId'] as String: {
-          ...data,
-          'id': data['novenaId'],
-          'status': 'published',
-          'trackerEnabled': true,
-        },
+      ...docs,
+      first: {...docs[first]!, 'contentVersion': 2},
     });
     final updater = ContentUpdater(remote: remote);
     final check = await updater.check();
     expect(check.kind, ContentCheckKind.patch);
     await updater.apply(check.plan!);
     expect(collection.length, 55);
+    expect((collection.get(first) as Map)['contentVersion'], 2);
 
     var now = DateTime(2027, 5, 7);
     final container = ProviderContainer(
