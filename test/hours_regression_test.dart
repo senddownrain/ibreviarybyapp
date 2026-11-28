@@ -36,6 +36,50 @@ void main() {
   bool rawInstruction(Object? value) =>
       value is String && value.toLowerCase().contains('з нядзелі і тыдня');
 
+  test('Advent Saturdays: I Vespers of Sundays I-III come from Saturday, '
+      'never from Sunday II Vespers', () {
+    for (final date in [
+      DateTime(2026, 11, 28),
+      DateTime(2026, 12, 5),
+      DateTime(2026, 12, 12),
+    ]) {
+      final today = service.contentForDate(date);
+      final tomorrow = service.contentForDate(
+        date.add(const Duration(days: 1)),
+      );
+      final saturday =
+          today.itemsDays[periodDayDocumentId(
+            today.ordo.period,
+            today.ordo.week,
+            today.ordo.dayOfWeek,
+          )]!;
+      final sunday = tomorrow.options
+          .firstWhere(
+            (o) => o.ordo?.optionId == today.ordo.evening.celebrationId,
+          )
+          .day!;
+      final first = resolveEveningOffice(
+        date: date,
+        selected: today.options.first.day!,
+        today: today,
+        tomorrow: tomorrow,
+      );
+      expect(first.isFirst, isTrue, reason: '$date');
+      for (final field in ['vesperAnt1', 'vesperAnt2', 'vesperR', 'vesperPr']) {
+        expect(
+          first.day.field(field),
+          saturday.field(field),
+          reason: '$date $field',
+        );
+      }
+      expect(
+        first.day.field('vesperAnt1'),
+        isNot(sunday.field('vesperAnt1')),
+        reason: '$date repeats II Vespers',
+      );
+    }
+  });
+
   test('Guardian Angels 02.10.2026: Proper antiphons, Lauds psalms of '
       'Sunday I, never the raw instruction', () {
     final content = service.contentForDate(DateTime(2026, 10, 2));

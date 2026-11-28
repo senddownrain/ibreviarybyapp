@@ -32,8 +32,26 @@ LiturgicalDay? resolveAdventDateAgainstPeriod(
   );
   if (resolved == null) return null;
   final data = resolved.toMap();
+  // Sunday IV of Advent on 17–24 December: «Верш, чытанні і рэспансорыі
+  // бяруцца з бягучага дня» — the verse and both readings (with responsories)
+  // belong to the calendar date, everything else to the Sunday.
+  final fourthSunday = dow == 1 && periodDay?.id == 'advent-w4-d1';
+  const datedReadingFields = [
+    'officeOfReadingsVers',
+    'officeOfReadingsR1',
+    'officeOfReadingsR2',
+  ];
   for (final field
       in (approvedOfficeSources['fields'] as List).cast<String>()) {
+    if (fourthSunday && datedReadingFields.contains(field)) {
+      final dated = dateDay?.field(field);
+      if (dated != null &&
+          dated.trim().isNotEmpty &&
+          !isFromDayReference(dated)) {
+        data[field] = dated;
+        continue;
+      }
+    }
     final dateProper = ['laudesAntBen', 'vesperAntMag'].contains(field);
     if ((dow == 1 && !dateProper) ||
         ['vesperPs1', 'vesperPs2', 'vesperPs3'].contains(field)) {
@@ -42,5 +60,7 @@ LiturgicalDay? resolveAdventDateAgainstPeriod(
   }
   data.remove('_fromDayFields');
   final day = LiturgicalDay.fromMap(data);
-  return dow == 1 ? day : applySeasonalWeekdayAntiphons(day, dow);
+  return dow == 1
+      ? day
+      : applySeasonalWeekdayAntiphons(day, dow, ownDay: dateDay);
 }

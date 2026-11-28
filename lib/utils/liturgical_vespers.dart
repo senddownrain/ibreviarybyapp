@@ -132,10 +132,18 @@ EveningOfficeResolution resolveEveningOffice({
     return EveningOfficeResolution(day: selected);
   }
 
+  // I Vespers of an Advent Sunday (I–III) are stored in the preceding
+  // Saturday's `vesper*` fields (the Sunday document holds II Vespers and has
+  // no `vesper1*`), exactly like an ordinary Sunday.
+  final adventSunday =
+      RegExp(
+        r'^temporal:advent-w[1-3]-d1$',
+      ).hasMatch(evening.celebrationId ?? '') &&
+      !hasFirstVespers(celebration);
   final ordinarySunday =
       date.weekday == DateTime.saturday &&
       legal?.ordo?.officeKind == 'sunday' &&
-      tomorrow.ordo.period == 'ordinary';
+      (tomorrow.ordo.period == 'ordinary' || adventSunday);
   final periodId = periodDayDocumentId(
     today.ordo.period,
     today.ordo.week,
