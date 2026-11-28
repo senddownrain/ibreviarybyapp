@@ -26,3 +26,9 @@ linter:
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+analyzer:
+  exclude:
+    # Isolated typography lab with its own pubspec/analysis_options
+    # (analyze it with: cd tool/hyphenation_lab && flutter analyze).
+    - tool/hyphenation_lab/**

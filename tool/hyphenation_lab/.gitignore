@@ -1,0 +1,6 @@
+.dart_tool/
+build/
+out/*.tmp
+.sdk/
+out/real_threshold.json
+out/real_modes.json

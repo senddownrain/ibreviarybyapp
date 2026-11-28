@@ -1,0 +1,45 @@
+ALL (4 fonts x 4 widths x 3 scales, ~38 real readings)
+   A: lines= 56344 bad= 24422 (43.3%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 56344 bad=  9500 (16.9%)  hyphenated=0.0%  justified-lines=16%
+  B2: lines= 54924 bad= 12989 (23.6%)  hyphenated=25.8%  justified-lines=100%
+   D: lines= 56302 bad=  5256 (9.3%)  hyphenated=2.2%  justified-lines=0%
+scale 1.0
+   A: lines= 11985 bad=  2787 (23.3%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 11985 bad=  1950 (16.3%)  hyphenated=0.0%  justified-lines=77%
+  B2: lines= 11802 bad=   759 (6.4%)  hyphenated=19.5%  justified-lines=100%
+   D: lines= 12080 bad=   162 (1.3%)  hyphenated=0.0%  justified-lines=0%
+scale 1.5
+   A: lines= 19745 bad=  8549 (43.3%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 19745 bad=  2524 (12.8%)  hyphenated=0.0%  justified-lines=0%
+  B2: lines= 19240 bad=  4506 (23.4%)  hyphenated=26.1%  justified-lines=100%
+   D: lines= 19786 bad=  1685 (8.5%)  hyphenated=1.5%  justified-lines=0%
+scale 1.8
+   A: lines= 24614 bad= 13086 (53.2%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 24614 bad=  5026 (20.4%)  hyphenated=0.0%  justified-lines=0%
+  B2: lines= 23882 bad=  7724 (32.3%)  hyphenated=28.7%  justified-lines=100%
+   D: lines= 24436 bad=  3409 (14.0%)  hyphenated=3.9%  justified-lines=0%
+narrow (<=360) and scale>=1.5
+   A: lines= 24954 bad= 13375 (53.6%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 24954 bad=  5227 (20.9%)  hyphenated=0.0%  justified-lines=0%
+  B2: lines= 24193 bad=  7978 (33.0%)  hyphenated=29.2%  justified-lines=100%
+   D: lines= 24752 bad=  3550 (14.3%)  hyphenated=4.1%  justified-lines=0%
+width 320
+   A: lines= 17107 bad=  8687 (50.8%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 17107 bad=  3466 (20.3%)  hyphenated=0.0%  justified-lines=5%
+  B2: lines= 16614 bad=  5093 (30.7%)  hyphenated=28.3%  justified-lines=100%
+   D: lines= 16988 bad=  2248 (13.2%)  hyphenated=3.9%  justified-lines=0%
+width 360
+   A: lines= 14608 bad=  6579 (45.0%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 14608 bad=  2815 (19.3%)  hyphenated=0.0%  justified-lines=21%
+  B2: lines= 14221 bad=  3461 (24.3%)  hyphenated=26.6%  justified-lines=100%
+   D: lines= 14591 bad=  1420 (9.7%)  hyphenated=2.3%  justified-lines=0%
+width 390
+   A: lines= 13097 bad=  5124 (39.1%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 13097 bad=  1955 (14.9%)  hyphenated=0.0%  justified-lines=21%
+  B2: lines= 12806 bad=  2613 (20.4%)  hyphenated=24.7%  justified-lines=100%
+   D: lines= 13139 bad=   994 (7.6%)  hyphenated=1.4%  justified-lines=0%
+width 430
+   A: lines= 11532 bad=  4032 (35.0%)  hyphenated=0.0%  justified-lines=100%
+  AD: lines= 11532 bad=  1264 (11.0%)  hyphenated=0.0%  justified-lines=21%
+  B2: lines= 11283 bad=  1822 (16.1%)  hyphenated=22.6%  justified-lines=100%
+   D: lines= 11584 bad=   594 (5.1%)  hyphenated=0.6%  justified-lines=0%
