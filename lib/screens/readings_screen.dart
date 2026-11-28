@@ -2197,7 +2197,12 @@ class _ReadingTextState extends ConsumerState<_ReadingText> {
         style: widget.textStyle.copyWith(height: ReaderTheme.bodyHeight),
       );
     }
-    return Text.rich(span, textAlign: alignment);
+    // Prose that stays with the stock renderer (rubric marks) is not
+    // justified, so it never gets huge word gaps; psalmody is unchanged.
+    return Text.rich(
+      span,
+      textAlign: widget.isProse && !widget.isPsalm ? TextAlign.left : alignment,
+    );
   }
 
   TextStyle _sentenceStyle(BuildContext context, String sentenceId) {

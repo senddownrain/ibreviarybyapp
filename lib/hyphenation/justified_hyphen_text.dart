@@ -35,7 +35,8 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
     this.hyphenate = true,
     this.minRight = 3,
     this.minLeft = 2,
-    this.shrink = 0.0,
+    this.shrink = defaultSpaceShrink,
+    this.maxGapRatio = defaultMaxGapRatio,
     this.textScaler = TextScaler.noScaling,
   });
 
@@ -50,6 +51,9 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
   /// rejected. 0 = never shrink (safe for sacred text readability).
   final double shrink;
 
+  /// See [defaultMaxGapRatio].
+  final double maxGapRatio;
+
   /// System/reader text scale (pass `MediaQuery.textScalerOf(context)`).
   final TextScaler textScaler;
 
@@ -63,6 +67,7 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
           minLeft: minLeft,
           minRight: minRight,
           shrink: shrink,
+          maxGapRatio: maxGapRatio,
           textScaler: textScaler,
         )
         ..registrar = SelectionContainer.maybeOf(context)
@@ -81,6 +86,7 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
       ..minLeft = minLeft
       ..minRight = minRight
       ..shrink = shrink
+      ..maxGapRatio = maxGapRatio
       ..textScaler = textScaler
       ..registrar = SelectionContainer.maybeOf(context)
       ..selectionColor = DefaultSelectionStyle.of(context).selectionColor;
@@ -88,6 +94,14 @@ class HyphenatedJustifiedText extends LeafRenderObjectWidget {
 }
 
 /// One laid-out line, exposed for metrics and tests.
+/// A justified word gap is never wider than this many natural spaces. A line
+/// that would need more is drawn left-aligned with natural spaces instead.
+const double defaultMaxGapRatio = 1.8;
+
+/// A justified line may squeeze its spaces by at most this share (to 80 %),
+/// which lets many more lines be filled. Never used for left-aligned text.
+const double defaultSpaceShrink = 0.2;
+
 class HyphLine {
   HyphLine({
     required this.text,
@@ -98,6 +112,7 @@ class HyphLine {
     required this.endsWithHyphen,
     required this.isLast,
     required this.pieceCount,
+    this.alignedLeft = false,
   });
 
   /// Visible text of the line without the painted hyphen.
@@ -110,10 +125,14 @@ class HyphLine {
 
   /// Last line of its paragraph (ragged, never stretched).
   final bool isLast;
+
+  /// In justified mode: this line could not be filled within the gap limit and
+  /// is drawn with natural spaces.
+  final bool alignedLeft;
   final int pieceCount;
 
   /// Extra width added per space when justified, in multiples of a normal space.
-  double get stretch => spaces == 0 || isLast
+  double get stretch => spaces == 0 || isLast || alignedLeft
       ? 0
       : (width - naturalWidth) / (spaces * spaceWidth);
 }
@@ -219,6 +238,7 @@ class RenderHyphenatedJustifiedText extends RenderBox
     required int minLeft,
     required int minRight,
     required double shrink,
+    double maxGapRatio = defaultMaxGapRatio,
     TextScaler textScaler = TextScaler.noScaling,
   }) : _text = text,
        _hyphenator = hyphenator,
@@ -227,6 +247,7 @@ class RenderHyphenatedJustifiedText extends RenderBox
        _minLeft = minLeft,
        _minRight = minRight,
        _shrink = shrink,
+       _maxGapRatio = maxGapRatio,
        _textScaler = textScaler;
 
   TextSpan _text;
@@ -236,6 +257,16 @@ class RenderHyphenatedJustifiedText extends RenderBox
   int _minLeft;
   int _minRight;
   double _shrink;
+  double _maxGapRatio;
+
+  set maxGapRatio(double v) {
+    if (_maxGapRatio == v) {
+      return;
+    }
+    _maxGapRatio = v;
+    _invalidate();
+  }
+
   TextScaler _textScaler;
 
   set textScaler(TextScaler v) {
@@ -318,6 +349,22 @@ class RenderHyphenatedJustifiedText extends RenderBox
 
   /// True for B2 (justified), false for D (ragged right).
   bool get justify => _justify;
+
+  /// Natural width of one space in this paragraph.
+  @visibleForTesting
+  double get spaceWidth => _spaceWidth;
+
+  /// Widths of the gaps between words exactly as painted, per line.
+  @visibleForTesting
+  List<List<double>> get paintedWordGaps => [
+    for (final line in _lines)
+      [
+        for (var k = 1; k < line.placed.length; k++)
+          if (line.placed[k].seg.start >
+              line.placed[k - 1].seg.start + line.placed[k - 1].seg.text.length)
+            line.placed[k].x - line.placed[k - 1].x - line.placed[k - 1].width,
+      ],
+  ];
 
   /// The original, unmodified text (what copy/semantics would expose).
   String get plainText => _plain;
@@ -514,18 +561,20 @@ class RenderHyphenatedJustifiedText extends RenderBox
     if (_hyphenate && h != null) {
       // Hyphenate only the pure-letter core, leaving punctuation outside.
       final m = _core.firstMatch(word);
-      // Proper names (capitalised words inside a sentence) are never split.
-      final properName =
+      // A capital inside a sentence is often not a name (reverential forms,
+      // "Усемагутны", "Адкупіцель"): such words may be split, but only when
+      // long, and never closer than three letters to the start.
+      final capital =
           m != null &&
           m.group(0)![0] != m.group(0)![0].toLowerCase() &&
           !_isSentenceStart(plain, start);
-      if (m != null && !properName && m.group(0)!.length >= 6) {
+      if (m != null && m.group(0)!.length >= (capital ? 7 : 6)) {
         // The whole token must be "core + punctuation" with a single core run.
         final rest = word.substring(0, m.start) + word.substring(m.end);
         if (!RegExp(r'[А-Яа-яЁёІіЎў0-9A-Za-z]').hasMatch(rest)) {
           final pts = h.hyphenationPoints(
             m.group(0)!,
-            minLeft: _minLeft,
+            minLeft: capital ? math.max(_minLeft, 3) : _minLeft,
             minRight: _minRight,
           );
           for (final p in pts) {
@@ -726,34 +775,48 @@ class RenderHyphenatedJustifiedText extends RenderBox
               demerits += 2500;
             }
           } else {
-            if (lineW > w + 0.01) {
-              if (spaces == 0 || (lineW - w) > spaces * _spaceWidth * _shrink) {
-                break;
-              }
+            // Only justified lines can squeeze their spaces.
+            final squeeze = _justify ? spaces * _spaceWidth * _shrink : 0.0;
+            if (lineW > w + 0.01 && (spaces == 0 || (lineW - w) > squeeze)) {
+              break;
             }
-            double badness;
             if (!_justify) {
-              // Ragged right: only the slack at the end of the line matters.
-              badness =
+              // Ragged right: only the slack at the end of the line matters,
+              // and hyphens stay rare.
+              final badness =
                   100 * math.pow(((w - lineW) / w * 4).clamp(0.0, 4.0), 3)
                       as double;
-            } else if (spaces == 0) {
-              // A one-word line cannot be justified: always at least as bad
-              // as the worst stretched line (cap 10000), worse the shorter it is.
-              badness = 10000 + 10000 * ((w - lineW) / w).clamp(0.0, 1.0);
-              if (lineW >= w - 0.5) badness = 0;
+              demerits = math.pow(10 + badness, 2) as double;
+              if (hyphenBreak) {
+                demerits += 120000;
+                if (ph >= 1) {
+                  demerits += 3000000 * ph;
+                }
+              }
             } else {
-              final r = (w - lineW) / (spaces * _spaceWidth);
-              badness = r < 0
-                  ? 100 * math.pow(-r / math.max(_shrink, 0.01), 3) as double
-                  : 100 * math.pow(r, 3) as double;
-              if (badness > 10000) badness = 10000;
-            }
-            demerits = math.pow(10 + badness, 2) as double;
-            if (hyphenBreak) {
-              // Scale matches (10+badness)²: ~ a line stretched r≈1.5.
-              demerits += 120000;
-              if (ph >= 1) demerits += 3000000 * ph; // consecutive hyphen lines
+              final slack = w - lineW;
+              final allowed = spaces * _spaceWidth * (_maxGapRatio - 1);
+              final double badness;
+              if (slack < -0.01) {
+                // Squeezed spaces.
+                badness = 100 * math.pow(-slack / squeeze, 3) as double;
+              } else if (slack <= 0.5) {
+                badness = 0;
+              } else if (slack <= allowed) {
+                // Justifiable: 0 (tight) … 100 (spaces at the limit).
+                badness = 100 * math.pow(slack / allowed, 3) as double;
+              } else {
+                // Cannot be justified: drawn left-aligned. No saturation, so
+                // a fuller line is always preferred to an emptier one.
+                final f = slack / w;
+                badness = 1000 + 4000 * f + 20000 * f * f;
+              }
+              demerits = math.pow(10 + badness, 2) as double;
+              // A legal Belarusian hyphen is much better than a loose or
+              // unjustified line; runs of hyphens only cost a little more.
+              if (hyphenBreak) {
+                demerits += 2500.0 * (1 + ph);
+              }
             }
           }
           // At most 3 hyphenated lines in a row (state 3 = three already).
@@ -761,7 +824,7 @@ class RenderHyphenatedJustifiedText extends RenderBox
             continue;
           }
           // Breaking at a glued space is allowed only when unavoidable.
-          if (honorGlue && items[j].glue && !isEndOfPara) demerits += 5e8;
+          if (honorGlue && items[j].glue && !isEndOfPara) demerits += 5e9;
           final h = hyphenBreak ? ph + 1 : 0;
           final total = base + demerits;
           if (total < best[j + 1][h]) {
@@ -815,8 +878,11 @@ class RenderHyphenatedJustifiedText extends RenderBox
     final showHyphen = hyphenBreak && !lastPiece.hardHyphen;
     final hyphenW = showHyphen ? (lastPiece.hyphenSeg?.width ?? 0) : 0.0;
     final lineNatural = natural + hyphenW;
-    final extra = _justify && !isLast && spaces > 0
-        ? math.max(w - lineNatural, -spaces * _spaceWidth * _shrink) / spaces
+    final slack = w - lineNatural;
+    final fits =
+        slack <= spaces * _spaceWidth * (_maxGapRatio - 1) + 0.01 && spaces > 0;
+    final extra = _justify && !isLast && fits
+        ? math.max(slack, -spaces * _spaceWidth * _shrink) / spaces
         : 0.0;
     var x = 0.0;
     final text = StringBuffer();
@@ -851,6 +917,7 @@ class RenderHyphenatedJustifiedText extends RenderBox
       height = lastPiece.segs.isEmpty ? 0 : lastPiece.segs.last.height;
     }
     final info = HyphLine(
+      alignedLeft: _justify && !isLast && !fits && slack > 0.5,
       text: text.toString(),
       naturalWidth: lineNatural,
       spaces: spaces,

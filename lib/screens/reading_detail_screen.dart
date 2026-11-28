@@ -176,7 +176,8 @@ class _ReadingDetailScreenState extends ConsumerState<ReadingDetailScreen> {
             ),
         ],
       ),
-      textAlign: alignment,
+      // Unsupported running text is never justified (no huge word gaps).
+      textAlign: TextAlign.left,
     );
   }
 }

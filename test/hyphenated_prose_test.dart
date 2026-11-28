@@ -11,6 +11,7 @@ import 'package:mybrev_flutter/content/content_bundle.dart';
 import 'package:mybrev_flutter/hyphenation/be_hyphenator.dart';
 import 'package:mybrev_flutter/hyphenation/hyphenation_service.dart';
 import 'package:mybrev_flutter/hyphenation/justified_hyphen_text.dart';
+import 'package:mybrev_flutter/utils/liturgical_html.dart';
 import 'package:mybrev_flutter/utils/prayer_markdown.dart';
 import 'package:mybrev_flutter/utils/reading_alignment.dart';
 import 'package:mybrev_flutter/widgets/hyphenated_prose.dart';
@@ -139,7 +140,14 @@ void main() {
         expect(isProse('<p class="liturgical-rubric">$prose</p>'), isFalse);
         expect(isProse('<p class="psalm-strophe">$prose</p>'), isFalse);
         expect(isProse('<p style="text-align: center;">$prose</p>'), isFalse);
-        expect(isProse('<p style="text-indent: 18pt;">$prose</p>'), isFalse);
+        // Ignored by the stock renderer, so it does not block hyphenation.
+        expect(
+          isProse(
+            '<p style="text-indent: 18pt; text-align: justify;">$prose</p>',
+          ),
+          isTrue,
+        );
+        expect(isProse('<p style="margin-left: 18pt;">$prose</p>'), isFalse);
         expect(
           isProse(
             '<p><span class="liturgical-rubric-inline">ПЕРШАЕ ЧЫТАННЕ ПЕРШАЕ ЧЫТАННЕ ПЕРШАЕ ЧЫТАННЕ</span></p>',
@@ -773,5 +781,306 @@ void main() {
       reason:
           'still measured with the fallback face: $linesBefore lines, $widthBefore',
     );
+  });
+
+  group('word gaps stay bounded', () {
+    const faces = {
+      'Literata': 'Literata-Regular',
+      'SourceSerif4': 'SourceSerif4-Regular',
+      'OldStandardTT': 'OldStandardTT-Regular',
+      'Kurale': 'Kurale-Regular',
+    };
+    Future<void> loadFaces(WidgetTester t) => t.runAsync(() async {
+      for (final face in faces.entries) {
+        final loader = FontLoader(face.key)
+          ..addFont(
+            File(
+              'assets/google_fonts/${face.value}.ttf',
+            ).readAsBytes().then((b) => ByteData.sublistView(b)),
+          );
+        await loader.load();
+      }
+    });
+
+    Map<String, dynamic> docs(String name) => decodeContentCollection(
+      File('assets/content/$name.json.gz').readAsBytesSync(),
+    ).docs;
+
+    /// The running text of the documents the problem was reported on.
+    List<String> realProse() {
+      final styles = <String, Style>{
+        'p': Style(margin: Margins.only(bottom: 8)),
+        '.liturgical-rubric-inline': Style(color: const Color(0xFF9B302A)),
+      };
+      final out = <String>[];
+      void html(String source) {
+        for (final block in splitProseBlocks(source, styles)) {
+          if (block.prose != null)
+            out.add(
+              proseSpan(block.prose!, styles, const TextStyle()).toPlainText(),
+            );
+        }
+      }
+
+      final prayers = docs('prayers');
+      for (final id in [
+        'sacraments-baptism-emergency-baptism-of-children',
+        'sacraments-eucharist-aquinas-before-communion',
+      ]) {
+        final doc = prayers[id]!;
+        html(
+          prayerMarkdownToHtml(
+            ((doc['textVersions'] as Map?)?['be'] ?? doc['text']) as String,
+          ),
+        );
+      }
+      final day = docs('days')['ordinary-w34-d6']!;
+      for (final key in ['officeOfReadingsR1', 'officeOfReadingsR2']) {
+        html(
+          formatLiturgicalHtml(
+            normalizeOfficeHtml(day[key] as String, officeReading: true),
+          ),
+        );
+      }
+      final readings = docs('readings');
+      for (final id in ['ordinary-w34-d6--1', 'ordinary-w34-d6--2']) {
+        for (final field in ['reading1', 'gospel']) {
+          out.add(
+            ((readings[id]![field] as Map)['text'] as String).replaceAll(
+              RegExp(r'\r?\n[ \t]*\r?\n+'),
+              '\n',
+            ),
+          );
+        }
+      }
+      return out;
+    }
+
+    testWidgets(
+      'real prayers, Mass readings and Office readings: no gap above 1.8 spaces, no overflow, no lost text',
+      (t) async {
+        await loadFaces(t);
+        final texts = realProse();
+        expect(texts.length, greaterThan(8));
+        // The patristic Office reading (`text-indent` paragraphs) is covered.
+        expect(
+          texts.any((text) => text.contains('Мы заўсёды павінны памятаць')),
+          isTrue,
+        );
+        t.view.physicalSize = const Size(900, 60000);
+        t.view.devicePixelRatio = 1;
+        addTearDown(t.view.reset);
+        var lines = 0, justified = 0;
+        for (final face in faces.keys) {
+          for (final width in [288.0, 328.0, 358.0, 398.0]) {
+            for (final size in [16.0, 20.8]) {
+              final style = TextStyle(
+                fontFamily: face,
+                fontSize: size,
+                height: 1.68,
+              );
+              for (final text in texts) {
+                await t.pumpWidget(
+                  host(
+                    HyphenatedJustifiedText(
+                      text: TextSpan(text: text, style: style),
+                      hyphenator: hyph,
+                    ),
+                    width,
+                  ),
+                );
+                final render = hyphRenders(t).single;
+                final gaps = render.paintedWordGaps;
+                final rebuilt = StringBuffer();
+                for (var i = 0; i < render.lines.length; i++) {
+                  final line = render.lines[i];
+                  lines++;
+                  if (!line.isLast && !line.alignedLeft) justified++;
+                  var painted = line.naturalWidth;
+                  for (final gap in gaps[i]) {
+                    expect(
+                      gap,
+                      lessThanOrEqualTo(
+                        render.spaceWidth * defaultMaxGapRatio + 0.05,
+                      ),
+                      reason: '$face $size w=$width "${line.text}"',
+                    );
+                    painted += gap - render.spaceWidth;
+                  }
+                  expect(
+                    painted,
+                    lessThanOrEqualTo(width + 0.6),
+                    reason: 'overflow: "${line.text}"',
+                  );
+                  rebuilt.write(line.text);
+                  if (i < render.lines.length - 1 &&
+                      !line.endsWithHyphen &&
+                      !line.text.endsWith('-')) {
+                    rebuilt.write(line.isLast ? '\n' : ' ');
+                  }
+                }
+                String flat(String s) =>
+                    s.replaceAll(RegExp(r'\s+'), ' ').trim();
+                expect(flat(rebuilt.toString()), flat(text));
+              }
+            }
+          }
+        }
+        // The limit must not simply turn the book setting into ragged text.
+        expect(
+          justified / lines,
+          greaterThan(0.4),
+          reason: '$justified of $lines lines justified',
+        );
+      },
+    );
+
+    testWidgets(
+      'a line that cannot be filled keeps natural spaces; left alignment never squeezes',
+      (t) async {
+        const style = TextStyle(fontSize: 10, height: 1.5);
+        // Ahem: "аб вг" is 5 em, the next word cannot join or break.
+        const text = 'аб вг ААААААААААААААААААААААААААААААААААААА деж';
+        await t.pumpWidget(
+          host(
+            HyphenatedJustifiedText(
+              text: const TextSpan(text: text, style: style),
+              hyphenator: hyph,
+            ),
+            400,
+          ),
+        );
+        var render = hyphRenders(t).single;
+        expect(render.lines.first.alignedLeft, isTrue);
+        expect(
+          render.paintedWordGaps.first.single,
+          closeTo(render.spaceWidth, 0.01),
+        );
+        await t.pumpWidget(
+          host(
+            HyphenatedJustifiedText(
+              text: const TextSpan(text: prose, style: style),
+              hyphenator: hyph,
+              justify: false,
+            ),
+            300,
+          ),
+        );
+        render = hyphRenders(t).single;
+        for (var i = 0; i < render.lines.length; i++) {
+          expect(render.lines[i].naturalWidth, lessThanOrEqualTo(300.5));
+          for (final gap in render.paintedWordGaps[i]) {
+            expect(gap, closeTo(render.spaceWidth, 0.01));
+          }
+        }
+      },
+    );
+
+    testWidgets(
+      'long capitalised words inside a sentence may break, short names and acronyms do not',
+      (t) async {
+        const style = TextStyle(fontSize: 10, height: 1.5);
+        final broken = <String>{};
+        const text = 'мы просім Усемагутнага Бога праз Езуса і ДАБРАСЛАЎЛЕННЕ';
+        for (var width = 150.0; width <= 320; width += 5) {
+          await t.pumpWidget(
+            host(
+              HyphenatedJustifiedText(
+                text: const TextSpan(text: text, style: style),
+                hyphenator: hyph,
+              ),
+              width,
+            ),
+          );
+          for (final line in hyphRenders(t).single.lines) {
+            if (line.endsWithHyphen) broken.add(line.text.split(' ').last);
+          }
+        }
+        expect(
+          broken.any((w) => w.startsWith('Уса') || w.startsWith('Усе')),
+          isTrue,
+          reason: '$broken',
+        );
+        expect(
+          broken.any((w) => w.startsWith('Ез') || w.startsWith('ДАБ')),
+          isFalse,
+          reason: '$broken',
+        );
+        expect(
+          broken.any((w) => w == 'Ус'),
+          isFalse,
+          reason: 'at least three letters stay: $broken',
+        );
+      },
+    );
+
+    testWidgets(
+      'dialogues and unsupported running text are left-aligned; verses and centred titles are untouched',
+      (t) async {
+        final styles = <String, Style>{
+          'body': Style(
+            fontSize: FontSize(10),
+            textAlign: TextAlign.justify,
+            margin: Margins.zero,
+          ),
+          'p': Style(
+            textAlign: TextAlign.justify,
+            margin: Margins.only(bottom: 8),
+          ),
+          '.prayer-speaker': Style(color: const Color(0xFF9B302A)),
+        };
+        const html =
+            '<p><span class="prayer-speaker">Цэлебрант:</span> Молімся, каб праз хрост Ты далучыў гэтае дзіця да Касцёла.</p>'
+            '<p><span class="prayer-speaker">Усе:</span> <em>Цябе просім, выслухай нас, Пане.</em></p>'
+            '<p style="text-align: justify;">Народ адказвае: Дзякуй Богу за ўсе дабрадзействы Ягоныя.</p>'
+            '<p style="text-align: justify;">Глядзі <a href="https://example.invalid/x">спасылку</a> і чытай далей гэты доўгі абзац.</p>'
+            '<p>Божа мой, Цябе шукаю, *<br />Цябе прагне душа мая.</p>'
+            '<p style="text-align: center;">Назва раздзела па цэнтры</p>';
+        await t.pumpWidget(
+          host(
+            HyphenatedHtml(
+              data: html,
+              style: styles,
+              selected: TextAlign.justify,
+            ),
+            400,
+          ),
+        );
+        await t.pumpAndSettle();
+        TextAlign alignOf(String needle) => t.allRenderObjects
+            .whereType<RenderParagraph>()
+            .firstWhere(
+              (p) =>
+                  p.text.toPlainText().contains(needle) &&
+                  !p.text.toPlainText().contains('￼'),
+            )
+            .textAlign;
+        expect(alignOf('Молімся'), TextAlign.left);
+        expect(alignOf('Цябе просім'), TextAlign.left);
+        expect(alignOf('Народ адказвае'), TextAlign.left);
+        expect(alignOf('спасылку'), TextAlign.left);
+        expect(
+          alignOf('Цябе прагне'),
+          TextAlign.justify,
+          reason: 'psalm verse unchanged',
+        );
+        // formatting and the red speaker survive
+        final aligned = alignUnsupportedProse(html);
+        expect(aligned, contains('class="prayer-speaker"'));
+        expect(aligned, contains('<em>'));
+        expect(aligned, contains('href="https://example.invalid/x"'));
+        // centred titles keep their own style: not re-aligned by this rule
+        expect(
+          aligned,
+          contains('<p style="text-align: center;">Назва раздзела'),
+        );
+      },
+    );
+
+    test('responsory sections are not re-aligned', () {
+      const html =
+          '<h3>Рэспансорый</h3><p><span class="prayer-speaker">К.</span> Пане, пачуй малітву маю.</p>';
+      expect(alignUnsupportedProse(html), isNot(contains(proseLeftClass)));
+    });
   });
 }
