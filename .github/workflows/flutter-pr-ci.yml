@@ -34,6 +34,10 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
+      - name: App Check platform selection and emulator bypass
+        run: |
+          flutter test --no-pub test/services/firebase_app_check_test.dart
+          flutter test --no-pub --dart-define=PRIEST_USE_EMULATORS=true test/services/firebase_app_check_test.dart
       - name: Five Flutter visual acceptance screenshots
         env:
           READER_UI_ACCEPTANCE_IMAGES: '1'
@@ -235,6 +239,8 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
+      - name: Flutter Web App Check provider with a synthetic key
+        run: flutter test --no-pub --platform chrome --dart-define=FIREBASE_APP_CHECK_SITE_KEY=test-key test/services/firebase_app_check_test.dart
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
